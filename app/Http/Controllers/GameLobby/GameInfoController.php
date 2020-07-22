@@ -11,6 +11,16 @@ use DB;
 
 class GameInfoController extends Controller
 {
+	public function getDemoGame(Request $request){
+	 	$games = DB::table('games as g')
+                ->select('g.game_demo')
+                ->leftJoin('providers as p', "g.provider_id", "=", "p.provider_id")
+                ->where('g.game_code', $request->game_code)
+                ->where('p.provider_name', $request->game_provider)
+                ->first();
+        // return $games ? $games : false;        
+        return json_encode($games);        
+	}
 
 	public function getNewestGames(Request $request){
 	
@@ -23,7 +33,6 @@ class GameInfoController extends Controller
                 ->get();
         return $games;        
 	}
-
 
 	public function getMostPlayed(Request $request){
 		// $games = DB::table('games as g')
@@ -80,7 +89,6 @@ class GameInfoController extends Controller
         return $games;        
 	}
 
-
 	public function getBetList(Request $request){
 		// return $request->sample;
 
@@ -99,7 +107,6 @@ class GameInfoController extends Controller
 		// return '11';	
 	}
 
-
 	public function getTopProvider(Request $request){
 	    $data = array();
 	    $provider = DB::table('game_transactions as gt')
@@ -111,6 +118,7 @@ class GameInfoController extends Controller
 	  			 ->orderBy('total', 'DESC')
 	  			 ->limit(1)
 	  			 ->get();
+	  	
 	  	foreach ($provider as $pro) {
 	  		$data['provider'] = $pro;
 	  	}
@@ -121,9 +129,14 @@ class GameInfoController extends Controller
                 ->where('p.provider_id', $data['provider']->provider_id)
                 ->get();
         $data['games'] = $games;          
-        return $data;    
+        return $data ? $data : false;    
 	}
 
+	
+	/*
+	 * DEPRECATED
+	 *
+	 */
 	public function getGameSuggestions(Request $request){			
 		 $player_details = $this->_getClientDetails('token', $request->token);
          $query = DB::table("game_suggestions AS gs")
@@ -141,13 +154,57 @@ class GameInfoController extends Controller
             array_push($game_suggestions[$value->classification], $value);
         }
 
-        // $player_data = [
-        //     'player_details' => $player_details,
-        //     'game_suggestions' => $game_suggestions,
-        //     'client_code' => $client_details['client_code']
-        // ];
+        $player_data = [
+            'player_details' => $player_details,
+            'game_suggestions' => $game_suggestions,
+            'client_code' => $client_details['client_code']
+        ];
 
         return $game_suggestions;
+	}
+
+
+
+	/**
+	 *	@return client player details 
+	 *	@param accept player_id, token
+	 */
+	public function getClientPlayerDetails(Request $request){
+			if($request->has('player_id')){
+				$client_details = $this->_getClientDetails('player_id', $request->player_id);
+			}else if($request->has('token')){
+				$client_details = $this->_getClientDetails('token', $request->token);
+			}else{
+				return ['status' => 'failed'];
+			}
+
+		    $client = new Client([
+			    'headers' => [ 
+			    	'Content-Type' => 'application/json',
+			    	'Authorization' => 'Bearer '.$client_details->client_access_token
+			    ]
+			]);
+			$datatosend = ["access_token" => $client_details->client_access_token,
+				"hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+				"type" => "playerdetailsrequest",
+				"datesent" => Helper::datesent(),
+				"gameid" => "",
+				"clientid" => $client_details->client_id,
+				"playerdetailsrequest" => [
+					"client_player_id" => $client_details->client_player_id,
+					"token" => $client_details->player_token ? $client_details->player_token : '',
+					"username" => $client_details->username ? $client_details->username : '',
+					"gamelaunch" => false,
+					"refreshtoken" => $request->has('refreshtoken') ? true : false,
+				]
+			];
+
+			$guzzle_response = $client->post($client_details->player_details_url,
+				['body' => json_encode($datatosend)]
+			);
+
+			$client_response = json_decode($guzzle_response->getBody()->getContents());
+			return json_encode($client_response);
 	}
 
 
@@ -157,7 +214,7 @@ class GameInfoController extends Controller
 	public function _getClientDetails($type = "", $value = "", $client_id="") 
 	{
 		$query = DB::table("clients AS c")
-				 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'c.client_url', 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
+				 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'c.client_url', 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
 				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
 				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
 				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
@@ -165,13 +222,13 @@ class GameInfoController extends Controller
 					if ($type == 'token') {
 						$query->where([
 					 		["pst.player_token", "=", $value],
-					 		["pst.status_id", "=", 1]
+					 		// ["pst.status_id", "=", 1]
 					 	]);
 					}
 					if ($type == 'player_id') {
 						$query->where([
 					 		["p.player_id", "=", $value],
-					 		["pst.status_id", "=", 1]
+					 		// ["pst.status_id", "=", 1]
 					 	]);
 					}
 					if ($type == 'site_url') {

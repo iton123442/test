@@ -17,7 +17,7 @@ class PaymentGatewayController extends Controller
 	//
     public function __construct(){
 
-		$this->middleware('oauth', ['except' => ['updatetransaction','updatePayoutTransaction']]);
+		$this->middleware('oauth', ['except' => ['updatetransaction','updatePayoutTransaction','catpayCallback']]);
 		/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
 	}
     public function index(){
@@ -349,8 +349,6 @@ class PaymentGatewayController extends Controller
                      );
 
                     $token_player_id = $this->getPlayerTokenId($player_check->player_id);   
-
-
                       if($request->has("amount")&&
                            $request->has("currency")&&
                            $request->has("payout_method")&&
@@ -559,6 +557,9 @@ class PaymentGatewayController extends Controller
             elseif($request->payment_method_code == "QAICASH"){
                 $payment_method_id = 9;
             }
+            elseif($request->payment_method_code == "STRIPE"){
+                $payment_method_id = 13;
+            }
             $transaction = PayTransaction::where("identification_id",$request->identification_id)->where("payment_id",$payment_method_id)->first();
             $message = "";
             if($request->payment_method_code == "VPRICA"){
@@ -596,6 +597,14 @@ class PaymentGatewayController extends Controller
                     $message = "Hi! Your QAICASH with transaction number ".$transaction->id." has failed.";
                 }
             }
+            elseif($request->payment_method_code == "STRIPE"){
+                if($request->status == "SUCCESS"){
+                    $message = "Thank you! Your Payment using STRIPE has successfully completed.";
+                }
+                elseif($request->status == "FAILED"){
+                    $message = "Hi! Your STRIPE with transaction number ".$transaction->id." has failed.";
+                }
+            }
             if($transaction){
                 if($request->status == "SUCCESS"){
                     $transaction->status_id=5;
@@ -620,6 +629,7 @@ class PaymentGatewayController extends Controller
                 $http = new Client();
                 $response = $http->post($transaction->trans_update_url,[
                     'form_params' => [
+                        'transaction_type'=> "DEPOSIT",
                         'transaction_id' => $transaction->id,
                         'orderId' => $transaction->orderId,
                         'amount'=> $transaction->amount,
@@ -630,6 +640,7 @@ class PaymentGatewayController extends Controller
                     ],
                 ]);
                 $request_to_client = array(
+                        'transaction_type'=> "DEPOSIT",
                         'transaction_id' => $transaction->id,
                         'orderId' => $transaction->orderId,
                         'amount'=> $transaction->amount,
@@ -692,6 +703,7 @@ class PaymentGatewayController extends Controller
                     $http = new Client();
                     $response = $http->post($transaction->trans_update_url,[
                         'form_params' => [
+                            'transaction_type'=> "PAYOUT",
                             'transaction_id' => $transaction->id,
                             'payoutId' => $transaction->orderId,
                             'amount'=> $transaction->amount,
@@ -703,6 +715,7 @@ class PaymentGatewayController extends Controller
                         ],
                     ]);
                     $request_to_client = array(
+                            'transaction_type'=> "PAYOUT",
                             'transaction_id' => $transaction->id,
                             'payoutId' => $transaction->orderId,
                             'amount'=> $transaction->amount,
@@ -775,6 +788,7 @@ class PaymentGatewayController extends Controller
                                     $http = new Client();
                                     $responsefromclient = $http->post($order_details->trans_update_url, [
                                         'form_params' => [
+                                            'transaction_type'=> "PAYOUT",
                                             'transaction_id' => $order_details->id,
                                             'payoutId' => $order_details->orderId,
                                             'amount' => $order_details->amount,
@@ -785,6 +799,7 @@ class PaymentGatewayController extends Controller
                                         ]
                                     ]);
                                     $requesttoclient = array(
+                                        'transaction_type'=> "PAYOUT",
                                         'transaction_id' => $order_details->id,
                                         'payoutId' => $order_details->orderId,
                                         'amount' => $order_details->amount,
@@ -887,5 +902,102 @@ class PaymentGatewayController extends Controller
         ));
 
         return $update_withdraw;    
+    }
+    public function catpayCallback(Request $request){
+        PaymentHelper::savePayTransactionLogs(123,json_encode($request->getContent()), "","CATPAY CALLBACK TRANSACTION");
+        $datafromprovider=array(
+            "statusid"=>$request->statusId,
+            "orderId"=>$request->orderId,
+            "blockCPayOrder" => $request->blockCPayOrder,
+            "orderPrice"=>$request->orderPrice,
+            "message" =>$request->message,
+            "sign"=>$request->sign,
+        );
+        $md5Key = "786eea43c64af4e8dc26dc0c1cb896ea";
+        $transaction = PayTransaction::where("orderId",$request->orderId)->where("payment_id",14)->first();
+        if($datafromprovider["message"]=='success' && $datafromprovider["statusid"]=='15')
+        {
+            $price =sprintf("%.2f",$datafromprovider["orderPrice"]);
+            $mysign = md5($datafromprovider["blockCPayOrder"].$price.$datafromprovider["orderId"].$datafromprovider["statusid"].$datafromprovider["message"].$md5Key);
+            if($mysign != $datafromprovider["sign"])
+            {
+                return 'Failed verification';
+            }
+            $transaction->status_id =5;
+            $transaction->save();
+            $client_player_id = DB::table('player_session_tokens as pst')
+                                    ->select("p.client_player_id","p.client_id")
+                                    ->leftJoin("players as p","pst.player_id","=","p.player_id")
+                                    ->where("pst.token_id",$transaction->token_id)
+                                    ->first();
+            $key = $transaction->id.'|'.$client_player_id->client_player_id.'|SUCCESS';
+            $authenticationCode = hash_hmac("sha256",$client_player_id->client_id,$key);
+            $message = "Thank you! Your Payment using CATPAY has successfully completed.";
+            $http = new Client();
+            $response = $http->post($transaction->trans_update_url,[
+                'form_params' => [
+                    'transaction_type'=> "DEPOSIT",
+                    'transaction_id' => $transaction->id,
+                    'payoutId' => $transaction->orderId,
+                    'amount'=> $transaction->amount,
+                    'client_player_id' => $client_player_id->client_player_id,
+                    'client_id' =>$client_player_id->client_id,
+                    'status' => "SUCCESS",
+                    'message'=> $message,
+                    'AuthenticationCode' => $authenticationCode
+                ],
+            ]);
+            $request_to_client = array(
+                    'transaction_type'=> "DEPOSIT",
+                    'transaction_id' => $transaction->id,
+                    'payoutId' => $transaction->orderId,
+                    'amount'=> $transaction->amount,
+                    'client_player_id' => $client_player_id->client_player_id,
+                    'client_id' =>$client_player_id->client_id,
+                    'status' => "SUCCESS",
+                    'message'=> $message,
+                    'AuthenticationCode' => $authenticationCode
+            );
+            PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($request),json_encode($response->getBody()),"Payout Update Transaction"); 
+            return 'SUCCESS';
+        }
+        $transaction->status_id =3;
+        $transaction->save();
+        $client_player_id = DB::table('player_session_tokens as pst')
+                                    ->select("p.client_player_id","p.client_id")
+                                    ->leftJoin("players as p","pst.player_id","=","p.player_id")
+                                    ->where("pst.token_id",$transaction->token_id)
+                                    ->first();
+        $key = $transaction->id.'|'.$client_player_id->client_player_id.'|'.$request->status;
+        $authenticationCode = hash_hmac("sha256",$client_player_id->client_id,$key);
+        $message = "Hi! Your STRIPE with transaction number ".$transaction->id." has failed.";
+        $http = new Client();
+        $response = $http->post($transaction->trans_update_url,[
+            'form_params' => [
+                'transaction_type'=> "DEPOSIT",
+                'transaction_id' => $transaction->id,
+                'payoutId' => $transaction->orderId,
+                'amount'=> $transaction->amount,
+                'client_player_id' => $client_player_id->client_player_id,
+                'client_id' =>$client_player_id->client_id,
+                'status' => "FAILED",
+                'message'=> $message,
+                'AuthenticationCode' => $authenticationCode
+            ],
+        ]);
+        $request_to_client = array(
+                'transaction_type'=> "DEPOSIT",
+                'transaction_id' => $transaction->id,
+                'payoutId' => $transaction->orderId,
+                'amount'=> $transaction->amount,
+                'client_player_id' => $client_player_id->client_player_id,
+                'client_id' =>$client_player_id->client_id,
+                'status' => "FAILED",
+                'message'=> $message,
+                'AuthenticationCode' => $authenticationCode
+        );
+        PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($request),json_encode($response->getBody()),"Payout Update Transaction"); 
+        return 'FAIL';
+        PaymentHelper::savePayTransactionLogs(123,json_encode($request, true), json_encode($datafromprovider),"CATPAY CALLBACK TRANSACTION");
     }   
 }

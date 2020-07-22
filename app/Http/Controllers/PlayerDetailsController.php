@@ -27,7 +27,8 @@ class PlayerDetailsController extends Controller
 		$arr_result = [
 						"playerdetailsresponse" =>  [
 							"status" =>  [
-								"success" =>  "false",
+								"code" => "404",
+								"status" =>  "Failed",
 								"message" =>  "Invalid Request."
 							]
 						]
@@ -83,12 +84,16 @@ class PlayerDetailsController extends Controller
 										"clientid" => $json_data["clientid"],
 										"playerdetailsrequest" => [
 											"token" => $json_data["playerdetailsrequest"]["token"],
-											"gamelaunch" => $json_data["playerdetailsrequest"]["gamelaunch"]
+											"gamelaunch" => $json_data["playerdetailsrequest"]["gamelaunch"],
+											"username" => $json_data["playerdetailsrequest"]["username"],
+											"refresh_token" => $json_data["playerdetailsrequest"]["refresh_token"]
 										]]
 						    )]
 						);
-
-						return var_export($response->getBody()->getContents(), true);
+						
+						$client_response = $response->getBody()->getContents();
+						
+						$arr_result = $client_response;
 					}
 				}
 			}

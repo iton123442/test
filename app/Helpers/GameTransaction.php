@@ -4,10 +4,10 @@ use DB;
 
 class GameTransaction
 {
-	public static function save($method, $request_data, $game_data, $client_data) {
+	public static function save($method, $request_data, $game_data, $client_data, $player_data) {
 		/*var_dump($request_data); die();*/
 		$trans_data = [
-					"token_id" => $client_data->token_id,
+					"token_id" => $player_data->token_id,
 					"game_id" => $game_data->game_id,
 					"round_id" => $request_data["roundid"],
 					"income" => $request_data["income"]
@@ -18,7 +18,7 @@ class GameTransaction
 					$trans_data["provider_trans_id"] = $request_data["transid"];
 					$trans_data["bet_amount"] = $request_data["amount"];
 					$trans_data["win"] = 0;
-					$trans_data["pay_amount"] = $request_data["amount"];
+					$trans_data["pay_amount"] = 0;
 					$trans_data["entry_id"] = 1;
 		        break;
 		    case "credit":
@@ -30,6 +30,7 @@ class GameTransaction
 			        $trans_data["payout_reason"] = $request_data["reason"];
 		        break;
 		    case "rollback":
+		    		$trans_data["provider_trans_id"] = (array_key_exists('transid', $request_data) ? $request_data["transid"] : '');
 					$trans_data["bet_amount"] = 0;
 					$trans_data["win"] = 1;
 					$trans_data["pay_amount"] = $game_data->pay_amount;
@@ -39,8 +40,33 @@ class GameTransaction
 
 		    default:
 		}
-		/*var_dump($trans_data); die();*/
-		DB::table('game_transactions')->insert($trans_data);
+		$id = DB::table('game_transactions')->insertGetId($trans_data);
+		return $id; 
+	}
+
+	public static function update($method, $request_data, $game_data, $client_data, $player_data) {
+
+		$game_details = DB::table("game_transactions AS g")
+				 ->where("g.round_id", $request_data['roundid'])
+				 ->first();
+		
+		$income = $game_details->income; 
+		$win = $game_details->win;
+		$pay_amount = $game_details->pay_amount;
+		$entry_id = $game_details->entry_id;
+		
+		if($request_data["amount"] > 0.00) {
+			$win = 1;
+			$pay_amount = $game_details->pay_amount + $request_data["amount"];
+			$income = $game_details->bet_amount - $pay_amount;
+			$entry_id = 2;
+		}
+
+        $update = DB::table('game_transactions')
+                ->where('game_trans_id', $game_details->game_trans_id)
+                ->update(['pay_amount' => $pay_amount, 'income' => $income, 'win' => $win, 'entry_id' => $entry_id]);
+                
+		return ($update ? $game_details->game_trans_id : false);
 	}
 
 	public static function find($original_trans_id) {

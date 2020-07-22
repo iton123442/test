@@ -2,105 +2,48 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use App\Helpers\GameRound;
+use App\Helpers\GameTransaction;
+use App\Helpers\Helper;
+use App\Helpers\CallParameters;
+
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request as Psr7Request;
-use App\Helpers\Helper as Helper;
+use Carbon\Carbon;
+
 use DB;
 
 
+/**
+ * UNDER CONSTRUCTION
+ * 
+ */
 class LotteryController extends Controller
 {
-    //UPDATE TRACK
-
-	public function authPlayer(Request $request){
-
-		// dd(1);
-		 $client_check = DB::table('clients')
-				->where('client_url', $request->site_url)
-				->first();
-
-		 if($client_check){
-		 		// echo "meron";
-	 		    $player_check = DB::table('players')
-					->where('client_id', $client_check->client_id)
-					->where('username', $request->merchant_user)
-					->first();
-
-				if($player_check){
-					// echo "meron";
-
-					 $http = new Client();
-			         // $response = $http->post('http://localhost:8080/betrnkLotto-2-20-20/public_html/api/v1/index.php', [
-			         $response = $http->post('http://betrnk-lotto.com/api/v1/index.php', [
-			            'form_params' => [
-			                'cmd' => 'auth',
-			                'username' => $request->username,
-			                'password' => $request->password,
-			                'merchant_user'=> $request->merchant_user,
-			                'merchant_user_balance'=> $request->merchant_user_balance,
-			            ],
-			         ]);
 
 
-			       	 $game_url = json_decode((string) $response->getBody(), true)["response"]["game_url"];
+	// public $access_token = '321dsfjo34j5olkdsf';
+	// public $api_key = '123iuysdhfb09875v9hb9pwe8f7yu439jvoiefjs';
+	public $secret_key = 'freebetrnksecret';
+	public $username = 'freebetrnk';
 
-			       	 DB::table('player_session_tokens')->insert(
-					        array('player_id' => $player_check->player_id, 'player_token' =>  $request->player_token, 'status_id' => '1')
-					 );
-
-			       	 return $game_url.'&player_token='.$request->player_token;
-
-				}else{
-					// echo "wala";
-
-					DB::table('players')->insert(
-					        array('client_id' => $client_check->client_id, 'client_player_id' =>  $request->merchant_user_id, 'username' => $request->merchant_user, 'email' => $request->merchant_user_email,'display_name' => $request->merchant_user_display_name)
-					);
-
-					$last_player_id = DB::getPDO()->lastInsertId();
-
-					DB::table('player_session_tokens')->insert(
-					        array('player_id' => $last_player_id, 'player_token' =>  $request->player_token, 'status_id' => '1')
-					);
+	// hash_hmac("sha256",'freebetrnk','freebetrnksecret'); // CORRCET HASH LOTTO TO SEND
 
 
-					 $http = new Client();
-			         $response = $http->post('http://betrnk-lotto.com/api/v1/index.php', [
-			            'form_params' => [
-			                'cmd' => 'auth',
-			                'username' => $request->username,
-			                'password' => $request->password,
-			                'merchant_user'=> $request->merchant_user,
-			                'merchant_user_balance'=> $request->merchant_user_balance,
-			            ],
-			         ]);
-
-			       	 $game_url = json_decode((string) $response->getBody(), true)["response"]["game_url"];
-
-			       	 return $game_url.'&player_token='.$request->player_token;
-				}
-
-
-		 }else{
-		 	// echo "wala";
-		 	return 'Your Not Subscribed!';
-		 }	
-
-	}
-
-
-
+	public function auth_key($hashkey) {
+        $result = false;
+            // API KEY STORED IN MW CLIENT API KEY
+            if($hashkey == md5($this->api_key.$this->access_token)) {
+                $result = true;
+            }
+        return $result;
+    }
 
 
 	public function getBalance(Request $request)
 	{	
-
-		// dd(1);
-
-		// $player_token = $request->player_token;
+		Helper::saveLog('Lottery Balance', 10, json_encode($request->all()), 'ENDPOINT HIT');
 		$merchant_user = $request->merchant_user;
-
-		// dd($merchant_user);
 		$client_details = DB::table("players AS p")
 						 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.language', 'p.currency', 'pst.player_token' , 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
 						 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
@@ -111,27 +54,13 @@ class LotteryController extends Controller
 						 ->where("pst.status_id", 1)
 						 ->first();				 
 
-	 	// dd($client_details);
-		// $hashkey = 6f1190df5414d22490583434fe3622fe;
-
 		if ($client_details) {
-		  // 	$http = new Client();
-		  //       $response = $http->post($client_details->player_details_url, [ 
-		  //           'form_params' => [
-		  //               'merchant_user'=> $request->merchant_user,
-		  //               'hashkey' => md5($client_details->client_api_key.$client_details->client_access_token),
-		  //           ],
-		  //       ]);
-				// $balance = json_decode((string) $response->getBody(), true);
-				// return $balance['playerdetailsresponse']['balance'];
-
 				$client = new Client([
 				    'headers' => [ 
 				    	'Content-Type' => 'application/json',
 				    	'Authorization' => 'Bearer '.$client_details->client_access_token
 				    ]
 				]);
-				
 				$guzzle_response = $client->post($client_details->player_details_url,
 				    ['body' => json_encode(
 				        	["access_token" => $client_details->client_access_token,
@@ -145,28 +74,27 @@ class LotteryController extends Controller
 							]
 				    )]
 				);
-
 				$client_response = json_decode($guzzle_response->getBody()->getContents());
-
-				// dd($client_response);
-				 echo json_encode($client_response->playerdetailsresponse->balance);
-				// return $client_response->playerdetailsresponse->balance;
+				Helper::saveLog('Lottery Balance Reply', 10, json_encode($client_response), 'ENDPOINT HIT');
+				echo json_encode($client_response->playerdetailsresponse->balance);
 		}
-
-
 	}
 
 	public function debitProcess(Request $request)
-	{
-		  // dd(1);	
+    {
+		  Helper::saveLog('Lottery Debit', 10, json_encode($request->all()), 'ENDPOINT HIT');
+
+		   if ($this->auth_key($request->hashkey)) {
+		     	return 'true';
+		   }else{
+                return 'mali!';
+	       }
 
 		  $player_check = DB::table('players')
 				->where('username', $request->merchant_user)
 				->first();
-
 	      // $player_token = $request->player_token;
 	      // $player_id = $request->player_id;
-
 	      $client_details = DB::table("players AS p")
 						 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.language', 'p.currency', 'pst.player_token' , 'pst.status_id','pst.token_id' , 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
 						 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
@@ -178,55 +106,186 @@ class LotteryController extends Controller
 						 ->latest('token_id')
 						 ->first();
 
-			// return ($client_details->player_token);			 
-
-		 	// dd($client_details->player_token);
-
 			if ($client_details) {
 
-			
-				// dd($client_details);
+	// 			   $http = new Client();
+    //             $response = $http->post($client_details->fund_transfer_url, [
+    //                 'form_params' => [
+    //                     'hashkey' => md5($client_details->client_api_key.$client_details->client_access_token),
+    //                     'debit' => $request->debit,
+    //                     'merchant_user'=> $request->merchant_user,
+    //                     'http' => 200,
+    //                     'transactiontype' => 'debit',
+    //                     'player_token' => $client_details->player_token
+    //                 ],
+    //             ]);
+    //             $res = json_decode((string) $response->getBody(), true);
+    //             $game_code = $res['playerdetailsresponse']['gamedetails']['gameid'];
+    //             $db_game_id = DB::table('games')
+    //             			 ->where('game_code', $game_code) 
+    //             			 ->first();
+    //             $token_id = $client_details->token_id;
+    //             $game_id = $db_game_id->game_id;
+    //             $played_amount = $request->debit;
+    //             $payout = $request->debit;	
 
-				$http = new Client();
-                $response = $http->post($client_details->fund_transfer_url, [
-                    'form_params' => [
-                        'hashkey' => md5($client_details->client_api_key.$client_details->client_access_token),
-                        'debit' => $request->debit,
-                        'merchant_user'=> $request->merchant_user,
-                        'http' => 200,
-                        'transactiontype' => 'debit',
-                        'player_token' => $client_details->player_token
-                    ],
-                ]);
+                // Helper::saveGame_transaction($token_id, $game_id, $played_amount,  $payout, 2);
 
-                $res = json_decode((string) $response->getBody(), true);
-                // return   $res['playerdetailsresponse']['gamedetails']['gameid'];
-                // {"status":{"success":true,"message":"Request successful."},"gamedetails":{"gameid":1,"gamename":"lotto"},"type":"debit"} 
+                    $client = new Client([
+	                    'headers' => [ 
+	                        'Content-Type' => 'application/json',
+	                        'Authorization' => 'Bearer '.$client_details->client_access_token
+	                    ]
+	                ]);
 
-                // return $res['playerdetailsresponse']['gamedetails']['gameid'];
+	                $requesttosend = [
+					  "access_token" => $client_details->client_access_token,
+					  "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+					  "type" => "fundtransferrequest",
+					  "datesent" => Helper::datesent(),
+					  "gamedetails" => [
+					    "gameid" =>  "",
+					    "gamename" => ""
+					  ],
+					  "fundtransferrequest" => [
+							"playerinfo" => [
+							"token" => $client_details->player_token,
+						],
+						"fundinfo" => [
+						      "gamesessionid" => "",
+						      "transactiontype" => 'debit',
+						      "rollback" => "false",
+						      "currencycode" => $client_details->currency,
+						      "amount" => $request->debit
+						]
+					  ]
+					];
 
-                $game_code = $res['playerdetailsresponse']['gamedetails']['gameid'];
+					try {
 
-                $db_game_id = DB::table('games')
-                			 ->where('game_code', $game_code) 
-                			 ->first();
+						$guzzle_response = $client->post($client_details->fund_transfer_url,
+							['body' => json_encode($requesttosend)]
+						);
 
+						$client_response = json_decode($guzzle_response->getBody()->getContents());
 
-                // return $db_game_id;			 
+			 		    $token_id = $client_details->token_id;
+		                $game_id = $db_game_id->game_id;
+		                $played_amount = $request->debit;
+		                $payout = $request->debit;	
+                        Helper::saveGame_transaction($token_id, $game_id, $played_amount,  $payout, 2);
 
-                $token_id = $client_details->token_id;
-                $game_id = $db_game_id->game_id;
-                $played_amount = $request->debit;
-                $payout = $request->debit;	
-
-                Helper::saveGame_transaction($token_id, $game_id, $played_amount,  $payout, 2);
-
-              
-		        // return  'Success!';
+					} catch (\Exception $e) {
+						// IF ALL OR NONE IS TRUE IF ONE ITEM FAILED BREAK THE FLOW!!
+					}
 
 			}	
 
 	}
+
+
+
+	    //UPDATE TRACK
+
+	/**
+	 *  DEPRECATED CENTRALIZED
+	 */
+	// public function authPlayer(Request $request){
+	// 	// dd(1);
+	// 	 $client_check = DB::table('clients')
+	// 			->where('client_url', $request->site_url)
+	// 			->first();
+	// 	 if($client_check){
+	// 	 		// echo "meron";
+	//  		    $player_check = DB::table('players')
+	// 				->where('client_id', $client_check->client_id)
+	// 				->where('username', $request->merchant_user)
+	// 				->first();
+	// 			if($player_check){
+	// 				// echo "meron";
+	// 				 $http = new Client();
+	// 		         // $response = $http->post('http://localhost:8080/betrnkLotto-2-20-20/public_html/api/v1/index.php', [
+	// 		         $response = $http->post('http://betrnk-lotto.com/api/v1/index.php', [
+	// 		            'form_params' => [
+	// 		                'cmd' => 'auth',
+	// 		                'username' => $request->username,
+	// 		                'password' => $request->password,
+	// 		                'merchant_user'=> $request->merchant_user,
+	// 		                'merchant_user_balance'=> $request->merchant_user_balance,
+	// 		            ],
+	// 		         ]);
+	// 		       	 $game_url = json_decode((string) $response->getBody(), true)["response"]["game_url"];
+	// 		       	 DB::table('player_session_tokens')->insert(
+	// 				        array('player_id' => $player_check->player_id, 'player_token' =>  $request->player_token, 'status_id' => '1')
+	// 				 );
+	// 		       	 return $game_url.'&player_token='.$request->player_token;
+	// 			}else{
+	// 				// echo "wala";
+	// 				DB::table('players')->insert(
+	// 				        array('client_id' => $client_check->client_id, 'client_player_id' =>  $request->merchant_user_id, 'username' => $request->merchant_user, 'email' => $request->merchant_user_email,'display_name' => $request->merchant_user_display_name)
+	// 				);
+	// 				$last_player_id = DB::getPDO()->lastInsertId();
+	// 				DB::table('player_session_tokens')->insert(
+	// 				        array('player_id' => $last_player_id, 'player_token' =>  $request->player_token, 'status_id' => '1')
+	// 				);
+
+	// 				 $http = new Client();
+	// 		         $response = $http->post('http://betrnk-lotto.com/api/v1/index.php', [
+	// 		            'form_params' => [
+	// 		                'cmd' => 'auth',
+	// 		                'username' => $request->username,
+	// 		                'password' => $request->password,
+	// 		                'merchant_user'=> $request->merchant_user,
+	// 		                'merchant_user_balance'=> $request->merchant_user_balance,
+	// 		            ],
+	// 		         ]);
+	// 		       	 $game_url = json_decode((string) $response->getBody(), true)["response"]["game_url"];
+	// 		       	 return $game_url.'&player_token='.$request->player_token;
+	// 			}
+	// 	 }else{
+	// 	 	// echo "wala";
+	// 	 	return 'Your Not Subscribed!';
+	// 	 }	
+	// }
+
+
+
+
+
+
+
+		// $client = new Client([
+  //           'headers' => [ 
+  //               'Content-Type' => 'application/x-www-form-urlencoded',
+  //           ]
+  //       ]);
+		// $response = $client->post('http://api.8provider.com/game/geturl',[
+		// 	'form_params' => [
+		// 		  "project" => 1042,
+	 //              "version" => 1,
+		// 		  "token" => 'sampletoken',
+		// 		  "game" => '98',
+		// 		  "currency" => "USD",
+		// 		  "denomination" => '0.1',
+		// 		  "return_url_info" => true,  // true converted to 1
+	 //              "callback_version" => 1,
+		// 		  "settings" =>  [
+		// 		  	'user_id'=>'61',
+		// 		  	'language'=>'en'
+		// 		  ],
+		// 		  "signature" => md5('1042*1*sampletoken*98*USD*0.1*1*1*user_id:61,language:en*c270d53d4d83d69358056dbca870c0ce'),
+		// 	],
+		// ]);
+
+
+
+
+
+		// "signature" => md5('1042*1*sampletoken*98*USD*0.1*1*1*61,en*c270d53d4d83d69358056dbca870c0ce'),
+		// "signature" => md5('1042*1*sampletoken*98*USD*0.1*1*1*61*en*c270d53d4d83d69358056dbca870c0ce'),
+		// "signature" => md5('1042,1,sampletoken,98,USD,0.1,1,1,61,en,c270d53d4d83d69358056dbca870c0ce'),
+		// "signature" => md5('1042*1*sampletoken*98*USD*0.1*1*1*user_id,61,language,en*c270d53d4d83d69358056dbca870c0ce'),
+
 
 }
 

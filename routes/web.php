@@ -14,6 +14,8 @@
 $app->get('/', function () use ($app) {
     return $app->version();
 });
+$app->post('/al','AlController@index'); // TESTING!
+$app->post('/alplayer','AlController@checkCLientPlayer'); // TESTING!
 // Posts
 $app->get('/posts','PostController@index');
 $app->post('/posts','PostController@store');
@@ -37,20 +39,47 @@ $app->post('/posts/{post_id}/comments', 'PostCommentController@store');
 $app->put('/posts/{post_id}/comments/{comment_id}', 'PostCommentController@update');
 $app->patch('/posts/{post_id}/comments/{comment_id}', 'PostCommentController@update');
 $app->delete('/posts/{post_id}/comments/{comment_id}', 'PostCommentController@destroy');
+
+// Request an access token
+$app->post('/oauth/access_token', function() use ($app){
+    return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
+});
+
 // Player Details Request
 $app->post('/api/playerdetailsrequest/', 'PlayerDetailsController@show');
+
 // Fund Transfer Request
 $app->post('/api/fundtransferrequest/', 'FundTransferController@process');
+
 // Solid Gaming Endpoints
-$app->post('/api/solid/authenticate', 'SolidGamingController@authPlayer');
-$app->post('/api/solid/playerdetails', 'SolidGamingController@getPlayerDetails');
-$app->post('/api/solid/balance', 'SolidGamingController@getBalance');
-$app->post('/api/solid/debit', 'SolidGamingController@debitProcess');
-$app->post('/api/solid/credit', 'SolidGamingController@creditProcess');
-$app->post('/api/solid/debitandcredit', 'SolidGamingController@debitAndCreditProcess');
-$app->post('/api/solid/rollback', 'SolidGamingController@rollbackTransaction');
-$app->post('/api/solid/endround', 'SolidGamingController@endPlayerRound');
-$app->post('/api/solid/endsession', 'SolidGamingController@endPlayerSession');
+$app->post('/api/solid/{brand_code}/authenticate', 'SolidGamingController@authPlayer');
+$app->post('/api/solid/{brand_code}/playerdetails', 'SolidGamingController@getPlayerDetails');
+$app->post('/api/solid/{brand_code}/balance', 'SolidGamingController@getBalance');
+$app->post('/api/solid/{brand_code}/debit', 'SolidGamingController@debitProcess');
+$app->post('/api/solid/{brand_code}/credit', 'SolidGamingController@creditProcess');
+$app->post('/api/solid/{brand_code}/debitandcredit', 'SolidGamingController@debitAndCreditProcess');
+$app->post('/api/solid/{brand_code}/rollback', 'SolidGamingController@rollbackTransaction');
+$app->post('/api/solid/{brand_code}/endround', 'SolidGamingController@endPlayerRound');
+$app->post('/api/solid/{brand_code}/endsession', 'SolidGamingController@endPlayerSession');
+
+// Oryx Gaming Endpoints
+$app->post('/api/oryx/{brand_code}/tokens/{token}/authenticate', 'OryxGamingController@authPlayer');
+$app->post('/api/oryx/{brand_code}/players/{player_id}/balance', 'OryxGamingController@getBalance');
+$app->post('/api/oryx/{brand_code}/game-transaction', 'OryxGamingController@gameTransaction');
+
+// SimplePlay Endpoints
+$app->post('/api/simpleplay/{brand_code}/GetUserBalance', 'SimplePlayController@getBalance');
+$app->post('/api/simpleplay/{brand_code}/PlaceBet', 'SimplePlayController@debitProcess');
+$app->post('/api/simpleplay/{brand_code}/PlayerWin', 'SimplePlayController@creditProcess');
+$app->post('/api/simpleplay/{brand_code}/PlayerLost', 'SimplePlayController@lostTransaction');
+$app->post('/api/simpleplay/{brand_code}/PlaceBetCancel', 'SimplePlayController@rollBackTransaction');
+
+// MannaPlay Endpoints
+$app->post('/api/manna/{brand_code}/fetchbalance', 'MannaPlayController@getBalance');
+$app->post('/api/manna/{brand_code}/bet', 'MannaPlayController@debitProcess');
+$app->post('/api/manna/{brand_code}/win', 'MannaPlayController@creditProcess');
+$app->post('/api/manna/{brand_code}/betrollback', 'MannaPlayController@rollbackTransaction');
+
 // ICG Gaming Endpoints
 $app->get('/api/icgaming/gamelist','ICGController@getGameList');
 $app->post('/api/icgaming/gamelaunch','ICGController@gameLaunchURL');
@@ -92,16 +121,16 @@ $app->post('rsg/betwin', 'DigitainController@betwin');
 $app->post('rsg/refund', 'DigitainController@refund');
 $app->post('rsg/amend', 'DigitainController@amend');
 // IA SPORTS
-$app->post('ia/hash', 'IAESportsController@hashen');
-$app->post('ia/lunch', 'IAESportsController@userlunch');
+$app->post('ia/hash', 'IAESportsController@hashen'); // DEPRECATED
+$app->post('ia/lunch', 'IAESportsController@userlunch');// DEPRECATED
 $app->post('ia/register', 'IAESportsController@userRegister');
-$app->post('ia/userwithdraw', 'IAESportsController@userWithdraw');
-$app->post('ia/userdeposit', 'IAESportsController@userDeposit');
-$app->post('ia/userbalance', 'IAESportsController@userBalance');
-$app->post('ia/wager', 'IAESportsController@userWager');
-$app->post('ia/hotgames', 'IAESportsController@getHotGames');
-$app->post('ia/orders', 'IAESportsController@userOrders');
-$app->post('ia/activity_logs', 'IAESportsController@userActivityLog');
+$app->post('ia/userwithdraw', 'IAESportsController@userWithdraw');// DEPRECATED
+$app->post('ia/userdeposit', 'IAESportsController@userDeposit');// DEPRECATED
+$app->post('ia/userbalance', 'IAESportsController@userBalance');// DEPRECATED
+$app->post('ia/wager', 'IAESportsController@userWager'); // DEPRECATED
+$app->post('ia/hotgames', 'IAESportsController@getHotGames'); // DEPRECATED
+$app->post('ia/orders', 'IAESportsController@userOrders');// DEPRECATED
+$app->post('ia/activity_logs', 'IAESportsController@userActivityLog'); // DEPRECATED
 $app->post('ia/deposit', 'IAESportsController@seamlessDeposit');
 $app->post('ia/withdrawal', 'IAESportsController@seamlessWithdrawal');
 $app->post('ia/balance', 'IAESportsController@seamlessBalance');
@@ -111,6 +140,49 @@ $app->post('/api/bole/register', 'BoleGamingController@playerRegister');
 $app->post('/api/bole/logout', 'BoleGamingController@playerLogout');
 $app->post('/api/bole/wallet/player/cost', 'BoleGamingController@playerWalletCost');
 $app->post('/api/bole/wallet/player/balance', 'BoleGamingController@playerWalletBalance');
+// AWS PROVIDER BACKOFFICE ROUTE
+$app->post('/api/aws/register', 'AWSController@playerRegister');
+$app->post('/api/aws/launchgame', 'AWSController@launchGame');
+$app->post('/api/aws/gamelist', 'AWSController@gameList');
+$app->post('/api/aws/playermanage', 'AWSController@playerManage');
+$app->post('/api/aws/playerstatus', 'AWSController@playerStatus');
+$app->post('/api/aws/playerbalance', 'AWSController@playerBalance'); 
+$app->post('/api/aws/fundtransfer', 'AWSController@fundTransfer'); 
+$app->post('/api/aws/querystatus', 'AWSController@queryStatus'); 
+$app->post('/api/aws/orderquery', 'AWSController@queryOrder');
+// AWS PROVIDER SINGLE WALLET ROUTE
+$app->post('api/aws/single/wallet/balance', 'AWSController@singleBalance');
+$app->post('api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
+$app->post('api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
+
+
+
+
+
+// 8PROVIDERS
+$app->post('/api/eightprovider', 'EightProviderController@index'); // Single Route
+
+$app->post('/api/eightprovider/test', 'EightProviderController@testcall'); // TEST
+$app->post('/api/eightprovider/getlist', 'EightProviderController@getGames');
+$app->post('/api/eightprovider/geturl', 'EightProviderController@gameUrl'); // DEPRECATED
+$app->post('/api/eightprovider/registerbunos', 'EightProviderController@registerBunos'); // DEPRECATED
+$app->post('/api/eightprovider/init', 'EightProviderController@gameInit'); // DEPRECATED
+$app->post('/api/eightprovider/bet', 'EightProviderController@gameBet'); // DEPRECATED
+$app->post('/api/eightprovider/win', 'EightProviderController@gameWin'); // DEPRECATED
+$app->post('/api/eightprovider/refund', 'EightProviderController@gameRefund'); // DEPRECATED
+$app->post('/api/eightprovider/deposit', 'EightProviderController@gameDeposit'); // DEPRECATED
+$app->post('/api/eightprovider/withdrawal', 'EightProviderController@gameWithdrawal'); // DEPRECATED
+
+
+//BNG Endpoints
+$app->post('/api/bng', 'BNGController@index');
+$app->post('/api/bng/gamelaunch', 'BNGController@gameLaunchUrl');
+$app->post('/api/bng/generateGame','BNGController@generateGame');
+
+// BETRNK LOTTO
+$app->post('/api/betrnk/lotto', 'BetrnkController@getUrl');
+
+
 // EPOINT CONTROLLER
 // $app->post('/api/epoint', 'EpointController@epointAuth'); #/
 // $app->post('/api/epoint/bitgo', 'EpointController@bitgo'); #/
@@ -129,6 +201,7 @@ $app->post('/api/ebancodeposittransaction', 'EbancoController@depositInfo');
 $app->post('/api/ebancodeposittransactions', 'EbancoController@depositHistory'); 
 $app->post('/api/ebancoupdatedeposit', 'EbancoController@updateDeposit'); 
 $app->post('/api/ebancotest','EbancoController@testrequest');
+
 // Request an access token
 $app->post('/oauth/access_token', function() use ($app){
     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
@@ -157,9 +230,11 @@ $app->get('payment/list','Payments\PaymentLobbyController@getPaymentMethod');
 $app->get('payout/list','Payments\PaymentLobbyController@getPayoutMethod');
 $app->post('payment/check','Payments\PaymentLobbyController@minMaxAmountChecker');
 $app->post('payment/paymongoupdate','Payments\PaymentLobbyController@paymongoUpdateTransaction');
+$app->post('payment/checktransaction','Payments\PaymentLobbyController@checkPayTransactionContent');
 
 $app->post('payment/transaction','Payments\PaymentLobbyController@getPayTransactionDetails');
 $app->post('payment/cancel','Payments\PaymentLobbyController@cancelPayTransaction');
+$app->post('currency/convert','Payments\PaymentLobbyController@currencyConverter');
 //GameLobby
 $app->get('game/list','GameLobby\GameLobbyController@getGameList');
 $app->get('game/provider/{provider_name}','GameLobby\GameLobbyController@getProviderDetails');
@@ -171,14 +246,19 @@ $app->post('game/playerinfo','GameLobby\GameFavoriteController@playerInfo');
 $app->post('game/playerfavoritelist','GameLobby\GameFavoriteController@playerFavorite');
 $app->get('game/newestgames','GameLobby\GameInfoController@getNewestGames');
 $app->get('game/mostplayed','GameLobby\GameInfoController@getMostPlayed');
-$app->post('game/suggestions','GameLobby\GameInfoController@getGameSuggestions');
+$app->post('game/demogame','GameLobby\GameInfoController@getDemoGame');
+$app->post('game/suggestions','GameLobby\GameInfoController@getGameSuggestions'); // DEPRECATED
 $app->get('game/topcharts','GameLobby\GameInfoController@getTopGames');
 $app->get('game/topcharts/numberone','GameLobby\GameInfoController@getTopProvider');
+$app->post('game/playerdetailsrequest','GameLobby\GameInfoController@getClientPlayerDetails');
 $app->post('game/betlist','GameLobby\GameInfoController@getBetList');
 $app->post('game/query','GameLobby\QueryController@queryData');
-
 // IWallet
 // $app->post('api/iwallet/makedeposit','IWalletController@makeDeposit');
 $app->post('api/iwallet/makesettlement','IWalletController@makeSettlement');
 // $app->post('api/iwallet/makepayment','IWalletController@makePayment');
 $app->post('api/iwallet/makeremittance','IWalletController@makeRemittance');
+
+$app->post('game/lang','GameLobby\GameLobbyController@getLanguage');
+
+$app->post('payment/catpay/callBack','Payments\PaymentGatewayController@catpayCallback');

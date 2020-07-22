@@ -31,7 +31,7 @@ class ICGController extends Controller
     public function getGameList(){
         $http = new Client();
 
-        $response = $http->get('https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=en', [
+        $response = $http->get('https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=zh', [
             'headers' =>[
                 'Authorization' => 'Bearer '.$this->index(),
                 'Accept'     => 'application/json' 
@@ -76,7 +76,7 @@ class ICGController extends Controller
                         if($game["productId"] == $request->game_code){
                             Helper::savePLayerGameRound($game["productId"],$token);
                             $msg = array(
-                                "url" => $game["href"].'&token='.$token.'&lang=en&home_URL=http://demo.freebetrnk.com/icgaming',
+                                "url" => $game["href"].'&token='.$token.'&lang=zh&home_URL=http://demo.freebetrnk.com/icgaming',
                                 "game_launch" => true
                             );
                             return response($msg,200)
@@ -114,6 +114,7 @@ class ICGController extends Controller
                                 "gameid" => "",
                                 "clientid" => $client_details->client_id,
                                 "playerdetailsrequest" => [
+                                    "client_player_id"=>$client_details->client_player_id,
                                     "token" => $client_details->player_token,
                                     "gamelaunch" => "true"
                                 ]]
@@ -127,7 +128,7 @@ class ICGController extends Controller
                         "statusCode" => 0,
                         "username" => $client_details->username,
                         "balance" => $balance,
-                        "hash" => md5("2c00c099-f32b-4fc1-a69d-661d8c51c6ae".$client_details->username."".$balance),
+                        "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                     ),
                 );
                 Helper::saveLog('AuthPlayer(ICG)', 12, json_encode(array("token"=>$request->token)), $client_details);
@@ -163,7 +164,7 @@ class ICGController extends Controller
     public function playerDetails(Request $request){
         if($request->has("token")){
             $client_details = $this->_getClientDetails('token', $request->token);
-            Helper::saveLog('AuthPlayer(ICG)', 12, json_encode(array("token"=>$request->token)), $client_details);
+            //Helper::saveLog('PlayerDetails(ICG)', 12, json_encode(array("token"=>$request->token)), $client_details);
             if($client_details){
                 $client = new Client([
                     'headers' => [ 
@@ -182,23 +183,23 @@ class ICGController extends Controller
                                 "gameid" => "",
                                 "clientid" => $client_details->client_id,
                                 "playerdetailsrequest" => [
+                                    "client_player_id"=>$client_details->client_player_id,
                                     "token" => $client_details->player_token,
                                     "gamelaunch" => "false"
                                 ]]
                     )]
                 );
                 $client_response = json_decode($guzzle_response->getBody()->getContents());
-                
+                Helper::saveLog('PlayerBalance(ICG)AfterClient', 12, json_encode(array("token"=>$request->token)), $client_response);
                 $balance = round($client_response->playerdetailsresponse->balance*100,2);
                 $msg = array(
                     "data" => array(
                         "statusCode" => 0,
                         "username" => $client_details->username,
                         "balance" => $balance,
-                        "hash" => md5("2c00c099-f32b-4fc1-a69d-661d8c51c6ae".$client_details->username."".$balance),
+                        "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                     ),
                 );
-                Helper::saveLog('PlayerBalance(ICG)', 12, json_encode(array("token"=>$request->token)), $msg);
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
             else{
@@ -266,6 +267,7 @@ class ICGController extends Controller
                     ],
                     "fundtransferrequest" => [
                           "playerinfo" => [
+                          "client_player_id"=>$client_details->client_player_id,
                           "token" => $client_details->player_token
                       ],
                       "fundinfo" => [
@@ -274,7 +276,7 @@ class ICGController extends Controller
                             "transferid" => "",
                             "rollback" => "false",
                             "currencycode" => $client_details->currency,
-                            "amount" => "-".round($json["amount"]/100,2)
+                            "amount" => round($json["amount"]/100,2) #change data here
                       ]
                     ]
                       ];
@@ -301,7 +303,7 @@ class ICGController extends Controller
                             "statusCode"=>0,
                             "username" => $client_details->username,
                             "balance" =>$balance,
-                            "hash" => md5("2c00c099-f32b-4fc1-a69d-661d8c51c6ae".$client_details->username."".$balance),
+                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
                     $game = Helper::getGameTransaction($request->token,$request->gameId);
@@ -368,6 +370,7 @@ class ICGController extends Controller
                     ],
                     "fundtransferrequest" => [
                           "playerinfo" => [
+                          "client_player_id"=>$client_details->client_player_id,
                           "token" => $client_details->player_token
                       ],
                       "fundinfo" => [
@@ -416,7 +419,7 @@ class ICGController extends Controller
                             "statusCode"=>0,
                             "username" => $client_details->username,
                             "balance" =>$balance,
-                            "hash" => md5("2c00c099-f32b-4fc1-a69d-661d8c51c6ae".$client_details->username."".$balance),
+                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
                     Helper::createICGGameTransactionExt($gametransactionid,$json,$requesttocient,$response,$client_response,2);  
@@ -447,7 +450,7 @@ class ICGController extends Controller
     private function _getClientDetails($type = "", $value = "") {
 
 		$query = DB::table("clients AS c")
-				 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
+				 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
 				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
 				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
 				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
@@ -496,6 +499,7 @@ class ICGController extends Controller
                         ],
                         "fundtransferrequest" => [
                               "playerinfo" => [
+                              "client_player_id"=>$client_details->client_player_id,
                               "token" => $client_details->player_token
                           ],
                           "fundinfo" => [
@@ -541,7 +545,7 @@ class ICGController extends Controller
                             "statusCode"=>0,
                             "username" => $client_details->username,
                             "balance" =>$balance,
-                            "hash" => md5("2c00c099-f32b-4fc1-a69d-661d8c51c6ae".$client_details->username."".$balance),
+                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
                     Helper::createICGGameTransactionExt($gametransactionid,$json,$requesttocient,$response,$client_response,2);
@@ -595,6 +599,7 @@ class ICGController extends Controller
                         ],
                         "fundtransferrequest" => [
                               "playerinfo" => [
+                              "client_player_id"=>$client_details->client_player_id,
                               "token" => $client_details->player_token
                           ],
                           "fundinfo" => [
@@ -603,7 +608,7 @@ class ICGController extends Controller
                                 "transferid" => "",
                                 "rollback" => "false",
                                 "currencycode" => $client_details->currency,
-                                "amount" => "-".round($json["amount"]/100,2)
+                                "amount" => round($json["amount"]/100,2)
                           ]
                         ]
                           ];
@@ -631,7 +636,7 @@ class ICGController extends Controller
                             "statusCode"=>0,
                             "username" => $client_details->username,
                             "balance" =>$balance,
-                            "hash" => md5("2c00c099-f32b-4fc1-a69d-661d8c51c6ae".$client_details->username."".$balance),
+                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
                     $game = Helper::getGameTransaction($request->token,0);
@@ -687,5 +692,37 @@ class ICGController extends Controller
                 ->header('Content-Type', 'application/json');
             }
         } 
+    }
+    public function changeSecurityCode($currency){
+        if($currency == "USD"){
+            return config("providerlinks.icgagents.usdagents.secure_code");
+        }
+        elseif($currency == "JPY"){
+            return config("providerlinks.icgagents.jpyagents.secure_code");
+        }
+        elseif($currency == "CNY"){
+            return config("providerlinks.icgagents.cnyagents.secure_code");
+        }
+        elseif($currency == "EUR"){
+            return config("providerlinks.icgagents.euragents.secure_code");
+        }
+        elseif($currency == "KRW"){
+            return config("providerlinks.icgagents.krwagents.secure_code");
+        }
+        elseif($currency == "PHP"){
+            return config("providerlinks.icgagents.phpagents.secure_code");
+        }
+        elseif($currency == "THB"){
+            return config("providerlinks.icgagents.thbagents.secure_code");
+        }
+        elseif($currency == "TRY"){
+            return config("providerlinks.icgagents.tryagents.secure_code");
+        }
+        elseif($currency == "TWD"){
+            return config("providerlinks.icgagents.twdagents.secure_code");
+        }
+        elseif($currency == "VND"){
+            return config("providerlinks.icgagents.vndagents.secure_code");
+        }
     }
 }

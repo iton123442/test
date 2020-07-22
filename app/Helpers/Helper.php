@@ -2,8 +2,16 @@
 namespace App\Helpers;
 use DB;
 use GuzzleHttp\Client;
+use Carbon\Carbon;
+
 class Helper
 {
+	
+	public static function datesent(){
+		$date = Carbon::now();
+		return $date->toDateTimeString();
+	}
+
 	public static function auth_key($api_key, $access_token) {
 		$result = false;
 
@@ -23,6 +31,17 @@ class Helper
 					"response_data" => json_encode($response_data)
 				];
 		DB::table('seamless_request_logs')->insert($data);
+	}
+
+	public static function saveClientLog($method, $provider_id = 0, $sent_data, $response_data) {
+		$data = [
+					"method_name" => $method,
+					"provider_id" => $provider_id,
+					"sent_data" => $sent_data,
+					"response_data" => json_encode($response_data)
+				];
+
+		DB::table('seamless_sent_logs')->insert($data);
 	}
 
 	/* NEW 061620 */
@@ -82,24 +101,25 @@ class Helper
 				];
 		return DB::table('players')->insertGetId($data);
 	}
-	public static function checkPlayerExist($client_id, $client_player_id, $username,  $email, $display_name,$token){
+	public static function checkPlayerExist($client_id, $client_player_id, $username,  $email, $display_name,$token,$player_ip_address=false){
 		$player = DB::table('players')
 					->where('client_id',$client_id)
 					->where('client_player_id',$client_player_id)
-					->where('username',$username)
+					// ->where('username',$username)
 					->first();
 		if($player){
-			return Helper::createPlayerSessionToken($player->player_id,$token);
+			return Helper::createPlayerSessionToken($player->player_id,$token,$player_ip_address);
 		}
 		else{
 			$player_id=Helper::save_player($client_id,$client_player_id,$username,$email,$display_name);
-			return Helper::createPlayerSessionToken($player_id,$token);
+			return Helper::createPlayerSessionToken($player_id,$token,$player_ip_address);
 		}
 	}
-	public static function createPlayerSessionToken($player_id,$token){
+	public static function createPlayerSessionToken($player_id,$token,$player_ip_address){
 		$player_session_token = array(
 			"player_id" => $player_id,
 			"player_token" => $token,
+			"player_ip_address" => $player_ip_address,
 			"status_id" => 1
 		);
 		DB::table('player_session_tokens')->insert($player_session_token);
@@ -202,8 +222,10 @@ class Helper
                                 "gameid" => "",
                                 "clientid" => $client_details->client_id,
                                 "playerdetailsrequest" => [
+                                	"client_player_id" => $client_details->client_player_id,
                                     "token" => $client_details->player_token,
-                                    "gamelaunch" => "false"
+                                    "gamelaunch" => "false",
+                                    "refreshtoken" => "false"
                                 ]]
                     )]
                 );
@@ -217,6 +239,21 @@ class Helper
 			"game_trans_id" => $gametransaction_id,
 			"round_id" =>array_key_exists("roundId",$provider_request)?$provider_request["roundId"]:0,
 			"amount" =>round($provider_request["amount"]/100,2),
+			"game_transaction_type"=>$game_transaction_type,
+			"provider_request" =>json_encode($provider_request),
+			"mw_request"=>json_encode($mw_request),
+			"mw_response" =>json_encode($mw_response),
+			"client_response" =>json_encode($client_response),
+		);
+		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
+		return $gametransactionext;
+	}
+	public static function createBNGGameTransactionExt($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type){
+		$gametransactionext = array(
+			"provider_trans_id" => $provider_request["uid"],
+			"game_trans_id" => $gametransaction_id,
+			"round_id" =>$provider_request["args"]["round_id"],
+			"amount" =>$game_transaction_type==1?round($provider_request["args"]["bet"],2):round($provider_request["args"]["win"],2),
 			"game_transaction_type"=>$game_transaction_type,
 			"provider_request" =>json_encode($provider_request),
 			"mw_request"=>json_encode($mw_request),
@@ -243,6 +280,22 @@ class Helper
 		else{
 			$gametransactionext["provider_trans_id"] = 0;
 		}
+		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
+		return $gametransactionext;
+	}
+	public static function createMannaGameTransactionExt($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type){
+		$gametransactionext = array(
+			"game_trans_id" => $gametransaction_id,
+			"provider_trans_id" => $provider_request['transaction_id'],
+			"round_id" =>$provider_request['round_id'],
+			"amount" =>$provider_request['amount'],
+			"game_transaction_type"=>$game_transaction_type,
+			"provider_request" =>json_encode($provider_request),
+			"mw_request"=>json_encode($mw_request),
+			"mw_response" =>json_encode($mw_response),
+			"client_response" =>json_encode($client_response),
+		);
+	
 		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
 		return $gametransactionext;
 	}

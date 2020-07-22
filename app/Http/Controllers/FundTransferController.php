@@ -6,6 +6,7 @@ use App\Models\PlayerDetail;
 use App\Models\PlayerSessionToken;
 use App\Models\PlayerWallet;
 use App\Helpers\Helper;
+use App\Helpers\GameTransaction;
 
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
@@ -28,11 +29,12 @@ class FundTransferController extends Controller
 		$arr_result = [
 						"fundtransferresponse" => [
 							"status" => [
-								"success" => false,
+								"code" => "402",
+								"status" => "Failed",
 								"message" => "Insufficient balance.",
 							],
-								"balance" => false,
-								"currencycode" => false
+								"balance" => "false",
+								"currencycode" => "false"
 							]
 						];
 
@@ -100,6 +102,7 @@ class FundTransferController extends Controller
 											      "gamesessionid" => $json_data["fundtransferrequest"]["fundinfo"]["gamesessionid"],
 											      "transactiontype" => $json_data["fundtransferrequest"]["fundinfo"]["transactiontype"],
 											      "transferid" => $json_data["fundtransferrequest"]["fundinfo"]["transferid"],
+											      "rollback" => $json_data["fundtransferrequest"]["fundinfo"]["rollback"],
 											      "currencycode" => $json_data["fundtransferrequest"]["fundinfo"]["currencycode"],
 											      "amount" => $json_data["fundtransferrequest"]["fundinfo"]["amount"]
 											]
@@ -108,14 +111,19 @@ class FundTransferController extends Controller
 							    )]
 							);
 
-							return var_export($response->getBody()->getContents(), true);
+							$client_response = json_decode($response->getBody()->getContents());
+
+							/* if($client_response->fundtransferresponse->status->success) {
+								GameTransaction::save($json_data);
+							} */
+
+							$arr_result = $client_response;
 						}
 					}
 				}
 			}
 		}
 		
-
 		echo json_encode($arr_result);
 	}
 

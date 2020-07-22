@@ -5,18 +5,20 @@ namespace App\Http\Controllers\Payments;
 use App\Helpers\Helper;
 use App\Helpers\PaymentHelper;
 use App\Http\Controllers\Controller;
+use App\Payment;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use App\PayTransaction;
 use DB;
+use Carbon\Carbon;
 class PaymentLobbyController extends Controller
 {
     //
-    private $payment_lobby_url = "https://pay.betrnk.games";
+    private $payment_lobby_url = "https://pay-staging.betrnk.games";
     // private $payment_lobby_url = 'http://middleware.freebetrnk.com/public';
-     // private $payment_lobby_url = "http://127.0.0.1:8003";
+    //private $payment_lobby_url = "http://127.0.0.1:8000";
     public function paymentLobbyLaunchUrl(Request $request){
         if($request->has("callBackUrl")
             &&$request->has("exitUrl")
@@ -35,7 +37,7 @@ class PaymentLobbyController extends Controller
                     return response($response,401)->header('Content-Type', 'application/json');
                 }
                 $token = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
-                if($token = Helper::checkPlayerExist($request->client_id,$request->player_id,$request->player_username,$request->email,$request->player_username,$token)){
+                if($token = Helper::checkPlayerExist($request->client_id,$request->player_id,$request->player_username,$request->email,$request->player_username,$token,'127.0.0.1')){
                     $payment_method_code = "";
                     if($request->payment_method == "PAYMONGO")
                     {
@@ -94,6 +96,7 @@ class PaymentLobbyController extends Controller
                             $lang= $request->lang;
                         }
                         $response = array(
+                            "token"=> $token,
                             "transaction_id" => $transaction->id,
                             "orderId" => $transaction->orderId,
                             "payment_method" => $payment_method_code,
@@ -130,6 +133,32 @@ class PaymentLobbyController extends Controller
                         $player_details = $this->_getClientDetails("token",$token);
                         $transaction = PaymentHelper::payTransactions($player_details->token_id,$request->input("orderId"),null,10,$request->input("amount"),2,1,$request->input("callBackUrl"),6);
                     }
+                    elseif($request->payment_method == "STRIPE")
+                    {
+                        /*
+                        entry type 2 = credit
+                        transaction type 1 = deposit
+                        status 6 = pending
+                        method_id = 10 IWALLET
+                        */
+                        $payment_method = "stripe";
+                        $payment_method_code = "STRIPE";
+                        $player_details = $this->_getClientDetails("token",$token);
+                        $transaction = PaymentHelper::payTransactions($player_details->token_id,$request->input("orderId"),null,13,$request->input("amount"),2,1,$request->input("callBackUrl"),6);
+                    }
+                    elseif($request->payment_method == "CATPAY")
+                    {
+                        /*
+                        entry type 2 = credit
+                        transaction type 1 = deposit
+                        status 6 = pending
+                        method_id = 10 IWALLET
+                        */
+                        $payment_method = "catpay";
+                        $payment_method_code = "CATPAY";
+                        $player_details = $this->_getClientDetails("token",$token);
+                        $transaction = PaymentHelper::payTransactions($player_details->token_id,$request->input("orderId"),null,14,$request->input("amount"),2,1,$request->input("callBackUrl"),6);
+                    }
                     else{
                         $response = array(
                             "error" => "INVALID_METHOD",
@@ -141,7 +170,19 @@ class PaymentLobbyController extends Controller
                     if($request->has("lang")){
                         $lang= $request->lang;
                     }
+                    if($request->has("api")&&$request->input("api")=="V1"){
+                        $response = array(
+                            "token" => $token,
+                            "transaction_id" => $transaction->id,
+                            "orderId" => $transaction->orderId,
+                            "payment_method" => $payment_method_code,
+                            "status" => "PENDING"
+                        );
+                        PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($request->getContent()),json_encode($response),"PaymentUrl"); 
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
                     $response = array(
+                        "token" => $token,
                         "transaction_id" => $transaction->id,
                         "orderId" => $transaction->orderId,
                         "payment_method" => $payment_method_code,
@@ -180,15 +221,20 @@ class PaymentLobbyController extends Controller
                     &&$request->has("cvc")
                     &&$request->has("currency")
                     &&$request->has("exitUrl")){
-                        $returnUrl="https://pay.betrnk.games/paymongo/request?token=".$request->token."&exitUrl=".$request->exitUrl;
+                        $returnUrl="https://pay-staging.betrnk.games/paymongo/request?token=".$request->token."&exitUrl=".$request->exitUrl;
                         $paymongo_transaction = PaymentHelper::paymongo($request->input("cardnumber"),$request->input("exp_year"),$request->input("exp_month"),$request->input("cvc"),$request->input("amount"),$request->input("currency"),$returnUrl);
                         if($paymongo_transaction){
                             if(array_key_exists("message",$paymongo_transaction)){
+                                $converted = $this->currencyConverter($player_details->default_currency,$request->currency,$paymongo_transaction["equivalent_point"]);
                                 if($paymongo_transaction["status"]=="awaiting_next_action"){
                                         $data = array(
                                         "token_id" => $player_details->token_id,
+                                        "reference_number" => $paymongo_transaction["provider_transaction_id"],
                                         "purchase_id" => $paymongo_transaction["purchase_id"],
-                                        "amount" => $paymongo_transaction["equivalent_point"],
+                                        "from_currency" =>$converted[0]["currency_to"],
+                                        "input_amount"=>$request->amount,
+                                        "exchange_rate"=>$converted[0]["exchange_rate"],
+                                        "amount" => $converted[0]["amount"],
                                         "status_id" => 6
                                         );
                                         $transaction = PaymentHelper::updateTransaction($data);
@@ -200,7 +246,11 @@ class PaymentLobbyController extends Controller
                                         $data = array(
                                             "token_id" => $player_details->token_id,
                                             "purchase_id" => $paymongo_transaction["purchase_id"],
-                                            "amount" => $paymongo_transaction["equivalent_point"],
+                                            "reference_number" => $paymongo_transaction["provider_transaction_id"],
+                                            "from_currency" =>$converted[0]["currency_to"],
+                                            "input_amount"=>$request->amount,
+                                            "exchange_rate"=>$converted[0]["exchange_rate"],
+                                            "amount" => $converted[0]["amount"],
                                             "status_id" => 5
                                             );
                                         $transaction = PaymentHelper::updateTransaction($data);
@@ -216,7 +266,7 @@ class PaymentLobbyController extends Controller
                                             'form_params' => [
                                                 'transaction_id' => $transaction->id,
                                                 'orderId' => $transaction->orderId,
-                                                "amount" => $paymongo_transaction["equivalent_point"],
+                                                "amount" => $converted[0]["amount"],
                                                 'client_player_id' => $client_player_id->client_player_id,
                                                 'status' => "SUCCESS",
                                                 'message' => 'Thank you! Your Payment using PAYMONGO has successfully completed.',
@@ -226,7 +276,7 @@ class PaymentLobbyController extends Controller
                                         $datatorequest = array(
                                                 'transaction_id' => $transaction->id,
                                                 'orderId' => $transaction->orderId,
-                                                "amount" => $paymongo_transaction["equivalent_point"],
+                                                "amount" => $converted[0]["amount"],
                                                 'client_player_id' => $client_player_id->client_player_id,
                                                 'status' => "SUCCESS",
                                                 'message' => 'Thank you! Your Payment using PAYMONGO has successfully completed.',
@@ -272,17 +322,135 @@ class PaymentLobbyController extends Controller
                         return response($response,401)->header('Content-Type', 'application/json');
                     }
                 }
+                elseif($request->input("payment_method")== "STRIPE"){
+                    if($request->has("cardnumber")
+                    &&$request->has("exp_month")
+                    &&$request->has("exp_year")
+                    &&$request->has("cvc")
+                    &&$request->has("currency")
+                    &&$request->has("exitUrl")){
+                        $returnUrl="https://pay-staging.betrnk.games/stripe/request?token=".$request->token."&exitUrl=".$request->exitUrl;
+                        $stripe_transaction = PaymentHelper::stripePayment($request->input("cardnumber"),$request->input("exp_year"),$request->input("exp_month"),$request->input("cvc"),$request->input("amount"),$request->input("currency"),$returnUrl);
+                        
+                        if($stripe_transaction){
+                            if(array_key_exists("status",$stripe_transaction)){
+                                    $converted = $this->currencyConverter($player_details->default_currency,$request->currency,$stripe_transaction["equivalent_point"]);
+                                    if($stripe_transaction["status"]=="requires_action"){
+                                        
+                                        $data = array(
+                                        "token_id" => $player_details->token_id,
+                                        "reference_number" => $stripe_transaction["provider_transaction_id"],
+                                        "purchase_id" => $stripe_transaction["purchase_id"],
+                                        "from_currency" =>$converted[0]["currency_to"],
+                                        "input_amount"=>$request->amount,
+                                        "exchange_rate"=>$converted[0]["exchange_rate"],
+                                        "amount" => $converted[0]["amount"],
+                                        "status_id" => 6
+                                        );
+                                        $transaction = PaymentHelper::updateTransaction($data);
+                                        PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($request->getContent()),json_encode($transaction),"PayMongo Payment Transaction");
+                                        return $stripe_transaction;
+                                    }
+                                    elseif($stripe_transaction["status"]=="succeeded"){
+                                        try{
+                                            $data = array(
+                                                "token_id" => $player_details->token_id,
+                                                "reference_number" => $stripe_transaction["provider_transaction_id"],
+                                                "purchase_id" => $stripe_transaction["purchase_id"],
+                                                "from_currency" =>$converted[0]["currency_to"],
+                                                "input_amount"=>$request->amount,
+                                                "exchange_rate"=>$converted[0]["exchange_rate"],
+                                                "amount" => $converted[0]["amount"],
+                                                "status_id" => 5
+                                                );
+                                            $transaction = PaymentHelper::updateTransaction($data);
+                                            $client_player_id = DB::table('player_session_tokens as pst')
+                                                ->select("p.client_player_id","p.client_id")
+                                                ->leftJoin("players as p","pst.player_id","=","p.player_id")
+                                                ->where("pst.token_id",$transaction->token_id)
+                                                ->first();
+                                            $key = $transaction->id.'|'.$client_player_id->client_player_id.'|SUCCESS';
+                                            $authenticationCode = hash_hmac("sha256",$client_player_id->client_id,$key);
+                                            $http = new Client();
+                                            $response_client = $http->post($transaction->trans_update_url,[
+                                                'form_params' => [
+                                                    'transaction_type' => "DEPOSIT",
+                                                    'transaction_id' => $transaction->id,
+                                                    'orderId' => $transaction->orderId,
+                                                    "amount" => $converted[0]["amount"],
+                                                    'client_player_id' => $client_player_id->client_player_id,
+                                                    'status' => "SUCCESS",
+                                                    'message' => 'Thank you! Your Payment using STRIPE has successfully completed.',
+                                                    'AuthenticationCode' => $authenticationCode
+                                                ],
+                                            ]);
+                                            $datatorequest = array(
+                                                    'transaction_type' => "DEPOSIT",
+                                                    'transaction_id' => $transaction->id,
+                                                    'orderId' => $transaction->orderId,
+                                                    "amount" => $converted[0]["amount"],
+                                                    'client_player_id' => $client_player_id->client_player_id,
+                                                    'status' => "SUCCESS",
+                                                    'message' => 'Thank you! Your Payment using STRIPE has successfully completed.',
+                                                    'AuthenticationCode' => $authenticationCode
+                                            );
+                                            PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($datatorequest),json_encode($response_client->getBody()),"Stripe Payment Update Transaction"); 
+                                            return $stripe_transaction; 
+                                        }
+                                        catch(ClientException $e){
+                                            $client_response = $e->getResponse();
+                                            $response = json_decode($client_response->getBody()->getContents(),True);
+                                            return response($response,200)
+                                            ->header('Content-Type', 'application/json');
+                                        }
+                                        catch(ConnectException $e){
+                                            $response = array(
+                                                "error" => "CONNECT_ERROR",
+                                                "message" => "Incorrect callBackUrl/callBackUrl is not found"
+                                            );
+                                            return response($response,200)
+                                            ->header('Content-Type', 'application/json');
+                                        }
+                                        
+                                    }
+                            }
+                            else{
+                                return $stripe_transaction;
+                            }
+                        }
+                        else{
+                            $response = array(
+                                "error" => "INVALID_REQUEST",
+                                "message" => "Invalid Stripe input/missing input"
+                            );
+                            return response($response,401)->header('Content-Type', 'application/json');
+                        }
+                        
+                    }
+                    else{
+                        $response = array(
+                            "error" => "INVALID_REQUEST",
+                            "message" => "Invalid Paymongo input/missing input"
+                        );
+                        return response($response,401)->header('Content-Type', 'application/json');
+                    }
+                }
                 elseif($request->input("payment_method")== "COINSPAYMENT"){
                     if($request->has("amount")&&$request->has("currency")&&$request->has("digital_currency")){
                         $dgcurrencyrate = $this->getCoinspaymentSingleRate($request->input("digital_currency"));//okiey
                             $currency = (float)$this->getCurrencyConvertion($request->input("currency"));
                             $finalcurrency =((float)$request->input("amount")*$currency)/(float)$dgcurrencyrate;
                             $cointransaction = PaymentHelper::coinspayment($finalcurrency,$request->input("digital_currency"));
+                            $converted = $this->currencyConverter($player_details->default_currency,$request->currency,$cointransaction["purchase_amount"]);
                             if($cointransaction){
                                 $data = array(
                                     "token_id" => $player_details->token_id,
                                     "purchase_id" => $cointransaction["purchaseid"],
-                                    "amount" => $cointransaction["purchase_amount"],
+                                    "reference_number" =>$cointransaction["txn_id"],
+                                    "from_currency" =>$converted[0]["currency_to"],
+                                    "input_amount"=>$request->amount,
+                                    "exchange_rate"=>$converted[0]["exchange_rate"],
+                                    "amount" => $converted[0]["amount"],
                                     "status_id" => 6
                                     );
                                 $transaction = PaymentHelper::updateTransaction($data);
@@ -291,6 +459,7 @@ class PaymentLobbyController extends Controller
                                     "order_id" => $transaction->orderId,
                                     "digi_currency" =>$request->input("digital_currency"),
                                     "digi_currency_value"=>$finalcurrency,
+                                    "amount" => $converted[0]["amount"],
                                     "checkout_url"=>$cointransaction["checkout_url"],
                                     "wallt_address"=>$cointransaction["wallet_address"],
                                     "httpcode" => "SUCCESS",
@@ -314,10 +483,15 @@ class PaymentLobbyController extends Controller
                         $qaicash_transaction = PaymentHelper::QAICASHMakeDeposit($request->input("amount"),$request->input("currency"),$request->input("deposit_method"),$player_details->player_id
                                                                 ,$player_details->email,$player_details->display_name,$request->input("exitUrl"));
                         if($qaicash_transaction){
+                            $converted = $this->currencyConverter($player_details->default_currency,$request->currency,$qaicash_transaction["purchase_amount"]);
                             $data = array(
                                 "token_id" => $player_details->token_id,
                                 "purchase_id" => $qaicash_transaction["purchase_id"],
-                                "amount" => $qaicash_transaction["purchase_amount"],
+                                "reference_number" => $qaicash_transaction["provider_transaction_id"],
+                                "from_currency" =>$converted[0]["currency_to"],
+                                "input_amount"=>$request->amount,
+                                "exchange_rate"=>$converted[0]["exchange_rate"],
+                                "amount" => $converted[0]["amount"],
                                 "status_id" => 6
                                 );
                             $transaction = PaymentHelper::updateTransaction($data);
@@ -325,6 +499,7 @@ class PaymentLobbyController extends Controller
                                 "transaction_id"=>$transaction->id,
                                 "order_id" => $transaction->orderId,
                                 "payment_page_url"=>$qaicash_transaction["payment_page_url"],
+                                "amount" => $converted[0]["amount"],
                                 "status"=>$qaicash_transaction["status"],
                                 "currency"=>$qaicash_transaction["currency"],
                             );
@@ -357,6 +532,7 @@ class PaymentLobbyController extends Controller
                                 "transaction_id"=>$transaction->id,
                                 "order_id" => $transaction->orderId,
                                 "payment_page_url"=>$qaicash_transaction["payment_page_url"],
+                                "amount" => $converted[0]["amount"],
                                 "status"=>$qaicash_transaction["status"],
                                 "currency"=>$qaicash_transaction["currency"],
                             );
@@ -383,6 +559,7 @@ class PaymentLobbyController extends Controller
                         if($vprica_trans){
                             $data = array(
                                 "token_id" => $player_details->token_id,
+                                "reference_number" =>$vprica_trans["purchase_id"],
                                 "purchase_id" => $vprica_trans["purchase_id"],
                                 "amount" => $vprica_trans["purchase_amount"],
                                 "status_id" => 7
@@ -442,10 +619,15 @@ class PaymentLobbyController extends Controller
                         $amount =((float)$request->input("amount")*$currency);                           
                         $ebanco_trans = PaymentHelper::ebanco($amount,$request->input("bank_name"));
                         if($ebanco_trans){
+                            $converted = $this->currencyConverter($player_details->default_currency,$request->currency,$ebanco_trans["deposit_amount"]);
                             $data = array(
                                 "token_id" => $player_details->token_id,
+                                "reference_number" =>$ebanco_trans["deposit_id"],
                                 "purchase_id" => $ebanco_trans["deposit_id"],
-                                "amount" => $amount,
+                                "from_currency" =>$converted[0]["currency_to"],
+                                "input_amount"=>$request->amount,
+                                "exchange_rate"=>$converted[0]["exchange_rate"],
+                                "amount" => $converted[0]["amount"],
                                 "status_id" => 7
                                 );
                             $transaction = PaymentHelper::updateTransaction($data);
@@ -457,7 +639,7 @@ class PaymentLobbyController extends Controller
                                 "bank_account_no"=>$ebanco_trans["bank_account_no"],
                                 "bank_account_name"=>$ebanco_trans["bank_account_name"],
                                 "bank_branch_name"=>$ebanco_trans["bank_branch_name"],
-                                "deposit_amount"=>$ebanco_trans["deposit_amount"],
+                                "amount" => $converted[0]["amount"],
                                 "status"=>$ebanco_trans["status"],
                             );
                             $status="HELD";
@@ -502,6 +684,94 @@ class PaymentLobbyController extends Controller
                         $response = array(
                             "error" => "INVALID_REQUEST",
                             "message" => "Invalid input / missing input in EBANCO"
+                        );
+                        return response($response,401)->header('Content-Type', 'application/json');
+                    }
+                }
+                elseif($request->input("payment_method") == "CATPAY"){
+                    if($request->has("amount")&&$request->has("paytype")){
+                        $transaction = PaymentHelper::getTransaction("token",$player_details->token_id);
+                        $order = array(
+                            'order' => array(
+                                "streetName"=>"",
+                                "sumPrice" => $request->amount,
+                                "freight">6,
+                                "name"=>$player_details->display_name,
+                                "mobile"=>""
+                            ),
+                            "orderId"=>$transaction->orderId
+                            );
+                        $catpay_transaction = PaymentHelper::launchCatPayPayment(json_encode($order),$request->paytype,$transaction->orderId);
+                        if(array_key_exists("result",$catpay_transaction)){
+                            $return_data = array(
+                                "transaction_id" => $transaction->id,
+                                "payment_page" =>config('providerlinks.payment.catpay.url_redirect').$catpay_transaction["result"]["payPage"]
+                                                .'?token='.$catpay_transaction["result"]["token"].'&orderId='.$transaction->orderId.'&price='.$request->amount.'&flowId='.$catpay_transaction["result"]["flowId"]
+                                                .'&noteNum='.$catpay_transaction["result"]["noteNum"].'&payType='.$catpay_transaction["result"]["payType"].'&providerMobile='.$catpay_transaction["result"]["providerMobile"],
+                                "status"=>"PENDING"
+                            );
+                            $converted = $this->currencyConverter($player_details->default_currency,$request->currency,$request->amount);
+                            $data = array(
+                                "token_id" => $player_details->token_id,
+                                "purchase_id" => $transaction->orderId,
+                                "reference_number" => $catpay_transaction["result"]["noteNum"],
+                                "from_currency" =>$converted[0]["currency_to"],
+                                "input_amount"=>$request->amount,
+                                "exchange_rate"=>$converted[0]["exchange_rate"],
+                                "amount" => $converted[0]["amount"],
+                                "status_id" => 6
+                                );
+                            $transaction = PaymentHelper::updateTransaction($data);
+                            $status="HELD";
+                            $key = $transaction->id.'|'.$player_details->player_id.'|'.$status;
+                            $authenticationCode = hash_hmac("sha256",$player_details->client_id,$key);
+                            try{
+                                $http = new Client();
+                                $responsefromclient = $http->post($transaction->trans_update_url,[
+                                    'form_params' => [
+                                        'transaction_id' => $transaction->id,
+                                        'orderId' => $transaction->orderId,
+                                        'amount'=> $transaction->amount,
+                                        'client_player_id' => $player_details->player_id,
+                                        'status' => $status,
+                                        'message' => "Hi! Thank you for choosing CatPay. Your Payment is in held and waiting for final payment.",
+                                        'AuthenticationCode' => $authenticationCode
+                                    ],
+                                ]);
+                                $requesttoclient = array(
+                                        'transaction_id' => $transaction->id,
+                                        'orderId' => $transaction->orderId,
+                                        'amount'=> $transaction->amount,
+                                        'client_player_id' => $player_details->player_id,
+                                        'status' => $status,
+                                        'message' => "Hi! Thank you for choosing CatPay. Your Payment is in held and waiting for final payment.",
+                                        'AuthenticationCode' => $authenticationCode
+                                );
+                            PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($requesttoclient),json_encode($responsefromclient->getBody()),"CATPAY Payment Transaction");
+                            }
+                            catch(ClientException $e){
+                                $requesttoclient = array(
+                                    'transaction_id' => $transaction->id,
+                                    'orderId' => $transaction->orderId,
+                                    'amount'=> $transaction->amount,
+                                    'client_player_id' => $player_details->player_id,
+                                    'status' => $status,
+                                    'message' => "Hi! Thank you for choosing CatPay. Your Payment is in held and waiting for final payment.",
+                                    'AuthenticationCode' => $authenticationCode
+                                );
+                                PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($requesttoclient),json_encode($e),"CATPAY Payment Transaction");
+                            }
+                            return $return_data;
+                        }
+                        else{
+                            PaymentHelper::savePayTransactionLogs($transaction->id,"",json_encode($catpay_transaction),"CATPAY Payment Transaction");
+                            return $catpay_transaction;
+                        }
+                    }
+                    else{
+                        $response = array(
+                            "error" => "INVALID_REQUEST",
+                            "message" => "Invalid input / missing input in CATPAY"
                         );
                         return response($response,401)->header('Content-Type', 'application/json');
                     }
@@ -569,7 +839,7 @@ class PaymentLobbyController extends Controller
     private function _getClientDetails($type = "", $value = "") {
 
         $query = DB::table("clients AS c")
-                 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
+                 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email','c.default_currency', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
                  ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
                  ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
                  ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
@@ -690,7 +960,7 @@ class PaymentLobbyController extends Controller
 
 
                 $token = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
-                if($token = Helper::checkPlayerExist($request->client_id,$request->player_id,$request->player_username,$request->email,$request->player_username,$token)){
+                if($token = Helper::checkPlayerExist($request->client_id,$request->player_id,$request->player_username,$request->email,$request->player_username,$token,'127.0.0.1')){
                     $payout_method_code = "";
                     
                     if($request->payout_method == "QAICASHPAYOUT")
@@ -727,6 +997,16 @@ class PaymentLobbyController extends Controller
                         );
                         return response($response,402)->header('Content-Type', 'application/json');
                     }
+                    if($request->has("api")){
+                        $response = array(
+                            "token" => $token,
+                            "transaction_id" => $transaction->id,
+                            "orderId" => $transaction->orderId,
+                            "payment_method" => $payout_method_code,
+                            "status" => "PENDING"
+                        );
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
                     $response = array(
                         "transaction_id" => $transaction->id,
                         "orderId" => $transaction->orderId,
@@ -756,25 +1036,35 @@ class PaymentLobbyController extends Controller
                     if($request->has("amount")&&$request->has("currency")&&$request->has("qaicashpayout_method")&&$request->has("exitUrl")){
                         $qaicash_transaction = PaymentHelper::QAICASHMakePayout($request->input("amount"),$request->input("currency"),$request->input("qaicashpayout_method"),$player_details->player_id
                                                                 ,$player_details->email,$player_details->display_name,$request->input("exitUrl"));
+
+                        $converted = $this->currencyConverter($player_details->default_currency,$request->currency,$request->amount);
                         if($qaicash_transaction){
                             $data = array(
                                 "token_id" => $player_details->token_id,
+                                "reference_number" => $qaicash_transaction["provider_transaction_id"],
                                 "purchase_id" => $qaicash_transaction["withdrawal_id"],
-                                "amount" => $qaicash_transaction["withdrawal_amount"],
+                                "from_currency" =>$converted[0]["currency_to"],
+                                "input_amount"=>$request->amount,
+                                "exchange_rate"=>$converted[0]["exchange_rate"],
+                                "amount" => $converted[0]["amount"],
                                 "status_id" => 6
                                 );
                             $transaction = PaymentHelper::updateTransaction($data);
                             $response = array(
+                                "transaction_type"=> "PAYOUT",
                                 "transaction_id"=>$transaction->id,
                                 "order_id" => $transaction->orderId,
+                                "amount"=>$converted[0]["amount"],
                                 "payout_page_url"=>$qaicash_transaction["payment_page_url"],
                                 "status"=>$qaicash_transaction["status"],
                                 "currency"=>$qaicash_transaction["currency"],
                             );
                             PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($request->getContent()),json_encode($response),"QAICASH Payout Transaction");
                             return array(
+                                "transaction_type"=> "PAYOUT",
                                 "transaction_id"=>$transaction->id,
                                 "order_id" => $transaction->orderId,
+                                "amount"=>$converted[0]["amount"],
                                 "payout_page_url"=>$qaicash_transaction["payment_page_url"],
                                 "status"=>$qaicash_transaction["status"],
                                 "currency"=>$qaicash_transaction["currency"],
@@ -999,6 +1289,10 @@ class PaymentLobbyController extends Controller
         $data = array(
             "token_id" => $get_token_id->token_id,
             "purchase_id" => $transaction->orderId,
+            "reference_number"=>$transaction->reference_number,
+            "from_currency" =>$transaction->from_currency,
+            "input_amount"=>$transaction->input_amount,
+            "exchange_rate"=>$transaction->exchange_rate,
             "amount" => $transaction->amount,
             "status_id" => $status_id
             );
@@ -1028,5 +1322,25 @@ class PaymentLobbyController extends Controller
         );
         PaymentHelper::savePayTransactionLogs($transaction->id,json_encode($datatorequest),json_encode($response_client->getBody()),"PayMongo Payment Update Transaction"); 
     }
-    
+    public function currencyConverter($client_currency,$player_currency,$amount){
+        $currencies = PaymentHelper::currencyConverter($client_currency);
+        $converted = array();
+        foreach($currencies["rates"] as $currency){
+            if($currency["currency"]== $player_currency){
+                $finalconverted = array(
+                    "currency_from" => $currencies["main_currency"],
+                    "currency_to" => $player_currency,
+                    "exchange_rate" => $currency["rate"],
+                    "amount" => round($amount*$currency["rate"],2)
+                );
+                array_push($converted,$finalconverted);
+            }
+        }
+        return $converted;
+    }
+    public function CatPaytest(){
+        // $dt = Carbon::parse('2020-03-27');
+        //return Carbon::now('Asia/Shanghai')->timestamp;
+        return PaymentHelper::launchCatPayPayment();
+    }
 }
