@@ -169,6 +169,14 @@ $app->post('skywind/api/getauth2', 'SkyWindController@getAuth2');
 //Lobby API
 //Report API
 
+//SAGaming 
+$app->post('api/sa/GetUserBalance','SAGamingController@GetUserBalance');
+$app->post('api/sa/PlaceBet','SAGamingController@PlaceBet');
+$app->post('api/sa/PlayerWin','SAGamingController@PlayerWin');
+$app->post('api/sa/PlayerLost','SAGamingController@PlayerLost');
+$app->post('api/sa/PlaceBetCancel','SAGamingController@PlaceBetCancel');
+
+
 
 // 8PROVIDERS
 $app->post('/api/eightprovider', 'EightProviderController@index'); // Single Route
@@ -193,6 +201,18 @@ $app->post('/api/bng/generateGame','BNGController@generateGame');
 // BETRNK LOTTO
 $app->post('/api/betrnk/lotto', 'BetrnkController@getUrl');
 
+// TIDY
+// $app->post('/tidy/api/auth', 'TidyController@conecteccc');
+$app->post('/tidy/api/game/outside/link', 'TidyController@getGameUrl');
+$app->post('/tidy/api/checkplayer', 'TidyController@autPlayer');
+$app->post('/tidy/api/gamelist', 'TidyController@getGamelist');
+$app->post('/tidy/api/gameurl', 'TidyController@gameUrl');
+
+$app->post('/tidy/api/user/balance', 'TidyController@checkBalance');
+$app->post('/tidy/api/transaction/bet', 'TidyController@gameBet');
+$app->post('/tidy/api/transaction/rollback', 'TidyController@gameRollback');
+$app->post('/tidy/api/transaction/win', 'TidyController@gameWin');
+// $app->post('/api/tidy/checkbalance', 'TidyController@checkBalance');
 
 // EPOINT CONTROLLER
 // $app->post('/api/epoint', 'EpointController@epointAuth'); #/
@@ -275,3 +295,9 @@ $app->post('api/wmt/makesettlement','Payments\WMTController@makeSettlement');
 $app->post('game/lang','GameLobby\GameLobbyController@getLanguage');
 
 $app->post('payment/catpay/callBack','Payments\PaymentGatewayController@catpayCallback');
+
+
+// Habanero 
+$app->post('hbn/api/auth','HabaneroController@playerdetailrequest');
+$app->post('hbn/api/tx','HabaneroController@fundtransferrequest');
+$app->post('hbn/api/query','HabaneroController@queryrequest');

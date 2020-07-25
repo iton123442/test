@@ -8,6 +8,8 @@ use GuzzleHttp\Exception\RequestException;
 use App\Helpers\Helper;
 use App\Helpers\IAHelper;
 use App\Helpers\AWSHelper;
+use App\Helpers\SAHelper;
+use App\Helpers\TidyHelper;
 use App\Helpers\ProviderHelper;
 use DB;             
 use Carbon\Carbon;
@@ -196,13 +198,85 @@ class GameLobby{
         return $url;
     }
 
+     public static function saGamingLaunchUrl($game_code,$token,$exitUrl,$lang='en'){
+        $client_details = Providerhelper::getClientDetails('token', $token);
+        $url = $exitUrl;
+        $lang = SAHelper::lang($lang);
+        $domain = parse_url($url, PHP_URL_HOST);
+        $url = 'https://www.sai.slgaming.net/app.aspx?username='.config('providerlinks.sagaming.prefix').$client_details->player_id.'&token='.$token.'&lobby='.config('providerlinks.sagaming.lobby').'&lang='.$lang.'&returnurl='.$url.'';
+        return $url;
+    }
+
+    public static function tidylaunchUrl( $game_code = null, $token = null){
+
+        $url = 'http://staging-v1-api.tidy.zone/api/game/outside/link';
+
+        $client_details = Providerhelper::getClientDetails('token', $token);
+         
+        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+           
+          // $requesttosend = [
+          //           'client_id' =>  '8440a5b6',
+          //           'game_id' => $game_code,
+          //           'username' => $client_details->username,
+          //           'token' => $token,
+          //           'uid' => 'TG_'.$client_details->player_id
+          //           ];   
+            
+          //   $data = TidyHelper::auth(
+          //       '/api/game/outside/link', 'POST', $requesttosend
+          //     );
+          //   return $data['link'];
+
+        $get_game_explode = explode("_", $game_code);
+
+                
+            $requesttosend = [
+                'client_id' =>  '8440a5b6',
+                'game_id' => $get_game_explode[1],
+                'username' => $client_details->username,
+                'token' => $token,
+                'uid' => 'TG_'.$client_details->player_id
+            ];
+
+
+           
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.TidyHelper::generateToken($requesttosend)
+                ]
+            ]);
+            $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
+            );
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+
+            return $client_response->link;
+
+    }
+
+    public static function habanerolaunchUrl( $game_code = null, $token = null){
+        $brandID = "2416208c-f3cb-ea11-8b03-281878589203";
+        $apiKey = "3C3C5A48-4FE0-4E27-A727-07DE6610AAC8";
+
+        $client_details = Providerhelper::getClientDetails('token', $token);
+        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+
+        $url = "https://app-test.insvr.com/go.ashx?brandid=$brandID&keyname=$game_code&token=$token&mode=real&locale=en&mobile=0";
+
+        return $url;
+    }
+    
 
     public static function iaLaunchUrl($game_code,$token,$exitUrl)
     {
-        $player_details = GameLobby::getClientDetails('token', $token);
-        $username = config('providerlinks.iagaming.prefix').'_'.$player_details->player_id;
-        $currency_code = 'USD'; 
-        // $currency_code = $request->has('currency_code') ? $request->currency_code : 'USD'; 
+        $player_details = Providerhelper::getClientDetails('token', $token);
+        $provider_reg_currency = Providerhelper::getProviderCurrency(15, $player_details->default_currency);
+        if($provider_reg_currency == 'false'){
+            return 'false';
+        }
+        $username = config('providerlinks.iagaming.prefix').$player_details->client_id.'_'.$player_details->player_id;
+        $currency_code = $player_details->default_currency; 
         $params = [
                 "register_username" => $username,
                 "lang" => 2,
@@ -212,26 +286,13 @@ class GameLobby{
         $header = ['pch:'. config('providerlinks.iagaming.pch')];
         $timeout = 5;
         $client_response = IAHelper::curlData(config('providerlinks.iagaming.url_register'), $uhayuu, $header, $timeout);
+         Helper::saveLog('IA Launch Game', 15, json_encode($client_response), $params);
         $data = json_decode(IAHelper::rehashen($client_response[1], true));
         if($data->status): // IF status is 1/true //user already register
             $data = IAHelper::userlunch($username);
-            // $msg = array(
-            //     "game_code" =>  $game_code,
-            //     "url" => $data,
-            //     "game_launch" => true
-            // );
-            // return response($msg,200)
-            // ->header('Content-Type', 'application/json');
             return $data;
         else: // Else User is successfull register
             $data = IAHelper::userlunch($username);
-            // $msg = array(
-            //     "game_code" => $game_code,
-            //     "url" => $data,
-            //     "game_launch" => true
-            // );
-            // return response($msg,200)
-            // ->header('Content-Type', 'application/json');
             return $data;
         endif;  
     }
