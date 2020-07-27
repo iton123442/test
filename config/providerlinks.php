@@ -91,8 +91,8 @@ return [
     ],
     'evoplay' => [
         'api_url' => 'http://api.8provider.com',
-        'project_id' => '1042',
-        'secretkey' => 'c270d53d4d83d69358056dbca870c0ce',
+        'project_id' => '1045',
+        'secretkey' => '900980b4fe8ad2d771713f77cde79333',
     ],
     'skywind' => [
         'api_url' => 'https://api.gcpstg.m27613.com',
