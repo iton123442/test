@@ -16,6 +16,7 @@ use DB;
 
 class TidyController extends Controller
 {
+	 public $prefix_id = 'TG';
 	 const CLIENT_ID = '8440a5b6';
 	 const SECRET_KEY = 'f83c8224b07f96f41ca23b3522c56ef1'; // token
 	 const API_URL = 'http://staging-v1-api.tidy.zone';
@@ -91,10 +92,10 @@ class TidyController extends Controller
 
 	/* SEAMLESS METHODS */
 	public function checkBalance(Request $request){
-		Helper::saveLog('Tidy Check Balance', 23, file_get_contents("php://input"), 'ENDPOINT HIT');
+		// Helper::saveLog('Tidy Check Balance', 23, json_encode(file_get_contents("php://input")), 'ENDPOINT HIT v2');
 		$data = json_decode(file_get_contents("php://input")); // INCASE RAW JSON / CHANGE IF NOT ARRAY
-		$header = $request->header('Authorization');
-	    Helper::saveLog('Tidy Authorization Logger', 23, file_get_contents("php://input"), $header);
+		// $header = $request->header('Authorization');
+	 //    Helper::saveLog('Tidy Authorization Logger', 23, file_get_contents("php://input"), $header);
 		$token = $data->token;
 		$request_uuid = $data->request_uuid;
 		$client_details = ProviderHelper::getClientDetails('token',$token);
@@ -105,13 +106,14 @@ class TidyController extends Controller
 				$get_code_currency = TidyHelper::currencyCode($currency);
 				$data =  array(	
 				 		'user' => array(
-				 			 "uid"			=> $client_details->player_id,
+				 			 "uid"			=> $this->prefix_id.'_'.$client_details->player_id,
 							 "request_uuid" => $request_uuid,
 							 "currency"		=> $get_code_currency,
 							 "balance" 		=> $player_details->playerdetailsresponse->balance )
 				 	);
-				 
-				return response($data,200)->header('Content-Type', 'application/json');
+				Helper::saveLog('Tidy Check Balance Response', 23, json_encode($request->all()), $data);
+				// return response($data,200)->header('Content-Type', 'application/json');
+				return $data;
 		}else{
 			$errormessage = array(
 				'error_code' 	=> '08-025',
@@ -127,7 +129,7 @@ class TidyController extends Controller
 		$data = json_decode(file_get_contents("php://input"));
 		Helper::saveLog('Tidy Game Bet', 23, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$header = $request->header('Authorization');
-	    Helper::saveLog('Tidy Authorization Logger', 23, file_get_contents("php://input"), $header);
+	    Helper::saveLog('Tidy Authorization Logger BET', 23, json_encode(file_get_contents("php://input")), $header);
 
 		$game_id = $data->game_id;
 		$token = $data->token;
@@ -140,83 +142,83 @@ class TidyController extends Controller
 		$getPlayer = ProviderHelper::playerDetailsCall($client_details->player_token);
 		$game_details = Helper::findGameDetails('game_code', 23, $game_id);
 
-			$transaction_check = ProviderHelper::findGameExt($transaction_uuid, 1,'transaction_id');
-			if($transaction_check != 'false'){
-				$data_response = [
-					'error' => '99-011' 
-				];
-				return $data_response;
-			}
-
-		    $client = new Client([
-			    'headers' => [ 
-			    	'Content-Type' => 'application/json',
-			    	'Authorization' => 'Bearer '.$client_details->client_access_token
-			    ]
-			]);
-			$requesttosend = [
-				  "access_token" => $client_details->client_access_token,
-				  "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-				  "type" => "fundtransferrequest",
-				  "datesent" => Helper::datesent(),
-				  "gamedetails" => [
-				    "gameid" => $game_details->game_code, // $game_details->game_code
-				    "gamename" => $game_details->game_name
-				  ],
-				  "fundtransferrequest" => [
-					  "playerinfo" => [
-						"client_player_id" => $client_details->client_player_id,
-						"token" => $client_details->player_token,
-					  ],
-					  "fundinfo" => [
-						      "gamesessionid" => "",
-						      "transactiontype" => "debit",
-						      "transferid" => "",
-						      "rollback" => false,
-						      "currency" => $client_details->default_currency,
-						      "amount" => abs($amount)
-					   ],
-				  ],
-			];
-			$guzzle_response = $client->post($client_details->fund_transfer_url,
-			    ['body' => json_encode($requesttosend)]
-			);
-		    $client_response = json_decode($guzzle_response->getBody()->getContents());
-		    // $status = json_encode($client_response->fundtransferresponse->status->code);	
-
-		    // TEST
-		    $transaction_type = 'debit';
-			$game_transaction_type = 1; // 1 Bet, 2 Win
-			$game_code = $game_details->game_id;
-			$token_id = $client_details->token_id;
-			$bet_amount = $amount; 
-			$pay_amount = $amount;
-			$income = $amount;
-			$win_type = 0;
-			$method = 1;
-			$win_or_lost = $win_type; // 0 lost,  5 processing
-			$payout_reason = 'Bet';
-			$provider_trans_id = $transaction_uuid;
-			// TEST
-
+		$transaction_check = ProviderHelper::findGameExt($transaction_uuid, 1,'transaction_id');
+		if($transaction_check != 'false'){
 			$data_response = [
-	    		"uid" 		   => $uid,
-	    		"request_uuid" => $request_uuid,
-	    		"currency"	   => TidyHelper::currencyCode($client_details->default_currency),
-	    		"balance" => $client_response->fundtransferresponse->balance
-	    	];
+				'error' => '99-011' 
+			];
+			return $data_response;
+		}
 
-		    $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
-		    $game_transextension = ProviderHelper::createGameTransExt($gamerecord,$provider_trans_id, $provider_trans_id, $pay_amount, $game_transaction_type, $data, $data_response, $requesttosend, $client_response, $data_response);
+	    $client = new Client([
+		    'headers' => [ 
+		    	'Content-Type' => 'application/json',
+		    	'Authorization' => 'Bearer '.$client_details->client_access_token
+		    ]
+		]);
+		$requesttosend = [
+			  "access_token" => $client_details->client_access_token,
+			  "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+			  "type" => "fundtransferrequest",
+			  "datesent" => Helper::datesent(),
+			  "gamedetails" => [
+			    "gameid" => $game_details->game_code, // $game_details->game_code
+			    "gamename" => $game_details->game_name
+			  ],
+			  "fundtransferrequest" => [
+				  "playerinfo" => [
+					"client_player_id" => $client_details->client_player_id,
+					"token" => $client_details->player_token,
+				  ],
+				  "fundinfo" => [
+					      "gamesessionid" => "",
+					      "transactiontype" => "debit",
+					      "transferid" => "",
+					      "rollback" => false,
+					      "currency" => $client_details->default_currency,
+					      "amount" => abs($amount)
+				   ],
+			  ],
+		];
+		$guzzle_response = $client->post($client_details->fund_transfer_url,
+		    ['body' => json_encode($requesttosend)]
+		);
+	    $client_response = json_decode($guzzle_response->getBody()->getContents());
+	    // $status = json_encode($client_response->fundtransferresponse->status->code);	
 
-		    return response($data_response,200)->header('Content-Type', 'application/json');
+	    // TEST
+	    $transaction_type = 'debit';
+		$game_transaction_type = 1; // 1 Bet, 2 Win
+		$game_code = $game_details->game_id;
+		$token_id = $client_details->token_id;
+		$bet_amount = $amount; 
+		$pay_amount = $amount;
+		$income = $amount;
+		$win_type = 0;
+		$method = 1;
+		$win_or_lost = $win_type; // 0 lost,  5 processing
+		$payout_reason = 'Bet';
+		$provider_trans_id = $transaction_uuid;
+		// TEST
+
+		$data_response = [
+    		"uid" 		   => $uid,
+    		"request_uuid" => $request_uuid,
+    		"currency"	   => TidyHelper::currencyCode($client_details->default_currency),
+    		"balance" => $client_response->fundtransferresponse->balance
+    	];
+
+	    $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
+	    $game_transextension = ProviderHelper::createGameTransExt($gamerecord,$provider_trans_id, $provider_trans_id, $pay_amount, $game_transaction_type, $data, $data_response, $requesttosend, $client_response, $data_response);
+
+	    return response($data_response,200)->header('Content-Type', 'application/json');
 	}
 
 	public function gameWin(Request $request){
 		$data = json_decode(file_get_contents("php://input"));
-		Helper::saveLog('Tidy Game Bet', 23, file_get_contents("php://input"), 'ENDPOINT HIT');
+		Helper::saveLog('Tidy Game WIN', 23, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$header = $request->header('Authorization');
-	    Helper::saveLog('Tidy Authorization Logger', 23, file_get_contents("php://input"), $header);
+	     Helper::saveLog('Tidy Authorization Logger WIN', 23, json_encode(file_get_contents("php://input")), $header);
 
 		$game_id = $data->game_id;
 		$token = $data->token;
