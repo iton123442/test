@@ -69,9 +69,9 @@ return [
     	'logout_url' => 'https://api.cdmolo.com:16800/v1/player/logout',
     ],
     'aws' => [
-        'api_url' => 'https://sapi.awsxpartner.com/b2b',
-        'merchant_id' => 'TG',
-        'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        'api_url' => 'https://papi.shisaplay.com',
+        'merchant_id' => 'TGUSD',
+        'merchant_key' => 'e47eae2b9264697e743bf3398986d5027bee72f6d72f121b38a73343a3133b0b12808e3ae9b2b9e10a88ed3ddd8d2bc125909cdf52f2c2482b8e4b69540e4489',
     ],
     'sagaming' => [
         "prefix" => "TG_SA",
