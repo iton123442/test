@@ -79,7 +79,8 @@ return [
         "API_URL" => "http://sai-api.sa-apisvr.com/api/api.aspx",
         "MD5Key" => "GgaIMaiNNtg",
         "EncryptKey" => "g9G16nTs",
-        "EncryptKey" =>" M06!1OgI",
+        "SAAPPEncryptKey" =>"M06!1OgI",
+        "SecretKey" => "87B41ED0FB20437E85DE569B16EAA1DB",
     ],
     'iagaming' => [
         'auth_key' => '54bc08c471ae3d656e43735e6ffc9bb6',
@@ -88,6 +89,9 @@ return [
         'iv' => '45b80556382b48e5',
         'url_lunch' => 'http://api.ilustretest.com/user/lunch',
         'url_register' => 'http://api.ilustretest.com/user/register',
+    ],
+    'tidygaming' => [
+        'url_lunch' => 'http://staging-v1-api.tidy.zone/api/game/outside/link',
     ],
     'evoplay' => [
         'api_url' => 'http://api.8provider.com',
