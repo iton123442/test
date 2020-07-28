@@ -51,9 +51,9 @@ return [
             'secure_code' => '99d78fd7-d342-4fa5-932a-029a65b8a1f1',
         ],
         'usdagents'=>[
-            'username' => 'betrnk',
-            'password' => 'betrnk168!^*',
-            'secure_code' => '2c00c099-f32b-4fc1-a69d-661d8c51c6ae',
+            'username' => 'tigergames',
+            'password' => 'Mm010935468-',
+            'secure_code' => '20c60c1c-fc16-42b7-9269-291d2b2b0346',
         ],
     ],
     'endorphina' => [
