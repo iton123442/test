@@ -2,8 +2,8 @@
 
 
 return [
-    'icgaminglogin' => 'https://admin-stage.iconic-gaming.com/service/login',
-    'icgaminggames' => 'https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
+    'icgaminglogin' => 'https://admin.iconic-gaming.com/service/login',
+    'icgaminggames' => 'https://admin.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
     'icgagents'=>[
         'jpyagents'=>[
             'username' => 'betrnkjpy',
