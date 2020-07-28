@@ -95,7 +95,7 @@ return [
         'url_lunch' => 'http://staging-v1-api.tidy.zone/api/game/outside/link',
     ],
     'evoplay' => [
-        'api_url' => 'http://api.8provider.com',
+        'api_url' => 'https://api.8provider.com',
         'project_id' => '1045',
         'secretkey' => '900980b4fe8ad2d771713f77cde79333',
     ],
