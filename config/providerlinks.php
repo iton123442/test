@@ -74,7 +74,8 @@ return [
         'merchant_key' => 'e47eae2b9264697e743bf3398986d5027bee72f6d72f121b38a73343a3133b0b12808e3ae9b2b9e10a88ed3ddd8d2bc125909cdf52f2c2482b8e4b69540e4489',
     ],
     'sagaming' => [
-        "prefix" => "TG_SA",
+        "pdbid"=> 25,
+        "prefix" => "TGSA",
         "lobby" => "A3107",
         "API_URL" => "http://sai-api.sa-apisvr.com/api/api.aspx",
         "MD5Key" => "GgaIMaiNNtg",
