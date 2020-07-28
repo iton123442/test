@@ -31,6 +31,7 @@ class EightProviderController extends Controller
 	public $api_url = 'https://api.8provider.com';
 	public $secret_key = '900980b4fe8ad2d771713f77cde79333';
 	public $project_id = '1045';
+	public $provider_db_id = 19;
 
 
     /**
