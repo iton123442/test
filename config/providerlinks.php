@@ -97,7 +97,7 @@ return [
         'pch' => 'TG01',
         'prefix' => 'TGAMES',
         'iv' => '1650cbec4319180b',
-        'url_lunch' => 'https://api.ilustre-analysis.net/user/lunch',
+        'url_lunch' => 'https://api.ilustre-analysis.net/user/launch',
         'url_register' => 'https://api.ilustre-analysis.net/user/register',
     ],
     'tidygaming' => [

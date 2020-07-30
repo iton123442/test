@@ -41,7 +41,7 @@ class IAESportsController extends Controller
 	public $auth_key = '6230204245ebbf14dfdc0ee40960134d';
 	public $pch = 'TG01';
 	public $iv = '1650cbec4319180b';
-	public $url_lunch = 'https://api.ilustre-analysis.net/user/lunch';
+	public $url_lunch = 'https://api.ilustre-analysis.net/user/launch';
 	public $url_register = 'https://api.ilustre-analysis.net/user/register';
 	public $url_withdraw = 'https://api.ilustre-analysis.net/user/withdraw';
 	public $url_deposit = 'https://api.ilustre-analysis.net/user/deposit';
