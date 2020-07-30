@@ -136,6 +136,7 @@ $app->post('ia/deposit', 'IAESportsController@seamlessDeposit');
 $app->post('ia/withdrawal', 'IAESportsController@seamlessWithdrawal');
 $app->post('ia/balance', 'IAESportsController@seamlessBalance');
 $app->post('ia/searchorder', 'IAESportsController@seamlessSearchOrder');
+$app->post('ia/debugg', 'IAESportsController@userlaunch');
 // Bole Gaming Endpoints
 $app->post('/api/bole/register', 'BoleGamingController@playerRegister');
 $app->post('/api/bole/logout', 'BoleGamingController@playerLogout');
