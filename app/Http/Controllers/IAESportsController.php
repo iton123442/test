@@ -66,7 +66,7 @@ class IAESportsController extends Controller
         $timeout = 5;
         $client_response = IAHelper::curlData(config('providerlinks.iagaming.url_lunch'), $uhayuu, $header, $timeout);
         $data = json_decode(IAHelper::rehashen($client_response[1], true));
-        return $data;
+        return json_encode($data);
     }
 	/**
 	 * Create Hash Key
