@@ -9,6 +9,7 @@ use App\Helpers\CallParameters;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use Carbon\Carbon;
+use App\Helpers\IAHelper;
 use DB;
 
 
@@ -41,7 +42,7 @@ class IAESportsController extends Controller
 	public $auth_key = '6230204245ebbf14dfdc0ee40960134d';
 	public $pch = 'TG01';
 	public $iv = '1650cbec4319180b';
-	public $url_lunch = 'https://api.ilustre-analysis.net/user/launch';
+	public $url_lunch = 'https://api.ilustre-analysis.net/user/lunch';
 	public $url_register = 'https://api.ilustre-analysis.net/user/register';
 	public $url_withdraw = 'https://api.ilustre-analysis.net/user/withdraw';
 	public $url_deposit = 'https://api.ilustre-analysis.net/user/deposit';
@@ -52,6 +53,21 @@ class IAESportsController extends Controller
 	public $url_activity_logs = 'https://api.ilustre-analysis.net/user/searchprders';
 
 
+
+	public function userlaunch($username)
+    {
+        $params = [
+            "username" => 'TGAMES1_4',
+            "lang" => 2, // Default English
+            // "client" => 2,  // 2 for wap, 1 for PC
+        ];
+        $uhayuu = IAHelper::hashen($params);
+        $header = ['pch:'. config('providerlinks.iagaming.pch')];
+        $timeout = 5;
+        $client_response = IAHelper::curlData(config('providerlinks.iagaming.url_lunch'), $uhayuu, $header, $timeout);
+        $data = json_decode(IAHelper::rehashen($client_response[1], true));
+        return $data;
+    }
 	/**
 	 * Create Hash Key
 	 * @return Encrypted AES string
