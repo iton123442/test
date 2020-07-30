@@ -93,12 +93,12 @@ return [
         "SecretKey" => "87B41ED0FB20437E85DE569B16EAA1DB",
     ],
     'iagaming' => [
-        'auth_key' => '54bc08c471ae3d656e43735e6ffc9bb6',
-        'pch' => 'BRNK',
+        'auth_key' => '6230204245ebbf14dfdc0ee40960134d',
+        'pch' => 'TG01',
         'prefix' => 'TGAMES',
-        'iv' => '45b80556382b48e5',
-        'url_lunch' => 'http://api.ilustretest.com/user/lunch',
-        'url_register' => 'http://api.ilustretest.com/user/register',
+        'iv' => '1650cbec4319180b',
+        'url_lunch' => 'https://api.ilustre-analysis.net/user/lunch',
+        'url_register' => 'https://api.ilustre-analysis.net/user/register',
     ],
     'tidygaming' => [
         'url_lunch' => 'http://staging-v1-api.tidy.zone/api/game/outside/link',
