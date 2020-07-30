@@ -54,7 +54,7 @@ class IAESportsController extends Controller
 
 
 
-	public function userlaunch($username)
+	public function userlaunch()
     {
         $params = [
             "username" => 'TGAMES1_4',
