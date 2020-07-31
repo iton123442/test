@@ -108,7 +108,7 @@ class GameLobbyController extends Controller
             // }
             //
            
-           $solid_gamings = ['Solid Gaming', 'Booongo', 'Concept', 'Espresso', 'EvoPlay', 'GameArt', 'Habanero', 'MultiSlot', 'NetEnt', 'Omi Gaming', 'Push Gaming', 'Revolver Gaming', 'RTG Asia', 'TPG', '1X2 Network', 'BetSoft', 'Booming', 'Leander', 'Lotus Gaming', 'No Limit City', 'One Touch', 'Quick Fire', 'Relax', 'Wazdan', 'Yggdrasil'];
+           $solid_gamings = ['Solid Gaming', 'Booongo', 'Concept', 'Espresso', 'EvoPlay', 'GameArt', 'Habanero', 'MultiSlot', 'NetEnt', 'Omi Gaming', 'Push Gaming', 'Revolver Gaming', 'RTG Asia', 'TPG', '1X2 Network', 'BetSoft', 'Booming', 'Leander', 'Lotus Gaming', 'No Limit City', 'One Touch', 'Quick Fire', 'Relax', 'Wazdan', 'Yggdrasil', 'Evolution Gaming'];
 
             $lang = $request->has("lang")?$request->input("lang"):"en";
             if($token=Helper::checkPlayerExist($request->client_id,$request->client_player_id,$request->username,$request->email,$request->display_name,$request->token,$ip_address)){
@@ -140,7 +140,8 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                  elseif($request->input('game_provider')=="Bole Gaming"){
-                    $url = GameLobby::boleLaunchUrl($request->game_code,$token,$request->exitUrl,$request->country_code);
+                    $country_code =  $request->has('country_code') ? $request->country_code : 'PH';
+                    $url = GameLobby::boleLaunchUrl($request->game_code,$token,$request->exitUrl,$country_code);
                     if($url){
                         $msg = array(
                             "game_code" => $request->input("game_code"),

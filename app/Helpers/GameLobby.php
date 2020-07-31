@@ -50,7 +50,7 @@ class GameLobby{
         Helper::saveLog('GAMELAUNCH EDP', 11, json_encode(config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign), json_encode($sign));
         return config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign;
     }
-    public static function boleLaunchUrl($game_code,$token,$exitUrl, $country_code){
+    public static function boleLaunchUrl($game_code,$token,$exitUrl, $country_code='PH'){
 
         $client_details = ProviderHelper::getClientDetails('token', $token);
         if($client_details != null){
@@ -65,9 +65,14 @@ class GameLobby{
 
         $scene_id = '';
         if(strpos($game_code, 'slot') !== false) {
-            $game_code = explode("_", $game_code);
-            $scene_id = $game_code[1];
-            $game_code = 'slot';
+            if($game_code == 'slot'){
+                $scene_id = '';
+                $game_code = 'slot'; 
+            }else{
+                $game_code = explode("_", $game_code);
+                $scene_id = $game_code[1];
+                $game_code = 'slot'; 
+            }
         }else{
             $game_code = $game_code;
         }
@@ -286,11 +291,11 @@ class GameLobby{
         // $hashCurrentBalance =  md5("externalPlayerId=".$userid."&secureLogin=".$stylename.$key);
         // $currentBalance = "https://api.prerelease-env.biz/IntegrationService/v3/http/CasinoGameAPI/balance/current/?externalPlayerId=$userid&secureLogin=$stylename&hash=$hashCurrentBalance";
 
-        $paramEncoded = urlencode ("token=".$token."&symbol=".$game_code."&technology=F&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
+        $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=F&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
         $url = "https://tigergames-sg0.prerelease-env.biz/gs2c/playGame.do?key=$paramEncoded&stylename=$stylename";
         // $result = file_get_contents($url);
         $result = json_encode($url);
-     
+        
         // $result = json_decode(json_decode($result));
         Helper::saveLog('start game url PP', 49, $result,"");
         return $url;
