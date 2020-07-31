@@ -121,7 +121,7 @@ class BNGController extends Controller
                         "brand"=> "BOONGO",      
                         "currency"=> $client_details->default_currency,   
                         "mode"=> "REAL",       
-                        "is_test"=> false
+                        "is_test"=> true
                     ),
                     "balance"=>array(
                         "value"=> number_format($client_response->playerdetailsresponse->balance,2,'.', ''),
