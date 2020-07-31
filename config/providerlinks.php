@@ -127,10 +127,10 @@ return [
         ]
         ],
     'boongo'=>[
-        'PLATFORM_SERVER_URL'=>'https://gate-stage.betsrv.com/op/',
-        'PROJECT_NAME'=>'tigergames-stage',
+        'PLATFORM_SERVER_URL'=>'https://gate2.betsrv.com/op/',
+        'PROJECT_NAME'=>'tigergames',
         'WL'=>'prod',
-        'API_TOKEN'=>'hj1yPYivJmIX4X1I1Z57494re',
+        'API_TOKEN'=>'BX0qal8GSe5srFozvnZ2azkYB',
     ],
     
 ];
