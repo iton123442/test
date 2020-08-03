@@ -133,9 +133,9 @@ return [
         'API_TOKEN'=>'BX0qal8GSe5srFozvnZ2azkYB',
     ],
     'fcgaming'=>[
-        'url' => 'http://api.fcg666.net',
+        'url' => 'http://ap1.fcg1688.net',
         'AgentCode' => 'TG',
-        'AgentKey' => '8t4A17537S1d5rwz',
+        'AgentKey' => 'trU20TV8677Ay45W',
         
     ]
     
