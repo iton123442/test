@@ -158,6 +158,7 @@ $app->post('api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTrans
 $app->post('api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
 $app->post('api/aws/single/wallet/altest', 'AWSController@changeAccount');
 // SILKSTONE ROUTES (SEAMLESS WALLET)
+$app->post('skywind/api/getgames', 'SkyWindController@getGameUrl');
 $app->post('skywind/api/validate_ticket', 'SkyWindController@validateTicket');
 $app->post('skywind/api/get_balance', 'SkyWindController@getBalance');
 $app->post('skywind/api/debit', 'SkyWindController@gameDebit');
@@ -202,6 +203,10 @@ $app->post('/api/bng/generateGame','BNGController@generateGame');
 //FC GAMING Endpoints
 $app->post('/api/fc/encrypt','FCController@SampleEncrypt');
 $app->post('/api/fc/decode','FCController@SampleDecrypt');
+$app->post('/api/fc/getbalance','FCController@getBalance');
+$app->post('/api/fc/transaction','FCController@transactionMake');
+$app->post('/api/fc/cancelbet','FCController@cancelBet');
+$app->post('/api/fc/gamelaunch','FCController@gameLaunch');
 
 
 // BETRNK LOTTO
@@ -220,6 +225,12 @@ $app->post('/tidy/api/user/balance', 'TidyController@checkBalance');
 
 //TGG
 $app->post('/tgg/api/game/getlist', 'TGGController@getGamelist');
+
+$app->post('/tgg/api/game/geturl', 'TGGController@getURL');
+$app->post('/tgg/api/game/init', 'TGGController@initBalance');
+$app->post('/tgg/api/game/bet', 'TidyController@gameBet');
+
+
 // EPOINT CONTROLLER
 // $app->post('/api/epoint', 'EpointController@epointAuth'); #/
 // $app->post('/api/epoint/bitgo', 'EpointController@bitgo'); #/
