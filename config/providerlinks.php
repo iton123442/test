@@ -82,9 +82,14 @@ return [
         'merchant_id' => 'TG',
         'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
     ],
+    'cqgames' => [
+        "pdbid"=> 30, // Database ID nothing todo with the provider!
+        'api_url' => 'http://api.cqgame.games',
+        'api_token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjIyODY1ZWNkNTY1ZjAwMDEzZjUyZDAiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWYyMjg2NWVjZDU2NWYwMDAxM2Y1MmQwIiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiMjQ3NDQ1MTQzIiwiaWF0IjoxNTk2MDk4MTQyLCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fdoQCWGPkYNLoROGR9jzMs4axnZbRJCnnLZ8T2UDCwU',
+    ],
     'sagaming' => [
-        "pdbid"=> 25,
-        "prefix" => "TGSA",
+        "pdbid"=> 25, // Database ID nothing todo with the provider!
+        "prefix" => "TGSA", // Nothing todo with the provider
         "lobby" => "A3107",
         "API_URL" => "http://sai-api.sa-apisvr.com/api/api.aspx",
         "MD5Key" => "GgaIMaiNNtg",
@@ -109,7 +114,8 @@ return [
         'secretkey' => '900980b4fe8ad2d771713f77cde79333',
     ],
     'skywind' => [
-        'api_url' => 'https://api.gcpstg.m27613.com',
+        'provider_db_id' => 28, // Database ID nothing todo with the provider!
+        'api_url' => 'https://api.gcpstg.m27613.com/v1',
         'seamless_key' => '47138d18-6b46-4bd4-8ae1-482776ccb82d',
         'seamless_username' => 'TGAMESU_USER',
         'seamless_password' => 'Tgames1234',
@@ -137,6 +143,11 @@ return [
         'AgentCode' => 'TG',
         'AgentKey' => 'trU20TV8677Ay45W',
         
+    ],
+    'tgg' => [
+        'api_url' => 'http://api.flexcontentprovider.com',
+        'project_id' => '1421',
+        'secretkey' => '29abd3790d0a5acd532194c5104171c8',
     ]
     
 ];
