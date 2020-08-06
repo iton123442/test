@@ -344,13 +344,13 @@ class GameLobby{
 
 
     public static function habanerolaunchUrl( $game_code = null, $token = null){
-        $brandID = "2416208c-f3cb-ea11-8b03-281878589203";
-        $apiKey = "3C3C5A48-4FE0-4E27-A727-07DE6610AAC8";
+        $brandID = "6fc71b15-0ed7-ea11-a522-0050f23870d2";
+        $apiKey = "94FF6FB7-4E01-4EDB-9185-44E3B2BC0AAC";
 
         $client_details = Providerhelper::getClientDetails('token', $token);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
 
-        $url = "https://app-test.insvr.com/go.ashx?brandid=$brandID&keyname=$game_code&token=$token&mode=real&locale=en&mobile=0";
+        $url = "https://app-a.insvr.com/go.ashx?brandid=$brandID&keyname=$game_code&token=$token&mode=real&locale=en&mobile=0";
 
         return $url;
     }
