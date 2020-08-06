@@ -12,7 +12,7 @@ use GuzzleHttp\Client;
 class HabaneroController extends Controller
 {
     
-    public $passkey = "Rja5ZK4kN1GA0R8C";
+    public $passkey = "78b5cc87-e0c5-4008-9a7e-dcebfd40642a";
 
     public function playerdetailrequest(Request $request){
      
