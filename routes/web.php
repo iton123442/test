@@ -196,6 +196,7 @@ $app->post('api/cq9/mw/getlist','CQ9Controller@getGameList');
 $app->post('api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
 
 //SAGaming 
+$app->post('api/sa/debugme','SAGamingController@debugme');
 $app->post('api/sa/GetUserBalance','SAGamingController@GetUserBalance');
 $app->post('api/sa/PlaceBet','SAGamingController@PlaceBet');
 $app->post('api/sa/PlayerWin','SAGamingController@PlayerWin');
@@ -353,7 +354,7 @@ $app->post('api/pp/refund','PragmaticPLayController@refund');
 $app->post('api/pp/bonusWin','PragmaticPLayController@bonusWin');
 $app->post('api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
 $app->post('api/pp/promoWin','PragmaticPLayController@promoWin');
-$app->post('api/pp/endRound ','PragmaticPLayController@endRound');
+$app->post('api/pp/endRound','PragmaticPLayController@endRound');
 $app->post('api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
 $app->post('api/pp/session/expired','PragmaticPLayController@sessionExpired');
 

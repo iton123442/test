@@ -40,6 +40,16 @@ class ProviderHelper{
 
     /**
      * GLOBAL 
+     * @param  [amount] $username [int]
+     * @return [float] [float two decimal number]
+     */
+    public static function amountToFloat($amount){
+    	$float = floatval(number_format((float)$amount, 2, '.', ''));
+    	return $float;
+    }
+
+    /**
+     * GLOBAL 
      * [explodeUsername description]
      * @author 's note sample = TG_Al98, 98 is the player id on MW Database
      * @param  [type] $username [string]
@@ -293,7 +303,7 @@ class ProviderHelper{
 			"transaction_detail" =>json_encode($transaction_detail),
 		);
 		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-		return $gametransactionext;
+		return $gamestransaction_ext_ID;
 	}
 
 	/**
