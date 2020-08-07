@@ -106,10 +106,10 @@ return [
         'url_register' => 'https://api.ilustre-analysis.net/user/register',
     ],
     'tidygaming' => [
-        'url_lunch' => 'http://staging-v1-api.tidy.zone/api/game/outside/link',
-        'API_URL' => 'http://staging-v1-api.tidy.zone',
-        'client_id' => '8440a5b6',
-        'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
+        'url_lunch' => 'https://asia.h93r.com/api/game/outside/link',
+        'API_URL' => 'https://asia.h93r.com/',
+        'client_id' => 'c9c219fc',
+        'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
     ],
     'evoplay' => [
         'api_url' => 'https://api.8provider.com',
