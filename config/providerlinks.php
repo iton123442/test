@@ -91,7 +91,7 @@ return [
         "pdbid"=> 25, // Database ID nothing todo with the provider!
         "prefix" => "TGSA", // Nothing todo with the provider
         "lobby" => "A3107",
-        "API_URL" => "http://api.sa-apisvr.net/api/api.aspx",
+        "API_URL" => "https://tgg.sa-apix.net/app.aspx",
         "MD5Key" => "GgaIMaiNNtg",
         "EncryptKey" => "g9G16nTs",
         "SAAPPEncryptKey" =>"M06!1OgI",
