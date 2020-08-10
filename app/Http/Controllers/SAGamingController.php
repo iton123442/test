@@ -124,11 +124,11 @@ class SAGamingController extends Controller
         $currency = $data['currency'];
         $amount = $data['amount'];
         $txnid = $data['txnid'];
-        $ip = $data['ip'];
+        // $ip = $data['ip'];
         $gametype = $data['gametype'];
         // $game_id = $data['gameid'];
         $game_id = $this->game_db_code;
-        $betdetails = $data['betdetails'];
+        // $betdetails = $data['betdetails'];
         $round_id = $data['gameid'];
 
         $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
