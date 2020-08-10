@@ -238,14 +238,14 @@ $app->post('/api/betrnk/lotto', 'BetrnkController@getUrl');
 
 // TIDY
 // $app->post('/tidy/api/auth', 'TidyController@conecteccc');
-$app->post('/tidy/api/game/outside/link', 'TidyController@getGameUrl'); // CENTRALIZED
-$app->post('/tidy/api/checkplayer', 'TidyController@autPlayer');
-$app->post('/tidy/api/gamelist', 'TidyController@getGamelist');
-$app->post('/tidy/api/gameurl', 'TidyController@gameUrl');
-$app->post('/tidy/api/transaction/bet', 'TidyController@gameBet');
-$app->post('/tidy/api/transaction/rollback', 'TidyController@gameRollback');
-$app->post('/tidy/api/transaction/win', 'TidyController@gameWin');
-$app->post('/tidy/api/user/balance', 'TidyController@checkBalance');
+$app->post('/api/tidy/api/game/outside/link', 'TidyController@getGameUrl'); // CENTRALIZED
+$app->post('/api/tidy/api/checkplayer', 'TidyController@autPlayer');
+$app->post('/api/tidy/api/gamelist', 'TidyController@getGamelist');
+$app->post('/api/tidy/api/gameurl', 'TidyController@gameUrl');
+$app->post('/api/tidy/api/transaction/bet', 'TidyController@gameBet');
+$app->post('/api/tidy/api/transaction/rollback', 'TidyController@gameRollback');
+$app->post('/api/tidy/api/transaction/win', 'TidyController@gameWin');
+$app->post('/api/tidy/api/user/balance', 'TidyController@checkBalance');
 
 //TGG
 $app->post('/api/tgg/gamelist', 'TGGController@getGamelist'); // launch game 
