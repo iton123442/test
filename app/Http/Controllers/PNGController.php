@@ -58,13 +58,11 @@ class PNGController extends Controller
                 return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
             else{
-                $msg = array(
-                    "uid" => $data["uid"],
-                    "error"=>array(
-                        "code" => "INVALID_TOKEN"
-                    ),
+                $array_data = array(
+                    "statusCode" => 1,
+                    "statusMessage" => "Session Expired",
                 );
-                return response($msg,200)->header('Content-Type', 'application/json');
+                return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
         }
         
@@ -80,7 +78,7 @@ class PNGController extends Controller
                 if(Helper::getBalance($client_details) < round($xmlparser->real,2)){
                     $array_data = array(
                         "real" => round(Helper::getBalance($client_details),2),
-                        "statusCode" => 9,
+                        "statusCode" => 7,
                         "statusMessage" => "Insufficient Balance",
                     );
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");  
@@ -88,8 +86,8 @@ class PNGController extends Controller
                 if(PNGHelper::gameTransactionExtChecker($xmlparser->transactionId)){
                     $array_data = array(
                         "real" => round(Helper::getBalance($client_details),2),
-                        "statusCode" => 8,
-                        "statusMessage" => "Transaction ID already proccessed",
+                        "statusCode" => 0,
+                        "statusMessage" => "ok",
                     );
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");       
                 }
@@ -131,7 +129,7 @@ class PNGController extends Controller
                 );
 
                 $client_response = json_decode($guzzle_response->getBody()->getContents());
-                $balance = round($client_response->fundtransferresponse->balance * 100,2);
+                $balance = round($client_response->fundtransferresponse->balance,2);
                 $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
                 $json_data = array(
                     "transid" => $xmlparser->transactionId,
@@ -161,20 +159,11 @@ class PNGController extends Controller
                 }
                 elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
-                    $response =array(
-                        "data" => array(
-                            "statusCode"=>2,
-                            "username" => $client_details->username,
-                            "balance" =>$balance,
-                        ),
-                        "error" => array(
-                            "title"=> "Not Enough Balance",
-                            "description"=>"Not Enough Balance"
-                        )
-                    ); 
-                    Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($json), $response);
-                    return response($response,400)
-                    ->header('Content-Type', 'application/json');
+                    $array_data = array(
+                        "statusCode" => 9,
+                        "statusMessage" => "Insufficient Funds",
+                    );
+                    return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
                 
 
@@ -192,8 +181,7 @@ class PNGController extends Controller
                 if($returnWinTransaction){
                     $array_data = array(
                         "real" => round(Helper::getBalance($client_details),2),
-                        "statusCode" => 8,
-                        "statusMessage" => "Transaction ID already proccessed",
+                        "statusCode" => 0,
                     );
                     return PNGHelper::arrayToXml($array_data,"<release/>");
                 }
@@ -315,13 +303,11 @@ class PNGController extends Controller
                 return PNGHelper::arrayToXml($array_data,"<balance/>");
             }
             else{
-                $msg = array(
-                    "uid" => $data["uid"],
-                    "error"=>array(
-                        "code" => "INVALID_TOKEN"
-                    ),
+                $array_data = array(
+                    "statusCode" => 1,
+                    "statusMessage" => "Session Expired",
                 );
-                return response($msg,200)->header('Content-Type', 'application/json');
+                return PNGHelper::arrayToXml($array_data,"<balance/>");
             }
         }
     }
@@ -334,11 +320,20 @@ class PNGController extends Controller
         if($client_details){
             $reservechecker = PNGHelper::gameTransactionExtChecker($xmlparser->transactionId);
             $rollbackchecker = PNGHelper::gameTransactionRollbackExtChecker($xmlparser->transactionId,3);
-            if($reservechecker==false || $rollbackchecker==true){
+            if($reservechecker==false){
                 $array_data = array(
-                    "statusCode" => 9,
+                    "statusCode" => 0,
+                    "externalTransactionId"=>""
                 );
-                Helper::saveLog('refundAlreadyexist(PNG)', 50, $data, $array_data);
+                Helper::saveLog('refundAlreadyexist(PNG)', 50,json_encode($xmlparser), $array_data);
+                return PNGHelper::arrayToXml($array_data,"<cancelReserve/>");
+            }
+            if($rollbackchecker){
+                $array_data = array(
+                    "statusCode" => 0,
+                    "externalTransactionId"=>$rollbackchecker->game_trans_ext_id
+                );
+                Helper::saveLog('refundAlreadyexist(PNG)', 50,json_encode($xmlparser), $array_data);
                 return PNGHelper::arrayToXml($array_data,"<cancelReserve/>");
             }
             $client = new Client([

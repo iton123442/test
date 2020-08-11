@@ -10,7 +10,16 @@ use DB;
 class WazdanController extends Controller
 {
     //
-
+    public function hashCode(Request $request){
+        $operator = "tigergames";
+        $license = "curacao";
+        $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
+        $data = array(
+            "how" => 'hash_hmac("sha256","'.$request->getContent().'",'.$key.')',
+            "hmac"=>hash_hmac("sha256",$request->getContent(),$key)
+        );
+        return $data;
+    }
     public function authenticate(Request $request){
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
@@ -93,6 +102,7 @@ class WazdanController extends Controller
     public function getStake(Request $request){
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
+        Helper::saveLog('getStake(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
@@ -205,12 +215,24 @@ class WazdanController extends Controller
                 
 
             }
+        }
+        else{
+            $msg = array(
+                "status" =>1,
+                "message" => array(
+                    "text"=>"This Session not Found",
+                )
+            ); 
+            Helper::saveLog('betGameInsuficient(Wazdan)', 50, $data, $msg);
+            return response($msg,200)
+            ->header('Content-Type', 'application/json');
         } 
     }
     public function rollbackState(Request $request){
         
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
+        Helper::saveLog('rollbackStake(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
         if($client_details){
@@ -220,8 +242,7 @@ class WazdanController extends Controller
                     "status" => 0,
                     "funds" => array(
                         "balance" => round(Helper::getBalance($client_details),2)
-                    ),
-                    "rollback" =>true
+                    )
                 );
                 Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
                 return response($msg,200)
@@ -279,8 +300,7 @@ class WazdanController extends Controller
                         "status" => 0,
                         "funds" => array(
                             "balance" => round(Helper::getBalance($client_details),2)
-                        ),
-                        "originalTransactionId" =>false
+                        )
                     );
                     Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
                     return response($msg,200)
@@ -330,6 +350,7 @@ class WazdanController extends Controller
     public function returnWin(Request $request){
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
+        Helper::saveLog('returnWin(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
@@ -339,8 +360,7 @@ class WazdanController extends Controller
                         "status" => 0,
                         "funds" => array(
                             "balance" => round(Helper::getBalance($client_details),2)
-                        ),
-                        "returnWinExist" =>true
+                        )
                     );
                     Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
                     return response($msg,200)
@@ -417,8 +437,7 @@ class WazdanController extends Controller
                         "status" => 0,
                         "funds" => array(
                             "balance" => $balance
-                        ),
-                        "win" =>true
+                        )
                     );
                     WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,$requesttocient,$msg,$client_response,2); 
                     return response($msg,200)
@@ -442,6 +461,7 @@ class WazdanController extends Controller
     public function getFunds(Request $request){
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
+        Helper::saveLog('getFund(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
             Helper::saveLog('GetFund (Wazdan)', 50, $data, $client_details);
