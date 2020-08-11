@@ -150,7 +150,7 @@ return [
     'tgg' => [
         'api_url' => 'https://api.flexcontentprovider.com',
         'project_id' => '1423',
-        'api_key' => 'b579876de979e423195a7d2214498093',
+        'api_key' => 'fff477943dd107dbe9827603a8f2eb48',
     ],
     'pgsoft' => [
         'api_url' => 'http://api.pg-bo.me/external',
