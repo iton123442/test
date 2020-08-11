@@ -148,9 +148,9 @@ return [
         
     ],
     'tgg' => [
-        'api_url' => 'http://api.flexcontentprovider.com',
-        'project_id' => '1421',
-        'api_key' => '29abd3790d0a5acd532194c5104171c8',
+        'api_url' => 'https://api.flexcontentprovider.com',
+        'project_id' => '1423',
+        'api_key' => 'b579876de979e423195a7d2214498093',
     ],
     'pgsoft' => [
         'api_url' => 'http://api.pg-bo.me/external',
