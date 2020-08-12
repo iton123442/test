@@ -574,7 +574,7 @@ class GameLobby{
             );
 
         $auth_result = json_decode($auth_token_response->getBody()->getContents());
-
+        Helper::saveLog('GAMELAUNCH MANNAPLAY', 11, json_encode($auth_result), json_encode("Auth"));
         // Generate Game Link
         $game_link = new Client([
                 'headers' => [ 
@@ -596,7 +596,7 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
-
+        Helper::saveLog('GAMELAUNCH MANNAPLAY', 11, json_encode($link_result), json_encode("urllaunch"));
         return $link_result->url;
     }
 
