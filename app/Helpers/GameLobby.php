@@ -557,11 +557,11 @@ class GameLobby{
         $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a'
+                    'apiKey' => 'kzHFKTpWG%49vaM&C2BdQcf3$*5mi!NUDwubj#nE'
                 ]
             ]);
 
-        $auth_token_response = $auth_token->post('https://api.mannagaming.com/agent/specify/betrnk/authenticate/auth_token',
+        $auth_token_response = $auth_token->post('https://api.manna-play.com/agent/specify/betrnk/authenticate/auth_token',
                 ['body' => json_encode(
                         [
                             "id" => "betrnk",
@@ -579,12 +579,12 @@ class GameLobby{
         $game_link = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+                    'apiKey' => 'kzHFKTpWG%49vaM&C2BdQcf3$*5mi!NUDwubj#nE',
                     'token' => $auth_result->token
                 ]
             ]);
 
-        $game_link_response = $game_link->post('https://api.mannagaming.com/agent/specify/betrnk/gameLink/link',
+        $game_link_response = $game_link->post('https://api.manna-play.com/agent/specify/betrnk/gameLink/link',
                 ['body' => json_encode(
                         [
                             "account" => $client_details->username,
