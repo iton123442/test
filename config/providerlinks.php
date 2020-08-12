@@ -178,7 +178,7 @@ return [
     'manna'=>[
         'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/betrnk/authenticate/auth_token',
         'GAME_LINK_URL' => 'https://api.manna-play.com/agent/specify/betrnk/gameLink/link',
-        'API_KEY'=> 'kzHFKTpWG%49vaM&C2BdQcf3$*5mi!NUDwubj#nE',
+        'AUTH_API_KEY'=> 'kzHFKTpWG%49vaM&C2BdQcf3$*5mi!NUDwubj#nE',
         'CLIENT_API_KEY'=> 'Az5Rm8K56s3TJVjF'
     ]
 ];
