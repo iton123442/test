@@ -186,18 +186,10 @@ return [
         'roll_back' => 'https://api-test.betrnk.games/public/api/booming/rollback'
     ],
     'manna'=>[
-<<<<<<< HEAD
         'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/betrnk/authenticate/auth_token',
         'GAME_LINK_URL' => 'https://api.manna-play.com/agent/specify/betrnk/gameLink/link',
         'AUTH_API_KEY'=> 'kzHFKTpWG%49vaM&C2BdQcf3$*5mi!NUDwubj#nE',
         'CLIENT_API_KEY'=> 'Az5Rm8K56s3TJVjF'
-=======
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/betrnk/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/betrnk/gameLink/link',
-        'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-        'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP'
->>>>>>> 81f17ebb1a4a4779a735d16e0228f8f7ddc555f9
     ]
 ];
 
