@@ -259,9 +259,16 @@ class GameLobby{
     public static function cq9LaunchUrl($game_code, $token){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+        $api_tokens = config('providerlinks.cqgames.api_tokens');
+        if(array_key_exists($client_details->default_currency, $api_tokens)){
+            $auth = $api_tokens[$client_details->default_currency];
+            // $auth = $api_tokens['USD'];
+        }else{
+            return 'false';
+        }
         $client = new Client([
             'headers' => [ 
-                'Authorization' => config('providerlinks.cqgames.api_token'),
+                'Authorization' => $auth,
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ]
         ]);
@@ -367,6 +374,48 @@ class GameLobby{
         $operator_token = config('providerlinks.pgsoft.operator_token');
         $url = "https://m.pg-redirect.net/".$game_code."/index.html?language=en-us&bet_type=1&operator_token=".urlencode($operator_token)."&operator_player_session=".urlencode($token);
         return $url;
+    }
+
+    public static function boomingGamingUrl($data){
+        Helper::saveLog('Booming Balance ', 36, json_encode($data), "ENDPOINT HIT");
+        $url = config('providerlinks.booming.api_url').'/v2/session';
+        $client_details = ProviderHelper::getClientDetails('token',$data["token"]);
+        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+        try{
+            $nonce = date('mdYhisu');
+            $requesttosend = array (
+                'game_id' => $data["game_code"],
+                'balance' => $player_details->playerdetailsresponse->balance,
+                'locale' => 'en',
+                'variant' => 'desktop',
+                'currency' => $client_details->default_currency,
+                'player_id' => (string)$client_details->player_id,
+                'callback' =>  config('providerlinks.booming.call_back'),
+                'rollback_callback' =>  config('providerlinks.booming.roll_back')
+            );
+            $sha256 =  hash('sha256', json_encode($requesttosend, JSON_FORCE_OBJECT));
+            $concat = '/v2/session'.$nonce.$sha256;
+            $secrete = hash_hmac('sha512', $concat, config('providerlinks.booming.api_secret'));
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/vnd.api+json',
+                    'X-Bg-Api-Key' => config('providerlinks.booming.api_key'),
+                    'X-Bg-Nonce'=> $nonce,
+                    'X-Bg-Signature' => $secrete
+                ]
+            ]);
+            $guzzle_response = $client->post($url,  ['body' => json_encode($requesttosend)]);
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            Helper::saveLog('Booming Balance process', 36, json_encode($data), $client_response);
+            return $client_response;
+        }catch(\Exception $e){
+            $error = [
+                'error' => $e->getMessage()
+            ];
+            Helper::saveLog('Booming Balance error', 36, json_encode($data), $e->getMessage());
+            return $error;
+        }
+
     }
 
     public static function habanerolaunchUrl( $game_code = null, $token = null){
