@@ -409,7 +409,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($request->input('game_provider')=="Habanero Direct){ 
+                elseif($request->input('game_provider')=="Habanero Direct"){ 
                     // Helper::saveLog('DEMO CALL', 11, json_encode($request->all()), 'DEMO');
                     // $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
                     $msg = array(
