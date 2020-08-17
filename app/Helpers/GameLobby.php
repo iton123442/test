@@ -269,6 +269,7 @@ class GameLobby{
         $client = new Client([
             'headers' => [ 
                 'Authorization' => $auth,
+                // 'Authorization' => config('providerlinks.cqgames.api_token'),
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ]
         ]);
@@ -377,12 +378,21 @@ class GameLobby{
     }
 
     public static function boomingGamingUrl($data){
-        Helper::saveLog('Booming Balance ', 36, json_encode($data), "ENDPOINT HIT");
+        Helper::saveLog('Booming session ', config('providerlinks.booming.provider_db_id'), json_encode($data), "ENDPOINT HIT");
         $url = config('providerlinks.booming.api_url').'/v2/session';
         $client_details = ProviderHelper::getClientDetails('token',$data["token"]);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+        $get_previous = ProviderHelper::getNonceprevious(config('providerlinks.booming.provider_db_id'));
         try{
-            $nonce = date('mdYhisu');
+            $nonce = date('mdYHisu');
+            for ($i = 1 ;$i < 20; $i++){
+                if($nonce > $get_previous->request_data){
+                    $nonce = $nonce;
+                break;
+                }else {
+                    $nonce = date('mdYHisu', strtotime('+'.$i.' hours'));
+                }
+            }
             $requesttosend = array (
                 'game_id' => $data["game_code"],
                 'balance' => $player_details->playerdetailsresponse->balance,
@@ -406,13 +416,14 @@ class GameLobby{
             ]);
             $guzzle_response = $client->post($url,  ['body' => json_encode($requesttosend)]);
             $client_response = json_decode($guzzle_response->getBody()->getContents());
-            Helper::saveLog('Booming Balance process', 36, json_encode($data), $client_response);
+            Helper::saveLogCode('Booming nonce', config('providerlinks.booming.provider_db_id'), $nonce, $nonce);
+            Helper::saveLog('Booming session process', config('providerlinks.booming.provider_db_id'), json_encode($data), $client_response);
             return $client_response;
         }catch(\Exception $e){
             $error = [
                 'error' => $e->getMessage()
             ];
-            Helper::saveLog('Booming Balance error', 36, json_encode($data), $e->getMessage());
+            Helper::saveLog('Booming session error', config('providerlinks.booming.provider_db_id'), json_encode($data), $e->getMessage());
             return $error;
         }
 
@@ -454,13 +465,13 @@ class GameLobby{
         // $hashCurrentBalance =  md5("externalPlayerId=".$userid."&secureLogin=".$stylename.$key);
         // $currentBalance = "https://api.prerelease-env.biz/IntegrationService/v3/http/CasinoGameAPI/balance/current/?externalPlayerId=$userid&secureLogin=$stylename&hash=$hashCurrentBalance";
 
-        $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=F&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
+        $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
         $url = "$gameluanch_url?key=$paramEncoded&stylename=$stylename";
         // $result = file_get_contents($url);
         $result = json_encode($url);
         
         // $result = json_decode(json_decode($result));
-        Helper::saveLog('start game url PP', 49, $result,"");
+        Helper::saveLog('start game url PP', 49, $result,"$result");
         return $url;
 
         // return isset($result->gameURL) ? $result->gameURL : false;
@@ -592,10 +603,9 @@ class GameLobby{
     }
 
     public static function solidLaunchUrl($game_code,$token,$exitUrl){
-        /*$client_details = GameLobby::getClientDetails('token', $token);*/
-        $client_code = 'BETRNKMW'; /*$client_details->client_code ? $client_details->client_code : 'BETRNKMW';*/
-        $url = $exitUrl;
-        $url = 'https://instage.solidgaming.net/api/launch/'.$client_code.'/'.$game_code.'?language=en&currency=USD&token='.$token.'';
+        $client_code = config("providerlinks.solid.BRAND");
+        $launch_url = config("providerlinks.solid.LAUNCH_URL");
+        $url = $launch_url.$client_code.'/'.$game_code.'?language=en&currency=USD&token='.$token.'';
         return $url;
     }
 

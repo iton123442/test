@@ -79,13 +79,13 @@ class Helper
 	}
 
 	public static function saveLog($method, $provider_id = 0, $request_data, $response_data) {
-		$data = [
-					"method_name" => $method,
-					"provider_id" => $provider_id,
-					"request_data" => json_encode(json_decode($request_data)),
-					"response_data" => json_encode($response_data)
-				];
-		DB::table('seamless_request_logs')->insert($data);
+			$data = [
+						"method_name" => $method,
+						"provider_id" => $provider_id,
+						"request_data" => json_encode(json_decode($request_data)),
+						"response_data" => json_encode($response_data)
+					];
+			DB::table('seamless_request_logs')->insert($data);
 	}
 
 	public static function saveClientLog($method, $provider_id = 0, $sent_data, $response_data) {
@@ -372,6 +372,23 @@ class Helper
 		return $gametransactionext;
 	}
 
+	public static function createVivoGameTransactionExt($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type){
+		$gametransactionext = array(
+			"game_trans_id" => $gametransaction_id,
+			"provider_trans_id" => $provider_request['TransactionID'],
+			"round_id" =>$provider_request['roundId'],
+			"amount" =>$provider_request['Amount'],
+			"game_transaction_type"=>$game_transaction_type,
+			"provider_request" =>json_encode($provider_request),
+			"mw_request"=>json_encode($mw_request),
+			"mw_response" =>addslashes($mw_response),
+			"client_response" =>json_encode($client_response),
+		);
+	
+		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
+		return $gametransactionext;
+	}
+
 	public static function updateGameTransaction($existingdata,$request_data,$type){
 		switch ($type) {
 			case "debit":
@@ -400,4 +417,30 @@ class Helper
 		/*var_dump($trans_data); die();*/
 		return DB::table('game_transactions')->where("game_trans_id",$existingdata->game_trans_id)->update($trans_data);
 	}
+	/**
+	 * @token = player_token
+	 * @response_data = token | player_id |
+	 */
+	public static function getGameCode($token,$provider_id){
+		$game_code = DB::table('seamless_request_logs')
+			->where('response_data', $token)
+			->where('provider_id',$provider_id)
+	    	->first();
+	    return $game_code ? $game_code : 'false';
+	}
+	/**
+	 * @request_data = game_code
+	 * @response_data = token | player_id |
+	 */
+	public static function saveLogCode($method, $provider_id = 0, $request_data, $response_data) {
+		$data = [
+			"method_name" => $method,
+			"provider_id" => $provider_id,
+			"request_data" => $request_data,
+			"response_data" => $response_data
+		];
+		DB::table('seamless_request_logs')->insert($data);
+	}
+
+	
 }

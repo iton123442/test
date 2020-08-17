@@ -140,7 +140,7 @@ class VivoController extends Controller
 
 		
 
-		Helper::saveLog('vivo_authentication', 5, file_get_contents("php://input"), $response);
+		Helper::saveLog('vivo_authentication', 34, file_get_contents("php://input"), $response);
 		echo $response;
 
 	}
@@ -149,28 +149,14 @@ class VivoController extends Controller
 	{
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
+		
+		if($this->_isIdempotent($request->TransactionID)) {
+			header("Content-type: text/xml; charset=utf-8");
+			return '<?xml version="1.0" encoding="utf-8"?>'. $this->_isIdempotent($request->TransactionID)->mw_response;
+		}
 
-		header("Content-type: text/xml; charset=utf-8");
-		$response = '<?xml version="1.0" encoding="utf-8"?>';
-		$response .= '<VGSSYSTEM>
-						<REQUEST>
-							<USERID>'.$request->userId.'</USERID>
-							<AMOUNT>'.$request->Amount.'</AMOUNT>
-							<TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID>
-							<TRNTYPE>'.$request->TrnType.'</TRNTYPE>
-							<GAMEID>'.$request->gameId.'</GAMEID>
-							<ROUNDID>'.$request->roundId.'</ROUNDID>
-							<TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION>
-							<HISTORY>'.$request->History.'</HISTORY>
-							<ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED>
-							<HASH>'.$request->hash.'</HASH>
-						</REQUEST>
-						<TIME>'.Helper::datesent().'</TIME>
-						<RESPONSE>
-							<RESULT>FAILED</RESULT>
-							<CODE>300</CODE>
-						</RESPONSE>
-						</VGSSYSTEM>';
+		$response = '';
+		$response .= '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 
 		$client_details = $this->_getClientDetails('player_id', $request->userId);
 
@@ -178,27 +164,7 @@ class VivoController extends Controller
 
 		if($hash != $request->hash) {
 
-			header("Content-type: text/xml; charset=utf-8");
-			$response = '<?xml version="1.0" encoding="utf-8"?>';
-			$response .= '<VGSSYSTEM>
-							<REQUEST>
-								<USERID>'.$request->userId.'</USERID>
-								<AMOUNT>'.$request->Amount.'</AMOUNT>
-								<TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID>
-								<TRNTYPE>'.$request->TrnType.'</TRNTYPE>
-								<GAMEID>'.$request->gameId.'</GAMEID>
-								<ROUNDID>'.$request->roundId.'</ROUNDID>
-								<TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION>
-								<HISTORY>'.$request->History.'</HISTORY>
-								<ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED>
-								<HASH>'.$request->hash.'</HASH>
-							</REQUEST>
-							<TIME>'.Helper::datesent().'</TIME>
-							<RESPONSE>
-								<RESULT>FAILED</RESULT>
-								<CODE>500</CODE>
-							</RESPONSE>
-							</VGSSYSTEM>';
+			$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>500</CODE></RESPONSE></VGSSYSTEM>';
 		}
 		else
 		{
@@ -206,27 +172,7 @@ class VivoController extends Controller
 			GameRound::create($request->roundId, $client_details->token_id);
 
 			if(!GameRound::check($request->roundId)) {
-				header("Content-type: text/xml; charset=utf-8");
-				$response = '<?xml version="1.0" encoding="utf-8"?>';
-				$response .= '<VGSSYSTEM>
-								<REQUEST>
-									<USERID>'.$request->userId.'</USERID>
-									<AMOUNT>'.$request->Amount.'</AMOUNT>
-									<TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID>
-									<TRNTYPE>'.$request->TrnType.'</TRNTYPE>
-									<GAMEID>'.$request->gameId.'</GAMEID>
-									<ROUNDID>'.$request->roundId.'</ROUNDID>
-									<TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION>
-									<HISTORY>'.$request->History.'</HISTORY>
-									<ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED>
-									<HASH>'.$request->hash.'</HASH>
-								</REQUEST>
-								<TIME>'.Helper::datesent().'</TIME>
-								<RESPONSE>
-									<RESULT>FAILED</RESULT>
-									<CODE>300</CODE>
-								</RESPONSE>
-								</VGSSYSTEM>';
+				$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 			}
 			else
 			{
@@ -240,34 +186,14 @@ class VivoController extends Controller
 					if($request->TrnType == 'CANCELED_BET') {
 						
 						// Check if the transaction exist
-						$game_transaction = GameTransaction::find($request->TransactionID);
+						/*$game_transaction = GameTransaction::find($request->TransactionID);
 						
 						// If transaction is not found
 						if(!$game_transaction) {
-							header("Content-type: text/xml; charset=utf-8");
-							$response = '<?xml version="1.0" encoding="utf-8"?>';
-							$response .= '<VGSSYSTEM>
-											<REQUEST>
-												<USERID>'.$request->userId.'</USERID>
-												<AMOUNT>'.$request->Amount.'</AMOUNT>
-												<TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID>
-												<TRNTYPE>'.$request->TrnType.'</TRNTYPE>
-												<GAMEID>'.$request->gameId.'</GAMEID>
-												<ROUNDID>'.$request->roundId.'</ROUNDID>
-												<TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION>
-												<HISTORY>'.$request->History.'</HISTORY>
-												<ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED>
-												<HASH>'.$request->hash.'</HASH>
-											</REQUEST>
-											<TIME>'.Helper::datesent().'</TIME>
-											<RESPONSE>
-												<RESULT>FAILED</RESULT>
-												<CODE>300</CODE>
-											</RESPONSE>
-											</VGSSYSTEM>';
+							$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 						}
 						else
-						{
+						{*/
 							// If transaction is found, send request to the client
 							$client = new Client([
 							    'headers' => [ 
@@ -276,8 +202,7 @@ class VivoController extends Controller
 							    ]
 							]);
 							
-							$guzzle_response = $client->post($client_details->fund_transfer_url,
-							    ['body' => json_encode(
+							$body = json_encode(
 							        	[
 										  "access_token" => $client_details->client_access_token,
 										  "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
@@ -298,48 +223,37 @@ class VivoController extends Controller
 											      "transferid" => "",
 											      "rollback" => "true",
 											      "currencycode" => $client_details->currency,
-											      "amount" => $game_transaction->bet_amount
+											      "amount" => $request->Amount
 											]
 										  ]
 										]
-							    )]
+							    );
+
+							$guzzle_response = $client->post($client_details->fund_transfer_url,
+							    ['body' => $body]
 							);
 
 							$client_response = json_decode($guzzle_response->getBody()->getContents());
 
 							// If client returned a success response
 							if($client_response->fundtransferresponse->status->code == "200") {
-								$json_data['roundid'] = $request->roundId;
-								$json_data['transid'] = $request->TransactionID;
-								$json_data['amount'] = $request->Amount;
-								$json_data['reason'] = NULL;
+								$new_request = $request->all();
+								$new_request['roundid'] = $request->roundId;
+								$new_request['transid'] = $request->TransactionID;
+								$new_request['amount'] = $request->Amount;
+								$new_request['reason'] = NULL;
+								$new_request['income'] = 0;
 
-								$transaction_id = GameTransaction::save('rollback', $json_data, $game_transaction, $client_details, $client_details);
+								$game_trans_array = ['pay_amount' => $request->Amount, 'game_trans_id' => 'N/A', 'game_id' => $request->gameId];
+								$game_transaction = (object) $game_trans_array;								
+
+								$transaction_id = GameTransaction::save('rollback', $new_request, $game_transaction, $client_details, $client_details);
+
+								$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$transaction_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';	
 								
-								header("Content-type: text/xml; charset=utf-8");
-						 		$response = '<?xml version="1.0" encoding="utf-8"?>';
-						 		$response .= '<VGSSYSTEM>
-						 						<REQUEST>
-						 							<USERID>'.$request->userId.'</USERID>
-						 							<AMOUNT>'.$request->Amount.'</AMOUNT>
-						 							<TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID>
-						 							<TRNTYPE>'.$request->TrnType.'</TRNTYPE>
-						 							<GAMEID>'.$request->gameId.'</GAMEID>
-						 							<ROUNDID>'.$request->roundId.'</ROUNDID>
-						 							<TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION>
-						 							<HISTORY>'.$request->History.'</HISTORY>
-						 							<ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED>
-						 							<HASH>'.$request->hash.'</HASH>
-						 						</REQUEST>
-						 						<TIME>'.Helper::datesent().'</TIME>
-						 						<RESPONSE>
-						 						<RESULT>OK</RESULT>
-						 							<ECSYSTEMTRANSACTIONID>'.$transaction_id.'</ECSYSTEMTRANSACTIONID>
-						 							<BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE>
-						 						</RESPONSE>
-						 					</VGSSYSTEM>';
+						 		Helper::createVivoGameTransactionExt($transaction_id, $new_request, $body, $response, $client_response, 3);
 							}
-						}
+						/*}*/
 					}
 					else
 					{
@@ -381,27 +295,8 @@ class VivoController extends Controller
 
 						if(isset($client_response->fundtransferresponse->status->code) 
 					&& $client_response->fundtransferresponse->status->code == "402") {
-							header("Content-type: text/xml; charset=utf-8");
-							$response = '<?xml version="1.0" encoding="utf-8"?>';
-							$response .= '<VGSSYSTEM>
-											<REQUEST>
-												<USERID>'.$request->userId.'</USERID>
-												<AMOUNT>'.$request->Amount.'</AMOUNT>
-												<TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID>
-												<TRNTYPE>'.$request->TrnType.'</TRNTYPE>
-												<GAMEID>'.$request->gameId.'</GAMEID>
-												<ROUNDID>'.$request->roundId.'</ROUNDID>
-												<TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION>
-												<HISTORY>'.$request->History.'</HISTORY>
-												<ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED>
-												<HASH>'.$request->hash.'</HASH>
-											</REQUEST>
-											<TIME>'.Helper::datesent().'</TIME>
-											<RESPONSE>
-												<RESULT>FAILED</RESULT>
-												<CODE>300</CODE>
-											</RESPONSE>
-											</VGSSYSTEM>';
+
+							$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 						}
 						else
 						{
@@ -418,29 +313,10 @@ class VivoController extends Controller
 
 								$transaction_id = GameTransaction::save(($transactiontype == 'BET' ? "debit" : "credit"), $json_data, $game_details, $client_details, $client_details);
 
-								header("Content-type: text/xml; charset=utf-8");
-						 		$response = '<?xml version="1.0" encoding="utf-8"?>';
-						 		$response .= '<VGSSYSTEM>
-						 						<REQUEST>
-						 							<USERID>'.$request->userId.'</USERID>
-						 							<AMOUNT>'.$request->Amount.'</AMOUNT>
-						 							<TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID>
-						 							<TRNTYPE>'.$request->TrnType.'</TRNTYPE>
-						 							<GAMEID>'.$request->gameId.'</GAMEID>
-						 							<ROUNDID>'.$request->roundId.'</ROUNDID>
-						 							<TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION>
-						 							<HISTORY>'.$request->History.'</HISTORY>
-						 							<ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED>
-						 							<HASH>'.$request->hash.'</HASH>
-						 						</REQUEST>
-						 						<TIME>'.Helper::datesent().'</TIME>
-						 						<RESPONSE>
-						 						<RESULT>OK</RESULT>
-						 							<ECSYSTEMTRANSACTIONID>'.$transaction_id.'</ECSYSTEMTRANSACTIONID>
-						 							<BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE>
-						 						</RESPONSE>
-						 					</VGSSYSTEM>';
+						 		$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$transaction_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
 							}
+
+							Helper::createVivoGameTransactionExt($transaction_id, $request->all(), $body, $response, $client_response, ($transactiontype == 'BET' ? 1 : 2));
 						}
 					}
 				}
@@ -448,8 +324,11 @@ class VivoController extends Controller
 		}
 
 		$transactiontype = ($request->TrnType == 'BET' ? "debit" : "credit");
-		Helper::saveLog($transactiontype, 19, file_get_contents("php://input"), $response);
-		echo $response;
+		Helper::saveLog($transactiontype, 34, file_get_contents("php://input"), $response);
+
+		header("Content-type: text/xml; charset=utf-8");
+		$final_response =  '<?xml version="1.0" encoding="utf-8"?>'. $response;
+		echo $final_response;
 
 	}
 
@@ -639,6 +518,25 @@ class VivoController extends Controller
 
 		return $result;
 
+	}
+
+	private function _isIdempotent($transaction_id, $is_rollback = false) {
+		$result = false;
+		$query = DB::table('game_transaction_ext')
+								->where('provider_trans_id', $transaction_id);
+		if ($is_rollback == true) {
+					$query->where([
+				 		["game_transaction_type", "=", 3]
+				 	]);
+				}
+
+		$transaction_exist = $query->first();
+
+		if($transaction_exist) {
+			$result = $transaction_exist;
+		}
+
+		return $result;								
 	}
 
 	/*private function _getClientDetails($type = "", $value = "") {

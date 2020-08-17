@@ -394,7 +394,22 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($request->input('game_provider')=="Habanero Direct"){ 
+                elseif($request->input('game_provider') == "Booming Games"){ 
+                    $url = GameLobby::boomingGamingUrl($request->all());
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => $url->play_url,
+                        "game_launch" => true
+                    );
+                    $array = [
+                        'game_code' => $request->input("game_code"),
+                        'url' =>  $url->play_url
+                    ];
+                    Helper::saveLogCode('Booming GameCode', 36, json_encode($array), $url->session_id);
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($request->input('game_provider')=="Habanero Direct){ 
                     // Helper::saveLog('DEMO CALL', 11, json_encode($request->all()), 'DEMO');
                     // $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
                     $msg = array(
