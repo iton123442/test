@@ -7,6 +7,7 @@ use SimpleXMLElement;
 use App\Helpers\PNGHelper;
 use GuzzleHttp\Client;
 use App\Helpers\Helper;
+use App\Helpers\ClientRequestHelper;
 use DB;
 class PNGController extends Controller
 {
@@ -34,6 +35,7 @@ class PNGController extends Controller
                                 "gameid" => "",
                                 "clientid" => $client_details->client_id,
                                 "playerdetailsrequest" => [
+                                    "player_username"=>$client_details->username,
                                     "client_player_id"=>$client_details->client_player_id,
                                     "token" => $client_details->player_token,
                                     "gamelaunch" => "true"
@@ -91,6 +93,10 @@ class PNGController extends Controller
                     );
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");       
                 }
+                //This is Temporarily Permanent
+                //This require to send TOKEN ID and the roundID
+                    $transaction_data = ClientRequestHelper::getTransactionId($xmlparser->externalGameSessionId,$xmlparser->roundId);
+                //
                 $client = new Client([
                     'headers' => [ 
                         'Content-Type' => 'application/json',
@@ -114,10 +120,11 @@ class PNGController extends Controller
                       "fundinfo" => [
                             "gamesessionid" => "",
                             "transactiontype" => "debit",
-                            "transferid" => "",
+                            "transferid" => $transaction_data["transferId"],
+                            "roundId" => $transaction_data["roundId"],
                             "rollback" => "false",
                             "currencycode" => $client_details->currency,
-                            "amount" => $xmlparser->real #change data here
+                            "amount" => (float)$xmlparser->real #change data here
                       ]
                     ]
                       ];
@@ -133,7 +140,7 @@ class PNGController extends Controller
                 $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
                 $json_data = array(
                     "transid" => $xmlparser->transactionId,
-                    "amount" => $xmlparser->real,
+                    "amount" => (float)$xmlparser->real,
                     "roundid" => $xmlparser->roundId
                 );
                 if(isset($client_response->fundtransferresponse->status->code) 
@@ -185,6 +192,10 @@ class PNGController extends Controller
                     );
                     return PNGHelper::arrayToXml($array_data,"<release/>");
                 }
+                //This is Temporarily Permanent
+                //This require to send TOKEN ID and the roundID
+                $transaction_data = ClientRequestHelper::getTransactionId($xmlparser->externalGameSessionId,$xmlparser->roundId);
+                //
                 $client = new Client([
                     'headers' => [ 
                         'Content-Type' => 'application/json',
@@ -209,10 +220,11 @@ class PNGController extends Controller
                       "fundinfo" => [
                             "gamesessionid" => "",
                             "transactiontype" => "credit",
-                            "transferid" => "",
+                            "transferid" => $transaction_data["transferId"],
+                            "roundId" => $transaction_data["roundId"],
                             "rollback" => "false",
                             "currencycode" => $client_details->currency,
-                            "amount" => $xmlparser->real
+                            "amount" => (float)$xmlparser->real
                       ]
                     ]
                       ];
@@ -228,7 +240,7 @@ class PNGController extends Controller
                 $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
                 $json_data = array(
                     "transid" => $xmlparser->transactionId,
-                    "amount" => $xmlparser->real,
+                    "amount" => (float)$xmlparser->real,
                     "roundid" => $xmlparser->roundId,
                     "payout_reason" => null,
                     "win" => $win,
@@ -343,6 +355,10 @@ class PNGController extends Controller
                 Helper::saveLog('refundAlreadyexist(PNG)', 50,json_encode($xmlparser), $array_data);
                 return PNGHelper::arrayToXml($array_data,"<cancelReserve/>");
             }
+            //This is Temporarily Permanent
+            //This require to send TOKEN ID and the roundID
+            $transaction_data = ClientRequestHelper::getTransactionId($xmlparser->externalGameSessionId,$xmlparser->roundId);
+            //
             $client = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json',
@@ -367,10 +383,11 @@ class PNGController extends Controller
                   "fundinfo" => [
                         "gamesessionid" => "",
                         "transactiontype" => "credit",
-                        "transferid" => "",
+                        "transferid" => $transaction_data["transferId"],
+                        "roundId" => $transaction_data["roundId"],
                         "rollback" => "true",
                         "currencycode" => $client_details->currency,
-                        "amount" => $xmlparser->real
+                        "amount" => (float)$xmlparser->real
                   ]
                 ]
                   ];
@@ -386,7 +403,7 @@ class PNGController extends Controller
                 $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
                 $json_data = array(
                     "transid" => $xmlparser->transactionId,
-                    "amount" => $xmlparser->real,
+                    "amount" => (float)$xmlparser->real,
                     "roundid" => 0,
                 );
                 $game = Helper::getGameTransaction($xmlparser->externalGameSessionId,$xmlparser->roundId);

@@ -70,7 +70,15 @@ class FCHelper
 			"client_response" =>json_encode($client_response),
 		);
 		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-		return $gametransactionext;
+		return $gamestransaction_ext_ID;
+    }
+    public static function updateFCGameTransactionExt($gametransextid,$mw_request,$mw_response,$client_response){
+		$gametransactionext = array(
+			"mw_request"=>json_encode($mw_request),
+			"mw_response" =>json_encode($mw_response),
+			"client_response" =>json_encode($client_response),
+		);
+		DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
     }
     public static function checkGameTransaction($provider_transaction_id,$round_id=false,$type=false){
         $game = DB::table('game_transaction_ext')

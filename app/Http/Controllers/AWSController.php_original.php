@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
-use App\Helpers\ClientRequestHelper;
 use App\Helpers\AWSHelper;
 use App\Helpers\GameLobby;
 use GuzzleHttp\Exception\GuzzleException;
@@ -238,11 +237,40 @@ class AWSController extends Controller
 		}
 
 		try {
-			// AWS IS 1 WAY FLIGHT
-			$gamerecord  = $this->createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
-		    $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $provider_trans_id, $pay_amount, $game_transaction_type);
-            $client_response = ClientRequestHelper::fundTransfer($client_details,abs($details->amount),$game_details->game_code,$game_details->game_name,$game_transextension,$gamerecord,$transaction_type);
-
+			$client = new Client([
+			    'headers' => [ 
+			    	'Content-Type' => 'application/json',
+			    	'Authorization' => 'Bearer '.$client_details->client_access_token
+			    ]
+			]);
+			$requesttosend = [
+				  "access_token" => $client_details->client_access_token,
+				  "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+				  "type" => "fundtransferrequest",
+				  "datesent" => Helper::datesent(),
+				  "gamedetails" => [
+				    "gameid" => $game_details->game_code, // $game_details->game_code
+				    "gamename" => $game_details->game_name
+				  ],
+				  "fundtransferrequest" => [
+					  "playerinfo" => [
+						"client_player_id" => $client_details->client_player_id,
+						"token" => $client_details->player_token,
+					  ],
+					  "fundinfo" => [
+						      "gamesessionid" => "",
+						      "transactiontype" => $transaction_type,
+						      "transferid" => "",
+						      "rollback" => false,
+						      "currencycode" => $client_details->currency,
+						      "amount" => abs($details->amount)
+					   ],
+				  ],
+			];
+			$guzzle_response = $client->post($client_details->fund_transfer_url,
+			    ['body' => json_encode($requesttosend)]
+			);
+		    $client_response = json_decode($guzzle_response->getBody()->getContents());
 			$response = [
 				"msg"=> "success",
 				"code"=> 0,
@@ -256,7 +284,8 @@ class AWSController extends Controller
 					"bonusBalance" => 0
 				]
 			];
-			ProviderHelper::updatecreateGameTransExt($game_transextension, $details, $response, $client_response->requestoclient, $client_response,$response);
+			$gamerecord  = $this->createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
+		    $game_transextension = $this->createGameTransExt($gamerecord,$provider_trans_id, $provider_trans_id, $pay_amount, $game_transaction_type, $details, $response, $requesttosend, $client_response, $response);
 			return $response;
 		} catch (Exception $e) {
 			$response = [

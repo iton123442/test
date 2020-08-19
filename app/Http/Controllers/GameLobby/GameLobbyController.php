@@ -194,12 +194,35 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($request->input('game_provider')=="SkyWind"){ // request->token
+                elseif($request->input('game_provider')=="SpadeGaming"){
+                    if($request->has('lang')){
+                        $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
+                    }else{
+                        $lang = GameLobby::getLanguage($request->game_provider, 'en');
+                    }
+                    $exitUrl = $request->has('exitUrl') ? $request->exitUrl : '';
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::skyWindLaunch($request->game_code,$token), //TEST
+                        "url" => GameLobby::spadeLaunch($request->game_code,$request->token,$exitUrl,$lang),
                         "game_launch" => true
                     );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($request->input('game_provider')=="SkyWind"){ // request->token
+                    $url = GameLobby::skyWindLaunch($request->game_code,$token);
+                    if($url!= 'false'){
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "url" => $url,
+                            "game_launch" => true
+                        );
+                    }else{
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "game_launch" => false
+                        );
+                    }
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
@@ -409,7 +432,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($request->input('game_provider')=="Habanero Direct"){ 
+                elseif($request->input('game_provider')=="HabaneroGaming"){ 
                     // Helper::saveLog('DEMO CALL', 11, json_encode($request->all()), 'DEMO');
                     // $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
                     $msg = array(

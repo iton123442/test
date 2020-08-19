@@ -239,21 +239,35 @@ class GameLobby{
         return $url;
     }
 
+    public static function spadeLaunch($game_code,$token,$exitUrl,$lang='en_US'){
+        $client_details = ProviderHelper::getClientDetails('token', $token);
+        $domain =  $exitUrl;
+        $url = 'https://lobby-egame-staging.sgplay.net/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
+        return $url;
+    }
+
     public static function skyWindLaunch($game_code, $token){
         $player_login = SkyWind::userLogin();
         $client_details = ProviderHelper::getClientDetails('token', $token);
-        $url = ''.config('providerlinks.skywind.api_url').'/players/'.$client_player_details->player_id.'/games/'.$game_code.'?playmode=real&ticket='.$token.'';
         $client = new Client([
               'headers' => [ 
                   'Content-Type' => 'application/json',
                   'X-ACCESS-TOKEN' => $player_login->accessToken,
               ]
         ]);
+        // $url = ''.config('providerlinks.skywind.api_url').'/fun/games/'.$game_code.'';
+         $url = ''.config('providerlinks.skywind.api_url').'/players/'.config('providerlinks.skywind.seamless_username').'/games/'.$game_code.'?playmode=real&ticket='.$token.'';
+        // try {
         $response = $client->get($url);
         $response = json_encode(json_decode($response->getBody()->getContents()));
         Helper::saveLog('Skywind Game Launch', config('providerlinks.skywind.provider_db_id'), $response, $player_login->accessToken);
         $url = json_decode($response, true);
         return isset($url['url']) ? $url['url'] : 'false';
+            
+        // } catch (\Exception $e) {
+        //     Helper::saveLog('Skywind Game Launch Failed', config('providerlinks.skywind.provider_db_id'), json_encode($player_login), $e->getMessage());
+        //     return 'false';
+        // }
     }
 
     public static function cq9LaunchUrl($game_code, $token){
@@ -384,6 +398,7 @@ class GameLobby{
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         $get_previous = ProviderHelper::getNonceprevious(config('providerlinks.booming.provider_db_id'));
         try{
+           
             $nonce = date('mdYHisu');
             for ($i = 1 ;$i < 20; $i++){
                 if($nonce > $get_previous->request_data){

@@ -45,7 +45,6 @@ class BoomingGamingController extends Controller
 
     //THIS IS PART OF GAMELAUNCH GET SESSION AND URL
     public function callBack(Request $request){
-        
         $header = [
             'bg_nonce' => $request->header('bg-nonce'),
             'bg_signature' => $request->header('bg-signature')
@@ -73,34 +72,36 @@ class BoomingGamingController extends Controller
                         Helper::saveLog('Booming Callback error ', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $errormessage);
                         return json_encode($errormessage, JSON_FORCE_OBJECT); 
                     endif;
-                    $amount = $data["bet"] - $data["win"];
-                    $transactiontype = $data["win"] == '0.0' ? "debit" : "credit";
-                    $requesttosend = [
-                        "access_token" => $client_details->client_access_token,
-                        "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                        "type" => "fundtransferrequest",
-                        "datesent" => Helper::datesent(),
-                        "gamedetails" => [
-                            "gameid" => $game_details->game_code, // $game_details->game_code
-                            "gamename" => $game_details->game_name
-                        ],
-                        "fundtransferrequest" => [
-                                "playerinfo" => [
-                                "client_player_id" => $client_details->client_player_id,
-                                "token" => $client_details->player_token,
-                            ],
-                            "fundinfo" => [
-                                "gamesessionid" => "",
-                                "transferid" => "",
-                                "transactiontype" => $transactiontype,
-                                "rollback" => "false",
-                                "currencycode" => $client_details->default_currency,
-                                "amount" => $amount
-                            ]
-                        ]
-                        ];
 
                     try {
+                        $amount = $data["bet"] - $data["win"];
+                        // $transactiontype = $data["win"] == '0.0' ? "debit" : "credit";
+                        //bet process
+                        $requesttosend_debit = [
+                            "access_token" => $client_details->client_access_token,
+                            "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+                            "type" => "fundtransferrequest",
+                            "datesent" => Helper::datesent(),
+                            "gamedetails" => [
+                                "gameid" => $game_details->game_code, // $game_details->game_code
+                                "gamename" => $game_details->game_name
+                            ],
+                            "fundtransferrequest" => [
+                                    "playerinfo" => [
+                                    "client_player_id" => $client_details->client_player_id,
+                                    "token" => $client_details->player_token,
+                                ],
+                                "fundinfo" => [
+                                    "gamesessionid" => "",
+                                    "transferid" => "",
+                                    "transactiontype" => "debit",
+                                    "rollback" => "false",
+                                    "currencycode" => $client_details->default_currency,
+                                    "amount" => $data["bet"]
+                                ]
+                            ]
+                            ];
+    
                         $client = new Client([
                             'headers' => [ 
                                 'Content-Type' => 'application/json',
@@ -108,13 +109,54 @@ class BoomingGamingController extends Controller
                             ]
                         ]);
                         $guzzle_response = $client->post($client_details->fund_transfer_url,
-                            ['body' => json_encode($requesttosend)]
+                            ['body' => json_encode($requesttosend_debit)]
                         );
-
                         $client_response = json_decode($guzzle_response->getBody()->getContents());
-                        $response =  [
+
+                        $response_debit =  [
                             "balance" => (string)$client_response->fundtransferresponse->balance
                         ];
+                        //win process
+                        $requesttosend_credet = [
+                            "access_token" => $client_details->client_access_token,
+                            "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+                            "type" => "fundtransferrequest",
+                            "datesent" => Helper::datesent(),
+                            "gamedetails" => [
+                                "gameid" => $game_details->game_code, // $game_details->game_code
+                                "gamename" => $game_details->game_name
+                            ],
+                            "fundtransferrequest" => [
+                                    "playerinfo" => [
+                                    "client_player_id" => $client_details->client_player_id,
+                                    "token" => $client_details->player_token,
+                                ],
+                                "fundinfo" => [
+                                    "gamesessionid" => "",
+                                    "transferid" => "",
+                                    "transactiontype" => "credit",
+                                    "rollback" => "false",
+                                    "currencycode" => $client_details->default_currency,
+                                    "amount" => $data["win"]
+                                ]
+                            ]
+                            ];
+    
+                        $client_credit = new Client([
+                            'headers' => [ 
+                                'Content-Type' => 'application/json',
+                                'Authorization' => 'Bearer '.$client_details->client_access_token
+                            ]
+                        ]);
+                        $guzzle_response_credit = $client_credit->post($client_details->fund_transfer_url,
+                            ['body' => json_encode($requesttosend_credet)]
+                        );
+                        $client_response_credit = json_decode($guzzle_response_credit->getBody()->getContents());
+                        $response_credit =  [
+                            "balance" => (string)$client_response_credit->fundtransferresponse->balance
+                        ];
+
+                     
 
                         $token_id = $client_details->token_id;
                         $bet_amount =  $data['bet'];
@@ -129,15 +171,16 @@ class BoomingGamingController extends Controller
                         $gametransaction_id = Helper::saveGame_transaction($token_id, $game_details->game_id, $bet_amount, $payout, $entry_id,  $win, null, null , $income, $provider_trans_id, $round_id);
                         
                         $provider_request = $data;
-                        $mw_request = $requesttosend;
-                        $mw_response = $response;
+                        $mw_request = $requesttosend_debit;
+                        $mw_response = $response_debit;
                         $client_response = $client_response;
-                        $game_transaction_type = 2;
-
+                        $game_transaction_type = 1;
+                        //bet transaction
                         $this->creteBoomingtransaction($gametransaction_id, $provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type, $bet_amount, $data['session_id'], $data['round']);
-                    
-                        Helper::saveLog('Booming Callback Process ', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
-                        return json_encode($response, JSON_FORCE_OBJECT); 
+                        //win transaction
+                        $this->creteBoomingtransaction($gametransaction_id, $provider_request,$requesttosend_credet,$response_credit,$client_response_credit,2, $data["win"], $data['session_id'], $data['round']);
+                        Helper::saveLog('Booming Callback Process ', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response_debit);
+                        return json_encode($response_credit, JSON_FORCE_OBJECT); 
                     }catch(\Exception $e){
                         $msg = array(
                             'error' => '2099',

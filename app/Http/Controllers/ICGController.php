@@ -10,6 +10,7 @@ use App\Helpers\GameTransaction;
 use App\Helpers\GameSubscription;
 use App\Helpers\GameRound;
 use App\Helpers\Game;
+use App\Helpers\ClientRequestHelper;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use DB;
@@ -114,6 +115,7 @@ class ICGController extends Controller
                                 "gameid" => "",
                                 "clientid" => $client_details->client_id,
                                 "playerdetailsrequest" => [
+                                    "player_username"=>$client_details->username,
                                     "client_player_id"=>$client_details->client_player_id,
                                     "token" => $client_details->player_token,
                                     "gamelaunch" => "true"
@@ -183,6 +185,7 @@ class ICGController extends Controller
                                 "gameid" => "",
                                 "clientid" => $client_details->client_id,
                                 "playerdetailsrequest" => [
+                                    "player_username"=>$client_details->username,
                                     "client_player_id"=>$client_details->client_player_id,
                                     "token" => $client_details->player_token,
                                     "gamelaunch" => "false"
@@ -250,54 +253,24 @@ class ICGController extends Controller
                     return response($response,400)
                     ->header('Content-Type', 'application/json');
                 }
-                $client = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$client_details->client_access_token
-                    ]
-                ]);
-                $requesttocient = [
-                    "access_token" => $client_details->client_access_token,
-                    "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                    "type" => "fundtransferrequest",
-                    "datetsent" => "",
-                    "gamedetails" => [
-                      "gameid" => "",
-                      "gamename" => ""
-                    ],
-                    "fundtransferrequest" => [
-                          "playerinfo" => [
-                          "client_player_id"=>$client_details->client_player_id,
-                          "token" => $client_details->player_token
-                      ],
-                      "fundinfo" => [
-                            "gamesessionid" => "",
-                            "transactiontype" => "debit",
-                            "transferid" => "",
-                            "rollback" => "false",
-                            "currencycode" => $client_details->currency,
-                            "amount" => round($json["amount"]/100,2) #change data here
-                      ]
-                    ]
-                      ];
-                    $guzzle_response = $client->post($client_details->fund_transfer_url,
-                    ['body' => json_encode(
-                            $requesttocient
-                    )],
-                    ['defaults' => [ 'exceptions' => false ]]
-                );
-
-                $client_response = json_decode($guzzle_response->getBody()->getContents());
-                $balance = round($client_response->fundtransferresponse->balance * 100,2);
-                $game_details = Helper::getInfoPlayerGameRound($json["token"]);
+                //Changes Starts here create the transaction and update later if the client already response with something
                 $json_data = array(
                     "transid" => $json["transactionId"],
                     "amount" => round($json["amount"]/100,2),
                     "roundid" => $json["roundId"]
                 );
+                $game_details = Helper::getInfoPlayerGameRound($json["token"]);
+                Helper::saveLog('checkGamedetails(ICG)', 12, json_encode($game_details), $game_details);
+                $game = Helper::getGameTransaction($request->token,$request->gameId);
+                if(!$game){
+                    $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
+                }
+                $transactionId = Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,1);
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
+                $balance = round($client_response->fundtransferresponse->balance * 100,2);
+                //End
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
-                    
                     $response =array(
                         "data" => array(
                             "statusCode"=>0,
@@ -306,15 +279,7 @@ class ICGController extends Controller
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
-                    $game = Helper::getGameTransaction($request->token,$request->gameId);
-                    if(!$game){
-                        $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
-                        // $game_transaction_id=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details);
-                        // Helper::saveGame_trans_ext($game_transaction_id,json_encode($json));
-                        // Helper::saveLog('betGame(ICG)', 12, json_encode($json), $response);
-                    }
-                    
-                    Helper::createICGGameTransactionExt($gametransactionid,$json,$requesttocient,$response,$client_response,1);  
+                    $transactionId = Helper::updateICGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -352,46 +317,7 @@ class ICGController extends Controller
             $client_details = $this->_getClientDetails('token', $json["token"]);
             if($client_details){
                 //$game_transaction = Helper::checkGameTransaction($json["transactionId"]);
-                $client = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$client_details->client_access_token
-                    ]
-                ]);
-                
-                 $requesttocient = [
-                    "access_token" => $client_details->client_access_token,
-                    "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                    "type" => "fundtransferrequest",
-                    "datetsent" => "",
-                    "gamedetails" => [
-                      "gameid" => "",
-                      "gamename" => ""
-                    ],
-                    "fundtransferrequest" => [
-                          "playerinfo" => [
-                          "client_player_id"=>$client_details->client_player_id,
-                          "token" => $client_details->player_token
-                      ],
-                      "fundinfo" => [
-                            "gamesessionid" => "",
-                            "transactiontype" => "credit",
-                            "transferid" => "",
-                            "rollback" => "false",
-                            "currencycode" => $client_details->currency,
-                            "amount" => round($json["amount"]/100,2)
-                      ]
-                    ]
-                      ];
-                    $guzzle_response = $client->post($client_details->fund_transfer_url,
-                    ['body' => json_encode(
-                            $requesttocient
-                    )],
-                    ['defaults' => [ 'exceptions' => false ]]
-                );
                 $win = $json["amount"] == 0 ? 0 : 1;
-                $client_response = json_decode($guzzle_response->getBody()->getContents());
-                $balance = round($client_response->fundtransferresponse->balance * 100,2);
                 $game_details = Helper::getInfoPlayerGameRound($json["token"]);
                 $json_data = array(
                     "transid" => $json["transactionId"],
@@ -408,9 +334,9 @@ class ICGController extends Controller
                     $gameupdate = Helper::updateGameTransaction($game,$json_data,"credit");
                     $gametransactionid = $game->game_trans_id;
                 }
-                // $game_transaction_id =Helper::createGameTransaction('credit', $json_data, $game_details, $client_details);
-                // Helper::saveGame_trans_ext($game_transaction_id,json_encode($json));
-                // Helper::saveLog('winGame(ICG)', 12, json_encode($json), "data");
+                $transactionId=Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,2);
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                $balance = round($client_response->fundtransferresponse->balance * 100,2);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     
@@ -422,7 +348,7 @@ class ICGController extends Controller
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
-                    Helper::createICGGameTransactionExt($gametransactionid,$json,$requesttocient,$response,$client_response,2);  
+                    Helper::updateICGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);  
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -481,46 +407,8 @@ class ICGController extends Controller
             $client_details = $this->_getClientDetails('token', $json["token"]);
             if($client_details){
                 //$game_transaction = Helper::checkGameTransaction($json["transactionId"]);
-                $client = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$client_details->client_access_token
-                    ]
-                ]);
                 
-                    $requesttocient = [
-                        "access_token" => $client_details->client_access_token,
-                        "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                        "type" => "fundtransferrequest",
-                        "datetsent" => "",
-                        "gamedetails" => [
-                          "gameid" => "",
-                          "gamename" => ""
-                        ],
-                        "fundtransferrequest" => [
-                              "playerinfo" => [
-                              "client_player_id"=>$client_details->client_player_id,
-                              "token" => $client_details->player_token
-                          ],
-                          "fundinfo" => [
-                                "gamesessionid" => "",
-                                "transactiontype" => "credit",
-                                "transferid" => "",
-                                "rollback" => "false",
-                                "currencycode" => $client_details->currency,
-                                "amount" => round($json["amount"]/100,2)
-                          ]
-                        ]
-                          ];
-                    $guzzle_response = $client->post($client_details->fund_transfer_url,
-                    ['body' => json_encode(
-                            $requesttocient
-                    )],
-                    ['defaults' => [ 'exceptions' => false ]]
-                );
                 $win = $json["amount"] == 0 ? 0 : 1;
-                $client_response = json_decode($guzzle_response->getBody()->getContents());
-                $balance = round($client_response->fundtransferresponse->balance * 100,2);
                 $game_details = Helper::getInfoPlayerGameRound($json["token"]);
                 $json_data = array(
                     "transid" => $json["transactionId"],
@@ -537,6 +425,10 @@ class ICGController extends Controller
                     $gameupdate = Helper::updateGameTransaction($game,$json_data,"credit");
                     $gametransactionid = $game->game_trans_id;
                 }
+                $transactionId=Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,2);
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                $balance = round($client_response->fundtransferresponse->balance * 100,2);
+                
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     
@@ -548,7 +440,7 @@ class ICGController extends Controller
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
-                    Helper::createICGGameTransactionExt($gametransactionid,$json,$requesttocient,$response,$client_response,2);
+                    Helper::updateICGGameTransactionExt($transactionId,$client_response->requesttoclient,$response,$client_response);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -580,54 +472,30 @@ class ICGController extends Controller
             $client_details = $this->_getClientDetails('token', $json["token"]);
             if($client_details){
                 $game_transaction = Helper::checkGameTransaction($json["transactionId"]);
-                
-                $client = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$client_details->client_access_token
-                    ]
-                ]);
-                
-                    $requesttocient = [
-                        "access_token" => $client_details->client_access_token,
-                        "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                        "type" => "fundtransferrequest",
-                        "datetsent" => "",
-                        "gamedetails" => [
-                          "gameid" => "",
-                          "gamename" => ""
-                        ],
-                        "fundtransferrequest" => [
-                              "playerinfo" => [
-                              "client_player_id"=>$client_details->client_player_id,
-                              "token" => $client_details->player_token
-                          ],
-                          "fundinfo" => [
-                                "gamesessionid" => "",
-                                "transactiontype" => "debit",
-                                "transferid" => "",
-                                "rollback" => "false",
-                                "currencycode" => $client_details->currency,
-                                "amount" => round($json["amount"]/100,2)
-                          ]
-                        ]
-                          ];
-                    $guzzle_response = $client->post($client_details->fund_transfer_url,
-                    ['body' => json_encode(
-                            $requesttocient
-                    )],
-                    ['defaults' => [ 'exceptions' => false ]]
-                );
-
-                $client_response = json_decode($guzzle_response->getBody()->getContents());
-                $balance = round($client_response->fundtransferresponse->balance * 100,2);
                 $game_details = Helper::getInfoPlayerGameRound($json["token"]);
                 $json_data = array(
                     "transid" => $json["transactionId"],
                     "amount" => round($json["amount"]/100,2),
                     "roundid" => 0
                 );
-                Helper::saveLog('GameTrasactionDeposit(ICG)', 12, json_encode($client_response), "fish");
+                $game = Helper::getGameTransaction($request->token,0);
+                if(!$game){
+                    $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
+                    // $game_transaction_id=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details);
+                    // Helper::saveGame_trans_ext($game_transaction_id,json_encode($json));
+                    // Helper::saveLog('betGame(ICG)', 12, json_encode($json), $response);
+                }
+                else{
+                    $json_data = array(
+                        "amount" => round($json["amount"]/100,2),
+                    );
+                    $gameupdate = Helper::updateGameTransaction($game,$json_data,"debit");
+                    $gametransactionid = $game->game_trans_id;
+                }
+                $transactionId=Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,1);
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                $balance = round($client_response->fundtransferresponse->balance * 100,2);
+                
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     
@@ -639,22 +507,7 @@ class ICGController extends Controller
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
-                    $game = Helper::getGameTransaction($request->token,0);
-                    if(!$game){
-                        $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
-                        // $game_transaction_id=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details);
-                        // Helper::saveGame_trans_ext($game_transaction_id,json_encode($json));
-                        // Helper::saveLog('betGame(ICG)', 12, json_encode($json), $response);
-                    }
-                    else{
-                        $json_data = array(
-                            "amount" => round($json["amount"]/100,2),
-                        );
-                        $gameupdate = Helper::updateGameTransaction($game,$json_data,"debit");
-                        $gametransactionid = $game->game_trans_id;
-                    }
-                    
-                    Helper::createICGGameTransactionExt($gametransactionid,$json,$requesttocient,$response,$client_response,1); 
+                    Helper::updateICGGameTransactionExt($transactionId,$client_response->requesttoclient,$response,$client_response); 
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }

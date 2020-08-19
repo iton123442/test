@@ -182,6 +182,7 @@ $app->post('skywind/api/get_balance', 'SkyWindController@getBalance');
 $app->post('skywind/api/debit', 'SkyWindController@gameDebit');
 $app->post('skywind/api/credit', 'SkyWindController@gameCredit');
 $app->post('skywind/api/rollback', 'SkyWindController@gameRollback');
+$app->post('skywind/api/get_free_bet', 'SkyWindController@getFreeBet');
 //Player API
 //Operator API
 //Lobby API
@@ -198,7 +199,7 @@ $app->post('api/cq9/transaction/game/credit','CQ9Controller@playerCredit');
 $app->post('api/cq9/transaction/game/bonus','CQ9Controller@playerBonus');
 $app->post('api/cq9/transaction/user/payoff','CQ9Controller@playerPayoff');
 $app->post('api/cq9/transaction/game/refund','CQ9Controller@playerRefund');
-$app->get('api/cq9/transaction/game/record/{mtcode}','CQ9Controller@playerRecord'); 
+$app->get('api/cq9/transaction/record/{mtcode}','CQ9Controller@playerRecord'); 
 $app->post('api/cq9/transaction/game/bets','CQ9Controller@playerBets');
 $app->post('api/cq9/transaction/game/refunds','CQ9Controller@playerRefunds');
 $app->post('api/cq9/transaction/game/cancel','CQ9Controller@playerCancel');
@@ -206,15 +207,19 @@ $app->post('api/cq9/transaction/game/amend','CQ9Controller@playerAmend');
 $app->post('api/cq9/transaction/game/wins','CQ9Controller@playerWins');
 $app->post('api/cq9/transaction/game/amends','CQ9Controller@playerAmends');
 
-
 $app->get('api/cq9/transaction/balance/{account}','CQ9Controller@CheckBalance');
 $app->get('api/cq9/gameboy/player/lotto/balance/{account}','CQ9Controller@CheckBalanceLotto'); // New
 $app->get('api/cq9/player/check/{account}','CQ9Controller@CheckPlayer');
 
-
 $app->post('api/cq9/mw/getlist','CQ9Controller@getGameList');
 $app->post('api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
 
+// Spade Gaming
+$app->post('api/spade','SpadeController@index');
+$app->post('api/spade/authorize','SpadeController@index');
+$app->post('api/spade/getBalance','SpadeController@getBalance');
+$app->post('api/spade/transfer','SpadeController@makeTransfer');
+$app->post('api/spade/getgame','SpadeController@getGameList');
 //SAGaming 
 $app->post('api/sa/debugme','SAGamingController@debugme');
 $app->post('api/sa/GetUserBalance','SAGamingController@GetUserBalance');
@@ -238,7 +243,7 @@ $app->post('/api/eightprovider/win', 'EightProviderController@gameWin'); // DEPR
 $app->post('/api/eightprovider/refund', 'EightProviderController@gameRefund'); // DEPRECATED
 $app->post('/api/eightprovider/deposit', 'EightProviderController@gameDeposit'); // DEPRECATED
 $app->post('/api/eightprovider/withdrawal', 'EightProviderController@gameWithdrawal'); // DEPRECATED
-
+$app->post('/api/gettransaction', 'AlController@testTransaction');
 
 //BNG Endpoints
 $app->post('/api/bng', 'BNGController@index');
