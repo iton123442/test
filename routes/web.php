@@ -67,6 +67,7 @@ $app->post('/api/solid/{brand_code}/endsession', 'SolidGamingController@endPlaye
 $app->post('/api/oryx/{brand_code}/tokens/{token}/authenticate', 'OryxGamingController@authPlayer');
 $app->post('/api/oryx/{brand_code}/players/{player_id}/balance', 'OryxGamingController@getBalance');
 $app->post('/api/oryx/{brand_code}/game-transaction', 'OryxGamingController@gameTransaction');
+$app->put('/api/oryx/{brand_code}/game-transactions', 'OryxGamingController@gameTransactionV2');
 
 // SimplePlay Endpoints
 $app->post('/api/simpleplay/{brand_code}/GetUserBalance', 'SimplePlayController@getBalance');
@@ -200,6 +201,7 @@ $app->post('api/cq9/transaction/game/bonus','CQ9Controller@playerBonus');
 $app->post('api/cq9/transaction/user/payoff','CQ9Controller@playerPayoff');
 $app->post('api/cq9/transaction/game/refund','CQ9Controller@playerRefund');
 $app->get('api/cq9/transaction/record/{mtcode}','CQ9Controller@playerRecord'); 
+
 $app->post('api/cq9/transaction/game/bets','CQ9Controller@playerBets');
 $app->post('api/cq9/transaction/game/refunds','CQ9Controller@playerRefunds');
 $app->post('api/cq9/transaction/game/cancel','CQ9Controller@playerCancel');
@@ -210,13 +212,16 @@ $app->post('api/cq9/transaction/game/amends','CQ9Controller@playerAmends');
 $app->get('api/cq9/transaction/balance/{account}','CQ9Controller@CheckBalance');
 $app->get('api/cq9/gameboy/player/lotto/balance/{account}','CQ9Controller@CheckBalanceLotto'); // New
 $app->get('api/cq9/player/check/{account}','CQ9Controller@CheckPlayer');
+$app->post('api/cq9/player/check','CQ9Controller@noRouteParamPassed'); // TEST
+$app->post('api/cq9/transaction/record','CQ9Controller@noRouteParamPassed');  // TEST
+$app->post('api/cq9/transaction/balance','CQ9Controller@noRouteParamPassed'); // TEST
 
 $app->post('api/cq9/mw/getlist','CQ9Controller@getGameList');
 $app->post('api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
 
 // Spade Gaming
-$app->post('api/spade','SpadeController@index');
-$app->post('api/spade/authorize','SpadeController@index');
+$app->post('api/spade','SpadeController@authorize');
+$app->post('api/spade/authorize','SpadeController@authorize');
 $app->post('api/spade/getBalance','SpadeController@getBalance');
 $app->post('api/spade/transfer','SpadeController@makeTransfer');
 $app->post('api/spade/getgame','SpadeController@getGameList');
