@@ -173,9 +173,9 @@ return [
     'wazdan'=>[
         'operator' => 'tigergames',
         'license' => 'curacao',
-        'hmac_scret_key' => 'uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1',
+        'hmac_scret_key' => '2QvSiQ2KXX8mBM0LyexfAcNNgI5eXzcx',
         'partnercode'=> 'gd1wiurg',
-        'gamelaunchurl' => 'https://gl-staging.wazdanep.com/'
+        'gamelaunchurl' => 'https://gamelaunch.wazdan.com/'
     ],
     'png'=>[
         'root_url'=> 'https://agastage.playngonetwork.com',
