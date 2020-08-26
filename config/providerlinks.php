@@ -167,9 +167,9 @@ return [
         'secret_key' => '02f314db35a0dfe4635dff771b607f34',
     ],
     'tpp' => [
-        'gamelaunch_url' => 'https://tigergames-sg0.prerelease-env.biz/gs2c/playGame.do',
+        'gamelaunch_url' => 'https://tigergames-dk2.pragmaticplay.net/gs2c/playGame.do',
         'secureLogin' => 'tg_tigergames', //or stylename
-        'secret_key' => 'testKey',
+        'secret_key' => 'uSPij46kVe977JH2',
     ],
     'wazdan'=>[
         'operator' => 'tigergames',
