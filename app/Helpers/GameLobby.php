@@ -449,7 +449,7 @@ class GameLobby{
     public static function spadeLaunch($game_code,$token,$exitUrl,$lang='en_US'){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         $domain =  $exitUrl;
-        $url = 'http://lobby.silverkirinplay.com/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
+        $url = 'https://lobby.silverkirinplay.com/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
         return $url;
     }
     
