@@ -61,10 +61,10 @@ class GameLobby{
                   '&game='.$game_code.'&mode=real&token='.$token.'&license='.config('providerlinks.wazdan.license').'&lang='.$lang.'&platform=desktop';
         return $gameurl;
     }
-    public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl){
-        $lang = "en";
+    public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;
+        $lang = GameLobby::getLanguage("PlayNGo",$lang);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.config('providerlinks.png.pid').'&gid='.$game_code.'&channel='.
                    config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
@@ -234,19 +234,15 @@ class GameLobby{
         return $game_url.'&player_token='.$token;
     }
 
-    public static function rsgLaunchUrl($game_code,$token,$exitUrl,$lang='en'){
+    public static function rsgLaunchUrl($game_code,$token,$exitUrl,$lang='en', $provider_sub_name){
         $url = $exitUrl;
         $domain = parse_url($url, PHP_URL_HOST);
+        Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
         $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
         return $url;
     }
 
-    public static function spadeLaunch($game_code,$token,$exitUrl,$lang='en_US'){
-        $client_details = ProviderHelper::getClientDetails('token', $token);
-        $domain =  $exitUrl;
-        $url = 'https://lobby-egame-staging.sgplay.net/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
-        return $url;
-    }
+    
 
     public static function skyWindLaunch($game_code, $token){
         $player_login = SkyWind::userLogin();
@@ -367,7 +363,8 @@ class GameLobby{
           "settings" =>  [
             'user_id'=> $client_player_details->player_id,
             'language'=> $client_player_details->language ? $client_player_details->language : 'en',
-            'https' => 1
+            'https' => 1,
+            'platform' => 'mobile'
           ],
           "denomination" => '1', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
@@ -449,6 +446,33 @@ class GameLobby{
 
     }
 
+    public static function spadeLaunch($game_code,$token,$exitUrl,$lang='en_US'){
+        $client_details = ProviderHelper::getClientDetails('token', $token);
+        $domain =  $exitUrl;
+        $url = 'https://lobby-egame-staging.sgplay.net/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
+        return $url;
+    }
+    
+    public static function majagamesLaunch($game_code,$token){
+        $client_details = ProviderHelper::getClientDetails('token',$token);
+        $requesttosend = [
+            'player_unique_id' => config('providerlinks.majagames.prefix').$client_details->player_id,
+            'player_name' => $client_details->username,
+            'player_currency' => $client_details->default_currency,
+            'game_id' =>$game_code,
+            'is_demo' => false,
+            'agent_code' =>  config('providerlinks.majagames.prefix').$client_details->player_id,
+            'agent_name' =>  $client_details->username
+        ];
+        $client = new Client([
+            'headers' => [ 
+                'Authorization' => config('providerlinks.majagames.auth')
+            ]
+        ]);
+        $guzzle_response = $client->post(config('providerlinks.majagames.api_url').'/launch-game',  ['form_params' => $requesttosend]);
+        $client_response = json_decode($guzzle_response->getBody()->getContents());
+        return $client_response->data->game_url;
+    }
     public static function habanerolaunchUrl( $game_code = null, $token = null){
         // $brandID = "2416208c-f3cb-ea11-8b03-281878589203";
         // $apiKey = "3C3C5A48-4FE0-4E27-A727-07DE6610AAC8";
@@ -503,6 +527,27 @@ class GameLobby{
         // $url = "https://tigergames-sg0.prerelease-env.biz/gs2c/playGame.do?key=$token&stylename=$stylename&symbol=$game_code&technology=H5&platform=WEB&language=en";
         
         // return $url;
+    }
+
+    public static function yggdrasillaunchUrl($data){
+        $provider_id = config("providerlinks.ygg.provider_id");
+        Helper::saveLog('YGG gamelaunch', $provider_id, json_encode($data), "Endpoing hit");
+        $url = config("providerlinks.ygg.api_url");
+        $org = config("providerlinks.ygg.Org");
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+        try{
+            $url = $url."gameid=".$data['game_code']."&lang=".$client_details->language."&currency=".$client_details->default_currency."&org=".$org."&channel=pc&key=".$data['token'];
+            Helper::saveLog('YGG gamelaunch', $provider_id, json_encode($data), $url);
+            return $url;
+        }catch(\Exception $e){
+            $error = [
+                'error' => $e->getMessage()
+            ];
+            Helper::saveLog('YGG gamelaunch', $provider_id, json_encode($data), $e->getMessage());
+            return $error;
+        }
+
     }
 
     public static function iaLaunchUrl($game_code,$token,$exitUrl)

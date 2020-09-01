@@ -83,6 +83,7 @@ return [
         'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
     ],
     'cqgames' => [
+        "prefix" => "TG",
         "pdbid"=> 30, // Database ID nothing todo with the provider!
         'api_url' => 'http://api.cqgame.games',
         // 'api_token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjIyODY1ZWNkNTY1ZjAwMDEzZjUyZDAiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWYyMjg2NWVjZDU2NWYwMDAxM2Y1MmQwIiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiMjQ3NDQ1MTQzIiwiaWF0IjoxNTk2MDk4MTQyLCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fdoQCWGPkYNLoROGR9jzMs4axnZbRJCnnLZ8T2UDCwU',
@@ -218,6 +219,26 @@ return [
         'MD5_KEY' => 'GgaIMaiNNtg',
         'ENCRYPT_KEY' => 'g9G16nTs',
         'API_URL' => 'http://api.sp-portal.com/api/api.aspx'
+    ],
+    'ygg'=>[
+        'api_url' => 'https://static-stage-tw.248ka.com/init/launchClient.html?',
+        'Org' => 'TIGERGAMES',
+        'topOrg' => 'TIGERGAMESGroup',
+        'provider_id' => 38,
+    ],
+    'spade'=>[
+        'prefix' => 'TIGERG', 
+        'api_url'=> 'https://api-egame-staging.sgplay.net/api',
+        'merchantCode' => 'TIGERG',
+        'siteId' => 'SITE_USD1',
+        'provider_id' => 37,
+    ],
+    'majagames'=>[
+        'api_url'=> 'http://api-integration.mj-02.com/api/MOGI',
+        'auth' => 'wsLQrQM1OC1bVscK',
+        'api_file_server' => 'https://file-integration.mj-02.com',
+        'provider_id' => 39,
+        'prefix' => 'MAJA_', 
     ]
 ];
 

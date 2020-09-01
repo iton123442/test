@@ -20,10 +20,10 @@ class GameLobbyController extends Controller
 
     public $image_url = 'https://bo-test.betrnk.games/';
     //
-    // public function __construct(){
-	// 	$this->middleware('oauth', ['except' => ['index']]);
-	// 	/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
-	// }
+    public function __construct(){
+		$this->middleware('oauth', ['except' => ['index']]);
+		/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
+	}
     public function getGameList(Request $request){
         if($request->has("client_id")){
             
@@ -113,9 +113,10 @@ class GameLobbyController extends Controller
             $lang = $request->has("lang")?$request->input("lang"):"en";
             if($token=Helper::checkPlayerExist($request->client_id,$request->client_player_id,$request->username,$request->email,$request->display_name,$request->token,$ip_address)){
                 if($request->input('game_provider')=="Iconic Gaming"){
+                    $url = GameLobby::icgLaunchUrl($request->game_code,$token,$request->exitUrl,$request->input('game_provider'),$lang);
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::icgLaunchUrl($request->game_code,$token,$request->exitUrl,$request->input('game_provider'),$lang),
+                        "url" => "https://play.betrnk.games/loadgame?url=".urlencode($url)."&token=".$request->token,
                         "game_launch" => true
                     );
                     return response($msg,200)
@@ -151,7 +152,7 @@ class GameLobbyController extends Controller
                 elseif($request->input('game_provider')=="PlayNGo Direct"){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::pngLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl),
+                        "url" => GameLobby::pngLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl,$lang),
                         "game_launch" => true
                     );
                     return response($msg,200)
@@ -184,31 +185,17 @@ class GameLobbyController extends Controller
                     return $msg;
                 }
                 elseif($request->input('game_provider')=="Digitain"){ // request->token
-                    Helper::saveLog('DEMO CALL', 11, json_encode($request->all()), 'DEMO');
+                    Helper::saveLog('DEMO CALL', 14, json_encode($request->all()), 'DEMO');
                     $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::rsgLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang), //TEST
+                        "url" => GameLobby::rsgLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang,$request->input('game_provider')), //TEST
                         "game_launch" => true
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($request->input('game_provider')=="SpadeGaming"){
-                    if($request->has('lang')){
-                        $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
-                    }else{
-                        $lang = GameLobby::getLanguage($request->game_provider, 'en');
-                    }
-                    $exitUrl = $request->has('exitUrl') ? $request->exitUrl : '';
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::spadeLaunch($request->game_code,$request->token,$exitUrl,$lang),
-                        "game_launch" => true
-                    );
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
-                }
+                
                 elseif($request->input('game_provider')=="SkyWind"){ // request->token
                     $url = GameLobby::skyWindLaunch($request->game_code,$token);
                     if($url!= 'false'){
@@ -266,9 +253,10 @@ class GameLobbyController extends Controller
                     if($url){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
-                            "url" => $url,
+                            "url" => "https://play.betrnk.games/loadgame?url=".urlencode($url)."&token=".$request->token,
                             "game_launch" => true
                         );
+                        Helper::saveLog('IA Launch Game URL', 15, json_encode("https://play.betrnk.games/loadgame?url=".urlencode($url)."&token=".$request->token), "TEST URL");
                     }else{
                         $msg = array(
                             "game_code" => $request->input("game_code"),
@@ -432,6 +420,30 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                elseif($request->input('game_provider')=="SpadeGaming"){
+                    if($request->has('lang')){
+                        $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
+                    }else{
+                        $lang = GameLobby::getLanguage($request->game_provider, 'en');
+                    }
+                    $exitUrl = $request->has('exitUrl') ? $request->exitUrl : '';
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::spadeLaunch($request->game_code,$request->token,$exitUrl,$lang),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($request->input('game_provider') == "Maja Games"){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::majagamesLaunch($request->game_code,$request->token),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
                 elseif($request->input('game_provider')=="HabaneroGaming"){ 
                     // Helper::saveLog('DEMO CALL', 11, json_encode($request->all()), 'DEMO');
                     // $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
@@ -448,6 +460,15 @@ class GameLobbyController extends Controller
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::simplePlayLaunchUrl($request->game_code,$request->token,$request->exitUrl), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($request->input('game_provider')=="Yggdrasil Direct"){ 
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::yggdrasillaunchUrl($request->all()), //TEST
                         "game_launch" => true
                     );
                     return response($msg,200)

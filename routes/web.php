@@ -135,6 +135,8 @@ $app->post('rsg/win', 'DigitainController@win');
 $app->post('rsg/betwin', 'DigitainController@betwin');
 $app->post('rsg/refund', 'DigitainController@refund');
 $app->post('rsg/amend', 'DigitainController@amend');
+$app->post('rsg/promowin', 'DigitainController@PromoWin');
+$app->post('rsg/checktxstatus', 'DigitainController@CheckTxStatus');
 // IA SPORTS
 $app->post('/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
 $app->post('/api/ia/lunch', 'IAESportsController@userlunch');// DEPRECATED
@@ -173,19 +175,19 @@ $app->post('api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
 $app->post('api/aws/single/wallet/altest', 'AWSController@changeAccount');
 // SILKSTONE ROUTES (SEAMLESS WALLET)
 // $app->post('skywind/api/get_ticket', 'SkyWindController@getTicket');
-$app->post('skywind/api/getgamelist', 'SkyWindController@getGamelist'); // TEST
-$app->post('skywind/api/getauth', 'SkyWindController@getAuth'); // TEST
-$app->post('skywind/api/getauth2', 'SkyWindController@getAuth2'); // TEST
-$app->post('skywind/api/getgames', 'SkyWindController@getGamelist'); // TEST
-$app->post('skywind/api/gamelaunch', 'SkyWindController@gameLaunch'); // TEST
+$app->post('api/skywind/api/getgamelist', 'SkyWindController@getGamelist'); // TEST
+$app->post('api/skywind/api/getauth', 'SkyWindController@getAuth'); // TEST
+$app->post('api/skywind/api/getauth2', 'SkyWindController@getAuth2'); // TEST
+$app->post('api/skywind/api/getgames', 'SkyWindController@getGamelist'); // TEST
+$app->post('api/skywind/api/gamelaunch', 'SkyWindController@gameLaunch'); // TEST
 
-$app->post('skywind/api/validate_ticket', 'SkyWindController@validateTicket');
-$app->post('skywind/api/get_ticket', 'SkyWindController@getTicket');
-$app->post('skywind/api/get_balance', 'SkyWindController@getBalance');
-$app->post('skywind/api/debit', 'SkyWindController@gameDebit');
-$app->post('skywind/api/credit', 'SkyWindController@gameCredit');
-$app->post('skywind/api/rollback', 'SkyWindController@gameRollback');
-$app->post('skywind/api/get_free_bet', 'SkyWindController@getFreeBet');
+$app->post('api/skywind/api/validate_ticket', 'SkyWindController@validateTicket');
+$app->post('api/skywind/api/get_ticket', 'SkyWindController@getTicket');
+$app->post('api/skywind/api/get_balance', 'SkyWindController@getBalance');
+$app->post('api/skywind/api/debit', 'SkyWindController@gameDebit');
+$app->post('api/skywind/api/credit', 'SkyWindController@gameCredit');
+$app->post('api/skywind/api/rollback', 'SkyWindController@gameRollback');
+$app->post('api/skywind/api/get_free_bet', 'SkyWindController@getFreeBet');
 //Player API
 //Operator API
 //Lobby API
@@ -221,12 +223,7 @@ $app->post('api/cq9/transaction/balance','CQ9Controller@noRouteParamPassed'); //
 $app->post('api/cq9/mw/getlist','CQ9Controller@getGameList');
 $app->post('api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
 
-// Spade Gaming
-$app->post('api/spade','SpadeController@index');
-$app->post('api/spade/authorize','SpadeController@authorize');
-$app->post('api/spade/getBalance','SpadeController@getBalance');
-$app->post('api/spade/transfer','SpadeController@makeTransfer');
-$app->post('api/spade/getgame','SpadeController@getGameList');
+
 //SAGaming 
 $app->post('api/sa/debugme','SAGamingController@debugme');
 $app->post('api/sa/GetUserBalance','SAGamingController@GetUserBalance');
@@ -305,6 +302,25 @@ $app->post('/api/pgsoft/VerifySession', 'PGSoftController@verifySession');
 $app->post('/api/pgsoft/Cash/Get', 'PGSoftController@cashGet');
 $app->post('/api/pgsoft/Cash/TransferOut', 'PGSoftController@transferOut');
 $app->post('/api/pgsoft/Cash/TransferIn', 'PGSoftController@transferIn');
+
+//Booming Games
+$app->post('api/booming/gamelist','BoomingGamingController@gameList');
+$app->post('api/booming/callback','BoomingGamingController@callBack');
+$app->post('api/booming/rollback','BoomingGamingController@rollBack');
+
+// Spade Gaming
+$app->post('api/spade','SpadeController@index');//single route
+$app->post('api/spade/authorize','SpadeController@authorize');
+$app->post('api/spade/getBalance','SpadeController@getBalance');
+$app->post('api/spade/transfer','SpadeController@makeTransfer');
+$app->post('api/spade/getgame','SpadeController@getGameList');
+
+//MajaGames
+$app->post('api/mj/seamless/bet','MajaGamesController@bet');
+$app->post('api/mj/seamless/settlement','MajaGamesController@settlement');
+$app->post('api/mj/seamless/cancel','MajaGamesController@cancel');
+$app->get('api/mj/seamless/getBalance','MajaGamesController@getBalance');
+
 // EPOINT CONTROLLER
 // $app->post('/api/epoint', 'EpointController@epointAuth'); #/
 // $app->post('/api/epoint/bitgo', 'EpointController@bitgo'); #/
@@ -410,6 +426,17 @@ $app->post('api/pp/session/expired','PragmaticPLayController@sessionExpired');
 
 
 // $app->get('al-games','AlController@insertGamesTapulanMode');
-$app->post('api/booming/gamelist','BoomingGamingController@gameList');
-$app->post('api/booming/callback','BoomingGamingController@callBack');
-$app->post('api/booming/rollback','BoomingGamingController@rollBack');
+
+
+// Yggdrasil 
+$app->get('api/ygg/playerinfo.json','YGGController@playerinfo');
+$app->get('api/ygg/wager.json','YGGController@wager');
+$app->get('api/ygg/cancelwager.json','YGGController@cancelwager');
+$app->get('api/ygg/appendwagerrequest.json','YGGController@appendwagerrequest');
+$app->get('api/ygg/endwager.json','YGGController@endwager');
+$app->get('api/ygg/campaignpayout.json','YGGController@campaignpayout');
+$app->get('api/ygg/getbalance.json','YGGController@getbalance');
+
+
+//IFRAME URL ENDPOINTS
+$app->post('/iframe/auth/token','Iframe\AuthenticationController@checkTokenExist');

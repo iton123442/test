@@ -52,8 +52,6 @@ class PNGController extends Controller
                     "userCurrency" => $client_details->default_currency,
                     "country" => "SE",
                     "birthdate"=> "1990-04-29",
-                    "registration"=> $client_details->created_at,
-                    "language" => "EN",
                     "externalGameSessionId" => $xmlparser->username,
                     "real"=> number_format($client_response->playerdetailsresponse->balance,2,'.', ''),
                 );
@@ -61,11 +59,16 @@ class PNGController extends Controller
             }
             else{
                 $array_data = array(
-                    "statusCode" => 1,
-                    "statusMessage" => "Session Expired",
+                    "statusCode" => 4,
                 );
                 return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
+        }
+        else{
+            $array_data = array(
+                "statusCode" => 4,
+            );
+            return PNGHelper::arrayToXml($array_data,"<authenticate/>");
         }
         
     }
@@ -81,7 +84,6 @@ class PNGController extends Controller
                     $array_data = array(
                         "real" => round(Helper::getBalance($client_details),2),
                         "statusCode" => 7,
-                        "statusMessage" => "Insufficient Balance",
                     );
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");  
                 }
@@ -89,7 +91,6 @@ class PNGController extends Controller
                     $array_data = array(
                         "real" => round(Helper::getBalance($client_details),2),
                         "statusCode" => 0,
-                        "statusMessage" => "ok",
                     );
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");       
                 }
@@ -149,7 +150,6 @@ class PNGController extends Controller
                     $array_data = array(
                         "real" => $balance,
                         "statusCode" => 0,
-                        "statusMessage" => "ok",
                     );
                     
                     $game = Helper::getGameTransaction($xmlparser->externalGameSessionId,$xmlparser->roundId);
@@ -167,13 +167,18 @@ class PNGController extends Controller
                 elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
                     $array_data = array(
-                        "statusCode" => 9,
-                        "statusMessage" => "Insufficient Funds",
+                        "statusCode" => 7,
                     );
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
                 
 
+            }
+            else{
+                $array_data = array(
+                    "statusCode" => 4,
+                );
+                return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
         } 
     }
@@ -274,6 +279,12 @@ class PNGController extends Controller
                     return "something error with the client";
                 }
             }
+            else{
+                $array_data = array(
+                    "statusCode" => 4,
+                );
+                return PNGHelper::arrayToXml($array_data,"<authenticate/>");
+            }
         } 
     }
     public function balance(Request $request){
@@ -283,7 +294,6 @@ class PNGController extends Controller
         if($accessToken != $xmlparser->accessToken){
             $array_data = array(
                 "statusCode" => 4,
-                "statusMessage" => "WRONGUSERNAMEPASSWORD",
             );
             return PNGHelper::arrayToXml($array_data,"<balance/>");
         }
@@ -324,7 +334,6 @@ class PNGController extends Controller
             else{
                 $array_data = array(
                     "statusCode" => 4,
-                    "statusMessage" => "WRONGUSERNAMEPASSWORD",
                 );
                 return PNGHelper::arrayToXml($array_data,"<balance/>");
             }
@@ -425,20 +434,10 @@ class PNGController extends Controller
                 }
             }
             else{
-                $msg = array(
-                    "status" =>1,
-                    "message" => array(
-                        "text"=>"session not found",
-                        "choices"=>array(
-                            array(
-                                "label" => "Go Back to Game List",
-                                "action" => "close_game",
-                                "response" => "quit"
-                            )
-                        )
-                    )
+                $array_data = array(
+                    "statusCode" => 4,
                 );
-                return response($msg,200)->header('Content-Type', 'application/json');
+                return PNGHelper::arrayToXml($array_data,"<cancelReserve/>");
             }
         } 
     }
