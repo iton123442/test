@@ -228,7 +228,7 @@ return [
     ],
     'spade'=>[
         'prefix' => 'TIGERG', 
-        'api_url'=> 'https://api-egame-staging.sgplay.net/api',
+        'api_url'=> 'http://merchantapi.silverkirin88.com/api/',
         'merchantCode' => 'TIGERG',
         'siteId' => 'SITE_USD1',
         'provider_id' => 37,
