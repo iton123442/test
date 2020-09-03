@@ -31,7 +31,7 @@ class YGGController extends Controller
                 "msg" => "Session expired. Please log in again."
             );
             return $response;
-            Helper::saveLog("YGG playerinfo response", $this->provider_id, $request->all(), $response);
+            Helper::saveLog("YGG playerinfo response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
         }
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);  
         $player_id = "TGaming_".$client_details->player_id;
@@ -164,18 +164,21 @@ class YGGController extends Controller
     {
         $playerId = ProviderHelper::explodeUsername('_',$request->playerid);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
+        Helper::saveLog("YGG cancelwager request", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), "");
         if($client_details == null){ 
             $response = array(
                 "code" => 1000,
                 "msg" => "Session expired. Please log in again."
             );
-            Helper::saveLog("YGG cancelwager login", $this->provider_id, $request->all(), $response);
+            Helper::saveLog("YGG cancelwager login", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
         $provider_trans_id = $request->reference;
         $round_id = $request->subreference;
         $checkTrans = DB::table('game_transactions')->where('provider_trans_id','=',$provider_trans_id)->where('round_id','=',$round_id)->get();
+        
         if(count($checkTrans) > 0){
+            
             $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             if($checkTrans[0]->win == 4){
                 $response = array(
@@ -184,7 +187,8 @@ class YGGController extends Controller
                         "playerId" => "TGaming_".$client_details->player_id,
                         "organization" => $this->org,
                         "balance" => floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', '')),
-                        "currency" => $client_details->default_currency
+                        "currency" => $client_details->default_currency,
+                        "duplicate" => ''
                     )
                 );
                 Helper::saveLog('Yggdrasil cancelwager duplicate call', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -222,13 +226,26 @@ class YGGController extends Controller
             $game_trans_ext = ProviderHelper::createGameTransExt( $checkTrans[0]->game_trans_id, $provider_trans_id, $round_id, $bet_amount, 2, json_encode($request->all()), $response, $client_response['requesttosend'], $client_response['client_response'], "refund");
             Helper::saveLog('Yggdrasil cancelwager response', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
+        }else{
+            $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+            $response = array(
+                "code" => 0,
+                "data" => array(
+                    "playerId" => "TGaming_".$client_details->player_id,
+                    "organization" => $this->org,
+                    "balance" => floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', '')),
+                    "currency" => $client_details->default_currency
+                )
+            );
+            Helper::saveLog('Yggdrasil cancelwager not exist', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            return $response;
         }
     }
 
-    public function appendwagerrequest(Request $request)
+    public function appendwagerresult(Request $request)
     {
-     
-        Helper::saveLog('Yggdrasil appendwagerrequest request', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), "" );
+        
+        Helper::saveLog('Yggdrasil appendwagerresult request', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), "" );
         $playerId = ProviderHelper::explodeUsername('_',$request->playerid);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
 
@@ -237,7 +254,7 @@ class YGGController extends Controller
                 "code" => 1000,
                 "msg" => "Session expired. Please log in again."
             );
-            Helper::saveLog("YGG appendwagerrequest login", $this->provider_id, $request->all(), $response);
+            Helper::saveLog("YGG appendwagerresult login", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
 
@@ -266,7 +283,7 @@ class YGGController extends Controller
                         "bonus" => 0
                     ),
                 );
-                Helper::saveLog("YGG appendwagerrequest dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                Helper::saveLog("YGG appendwagerresult dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }
             $gamecode = '';
@@ -307,7 +324,7 @@ class YGGController extends Controller
                     false
                 ); 
             $bonus = 'getbonusprize';
-            Helper::saveLog('Yggdrasil appendwagerrequest bonus', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $bonus );
+            Helper::saveLog('Yggdrasil appendwagerresult bonus', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $bonus );
 
 
             // $bonusBal = DB::select('select * from seamless_request_logs where provider_id = 38 and request_data like "%TGaming_188%"  and request_data like "%getbonusprize%" and response_data like "%bonusprize%" ');
@@ -333,7 +350,7 @@ class YGGController extends Controller
             
             $gametrans = ProviderHelper::createGameTransaction($tokenId, $game_details[0]->game_id, $bet_amount, 0.00, 1, 0, null, null, $bet_amount, $provider_trans_id, $round_id);
             $game_trans_ext = ProviderHelper::createGameTransExt( $gametrans, $provider_trans_id, $round_id, $bet_amount, 1, json_encode($request->all()), $response, $client_response['requesttosend'], $client_response['client_response'], "");  
-            Helper::saveLog('Yggdrasil appendwagerrequest', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            Helper::saveLog('Yggdrasil appendwagerresult', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
 
         }catch(\Exception $e){
@@ -341,7 +358,7 @@ class YGGController extends Controller
                 'error' => '1',
                 'message' => $e->getMessage(),
             );
-            Helper::saveLog('Yggdrasil appendwagerrequest error', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
+            Helper::saveLog('Yggdrasil appendwagerresult error', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
             return json_encode($msg, JSON_FORCE_OBJECT); 
         }
 
@@ -356,7 +373,7 @@ class YGGController extends Controller
                 "code" => 1000,
                 "msg" => "Session expired. Please log in again."
             );
-            Helper::saveLog("YGG endwager login", $this->provider_id, $request->all(), $response);
+            Helper::saveLog("YGG endwager login", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
         $checkTrans = DB::table('game_transaction_ext')->where('provider_trans_id','=',$request->reference)->where('round_id','=',$request->subreference)->get();
@@ -482,7 +499,7 @@ class YGGController extends Controller
                 "msg" => "Session expired. Please log in again."
             );
             return $response;
-            Helper::saveLog("YGG playerinfo response", $this->provider_id, $request->all(), $response);
+            Helper::saveLog("YGG playerinfo response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
         }
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);  
         $player_id = "TGaming_".$client_details->player_id;
