@@ -180,7 +180,7 @@ return [
         'gamelaunchurl' => 'https://gamelaunch.wazdan.com/'
     ],
     'png'=>[
-        'root_url'=> 'https://agastage.playngonetwork.com',
+        'root_url'=> 'https://agacw.playngonetwork.com',
         'pid' => 8888,
         'channel'=> 'desktop',
         'practice'=>0
