@@ -239,11 +239,31 @@ return [
         'provider_id' => 37,
     ],
     'majagames'=>[
-        'api_url'=> 'http://api-integration.mj-02.com/api/MOGI',
         'auth' => 'wsLQrQM1OC1bVscK',
-        'api_file_server' => 'https://file-integration.mj-02.com',
         'provider_id' => 39,
         'prefix' => 'MAJA_', 
+        'api_url'=> 'http://api-integration.mj-02.com/api/MOGI', //slot api
+        'tapbet_api_url'=> 'https://tbb-integration.mj-02.com/api', //tapbet api
+    ],
+    'spade_curacao'=>[
+        'prefix' => 'TIGERG', 
+        'api_url'=> 'https://api-egame-staging.spadecasino777.com/api',
+        'lobby_url'=> 'https://lobby-egame-staging.spadecasino777.com/TIGEREU/auth/?',
+        'merchantCode' => 'TIGEREU',
+        'siteId' => 'SITE_EU1',
+        'provider_id' => 37,
+    ],
+    'vivo' => [
+        'OPERATOR_ID' => '3003033',
+        'SERVER_ID' => '6401748',
+        'PASS_KEY' => '7f1c5d',
+        'VIVO_URL' => 'https://games.vivogaming.com/',
+        'BETSOFT_URL' => 'https://2vivo.com/FlashRunGame/RunRngGame.aspx',
+        'SPINOMENAL_URL' => 'https://www.2vivo.com/flashRunGame/RunSPNRngGame.aspx',
+        'TOMHORN_URL' => 'https:///www.2vivo.com/FlashRunGame/Prod/RunTomHornGame.aspx',
+        'NUCLEUS_URL' => 'https://www.2vivo.com/FlashRunGame/set2/RunNucGame.aspx',
+        'PLATIPUS_URL' => 'https://www.2vivo.com/flashrungame/set2/RunPlatipusGame.aspx',
+        'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx'
     ]
 ];
 

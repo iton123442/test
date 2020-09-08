@@ -15,25 +15,22 @@ class MajaGamesController extends Controller
 
     public function __construct(){
     	$this->auth = config('providerlinks.majagames.auth');
-		$this->api_file_server = config('providerlinks.majagames.api_file_server');
-		$this->api_url = config('providerlinks.majagames.api_url');
 		$this->provider_db_id = config('providerlinks.majagames.provider_id');
-		$this->prefix = config('providerlinks.majagames.prefix');
 	}
 
 	public function bet(Request $request){
-		$header = $request->header('Authorization');
-		if($header != $this->auth):
-			$errormessage = array(
-				'status' => '400',
-				'error_code' => '1000',
-				'error_msg' => 'Invalid request parameters'
-			);
-			Helper::saveLog('MajaGames Authorization Bet error '.$header, $this->provider_db_id, json_encode($request->all()), $errormessage);
-			return $errormessage;
-		endif;
-	    Helper::saveLog('MajaGames Authorization BET', $this->provider_db_id, json_encode($request->all()), $header);
-
+		// $header = $request->header('Authorization');
+		// if($header != $this->auth):
+		// 	$errormessage = array(
+		// 		'status' => '400',
+		// 		'error_code' => '1000',
+		// 		'error_msg' => 'Invalid request parameters'
+		// 	);
+		// 	Helper::saveLog('MajaGames Authorization Bet error '.$header, $this->provider_db_id, json_encode($request->all()), $errormessage);
+		// 	return $errormessage;
+		// endif;
+	    // Helper::saveLog('MajaGames Authorization BET', $this->provider_db_id, json_encode($request->all()), $header);
+		Helper::saveLog('MajaGames Authorization BET', $this->provider_db_id, json_encode($request->all()), "BET Endpoint");
 		$data =  json_decode(json_encode($request->all()));
 		$player_id = $data->player_unique_id;
 		$game_id = $data->game;
@@ -106,17 +103,17 @@ class MajaGamesController extends Controller
 	}
 
 	public function settlement(Request $request){
-		$header = $request->header('Authorization');
-		if($header != $this->auth):
-			$errormessage = array(
-				'status' => '400',
-				'error_code' => '1000',
-				'error_msg' => 'Invalid request parameters'
-			);
-			Helper::saveLog('MajaGames Authorization Settlement error'.$header, $this->provider_db_id,  json_decode(json_encode(file_get_contents("php://input"))), $errormessage);
-			return $errormessage;
-		endif;
-	    Helper::saveLog('MajaGames Authorization Win', $this->provider_db_id, json_decode(json_encode(file_get_contents("php://input"))), $header);
+		// $header = $request->header('Authorization');
+		// if($header != $this->auth):
+		// 	$errormessage = array(
+		// 		'status' => '400',
+		// 		'error_code' => '1000',
+		// 		'error_msg' => 'Invalid request parameters'
+		// 	);
+		// 	Helper::saveLog('MajaGames Authorization Settlement error'.$header, $this->provider_db_id,  json_decode(json_encode(file_get_contents("php://input"))), $errormessage);
+		// 	return $errormessage;
+		// endif;
+	    Helper::saveLog('MajaGames Authorization Win', $this->provider_db_id, json_decode(json_encode(file_get_contents("php://input"))), "Win Endpoint");
 		
 		//JSON_FORMAT CONVERT
 		$data = file_get_contents("php://input");
@@ -215,21 +212,23 @@ class MajaGamesController extends Controller
 
 	public function getBalance(Request $request){
 		try{
-			$header = $request->header('Authorization');
-			if($header != $this->auth):
-				$errormessage = array(
-					'status' => '400',
-					'error_code' => '1000',
-					'error_msg' => 'Invalid request parameters'
-				);
-				Helper::saveLog('MajaGames Authorization Balance error', $this->provider_db_id, json_encode($request->all()), $errormessage);
-				return $errormessage;
-			endif;
-			Helper::saveLog('MajaGames Authorization Balance', $this->provider_db_id, json_encode($request->all()), $header);
 			$data =  json_decode(json_encode($request->all()));
+			// $header = $request->header('Authorization');
+			// if($header != $this->auth):
+			// 	$errormessage = array(
+			// 		'status' => '400',
+			// 		'error_code' => '1000',
+			// 		'error_msg' => 'Invalid request parameters'
+			// 	);
+			// 	Helper::saveLog('MajaGames Authorization Balance error '.$header, $this->provider_db_id, json_encode($request->all()), $errormessage);
+			// 	return $errormessage;
+			// endif;
+			Helper::saveLog('MajaGames Authorization Balance', $this->provider_db_id, json_encode($request->all()), "Balance Endpoint");
 			$player_id = $data->player_unique_id;
 			$player_id =  ProviderHelper::explodeUsername('_', $player_id);
 			$client_details = ProviderHelper::getClientDetails('player_id',$player_id);
+		
+
 			if($client_details != null){
 				$player_details = Providerhelper::playerDetailsCall($client_details->player_token);
 				$data =  [
@@ -255,7 +254,7 @@ class MajaGamesController extends Controller
 				'error_code' => '1000',
 				'error_msg' => $e->getMessage()
 			);
-			Helper::saveLog('MajaGames Balance error', $this->provider_db_id, json_encode($request->all()) , $header);
+			Helper::saveLog('MajaGames Balance error', $this->provider_db_id, json_encode($request->all()) , $errormessage);
 			return $errormessage;
 		}
 	}
