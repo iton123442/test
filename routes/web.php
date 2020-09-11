@@ -181,6 +181,7 @@ $app->post('api/skywind/api/getauth2', 'SkyWindController@getAuth2'); // TEST
 $app->post('api/skywind/api/getgames', 'SkyWindController@getGamelist'); // TEST
 $app->post('api/skywind/api/gamelaunch', 'SkyWindController@gameLaunch'); // TEST
 
+// Version  Sky Wind 1
 $app->post('api/skywind/api/validate_ticket', 'SkyWindController@validateTicket');
 $app->post('api/skywind/api/get_ticket', 'SkyWindController@getTicket');
 $app->post('api/skywind/api/get_balance', 'SkyWindController@getBalance');
@@ -188,6 +189,15 @@ $app->post('api/skywind/api/debit', 'SkyWindController@gameDebit');
 $app->post('api/skywind/api/credit', 'SkyWindController@gameCredit');
 $app->post('api/skywind/api/rollback', 'SkyWindController@gameRollback');
 $app->post('api/skywind/api/get_free_bet', 'SkyWindController@getFreeBet');
+
+// Version two  Skywind
+$app->post('api/skywind/api/api/validate_ticket', 'SkyWindController@validateTicket');
+$app->post('api/skywind/api/api/get_ticket', 'SkyWindController@getTicket');
+$app->post('api/skywind/api/api/get_balance', 'SkyWindController@getBalance');
+$app->post('api/skywind/api/api/debit', 'SkyWindController@gameDebit');
+$app->post('api/skywind/api/api/credit', 'SkyWindController@gameCredit');
+$app->post('api/skywind/api/api/rollback', 'SkyWindController@gameRollback');
+$app->post('api/skywind/api/api/get_free_bet', 'SkyWindController@getFreeBet');
 //Player API
 //Operator API
 //Lobby API
@@ -452,3 +462,13 @@ $app->post('/api/microgaming/launch','MicroGamingController@launchGame');
 $app->post('/api/microgaming/makeDeposit','MicroGamingController@makeDeposit');
 $app->post('/api/microgaming/makeWithdraw','MicroGamingController@makeWithdraw');
 $app->post('/api/microgaming/getPlayerBalance','MicroGamingController@getPlayerBalance');
+
+//Evolution Gaming Endpoints
+
+$app->post('/api/evogaming/check','EvolutionController@authentication');
+$app->post('/api/evogaming/balance','EvolutionController@balance');
+$app->post('/api/evogaming/debit','EvolutionController@debit');
+$app->post('/api/evogaming/credit','EvolutionController@credit');
+$app->post('/api/evogaming/cancel','EvolutionController@cancel');
+$app->post('/api/evogaming/sid','EvolutionController@sid');
+$app->post('/api/evogaming/launch','EvolutionController@gameLaunch');

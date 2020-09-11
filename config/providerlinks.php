@@ -179,6 +179,15 @@ return [
         'partnercode'=> 'gd1wiurg',
         'gamelaunchurl' => 'https://gamelaunch.wazdan.com/'
     ],
+    'evolution'=>[
+        'host' => 'https://babylontgg.uat1.evo-test.com',
+        'ua2Token' => 'test123',
+        'gameHistoryApiToken' => 'test123',
+        'externalLobbyApiToken'=> 'test123',
+        'owAuthToken' => 'TigerGames@2020',
+        'ua2AuthenticationUrl' => 'https://babylontgg.uat1.evo-test.com/ua/v1/babylontgg000001/test123',
+
+    ],
     'png'=>[
         'root_url'=> 'https://agacw.playngonetwork.com',
         'pid' => 8888,
@@ -219,6 +228,7 @@ return [
         'passKey' => 'Rja5ZK4kN1GA0R8C'
     ],
     'simpleplay' => [
+        'PROVIDER_ID' => 35,
         'LOBBY_CODE' => 'S592',
         'SECRET_KEY' => 'A872BAFDFA8349CC824A460E7AC02515',
         'MD5_KEY' => 'GgaIMaiNNtg',
