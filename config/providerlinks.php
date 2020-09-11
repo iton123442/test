@@ -200,11 +200,11 @@ return [
         'client_secret'=> 'd4e59abcbf0b4fd88e3904f12c3dfb',
     ],
     'booming' => [
-        'api_url' => 'https://api.intgr.booming-games.com',
-        'api_secret' => 'NQGRafUDbe/esU8r+zVWWW7cx6xZKE2gpqWXv4Fs17j88u0djV6NBi9Tgdtc0R6w',
-        'api_key' =>'xvkwXPp52AUPLBGCXmD5UA==',
-        'call_back' => 'https://api-test.betrnk.games/public/api/booming/callback',
-        'roll_back' => 'https://api-test.betrnk.games/public/api/booming/rollback',
+        'api_url' => 'https://api.asia.booming-games.com/',
+        'api_secret' => 'FWepCk1Pv+dzC++tO+RbnrSAc7HeRLCWDpddESCN/c9oGp0Bw5jpNZSWYAFHNJT2',
+        'api_key' =>'GIvbUT7vjwwWczBi1StdMA==',
+        'call_back' => 'https://api.betrnk.games/api/booming/callback',
+        'roll_back' => 'https://api.betrnk.games/api/booming/rollback',
         'provider_db_id' => 36,
     ],
     'manna'=>[
