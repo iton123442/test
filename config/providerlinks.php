@@ -257,8 +257,8 @@ return [
     ],
     'spade_curacao'=>[
         'prefix' => 'TIGERG', 
-        'api_url'=> 'https://api-egame-staging.spadecasino777.com/api',
-        'lobby_url'=> 'https://lobby-egame-staging.spadecasino777.com/TIGEREU/auth/?',
+        'api_url'=> 'http://merchantapi.silverkirin88.com/api/',
+        'lobby_url'=> 'https://lobby.silverkirinplay.com/TIGERG/auth/?',
         'merchantCode' => 'TIGEREU',
         'siteId' => 'SITE_EU1',
         'provider_id' => 37,
