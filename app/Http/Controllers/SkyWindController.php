@@ -170,7 +170,7 @@ class SkyWindController extends Controller
     }
 
     public  function getBalance(Request $request){
-      Helper::saveLog('Skywind getBalance EH', $this->provider_db_id, json_encode(file_get_contents("php://input")), 'ENDPOINT HIT!');
+      // Helper::saveLog('Skywind getBalance EH', $this->provider_db_id, json_encode(file_get_contents("php://input")), 'ENDPOINT HIT!');
       $raw_request = file_get_contents("php://input");
       parse_str($raw_request, $data);
       // dd($data);
@@ -186,13 +186,13 @@ class SkyWindController extends Controller
       if($player_details != 'false'){
         $response = [
             "error_code" => 0,
-            "balance" => $player_details->playerdetailsresponse->balance,
+            "balance" =>  Providerhelper::amountToFloat($player_details->playerdetailsresponse->balance),
             "currency_code" => $client_details->default_currency,
         ];
       }else{
         $response = ["error_code" => -1];
       }
-      Helper::saveLog('Skywind getBalance - SUCCESS', $this->provider_db_id, json_encode(file_get_contents("php://input")), $response);
+      // Helper::saveLog('Skywind getBalance - SUCCESS', $this->provider_db_id, json_encode(file_get_contents("php://input")), $response);
       return $response;
     }
 
@@ -208,14 +208,16 @@ class SkyWindController extends Controller
         $general_details = ["aggregator" => [], "provider" => [], "client" => []];
         $cust_id = $data['cust_id'];
         $amount = $data['amount'];
+        $event_type = $data['event_type'];
         $bet_amount = abs($data['amount']);
         $pay_amount =  abs($data['amount']);
         $income = $bet_amount - $pay_amount;
         $win_type = 0;
         $method = 1;
-        $win_or_lost = 0; // 0 lost,  5 processing
+        $win_or_lost = 5; // 0 lost,  5 processing
         $payout_reason = 'TEST';
         $provider_trans_id = $data['trx_id'];
+        $round_id = $data['round_id'];
         $game_code = $data['game_code'];
 
         $cust_id = $data['cust_id'];
@@ -243,8 +245,17 @@ class SkyWindController extends Controller
         $game_code = $game_information->game_id;
         $token_id = $client_details->token_id;
 
-        $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
-        $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $provider_trans_id, $pay_amount, $game_transaction_type);
+        $check_bet_round = ProviderHelper::findGameExt($round_id, 1, 'round_id');
+        if($check_bet_round != 'false'){
+          $existing_bet_details = Providerhelper::findGameTransaction($check_bet_round->game_trans_id, 'game_transaction');
+          $bet_amount = $existing_bet_details->bet_amount + $amount;
+          $this->updateGameTransaction($existing_bet_details->game_trans_id, $existing_bet_details->pay_amount, $existing_bet_details->income, $existing_bet_details->win, $existing_bet_details->entry_id,$bet_amount);
+          $game_transextension = ProviderHelper::createGameTransExtV2($existing_bet_details->game_trans_id,$provider_trans_id, $round_id, $amount, $game_transaction_type);
+          $gamerecord = $existing_bet_details->game_trans_id;
+        }else{
+          $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
+          $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $pay_amount, $game_transaction_type);
+        }
 
         try {
           $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, 'debit');
@@ -261,10 +272,10 @@ class SkyWindController extends Controller
              && $client_response->fundtransferresponse->status->code == "200"){
             $response = [
                 "error_code" => 0,
-                "balance" => $client_response->fundtransferresponse->balance,
+                "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
                 "trx_id" => $provider_trans_id,
             ];
-         ProviderHelper::updatecreateGameTransExt($game_transextension, json_encode($request->all()), $response, $client_response->requestoclient, $client_response, $response,$general_details);
+         ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
 
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
@@ -300,6 +311,7 @@ class SkyWindController extends Controller
         $cust_id = $data['cust_id'];
         $amount = $data['amount'];
         $trx_id = $data['trx_id'];
+        $roundid = $data['round_id'];
         $game_code = $data['game_code'];
 
         $cust_id = $data['cust_id'];
@@ -326,11 +338,17 @@ class SkyWindController extends Controller
         }
 
         $provider_trans_id = $trx_id;
-        $roundid = $trx_id;
+        $roundid = $roundid;
         $existing_bet = ProviderHelper::findGameTransaction($game_ext_check->game_trans_id, 'game_transaction'); // Find if win has bet record
 
-        $win = 2;
-        $entry_id = 2;
+        if($amount > 0){
+          $win = 1;
+          $entry_id = 2;
+        }else{
+          $win = 0;
+          $entry_id = 1;
+        }
+        
         $pay_amount = $amount;
         $income = $existing_bet->bet_amount - $pay_amount;
         $game_transaction_type = 2;
@@ -352,10 +370,11 @@ class SkyWindController extends Controller
              && $client_response->fundtransferresponse->status->code == "200"){
           $response = [
               "error_code" => 0,
-              "balance" => $client_response->fundtransferresponse->balance,
+              "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
               "trx_id" => $trx_id,
           ];
-          $this->updateBetTransaction($trx_id, $amount, $income, $win, $entry_id);
+          $this->updateBetTransaction($existing_bet->game_trans_id, $amount, $income, $win, $entry_id);
+          // $this->updateBetTransaction($trx_id, $amount, $income, $win, $entry_id);
           ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response);
 
         }elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -443,10 +462,11 @@ class SkyWindController extends Controller
              && $client_response->fundtransferresponse->status->code == "200"){
           $response = [
               "error_code" => 0,
-              "balance" => $client_response->fundtransferresponse->balance,
+              "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
               "trx_id" => $trx_id,
           ];
-          $this->updateBetTransaction($trx_id, $amount, $income, $win, $entry_id);
+          $this->updateBetTransaction($existing_bet->game_trans_id, $amount, $income, $win, $entry_id);
+          // $this->updateBetTransaction($trx_id, $amount, $income, $win, $entry_id);
           ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response, $general_details);
 
          }elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -528,9 +548,10 @@ class SkyWindController extends Controller
      * @param [int] $[entry_id] [<1 bet, 2 win>]
      * 
      */
-    public  function updateBetTransaction($provider_trans_id, $pay_amount, $income, $win, $entry_id) {
+    public  function updateBetTransaction($game_trans_id, $pay_amount, $income, $win, $entry_id) {
         $update = DB::table('game_transactions')
-                ->where('provider_trans_id', $provider_trans_id)
+                ->where('game_trans_id', $game_trans_id)
+                // ->where('provider_trans_id', $provider_trans_id)
                 ->update(['pay_amount' => $pay_amount, 
                       'income' => $income, 
                       'win' => $win, 
@@ -539,6 +560,20 @@ class SkyWindController extends Controller
                 ]);
         return ($update ? true : false);
     }
+
+    public  function updateGameTransaction($game_trans_id, $pay_amount, $income, $win, $entry_id,$bet_amount) {
+        $update = DB::table('game_transactions')
+                ->where('game_trans_id', $game_trans_id)
+                ->update(['pay_amount' => $pay_amount, 
+                      'income' => $income, 
+                      'win' => $win, 
+                      'entry_id' => $entry_id,
+                      'bet_amount' => $bet_amount, 
+                      'transaction_reason' => ProviderHelper::updateReason($win),
+                ]);
+        return ($update ? true : false);
+    }
+
 
     /**
      * HELPER
