@@ -215,6 +215,7 @@ return [
         'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
     ],
     'solid'=>[
+        'PROVIDER_ID' => 1,
         'LAUNCH_URL'=> 'https://ingametw.solidgaming.net/api/launch/',
         'API_ENDPOINT' => 'https://inapitw.solidgaming.net/api/wallet/',
         'BRAND' => 'BETRNKMW',
