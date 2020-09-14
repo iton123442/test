@@ -424,7 +424,6 @@ class OryxGamingController extends Controller
 												}
 
 												ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
-											die();
 											}
 										}
 									}
@@ -502,7 +501,6 @@ class OryxGamingController extends Controller
 
 						$game_details = Game::find($json_data["gameCode"], config("providerlinks.oryx.PROVIDER_ID"));
 						$game_transaction_id = GameTransaction::save('cancelled', $json_data, $game_details, $client_details, $client_details);
-						die();
 					}
 					else
 					{
@@ -638,7 +636,7 @@ class OryxGamingController extends Controller
 
 	private function _toPennies($value)
 	{
-	    return str_replace(' ', '', intval(
+	    return (float) str_replace(' ', '', intval(
 	        strval(floatval(
 	            preg_replace("/[^0-9.]/", "", $value)
 	        ) * 100)
@@ -647,7 +645,7 @@ class OryxGamingController extends Controller
 
 	private function _toDollars($value)
 	{
-		return str_replace(' ', '', number_format(($value / 100), 2, '.', ' '));
+		return (float) str_replace(' ', '', number_format(($value / 100), 2, '.', ' '));
 	}
 
 }
