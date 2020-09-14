@@ -58,7 +58,7 @@ class EVGHelper
 		/*var_dump($trans_data); die();*/
 		return DB::table('game_transactions')->insertGetId($trans_data);			
 	}
-    public static function gameLaunch($token,$players_ip,$gamecode=null,$lang=null){
+    public static function gameLaunch($token,$players_ip,$gamecode=null,$lang="en",$exit_url){
         $client_details = EVGHelper::_getClientDetails("token",$token);
         $game_details = explode("_",$gamecode);
         if($client_details){
@@ -68,7 +68,7 @@ class EVGHelper
                             "id"=> (string)$client_details->player_id,
                             "update"=>false,
                             "country"=>"US",
-                            "language"=>"en",
+                            "language"=>$lang,
                             "currency"=> $client_details->default_currency,
                             "session" => array(
                                          "id"=>$token,
@@ -86,7 +86,10 @@ class EVGHelper
                             "channel"=> array(
                                         "wrapped"=> false,
                                         "mobile"=> false
-                            ),
+							),
+							"urls" =>array(
+										"lobby"=>$exit_url
+							)
                         ),
             );
             Helper::saveLog('requestLaunchUrl(EVG)', 50, json_encode($data), $gamecode);
@@ -97,7 +100,13 @@ class EVGHelper
             );
             return config("providerlinks.evolution.host").json_decode($provider_response->getBody(),TRUE)["entry"];
         }
-    }
+	}
+	public static function getGameDetails($game_code,$game_type){
+		$game = DB::table("games")
+				->where("game_code",$game_code."_".$game_type)
+				->first();
+		return $game ? $game : false;
+	}
     public static function _getClientDetails($type = "", $value = "") {
 
 		$query = DB::table("clients AS c")
