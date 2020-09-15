@@ -224,7 +224,7 @@ return [
         'AUTH_PASSWORD' => 'svYmaDbh3f2TQY93'
     ],
     'habanero'=>[
-        'api_url' => 'https://app-a.insvr.com/go.ashx',
+        'api_url' => 'https://app-a.insvr.com/go.ashx?',
         'brandID' => '6fc71b15-0ed7-ea11-a522-0050f23870d2',
         'apiKey' => '94FF6FB7-4E01-4EDB-9185-44E3B2BC0AAC',
         'passKey' => '78b5cc87-e0c5-4008-9a7e-dcebfd40642a'
