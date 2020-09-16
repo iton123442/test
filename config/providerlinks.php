@@ -266,8 +266,9 @@ return [
         'provider_id' => 37,
     ],
     'vivo' => [
-        'OPERATOR_ID' => '3003033',
-        'SERVER_ID' => '6401748',
+        'PROVIDER_ID' => 34,
+        'OPERATOR_ID' => '75674',
+        'SERVER_ID' => '51681981',
         'PASS_KEY' => '7f1c5d',
         'VIVO_URL' => 'https://games.vivogaming.com/',
         'BETSOFT_URL' => 'https://2vivo.com/FlashRunGame/RunRngGame.aspx',
