@@ -180,13 +180,13 @@ return [
         'gamelaunchurl' => 'https://gamelaunch.wazdan.com/'
     ],
     'evolution'=>[
-        'host' => 'https://babylontgg.uat1.evo-test.com',
-        'ua2Token' => 'test123',
-        'gameHistoryApiToken' => 'test123',
-        'externalLobbyApiToken'=> 'test123',
-        'owAuthToken' => 'TigerGames@2020',
-        'ua2AuthenticationUrl' => 'https://babylontgg.uat1.evo-test.com/ua/v1/babylontgg000001/test123',
-        'env'=>'test'
+        'host' => 'https://babylontgg.evo-games.com',
+        'ua2Token' => 'caad3c0956c0522e86419d668a69516c6326ae2e',
+        'gameHistoryApiToken' => '943a243607186a48dea41ae1f334979b69f6131f',
+        'externalLobbyApiToken'=> '4eb42bf658049ce0adbd90f56aed2afd0bf515a0',
+        'owAuthToken' => '&-gTqe8bYGCm#pgFBP6G$!5k4m?DjnPM',
+        'ua2AuthenticationUrl' => 'https://babylontgg.evo-games.com/ua/v1/babylontgg000001/caad3c0956c0522e86419d668a69516c6326ae2e',
+        'env'=>'production'
 
     ],
     'png'=>[
