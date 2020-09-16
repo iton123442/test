@@ -465,10 +465,10 @@ $app->post('/api/microgaming/getPlayerBalance','MicroGamingController@getPlayerB
 
 //Evolution Gaming Endpoints
 
-$app->post('/api/evo/gamin/check','EvolutionController@authentication');
-$app->post('/api/evo/gamin/balance','EvolutionController@balance');
-$app->post('/api/evo/gamin/debit','EvolutionController@debit');
-$app->post('/api/evo/gamin/credit','EvolutionController@credit');
-$app->post('/api/evo/gamin/cancel','EvolutionController@cancel');
-$app->post('/api/evo/gamin/sid','EvolutionController@sid');
-$app->post('/api/evo/gamin/launch','EvolutionController@gameLaunch');
+$app->post('/api/evogaming/check','EvolutionController@authentication');
+$app->post('/api/evogaming/balance','EvolutionController@balance');
+$app->post('/api/evogaming/debit','EvolutionController@debit');
+$app->post('/api/evogaming/credit','EvolutionController@credit');
+$app->post('/api/evogaming/cancel','EvolutionController@cancel');
+$app->post('/api/evogaming/sid','EvolutionController@sid');
+$app->post('/api/evogaming/launch','EvolutionController@gameLaunch');
