@@ -254,7 +254,7 @@ return [
     ],
     'spade'=>[
         'prefix' => 'TIGERG', 
-        'api_url'=> 'http://merchantapi.silverkirin88.com/api/',
+        'api_url'=> 'https://merchantapi.silverkirin88.com/api/',
         'merchantCode' => 'TIGERG',
         'siteId' => 'SITE_USD1',
         'provider_id' => 37,
@@ -268,9 +268,9 @@ return [
     ],
     'spade_curacao'=>[
         'prefix' => 'TIGERG', 
-        'api_url'=> 'http://merchantapi.silverkirin88.com/api/',
+        'api_url'=> 'https://merchantapi.silverkirin88.com/api/',
         'lobby_url'=> 'https://lobby.silverkirinplay.com/TIGERG/auth/?',
-        'merchantCode' => 'TIGEREU',
+        'merchantCode' => 'TIGERG',
         'siteId' => 'SITE_EU1',
         'provider_id' => 37,
     ],
