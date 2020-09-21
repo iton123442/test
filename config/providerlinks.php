@@ -241,10 +241,10 @@ return [
     'simpleplay' => [
         'PROVIDER_ID' => 35,
         'LOBBY_CODE' => 'S592',
-        'SECRET_KEY' => 'A872BAFDFA8349CC824A460E7AC02515',
+        'SECRET_KEY' => '355860191C1D421B8883D9933CA9ACBA',
         'MD5_KEY' => 'GgaIMaiNNtg',
         'ENCRYPT_KEY' => 'g9G16nTs',
-        'API_URL' => 'http://api.sp-portal.com/api/api.aspx'
+        'API_URL' => 'http://api.sp-connection.com/api/api.aspx'
     ],
     'ygg'=>[
         'api_url' => 'https://static-stage-tw.248ka.com/init/launchClient.html?',
