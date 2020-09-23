@@ -98,13 +98,24 @@ class ProviderHelper{
 	 * @param $[value] [<value to be searched>]
 	 * 
 	 */
-    public static function getClientDetails($type = "", $value = "") {
+    public static function getClientDetails($type = "", $value = "", $gg=1) {
+	    if($gg==1){
 		$query = DB::table("clients AS c")
-				 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.client_player_id','p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'c.client_url', 'c.default_currency', 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url','p.created_at')
-				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
-				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
-				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-				 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
+		 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.client_player_id','p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'c.client_url', 'c.default_currency', 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url','p.created_at')
+		 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
+		 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
+		 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
+		 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
+		}elseif($gg==2){
+			$query = DB::table("clients AS c")
+			 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.client_player_id','p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'c.default_currency', 'pst.status_id', 'p.display_name', 'op.client_api_key', 'op.client_name', 'op.client_access_token AS client_access_token', 'op.player_details_url', 'op.fund_transfer_url', 'op.player_token_url','p.created_at')
+			 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
+			 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
+			 // ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
+			 ->leftJoin("operator AS op", "c.operator_id", "=", "op.operator_id")
+			 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
+		}
+
 				if ($type == 'token') {
 					$query->where([
 				 		["pst.player_token", "=", $value],
@@ -147,8 +158,12 @@ class ProviderHelper{
 	 * @param $[refreshtoken] [<Default False, True token will be requested>]
 	 * 
 	 */
-	public static function playerDetailsCall($player_token, $refreshtoken=false){
-		$client_details = ProviderHelper::getClientDetails('token', $player_token);
+	public static function playerDetailsCall($player_token, $refreshtoken=false, $type=1){
+		if($type == 1){
+            $client_details = ProviderHelper::getClientDetails('token', $player_token);
+        }elseif($type == 2){
+            $client_details = ProviderHelper::getClientDetails('token', $player_token, 2);
+        }
 		if($client_details){
 			$client = new Client([
 			    'headers' => [ 
@@ -175,6 +190,7 @@ class ProviderHelper{
 				    ['body' => json_encode($datatosend)]
 				);
 				$client_response = json_decode($guzzle_response->getBody()->getContents());
+				Helper::saveLog('ALDEBUG REQUEST SEND = '.$player_token,  99, json_encode($client_response), $datatosend);
 			 	return $client_response;
             }catch (\Exception $e){
                Helper::saveLog('ALDEBUG client_player_id = '.$client_details->client_player_id,  99, json_encode($datatosend), $e->getMessage());
@@ -378,12 +394,29 @@ class ProviderHelper{
 		 "3" => 'Transaction updated to Draw',
 		 "4" => 'Transaction updated to Refund',
 		 "5" => 'Transaction updated to Processing',
+		 "6" => 'Transaction FAILED - Low Balance',
 		 "99" => 'Transaction FAILED - FATAL ERROR',
 		];
 		if(array_key_exists($win, $win_type)){
     		return $win_type[$win];
     	}else{
     		return 'Transaction Was Updated!';
+    	}
+	}
+
+	public static function checkFundStatus($win) {
+		$status_type = [
+		 "ok" => 'success code',
+		 "Ok" => 'success code',
+		 "OK" => 'success code',
+		 "success" => 'success code',
+		 "Success" => 'success code',
+		 "SUCCESS" => 'success code',
+		];
+		if(array_key_exists($win, $status_type)){
+    		return true; // if success
+    	}else{
+    		return false; // if failed
     	}
 	}
 
