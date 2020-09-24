@@ -267,7 +267,7 @@ return [
         'prefix' => 'TIGERG', 
         'api_url'=> 'https://merchantapi.oliveloris.com/api/',
         'lobby_url'=> 'https://lobby.olivelorisplay.com/TIGEREU/auth/?',
-        'merchantCode' => 'TIGERGEU',
+        'merchantCode' => 'TIGEREU',
         'siteId' => 'SITE_EU1',
         'provider_id' => 37,
     ],
