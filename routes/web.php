@@ -335,10 +335,10 @@ $app->post('api/spade/transfer','SpadeController@makeTransfer');
 $app->post('api/spade/getgame','SpadeController@getGameList');
 
 //MajaGames
-$app->post('api/mj/seamless/bet','MajaGamesController@bet');
-$app->post('api/mj/seamless/settlement','MajaGamesController@settlement');
-$app->post('api/mj/seamless/cancel','MajaGamesController@cancel');
-$app->get('api/mj/seamless/getBalance','MajaGamesController@getBalance');
+$app->post('api/maja/seamless/bet','MajaGamesController@bet');
+$app->post('api/maja/seamless/settlement','MajaGamesController@settlement');
+$app->post('api/maja/seamless/cancel','MajaGamesController@cancel');
+$app->get('api/maja/seamless/getBalance','MajaGamesController@getBalance');
 
 // Spade Curacao Gaming
 $app->post('api/spade_curacao','SpadeCuracaoController@index');//single route
