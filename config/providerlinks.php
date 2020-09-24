@@ -268,9 +268,9 @@ return [
     ],
     'spade_curacao'=>[
         'prefix' => 'TIGERG', 
-        'api_url'=> 'https://merchantapi.silverkirin88.com/api/',
-        'lobby_url'=> 'https://lobby.silverkirinplay.com/TIGERG/auth/?',
-        'merchantCode' => 'TIGERG',
+        'api_url'=> 'https://merchantapi.oliveloris.com/api/',
+        'lobby_url'=> 'https://lobby.olivelorisplay.com/TIGEREU/auth/?',
+        'merchantCode' => 'TIGERGEU',
         'siteId' => 'SITE_EU1',
         'provider_id' => 37,
     ],
