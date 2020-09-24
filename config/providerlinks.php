@@ -263,7 +263,7 @@ return [
         'auth' => 'wsLQrQM1OC1bVscK',
         'provider_id' => 39,
         'prefix' => 'MAJA_', 
-        'api_url'=> 'http://api.sagq3ktbaxo.com/api/', //slot api
+        'api_url'=> 'https://api.sagq3ktbaxo.com/api/MOGI/', //slot api
         'tapbet_api_url'=> 'https://tbb.sagq3ktbaxo.com/api', //tapbet api
     ],
     'spade_curacao'=>[
