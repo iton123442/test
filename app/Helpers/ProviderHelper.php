@@ -160,10 +160,13 @@ class ProviderHelper{
 	 */
 	public static function playerDetailsCall($player_token, $refreshtoken=false, $type=1){
 		if($type == 1){
-            $client_details = ProviderHelper::getClientDetails('token', $player_token);
+			$client_details = ProviderHelper::getClientDetails('token', $player_token);
+			// return 1;
         }elseif($type == 2){
-            $client_details = ProviderHelper::getClientDetails('token', $player_token, 2);
-        }
+			$client_details = ProviderHelper::getClientDetails('token', $player_token, 2);
+			// return 2;
+		}
+		// dd($client_details);
 		if($client_details){
 			$client = new Client([
 			    'headers' => [ 
@@ -185,6 +188,7 @@ class ProviderHelper{
 					"refreshtoken" => $refreshtoken
 				]
 			];
+			// return json_encode($datatosend);
 			try{	
 				$guzzle_response = $client->post($client_details->player_details_url,
 				    ['body' => json_encode($datatosend)]
@@ -595,7 +599,7 @@ class ProviderHelper{
 		$nonce_previous = DB::table('seamless_request_logs')
 			->where('method_name', 'Booming nonce')
 			->where('provider_id',$provider_id)
-	    	->first();
+			->latest()->first();
 	    return $nonce_previous ? $nonce_previous : 'false';
 	}
 
