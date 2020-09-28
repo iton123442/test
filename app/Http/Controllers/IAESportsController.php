@@ -40,18 +40,18 @@ class IAESportsController extends Controller
     
 	// public $url = 'https://middleware.freebetrnk.com/public/game/launchurl';
 
-	public $auth_key = '54bc08c471ae3d656e43735e6ffc9bb6';
-	public $pch = 'BRNK';
-	public $iv = '45b80556382b48e5';
-	public $url_lunch = 'http://api.ilustretest.com/user/lunch';
-	public $url_register = 'http://api.ilustretest.com/user/register';
-	public $url_withdraw = 'http://api.ilustretest.com/user/withdraw';
-	public $url_deposit = 'http://api.ilustretest.com/user/deposit';
-	public $url_balance = 'http://api.ilustretest.com/user/balance';
-	public $url_wager = 'http://api.ilustretest.com/wager/getproject';
-	public $url_hotgames = 'http://api.ilustretest.com/index/gethotgame';
-	public $url_orders = 'http://api.ilustretest.com/user/searchprders';
-	public $url_activity_logs = 'http://api.ilustretest.com/user/searchprders';
+	public $auth_key = '6230204245ebbf14dfdc0ee40960134d';
+	public $pch = 'TG01';
+	public $iv = '1650cbec4319180b';
+	public $url_lunch = 'https://api.ilustre-analysis.net/user/lunch';
+	public $url_register = 'https://api.ilustre-analysis.net/user/register';
+	public $url_withdraw = 'https://api.ilustre-analysis.net/user/withdraw';
+	public $url_deposit = 'https://api.ilustre-analysis.net/user/deposit';
+	public $url_balance = 'https://api.ilustre-analysis.net/user/balance';
+	public $url_wager = 'https://api.ilustre-analysis.net/wager/getproject';
+	public $url_hotgames = 'https://api.ilustre-analysis.net/index/gethotgame';
+	public $url_orders = 'https://api.ilustre-analysis.net/user/searchprders';
+	public $url_activity_logs = 'https://api.ilustre-analysis.net/user/searchprders';
 
 	public $game_code = 'ia-lobby';
 	public $game_name = 'IA Gaming';
