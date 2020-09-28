@@ -17,6 +17,7 @@ $app->get('/', function () use ($app) {
 $app->post('/al','AlController@index'); // TESTING!
 $app->post('/alplayer','AlController@checkCLientPlayer'); // TESTING!
 $app->post('/gg','AlController@tapulan'); // TESTING!
+$app->post('/aldebug','AlController@debugMe'); // TESTING!
 // Posts
 $app->get('/posts','PostController@index');
 $app->post('/posts','PostController@store');
@@ -139,21 +140,22 @@ $app->post('rsg/amend', 'DigitainController@amend');
 $app->post('rsg/promowin', 'DigitainController@PromoWin');
 $app->post('rsg/checktxstatus', 'DigitainController@CheckTxStatus');
 // IA SPORTS
-$app->post('/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
-$app->post('/api/ia/lunch', 'IAESportsController@userlunch');// DEPRECATED
-$app->post('/api/ia/register', 'IAESportsController@userRegister');
-$app->post('/api/ia/userwithdraw', 'IAESportsController@userWithdraw');// DEPRECATED
-$app->post('/api/ia/userdeposit', 'IAESportsController@userDeposit');// DEPRECATED
-$app->post('/api/ia/userbalance', 'IAESportsController@userBalance');// DEPRECATED
-$app->post('/api/ia/wager', 'IAESportsController@userWager'); // DEPRECATED
-$app->post('/api/ia/hotgames', 'IAESportsController@getHotGames'); // DEPRECATED
-$app->post('/api/ia/orders', 'IAESportsController@userOrders');// DEPRECATED
-$app->post('/api/ia/activity_logs', 'IAESportsController@userActivityLog'); // DEPRECATED
-$app->post('/api/ia/deposit', 'IAESportsController@seamlessDeposit');
-$app->post('/api/ia/withdrawal', 'IAESportsController@seamlessWithdrawal');
-$app->post('/api/ia/balance', 'IAESportsController@seamlessBalance');
-$app->post('/api/ia/searchorder', 'IAESportsController@seamlessSearchOrder');
-$app->post('/api/ia/debugg', 'IAESportsController@userlaunch');
+$app->post('ia/hash', 'IAESportsController@hashen'); // DEPRECATED
+$app->post('ia/lunch', 'IAESportsController@userlunch');// DEPRECATED
+$app->post('ia/register', 'IAESportsController@userRegister');
+$app->post('ia/userwithdraw', 'IAESportsController@userWithdraw');// DEPRECATED
+$app->post('ia/userdeposit', 'IAESportsController@userDeposit');// DEPRECATED
+$app->post('ia/userbalance', 'IAESportsController@userBalance');// DEPRECATED
+$app->post('ia/wager', 'IAESportsController@userWager'); // DEPRECATED
+$app->post('ia/hotgames', 'IAESportsController@getHotGames'); // DEPRECATED
+$app->post('ia/orders', 'IAESportsController@userOrders');// DEPRECATED
+$app->post('ia/activity_logs', 'IAESportsController@userActivityLog'); // DEPRECATED
+$app->post('ia/deposit', 'IAESportsController@seamlessDeposit');
+$app->post('ia/withdrawal', 'IAESportsController@seamlessWithdrawal');
+$app->post('ia/balance', 'IAESportsController@seamlessBalance');
+$app->post('ia/searchorder', 'IAESportsController@seamlessSearchOrder');
+$app->post('ia/debugg', 'IAESportsController@userlaunch');
+$app->post('ia/settleround', 'IAESportsController@SettleRounds');
 // Bole Gaming Endpoints
 $app->post('/api/bole/register', 'BoleGamingController@playerRegister');
 $app->post('/api/bole/logout', 'BoleGamingController@playerLogout');
@@ -490,3 +492,15 @@ $app->post('/api/evogaming/credit','EvolutionController@credit');
 $app->post('/api/evogaming/cancel','EvolutionController@cancel');
 $app->post('/api/evogaming/sid','EvolutionController@sid');
 $app->post('/api/evogaming/launch','EvolutionController@gameLaunch');
+
+
+//Golden F Game System
+$app->post('api/gf/Player/Create','GoldenFController@auth');
+$app->post('api/gf/GetPlayerBalance','GoldenFController@GetPlayerBalance');
+$app->post('api/gf/TransferIn','GoldenFController@TransferIn');
+$app->post('api/gf/TransferOut','GoldenFController@TransferOut');
+$app->post('api/gf/Bet/Record/Get','GoldenFController@BetRecordGet');
+$app->post('api/gf/Bet/Record/Player/Get','GoldenFController@BetRecordPlayerGet');
+$app->post('api/gf/Transaction/Record/Get','GoldenFController@TransactionRecordGet');
+$app->post('api/gf/Transaction/Record/Player/Get','GoldenFController@TransactionRecordPlayerGet');
+$app->post('api/gf/Bet/Record/Detail','GoldenFController@BetRecordDetail');
