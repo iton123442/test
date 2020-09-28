@@ -53,7 +53,7 @@ class IAESportsController extends Controller
 	public $url_hotgames = 'https://api.ilustre-analysis.net/index/gethotgame';
 	public $url_orders = 'https://api.ilustre-analysis.net/user/searchprders';
 	public $url_activity_logs = 'https://api.ilustre-analysis.net/user/searchprders';
-
+	public $provider_db_id = 15;
 
 
 	public function userlaunch()
