@@ -293,7 +293,7 @@ class GameLobbyController extends Controller
                     if($url){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
-                            "url" => "https://play.betrnk.games/loadgame?url=".urlencode($url)."&token=".$request->token,
+                            "url" => $url,//"https://play.betrnk.games/loadgame?url=".urlencode($url)."&token=".$request->token,
                             "game_launch" => true
                         );
                         Helper::saveLog('IA Launch Game URL', 15, json_encode("https://play.betrnk.games/loadgame?url=".urlencode($url)."&token=".$request->token), "TEST URL");
