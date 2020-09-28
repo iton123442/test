@@ -620,7 +620,7 @@ class GameLobby{
 
     public static function goldenFLaunchUrl($data){
         $operator_token = config("providerlinks.goldenF.operator_token");
-        $gameluanch_url = config("providerlinks.goldenF.api_url");
+        $api_url = config("providerlinks.goldenF.api_url");
         $secrete_key = config("providerlinks.goldenF.secrete_key");
         $provider_id = config("providerlinks.goldenF.provider_id");
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
@@ -628,7 +628,7 @@ class GameLobby{
         $player_id = "TG_".$client_details->player_id;
         $nickname = str_replace(' ', '_', $client_details->display_name);
         try{
-            $url_create = $gameluanch_url ."/Player/Create?secret_key=".$secrete_key."&operator_token=".$operator_token."&player_name=".$player_id."&currency=".$client_details->default_currency;
+            $url_create = $api_url ."/Player/Create?secret_key=".$secrete_key."&operator_token=".$operator_token."&player_name=".$player_id."&currency=".$client_details->default_currency;
         
             $http = new Client();
             // TRY BOTH
@@ -640,12 +640,26 @@ class GameLobby{
             Helper::saveLog('GoldenF Create Player response', $provider_id, json_encode($data), $create_player);
          
             if($create_player->data->action_result == "Success"):
-                $gameluanch_url = $gameluanch_url."/Launch?secret_key=".$secrete_key."&operator_token=".$operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
+                $gameluanch_url = $api_url."/Launch?secret_key=".$secrete_key."&operator_token=".$operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
 
                 $response = $http->post($gameluanch_url);
                 $get_url = json_decode($response->getBody()->getContents());
                 Helper::saveLog('GoldenF gamelaunch', $provider_id, json_encode($data), $gameluanch_url);
                 Helper::saveLog('GoldenF game url', $provider_id, json_encode($data), $get_url->data->game_url);
+                
+                $deposit = $api_url."/TransferIn?secret_key=".$secrete_key."&operator_token=".$operator_token."&player_name=".$player_id."&amount=50.00&traceId=1000";
+                $send_amt = $http->post($deposit);
+                $amount = json_decode($send_amt->getBody()->getContents());
+                Helper::saveLog('GoldenF deposit', $provider_id, json_encode($amount), $deposit); 
+
+
+                $get_bal_url = $api_url."/GetPlayerBalance?secret_key=".$secrete_key."&operator_token=".$operator_token."&player_name=".$player_id;
+                $get_bal = $http->post($get_bal_url);
+                $bal = json_decode($get_bal->getBody()->getContents());
+                Helper::saveLog('GoldenF balance', $provider_id, json_encode($bal), $get_bal_url); 
+
+
+
                 return $get_url->data->game_url;
             endif;
         }catch(\Exception $e){
