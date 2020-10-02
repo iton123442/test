@@ -79,17 +79,33 @@ return [
     ],
     'aws' => [
         'api_url' => 'https://papi.awsxpartner.com/b2b/',
-        'merchant_id' => 'TG',
-        'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
+        '1'=> [ // Tiger Games USD // Production
+            'merchant_id' => 'TG',
+            'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
+        ], 
+        '2' => [ // XIGOLO USD
+            'merchant_id' => 'XIGOLO',
+            'merchant_key' => 'b7943fc2e48c3b74a2c31514aebdce25364bd2b1a97855f290c01831052b25478c35bdebdde8aa7a963e140a8c1e6401102321a2bd237049f9e675352c35c4cc',
+        ],
+        '3' => [ // TGC USD
+            'merchant_id' => 'TGC',
+            'merchant_key' => 'cb1bc0a2fc16bddfd549bdd8aae0954fba28c9b11c6a25e6ef886b56e846b033ae5fe29880be69fd8741ab400e6c4cb2f8c0f05e49dcc4568362370278ba044d',
+        ],
+        '4' => [ // ASKMEBET THB
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
     ],
     'cqgames' => [
         "prefix" => "TG",
         "pdbid"=> 30, // Database ID nothing todo with the provider!
         'api_url' => 'https://apie.cqgame.cc',
         'api_tokens' => [
+        	'CNY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjZjNDIwYzkxOGI5ODAwMDE5YzM0ODgiLCJhY2NvdW50IjoidGVzdF9jbnkiLCJvd25lciI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsInBhcmVudCI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsImN1cnJlbmN5IjoiQ05ZIiwianRpIjoiODI1NTcwOTkwIiwiaWF0IjoxNjAwOTMwMzE2LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fwf2b4i5seyD_cEZyYkmpByTQaaxhPfH_IwEJGDRZ5A',
             'USD' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWY2MDYxYjQ4NTdhOTcwMDAxYmYwNzE1IiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiNjE0ODYyMDI5IiwiaWF0IjoxNjAwMTUxOTg4LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.XgbWboAdrRtrmKhvYymBXbdVqEwLccry0no0-8blFxI',
         ],
         'wallet_token' => [
+        	'CNY' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
             'USD' => 'avF0GzMKaFJuBLwZfEfq2SseM1ZKPLcf',
         ]
     ],
@@ -105,8 +121,8 @@ return [
     ],
     'kagaming' => [
         "pdbid"=> 32, // Database ID nothing todo with the provider!
-        "gamelaunch" => "https://gamesstage.kaga88.com",
-        "ka_api" => "https://rmpstage.kaga88.com/kaga/",
+        "gamelaunch" => "https://gamessea.kaga88.com",
+        "ka_api" => "https://rmpsea.kaga88.com/kaga/",
         "access_key" => "A95383137CE37E4E19EAD36DF59D589A",
         "secret_key" => "40C6AB9E806C4940E4C9D2B9E3A0AA25",
         "partner_name" => "TIGER",
