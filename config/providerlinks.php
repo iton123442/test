@@ -85,11 +85,11 @@ return [
         ], 
         '2' => [ // XIGOLO USD
             'merchant_id' => 'XIGOLO',
-            'merchant_key' => 'b7943fc2e48c3b74a2c31514aebdce25364bd2b1a97855f290c01831052b25478c35bdebdde8aa7a963e140a8c1e6401102321a2bd237049f9e675352c35c4cc',
+            'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
         ],
         '3' => [ // TGC USD
             'merchant_id' => 'TGC',
-            'merchant_key' => 'cb1bc0a2fc16bddfd549bdd8aae0954fba28c9b11c6a25e6ef886b56e846b033ae5fe29880be69fd8741ab400e6c4cb2f8c0f05e49dcc4568362370278ba044d',
+            'merchant_key' => '129d637c1aa5d3f3c6b9ea759d04d00250c9f4be29d71f72abd189f0c8283f263e08a2a99b70663ee28dc4e025cca82a0b955e2a9fcca604c72aa9dc22cf5232',
         ],
         '4' => [ // ASKMEBET THB
             'merchant_id' => 'ASKME',
