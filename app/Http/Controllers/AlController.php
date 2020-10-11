@@ -261,7 +261,56 @@ class AlController extends Controller
 
 
 
-    public function tapulan(){
+    public function tapulan(Request $request){
+      // $client_details = Providerhelper::getClientDetails('player_id',  98);
+      // $player= DB::table('players')->where('client_id', $client_details->client_id)
+      //     ->where('player_id', $client_details->player_id)->first();
+      // if(isset($player->player_status)){
+      //   if($player != '' || $player != null){
+      //     if($player->player_status == 2|| $player->player_status == 3){
+      //      return 'false';
+      //     }
+      //   }
+      // }
+
+
+      // return 1;
+
+      if(isset($_SERVER["HTTP_X_FORWARDED_FOR"])){
+        if($_SERVER["HTTP_X_FORWARDED_FOR"] == '119.92.151.236'){
+          $msg = 'your whilisted';
+        }else{
+          $msg = 'your blocked';
+        }
+      }else{
+        $msg = 'not set';
+      }
+
+
+
+      // return $this->getUserIpAddr();
+      // Helper::saveLog('IP LOG', 999, json_encode($request->ip()), $_SERVER["REMOTE_ADDR"].' '.$request->ip().' '.$this->getUserIpAddr());
+
+      //  if(isset($_SERVER['HTTP_CLIENT_IP'])):
+      //       Helper::saveLog('IP LOG2', 999, json_encode($request->ip()), $_SERVER["HTTP_CLIENT_IP"]);
+      //  elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR'])):
+      //      Helper::saveLog('IP LOG3', 999, json_encode($request->ip()), $_SERVER["HTTP_X_FORWARDED_FOR"]);
+      //  elseif(isset($_SERVER['HTTP_X_FORWARDED'])):
+      //      Helper::saveLog('IP LOG4', 999, json_encode($request->ip()), $_SERVER["HTTP_X_FORWARDED"]);
+      //  elseif(isset($_SERVER['HTTP_FORWARDED_FOR'])):
+      //      Helper::saveLog('IP LOG5', 999, json_encode($request->ip()), $_SERVER["HTTP_FORWARDED_FOR"]);
+      //  elseif(isset($_SERVER['HTTP_FORWARDED'])):
+      //       Helper::saveLog('IP LOG6', 999, json_encode($request->ip()), $_SERVER["HTTP_FORWARDED"]);
+      //  elseif(isset($_SERVER['REMOTE_ADDR'])):
+      //       Helper::saveLog('IP LOG7', 999, json_encode($request->ip()), $_SERVER["REMOTE_ADDR"]);
+      //  else:
+
+      //  endif;
+
+      return  $msg;
+      
+      // $client_details = Providerhelper::getClientDetails('player_id',  98);
+      // dd($client_details);
 
       // return response()
       //       ->json(['name' => 'Abigail', 'state' => 'CA'])

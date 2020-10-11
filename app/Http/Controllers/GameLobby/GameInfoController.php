@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Helpers\Helper;
+use App\Helpers\ProviderHelper;
 use Session;
 use DB;
 
@@ -175,9 +176,9 @@ class GameInfoController extends Controller
 	 */
 	public function getClientPlayerDetails(Request $request){
 			if($request->has('player_id')){
-				$client_details = $this->_getClientDetails('player_id', $request->player_id);
+				$client_details = ProviderHelper::getClientDetails('player_id', $request->player_id);
 			}else if($request->has('token')){
-				$client_details = $this->_getClientDetails('token', $request->token);
+				$client_details = ProviderHelper::getClientDetails('token', $request->token);
 			}else{
 				return ['status' => 'failed'];
 			}

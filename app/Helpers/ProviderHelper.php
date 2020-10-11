@@ -100,20 +100,23 @@ class ProviderHelper{
 	 */
     public static function getClientDetails($type = "", $value = "", $gg=1) {
 	    if($gg==1){
-		$query = DB::table("clients AS c")
-		 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.client_player_id','p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'c.client_url', 'c.default_currency', 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url','p.created_at')
+
+		 // Overall Operator Table
+		 $query = DB::table("clients AS c")
+		 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.client_player_id','p.language', 'p.currency','p.test_player','p.created_at','pst.token_id', 'pst.player_token' , 'c.client_url', 'c.default_currency', 'pst.status_id', 'p.display_name', 'op.client_api_key', 'op.client_code','op.client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url','p.created_at')
 		 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
 		 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
 		 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-		 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
-		}elseif($gg==2){
-			$query = DB::table("clients AS c")
-			 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.client_player_id','p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'c.default_currency', 'pst.status_id', 'p.display_name', 'op.client_api_key', 'op.client_name', 'op.client_access_token AS client_access_token', 'op.player_details_url', 'op.fund_transfer_url', 'op.player_token_url','p.created_at')
+		 ->leftJoin("operator AS op", "c.operator_id", "=", "op.operator_id");
+		 
+		}elseif($gg==2){  // TEST MULTI CURRENCY SETUP
+
+			 $query = DB::table("clients AS c")
+			 ->select('p.client_id', 'p.player_id', 'p.username', 'p.email', 'p.client_player_id','p.language', 'p.currency', 'p.test_player', 'p.created_at','pst.token_id', 'pst.player_token' , 'c.client_url', 'c.default_currency', 'pst.status_id', 'p.display_name', 'op.client_api_key', 'op.client_code','op.client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url','p.created_at')
 			 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
 			 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
-			 // ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-			 ->leftJoin("operator AS op", "c.operator_id", "=", "op.operator_id")
-			 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
+			 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
+			 ->leftJoin("operator AS op", "c.operator_id", "=", "op.operator_id");
 		}
 
 				if ($type == 'token') {
@@ -188,6 +191,19 @@ class ProviderHelper{
 					"refreshtoken" => $refreshtoken
 				]
 			];
+
+			// Filter Player If Disabled
+			$player= DB::table('players')->where('client_id', $client_details->client_id)
+					->where('player_id', $client_details->player_id)->first();
+			if(isset($player->player_status)){
+				if($player != '' || $player != null){
+					if($player->player_status == 3){
+					Helper::saveLog('ALDEBUG PLAYER BLOCKED = '.$player->player_status,  999, json_encode($datatosend), $datatosend);
+					 return 'false';
+					}
+				}
+			}
+
 			// return json_encode($datatosend);
 			try{	
 				$guzzle_response = $client->post($client_details->player_details_url,

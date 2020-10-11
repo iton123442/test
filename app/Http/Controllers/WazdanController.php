@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Helpers\Helper;
 use App\Helpers\WazdanHelper;
 use GuzzleHttp\Client;
+use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
 use DB;
 class WazdanController extends Controller
@@ -25,7 +26,7 @@ class WazdanController extends Controller
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
         if($datadecoded["token"]){
-            $client_details = $this->_getClientDetails('token', $request->token);
+            $client_details = ProviderHelper::getClientDetails('token', $request->token);
             Helper::saveLog('AuthPlayer (Wazdan)', 50, $data, $client_details);
             if($client_details){
                 $client = new Client([
@@ -106,7 +107,7 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('getStake(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-            $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
                 $game_transaction = Helper::checkGameTransaction($datadecoded["transactionId"]);
                 if(Helper::getBalance($client_details) < round($datadecoded["amount"],2)){
@@ -200,7 +201,7 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('rollbackStake(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-            $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
         if($client_details){
             $rollbackchecker = WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"]);
             if($rollbackchecker){
@@ -283,7 +284,7 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('returnWin(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-            $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
                 $returnWinTransaction = WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"]);
                 if($returnWinTransaction){
@@ -353,7 +354,7 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('getFund(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-            $client_details = $this->_getClientDetails('token', $datadecoded["user"]["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             Helper::saveLog('GetFund (Wazdan)', 50, $data, $client_details);
             if($client_details){
                 $client = new Client([

@@ -270,11 +270,17 @@ class KAGamingController extends Controller
                 "statusCode" =>  0
             ];
             if($check_bet_round != 'false'){
+                $win_or_lost = $existing_bet_details->win;
+                $entry_id = $existing_bet_details->entry_id;
+
                 $pay_amount = $existing_bet_details->pay_amount + $win_amount;
                 $bet_amount = $existing_bet_details->bet_amount + $bet_amount;
                 $income = $bet_amount - $pay_amount; //$existing_bet_details->income;
-                $win_or_lost = $existing_bet_details->win;
-                $entry_id = $existing_bet_details->entry_id;
+
+                if($pay_amount == $bet_amount){
+                    $win_or_lost = 3;
+                }
+
                 ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id,'game_trans_id',$bet_amount,$multi_bet=true);
             }else{
                 $pay_amount = $win_amount;
@@ -286,6 +292,11 @@ class KAGamingController extends Controller
                    $win_or_lost = 0;
                    $entry_id = 1;
                 }
+
+                if($pay_amount == $bet_amount){
+                    $win_or_lost = 3;
+                }
+                
                 ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
             }
             ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
@@ -363,11 +374,19 @@ class KAGamingController extends Controller
         $existing_bet = ProviderHelper::findGameTransaction($gamerecord,'game_transaction');
 
         $round_id = $existing_bet->round_id;
-        $entry_id = 1;
-        $win_or_lost = 1; // 0 lost,  5 processing
+      
+       
         $bet_amount = $existing_bet->bet_amount;
         $pay_amount =  $existing_bet->pay_amount + $amount; //abs($data['amount']);
         $income = $bet_amount - $pay_amount;
+
+        if($pay_amount > 0){
+            $entry_id = 2; // Credit
+            $win_or_lost = 1; // 0 lost,  5 processing
+        }else{
+            $entry_id = 1; // Debit
+            $win_or_lost = 0; // 0 lost,  5 processing
+        }
 
         $game_transaction_type = 2; // 1 Bet, 2 Win
         $game_code = $game_information->game_id;
