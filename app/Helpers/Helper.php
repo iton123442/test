@@ -457,6 +457,7 @@ class Helper
 	}
 
 	public static function updateGameTransaction($existingdata,$request_data,$type){
+		DB::enableQueryLog();
 		switch ($type) {
 			case "debit":
 					$trans_data["win"] = 0;
@@ -478,10 +479,17 @@ class Helper
 					$trans_data["income"]= $existingdata->bet_amount-$request_data["amount"];
 					$trans_data["payout_reason"] = "Refund of this transaction ID: ".$request_data["transid"]."of GameRound ".$request_data["roundid"];
 				break;
-
+			case "fail":
+				$trans_data["win"] = 2;
+				$trans_data["pay_amount"] = $request_data["amount"];
+				$trans_data["entry_id"] = 1;
+				$trans_data["income"]= 0;
+				$trans_data["payout_reason"] = "Fail  transaction ID: ".$request_data["transid"]."of GameRound ".$request_data["roundid"] .":Insuffecient Balance";
+			break;
 			default:
 		}
 		/*var_dump($trans_data); die();*/
+		Helper::saveLog('TIMEupdateGameTransaction(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME");
 		return DB::table('game_transactions')->where("game_trans_id",$existingdata->game_trans_id)->update($trans_data);
 	}
 	/**
