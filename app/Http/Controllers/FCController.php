@@ -34,6 +34,7 @@ class FCController extends Controller
         //return $data;
         $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
         if($client_details){
+            Helper::saveLog('transactionMake(FC)', 27, json_encode($client_details), "data");
             if(Helper::getBalance($client_details) < round($data["Bet"],2)){ 
                 $response =array(
                     "Result"=>203,
