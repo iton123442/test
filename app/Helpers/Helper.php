@@ -269,15 +269,16 @@ class Helper
 		return DB::table('game_transactions')->insertGetId($trans_data);			
 	}
 	public static function getGameTransaction($player_token,$game_round){
+		DB::enableQueryLog();
 		$game = DB::table("player_session_tokens as pst")
 				->leftJoin("game_transactions as gt","pst.token_id","=","gt.token_id")
 				->where("pst.player_token",$player_token)
 				->where("gt.round_id",$game_round)
 				->first();
+		Helper::saveLog('TIMEgetGameTransaction(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME");
 		return $game;
 	}
 	public static function checkGameTransaction($provider_transaction_id,$round_id=false,$type=false){
-		DB::enableQueryLog();
 		if($type&&$round_id){
 			$game = DB::table('game_transaction_ext')
 				->where('provider_trans_id',$provider_transaction_id)
@@ -290,7 +291,6 @@ class Helper
 			FROM wt_mw_db_production.game_transaction_ext
 			where provider_trans_id='".$provider_transaction_id."' limit 1");
 		}
-		Helper::saveLog('TIMEcheckGameTransaction(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME");
 		return $game ? true :false;
 	}
 	public static function checkGameTransactionData($provider_transaction_id){
