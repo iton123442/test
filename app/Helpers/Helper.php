@@ -269,11 +269,13 @@ class Helper
 		return DB::table('game_transactions')->insertGetId($trans_data);			
 	}
 	public static function getGameTransaction($player_token,$game_round){
+		DB::enableQueryLog();
 		$game = DB::table("player_session_tokens as pst")
 				->leftJoin("game_transactions as gt","pst.token_id","=","gt.token_id")
 				->where("pst.player_token",$player_token)
 				->where("gt.round_id",$game_round)
 				->first();
+		Helper::saveLog('TIMEgetGameTransaction(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME duplicatechecker");
 		return $game;
 	}
 	public static function checkGameTransaction($provider_transaction_id,$round_id=false,$type=false){
