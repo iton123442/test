@@ -303,10 +303,10 @@ class Helper
 	}
 	public static function checkGameTransactionupdate($round_id=false,$type=false){
 		DB::enableQueryLog();
-			$game = DB::table('game_transaction_ext')
-				->where('provider_trans_id',$round_id)
-				->where('game_transaction_type',$type)
-				->first();
+			$game = DB::select("SELECT game_trans_ext_id
+			FROM wt_mw_db_production.game_transaction_ext
+			where provider_trans_id='".$round_id."' and game_transaction_type = ".$type."
+			order by game_trans_ext_id desc limit 1");
 	    Helper::saveLog('TIMEcheckGameTransactionupdate(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME duplicatechecker");
 		return $game ? true :false;
 	}
