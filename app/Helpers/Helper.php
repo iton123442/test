@@ -286,9 +286,9 @@ class Helper
 				->first();
 		}
 		else{
-			$game = DB::table('game_transaction_ext')
-				->where('provider_trans_id',$provider_transaction_id)
-				->first();
+			$game = DB::select("SELECT game_trans_ext_id
+			FROM wt_mw_db_production.game_transaction_ext
+			where provider_trans_id='".$provider_transaction_id."' limit 1");
 		}
 		Helper::saveLog('TIMEcheckGameTransaction(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME");
 		return $game ? true :false;
@@ -302,8 +302,7 @@ class Helper
 	public static function checkGameTransactionupdate($round_id=false,$type=false){
 			$game = DB::select("SELECT game_trans_ext_id
 			FROM wt_mw_db_production.game_transaction_ext
-			where provider_trans_id='".$round_id."' and game_transaction_type = ".$type."
-			order by game_trans_ext_id desc limit 1");
+			where provider_trans_id='".$round_id."' and game_transaction_type = ".$type." limit 1");
 		return $game ? true :false;
 	}
 	public static function getBalance($client_details){
