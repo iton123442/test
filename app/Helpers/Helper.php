@@ -220,6 +220,16 @@ class Helper
 				->first();
 		return $game ? $game : false;
 	}
+	public static function getInfoPlayerGameRoundupdate($player_token,$game_id){
+		$game = DB::table("player_game_rounds as pgr")
+				->leftJoin("player_session_tokens as pst","pst.player_token","=","pgr.player_token")
+				->leftJoin("games as g" , "g.game_id","=","pgr.game_id")
+				->leftJoin("players as ply" , "pst.player_id","=","ply.player_id")
+				->where("pgr.player_token",$player_token)
+				->where("pgr.game_id",$game_id)
+				->first();
+		return $game ? $game : false;
+	}
 	public static function createGameTransaction($method, $request_data, $game_data, $client_data){
 		$trans_data = [
 			"token_id" => $client_data->token_id,

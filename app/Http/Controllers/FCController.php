@@ -145,43 +145,45 @@ class FCController extends Controller
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
             }
-            $game_transaction = FCHelper::checkGameTransaction($data["BankID"]);
-            $refund_amount = empty($game_transaction) ? 0 : $game_transaction->amount;
-            $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
-            $win = 0;
-            $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
-            $json_data = array(
-                "transid" => $data["BankID"],
-                "amount" => round($refund_amount,2),
-                "roundid" => 0,
-            );
-            $game = FCHelper::getGameTransaction($client_details->player_token,$data["BankID"]);
-            
-            if(!$game){
-                $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
-            }
             else{
-                $gameupdate = Helper::updateGameTransaction($game,$json_data,"refund");
-                $gametransactionid = $game->game_trans_id;
-
-            }
-            if(!empty($game_transaction)){
-                $data["RecordID"]= $game_transaction->round_id;
-                $data["Win"] = $refund_amount;
-                $transactionId=FCHelper::createFCGameTransactionExt($gametransactionid,$data,null,null,null,3);
-            }
-            $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-            
-            if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "200"){
-                $response =array(
-                    "Result"=>0,
-                    "MainPoints" => $balance,
+                $game_transaction = FCHelper::checkGameTransaction($data["BankID"]);
+                $refund_amount = empty($game_transaction) ? 0 : $game_transaction->amount;
+                $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
+                $win = 0;
+                $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+                $json_data = array(
+                    "transid" => $data["BankID"],
+                    "amount" => round($refund_amount,2),
+                    "roundid" => 0,
                 );
-                FCHelper::updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
-                return response($response,200)
-                    ->header('Content-Type', 'application/json');
+                $game = FCHelper::getGameTransaction($client_details->player_token,$data["BankID"]);
+                
+                if(!$game){
+                    $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
+                }
+                else{
+                    $gameupdate = Helper::updateGameTransaction($game,$json_data,"refund");
+                    $gametransactionid = $game->game_trans_id;
+
+                }
+                if(!empty($game_transaction)){
+                    $data["RecordID"]= $game_transaction->round_id;
+                    $data["Win"] = $refund_amount;
+                    $transactionId=FCHelper::createFCGameTransactionExt($gametransactionid,$data,null,null,null,3);
+                }
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
+                $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                
+                if(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "200"){
+                    $response =array(
+                        "Result"=>0,
+                        "MainPoints" => $balance,
+                    );
+                    FCHelper::updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+                    return response($response,200)
+                        ->header('Content-Type', 'application/json');
+                }
             }
         }
         else{
