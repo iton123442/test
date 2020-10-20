@@ -307,7 +307,7 @@ class Helper
 				->where('provider_trans_id',$round_id)
 				->where('game_transaction_type',$type)
 				->first();
-		Helper::saveLog('TIMEcheckGameTransaction(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME");
+	    Helper::saveLog('TIMEcheckGameTransactionupdate(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME duplicatechecker");
 		return $game ? true :false;
 	}
 	public static function getBalance($client_details){
