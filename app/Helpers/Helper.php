@@ -270,21 +270,29 @@ class Helper
 	}
 	public static function getGameTransaction($player_token,$game_round){
 		DB::enableQueryLog();
-		$game = DB::table("player_session_tokens as pst")
-				->leftJoin("game_transactions as gt","pst.token_id","=","gt.token_id")
-				->where("pst.player_token",$player_token)
-				->where("gt.round_id",$game_round)
-				->first();
+		// $game = DB::table("player_session_tokens as pst")
+		// 		->leftJoin("game_transactions as gt","pst.token_id","=","gt.token_id")
+		// 		->where("pst.player_token",$player_token)
+		// 		->where("gt.round_id",$game_round)
+		// 		->first();
+		$game = DB::select("SELECT
+						entry_id
+						FROM game_transactions g
+						INNER JOIN player_session_tokens USING (token_id)
+						WHERE player_token = '".$player_token."' and round_id = '".$game_round."'");
 		Helper::saveLog('TIMEgetGameTransaction(EVG)', 189, json_encode(DB::getQueryLog()), "DB TIME");
 		return $game;
 	}
 	public static function checkGameTransaction($provider_transaction_id,$round_id=false,$type=false){
 		if($type&&$round_id){
-			$game = DB::table('game_transaction_ext')
-				->where('provider_trans_id',$provider_transaction_id)
-				->where('round_id',$round_id)
-				->where('game_transaction_type',$type)
-				->first();
+			// $game = DB::table('game_transaction_ext')
+			// 	->where('provider_trans_id',$provider_transaction_id)
+			// 	->where('round_id',$round_id)
+			// 	->where('game_transaction_type',$type)
+			// 	->first();
+			$game = DB::select("SELECT game_transaction_type
+								FROM wt_mw_db_production.game_transaction_ext
+								WHERE round_id = '".$round_id."' AND provider_trans_id='".$provider_transaction_id."' AND game_transaction_type = ".$type."");
 		}
 		else{
 			$game = DB::select("SELECT game_trans_ext_id
