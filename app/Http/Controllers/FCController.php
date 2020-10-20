@@ -13,7 +13,7 @@ use DB;
 class FCController extends Controller
 {
     //
-
+    public $provider_db_id=27;
 
     public function SampleEncrypt(Request $request){
         $data = $request->getContent();
@@ -32,7 +32,7 @@ class FCController extends Controller
         $datareq = FCHelper::AESDecode((string)$request->Params);
         $data = json_decode($datareq,TRUE);
         //return $data;
-        $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"]);
+        $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
         if($client_details){
             if(Helper::getBalance($client_details) < round($data["Bet"],2)){ 
                 $response =array(
@@ -51,7 +51,7 @@ class FCController extends Controller
             $game_transaction = Helper::checkGameTransaction($data["BankID"]);
             $bet_amount = $game_transaction ? 0 : round($data["Bet"],2);
             $bet_amount = $bet_amount < 0 ? 0 :$bet_amount;
-            $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+            $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $data["GameID"]);
             $json_data = array(
                 "transid" => $data["BankID"],
                 "amount" => round($data["Bet"],2),
@@ -89,7 +89,7 @@ class FCController extends Controller
             $win_amount = $game_transaction ? 0 : round($data["Win"],2);
             $win_amount = $win_amount < 0 ? 0 :$win_amount;
             $win = $data["Win"] == 0 ? 0 : 1;
-            $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+            $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $data["GameID"]);
             $json_data = array(
                 "transid" => $data["BankID"],
                 "amount" => round($data["Win"],2),
@@ -134,7 +134,7 @@ class FCController extends Controller
         $datareq = FCHelper::AESDecode((string)$request->Params);
         $data = json_decode($datareq,TRUE);
         //return $data;
-        $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"]);
+        $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
         if($client_details){
             $rollbackchecker = Helper::checkGameTransaction($data["BankID"]);
             if(!$rollbackchecker){
@@ -146,43 +146,52 @@ class FCController extends Controller
                     ->header('Content-Type', 'application/json');
             }
             else{
-                $game_transaction = FCHelper::checkGameTransaction($data["BankID"]);
-                $refund_amount = empty($game_transaction) ? 0 : $game_transaction->amount;
-                $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
-                $win = 0;
-                $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
-                $json_data = array(
-                    "transid" => $data["BankID"],
-                    "amount" => round($refund_amount,2),
-                    "roundid" => 0,
-                );
-                $game = FCHelper::getGameTransaction($client_details->player_token,$data["BankID"]);
-                
-                if(!$game){
-                    $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
-                }
-                else{
-                    $gameupdate = Helper::updateGameTransaction($game,$json_data,"refund");
-                    $gametransactionid = $game->game_trans_id;
-
-                }
-                if(!empty($game_transaction)){
-                    $data["RecordID"]= $game_transaction->round_id;
-                    $data["Win"] = $refund_amount;
-                    $transactionId=FCHelper::createFCGameTransactionExt($gametransactionid,$data,null,null,null,3);
-                }
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
-                $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-                
-                if(isset($client_response->fundtransferresponse->status->code) 
-                && $client_response->fundtransferresponse->status->code == "200"){
+                $duplicatechecker = Helper::checkGameTransactionupdate($data["BankID"],3);
+                if(!$duplicatechecker){
                     $response =array(
-                        "Result"=>0,
-                        "MainPoints" => $balance,
+                        "Result"=>205,
+                        "ErrorText" => "Duplicate Transaction ID number",
                     );
-                    FCHelper::updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
+                }else{
+                    $game_transaction = FCHelper::checkGameTransaction($data["BankID"]);
+                    $refund_amount = empty($game_transaction) ? 0 : $game_transaction->amount;
+                    $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
+                    $win = 0;
+                    $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+                    $json_data = array(
+                        "transid" => $data["BankID"],
+                        "amount" => round($refund_amount,2),
+                        "roundid" => 0,
+                    );
+                    $game = FCHelper::getGameTransaction($client_details->player_token,$data["BankID"]);
+                    if(!$game){
+                        $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
+                    }
+                    else{
+                        $gameupdate = Helper::updateGameTransaction($game,$json_data,"refund");
+                        $gametransactionid = $game->game_trans_id;
+
+                    }
+                    if(!empty($game_transaction)){
+                        $data["RecordID"]= $game_transaction->round_id;
+                        $data["Win"] = $refund_amount;
+                        $transactionId=FCHelper::createFCGameTransactionExt($gametransactionid,$data,null,null,null,3);
+                    }
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
+                    $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                    
+                    if(isset($client_response->fundtransferresponse->status->code) 
+                    && $client_response->fundtransferresponse->status->code == "200"){
+                        $response =array(
+                            "Result"=>0,
+                            "MainPoints" => $balance,
+                        );
+                        FCHelper::updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+                        return response($response,200)
+                            ->header('Content-Type', 'application/json');
+                    }
                 }
             }
         }
@@ -198,7 +207,7 @@ class FCController extends Controller
     public function getBalance(Request $request){
         if($request->has("Params")){
             $datareq = FCHelper::AESDecode((string)$request->Params);
-            $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"]);
+            $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
             if($client_details){
                 $client = new Client([
                     'headers' => [ 
@@ -248,30 +257,30 @@ class FCController extends Controller
     }
     private function _getClientDetails($type = "", $value = "") {
 
-		$query = DB::table("clients AS c")
-				 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
-				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
-				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
-				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-				 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
-				 
-				if ($type == 'token') {
-					$query->where([
-				 		["pst.player_token", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	]);
-				}
+        $query = DB::table("clients AS c")
+                 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
+                 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
+                 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
+                 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
+                 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
+                 
+                if ($type == 'token') {
+                    $query->where([
+                        ["pst.player_token", "=", $value],
+                        ["pst.status_id", "=", 1]
+                    ]);
+                }
 
-				if ($type == 'player_id') {
-					$query->where([
-				 		["p.player_id", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	])->orderBy('pst.token_id','desc')->limit(1);
-				}
+                if ($type == 'player_id') {
+                    $query->where([
+                        ["p.player_id", "=", $value],
+                        ["pst.status_id", "=", 1]
+                    ])->orderBy('pst.token_id','desc')->limit(1);
+                }
 
-				 $result= $query->first();
+                 $result= $query->first();
 
-		return $result;
+        return $result;
     }
 
 }
