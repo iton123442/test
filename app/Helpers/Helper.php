@@ -105,7 +105,7 @@ class Helper
 						"request_data" => json_encode(json_decode($request_data)),
 						"response_data" => json_encode($response_data)
 					];
-			DB::table('seamless_request_logs')->insert($data);
+			return DB::table('seamless_request_logs')->insertGetId($data);
 	}
 
 	public static function saveClientLog($method, $provider_id = 0, $sent_data, $response_data) {
@@ -280,15 +280,18 @@ class Helper
 	}
 	public static function checkGameTransaction($provider_transaction_id,$round_id=false,$type=false){
 		if($type&&$round_id){
-			$game = DB::table('game_transaction_ext')
-				->where('provider_trans_id',$provider_transaction_id)
-				->where('round_id',$round_id)
-				->where('game_transaction_type',$type)
-				->first();
+			// $game = DB::table('game_transaction_ext')
+			// 	->where('provider_trans_id',$provider_transaction_id)
+			// 	->where('round_id',$round_id)
+			// 	->where('game_transaction_type',$type)
+			// 	->first();
+			$game = DB::select("SELECT game_transaction_type
+								FROM game_transaction_ext
+								WHERE round_id = '".$round_id."' AND provider_trans_id='".$provider_transaction_id."' AND game_transaction_type = ".$type."");
 		}
 		else{
 			$game = DB::select("SELECT game_trans_ext_id
-			FROM wt_mw_db_production.game_transaction_ext
+			FROM game_transaction_ext
 			where provider_trans_id='".$provider_transaction_id."' limit 1");
 		}
 		return $game ? true :false;
@@ -301,7 +304,7 @@ class Helper
 	}
 	public static function checkGameTransactionupdate($round_id=false,$type=false){
 			$game = DB::select("SELECT game_trans_ext_id
-			FROM wt_mw_db_production.game_transaction_ext
+			FROM game_transaction_ext
 			where provider_trans_id='".$round_id."' and game_transaction_type = ".$type." limit 1");
 		return $game ? true :false;
 	}
