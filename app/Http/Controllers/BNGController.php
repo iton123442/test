@@ -8,10 +8,16 @@ use GuzzleHttp\Client;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
+use App\Helpers\TransactionHelper;
 use DB;
 class BNGController extends Controller
 {
     //
+    protected $startTime;
+
+    public function __construct() {
+        $this->startTime = microtime(true);
+    }
     public function index(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         if($data["name"]== "login"){
@@ -19,23 +25,65 @@ class BNGController extends Controller
         }
         elseif($data["name"]== "transaction"){
             if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
-                $game_transaction = Helper::checkGameTransactionData($data["uid"]);
+                $game_transaction = TransactionHelper::checkGameTransactionData($data["uid"]);
                 if(!empty($game_transaction)){
-                    $response = json_decode($game_transaction->mw_response,TRUE);
+                    $response = json_decode($game_transaction[0]->mw_response,TRUE);
                     Helper::saveLog('betAlreadyExist(BNG)', 12, json_encode($data), $response);
+                    Helper::saveLog('responseTime(BNG)', 12, json_encode(["stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
                 else{
-                    $this->_betGame($data);
-                    return $this->_winGame($data);
+                    $bet_response = $this->_betGame($data);
+                    if($bet_response){
+                        if(array_key_exists("error",$bet_response)){
+                        Helper::saveLog('responseTime(BNG)', 12, json_encode(["stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                        return response($bet_response,200)
+                        ->header('Content-Type', 'application/json');
+                        }
+                        else{
+                            Helper::saveLog('responseTime(BNG)', 12, json_encode(["stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                            return $this->_winGame($data);
+                        }
+                    }
+                    else{
+                        $msg = array(
+                            "uid" => $data["uid"],
+                            "error"=>array(
+                                "code" => "INVALID_TOKEN"
+                            ),
+                        );
+                        return response($msg,200)->header('Content-Type', 'application/json');
+                    }
                 }
             }
             elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
+                Helper::saveLog('responseTime(BNG)', 12, json_encode(["stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                 return $this->_winGame($data);
             }
             elseif($data["args"]["bet"]!= null && $data["args"]["win"]== null){
-                return $this->_betGame($data);
+                    $bet_response = $this->_betGame($data);
+                    if($bet_response){
+                        if(array_key_exists("error",$bet_response)){
+                            Helper::saveLog('responseTime(BNG)', 12, json_encode(["stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                            return response($bet_response,200)
+                            ->header('Content-Type', 'application/json');
+                        }
+                        else{
+                            Helper::saveLog('responseTime(BNG)', 12, json_encode(["stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                            return response($bet_response,200)
+                            ->header('Content-Type', 'application/json');
+                        }
+                    }
+                    else{
+                        $msg = array(
+                            "uid" => $data["uid"],
+                            "error"=>array(
+                                "code" => "INVALID_TOKEN"
+                            ),
+                        );
+                        return response($msg,200)->header('Content-Type', 'application/json');
+                    }
             }
             //return $this->_betGame($data);
         }
@@ -201,22 +249,6 @@ class BNGController extends Controller
         if($data["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
             if($client_details){
-                if(Helper::getBalance($client_details) < round($data["args"]["bet"],2)){ 
-                    $response =array(
-                        "uid"=>$data["uid"],
-                        "balance" => array(
-                            "value" =>number_format(Helper::getBalance($client_details),2,'.', ''),
-                            "version" => $this->_getExtParameter()
-                        ),
-                        "error" => array(
-                            "code"=> "FUNDS_EXCEED",
-                        )
-                    );
-                    $this->_setExtParameter($this->_getExtParameter()+1);
-                    Helper::saveLog('betGameInsuficientN(BNG)', 12, json_encode($data), $response);
-                    return response($response,200)
-                        ->header('Content-Type', 'application/json');
-                }
                 $game_transaction = Helper::checkGameTransaction($data["uid"]);
                 $bet_amount = $game_transaction ? 0 : round($data["args"]["bet"],2);
                 $bet_amount = $bet_amount < 0 ? 0 :$bet_amount;
@@ -226,12 +258,12 @@ class BNGController extends Controller
                     "amount" => round($data["args"]["bet"],2),
                     "roundid" => $data["args"]["round_id"]
                 );
-                $game = Helper::getGameTransaction($data['token'],$data["args"]["round_id"]);
+                $game = TransactionHelper::getGameTransaction($data['token'],$data["args"]["round_id"]);
                 if(!$game){
                     $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
                 }
                 else{
-                    $gametransactionid= $game->game_trans_id;
+                    $gametransactionid= $game[0]->game_trans_id;
                 }
                 $this->_setExtParameter($this->_getExtParameter()+1);
                 if(!$game_transaction){
@@ -249,37 +281,10 @@ class BNGController extends Controller
                         ),
                     );
                     Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
-                    return response($response,200)
-                        ->header('Content-Type', 'application/json');
+                    return $response;
                 }
                 elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
-                    $response =array(
-                        "data" => array(
-                            "statusCode"=>2,
-                            "username" => $client_details->username,
-                            "balance" =>$balance,
-                        ),
-                        "error" => array(
-                            "title"=> "Not Enough Balance",
-                            "description"=>"Not Enough Balance"
-                        )
-                    ); 
-                    Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($data), $response);
-                    return response($response,400)
-                    ->header('Content-Type', 'application/json');
-                }
-                
-
-            }
-        } 
-    }
-    private function _winGame($data){
-        //return $data["args"]["win"];
-        if($data["token"]){
-            $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
-            if($client_details){
-                if(Helper::getBalance($client_details) < round($data["args"]["bet"],2)){ 
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
@@ -292,9 +297,18 @@ class BNGController extends Controller
                     );
                     $this->_setExtParameter($this->_getExtParameter()+1);
                     Helper::saveLog('betGameInsuficientN(BNG)', 12, json_encode($data), $response);
-                    return response($response,200)
-                        ->header('Content-Type', 'application/json');
+                    return $response;
                 }
+                
+
+            }
+        } 
+    }
+    private function _winGame($data){
+        //return $data["args"]["win"];
+        if($data["token"]){
+            $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+            if($client_details){
                 //$game_transaction = Helper::checkGameTransaction($json["transactionId"]);
                 $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],2);
                 $win_amount = $game_transaction ? 0 : round($data["args"]["win"],2);
@@ -308,18 +322,18 @@ class BNGController extends Controller
                     "payout_reason" => null,
                     "win" => $win,
                 );
-                $game = Helper::getGameTransaction($data["token"],$data["args"]["round_id"]);
+                $game = TransactionHelper::getGameTransaction($data["token"],$data["args"]["round_id"]);
                 if(!$game){
                     $gametransactionid=Helper::createGameTransaction('credit', $json_data, $game_details, $client_details); 
                 }
                 else{
-                    $json_data["amount"] = round($data["args"]["win"],2)+ $game->pay_amount;
+                    $json_data["amount"] = round($data["args"]["win"],2)+ $game[0]->pay_amount;
                     if($win == 0){
-                        $gameupdate = Helper::updateGameTransaction($game,$json_data,"debit");
+                        $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"debit");
                     }else{
-                        $gameupdate = Helper::updateGameTransaction($game,$json_data,"credit");
+                        $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"credit");
                     }
-                    $gametransactionid = $game->game_trans_id;
+                    $gametransactionid = $game[0]->game_trans_id;
                 }
                 $this->_setExtParameter($this->_getExtParameter()+1);
                 if(!$game_transaction){
@@ -375,13 +389,13 @@ class BNGController extends Controller
                     "amount" => round($refund_amount,2),
                     "roundid" => $data["args"]["round_id"],
                 );
-                $game = Helper::getGameTransaction($data["token"],$data["args"]["round_id"]);
+                $game = TransactionHelper::getGameTransaction($data["token"],$data["args"]["round_id"]);
                 if(!$game){
                     $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
                 }
                 else{
-                    $gameupdate = Helper::updateGameTransaction($game,$json_data,"refund");
-                    $gametransactionid = $game->game_trans_id;
+                    $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"refund");
+                    $gametransactionid = $game[0]->game_trans_id;
                 }
                 $this->_setExtParameter($this->_getExtParameter()+1);
                 if(!$game_transaction){
