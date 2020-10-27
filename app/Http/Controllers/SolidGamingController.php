@@ -417,6 +417,12 @@ class SolidGamingController extends Controller
 			/*$player_details = PlayerHelper::getPlayerDetails($json_data['playerid']);*/
 
 			if ($client_details/* && $player_details != NULL*/) {
+				// If free round create round id
+				if(isset($json_data['payoutreason'])) {
+					if($json_data['payoutreason'] == 'FREEROUND_WIN') {
+						GameRound::create($json_data['roundid'], $client_details->token_id);
+					}
+				}
 
 				// Check if the game is available for the client
 				/*$subscription = new GameSubscription();
@@ -444,7 +450,15 @@ class SolidGamingController extends Controller
 
 						$json_data['income'] = $json_data["amount"];
 
-						$game_transaction_id = GameTransaction::update('credit', $json_data, $game_details, $client_details, $client_details);
+						if(isset($json_data['payoutreason'])) {
+							if($json_data['payoutreason'] == 'FREEROUND_WIN') {
+								$game_transaction_id = GameTransaction::save('credit', $json_data, $game_details, $client_details, $client_details);;
+							}
+						}
+						else
+						{
+							$game_transaction_id = GameTransaction::update('credit', $json_data, $game_details, $client_details, $client_details);
+						}
 
 						$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transid'], $json_data['roundid'], $json_data['amount'], 2);
 
@@ -884,19 +898,32 @@ class SolidGamingController extends Controller
 
 	private function _isIdempotent($transaction_id, $is_rollback = false) {
 		$result = false;
-		$query = DB::table('game_transaction_ext')
-								->where('provider_trans_id', $transaction_id);
+		/*$query = DB::table('game_transaction_ext')
+								->select('mw_response')
+								->where('provider_trans_id', $transaction_id);*/
+
+		$query_str = "SELECT mw_response FROM game_transaction_ext WHERE provider_trans_id = '".$transaction_id."' AND mw_response NOT LIKE '%FAILED%' LIMIT 1" ;
+		
 		if ($is_rollback == true) {
+			$query_str = "SELECT mw_response FROM game_transaction_ext WHERE provider_trans_id = '".$transaction_id."' AND game_transaction_type = 3 AND mw_response NOT LIKE '%FAILED%' LIMIT 1" ;
+		}
+
+
+         $transaction_exist = DB::select($query_str);
+
+		/*if ($is_rollback == true) {
 					$query->where([
 				 		["game_transaction_type", "=", 3],
 				 		["mw_response", "NOT LIKE", "%FAILED%"]
 				 	]);
 				}
 
-		$transaction_exist = $query->first();
+		$query->limit(1);
+
+		$transaction_exist = $query->first();*/
 
 		if($transaction_exist) {
-			$result = $transaction_exist;
+			$result = $transaction_exist[0];
 		}
 
 		return $result;								
