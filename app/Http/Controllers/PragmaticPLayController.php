@@ -133,7 +133,6 @@ class PragmaticPLayController extends Controller
         $hash = $this->hashParam($dataSort);
         
         // $hash = md5('amount='.$data->amount.'&gameId='.$data->gameId.'&providerId='.$data->providerId.'&reference='.$data->reference.'&roundDetails='.$data->roundDetails.'&roundId='.$data->roundId.'&timestamp='.$data->timestamp.'&userId='.$data->userId.$this->key);
-        
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
@@ -149,7 +148,6 @@ class PragmaticPLayController extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $data->gameId);
-
    
 
         $tokenId = $client_details->token_id;
@@ -173,8 +171,9 @@ class PragmaticPLayController extends Controller
             Helper::saveLog('PP bet not enough balance', $this->provider_id,json_encode($data) , $response);
             return $response;
         }
-
-        $checkGameTrans = DB::table('game_transactions')->where("round_id","=",$data->roundId)->where('provider_trans_id','=',$data->reference)->get();
+       
+        $checkGameTrans = DB::select("SELECT game_trans_id FROM game_transactions WHERE provider_trans_id = '".$data->reference."' AND round_id = '".$data->roundId."' ");
+        // $checkGameTrans = DB::table('game_transactions')->select('game_trans_id')->where('provider_trans_id','=',$data->reference)->where("round_id","=",$data->roundId)->get();
         if(count($checkGameTrans) > 0){
 
             $response = array(
@@ -191,9 +190,11 @@ class PragmaticPLayController extends Controller
             return $response;
         }
         
-        $checkDoubleBet = DB::table('game_transactions')->where("round_id","=",$data->roundId)->get();
+        // $checkDoubleBet = DB::table('game_transactions')->select('game_trans_id')->where("round_id","=",$data->roundId)->get();
+        $checkDoubleBet = DB::select("SELECT game_trans_id FROM game_transactions WHERE round_id = '".$data->roundId."' ");
         if(count($checkDoubleBet) > 0){
-            $checkDuplicate = DB::table('game_transaction_ext')->where("round_id","=",$data->roundId)->where('provider_trans_id','=',$data->reference)->get();
+            // $checkDuplicate = DB::table('game_transaction_ext')->where("round_id","=",$data->roundId)->where('provider_trans_id','=',$data->reference)->get();
+            $checkDuplicate = DB::select("SELECT game_transaction_type FROM game_transaction_ext WHERE provider_trans_id = '".$data->reference."' ");
             if(count($checkDuplicate) > 0){
                 return "not here?";
                 $response = array(
@@ -324,7 +325,8 @@ class PragmaticPLayController extends Controller
         //     return $response;
         // }
         
-        $checkGameTrans = DB::table('game_transactions')->where("round_id","=",$data->roundId)->get();
+        $checkGameTrans = DB::select("SELECT game_trans_id FROM game_transactions WHERE round_id = '".$data->roundId."' ");
+        // $checkGameTrans = DB::table('game_transactions')->select('game_trans_id')->where("round_id","=",$data->roundId)->get();
 
         $playerId = ProviderHelper::explodeUsername('_',$data->userId);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
@@ -344,7 +346,9 @@ class PragmaticPLayController extends Controller
             
             return $response_log;
         }
-        $game_trans = DB::table('game_transactions')->where("round_id","=",$data->roundId)->get();
+        // $game_trans = DB::table('game_transactions')->select('game_trans_id','bet_amount')->where("round_id","=",$data->roundId)->get();
+        $game_trans = DB::select("SELECT game_trans_id, bet_amount FROM game_transactions WHERE round_id = '".$data->roundId."' ");
+        
         
         $token_id = $client_details->token_id;
         $game_id = $game_details->game_id;
@@ -538,7 +542,7 @@ class PragmaticPLayController extends Controller
              "gamesBalances" => $response
         );
 
-        Helper::saveLog('PP getBalancePerGame response', $this->provider_id, json_encode($data) ,$response);
+        // Helper::saveLog('PP getBalancePerGame response', $this->provider_id, json_encode($data) ,$response);
         // return $game_bal;
 
         // $response = [
@@ -604,7 +608,7 @@ class PragmaticPLayController extends Controller
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);
         }
 
-        $game_trans = DB::table("game_transactions")->where("round_id","=",$data->roundId)->get();
+        $game_trans = DB::table("game_transactions")->select('game_trans_id','game_id','bet_amount','win')->where("round_id","=",$data->roundId)->get();
 
         // return count($game_trans);
         if(count($game_trans) > 0){
@@ -919,7 +923,9 @@ class PragmaticPLayController extends Controller
                 $i++;
             }
         }
-        return $hash = md5($param.$this->key);
+        $str = str_replace("\n","",$param.$this->key);
+        $clean = str_replace("\r","",$str);
+        return $hash = md5($clean);
     }
 
     public function checkGameTrans($round_id, $game_code){
