@@ -134,6 +134,13 @@ return [
         'iv' => '1650cbec4319180b',
         'url_lunch' => 'https://api.ilustre-analysis.net/user/lunch',
         'url_register' => 'https://api.ilustre-analysis.net/user/register',
+        'url_withdraw' => 'https://api.ilustre-analysis.net/user/withdraw',
+        'url_deposit' => 'https://api.ilustre-analysis.net/user/deposit',
+        'url_balance' => 'https://api.ilustre-analysis.net/user/balance',
+        'url_wager' => 'https://api.ilustre-analysis.net/user/getproject',
+        'url_hotgames' => 'https://api.ilustre-analysis.net/user/gethotgame',
+        'url_orders' => 'https://api.ilustre-analysis.net/user/searchprders',
+        'url_activity_logs' => 'https://api.ilustre-analysis.net/user/searchprders',
     ],
     'tidygaming' => [
         'url_lunch' => 'https://asia.h93r.com/api/game/outside/link',
