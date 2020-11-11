@@ -77,24 +77,43 @@ return [
             'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
         ],
     ],
+    // 'aws' => [
+    //     'api_url' => 'https://papi.awsxpartner.com/b2b/',
+    //     '1'=> [ // Tiger Games USD // Production
+    //         'merchant_id' => 'TG',
+    //         'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
+    //     ], 
+    //     '2' => [ // XIGOLO USD
+    //         'merchant_id' => 'XIGOLO',
+    //         'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
+    //     ],
+    //     '3' => [ // TGC USD
+    //         'merchant_id' => 'TGC',
+    //         'merchant_key' => '129d637c1aa5d3f3c6b9ea759d04d00250c9f4be29d71f72abd189f0c8283f263e08a2a99b70663ee28dc4e025cca82a0b955e2a9fcca604c72aa9dc22cf5232',
+    //     ],
+    //     '4' => [ // ASKMEBET THB
+    //         'merchant_id' => 'ASKME',
+    //         'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+    //     ],
+    // ],
     'aws' => [
-        'api_url' => 'https://papi.awsxpartner.com/b2b/',
-        '1'=> [ // Tiger Games USD // Production
+        'api_url' => 'https://papi.awsxpartner.com/b2b',
+        '1USD'=> [ // 
             'merchant_id' => 'TG',
             'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
         ], 
-        '2' => [ // XIGOLO USD
-            'merchant_id' => 'XIGOLO',
-            'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
-        ],
-        '3' => [ // TGC USD
-            'merchant_id' => 'TGC',
-            'merchant_key' => '129d637c1aa5d3f3c6b9ea759d04d00250c9f4be29d71f72abd189f0c8283f263e08a2a99b70663ee28dc4e025cca82a0b955e2a9fcca604c72aa9dc22cf5232',
-        ],
-        '4' => [ // ASKMEBET THB
+        '2THB' => [ // ASK THB
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
         ],
+        '3USD' => [ // XIGOLO USD
+            'merchant_id' => 'XIGOLO',
+            'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
+        ],
+        '4USD' => [  // ASK ME THB
+            'merchant_id' => 'TGC',
+            'merchant_key' => '129d637c1aa5d3f3c6b9ea759d04d00250c9f4be29d71f72abd189f0c8283f263e08a2a99b70663ee28dc4e025cca82a0b955e2a9fcca604c72aa9dc22cf5232',
+        ]
     ],
     'cqgames' => [
         "prefix" => "TG",
