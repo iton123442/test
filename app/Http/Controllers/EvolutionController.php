@@ -152,7 +152,7 @@ class EvolutionController extends Controller
                             "uuid"=>$data["uuid"],
                         );
                         Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                        Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
+                        //Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                         return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
@@ -246,7 +246,7 @@ class EvolutionController extends Controller
                             "uuid"=>$data["uuid"],
                         );
                         Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                        Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"creditproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
+                        //Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"creditproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                         return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
@@ -326,7 +326,7 @@ class EvolutionController extends Controller
                                 "uuid"=>$data["uuid"],
                             );
                             Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                            Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"creditproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
+                            //Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"creditproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                             return response($msg,200)
                                 ->header('Content-Type', 'application/json');
                         }
@@ -356,7 +356,7 @@ class EvolutionController extends Controller
     public function internalrefund(Request $request){
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
-            Helper::saveLog('cancelrequest(EVG)', 50, json_encode($data), "cancel");
+            //Helper::saveLog('cancelrequest(EVG)', 50, json_encode($data), "cancel");
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
             if($client_details){
                 $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"],$data["transaction"]["refId"],3);
