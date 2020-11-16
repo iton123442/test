@@ -56,6 +56,7 @@ class FCController extends Controller
         
     }
     private function _betGame($client_details,$data){
+        $startTime = microtime(true);
         if($client_details){
             $game_transaction = $this->checkGameTransaction($data["BankID"]);
             $bet_amount = $game_transaction ? 0 : round($data["Bet"],2);
@@ -96,7 +97,7 @@ class FCController extends Controller
                 $updateFCGameTransactionExtinit =  microtime(true);
                 $this->updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
                 $endupdateFCGameTransaction = microtime(true) - $updateFCGameTransactionExtinit;
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"betsuccess","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time,"getgameTransaction"=>$endgetGameTransaction,"findgamedetails" =>$endfindGameDetailsinit,"creategameTransaction" => $endcreateGameTransaction,"updategametransaction"=>$endupdateFCGameTransaction]);
+                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"betsuccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=>microtime(true) - $startTime-$client_response_time,"clientresponse"=>$client_response_time,"getgameTransaction"=>$endgetGameTransaction,"findgamedetails" =>$endfindGameDetailsinit,"creategameTransaction" => $endcreateGameTransaction,"updategametransaction"=>$endupdateFCGameTransaction]);
                 return $response;
             }
             elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -105,12 +106,13 @@ class FCController extends Controller
                         "Result"=>203,
                         "ErrorText"=> "Your Cash Balance not enough."
                     );
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"betinsuficient","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
+                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"betinsuficient","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"clientresponse"=>$client_response_time]);
                 return $response;
             }
         }
     }
     private function _winGame($client_details,$data){
+        $startTime = microtime(true);
         if($client_details){
             $checkGameTransactioninit =  microtime(true);
             $game_transaction = $this->checkGameTransaction($data["BankID"],$data["RecordID"],2);
@@ -161,17 +163,18 @@ class FCController extends Controller
                 $updateFCGameTransactionExtinit =  microtime(true);
                 $this->updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
                 $endupdateFCGameTransaction = microtime(true) - $updateFCGameTransactionExtinit;
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"winsuccess","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time,"checkGameTransaction"=>$endcheckGameTransaction,"findgamedetails" =>$endfindGameDetailsinit,"getGameTransaction"=>$endgetGameTransaction,"updateGameTransaction"=>$endupdateGameTransaction,"udpateGamtransactionExt"=>$endupdateFCGameTransaction]);
+                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"winsuccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=>microtime(true) - $startTime-$client_response_time,"clientresponse"=>$client_response_time,"checkGameTransaction"=>$endcheckGameTransaction,"findgamedetails" =>$endfindGameDetailsinit,"getGameTransaction"=>$endgetGameTransaction,"updateGameTransaction"=>$endupdateGameTransaction,"udpateGamtransactionExt"=>$endupdateFCGameTransaction]);
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
             }
             else{
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"winerror","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
+                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"winerror","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"clientresponse"=>$client_response_time]);
                 return "something error with the client";
             }
         }
     }
     public function cancelBet(Request $request){
+        $startTime = microtime(true);
         $datareq = FCHelper::AESDecode((string)$request->Params);
         $data = json_decode($datareq,TRUE);
         //return $data;
@@ -183,7 +186,7 @@ class FCController extends Controller
                     "Result"=>221,
                     "ErrorText" => "BankID does not exist.",
                 );
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"refundBankIdnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"refundBankIdnotexist","stating"=>$startTime,"response"=>microtime(true)]), microtime(true) - $startTime);
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
             }
@@ -194,7 +197,7 @@ class FCController extends Controller
                         "Result"=>205,
                         "ErrorText" => "Duplicate Transaction ID number",
                     );
-                    Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"refundduplicate","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                    Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"refundduplicate","stating"=>$startTime,"response"=>microtime(true)]), microtime(true) - $startTime);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }else{
@@ -234,7 +237,7 @@ class FCController extends Controller
                             "MainPoints" => $balance,
                         );
                         $this->updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
-                        Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"refundsuccess","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
+                        Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"refundsuccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"clientresponse"=>$client_response_time]);
                         return response($response,200)
                             ->header('Content-Type', 'application/json');
                     }
