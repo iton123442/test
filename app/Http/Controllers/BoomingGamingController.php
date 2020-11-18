@@ -13,11 +13,12 @@ use DB;
 
 
 class BoomingGamingController extends Controller
-{
+{ 
+    
 
     public function __construct(){
-        $this->api_key = config('providerlinks.booming.api_key');
-        $this->api_secret = config('providerlinks.booming.api_secret');
+    	$this->api_key = config('providerlinks.booming.api_key');
+    	$this->api_secret = config('providerlinks.booming.api_secret');
         $this->api_url = config('providerlinks.booming.api_url');
         $this->provider_db_id = config('providerlinks.booming.provider_db_id');
     }
@@ -148,14 +149,14 @@ class BoomingGamingController extends Controller
                 return json_encode($msg, JSON_FORCE_OBJECT); 
             }
 
-        }else{
+		}else{
             $errormessage = array(
                 'error' => '2012',
                 'message' => 'Invalid Player ID'
             );
             Helper::saveLog('Booming Callback error', $this->provider_db_id, json_encode($request->all(), JSON_FORCE_OBJECT),  $errormessage);
             return json_encode($errormessage, JSON_FORCE_OBJECT); 
-        }
+		}
         
     }
 
@@ -266,61 +267,61 @@ class BoomingGamingController extends Controller
     }
 
     public static function creteBoomingtransaction($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response, $game_transaction_type, $amount=null, $provider_trans_id=null, $round_id=null){
-        $gametransactionext = array(
-            "game_trans_id" => $gametransaction_id,
-            "provider_trans_id" => $provider_trans_id,
-            "round_id" => $round_id,
-            "amount" => $amount,
-            "game_transaction_type"=>$game_transaction_type,
-            "provider_request" => json_encode($provider_request),
-            "mw_request"=>json_encode($mw_request),
-            "mw_response" =>json_encode($mw_response),
-            "client_response" =>json_encode($client_response),
-        );
-        $gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-        return $gametransactionext;
+		$gametransactionext = array(
+			"game_trans_id" => $gametransaction_id,
+			"provider_trans_id" => $provider_trans_id,
+			"round_id" => $round_id,
+			"amount" => $amount,
+			"game_transaction_type"=>$game_transaction_type,
+			"provider_request" => json_encode($provider_request),
+			"mw_request"=>json_encode($mw_request),
+			"mw_response" =>json_encode($mw_response),
+			"client_response" =>json_encode($client_response),
+		);
+		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
+		return $gametransactionext;
     }
 
     public  static function findGameExt($provider_identifier,$round, $game_transaction_type, $type) {
-        $transaction_db = DB::table('game_transaction_ext as gte');
+		$transaction_db = DB::table('game_transaction_ext as gte');
         if ($type == 'transaction_id') {
-            $transaction_db->where([
+			$transaction_db->where([
                 ["gte.provider_trans_id", "=", $provider_identifier],
                 ["gte.round_id", "=", $round],
-                ["gte.game_transaction_type", "=", $game_transaction_type],
-            ]);
-        }
-        $result = $transaction_db->latest()->first(); // Added Latest (CQ9) 08-12-20 - Al
-        return $result ? $result : 'false';
+		 		["gte.game_transaction_type", "=", $game_transaction_type],
+		 	]);
+		}
+		$result = $transaction_db->latest()->first(); // Added Latest (CQ9) 08-12-20 - Al
+		return $result ? $result : 'false';
     }
 
 
     //update 2020/09/21
     public static function createGameTransExt($game_trans_id, $provider_trans_id, $round_id, $amount, $game_type, $provider_request, $mw_response, $mw_request, $client_response, $transaction_detail){
-        $gametransactionext = array(
-            "game_trans_id" => $game_trans_id,
-            "provider_trans_id" => $provider_trans_id,
-            "round_id" => $round_id,
-            "amount" => $amount,
-            "game_transaction_type"=>$game_type,
-            "provider_request" => json_encode($provider_request),
-            "mw_response" =>json_encode($mw_response),
-            "mw_request"=>json_encode($mw_request),
-            "client_response" =>json_encode($client_response),
-            "transaction_detail" =>json_encode($transaction_detail)
-        );
-        $gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-        return $gamestransaction_ext_ID;
+		$gametransactionext = array(
+			"game_trans_id" => $game_trans_id,
+			"provider_trans_id" => $provider_trans_id,
+			"round_id" => $round_id,
+			"amount" => $amount,
+			"game_transaction_type"=>$game_type,
+			"provider_request" => json_encode($provider_request),
+			"mw_response" =>json_encode($mw_response),
+			"mw_request"=>json_encode($mw_request),
+			"client_response" =>json_encode($client_response),
+			"transaction_detail" =>json_encode($transaction_detail)
+		);
+		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
+		return $gamestransaction_ext_ID;
     }
     
     public static function updateGameTransactionExt($gametransextid,$mw_request,$mw_response,$client_response){
-        $gametransactionext = array(
-            "mw_request"=>json_encode($mw_request),
-            "mw_response" =>json_encode($mw_response),
-            "client_response" =>json_encode($client_response),
-        );
-        DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
-    }
+		$gametransactionext = array(
+			"mw_request"=>json_encode($mw_request),
+			"mw_response" =>json_encode($mw_response),
+			"client_response" =>json_encode($client_response),
+		);
+		DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
+	}
 
     
     
