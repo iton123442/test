@@ -10,11 +10,13 @@ use App\Helpers\IAHelper;
 use App\Helpers\AWSHelper;
 use App\Helpers\SAHelper;
 use App\Helpers\TidyHelper;
+use App\Helpers\GoldenFHelper;
 use App\Helpers\FCHelper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\MGHelper;
 use App\Helpers\EVGHelper;
-
+use DOMDocument;
+use App\Services\AES;
 
 use DB;             
 use Carbon\Carbon;
@@ -81,6 +83,11 @@ class GameLobby{
         return config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign;
     }
     public static function microgamingLaunchUrl($game_code,$token,$provider,$exitUrl){
+        $client_details = ProviderHelper::getClientDetails('token', $token);
+        Helper::savePLayerGameRound($game_code,$token,$provider);
+        $url = MGHelper::launchGame($token,$client_details->player_id,$game_code);
+        return $url;
+    }public static function upgLaunchUrl($game_code,$token,$provider,$exitUrl){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $url = MGHelper::launchGame($token,$client_details->player_id,$game_code);
@@ -170,7 +177,6 @@ class GameLobby{
           "settings" =>  [
             'user_id'=> $client_player_details->player_id,
             'language'=> $client_player_details->language ? $client_player_details->language : 'en',
-            'https'=>1
           ],
           "denomination" => '1', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
@@ -363,7 +369,7 @@ class GameLobby{
             }
 
             if(isset($login_token['Token'])){
-                $url = 'https://tgg.sa-apix.net/app.aspx?username='.config('providerlinks.sagaming.prefix').$client_details->player_id.'&token='.$login_token['Token'].'&lobby='.config('providerlinks.sagaming.lobby').'&lang='.$lang.'&returnurl='.$url.'';
+                $url = 'https://www.sai.slgaming.net/app.aspx?username='.config('providerlinks.sagaming.prefix').$client_details->player_id.'&token='.$login_token['Token'].'&lobby='.config('providerlinks.sagaming.lobby').'&lang='.$lang.'&returnurl='.$url.'';
                 return $url;
             }else{
                 return false;
@@ -376,28 +382,39 @@ class GameLobby{
     }
 
      public static function tidylaunchUrl( $game_code = null, $token = null){
-        $url = config('providerlinks.tidygaming.url_lunch');
-        $client_details = Providerhelper::getClientDetails('token', $token);
-        $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
-        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
-        $requesttosend = [
-            'client_id' =>  config('providerlinks.tidygaming.client_id'),
-            'game_id' => $game_code,
-            'username' => $client_details->username,
-            'token' => $token,
-            'uid' => 'TG_'.$client_details->player_id,
-            'currency' => $get_code_currency
-        ];
-        $client = new Client([
-            'headers' => [ 
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer '.TidyHelper::generateToken($requesttosend)
-            ]
-        ]);
-        $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
-        );
-        $client_response = json_decode($guzzle_response->getBody()->getContents());
-        return $client_response->link;
+        Helper::saveLog('Tidy Gameluanch', 23, "", "");
+        try{
+            $url = config('providerlinks.tidygaming.url_lunch');
+            $client_details = Providerhelper::getClientDetails('token', $token);
+            $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
+            $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+            $requesttosend = [
+                'client_id' =>  config('providerlinks.tidygaming.client_id'),
+                'game_id' => $game_code,
+                'username' => $client_details->username,
+                'token' => $token,
+                'uid' => 'TG_'.$client_details->player_id,
+                'currency' => $get_code_currency
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.TidyHelper::generateToken($requesttosend)
+                ]
+            ]);
+            $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
+            );
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            Helper::saveLog('Tidy Gameluanch 102', 23, json_encode($requesttosend), $client_response);
+            return $client_response->link;
+        }catch(\Exception $e){
+            $requesttosend = [
+                'error' => 1010
+            ];
+            Helper::saveLog('Tidy Gameluanch 101', 23, json_encode($requesttosend), $e->getMessage() );
+            return $e->getMessage();
+        }
+        
     }
 
     public static function tgglaunchUrl( $game_code = null, $token = null){
@@ -487,7 +504,6 @@ class GameLobby{
             // Helper::saveLogCode('Booming nonce', config('providerlinks.booming.provider_db_id'), $nonce, $nonce);
             // Helper::saveLog('Booming session process', config('providerlinks.booming.provider_db_id'), json_encode($data), $client_response);
             Helper::savePLayerGameRoundBooming($data["game_code"],$data["token"],$provider_name);
-
             return $client_response;
 
         }catch(\Exception $e){
@@ -503,7 +519,7 @@ class GameLobby{
     public static function spadeLaunch($game_code,$token,$exitUrl,$lang='en_US'){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         $domain =  $exitUrl;
-        $url = 'https://lobby.silverkirinplay.com/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
+        $url = 'https://lobby-egame-staging.sgplay.net/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
         return $url;
     }
     
@@ -584,39 +600,40 @@ class GameLobby{
         $stylename = config('providerlinks.tpp.secureLogin');
         $key = config('providerlinks.tpp.secret_key');
         $gameluanch_url = config('providerlinks.tpp.gamelaunch_url');
+        $casinoId = config('providerlinks.tpp.casinoId');
+        $wsUri = config('providerlinks.tpp.wsUri');
 
         $client_details = Providerhelper::getClientDetails('token', $token);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
-        
+        // $game_details = DB::select("SELECT * FROM games WHERE provider_id = '26' AND game_code = '".$game_code."' order by created  ");
+        $game_details = DB::table('games')->where('provider_id','=',26)->where('game_code','=',$game_code)->orderBy('created_at','desc')->first();
+        // $game_details = Helper::findGameDetails('game_code', 26, $game_code);
+
         $userid = "TGaming_".$client_details->player_id;
         $currency = $client_details->default_currency;
         $hashCreatePlayer = md5('currency='.$currency.'&externalPlayerId='.$userid.'&secureLogin='.$stylename.$key);
-        
-
-        // $createPlayer = "https://api.prerelease-env.biz/IntegrationService/v3/http/CasinoGameAPI/player/account/create/?secureLogin=$stylename&externalPlayerId=$userid&currency=$currency&hash=$hashCreatePlayer";
-        // $createP = file_get_contents($createPlayer);
-        // $createP = json_encode($createP);
-        // $createP = json_decode(json_decode($createP));
-
-        
-
-        // $hashCurrentBalance =  md5("externalPlayerId=".$userid."&secureLogin=".$stylename.$key);
-        // $currentBalance = "https://api.prerelease-env.biz/IntegrationService/v3/http/CasinoGameAPI/balance/current/?externalPlayerId=$userid&secureLogin=$stylename&hash=$hashCurrentBalance";
 
         $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
         $url = "$gameluanch_url?key=$paramEncoded&stylename=$stylename";
-        // $result = file_get_contents($url);
         $result = json_encode($url);
-        
-        // $result = json_decode(json_decode($result));
-        Helper::saveLog('start game url PP', 49, $result,"$result");
-        return $url;
 
-        // return isset($result->gameURL) ? $result->gameURL : false;
-
-        // $url = "https://tigergames-sg0.prerelease-env.biz/gs2c/playGame.do?key=$token&stylename=$stylename&symbol=$game_code&technology=H5&platform=WEB&language=en";
-        
-        // return $url;
+        $aes = new AES();
+        $data = array(
+            'url' => $url,
+            'wsUri' => $wsUri,
+            'tableId' => $game_code,
+            'casinoId' => $casinoId,
+        );
+        $encoded_data = $aes->AESencode(json_encode($data));
+        if($game_details->game_type_id == '15'){
+            Helper::saveLog('start game url PP DGA', 26, $result,"$result");
+            // return "http://play.betrnk.games:81/loadgame/pragmatic-play-dga?param=".urlencode($encoded_data);
+            $url = config("providerlinks.play_betrnk")."/loadgame/pragmatic-play-dga?param=".urlencode($encoded_data);
+            return $url;
+        }else{
+            Helper::saveLog('start game url PP', 26, $result,"$result");
+            return $url;
+        }
     }
 
     public static function yggdrasillaunchUrl($data){
@@ -641,55 +658,58 @@ class GameLobby{
     }
 
     public static function goldenFLaunchUrl($data){
+        $key = "LUGTPyr6u8sRjCfh";
+        $aes = new AES($key);
         $operator_token = config("providerlinks.goldenF.operator_token");
         $api_url = config("providerlinks.goldenF.api_url");
-        $secrete_key = config("providerlinks.goldenF.secrete_key");
+        $secret_key = config("providerlinks.goldenF.secrete_key");
         $provider_id = config("providerlinks.goldenF.provider_id");
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         $player_id = "TG_".$client_details->player_id;
-        $nickname = str_replace(' ', '_', $client_details->display_name);
-        try{
-            $url_create = $api_url ."/Player/Create?secret_key=".$secrete_key."&operator_token=".$operator_token."&player_name=".$player_id."&currency=".$client_details->default_currency;
+        $nickname = $client_details->username;
         
+        try{
             $http = new Client();
-            // TRY BOTH
-            // $response = $http->get($url_create);
-            $response = $http->post($url_create);
-            $create_player = json_decode($response->getBody()->getContents());
-            // Helper::saveLog('GoldenF Create Player response', $provider_id, json_encode($data), $response);
-            Helper::saveLog('GoldenF Create Player', $provider_id, json_encode($data), $url_create);
-            Helper::saveLog('GoldenF Create Player response', $provider_id, json_encode($data), $create_player);
-         
-            if($create_player->data->action_result == "Success"):
-                $gameluanch_url = $api_url."/Launch?secret_key=".$secrete_key."&operator_token=".$operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
+            $response = $http->post($api_url."/Player/Create",[
+               'form_params' => [
+                'secret_key' => $secret_key,
+                'operator_token' => $operator_token,
+                'player_name' => "TG_".$client_details->player_id,
+                ]
+            ]);
+            $golden_response = json_decode((string) $response->getBody(), true);
+            GoldenFHelper::saveLog('GoldenF create_player', $provider_id, json_encode($data), $golden_response);
+            if(isset($golden_response['data']['action_result']) && $golden_response['data']['action_result'] == "Success"){
+                $gameluanch_url = $api_url."/Launch?secret_key=".$secret_key."&operator_token=".$operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
 
                 $response = $http->post($gameluanch_url);
                 $get_url = json_decode($response->getBody()->getContents());
-                Helper::saveLog('GoldenF gamelaunch', $provider_id, json_encode($data), $gameluanch_url);
-                Helper::saveLog('GoldenF game url', $provider_id, json_encode($data), $get_url->data->game_url);
-                
-                $deposit = $api_url."/TransferIn?secret_key=".$secrete_key."&operator_token=".$operator_token."&player_name=".$player_id."&amount=50.00&traceId=1000";
-                $send_amt = $http->post($deposit);
-                $amount = json_decode($send_amt->getBody()->getContents());
-                Helper::saveLog('GoldenF deposit', $provider_id, json_encode($amount), $deposit); 
 
-
-                $get_bal_url = $api_url."/GetPlayerBalance?secret_key=".$secrete_key."&operator_token=".$operator_token."&player_name=".$player_id;
-                $get_bal = $http->post($get_bal_url);
-                $bal = json_decode($get_bal->getBody()->getContents());
-                Helper::saveLog('GoldenF balance', $provider_id, json_encode($bal), $get_bal_url); 
-
-
-
-                return $get_url->data->game_url;
-            endif;
+                if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
+                    GoldenFHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
+                    GoldenFHelper::saveLog('GoldenF gamelaunch', $provider_id, json_encode($data), $gameluanch_url);
+                    $data = array(
+                        "url" => urlencode($get_url->data->game_url),
+                        "token" => $client_details->player_token,
+                        "player_id" => $player_id,
+                        // "system_player_id" => $client_details->player_id,
+                        "exitUrl" => $data['exitUrl'],
+                    );
+                    $encoded_data = $aes->AESencode(json_encode($data));
+                    // return "https://play.betrnk.games/loadgame/goldenf?param=".urlencode($encoded_data);
+                    // return "http://play.betrnk.games:81/loadgame/goldenf?param=".urlencode($encoded_data);
+                    return config('providerlinks.play_betrnk')."/loadgame/goldenf?param=".urlencode($encoded_data);
+                }else{
+                    return 'false';
+                }
+            }
         }catch(\Exception $e){
             $error = [
                 'error' => $e->getMessage()
             ];
-            Helper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
-            return $error;
+            GoldenFHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
+            // return $error;
+            return 'false';
         }
     }
 
@@ -848,7 +868,7 @@ class GameLobby{
             );
 
         $auth_result = json_decode($auth_token_response->getBody()->getContents());
-        Helper::saveLog('GAMELAUNCH MANNAPLAY', 11, json_encode($auth_result), json_encode("Auth"));
+
         // Generate Game Link
         $game_link = new Client([
                 'headers' => [ 
@@ -871,7 +891,7 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
-        Helper::saveLog('GAMELAUNCH MANNAPLAY', 11, json_encode($link_result), json_encode("urllaunch"));
+
         return $link_result->url;
     }
 
@@ -885,8 +905,7 @@ class GameLobby{
 
     public static function oryxLaunchUrl($game_code,$token,$exitUrl){
         $url = $exitUrl;
-        /*$url = 'https://cdn.oryxgaming.com/badges/ORX/_P168/2019-P09.05/index.html?token='.$token.'&gameCode='.$game_code.'&languageCode=ENG&play_mode=REAL&lobbyUrl=OFF';*/
-        $url = 'https://play-prodcopy.oryxgaming.com/agg_plus_public/launch/wallets/WELLTREASURETECH/games/'.$game_code.'/open?token='.$token.'&languageCode=ENG&playMode=REAL';
+        $url = config("providerlinks.oryx.GAME_URL").$game_code.'/open?token='.$token.'&languageCode=ENG&playMode=REAL';
         return $url;
     }
 
@@ -964,6 +983,13 @@ class GameLobby{
         return $url;
     }
 
+     public static function ultraPlayLaunchUrl($game_code,$token,$exitUrl){
+        $url = $exitUrl;
+
+        $url = config("providerlinks.ultraplay.domain_url").'/UI/ExternalLogin?loginToken='.$token.'&deviceType=desktop&lang=en-US&oddformat=decimal';
+        return $url;
+    }
+
     
     
     public static function getLanguage($provider_name,$language){
@@ -1025,6 +1051,57 @@ class GameLobby{
                return false;
             }
         }else{
+            return false;
+        }
+    }
+
+
+    public static function netEntDirect($request){
+        try {
+            $client_details = Providerhelper::getClientDetails('token', $request["token"]);
+            $game_code = $request["game_code"];
+            
+            //process sessionID
+            $url = "https://".config("providerlinks.netent.casinoID")."-api-test.casinomodule.com/ws-jaxws/services/casino";
+            $game_link = new Client([
+                    'headers' => [ 
+                        'Content-Type' => 'application/json'
+                    ]
+                ]);
+            $game_link_response = $game_link->post($url, 
+                ['body' => '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:api="http://casinomodule.com/api">
+                                <soapenv:Header/>
+                                <soapenv:Body>
+                                    <api:loginUserDetailed>
+                                        <userName>TG_'.$client_details->player_id.'</userName>
+                                        <merchantId>'.config("providerlinks.netent.merchantId").'</merchantId>
+                                        <merchantPassword>'.config("providerlinks.netent.merchantPassword").'</merchantPassword>
+                                        <currencyISOCode>'.$client_details->default_currency.'</currencyISOCode>
+                                    </api:loginUserDetailed>
+                                </soapenv:Body>
+                            </soapenv:Envelope>'
+            ]);
+            $response = $game_link_response->getBody();
+            $dom = new DOMDocument;
+            $dom->loadXML($response);
+            $sessionID = $dom->getElementsByTagName('loginUserDetailedReturn')->item(0)->nodeValue;
+           
+            $staticServerURL = "https://".config("providerlinks.netent.casinoID")."-static-test.casinomodule.com";
+            $gameServerURL = "https://".config("providerlinks.netent.casinoID")."-game-test.casinomodule.com";
+            $aes = new AES();
+            $data = array(
+                "gameId" => $request["game_code"],
+                "staticServerURL" => urlencode($staticServerURL),
+                "gameServerURL" => urlencode($gameServerURL),
+                "sessionId" => $sessionID,
+                "casinoID" => config("providerlinks.netent.casinoID"),
+                "lobbyUrl" => urlencode($request["exitUrl"])
+            );
+            $encoded_data = $aes->AESencode(json_encode($data));
+            // return urlencode($encoded_data);
+            // return "http://localhost:2020/loadgame/netent_direct?param=".urlencode($encoded_data);
+            return config("providerlinks.play_betrnk")."/loadgame/netent_direct?param=".urlencode($encoded_data);
+        } catch (\Exception $e){
             return false;
         }
     }
