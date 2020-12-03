@@ -117,17 +117,17 @@ class GameLobbyController extends Controller
             // }
             
             // Filters
-            // if(ClientHelper::checkClientID($request->all()) != 200){
-            //     $log_id = Helper::saveLog('GAME LAUNCH', 99, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
-            //     $msg = array(
-            //         "error_code" => ClientHelper::checkClientID($request->all()),
-            //         "message" => ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())),
-            //         "url" => config('providerlinks.tigergames').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())).'&id='.$log_id,
-            //         "game_launch" => false
-            //     );
-            //     return response($msg,200)
-            //     ->header('Content-Type', 'application/json');
-            // }
+            if(ClientHelper::checkClientID($request->all()) != 200){
+                $log_id = Helper::saveLog('GAME LAUNCH', 99, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
+                $msg = array(
+                    // "error_code" => ClientHelper::checkClientID($request->all()),
+                    "message" => ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())),
+                    "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())).'&id='.$log_id,
+                    "game_launch" => false
+                );
+                return response($msg,200)
+                ->header('Content-Type', 'application/json');
+            }
 
            $solid_gamings = ['Solid Gaming', 'Concept', 'Espresso', 'EvoPlay', 'GameArt', 'Habanero', 'MultiSlot', 'NetEnt', 'Oryx Gaming', 'Omi Gaming', 'Push Gaming', 'Revolver Gaming', 'RTG Asia', 'TPG', '1X2 Network', 'BetSoft', 'Booming', 'Leander', 'Lotus Gaming', 'No Limit City', 'One Touch', 'Quick Fire', 'Relax', 'Wazdan', 'Yggdrasil', 'Evolution Gaming', 'Golden Hero'];
 
@@ -179,7 +179,11 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+<<<<<<< HEAD
                 elseif($request->input('game_provider')=="Wazdan Direct"){
+=======
+                elseif($provider_code==57){
+>>>>>>> 0e5e72f7 (Gamelobby Launch URL)
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::wazdanLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl),
