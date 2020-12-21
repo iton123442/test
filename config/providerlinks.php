@@ -351,6 +351,12 @@ return [
         'operator_token' => '009583d3138a9e3934787112c345ef10',
         'provider_id' => 41,
     ],
+    'netent' => [
+        'provider_db_id' => 44, //CHANGE THE PROVIDER ID THIS 45 IS FROM STAGING
+        'casinoID' => "tigergames",//casinoID
+        'merchantId' => "tigergamesws",//soap api login
+        'merchantPassword' => "G4Rvxun3BFJjULGp",//soap api login
+    ],
 ];
 
 ?>
