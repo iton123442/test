@@ -638,7 +638,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==2222){ // NEED TO CHANGE PROVIDER CODE
+                elseif($provider_code== 89){ // NEED TO CHANGE PROVIDER CODE
                     $url = GameLobby::netEntDirect($request->all());
                     if($url){
                         $msg = array(

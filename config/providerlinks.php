@@ -352,7 +352,7 @@ return [
         'provider_id' => 41,
     ],
     'netent' => [
-        'provider_db_id' => 45, //CHANGE THE PROVIDER ID THIS 45 IS FROM STAGING
+        'provider_db_id' => 89, //CHANGE THE PROVIDER ID THIS 45 IS FROM STAGING
         'casinoID' => "tigergames",//casinoID
         'merchantId' => "tigergamesws",//soap api login
         'merchantPassword' => "G4Rvxun3BFJjULGp",//soap api login
