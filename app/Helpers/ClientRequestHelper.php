@@ -2,6 +2,7 @@
 namespace App\Helpers;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\TransferStats;
 use App\Helpers\Helper;
 use App\Helpers\GameLobby;
 use App\Helpers\ProviderHelper;
@@ -32,6 +33,7 @@ class ClientRequestHelper{
         return $data;
     }
     public static function fundTransfer($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false){
+        $sendtoclient =  microtime(true);
         $client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/json',
@@ -65,12 +67,18 @@ class ClientRequestHelper{
             ]
               ];
             $guzzle_response = $client->post($client_details->fund_transfer_url,
-            ['body' => json_encode(
+            [
+                'on_stats' => function (TransferStats $stats) use ($requesttocient){
+                    Helper::saveLog('TIME = '.$stats->getTransferTime() .' GEID = '.$requesttocient['fundtransferrequest']['fundinfo']['transactionId'].' '.$requesttocient['fundtransferrequest']['fundinfo']['transactiontype'], 999, json_encode($stats->getHandlerStats()), $requesttocient);
+                },
+                'body' => json_encode(
                     $requesttocient
             )],
             ['defaults' => [ 'exceptions' => false ]]
         );
         $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+        $client_response_time = microtime(true) - $sendtoclient;
+        Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
         $client_reponse->requestoclient = $requesttocient;
         //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
         return $client_reponse;
@@ -109,6 +117,7 @@ class ClientRequestHelper{
      */
     public static function playerDetailsCall($player_token, $refreshtoken=false){
         $client_details = ProviderHelper::getClientDetails('token', $player_token);
+
         if($client_details){
             try{
                 $client = new Client([
@@ -131,11 +140,23 @@ class ClientRequestHelper{
                         "refreshtoken" => $refreshtoken
                     ]
                 ];
-            
+        
                 $guzzle_response = $client->post($client_details->player_details_url,
                     ['body' => json_encode($datatosend)]
                 );
+
                 $client_response = json_decode($guzzle_response->getBody()->getContents());
+
+                /** [START] Additional information needed for UltraPlay Integration **/
+
+                if($client_response->playerdetailsresponse->status->code == 200) {
+                    $client_response->playerdetailsresponse->internal_id = $client_details->player_id;
+                    $client_response->playerdetailsresponse->is_test_player = ($client_details->test_player == 1 ? true : false);
+                }
+
+                /** [END] Additional information needed for UltraPlay Integration **/
+
+                
                 return $client_response;
             }catch (\Exception $e){
                return 'false';

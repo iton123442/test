@@ -10,7 +10,7 @@ use App\Helpers\IAHelper;
 use App\Helpers\AWSHelper;
 use App\Helpers\SAHelper;
 use App\Helpers\TidyHelper;
-use App\Helpers\GoldenFHelper;
+use App\Helpers\TransferWalletHelper;
 use App\Helpers\FCHelper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\MGHelper;
@@ -679,7 +679,7 @@ class GameLobby{
                 ]
             ]);
             $golden_response = json_decode((string) $response->getBody(), true);
-            GoldenFHelper::saveLog('GoldenF create_player', $provider_id, json_encode($data), $golden_response);
+            TransferWalletHelper::saveLog('GoldenF create_player', $provider_id, json_encode($data), $golden_response);
             if(isset($golden_response['data']['action_result']) && $golden_response['data']['action_result'] == "Success"){
                 $gameluanch_url = $api_url."/Launch?secret_key=".$secret_key."&operator_token=".$operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
 
@@ -687,8 +687,8 @@ class GameLobby{
                 $get_url = json_decode($response->getBody()->getContents());
 
                 if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
-                    GoldenFHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
-                    GoldenFHelper::saveLog('GoldenF gamelaunch', $provider_id, json_encode($data), $gameluanch_url);
+                    TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
+                    TransferWalletHelper::saveLog('GoldenF gamelaunch', $provider_id, json_encode($data), $gameluanch_url);
                     $data = array(
                         "url" => urlencode($get_url->data->game_url),
                         "token" => $client_details->player_token,
@@ -708,7 +708,7 @@ class GameLobby{
             $error = [
                 'error' => $e->getMessage()
             ];
-            GoldenFHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
+            TransferWalletHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
             // return $error;
             return 'false';
         }
