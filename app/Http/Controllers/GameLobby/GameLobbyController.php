@@ -146,7 +146,8 @@ class GameLobbyController extends Controller
                     return DemoHelper::DemoGame($request->all());
                 }
 
-                # EXPERIMENTAL - GAME BALANCE INHOUSE (SAVE ALL PLAYER BALANCE)
+
+                 # EXPERIMENTAL - GAME BALANCE INHOUSE (SAVE ALL PLAYER BALANCE)
                 $save_balance = ProviderHelper::saveBalance($request->token);
                 if($save_balance == false){
                     $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH SAVE BALANCE'.$request->client_id);
