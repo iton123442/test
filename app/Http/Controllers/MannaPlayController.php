@@ -67,19 +67,25 @@ class MannaPlayController extends Controller
 							];
 
 				// Find the player and client details
-				$client_details = $this->_getClientDetails('token', $json_data['sessionId']);
+				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				// $client_details = $this->_getClientDetails('token', $json_data['sessionId']);
 				
 				if ($client_details) {
-					$client_response = ClientRequestHelper::playerDetailsCall($client_details->player_token);
+					// $client_response = ClientRequestHelper::playerDetailsCall($client_details->player_token);
 
-					if(isset($client_response->playerdetailsresponse->status->code) 
-					&& $client_response->playerdetailsresponse->status->code == "200") {
+					// if(isset($client_response->playerdetailsresponse->status->code) 
+					// && $client_response->playerdetailsresponse->status->code == "200") {
 
-						$http_status = 200;
+					// 	$http_status = 200;
+					// 	$response = [
+					// 		"balance" => bcdiv($client_response->playerdetailsresponse->balance, 1, 2)
+					// 	];
+					// }
+
+					$http_status = 200;
 						$response = [
-							"balance" => bcdiv($client_response->playerdetailsresponse->balance, 1, 2)
-						];
-					}
+							"balance" => bcdiv($client_details->balance, 1, 2)
+					];
 				
 				}
 			}
@@ -129,13 +135,13 @@ class MannaPlayController extends Controller
 				$game_transaction_id = 0;
 				$client_response = ['error' => 'true'];
 
-				$client_details = $this->_getClientDetails('token', $json_data['sessionId']);
+				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 
 				if ($client_details/* && $player_details != NULL*/) {
 					GameRound::create($json_data['round_id'], $client_details->token_id);
 
 					// Check if the game is available for the client
-					$subscription = new GameSubscription();
+					/*$subscription = new GameSubscription();
 					$client_game_subscription = $subscription->check($client_details->client_id, 16, $json_data['game_id']);
 					
 					if(!$client_game_subscription) {
@@ -146,7 +152,7 @@ class MannaPlayController extends Controller
 							];
 					}
 					else
-					{
+					{*/
 						if(!GameRound::check($json_data['round_id'])) {
 							$http_status = 200;
 							$response = [
@@ -182,7 +188,7 @@ class MannaPlayController extends Controller
 							{
 								if(isset($client_response->fundtransferresponse->status->code) 
 							&& $client_response->fundtransferresponse->status->code == "200") {
-
+									ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 									$http_status = 200;
 									$response = [
 										"transaction_id" => $json_data['transaction_id'],
@@ -193,7 +199,7 @@ class MannaPlayController extends Controller
 
 							ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
 						}
-					}
+					/*}*/
 				}
 			}
 		}
@@ -244,12 +250,12 @@ class MannaPlayController extends Controller
 				$game_transaction_id = 0;
 				$client_response = ['error' => 'true'];
 
-				$client_details = $this->_getClientDetails('token', $json_data['sessionId']);
+				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 
 				if ($client_details/* && $player_details != NULL*/) {
 
 					// Check if the game is available for the client
-					$subscription = new GameSubscription();
+					/*$subscription = new GameSubscription();
 					$client_game_subscription = $subscription->check($client_details->client_id, 16, $json_data['game_id']);
 
 					if(!$client_game_subscription) {
@@ -260,7 +266,7 @@ class MannaPlayController extends Controller
 							];
 					}
 					else
-					{
+					{*/
 						if(!GameRound::check($json_data['round_id'])) {
 							$http_status = 200;
 								$response = [
@@ -303,7 +309,7 @@ class MannaPlayController extends Controller
 
 									if(isset($client_response->fundtransferresponse->status->code) 
 								&& $client_response->fundtransferresponse->status->code == "200") {
-										
+										ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 										$http_status = 200;
 										$response = [
 											"transaction_id" => $json_data['transaction_id'],
@@ -315,7 +321,7 @@ class MannaPlayController extends Controller
 								}
 							}
 						}
-					}
+					/*}*/
 				}
 			}
 		}
@@ -363,7 +369,7 @@ class MannaPlayController extends Controller
 
 
 
-				$client_details = $this->_getClientDetails('token', $json_data['sessionId']);
+				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				/*$player_details = PlayerHelper::getPlayerDetails($json_data['sessionId'], 'token');*/
 
 				if ($client_details/* && $player_details != NULL*/) {
@@ -400,7 +406,7 @@ class MannaPlayController extends Controller
 							
 							// If client returned a success response
 							if($client_response->fundtransferresponse->status->code == "200") {
-								
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$http_status = 200;
 								$response = [
 									"transaction_id" => $json_data['transaction_id'],
