@@ -509,3 +509,11 @@ $app->post('api/gf/Bet/Record/Detail','GoldenFController@BetRecordDetail');
 
 
 $app->post('api/currency','AlController@currency');
+
+
+// NETENT Direct
+$app->get('api/netent/walletserver/players/{player}/account/currency','NetEntController@currency');
+$app->get('api/netent/walletserver/players/{player}/account/balance','NetEntController@balance');
+$app->post('api/netent/walletserver/players/{player}/account/withdraw','NetEntController@withdraw');//debit
+$app->post('api/netent/walletserver/players/{player}/account/deposit','NetEntController@deposit');
+$app->delete('api/netent/walletserver/players/{player}/account/withdraw','NetEntController@withdraw');//debit
