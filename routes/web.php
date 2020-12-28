@@ -517,3 +517,9 @@ $app->get('api/netent/walletserver/players/{player}/account/balance','NetEntCont
 $app->post('api/netent/walletserver/players/{player}/account/withdraw','NetEntController@withdraw');//debit
 $app->post('api/netent/walletserver/players/{player}/account/deposit','NetEntController@deposit');
 $app->delete('api/netent/walletserver/players/{player}/account/withdraw','NetEntController@withdraw');//debit
+
+
+
+//EXPIREMENT TIME NA WAHHAHAH
+$app->post('/api/oryx/endpoint', 'OryxGamingController@endpoint');
+$app->post('/api/oryx/fund', 'OryxGamingController@fund');
