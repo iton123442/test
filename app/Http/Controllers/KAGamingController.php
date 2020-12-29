@@ -233,22 +233,22 @@ class KAGamingController extends Controller
         }
 
 
-        // $game_ext_check = KAHelper::findGameExt($round_id, 1, 'round_id');
-        // if($game_ext_check != 'false'){ // Duplicate transaction
-        //     return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
-        // }
-
-        # Insert Idenpotent
-        try{
-            ProviderHelper::idenpotencyTable($this->prefix.'_'.$round_id);
-        }catch(\Exception $e){
+        $game_ext_check = KAHelper::findGameExt($round_id, 1, 'round_id');
+        if($game_ext_check != 'false'){ // Duplicate transaction
             return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
         }
 
-        // if(KAHelper::amountToFloat($player_details->playerdetailsresponse->balance) < $amount){
-        if(KAHelper::amountToFloat($client_details->balance) < $amount){
-             return  $response = ["status" => "Insufficient balance", "statusCode" =>  200];
-        }
+        # Insert Idenpotent
+        // try{
+        //  ProviderHelper::idenpotencyTable($this->prefix.'_'.$round_id);
+        // }catch(\Exception $e){
+        //  return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
+        // }
+
+        // // if(KAHelper::amountToFloat($player_details->playerdetailsresponse->balance) < $amount){
+        // if(KAHelper::amountToFloat($client_details->balance) < $amount){
+        //      return  $response = ["status" => "Insufficient balance", "statusCode" =>  200];
+        // }
 
         $general_details['client']['before_balance'] = KAHelper::amountToFloat($client_details->balance);
         // $general_details['client']['before_balance'] = KAHelper::amountToFloat($player_details->playerdetailsresponse->balance);
@@ -287,6 +287,12 @@ class KAGamingController extends Controller
         if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+            $response = [
+                "balance" => $this->formatBalance($client_response->fundtransferresponse->balance),
+                "status" => "success",
+                "statusCode" =>  0
+            ];
+            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
             #2 CREDIT OPERATION   
             $game_transextension_credit = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $win_amount, 2);
             $client_response_credit = ClientRequestHelper::fundTransfer($client_details,abs($win_amount),$game_information->game_code,$game_information->game_name,$game_transextension_credit,$gamerecord, 'credit');
@@ -326,7 +332,7 @@ class KAGamingController extends Controller
                 
                 ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
             }
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
             ProviderHelper::updatecreateGameTransExt($game_transextension_credit, $data, $response, $client_response_credit->requestoclient, $client_response_credit, $response,$general_details);
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
@@ -383,20 +389,20 @@ class KAGamingController extends Controller
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
 
-        // $game_ext_check_win = KAHelper::findGameExt($provider_trans_id, 2, 'transaction_id');
-        // if($game_ext_check_win != 'false'){
-        //     $transaction_general_details = json_decode($game_ext_check_win->general_details);
-        //     if(isset($transaction_general_details->client->action) && $transaction_general_details->client->action == 'credit'){
-        //         return  $response = ["status" => "Double transactionId with an action credit", "statusCode" =>  301];
-        //     }
-        // }
+        $game_ext_check_win = KAHelper::findGameExt($provider_trans_id, 2, 'transaction_id');
+        if($game_ext_check_win != 'false'){
+            $transaction_general_details = json_decode($game_ext_check_win->general_details);
+            if(isset($transaction_general_details->client->action) && $transaction_general_details->client->action == 'credit'){
+                return  $response = ["status" => "Double transactionId with an action credit", "statusCode" =>  301];
+            }
+        }
 
         # Insert Idenpotent (CREDIT)
-        try{
-            ProviderHelper::idenpotencyTable($this->prefix.'_CREDIT_'.$provider_trans_id);
-        }catch(\Exception $e){
-            return  $response = ["status" => "Double transactionId with an action credit", "statusCode" =>  301];
-        }
+        // try{
+        //  ProviderHelper::idenpotencyTable($this->prefix.'_CREDIT_'.$provider_trans_id);
+        // }catch(\Exception $e){
+        //  return  $response = ["status" => "Double transactionId with an action credit", "statusCode" =>  301];
+        // }
 
         $game_ext_check = KAHelper::findGameExt($provider_trans_id, 1, 'transaction_id');
         if($game_ext_check == 'false'){ // Duplicate transaction
