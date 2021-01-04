@@ -519,7 +519,8 @@ $app->post('api/netent/walletserver/players/{player}/account/deposit','NetEntCon
 $app->delete('api/netent/walletserver/players/{player}/account/withdraw','NetEntController@withdraw');//debit
 
 
-
-//EXPIREMENT TIME NA WAHHAHAH
-$app->post('/api/oryx/endpoint', 'OryxGamingController@endpoint');
-$app->post('/api/oryx/fund', 'OryxGamingController@fund');
+//ORXY FUNDSRANFER
+$app->post('/api/oryx/readWriteProcess', 'OryxGamingController@readWriteProcess');
+$app->post('/api/oryx/fundTransfer', 'OryxGamingController@fundTransfer');
+$app->post('tigergames/{type}/bg-fundtransfer','FundtransferProcessorController@backgroundProcessDebitCreditFund');
+$app->post('tigergames/bg-fundtransfer','FundtransferProcessorController@bgFundTransfer');
