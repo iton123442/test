@@ -47,7 +47,7 @@ return [
         'thbagents'=>[
             'username' => 'betrnkthb',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => 'e2d411bd-ddea-41b1-a173-483d2f98f7cf',
+            'secure_code' => '41aa6cf7-ab5f-49e1-86e0-93ee217b6c79',
         ],
         'tryagents'=>[
             'username' => 'betrnktry',
