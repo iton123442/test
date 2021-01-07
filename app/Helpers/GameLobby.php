@@ -218,6 +218,7 @@ class GameLobby{
             Helper::saveLog('AWS Launch Game Failed', 21, json_encode($client_details), $client_details);
             return 'false';
         }
+        
         if($player_check->code == 100){ // Not Registered!
             $register_player = AWSHelper::playerRegister($token);
             if($register_player->code != 2217 && $register_player->code != 0){
