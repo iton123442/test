@@ -94,6 +94,7 @@ class ClientRequestHelper{
                         'balance' => 0.0
                     )
                 );
+                Helper::saveLog('FAILED'.$requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($requesttocient),$response);
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
                 return $client_reponse;
