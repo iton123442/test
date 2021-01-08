@@ -66,22 +66,38 @@ class ClientRequestHelper{
               ]
             ]
               ];
+        try{
             $guzzle_response = $client->post($client_details->fund_transfer_url,
             [
-                'on_stats' => function (TransferStats $stats) use ($requesttocient){
-                    Helper::saveLog('TIME = '.$stats->getTransferTime() .' GEID = '.$requesttocient['fundtransferrequest']['fundinfo']['transactionId'].' '.$requesttocient['fundtransferrequest']['fundinfo']['transactiontype'], 999, json_encode($stats->getHandlerStats()), $requesttocient);
-                },
-                'body' => json_encode(
-                    $requesttocient
-            )],
-            ['defaults' => [ 'exceptions' => false ]]
-        );
-        $client_reponse = json_decode($guzzle_response->getBody()->getContents());
-        $client_response_time = microtime(true) - $sendtoclient;
-        Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
-        $client_reponse->requestoclient = $requesttocient;
-        //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
-        return $client_reponse;
+                    'on_stats' => function (TransferStats $stats) use ($requesttocient){
+                        Helper::saveLog('RID'.$requesttocient['fundtransferrequest']['fundinfo']['roundId']. 'TIME = '.$stats->getTransferTime(), 999, json_encode($stats->getHandlerStats()), $requesttocient);
+                    },
+                    'body' => json_encode(
+                        $requesttocient
+                )],
+                ['defaults' => [ 'exceptions' => false ]]
+            );
+            $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+            $client_response_time = microtime(true) - $sendtoclient;
+            Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
+            $client_reponse->requestoclient = $requesttocient;
+            //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
+            return $client_reponse;
+        }catch(\Exception $e){
+                $response = array(
+                    "fundtransferresponse" => array(
+                        "status" => array(
+                            "code" => 402,
+                            "status" => "FAILED",
+                            "message" => $e->getMessage().' '.$e->getLine(),
+                        ),
+                        'balance' => 0.0
+                    )
+                );
+                $client_reponse = json_decode(json_encode($response));
+                $client_reponse->requestoclient = $requesttocient;
+                return $client_reponse;
+        }
     }
     public static function currencyRateConverter($currency,$roundId=1){
         try{
