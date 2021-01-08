@@ -190,6 +190,7 @@ class BNGController extends Controller
                     ),
                     "tag"=>""
                 );
+                Helper::saveLog('authplayer(BNG)', 12, json_encode($msg), $data);
                 $this->_setExtParameter($this->_getExtParameter()+1);
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
