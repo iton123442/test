@@ -341,6 +341,7 @@ class BNGController extends Controller
                     $gametransactionid = $game[0]->game_trans_id;
                 }
                 $this->_setExtParameter($this->_getExtParameter()+1);
+                $transactionId = $data["uid"];
                 if(!$game_transaction){
                     $transactionId=Helper::createBNGGameTransactionExt($gametransactionid,$data,null,null,null,2);
                 } 
