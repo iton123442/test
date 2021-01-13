@@ -162,19 +162,22 @@ class GameLobbyController extends Controller
 
                 # Check if player is allowed to play a specific game
                 //    Helper::savePLayerGameRound( $request->input("game_code"), $request->input("token"), $request->input("game_provider"));
-                // $checkplayer = ProviderHelper::checkClientPlayer($request->client_id, $request->client_player_id);
-                // $check_game_details = ProviderHelper::getSubGameDetails($provider_code, $request->input("game_code"));
-                // $isRestricted = ProviderHelper::checkGameRestricted($check_game_details->game_id,$checkplayer->player_id);
-                // if($isRestricted){
-                //     $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH GAME RESTRICTED '.$request->client_id);
-                //     $msg = array(
-                //         "message" => ClientHelper::getClientErrorCode(10),
-                //         "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10).'&id='.$log_id,
-                //         "game_launch" => false
-                //     );
-                //     return response($msg,200)
-                //     ->header('Content-Type', 'application/json');
-                // }
+                $checkplayer = ProviderHelper::checkClientPlayer($request->client_id, $request->client_player_id);
+                $check_game_details = ProviderHelper::getSubGameDetails($provider_code, $request->input("game_code"));
+                $isRestricted = ProviderHelper::checkGameRestricted($check_game_details->game_id,$checkplayer->player_id);
+                if($isRestricted){
+                    $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($isRestricted);
+                    if(!$attempt_resend_transaction){
+                        $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH GAME RESTRICTED '.$request->client_id);
+                        $msg = array(
+                            "message" => ClientHelper::getClientErrorCode(10),
+                            "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10).'&id='.$log_id,
+                            "game_launch" => false
+                        );
+                        return response($msg,200)
+                        ->header('Content-Type', 'application/json');
+                    }
+                }
 
                 if($provider_code==35){
                     $url = GameLobby::icgLaunchUrl($request->game_code,$token,$request->exitUrl,$request->input('game_provider'),$lang);
