@@ -32,7 +32,8 @@ class ClientRequestHelper{
         );
         return $data;
     }
-    public static function fundTransfer($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,,$action=array()){
+    public static function fundTransfer($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
+
         $sendtoclient =  microtime(true);
         $client = new Client([
             'headers' => [ 
@@ -65,7 +66,12 @@ class ClientRequestHelper{
                     "amount" => $amount #change data here
               ]
             ]
-              ];
+        ];
+
+        if(count($action) > 0){
+            // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
+        }
+
         try{
             $guzzle_response = $client->post($client_details->fund_transfer_url,
             [
