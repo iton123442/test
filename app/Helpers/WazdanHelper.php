@@ -5,12 +5,13 @@ use GuzzleHttp\Client;
 class WazdanHelper
 {
     public static function getGameTransaction($player_token,$game_round){
-		$game = DB::table("player_session_tokens as pst")
-				->leftJoin("game_transactions as gt","pst.token_id","=","gt.token_id")
-				->where("pst.player_token",$player_token)
-				->where("gt.round_id",$game_round)
-				->first();
-		return $game;
+		$game = DB::select("SELECT
+						entry_id,bet_amount,game_trans_id,pay_amount
+						FROM game_transactions g
+						INNER JOIN player_session_tokens USING (token_id)
+						WHERE player_token = '".$player_token."' and round_id = '".$game_round."'");
+		$count = count($game);
+		return $count > 0 ? $game[0]:null;
     }
     public static function getGameTransactionById($game_trans_id){
         $game = DB::table("game_transactions")
@@ -19,13 +20,19 @@ class WazdanHelper
 		return $game;
     }
     public static function getTransactionExt($provider_trans_id){
-        $gametransaction = DB::table('game_transaction_ext')->where("provider_trans_id",$provider_trans_id)->first();
-        return $gametransaction;
+        $game = DB::select("SELECT game_trans_ext_id,mw_response
+        FROM game_transaction_ext
+		where provider_trans_id='".$provider_trans_id."' limit 1");
+		$count = count($game);
+		return $count > 0 ? $game[0]:null;
     }
     
     public static function gameTransactionExtChecker($provider_trans_id){
-        $gametransaction = DB::table('game_transaction_ext')->where("provider_trans_id",$provider_trans_id)->first();
-        return $gametransaction?true:false;
+        $game = DB::select("SELECT game_trans_ext_id,mw_response
+        FROM game_transaction_ext
+		where provider_trans_id='".$provider_trans_id."' limit 1");
+		$count = count($game);
+		return $count > 0 ? true:false;
     }
     public static function updateGameTransaction($existingdata,$request_data,$type){
 		switch ($type) {
