@@ -173,7 +173,7 @@ class GameLobbyController extends Controller
                 $check_game_details = ProviderHelper::getSubGameDetails($provider_code, $request->input("game_code"));
                 $isRestricted = ProviderHelper::checkGameRestricted($check_game_details->game_id,$checkplayer->player_id);
                 if($isRestricted){
-                    $attempt_resend_transaction =   ::fundTransferResend($isRestricted);
+                    $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($isRestricted);
                     if(!$attempt_resend_transaction){
                         $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH GAME RESTRICTED '.$request->client_id);
                         $msg = array(
