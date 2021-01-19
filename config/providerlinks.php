@@ -242,13 +242,11 @@ return [
         'license' => 'curacao',
         'hmac_scret_key' => '2QvSiQ2KXX8mBM0LyexfAcNNgI5eXzcx',
         'partnercode'=> 'gd1wiurg',
-        'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
+        'gamelaunchurl' => 'https://gamelaunch.wazdan.com/',
         'operator_data' =>[
             "1"=>"tigergames",
-            "2"=>"askmebet",
             "5"=>"askmebet",
-            "6"=>"askmebet",
-            "3"=>"xigolo",
+            "6"=>"xigolo",
         ]
     ],
     'evolution'=>[
