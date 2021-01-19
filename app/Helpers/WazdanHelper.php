@@ -5,46 +5,46 @@ use GuzzleHttp\Client;
 class WazdanHelper
 {
     public static function getGameTransaction($player_token,$game_round){
-		$starttime = microtime(true);
+		//$starttime = microtime(true);
 		$game = DB::select("SELECT
 						entry_id,bet_amount,game_trans_id,pay_amount
 						FROM game_transactions g
 						INNER JOIN player_session_tokens USING (token_id)
 						WHERE player_token = '".$player_token."' and round_id = '".$game_round."'");
 		$count = count($game);
-		Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"getGameTransaction"]), microtime(true) - $starttime);
+		//Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"getGameTransaction"]), microtime(true) - $starttime);
 		return $count > 0 ? $game[0]:null;
     }
     public static function getGameTransactionById($game_trans_id){
-		$starttime = microtime(true);
+		//$starttime = microtime(true);
         $game = DB::table("game_transactions")
                 ->where("game_trans_id",$game_trans_id)
 				->first();
-		Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"getGameTransactionById"]), microtime(true) - $starttime);
+		//Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"getGameTransactionById"]), microtime(true) - $starttime);
 		return $game;
 		
     }
     public static function getTransactionExt($provider_trans_id){
-		$starttime = microtime(true);
+		//$starttime = microtime(true);
         $game = DB::select("SELECT game_trans_ext_id,mw_response
         FROM game_transaction_ext
 		where provider_trans_id='".$provider_trans_id."' limit 1");
 		$count = count($game);
-		Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"getTransactionExt"]), microtime(true) - $starttime);
+		//Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"getTransactionExt"]), microtime(true) - $starttime);
 		return $count > 0 ? $game[0]:null;
     }
     
     public static function gameTransactionExtChecker($provider_trans_id){
-		$starttime = microtime(true);
+		//$starttime = microtime(true);
         $game = DB::select("SELECT game_trans_ext_id,mw_response
         FROM game_transaction_ext
 		where provider_trans_id='".$provider_trans_id."' limit 1");
 		$count = count($game);
-		Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"gameTransactionExtChecker"]), microtime(true) - $starttime);
+		//Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"gameTransactionExtChecker"]), microtime(true) - $starttime);
 		return $count > 0 ? true:false;
     }
     public static function updateGameTransaction($existingdata,$request_data,$type){
-		$starttime = microtime(true);
+		//$starttime = microtime(true);
 		switch ($type) {
 			case "debit":
                     $trans_data["win"] = 0;
@@ -71,11 +71,11 @@ class WazdanHelper
 			default:
 		}
 		/*var_dump($trans_data); die();*/
-		Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"updateGameTransaction"]), microtime(true) - $starttime);
+		//Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"updateGameTransaction"]), microtime(true) - $starttime);
 		return DB::table('game_transactions')->where("game_trans_id",$existingdata->game_trans_id)->update($trans_data);
 	}
     public static function createWazdanGameTransactionExt($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type){
-		$starttime = microtime(true);
+		//$starttime = microtime(true);
 		$gametransactionext = array(
 			"provider_trans_id" => $provider_request["transactionId"],
 			"game_trans_id" => $gametransaction_id,
@@ -88,7 +88,7 @@ class WazdanHelper
 			"client_response" =>json_encode($client_response),
 		);
 		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-		Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"createWazdanGameTransactionExt"]), microtime(true) - $starttime);
+		//Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"createWazdanGameTransactionExt"]), microtime(true) - $starttime);
 		return $gamestransaction_ext_ID;
     }
 }
