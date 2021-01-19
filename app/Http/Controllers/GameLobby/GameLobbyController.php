@@ -11,6 +11,7 @@ use App\Models\GameSubProvider;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\ClientHelper;
+use App\Helpers\ClientRequestHelper;
 use App\Helpers\DemoHelper;
 use App\Helpers\GameLobby;
 use App\Models\ClientGameSubscribe;
@@ -114,7 +115,8 @@ class GameLobbyController extends Controller
                 return response(["error_code"=>"404","message"=>"Provider Code Doesnt Exist/Not Found"],200)
                  ->header('Content-Type', 'application/json');
             }
-            #CLIENT SUBSCRIPTION FILTER
+
+             # CLIENT SUBSCRIPTION FILTER
             $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
             if(!$subscription_checker){
                $log_id = Helper::saveLog('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
@@ -125,7 +127,10 @@ class GameLobbyController extends Controller
                );
                return $msg;
             }
-            
+
+            # Save Every Gamelaunch from the client
+            Helper::saveLog('GAMELAUNCH LOG', 1223, json_encode($request->all()), $request->client_player_id);
+
             // Filters
             if(ClientHelper::checkClientID($request->all()) != 200){
                 $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
@@ -168,7 +173,7 @@ class GameLobbyController extends Controller
                 $check_game_details = ProviderHelper::getSubGameDetails($provider_code, $request->input("game_code"));
                 $isRestricted = ProviderHelper::checkGameRestricted($check_game_details->game_id,$checkplayer->player_id);
                 if($isRestricted){
-                    $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($isRestricted);
+                    $attempt_resend_transaction =   ::fundTransferResend($isRestricted);
                     if(!$attempt_resend_transaction){
                         $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH GAME RESTRICTED '.$request->client_id);
                         $msg = array(
