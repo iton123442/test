@@ -276,7 +276,6 @@ class WazdanController extends Controller
     public function returnWin(Request $request){
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
-        Helper::saveLog('returnWin(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
@@ -288,7 +287,6 @@ class WazdanController extends Controller
                             "balance" => round($client_details->balance,2)
                         )
                     );
-                    Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
@@ -301,7 +299,7 @@ class WazdanController extends Controller
                     "payout_reason" => null,
                     "win" => $win,
                 );
-                $game = Helper::getGameTransaction($datadecoded["user"]["token"],$datadecoded["roundId"]);
+                $game = WazdanHelper::getGameTransaction($datadecoded["user"]["token"],$datadecoded["roundId"]);
                 if(!$game){
                     $gametransactionid=Helper::createGameTransaction('credit', $json_data, $game_details, $client_details); 
                 }
