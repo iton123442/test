@@ -57,13 +57,25 @@ class GameLobby{
         return $gameurl;
     }
     public static function wazdanLaunchUrl($game_code,$token,$provider,$exitUrl){
-        $lang = "en";
-        $timestamp = Carbon::now()->timestamp;
-        $exit_url = $exitUrl;
-        Helper::savePLayerGameRound($game_code,$token,$provider);
-        $gameurl = config('providerlinks.wazdan.gamelaunchurl').config('providerlinks.wazdan.partnercode').'/gamelauncher?operator='.config('providerlinks.wazdan.operator').
+        $client_details = ProviderHelper::getClientDetails('token', $token);
+        if($client_details){
+            $lang = "en";
+            $timestamp = Carbon::now()->timestamp;
+            $exit_url = $exitUrl;
+            Helper::savePLayerGameRound($game_code,$token,$provider);
+            $operator_data = config('providerlinks.wazdan.operator_data');
+            $wazdan_operator = "tigergames";
+            if(array_key_exists($client_details->operator_id,$operator_data)){
+                $wazdan_operator = $operator_data[$client_details->operator_id];
+            }
+            $gameurl = config('providerlinks.wazdan.gamelaunchurl').config('providerlinks.wazdan.partnercode').'/gamelauncher?operator='.$wazdan_operator.
                   '&game='.$game_code.'&mode=real&token='.$token.'&license='.config('providerlinks.wazdan.license').'&lang='.$lang.'&platform=desktop';
-        return $gameurl;
+            return $gameurl;
+        }
+        else{
+            return 'false';
+        }
+        
     }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
         $timestamp = Carbon::now()->timestamp;
