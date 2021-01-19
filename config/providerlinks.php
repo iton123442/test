@@ -242,7 +242,14 @@ return [
         'license' => 'curacao',
         'hmac_scret_key' => '2QvSiQ2KXX8mBM0LyexfAcNNgI5eXzcx',
         'partnercode'=> 'gd1wiurg',
-        'gamelaunchurl' => 'https://gamelaunch.wazdan.com/'
+        'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
+        'operator_data' =>[
+            "1"=>"tigergames",
+            "2"=>"askmebet",
+            "5"=>"askmebet",
+            "6"=>"askmebet",
+            "3"=>"xigolo",
+        ]
     ],
     'evolution'=>[
         'host' => 'https://babylontgg.evo-games.com',
