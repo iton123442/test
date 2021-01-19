@@ -114,15 +114,17 @@ class GameLobbyController extends Controller
                 return response(["error_code"=>"404","message"=>"Provider Code Doesnt Exist/Not Found"],200)
                  ->header('Content-Type', 'application/json');
             }
-            // CLIENT SUBSCRIPTION FILTER
-            // $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"));
-            // if(!$subscription_checker){
-            //     $msg = array(
-            //         "game_code" => $request->input("game_code"),
-            //         "game_launch" => false
-            //     );
-            //     return $msg;
-            // }
+            #CLIENT SUBSCRIPTION FILTER
+            $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
+            if(!$subscription_checker){
+               $log_id = Helper::saveLog('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
+               $msg = array(
+                   "game_code" => $request->input("game_code"),
+                   "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(3).'&id='.$log_id,
+                   "game_launch" => false
+               );
+               return $msg;
+            }
             
             // Filters
             if(ClientHelper::checkClientID($request->all()) != 200){
@@ -767,14 +769,10 @@ class GameLobbyController extends Controller
             return $data;
     }
 
-    public function checkGameAccess($client_id, $game_code){
+   public function checkGameAccess($client_id, $game_code, $sub_provider_id){
 
-         $excludedlist = ClientGameSubscribe::with("selectedProvider")->with("gameExclude")->with("subProviderExcluded")->where("client_id",$client_id)->get();
-         if($excludedlist){
-                $providerexcludeId=array();
-                foreach($excludedlist[0]->selectedProvider as $providerexcluded){
-                    array_push($providerexcludeId,$providerexcluded->provider_id);
-                }
+            $excludedlist = ClientGameSubscribe::with("selectedProvider")->with("gameExclude")->with("subProviderExcluded")->where("client_id",$client_id)->get();
+            if(count($excludedlist)>0){  # No Excluded Provider
                 $gamesexcludeId=array();
                 foreach($excludedlist[0]->gameExclude as $excluded){
                     array_push($gamesexcludeId,$excluded->game_id);
@@ -783,24 +781,34 @@ class GameLobbyController extends Controller
                 foreach($excludedlist[0]->subProviderExcluded as $excluded){
                     array_push($subproviderexcludeId,$excluded->sub_provider_id);
                 }
-                $providers = GameProvider::with(["games.game_type","games"=>function($q)use($gamesexcludeId){
-                        $q->whereNotIn("game_id",$gamesexcludeId);
-                }])->whereNotIn("provider_id",$providerexcludeId)->get(["provider_id"]);
                 $data = array();
-                foreach($providers as $provider){
-                    foreach($provider->games as $game){
-                        // if($game->sub_provider_id == 0){   // COMMENTED RiAN
-                            $game = $game->game_code;
-                            array_push($data,$game);
-                        // }
-                    }
-                }
-              return  in_array($game_code, $data) ? 1 : 0;
+                $sub_providers = GameSubProvider::with(["games.game_type","games"=>function($q)use($gamesexcludeId){
+                    $q->whereNotIn("game_id",$gamesexcludeId)->where("on_maintenance",0);
+                }])->whereNotIn("sub_provider_id",$subproviderexcludeId)->where("on_maintenance",0)->get(["sub_provider_id","sub_provider_name", "icon"]);
 
-        }else{
-            return false;
-        }
-    }
+                $sub_provider_subscribed = array();
+                $provider_gamecodes = array();
+                foreach($sub_providers as $sub_provider){
+                    foreach($sub_provider->games as $game){
+                        if($sub_provider->sub_provider_id == $sub_provider_id){
+                            array_push($provider_gamecodes,$game->game_code);
+                        }
+                    }
+                    array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
+                }
+                if(in_array($sub_provider_id, $sub_provider_subscribed)){
+                    if(in_array($game_code, $provider_gamecodes)){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }else{
+                    return false;
+                }
+            }else{ 
+                return false; # NO SUBSCRIBE RETURN FALSE
+            }
+   }
 
     public function getLanguage(Request $request){
         return GameLobby::getLanguage($request->provider_name,$request->language);

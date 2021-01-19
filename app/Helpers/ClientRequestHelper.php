@@ -10,6 +10,8 @@ use App\Payment;
 use DB;
 use ErrorException;
 
+use function GuzzleHttp\json_decode;
+
 class ClientRequestHelper{
     
     public static function getTransactionId($player_token,$game_round){
@@ -33,7 +35,6 @@ class ClientRequestHelper{
         return $data;
     }
     public static function fundTransfer($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
-
         $sendtoclient =  microtime(true);
         $client = new Client([
             'headers' => [ 
@@ -62,34 +63,39 @@ class ClientRequestHelper{
                     "transactionId" => $transactionId, // this id is equivalent to game_transaction_ext game_trans_ext_id
                     "roundId" => $roundId,// this id is equivalent to game_transaction game_trans_id
                     "rollback" => $rollback,
+                    // "freespin" => false,
                     "currencycode" => $client_details->default_currency,
                     "amount" => $amount #change data here
               ]
             ]
-        ];
+              ];
 
-        if(count($action) > 0){
-            // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
-        }
+            if(count($action) > 0){
+                // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
+            }
 
-        try{
-            $guzzle_response = $client->post($client_details->fund_transfer_url,
-            [
-                    'on_stats' => function (TransferStats $stats) use ($requesttocient){
-                        Helper::saveLog('RID'.$requesttocient['fundtransferrequest']['fundinfo']['roundId']. 'TIME = '.$stats->getTransferTime(), 999, json_encode($stats->getHandlerStats()), $requesttocient);
-                    },
-                    'body' => json_encode(
-                        $requesttocient
-                )],
-                ['defaults' => [ 'exceptions' => false ]]
-            );
-            $client_reponse = json_decode($guzzle_response->getBody()->getContents());
-            $client_response_time = microtime(true) - $sendtoclient;
-            Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
-            $client_reponse->requestoclient = $requesttocient;
-            //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
-            return $client_reponse;
-        }catch(\Exception $e){
+            try{
+                $guzzle_response = $client->post($client_details->fund_transfer_url,
+                    [
+                        'on_stats' => function (TransferStats $stats) use ($requesttocient){
+                            $data = [
+                                'http_body' => $stats->getHandlerStats(),
+                                'request_body' => $requesttocient
+                            ];
+                            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
+                        },
+                        'body' => json_encode(
+                            $requesttocient
+                    )],
+                    ['defaults' => [ 'exceptions' => false ]]
+                );
+                $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+                $client_response_time = microtime(true) - $sendtoclient;
+                Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
+                $client_reponse->requestoclient = $requesttocient;
+                //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
+                return $client_reponse;
+            }catch(\Exception $e){
                 $response = array(
                     "fundtransferresponse" => array(
                         "status" => array(
@@ -100,11 +106,11 @@ class ClientRequestHelper{
                         'balance' => 0.0
                     )
                 );
-                Helper::saveLog('FAILED'.$requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($requesttocient),$response);
+                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
                 return $client_reponse;
-        }
+            }
     }
     public static function currencyRateConverter($currency,$roundId=1){
         try{
@@ -190,6 +196,7 @@ class ClientRequestHelper{
     }
 
 
+
     /**
      * Custom Fundtransfer for CREDIT ASYNC PURPOSE -RiAN
      * USAGE just add _TG to existing fundtransfer, and action array parameter!
@@ -261,7 +268,11 @@ class ClientRequestHelper{
             $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl').'/tigergames/fundtransfer',
                 [
                     'on_stats' => function (TransferStats $stats) use ($requesttocient) {
-                        ProviderHelper::saveLog('RID'.$requesttocient['fundtransferrequest']['fundinfo']['roundId']. 'TIME = '.$stats->getTransferTime(), 999, json_encode($stats->getHandlerStats()), $requesttocient);
+                        $data = [
+                            'http_body' => $stats->getHandlerStats(),
+                            'request_body' => $requesttocient
+                        ];
+                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                     },
                     'timeout' => 0.50, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
@@ -360,7 +371,11 @@ class ClientRequestHelper{
             $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl').'/tigergames/fundtransfer-timeout',
                 [
                     'on_stats' => function (TransferStats $stats) use ($requesttocient) {
-                        ProviderHelper::saveLog('RID'.$requesttocient['fundtransferrequest']['fundinfo']['roundId']. 'TIME = '.$stats->getTransferTime(), 999, json_encode($stats->getHandlerStats()), $requesttocient);
+                        $data = [
+                            'http_body' => $stats->getHandlerStats(),
+                            'request_body' => $requesttocient
+                        ];
+                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                     },
                     'timeout' => 0.10, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
@@ -413,7 +428,11 @@ class ClientRequestHelper{
             $guzzle_response = $client->post($client_details->fund_transfer_url,
                 [
                     'on_stats' => function (TransferStats $stats) use ($requesttocient) {
-                        ProviderHelper::saveLog('RID '.$requesttocient->fundtransferrequest->fundinfo->roundId. 'TIME = '.$stats->getTransferTime(), 999, json_encode($stats->getHandlerStats()), $requesttocient);
+                        $data = [
+                            'http_body' => $stats->getHandlerStats(),
+                            'request_body' => $requesttocient
+                        ];
+                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                     },
                     'body' => json_encode($requesttocient)
                 ],
@@ -428,10 +447,10 @@ class ClientRequestHelper{
                 return true;
             }elseif(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402"){
-                Helper::saveLog('fundTransferResend', 999, json_encode([$client_response]), "fundTransferResend 402");
+                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode([$client_response]), "fundTransferResend 402");
                 return false;
             }else{
-                Helper::saveLog('fundTransferResend', 999, json_encode([$client_response]), "fundTransferResend unknown");
+                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode([$client_response]), "fundTransferResend unknown");
                 return false;
             }
         }catch(\Exception $e){
@@ -439,7 +458,7 @@ class ClientRequestHelper{
                 "msg"=> $e->getMessage().' '.$e->getLine(),
                 "code"=> '402'
             ];
-            Helper::saveLog('fundTransferResend', 999, json_encode([$response]), "fundTransferResend HIT");
+            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode([$response]), "fundTransferResend HIT");
             return false;
         }
     }
@@ -505,6 +524,5 @@ class ClientRequestHelper{
         // Helper::saveLog('updatecreateGameTransExt', 999, json_encode(DB::getQueryLog()), "TIME updatecreateGameTransExt");
         return ($update ? true : false);
     }
-
-
+    
 }
