@@ -12,6 +12,9 @@ use DB;
 class WazdanController extends Controller
 {
     //
+    public function __construct() {
+        $this->startTime = microtime(true);
+    }
     public function hashCode(Request $request){
         $operator = "tigergames";
         $license = "curacao";
@@ -153,6 +156,7 @@ class WazdanController extends Controller
                     );
                     Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
                     response($msg,200)->header('Content-Type', 'application/json');
+                    Helper::saveLog('responseTime(WAZDANBET)', 12, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -322,6 +326,7 @@ class WazdanController extends Controller
                         )
                     );
                     Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
+                    Helper::saveLog('responseTime(WAZDANWIN)', 12, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
