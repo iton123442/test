@@ -130,14 +130,8 @@ class EvolutionController extends Controller
                         "amount" => round($data["transaction"]["amount"],2),
                         "roundid" => $data["transaction"]["refId"]
                     );
-                    $game = $this->getGameTransaction($client_details->player_token,$data["transaction"]["refId"]);
-                    if(!$game){
-                        $gametransactionid=EVGHelper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
-                    }
-                    else{
-                        $gametransactionid= $game->game_trans_id;
-                    }
                     if(!$game_transaction){
+                        $gametransactionid=EVGHelper::createGameTransaction('debit', $json_data, $game_details, $client_details);
                         $transactionId=EVGHelper::createEVGGameTransactionExt($gametransactionid,$data,null,null,null,1);
                     }
                     $sendtoclient =  microtime(true); 

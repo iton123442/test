@@ -333,15 +333,9 @@ class BNGController extends Controller
                     "amount" => round($data["args"]["bet"],2),
                     "roundid" => $data["args"]["round_id"]
                 );
-                $game = TransactionHelper::getGameTransaction($data['token'],$data["args"]["round_id"]);
-                if(!$game){
-                    $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
-                }
-                else{
-                    $gametransactionid= $game[0]->game_trans_id;
-                }
                 $this->_setExtParameter($this->_getExtParameter()+1);
                 if(!$game_transaction){
+                    $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details);
                     $transactionId=Helper::createBNGGameTransactionExt($gametransactionid,$data,null,null,null,1);
                 } 
 
