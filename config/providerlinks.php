@@ -245,8 +245,10 @@ return [
         'gamelaunchurl' => 'https://gamelaunch.wazdan.com/',
         'operator_data' =>[
             "1"=>"tigergames",
+            "2"=>"askmebet",
             "5"=>"askmebet",
-            "6"=>"xigolo",
+            "6"=>"askmebet",
+            "3"=>"xigolo",
         ]
     ],
     'evolution'=>[
