@@ -238,18 +238,18 @@ return [
         'secret_key' => 'uSPij46kVe977JH2',
     ],
     'wazdan'=>[
-        'operator' => 'tigergames',
-        'license' => 'curacao',
-        'hmac_scret_key' => '2QvSiQ2KXX8mBM0LyexfAcNNgI5eXzcx',
-        'partnercode'=> 'gd1wiurg',
-        'gamelaunchurl' => 'https://gamelaunch.wazdan.com/',
         'operator_data' =>[
             "1"=>"tigergames",
             "2"=>"askmebet",
             "5"=>"askmebet",
             "6"=>"askmebet",
             "3"=>"xigolo",
-        ]
+        ],
+        'operator' => 'tigergames',
+        'license' => 'curacao',
+        'hmac_scret_key' => '2QvSiQ2KXX8mBM0LyexfAcNNgI5eXzcx',
+        'partnercode'=> 'gd1wiurg',
+        'gamelaunchurl' => 'https://gamelaunch.wazdan.com/'
     ],
     'evolution'=>[
         'host' => 'https://babylontgg.evo-games.com',
