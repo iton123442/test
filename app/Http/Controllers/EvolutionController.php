@@ -11,7 +11,7 @@ use DB;
 class EvolutionController extends Controller
 {
     //
-
+    // # Rollback 01/06/20
     public function authentication(Request $request){
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
@@ -78,6 +78,7 @@ class EvolutionController extends Controller
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
             if($client_details){
                 $client_response=ClientRequestHelper::playerDetailsCall($client_details->player_token);
+                Helper::saveLog('BALANCE(EVG)', 12, json_encode(["balancebefore"=>$client_response->playerdetailsresponse->balance]), ["ONBALANCE"]);
                 $msg = array(
                     "status"=>"OK",
                     "balance" => (float)number_format($client_response->playerdetailsresponse->balance,2,'.', ''),
@@ -102,6 +103,7 @@ class EvolutionController extends Controller
             return response($msg,200)->header('Content-Type', 'application/json');
         }
     }
+
     public function debit(Request $request){
         $startTime =  microtime(true);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
@@ -131,22 +133,49 @@ class EvolutionController extends Controller
                         "roundid" => $data["transaction"]["refId"]
                     );
                     if(!$game_transaction){
-                        $gametransactionid=EVGHelper::createGameTransaction('debit', $json_data, $game_details, $client_details);
-                        $transactionId=EVGHelper::createEVGGameTransactionExt($gametransactionid,$data,null,null,null,1);
+                        $gametransactionid=EVGHelper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
                     }
-                    $sendtoclient =  microtime(true); 
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
+                    $msg = array(
+                        "status"=>"OK",
+                        "balance"=>$client_details->balance-round($data["transaction"]["amount"],2),
+                        "uuid"=>$data["uuid"],
+                    );
+                    Helper::saveLog('BALANCE(EVG)', 12, json_encode(["balancebefore"=>$client_details->balance,"balanceafter"=>$client_details->balance-round($data["transaction"]["amount"],2)]), ["ABOVEBALANCE"]);
+					$action_payload = [
+						"type" => "custom", #genreral,custom :D # REQUIRED!
+						"custom" => [
+							"provider" => 'evolution',
+						],
+						"provider" => [
+							"provider_request" => $data, #R
+							"provider_trans_id"=>$data["transaction"]["id"], #R
+							"provider_round_id"=>$data["transaction"]["refId"], #R
+						],
+						"mwapi" => [
+							"roundId"=>$gametransactionid, #R
+							"type"=>2, #R
+							"game_id" => $game_details->game_id, #R
+							"player_id" => $client_details->player_id, #R
+							"mw_response" => $msg, #R
+						]
+					];
+
+                    $sendtoclient =  microtime(true);  
+            		$client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$gametransactionid,'debit',false,$action_payload);
                     $client_response_time = microtime(true) - $sendtoclient;
                     $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                    Helper::saveLog('BALANCE(EVG)', 12, json_encode(["balancebefore"=>$client_response->fundtransferresponse->balance]), ["BELOWBALANCE"]);
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         $msg = array(
                             "status"=>"OK",
                             "balance"=>(float)$balance,
                             "uuid"=>$data["uuid"],
                         );
-                        Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                        Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
+                        //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
+                        
+                       // Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                         return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
@@ -227,20 +256,53 @@ class EvolutionController extends Controller
                         }
                         $gametransactionid = $game->game_trans_id;
                     }
-                    $transactionId= EVGHelper::createEVGGameTransactionExt($gametransactionid,$data,null,null,null,2);
+                    // $transactionId= EVGHelper::createEVGGameTransactionExt($gametransactionid,$data,null,null,null,2);
+                    // $sendtoclient =  microtime(true);  
+                    // $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                    // $client_response_time = microtime(true) - $sendtoclient;
+                    // $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                    $msg = array(
+                        "status"=>"OK",
+                        "balance"=>$client_details->balance+round($data["transaction"]["amount"],2),
+                        "uuid"=>$data["uuid"],
+                    );
+
+					$action_payload = [
+						"type" => "custom", #genreral,custom :D # REQUIRED!
+						"custom" => [
+							"provider" => 'evolution',
+						],
+						"provider" => [
+							"provider_request" => $data, #R
+							"provider_trans_id"=>$data["transaction"]["id"], #R
+							"provider_round_id"=>$data["transaction"]["refId"], #R
+						],
+						"mwapi" => [
+							"roundId"=>$gametransactionid, #R
+							"type"=>2, #R
+							"game_id" => $game_details->game_id, #R
+							"player_id" => $client_details->player_id, #R
+							"mw_response" => $msg, #R
+						]
+					];
+
                     $sendtoclient =  microtime(true);  
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                    // $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+            		$client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
                     $client_response_time = microtime(true) - $sendtoclient;
                     $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                    
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         $msg = array(
                             "status"=>"OK",
                             "balance"=>(float)$balance,
                             "uuid"=>$data["uuid"],
                         );
-                        Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                        Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"creditproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
+                        //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
+
+                        //Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"creditproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                         return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
@@ -462,3 +524,4 @@ class EvolutionController extends Controller
 		return $result > 0 ? $game[0] : null;
 	}
 }
+
