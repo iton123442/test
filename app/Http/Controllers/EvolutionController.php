@@ -140,7 +140,6 @@ class EvolutionController extends Controller
                         "balance"=>$client_details->balance-round($data["transaction"]["amount"],2),
                         "uuid"=>$data["uuid"],
                     );
-                    Helper::saveLog('BALANCE(EVG)', 12, json_encode(["balancebefore"=>$client_details->balance,"balanceafter"=>$client_details->balance-round($data["transaction"]["amount"],2)]), ["ABOVEBALANCE"]);
 					$action_payload = [
 						"type" => "custom", #genreral,custom :D # REQUIRED!
 						"custom" => [
@@ -164,7 +163,6 @@ class EvolutionController extends Controller
             		$client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$gametransactionid,'debit',false,$action_payload);
                     $client_response_time = microtime(true) - $sendtoclient;
                     $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-                    Helper::saveLog('BALANCE(EVG)', 12, json_encode(["balancebefore"=>$client_response->fundtransferresponse->balance]), ["BELOWBALANCE"]);
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
