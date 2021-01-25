@@ -524,3 +524,7 @@ $app->post('/api/oryx/readWriteProcess', 'OryxGamingController@readWriteProcess'
 $app->post('/api/oryx/fundTransfer', 'OryxGamingController@fundTransfer');
 $app->post('tigergames/{type}/bg-fundtransfer','FundtransferProcessorController@backgroundProcessDebitCreditFund');
 $app->post('tigergames/bg-fundtransfer','FundtransferProcessorController@bgFundTransfer');
+
+
+$app->post('tigergames/fundtransfer','FundtransferProcessorController@fundTransfer');
+$app->post('tigergames/fundtransfer-timeout','FundtransferProcessorController@fundTransferTimout');
