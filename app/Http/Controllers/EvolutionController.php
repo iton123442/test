@@ -78,10 +78,10 @@ class EvolutionController extends Controller
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
             if($client_details){
                 $client_response=ClientRequestHelper::playerDetailsCall($client_details->player_token);
-                Helper::saveLog('BALANCE(EVG)', 12, json_encode(["balancebefore"=>$client_response->playerdetailsresponse->balance]), ["ONBALANCE"]);
+                Helper::saveLog('BALANCE(EVG)', 12, json_encode(["balancebefore"=>$client_details->balance]), ["ONBALANCE"]);
                 $msg = array(
                     "status"=>"OK",
-                    "balance" => (float)number_format($client_response->playerdetailsresponse->balance,2,'.', ''),
+                    "balance" => (float)number_format($client_details->balance,2,'.', ''),
                     "uuid"=>$data["uuid"],
                 );
                 return response($msg,200)->header('Content-Type', 'application/json');
