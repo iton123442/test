@@ -233,7 +233,8 @@ return [
         'secret_key' => 'AE180CC1E8FF48B08A759F9625D725D6',
     ],
     'tpp' => [
-        'gamelaunch_url' => 'https://tigergames-dk2.pragmaticplay.net/gs2c/playGame.do',
+        'gamelaunch_url' => 'https://tigergames-tw.pragmaticplay.net/gs2c/playGame.do',
+        // 'gamelaunch_url' => 'https://tigergames-dk2.pragmaticplay.net/gs2c/playGame.do',
         'secureLogin' => 'tg_tigergames', //or stylename
         'secret_key' => 'uSPij46kVe977JH2',
     ],
