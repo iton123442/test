@@ -431,6 +431,27 @@ class GameLobby{
         
     }
 
+     public static function slotmill($request){
+        try {
+            $client_details = Providerhelper::getClientDetails('token', $request["token"]);
+            if ($request["game_code"] == "19002") {
+               $url = config("providerlinks.slotmill.treasures"); 
+            } elseif ($request["game_code"] == "19003") {
+               $url = config("providerlinks.slotmill.starspell"); 
+            } elseif ($request["game_code"] == "19005") {
+               $url =  config("providerlinks.slotmill.wildfire"); 
+            } elseif ($request["game_code"] == "19007") {
+               $url =  config("providerlinks.slotmill.vikings"); 
+            } elseif ($request["game_code"] == "19008") {
+               $url =  config("providerlinks.slotmill.outlaws"); 
+            }
+            return $url = $url."?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
+
+        } catch (\Exception $e){
+            return $request["exitUrl"];
+        }
+    }
+
     public static function tgglaunchUrl( $game_code = null, $token = null){
         $client_player_details = Providerhelper::getClientDetails('token', $token);
         $requesttosend = [

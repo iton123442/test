@@ -368,6 +368,15 @@ return [
         'merchantId' => "tigergamesws",//soap api login
         'merchantPassword' => "G4Rvxun3BFJjULGp",//soap api login
     ],
+    'slotmill'=>[
+        'provider_db_id'=> 47,
+        'brand' => "TigerGames",
+        'treasures' => "https://templar-treasures.slotmill.com/",
+        'starspell' => "https://starspell.slotmill.com/",
+        'wildfire' => "https://wildfire.slotmill.com/",
+        'vikings' => "https://vikings-creed.slotmill.com/",
+        'outlaws' => "https://outlaws.slotmill.com/"
+    ],
 ];
 
 ?>

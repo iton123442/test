@@ -528,3 +528,13 @@ $app->post('tigergames/bg-fundtransfer','FundtransferProcessorController@bgFundT
 
 $app->post('tigergames/fundtransfer','FundtransferProcessorController@fundTransfer');
 $app->post('tigergames/fundtransfer-timeout','FundtransferProcessorController@fundTransferTimout');
+
+
+// SLOTMILL
+$app->post('api/slotmill/playerinfo.json','SlotMillController@playerinfo');
+$app->post('api/slotmill/wager.json','SlotMillController@wager'); // bet 
+$app->post('api/slotmill/cancelwager.json','SlotMillController@cancelwager');
+$app->post('api/slotmill/appendwagerresult.json','SlotMillController@appendwagerresult'); //bonus
+$app->post('api/slotmill/appendwagergoods.json','SlotMillController@appendwagergoods'); //bonus
+$app->post('api/slotmill/endwager.json','SlotMillController@endwager'); // win 
+$app->post('api/slotmill/reverse.json','SlotMillController@reverse');

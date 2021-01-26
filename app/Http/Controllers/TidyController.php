@@ -238,7 +238,7 @@ class TidyController extends Controller
 			$income = 0;
 			$win_type = 0;
 			$method = 1;
-			$win_or_lost = 5; // 0 lost,  5 processing
+			$win_or_lost = 0; // 0 lost,  5 processing
 			$payout_reason = 'Bet';
 			$provider_trans_id = $transaction_uuid;
 
@@ -506,6 +506,18 @@ class TidyController extends Controller
 			return $data_response;
 		}
 
+		$already_process =  ProviderHelper::findGameExt($reference_transaction_uuid,2,'round_id');
+		
+		if($already_process != 'false'){
+			$data_response = [
+				"uid" => $uid,
+				"request_uuid" => $request_uuid,
+				"currency" => TidyHelper::currencyCode($client_details->default_currency),
+				"balance" => ProviderHelper::amountToFloat($client_details->balance)
+			];
+			return $data_response;
+		}
+
 		$refund_call = ProviderHelper::findGameExt($transaction_uuid, 3,'transaction_id');
 		if($refund_call != 'false'){
 			$data_response = array(
@@ -617,4 +629,3 @@ class TidyController extends Controller
 
 }
 
-	

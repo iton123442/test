@@ -532,6 +532,15 @@ class GameLobbyController extends Controller
                     // ->header('Content-Type', 'application/json');
                     
                 }
+                elseif($provider_code==90){ //slotmill
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" =>  GameLobby::slotmill($request->all()),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
                 elseif($provider_code == 53){ 
                     $url = GameLobby::tgglaunchUrl($request->game_code,$request->token);
                     $msg = array(
