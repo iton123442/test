@@ -36,7 +36,7 @@ class PragmaticPLayController extends Controller
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
-                "decription" => "Success"
+                "decription" => "Hash don't match!"
             ];
             return $response;
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);
@@ -98,7 +98,7 @@ class PragmaticPLayController extends Controller
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
-                "decription" => "Success"
+                "decription" => "Hash don't match!"
             ];
             return $response;
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);
@@ -136,7 +136,7 @@ class PragmaticPLayController extends Controller
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
-                "decription" => "Success"
+                "decription" => "Hash don't match!"
             ];
             return $response;
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);
@@ -317,13 +317,13 @@ class PragmaticPLayController extends Controller
         $dataSort = json_decode($json_encode, true);
         $hash = $this->hashParam($dataSort);
         
-        // if($hash != $data->hash){
-        //     $response = [
-        //         "error" => 5,
-        //         "decription" => "Success"
-        //     ];
-        //     return $response;
-        // }
+        if($hash != $data->hash){
+            $response = [
+                "error" => 5,
+                "decription" => "Hash don't match!"
+            ];
+            return $response;
+        }
         
         $checkGameTrans = DB::select("SELECT game_trans_id FROM game_transactions WHERE round_id = '".$data->roundId."' ");
         // $checkGameTrans = DB::table('game_transactions')->select('game_trans_id')->where("round_id","=",$data->roundId)->get();
@@ -570,7 +570,7 @@ class PragmaticPLayController extends Controller
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
-                "decription" => "Success"
+                "decription" => "Hash don't match!"
             ];
             return $response;
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);
@@ -602,7 +602,7 @@ class PragmaticPLayController extends Controller
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
-                "decription" => "Success"
+                "decription" => "Hash don't match!"
             ];
             return $response;
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);
@@ -718,7 +718,7 @@ class PragmaticPLayController extends Controller
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
-                "decription" => "Success"
+                "decription" => "Hash don't match!"
             ];
             return $response;
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);
@@ -806,7 +806,7 @@ class PragmaticPLayController extends Controller
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
-                "decription" => "Success"
+                "decription" => "Hash don't match!"
             ];
             return $response;
             Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $response);

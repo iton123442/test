@@ -236,7 +236,8 @@ return [
         'gamelaunch_url' => 'https://tigergames-tw.pragmaticplay.net/gs2c/playGame.do',
         // 'gamelaunch_url' => 'https://tigergames-dk2.pragmaticplay.net/gs2c/playGame.do',
         'secureLogin' => 'tg_tigergames', //or stylename
-        'secret_key' => 'uSPij46kVe977JH2',
+        'secret_key' => 'VV23U65sif2AnZ9d',
+        // 'secret_key' => 'uSPij46kVe977JH2',
     ],
     'wazdan'=>[
         'operator_data' =>[
