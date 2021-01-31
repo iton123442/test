@@ -36,7 +36,7 @@ class FundtransferProcessorController extends Controller
         // sleep(10);
         try{
             if($payload->action->custom->provider == 'tpp'){
-                $gteid = $payload->action->mwapi->roundId;
+                $gteid = $payload->action->custom->idepotent_trans_id;
             }else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
@@ -130,6 +130,9 @@ class FundtransferProcessorController extends Controller
                         $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
                     }
                     if($payload->action->custom->provider == 'tpp'){
+                        $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$gteid)->update(["amount" => $payload->request_body->fundtransferrequest->fundinfo->amount ,"game_transaction_type" => $game_transaction_type, "provider_request" => json_encode($payload->action->provider->provider_request),"mw_response" => json_encode($payload->action->mwapi->mw_response),"mw_request" => json_encode($requesttocient),"client_response" => json_encode($client_response),"transaction_detail" => "success" ]);
+                    }
+                    if($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'ygg'){
                         $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$gteid)->update(["amount" => $payload->request_body->fundtransferrequest->fundinfo->amount ,"game_transaction_type" => $game_transaction_type, "provider_request" => json_encode($payload->action->provider->provider_request),"mw_response" => json_encode($payload->action->mwapi->mw_response),"mw_request" => json_encode($requesttocient),"client_response" => json_encode($client_response),"transaction_detail" => "success" ]);
                     }
                 }else{
