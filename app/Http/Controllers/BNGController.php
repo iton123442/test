@@ -231,14 +231,16 @@ class BNGController extends Controller
                 // $client_response = json_decode($guzzle_response->getBody()->getContents());
                 // Helper::saveLog('AuthPlayer(BNG)', 12, json_encode(array("token"=>$data)),$client_response);
                 //$balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                $is_test= $client_details->test_player == 0?false:true;
+                $brand = $client_details->client_code?$client_details->client_code:"TigerGames";
                 $msg = array(
                     "uid" => $data["uid"],
                     "player"=>array(
                         "id"=> (string)$client_details->player_id,         
-                        "brand"=> "BOONGO",      
+                        "brand"=> $brand,      
                         "currency"=> $client_details->default_currency,   
                         "mode"=> "REAL",       
-                        "is_test"=> false
+                        "is_test"=> $is_test
                     ),
                     "balance"=>array(
                         "value"=> number_format($client_details->balance,2,'.', ''),
