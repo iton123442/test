@@ -150,6 +150,7 @@ class ProviderHelper{
 		    // $result= $query->latest('token_id')->first();
 		    $filter = 'order by token_id desc LIMIT 1';
 		}
+
 		$query = DB::select('select `p`.`client_id`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`p`.`created_at` from player_session_tokens pst inner join players as p using(player_id) inner join clients as c using (client_id) inner join client_endpoints as ce using (client_id) inner join operator as op using (operator_id) '.$where.' '.$filter.'');
 
 		 $client_details = count($query);
@@ -537,11 +538,19 @@ class ProviderHelper{
         // Helper::saveLog('updateGameTransaction', 999, json_encode(DB::getQueryLog()), "TIME updateGameTransaction");
         return ($update ? true : false);
     }
+    
 
-    public static function updateGameTransactionExtTransactionStatus($game_ext_id, $status)
-	{
-		$update = DB::select("update `game_transaction_ext` set `transaction_detail` = $status where `game_trans_ext_id` = $game_ext_id");
+    public  static function updateGameTransactionExtCustom($game_trans_ext_id, $provider_request, $mw_response) {
+		// DB::enableQueryLog();
+   	    $update = DB::table('game_transaction_ext')
+                ->where('game_trans_ext_id', $game_trans_ext_id)
+                ->update([
+        		  'provider_request' => json_encode($provider_request), 
+        		  'mw_response' => json_encode($mw_response), 
+	    		]);
+		return ($update ? true : false);
 	}
+
 
 	/**
 	 * GLOBAL
@@ -567,6 +576,11 @@ class ProviderHelper{
 		$update = DB::select("update `game_transactions` set `win` = $win, `transaction_reason` = '$reason' where `game_trans_id` = $game_trans_id");
 	}
 
+
+	public static function updateGameTransactionExtTransactionStatus($game_ext_id, $status)
+	{
+		$update = DB::select("update `game_transaction_ext` set `transaction_detail` = $status where `game_trans_ext_id` = $game_ext_id");
+	}
 
 	/**
 	 * GLOBAL
@@ -945,9 +959,10 @@ class ProviderHelper{
 	public static function checkGameRestricted($game_id, $player_id){
 		$query = DB::select('select * from game_player_restriction where player_id = '.$player_id.' and game_id = '.$game_id.'');
 		$client_details = count($query);
-		return $client_details > 0 ? true : false;
+		$data = count($query);
+		return $data > 0 ? $query[0] : false;
 	}
-	
+	// RESTRICKPLAYER ALL GAME
 	public static function checkGameRestrictedV2($player_id){
 		$query = DB::select('select * from game_player_restriction where player_id = '.$player_id.' ');
 		$client_details = count($query);
@@ -1026,7 +1041,7 @@ class ProviderHelper{
 	 * 
 	 */
 	public static function saveBalance($token){
-		$client_details = AWSHelper::getClientDetails('token', $token);
+		$client_details = ProviderHelper::getClientDetails('token', $token);
 		if($client_details){
 			$client = new Client([
 			    'headers' => [ 
@@ -1054,30 +1069,33 @@ class ProviderHelper{
 				['body' => json_encode($datatosend)]
 			);
 			$client_response = json_decode($guzzle_response->getBody()->getContents());
-			AWSHelper::saveLog('PLAYER DETAILS LOG', 999, json_encode($client_response), $datatosend);
+			ProviderHelper::saveLog('PLAYER DETAILS LOG', 999, json_encode($client_response), $datatosend);
 			if(isset($client_response->playerdetailsresponse->status->code) && $client_response->playerdetailsresponse->status->code == 200){
-				AWSHelper::_insertOrUpdate($client_details->token_id,$client_response->playerdetailsresponse->balance);
+				ProviderHelper::_insertOrUpdate($client_details->token_id,$client_response->playerdetailsresponse->balance);
 				return true;
 			}else{
 				return false;
 			}
 		}catch (\Exception $e){
+			// return $e->getMessage();
 			return false;
 		 }
 	}
 
-	public static function _insertOrUpdate($token_id,$balance){
+	public static function _insertOrUpdate($token_id,$balance,$player_id=null){
 		$balance_query = DB::select("SELECT * FROM player_session_tokens WHERE token_id = '".$token_id."'");
 		$data = count($balance_query);
 		if($data > 0){
 			return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
 		}
 		else{
-			return DB::select("INSERT INTO  player_session_tokens (token_id,balance) VALUEs ('".$token_id."',".$balance.")");
+			$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+			return DB::select("INSERT INTO  player_session_tokenss (token_id,balance, player_token, player_ip_address) VALUEs ('".$token_id."',".$client_details->player_token."','127.0.0.11',".$balance.")");
 		}
 	}
 
 	public static function idenpotencyTable($provider_trans_id){
 		return DB::select("INSERT INTO  transaction_idempotent (provider_trans_id) VALUEs ('".$provider_trans_id."')");
 	}
+
 }

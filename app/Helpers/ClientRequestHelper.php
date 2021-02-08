@@ -206,7 +206,6 @@ class ClientRequestHelper{
      */
     // public static function fundTransfer_TG($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
     public static function fundTransfer_TG($client_details,$amount,$game_code,$game_name,$roundId,$type,$rollback=false,$action=array()){
-        Helper::saveLog('fundTransfer_TG', 999, json_encode([]), "fundTransfer_TG HIT");
         // if($type == 'credit'){
         //     $game_transaction_type = 2;
         // }else{
@@ -254,7 +253,7 @@ class ClientRequestHelper{
                 "endpoint" => $client_details->fund_transfer_url
             ],
         ];
-        
+        Helper::saveLog('fundTransfer_TG', 999, json_encode($requesttocient), "fundTransfer_TG HIT ".$roundId);
         # REQUIRED PARAMETER IN ACTION ARRAY
         if(count($action) > 0){
             $requesttocient["action"] = $action;
@@ -274,7 +273,7 @@ class ClientRequestHelper{
                         ];
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                     },
-                    'timeout' => 0.50, # enough tobe received by the server!
+                    'timeout' => 0.050, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
                 ],
                 ['defaults' => ['exceptions' => false]]
@@ -377,7 +376,7 @@ class ClientRequestHelper{
                         ];
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                     },
-                    'timeout' => 0.10, # enough tobe received by the server!
+                    'timeout' => 0.050, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
                 ],
                 ['defaults' => ['exceptions' => false]]
@@ -432,7 +431,8 @@ class ClientRequestHelper{
                             'http_body' => $stats->getHandlerStats(),
                             'request_body' => $requesttocient
                         ];
-                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
+                        // Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
+                        Helper::saveLog($requesttocient->fundtransferrequest->fundinfo->roundId, 999, json_encode($data), $stats->getTransferTime());
                     },
                     'body' => json_encode($requesttocient)
                 ],
@@ -447,10 +447,10 @@ class ClientRequestHelper{
                 return true;
             }elseif(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402"){
-                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode([$client_response]), "fundTransferResend 402");
+                Helper::saveLog($requesttocient->fundtransferrequest->fundinfo->roundId, 402, json_encode([$client_response]), "fundTransferResend 402");
                 return false;
             }else{
-                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode([$client_response]), "fundTransferResend unknown");
+                Helper::saveLog($requesttocient->fundtransferrequest->fundinfo->roundId, 402, json_encode([$client_response]), "fundTransferResend unknown");
                 return false;
             }
         }catch(\Exception $e){
@@ -458,7 +458,7 @@ class ClientRequestHelper{
                 "msg"=> $e->getMessage().' '.$e->getLine(),
                 "code"=> '402'
             ];
-            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode([$response]), "fundTransferResend HIT");
+            Helper::saveLog($requesttocient->fundtransferrequest->fundinfo->roundId, 504, json_encode([$response]), "fundTransferResend HIT");
             return false;
         }
     }

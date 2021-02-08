@@ -187,9 +187,19 @@ class KAGamingController extends Controller
 
         if($freeGames == true){
             $bet_amount = 0;
+            $is_freespin = true;
         }else{
             $bet_amount = $this->formatAmounts($data->betAmount);
+            $is_freespin = false;
         }
+
+        $fund_extra_data = [
+            'fundtransferrequest' => [
+                'fundinfo' => [
+                    'freespin' => $is_freespin,
+                ]
+            ]
+        ];
 
         #1DEBUGGING
         // $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
@@ -232,6 +242,14 @@ class KAGamingController extends Controller
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
 
+        # Check Game Restricted
+        $restricted_player = ProviderHelper::checkGameRestricted($game_information->game_id, $client_details->player_id);
+        if($restricted_player){
+            $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($restricted_player);
+            if(!$attempt_resend_transaction){
+                return  $response = ["status" => "failed - player restricted", "statusCode" =>  4];
+            }
+        }
 
         // $all_round = $this->findAllGameExt($provider_trans_id, 'all', $round_id);
         // dd($all_round);
@@ -266,13 +284,13 @@ class KAGamingController extends Controller
         if($check_bet_round != 'false'){
           $existing_bet_details = KAHelper::findGameTransaction($check_bet_round->game_trans_id, 'game_transaction');
           $gamerecord = $existing_bet_details->game_trans_id;
-          $game_transextension = KAHelper::createGameTransExtV2($existing_bet_details->game_trans_id,$provider_trans_id, $round_id, $amount, $game_transaction_type);
+          $game_transextension = KAHelper::createGameTransExtV2($existing_bet_details->game_trans_id,$provider_trans_id, $round_id, $amount, $game_transaction_type,$data);
         }else{
            #1 DEBIT OPERATION
            $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
-           $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type);
+           $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type,$data);
         }
-
+        
         try {
           $client_response = ClientRequestHelper::fundTransfer($client_details,abs($bet_amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, 'debit');
           KAHelper::saveLog('KAGaming checkPlay CRID '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
@@ -300,6 +318,21 @@ class KAGamingController extends Controller
             #2 CREDIT OPERATION   
             $game_transextension_credit = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $win_amount, 2);
             $client_response_credit = ClientRequestHelper::fundTransfer($client_details,abs($win_amount),$game_information->game_code,$game_information->game_name,$game_transextension_credit,$gamerecord, 'credit');
+
+            if(isset($client_response_credit->fundtransferresponse->status->code) 
+             && $client_response_credit->fundtransferresponse->status->code == "402"){
+
+                $response = [
+                    "balance" => $this->formatBalance($client_details->balance+$win_amount),
+                    "status" => "success",
+                    "statusCode" =>  0
+                ];
+                Providerhelper::updateGameTransactionExtCustom($game_transextension_credit, $data,$response);
+                Providerhelper::createRestrictGame($game_information->game_id,$client_details->player_id,$game_transextension_credit, $client_response_credit->requestoclient);
+                return $response;
+
+            }
+
             $general_details['client']['after_balance'] = KAHelper::amountToFloat($client_response_credit->fundtransferresponse->balance);
             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response_credit->fundtransferresponse->balance);
             $response = [
@@ -448,7 +481,7 @@ class KAGamingController extends Controller
         $game_code = $game_information->game_id;
         $token_id = $client_details->token_id;
 
-        $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type);
+        $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type, $data);
 
         try {
           $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, 'credit');
@@ -567,17 +600,17 @@ class KAGamingController extends Controller
 
         if($refund_amount < 0){
            $transaction_type = 'debit';
-           $pay_amount =  0; //abs($data['amount']);
-           $pay_amount =  $existing_bet->pay_amount;
-           $income = $existing_bet->bet_amount - $existing_bet->pay_amount;
+        //    $pay_amount =  0; //abs($data['amount']);
+           $pay_amount =  $existing_bet->pay_amount + abs($refund_amount);
+           $income = $existing_bet->bet_amount - $pay_amount;
            // if(KAHelper::amountToFloat($player_details->playerdetailsresponse->balance) < abs($refund_amount)){
            if(KAHelper::amountToFloat($client_details->balance) < abs($refund_amount)){
                  return  $response = ["status" => "Insufficient balance", "statusCode" =>  200];
            }
         }else{
            $transaction_type = 'credit';
-           $pay_amount =  $existing_bet->pay_amount;
-           $income = $existing_bet->bet_amount - $existing_bet->pay_amount;
+           $pay_amount =  $existing_bet->pay_amount + abs($refund_amount);
+           $income = $existing_bet->bet_amount - $pay_amount;
         }
 
         if($pay_amount > 0){
@@ -587,7 +620,7 @@ class KAGamingController extends Controller
         }
 
         #1 DEBIT OPERATION
-        $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, abs($refund_amount), $game_transaction_type);
+        $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, abs($refund_amount), $game_transaction_type, $data);
 
         try {
           $client_response = ClientRequestHelper::fundTransfer($client_details,abs($refund_amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, $transaction_type, true);
@@ -1175,6 +1208,7 @@ class KAGamingController extends Controller
             $transaction_db->where([
                 // ["gte.round_id", "=", $second_identifier],
                 ["gte.provider_trans_id", "=", $provider_identifier],
+                ["gte.transaction_detail", "!=", '"FAILED"'],
             ]);
         }  
         // $result = $transaction_db->latest()->get();
