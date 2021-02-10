@@ -551,7 +551,7 @@ class TidyController extends Controller
  
 			$type = "refund";
 			$request_data = [
-				'amount' => 0,
+				'amount' => $bet_transaction->bet_amount,
 				'transid' => $transaction_uuid,
 				'roundid' => $reference_transaction_uuid
 			];

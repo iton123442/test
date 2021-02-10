@@ -245,10 +245,10 @@ class KAGamingController extends Controller
         # Check Game Restricted
         $restricted_player = ProviderHelper::checkGameRestricted($game_information->game_id, $client_details->player_id);
         if($restricted_player){
-            $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($restricted_player);
-            if(!$attempt_resend_transaction){
+            // $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($restricted_player);
+            // if(!$attempt_resend_transaction){
                 return  $response = ["status" => "failed - player restricted", "statusCode" =>  4];
-            }
+            // }
         }
 
         // $all_round = $this->findAllGameExt($provider_trans_id, 'all', $round_id);
