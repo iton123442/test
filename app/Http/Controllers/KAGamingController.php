@@ -614,7 +614,11 @@ class KAGamingController extends Controller
         }
 
         if($pay_amount > 0){
-            $win_or_lost = 1; // 1 win,  5 processing
+            if(count($all_round) != 0){
+                $win_or_lost = 1; // 1 win,  5 processing
+            }else{
+                $win_or_lost = 4; // 4 refund,  5 processing
+            }
         }else{
             $win_or_lost = 4; // 4 refund,  5 processing
         }
