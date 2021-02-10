@@ -398,7 +398,7 @@ class BNGController extends Controller
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
-                            "value" =>number_format(Helper::getBalance($client_details),2,'.', ''),
+                            "value" =>number_format($client_details->balance,2,'.', ''),
                             "version" => $this->_getExtParameter()
                         ),
                         "error" => array(
