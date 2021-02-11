@@ -9,17 +9,17 @@ class ClientHelper
 {
 	public static function getClientErrorCode($error_code){
 		$msg = [
-		  1 => 'Client not found',
-		  2 => 'Client is disabled',
-		  3 => 'Game not found',
-		  4 => 'Game is under maintenance',
-		  5 => 'Provider not found',
-		  6 => 'Provider is under maintenance',
-		  7 => 'Player is disabled',
+		  1 => 'Client Not Found',
+		  2 => 'Client Disabled',
+		  3 => 'Game Not Found',
+		  4 => 'Game Under Maintenance',
+		  5 => 'Provider Not Found',
+		  6 => 'Provider Under Maintenance',
+		  7 => 'Player Disabled',
 		  8 => 'Operator Not Found',
 		  9 => 'Operator Disabled',
-		  10 => 'Some thing went wrong',
-		  200 => 'Success'
+		  10 => 'Something went wrong',
+		  200 => 'Contact the Service Provider'
 		];
 		return $msg[$error_code];
 	}
@@ -47,17 +47,18 @@ class ClientHelper
 		if($operator == '' || $operator == null){ return 8; } 
 		if(isset($operator->status_id) && $operator->status_id != 1 ){ return 9; }
 
-		// Game Not Found / Game on maintenance
 		$game_provider = DB::table('sub_provider_code')->where('sub_provider_name', $data['game_provider'])->first();
-		$games = DB::table('games')->where('game_code', $data['game_code'])->where('sub_provider_id', $game_provider->sub_provider_id)->first();
-		if($games == '' || $games == null){ return 3; }
-		if($games->on_maintenance != 0 ){ return 4; } 
 
 		// Provider Disabled
 		// $sub_provider = DB::table('sub_providers')->where('sub_provider_name', $data['game_provider'])->first();
 		$sub_provider = DB::table('sub_providers')->where('sub_provider_id', $game_provider->sub_provider_id)->first();
 		if($sub_provider == '' || $sub_provider == null){ return 5; }
 		if($sub_provider->on_maintenance != 0){ return 6; }
+
+		// Game Not Found / Game on maintenance
+		$games = DB::table('games')->where('game_code', $data['game_code'])->where('sub_provider_id', $game_provider->sub_provider_id)->first();
+		if($games->on_maintenance != 0 ){ return 4; } 
+		if($games == '' || $games == null){ return 3; }
 
 		// Player Disabled
 		$player= DB::table('players')->where('client_id', $data['client_id'])
