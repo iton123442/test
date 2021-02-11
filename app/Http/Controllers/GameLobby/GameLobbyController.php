@@ -164,7 +164,7 @@ class GameLobbyController extends Controller
                         $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH GAME RESTRICTED '.$request->client_id);
                         $msg = array(
                             "message" => ClientHelper::getClientErrorCode(10),
-                            "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10).'&id='.$log_id,
+                            "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg=Player is Restricted&id='.$log_id,
                             "game_launch" => false
                         );
                         return response($msg,200)
@@ -178,7 +178,7 @@ class GameLobbyController extends Controller
                      $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH SAVE BALANCE'.$request->client_id);
                      $msg = array(
                          "message" => ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())),
-                         "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())).'&id='.$log_id,
+                         "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg=Balance Acquisition Failed&id='.$log_id,
                          "game_launch" => false
                      );
                      return response($msg,200)
