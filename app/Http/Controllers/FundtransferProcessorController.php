@@ -374,7 +374,7 @@ class FundtransferProcessorController extends Controller
             $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, $type, $details["rollback"]);
         } catch (\Exception $e) {
             ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED');
-            ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+            // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
             $mw_payload = ProviderHelper::fundTransfer_requestBody($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$type);
             ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $mw_payload);
             Helper::saveLog('backgroundProcesstFund FATAL ERROR', 88, json_encode($details), Helper::datesent());
@@ -423,8 +423,8 @@ class FundtransferProcessorController extends Controller
                 "balance" => $client_response->fundtransferresponse->balance,
             ];
             $this->updateGameTransactionExt($game_trans_ext_id,$client_response->requestoclient,$response,$client_response->fundtransferresponse);
-            ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
-            // ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $client_response->requestoclient);
+            // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+            ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $client_response->requestoclient);
             Helper::saveLog('backgroundProcesstFund', 88, json_encode($details), $response);
         }
     }
