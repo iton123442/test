@@ -100,7 +100,7 @@ class GameTransaction
 
         $update = DB::table('game_transactions')
                 ->where('game_trans_id', $game_details->game_trans_id)
-                ->update(['win' => $win, 'entry_id' => $entry_id]);
+                ->update(['win' => $win, 'entry_id' => $entry_id, 'pay_amount' => $game_details->bet_amount]);
      
 		return ($update ? $game_details->game_trans_id : false);
 	}
