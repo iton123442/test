@@ -396,26 +396,40 @@ class TidyController extends Controller
 		
 		try{
 			
+			$game_trans_ext_id = $this->createGameTransExt($bet_transaction->game_trans_id,$transaction_uuid, $reference_transaction_uuid, $amount, 2, $data, $data_response = null, $requesttosend = null, $client_response = null, $data_response = null);
+
+			//Initialize data to pass
+			$win = $amount > 0  ?  1 : 0;  /// 1win 0lost
+			$type = $amount > 0  ? "credit" : "debit";
+			$request_data = [
+				'win' => $win,
+				'amount' => $amount,
+				'payout_reason' => ProviderHelper::updateReason(1),
+			];
+			//update transaction
+			Helper::updateGameTransaction($bet_transaction,$request_data,$type);
+
 			$body_details = [
-				"token" => $client_details->player_token,
-				"rollback" => false,
-				"game_details" => [
-					"game_code" => $game_code,
-					"provider_id" => $this->provider_db_id
-				],
-				"game_transaction" => [
-					"provider_trans_id" => $transaction_uuid,
+	            "type" => "credit",
+	            "token" => $client_details->player_token,
+	            "rollback" => false,
+	            "game_details" => [
+	                "game_id" => $game_details->game_id
+	            ],
+	            "game_transaction" => [
+	                "provider_trans_id" => $transaction_uuid,
 	                "round_id" => $reference_transaction_uuid,
 	                "amount" => $amount
-				],
-				"provider_request" => $data,
-				"existing_bet" => [
-					"game_trans_id" => $bet_transaction->game_trans_id
-				]
-			];
+	            ],
+	            "provider_request" => $data,
+	            "game_trans_ext_id" => $game_trans_ext_id,
+	            "game_transaction_id" => $bet_transaction->game_trans_id
+
+	        ];
+
 			try {
 				$client = new Client();
-		 		$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/credit/bg-fundtransfer',
+		 		$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-fundtransfer',
 		 			[ 'body' => json_encode($body_details), 'timeout' => '0.20']
 		 		);
 		 		
