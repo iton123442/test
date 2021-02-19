@@ -27,6 +27,7 @@ class FundtransferProcessorController extends Controller
 
         // Helper::saveLog('fundTransfer', 999, json_encode([]), "MAGIC END HIT");
         $payload = json_decode(file_get_contents("php://input"));
+        Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 200, json_encode($payload), 'TG_ARRIVED');
 
         if($payload->request_body->fundtransferrequest->fundinfo->transactiontype == 'credit'){
             $game_transaction_type = 2;
@@ -49,7 +50,7 @@ class FundtransferProcessorController extends Controller
                 );
             }
         }catch(\Exception $e){
-            Helper::saveLog('fundTransfer generateGTEID', 888, json_encode([]), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
+            Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 888, json_encode([]), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
         }
 
         $client = new Client([
@@ -86,7 +87,6 @@ class FundtransferProcessorController extends Controller
             ]
         ];
 
-        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 200, json_encode($requesttocient), 'PROCESS THE TRANSACTIONROUND');
         try{
             $guzzle_response = $client->post($payload->header->endpoint,
             [
@@ -95,7 +95,7 @@ class FundtransferProcessorController extends Controller
                         'http_body' => $stats->getHandlerStats(),
                         'request_body' => $requesttocient
                     ];
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
+                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() .' TG_SUCCESS');
                 },
                 'body' => json_encode($requesttocient)
             ],
@@ -149,7 +149,7 @@ class FundtransferProcessorController extends Controller
                 //  ProviderHelper::updatecreateGameTransExt($payload->request_body->fundtransferrequest->fundinfo->transactionId, 'FAILED', 'FAILED', $client_response->requestoclient, $client_response,'success');
 
             }
-            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 200, json_encode([]), "CUTFUND END HIT RECEIVED");
+            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 200, json_encode($requesttocient), " TG_DB_UPDATED");
         }catch(\Exception $e){
             Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
             Providerhelper::createRestrictGame($payload->action->mwapi->game_id,$payload->action->mwapi->player_id,$gteid, $requesttocient);
