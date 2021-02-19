@@ -272,7 +272,7 @@ class ClientRequestHelper{
                             'http_body' => $stats->getHandlerStats(),
                             'request_body' => $requesttocient
                         ];
-                        Helper::saveLog($requesttocient['request_body']['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() . '_TGPROCESS');
+                        Helper::saveLog($requesttocient['request_body']['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() . ' TG_PROCESS');
                     },
                     'timeout' => 0.050, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
