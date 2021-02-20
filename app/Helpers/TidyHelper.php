@@ -15,45 +15,26 @@ use DB;
 class TidyHelper{
 
 
-	 // const CLIENT_ID = '8440a5b6';
-	 // const SECRET_KEY = 'f83c8224b07f96f41ca23b3522c56ef1'; 
-	 // const API_URL = 'http://staging-v1-api.tidy.zone';
+	public static function updateGameTransactionBet($game_trans_id, $bet_amount) {
 
+        $update = DB::table('game_transactions')
+                ->where('game_trans_id', $game_trans_id)
+                ->update(['bet_amount' => $bet_amount]);
+                
+		return ($update);
+	}
 
-	// //for the tidy
-	//   public static function auth($uri,  Array $data = []) {
-	// 	 // $curl = new Curl();
-	// 	 // $data['client_id'] = self::CLIENT_ID;
-	// 	 // $curl->setHeader(
-	// 	 // 		'Authorization' ,'Bearer ' . self::generateToken($data),
-	// 	 // 		'Accept', 'application/json'
-	// 	 // );
-
-
-	// 	 // $method = strtolower($method);
-	// 	 // $curl->{$method}(self::API_URL . $uri, $data);
-	// 	 // return json_decode($curl->response, true);
-
- //            $client = new Client([
- //                'headers' => [ 
- //                    'Content-Type' => 'application/json',
- //                    'Authorization' => 'Bearer '.TidyHelper::generateToken($data)
- //                ]
- //            ]);
- //            $guzzle_response = $client->post(self::API_URL . $uri,['body' => json_encode($data)]
- //            );
-
- //            $client_response = json_decode($guzzle_response->getBody()->getContents());
-
- //            return $client_response;
-
-	//  }
-
-	  public static function generateToken(Array $data) {
+	public static function generateToken(Array $data) {
 		 $data['iat'] = (int)microtime(true);
 		 $jwt = JWT::encode($data, config('providerlinks.tidygaming.SECRET_KEY'));
 		 return $jwt;
-	 }
+	}
+
+	public static function generateTokenTransfer(Array $data) {
+         $data['iat'] = (int)microtime(true);
+         $jwt = JWT::encode($data, config('providerlinks.tidygaming.TransferWallet.SECRET_KEY'));
+         return $jwt;
+    }
 
 	// JWT VERIFICATION
     public static function decodeToken($token){

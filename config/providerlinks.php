@@ -183,6 +183,8 @@ return [
         'url_lunch' => 'https://asia.h93r.com/api/game/outside/link',
         'API_URL' => 'https://asia.h93r.com/',
         'client_id' => 'c9c219fc',
+        'usd_invite' => '00688c94',
+        'thb_invite' => '3f330a37',
         'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
     ],
     'evoplay' => [

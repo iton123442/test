@@ -395,11 +395,15 @@ class GameLobby{
        
     }
 
-     public static function tidylaunchUrl( $game_code = null, $token = null){
+    public static function tidylaunchUrl( $game_code = null, $token = null){
         Helper::saveLog('Tidy Gameluanch', 23, "", "");
         try{
             $url = config('providerlinks.tidygaming.url_lunch');
             $client_details = Providerhelper::getClientDetails('token', $token);
+            $invite_cdoe = config('providerlinks.tidygaming.usd_invite');
+            if ($client_details->default_currency == "THB" ) {
+                $invite_cdoe = config('providerlinks.tidygaming.thb_invite');
+            } 
             $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
             $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             $requesttosend = [
@@ -408,7 +412,8 @@ class GameLobby{
                 'username' => $client_details->username,
                 'token' => $token,
                 'uid' => 'TG_'.$client_details->player_id,
-                'currency' => $get_code_currency
+                'currency' => $get_code_currency,
+                'invite_code' => $invite_cdoe
             ];
             $client = new Client([
                 'headers' => [ 
