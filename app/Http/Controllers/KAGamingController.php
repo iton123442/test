@@ -601,7 +601,7 @@ class KAGamingController extends Controller
         if($refund_amount < 0){
            $transaction_type = 'debit';
         //    $pay_amount =  0; //abs($data['amount']);
-           $pay_amount =  $existing_bet->pay_amount + abs($refund_amount);
+           $pay_amount =  $existing_bet->pay_amount - abs($refund_amount);
            $income = $existing_bet->bet_amount - $pay_amount;
            // if(KAHelper::amountToFloat($player_details->playerdetailsresponse->balance) < abs($refund_amount)){
            if(KAHelper::amountToFloat($client_details->balance) < abs($refund_amount)){
