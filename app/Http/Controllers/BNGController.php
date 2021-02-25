@@ -153,12 +153,16 @@ class BNGController extends Controller
             if($client_details){
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
                 if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
+                    Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => "betNotNullWinNotNull"]), "");
                     return $this->betNotNullWinNotNull($data,$client_details,$game_details);
+
                 }
                 elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
+                    Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => "betNullWinNotNull"]), "");
                     return $this->betNullWinNotNull($data,$client_details,$game_details);
                 }
                 elseif($data["args"]["bet"]!= null && $data["args"]["win"]== null){
+                    Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => "betNotNullWinNull"]), "");
                     return $this->betNotNullWinNull($data,$client_details,$game_details);
                 }
             }
@@ -279,6 +283,7 @@ class BNGController extends Controller
         }
     }
     private function betNullWinNotNull($data,$client_details,$game_details){
+        Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["method" =>"betNullWinNotNull","balance"=>$balance,"response_balance"=>$client_response->fundtransferresponse->balance]), "");
         $game = GameTransaction::getGameTransactionByRoundId($data["args"]["round_id"]);
         if($game != null){
             $createGametransaction = array(
