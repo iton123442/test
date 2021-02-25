@@ -153,16 +153,16 @@ class BNGController extends Controller
             if($client_details){
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
                 if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
-                    Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => "betNotNullWinNotNull"]), "");
+                    return "betNotNullWinNotNull";
                     return $this->betNotNullWinNotNull($data,$client_details,$game_details);
 
                 }
                 elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
-                    Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => "betNullWinNotNull"]), "");
+                    return "betNullWinNotNull";
                     return $this->betNullWinNotNull($data,$client_details,$game_details);
                 }
                 elseif($data["args"]["bet"]!= null && $data["args"]["win"]== null){
-                    Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => "betNotNullWinNull"]), "");
+                    return "betNotNullWinNull";
                     return $this->betNotNullWinNull($data,$client_details,$game_details);
                 }
             }
