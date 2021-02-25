@@ -346,6 +346,7 @@ class BNGController extends Controller
         }
         else{
             Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode("GameTransactionDoesnotExist"), "");
+            return json_encode($game);
         }
     }
     private function betNotNullWinNull($data,$client_details,$game_details){
