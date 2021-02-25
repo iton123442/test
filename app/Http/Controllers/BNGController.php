@@ -288,7 +288,7 @@ class BNGController extends Controller
                 "income" =>$game->income - $data["args"]["win"],
                 "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
             );
-            $game_transactionid = GameTransaction::updateGametransaction($game->game_trans_id,$createGametransaction);
+            $game_transactionid = GameTransaction::updateGametransaction($createGametransaction,$game->game_trans_id);
             $this->_setExtParameter($this->_getExtParameter()+1);
             $wingametransactionext = array(
                 "game_trans_id" => $game_transactionid,
