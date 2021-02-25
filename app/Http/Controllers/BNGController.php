@@ -143,6 +143,7 @@ class BNGController extends Controller
     private function _transaction($data,$client_details){
         Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $data]), "");
         $game_transaction = GameTransaction::getGameTransactionDataByProviderTransactionId($data["uid"]);
+        Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $game_transaction]), "");
         if(!empty($game_transaction)){
             $response = json_decode($game_transaction->mw_response,TRUE);
             return response($response,200)
