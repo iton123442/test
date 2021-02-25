@@ -141,7 +141,41 @@ class BNGController extends Controller
     }
 
     private function _transaction($data,$client_details){
-       
+        Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $data]), "");
+        $game_transaction = GameTransaction::getGameTransactionDataByProviderTransactionId($data["uid"]);
+        if(!empty($game_transaction)){
+            $response = json_decode($game_transaction->mw_response,TRUE);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');
+        }
+        else{
+            //$client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+            if($client_details){
+                $game_details = Helper::getInfoPlayerGameRound($data["token"]);
+                if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
+                    return "betNotNullWinNotNull";
+                    return $this->betNotNullWinNotNull($data,$client_details,$game_details);
+
+                }
+                elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
+                    return "betNullWinNotNull";
+                    return $this->betNullWinNotNull($data,$client_details,$game_details);
+                }
+                elseif($data["args"]["bet"]!= null && $data["args"]["win"]== null){
+                    return "betNotNullWinNull";
+                    return $this->betNotNullWinNull($data,$client_details,$game_details);
+                }
+            }
+            else{
+                $msg = array(
+                    "uid" => $data["uid"],
+                    "error"=>array(
+                        "code" => "INVALID_TOKEN"
+                    ),
+                );
+                return response($msg,200)->header('Content-Type', 'application/json');
+            }
+        }
         
     }
     private function betNotNullWinNotNull($data,$client_details,$game_details){
