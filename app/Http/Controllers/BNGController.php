@@ -288,7 +288,7 @@ class BNGController extends Controller
                 "income" =>$game->income - $data["args"]["win"],
                 "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
             );
-            $game_transactionid = GameTransaction::createGametransaction($createGametransaction);
+            $game_transactionid = GameTransaction::updateGametransaction($game->game_trans_id,$createGametransaction);
             $this->_setExtParameter($this->_getExtParameter()+1);
             $wingametransactionext = array(
                 "game_trans_id" => $game_transactionid,
@@ -298,7 +298,7 @@ class BNGController extends Controller
                 "provider_request" =>json_encode($data),
             );
             $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
-            $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game_transactionid,"credit");
+            $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit");
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
             // $response =array(
             //     "uid"=>$data["uid"],
@@ -342,6 +342,8 @@ class BNGController extends Controller
                 //Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
+            }else{
+                Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode($client_response), "");
             }
         }
         else{
