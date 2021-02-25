@@ -339,7 +339,7 @@ class BNGController extends Controller
                         "version" => $this->_getExtParameter()
                     ),
                 );
-                //Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+                Helper::updateBNGGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$response,$client_response);
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
             }else{
