@@ -18,7 +18,9 @@ class BNGController extends Controller
     public function __construct() {
         $this->startTime = microtime(true);
     }
-    public function index($data,$client_details){
+    public function index(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
         $invokeStart =  microtime(true);
         if($data["name"]== "login"){
             return $this->_authPlayer($data,$client_details);
