@@ -289,33 +289,43 @@ class BNGController extends Controller
             );
             $game_transactionid = GameTransaction::createGametransaction($createGametransaction);
             $this->_setExtParameter($this->_getExtParameter()+1);
-            $response =array(
-                "uid"=>$data["uid"],
-                "balance" => array(
-                    "value" =>$client_details->balance +$data["args"]["win"],
-                    "version" => $this->_getExtParameter()
-                ),
+            $wingametransactionext = array(
+                "game_trans_id" => $game_transactionid,
+                "round_id" =>$data["args"]["round_id"],
+                "amount" =>$data["args"]["win"],
+                "game_transaction_type"=>1,
+                "provider_request" =>json_encode($data),
             );
+            $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
+            $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game_transactionid,"credit");
+            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+            // $response =array(
+            //     "uid"=>$data["uid"],
+            //     "balance" => array(
+            //         "value" =>$client_details->balance +$data["args"]["win"],
+            //         "version" => $this->_getExtParameter()
+            //     ),
+            // );
 
-            $action_payload = [
-                "type" => "custom", #genreral,custom :D # REQUIRED!
-                "custom" => [
-                    "provider" => 'bng',
-                ],
-                "provider" => [
-                    "provider_request" => $data, #R
-                    "provider_trans_id"=>$data["uid"], #R
-                    "provider_round_id"=>$data["args"]["round_id"], #R
-                ],
-                "mwapi" => [
-                    "roundId"=>$game->game_trans_id, #R
-                    "type"=>2, #R
-                    "game_id" => $game_details->game_id, #R
-                    "player_id" => $client_details->player_id, #R
-                    "mw_response" => $response, #R
-                ]
-            ];
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
+            // $action_payload = [
+            //     "type" => "custom", #genreral,custom :D # REQUIRED!
+            //     "custom" => [
+            //         "provider" => 'bng',
+            //     ],
+            //     "provider" => [
+            //         "provider_request" => $data, #R
+            //         "provider_trans_id"=>$data["uid"], #R
+            //         "provider_round_id"=>$data["args"]["round_id"], #R
+            //     ],
+            //     "mwapi" => [
+            //         "roundId"=>$game->game_trans_id, #R
+            //         "type"=>2, #R
+            //         "game_id" => $game_details->game_id, #R
+            //         "player_id" => $client_details->player_id, #R
+            //         "mw_response" => $response, #R
+            //     ]
+            // ];
+            // $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');        
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
