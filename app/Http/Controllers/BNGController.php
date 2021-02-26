@@ -285,15 +285,16 @@ class BNGController extends Controller
         $game = GameTransaction::getGameTransactionByRoundId($data["args"]["round_id"]);
         if($game != null){
             $createGametransaction = array(
-                "win" =>$data["args"]["win"] == 0 ? 0 : 1,
+                "win" =>$data["args"]["win"] == 0 && $game->pay_amount == 0 ? 0 : 1,
                 "pay_amount" =>$game->pay_amount+$data["args"]["win"],
                 "income" =>$game->income - $data["args"]["win"],
-                "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
+                "entry_id" =>$data["args"]["win"] == 0 && $game->pay_amount == 0 ? 1 : 2,
             );
             $game_transactionid = GameTransaction::updateGametransaction($createGametransaction,$game->game_trans_id);
             $this->_setExtParameter($this->_getExtParameter()+1);
             $wingametransactionext = array(
                 "game_trans_id" => $game->game_trans_id,
+                "provider_trans_id" => $data["uid"],
                 "round_id" =>$data["args"]["round_id"],
                 "amount" =>$data["args"]["win"],
                 "game_transaction_type"=>1,
