@@ -96,6 +96,10 @@ class ClientRequestHelper{
                 //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
                 return $client_reponse;
             }catch(\Exception $e){
+                if($type == 'credit'){
+                    $game_details_id = providerHelper::getGameDetailsByCodeName($game_name, $game_code);
+                    Providerhelper::createRestrictGame($game_details_id->game_id,$client_details->player_id,$transactionId, $requesttocient);
+                }
                 $response = array(
                     "fundtransferresponse" => array(
                         "status" => array(
@@ -471,6 +475,7 @@ class ClientRequestHelper{
         $existing_bet_details = ProviderHelper::findGameTransaction($fundtransferData->fundtransferrequest->fundinfo->roundId, 'game_transaction');
         $payamount = $existing_bet_details->pay_amount+abs($fundtransferData->fundtransferrequest->fundinfo->amount);
 
+        
         if($fundtransferData->fundtransferrequest->fundinfo->rollback == true){
             if($existing_bet_details->bet_amount == $fundtransferData->fundtransferrequest->fundinfo->amount){
                $win = 4; // refund
@@ -478,7 +483,11 @@ class ClientRequestHelper{
                $win = 1;
             }
         }else{
-            $win = 1; // win
+            if($payamount == 0){
+                $win = 0;
+            }else{
+                $win = 1; // win
+            }
         }
 
         $trans_data["win"] = $win;
@@ -487,6 +496,11 @@ class ClientRequestHelper{
         $trans_data["entry_id"] = 2;
         $trans_data["transaction_reason"] = 'Game Resended';
         $trans_data["payout_reason"] = $existing_bet_details->payout_reason;
+        $transaction_hitory = [
+            'old_transaction' => $existing_bet_details,
+            'new_transaction' => $trans_data
+        ];
+        Helper::saveLog($requesttocient->fundtransferrequest->fundinfo->roundId, 200, json_encode($transaction_hitory), "RESEND UPDATE HISTORY");
         return DB::table('game_transactions')->where("game_trans_id",$existing_bet_details->game_trans_id)->update($trans_data);
     }
 

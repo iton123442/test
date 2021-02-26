@@ -113,6 +113,7 @@ class FundtransferProcessorController extends Controller
                     if($payload->action->custom->provider == 'allwayspin'){
                         # No need to update my gametransaction data :) 1 way flight, only the gametransaction extension
                         $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                        ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
                     }
                     elseif($payload->action->custom->provider == 'kagaming'){
                         $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );

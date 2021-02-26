@@ -74,7 +74,7 @@ class TidyController extends Controller
         return json_encode($client_response);
 	 }
 
-	 // TEST
+	// TEST
  	public function demoUrl(Request $request){
 			$url = $this->API_URL.'/api/game/outside/demo/link';
 	 	    $requesttosend = [
@@ -201,6 +201,10 @@ class TidyController extends Controller
 				return response($bet_transaction->mw_response,200)
 				->header('Content-Type', 'application/json');
 			} 
+			sleep(4);
+			$response = ["message" => "resend provider"];
+			Helper::saveLog('Tidy BET duplicate_transaction resend', $this->provider_db_id, json_encode($request->all()),  $response);
+			return response($response,200)->header('Content-Type', 'application/json');
 		}
 
 
@@ -266,7 +270,7 @@ class TidyController extends Controller
 					'error_msg'  	=> 'invalid_partner',
 					'request_uuid'	=> $request_uuid
 				);
-				ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
+				ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, 'FAILED', $e->getMessage(), $response, $general_details);
 				ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 99);
 				// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
 				Helper::saveLog('Tidy BET FATAL ERROR', $this->provider_db_id, json_encode($request->all()), $response);
@@ -299,7 +303,7 @@ class TidyController extends Controller
 							'error_msg'  	=> 'not_enough_balance',
 							'request_uuid'	=> $request_uuid
 						);
-	          			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $client_response, 'FAILED', $general_details);
+	          			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, $client_response->requestoclient, $client_response, $client_response->fundtransferresponse, $general_details);
 	          			ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 99);
 	          			Helper::saveLog('Tidy BET not_enough_balance', $this->provider_db_id, json_encode($request->all()), $response);
 						// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
@@ -311,7 +315,8 @@ class TidyController extends Controller
 							'error_msg'  	=> 'not_enough_balance',
 							'request_uuid'	=> $request_uuid
 						);
-	          			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $client_response, 'FAILED', $general_details);
+	          			// ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $client_response, $client_response->fundtransferresponse, $general_details);
+	          			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, $client_response->requestoclient, $client_response, $client_response->fundtransferresponse, $general_details);
 	          			ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 99);
 	          			Helper::saveLog('Tidy BET not_enough_balance_default', $this->provider_db_id, json_encode($request->all()), $response);
 	          			// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
@@ -437,22 +442,24 @@ class TidyController extends Controller
 
 	        ];
 
+	        $num = $client_details->balance + $amount;
+			ProviderHelper::_insertOrUpdate($client_details->token_id, $num); 
+			$response = [
+				"uid" => $uid,
+				"request_uuid" => $request_uuid,
+				"currency" => TidyHelper::currencyCode($client_details->default_currency),
+				"balance" =>  ProviderHelper::amountToFloat($num)
+			];
+
 			try {
 				$client = new Client();
 		 		$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-fundtransfer',
 		 			[ 'body' => json_encode($body_details), 'timeout' => '0.20']
 		 		);
-		 		
+		 		Helper::saveLog('Tidy Win Processed', $this->provider_db_id, json_encode($request->all()), $response);
+	            return $response;
 			} catch (\Exception $e) {
-				$num = $client_details->balance + $amount;
-				ProviderHelper::_insertOrUpdate($client_details->token_id, $num); 
-				$response = [
-					"uid" => $uid,
-					"request_uuid" => $request_uuid,
-					"currency" => TidyHelper::currencyCode($client_details->default_currency),
-					"balance" =>  ProviderHelper::amountToFloat($num)
-				];
-	            Helper::saveLog('Tidy Win Processed', $this->provider_db_id, json_encode($request->all()), $response);
+	            Helper::saveLog('Tidy Win Processed cut', $this->provider_db_id, json_encode($request->all()), $response);
 	            return $response;
 			}
 
@@ -518,7 +525,7 @@ class TidyController extends Controller
 			return $data_response;
 		}
 
-		$refund_call = ProviderHelper::findGameExt($reference_transaction_uuid, 3,'transaction_id');
+		$refund_call = ProviderHelper::findGameExt($reference_transaction_uuid, 3,'round_id');
 		if($refund_call != 'false'){
 			$data_response = [
 				"uid" => $uid,
@@ -631,4 +638,3 @@ class TidyController extends Controller
 
 }
 
-	

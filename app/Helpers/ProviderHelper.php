@@ -151,8 +151,8 @@ class ProviderHelper{
 		    $filter = 'order by token_id desc LIMIT 1';
 		}
 
-		$query = DB::select('select `p`.`client_id`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`p`.`created_at` from player_session_tokens pst inner join players as p using(player_id) inner join clients as c using (client_id) inner join client_endpoints as ce using (client_id) inner join operator as op using (operator_id) '.$where.' '.$filter.'');
-
+		$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at` from player_session_tokens pst inner join players as p using(player_id) inner join clients as c using (client_id) inner join client_endpoints as ce using (client_id) inner join operator as op using (operator_id) '.$where.' '.$filter.'');
+	
 		 $client_details = count($query);
 		 // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
 		 return $client_details > 0 ? $query[0] : null;
@@ -166,6 +166,17 @@ class ProviderHelper{
 	 */
 	public static function getSubGameDetails($sub_provider_id, $game_code){
 		$query = DB::select('select * from games where sub_provider_id = "'.$sub_provider_id.'" and game_code = "'.$game_code.'"');
+		$game_details = count($query);
+		return $game_details > 0 ? $query[0] : false;
+	}
+
+	/**
+	 * GLOBAL
+	 * @param $[game_name], $[game_code], 
+	 * 
+	 */
+	public static function getGameDetailsByCodeName($game_name, $game_code){
+		$query = DB::select('select * from games where game_name = "'.$game_name.'" and game_code = "'.$game_code.'"');
 		$game_details = count($query);
 		return $game_details > 0 ? $query[0] : false;
 	}
@@ -537,10 +548,10 @@ class ProviderHelper{
         }
         // Helper::saveLog('updateGameTransaction', 999, json_encode(DB::getQueryLog()), "TIME updateGameTransaction");
         return ($update ? true : false);
-    }
-    
+	}
+	
 
-    public  static function updateGameTransactionExtCustom($game_trans_ext_id, $provider_request, $mw_response) {
+	public  static function updateGameTransactionExtCustom($game_trans_ext_id, $provider_request, $mw_response) {
 		// DB::enableQueryLog();
    	    $update = DB::table('game_transaction_ext')
                 ->where('game_trans_ext_id', $game_trans_ext_id)
@@ -927,31 +938,22 @@ class ProviderHelper{
 	// $query = DB::select("insert into `game_player_restriction` (`game_id`, `player_id`, `game_trans_ext_id`) values ($game_id, $player_id, '$game_trans_ext')");
 
 	public static function createRestrictGame($game_id, $player_id,$game_trans_ext,$mwp_payload=false){
-		// if($mwp_payload != false){
-		// 	// $mw_col = "`mw_payload`, ";
-		// 	// $mw_val = "'".$mwp_payload."',";
-		// 	// $mw_val = $mwp_payload;
-		// 	// $mw_val =json_encode($mwp_payload);
-		// 	$mw_val = json_decode(json_encode($mwp_payload));
-		// 	$query = DB::select("insert into `game_player_restriction` (`game_id`, `player_id`,`mw_payload`, `game_trans_ext_id`) values ($game_id, $player_id,".$mw_val.", $game_trans_ext)");
-		// }else{
-		// 	$query = DB::select("insert into `game_player_restriction` (`game_id`, `player_id`,`mw_payload`, `game_trans_ext_id`) values ($game_id, $player_id,".$mw_val.", $game_trans_ext)");
-		// }
-		// return DB::connection()->getPdo()->lastInsertId();
-
-		if($mwp_payload != false){
-			$mw_val = json_encode($mwp_payload);
-		}else{
-			$mw_val = 'FAILED';
+		$is_exist_restrict = DB::table('game_player_restriction')->where('game_trans_ext_id', $game_trans_ext)->first();
+		if(!$is_exist_restrict){
+			if($mwp_payload != false){
+				$mw_val = json_encode($mwp_payload);
+			}else{
+				$mw_val = 'FAILED';
+			}
+			$gametransactionext = array(
+				"game_id" => $game_id,
+				"player_id" => $player_id,
+				"mw_payload" => $mw_val,
+				"game_trans_ext_id" => $game_trans_ext,
+			);
+			$gamestransaction_ext_ID = DB::table("game_player_restriction")->insertGetId($gametransactionext);
+			return $gamestransaction_ext_ID;
 		}
-		$gametransactionext = array(
-			"game_id" => $game_id,
-			"player_id" => $player_id,
-			"mw_payload" => $mw_val,
-			"game_trans_ext_id" => $game_trans_ext,
-		);
-		$gamestransaction_ext_ID = DB::table("game_player_restriction")->insertGetId($gametransactionext);
-		return $gamestransaction_ext_ID;
 	}
 
 	
@@ -1091,6 +1093,13 @@ class ProviderHelper{
 		else{
 			$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
 			return DB::select("INSERT INTO  player_session_tokenss (token_id,balance, player_token, player_ip_address) VALUEs ('".$token_id."',".$client_details->player_token."','127.0.0.11',".$balance.")");
+		}
+	}
+	public static function updateTWBalance($player_id,$balance){
+		$balance_query = DB::select("SELECT balance FROM players WHERE player_id = '{$player_id}'");
+		$data = count($balance_query);
+		if($data > 0){
+			return DB::select("UPDATE players SET balance=".$balance." WHERE player_id = '{$player_id}'");
 		}
 	}
 
