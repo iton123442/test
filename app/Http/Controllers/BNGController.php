@@ -93,14 +93,16 @@ class BNGController extends Controller
         if($data["token"]){
             // $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
             if($client_details){
+                $is_test= $client_details->test_player == 0?false:true;
+                $brand = $client_details->client_code?$client_details->client_code:"TigerGames";
                 $msg = array(
                     "uid" => $data["uid"],
                     "player"=>array(
                         "id"=> (string)$client_details->player_id,         
-                        "brand"=> "BOONGO",      
+                        "brand"=> $brand,      
                         "currency"=> $client_details->default_currency,   
                         "mode"=> "REAL",       
-                        "is_test"=> false
+                        "is_test"=> $is_test
                     ),
                     "balance"=>array(
                         "value"=> number_format($client_details->balance,2,'.', ''),
