@@ -196,25 +196,25 @@ class AlController extends Controller
           if($request->game_ext_type != 3){
             return  $response = ["status" => "failed", "msg" =>  'Game Extension type should be 3'];
           }
-          if($request->rollback_type == 'round'){ // Whole round (including bet and wins)
-             $pay_amount = 0;
-             $income = 0;
-             if($amount != abs($round_id->bet_amount-$round_id->pay_amount)){
-                if($round_id->bet_amount-$round_id->pay_amount > 0){
-                  $transaction_type = 'credit';
-                }else{
-                  $transaction_type = 'debit';
-                }
-                return  $response = ["status" => "failed", "msg" =>  'Rollback all round the amount dont match the bet and win amounts it should be '.abs($round_id->bet_amount-$round_id->pay_amount).' and transaction type is '.$transaction_type];
-             }
-          }
+          // if($request->rollback_type == 'round'){ // Whole round (including bet and wins)
+          //    $pay_amount = $round_id->pay_amount + $amount;
+          //    $income = $round_id->bet_amount - $pay_amount;
+          //    if($amount != abs($round_id->bet_amount-$round_id->pay_amount)){
+          //       if($round_id->bet_amount-$round_id->pay_amount > 0){
+          //         $transaction_type = 'credit';
+          //       }else{
+          //         $transaction_type = 'debit';
+          //       }
+          //       return  $response = ["status" => "failed", "msg" =>  'Rollback all round the amount dont match the bet and win amounts it should be '.abs($round_id->bet_amount-$round_id->pay_amount).' and transaction type is '.$transaction_type];
+          //    }
+          // }
           if($request->rollback_type == 'bet'){
             if($transaction_type == 'debit'){
                return  $response = ["status" => "failed", "msg" =>  'refunding bet should be credit transaction type'];
             }
-            $update_bet = true;
-            $update_bet_amount = $update_bet_amount - $amount;
-            $pay_amount = $round_id->pay_amount;
+            // $update_bet = true;
+            // $update_bet_amount = $update_bet_amount - $amount;
+            $pay_amount = $round_id->pay_amount + $amount;
             $income = $update_bet_amount - $pay_amount ;
           }
           if($request->rollback_type == 'win'){
@@ -223,6 +223,13 @@ class AlController extends Controller
             }
             $pay_amount = $round_id->pay_amount - $amount;
             $income = $update_bet_amount - $pay_amount ;
+          }
+          if($request->rollback_type == 'custom'){
+              $bet = $request->custom_bet;
+              $pay_amount = $request->custom_pay_amount;
+              $income = $request->custom_income;
+              $win_type = $request->custom_win_type;
+              $entry_type = $request->custom_entry_type;
           }
         }
 
