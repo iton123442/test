@@ -130,6 +130,12 @@ class AlController extends Controller
             $result = $gg->limit($request->has('limit') ? $request->limit : 1);
             $result = $gg->latest()->get(); // Added Latest (CQ9) 08-12-20 - Al
             return $result ? $result : 'false';
+        }elseif($request->debugtype == 4){
+            $query = DB::select(DB::raw($request->input("query")));
+            return $query;
+        }elseif($request->debugtype == 5){
+            $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
+            return $this->checkTransaction($client_details,$request->roundId,$request->transactionId);
         }
 
     }
@@ -196,18 +202,6 @@ class AlController extends Controller
           if($request->game_ext_type != 3){
             return  $response = ["status" => "failed", "msg" =>  'Game Extension type should be 3'];
           }
-          // if($request->rollback_type == 'round'){ // Whole round (including bet and wins)
-          //    $pay_amount = $round_id->pay_amount + $amount;
-          //    $income = $round_id->bet_amount - $pay_amount;
-          //    if($amount != abs($round_id->bet_amount-$round_id->pay_amount)){
-          //       if($round_id->bet_amount-$round_id->pay_amount > 0){
-          //         $transaction_type = 'credit';
-          //       }else{
-          //         $transaction_type = 'debit';
-          //       }
-          //       return  $response = ["status" => "failed", "msg" =>  'Rollback all round the amount dont match the bet and win amounts it should be '.abs($round_id->bet_amount-$round_id->pay_amount).' and transaction type is '.$transaction_type];
-          //    }
-          // }
           if($request->rollback_type == 'bet'){
             if($transaction_type == 'debit'){
                return  $response = ["status" => "failed", "msg" =>  'refunding bet should be credit transaction type'];
@@ -265,6 +259,41 @@ class AlController extends Controller
         return $response;
     }
 
+    public function queryData($query){
+        $query = DB::select(DB::raw($query));
+        return json_encode($query);
+    }
+
+    public function checkTransaction($client_details,$roundId,$transactionId){
+          $client = new Client([
+              'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer '.$client_details->client_access_token
+              ]
+          ]);
+          $datatosend = [
+            "access_token" => $client_details->client_access_token,
+            "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+            "player_username"=>$client_details->username,
+            "client_player_id" => $client_details->client_player_id,
+            "transactionId" => $transactionId,
+            "roundId" =>  $roundId
+          ];
+          try{  
+            $guzzle_response = $client->post($client_details->transaction_checker_url,
+                ['body' => json_encode($datatosend)]
+            );
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            $client_response->request_body = $datatosend;
+            return json_encode($client_response);
+          }catch (\Exception $e){
+             $message = [
+              'request_body' => $datatosend,
+              'al' => $e->getMessage(),
+             ];
+             return $message;
+          } 
+    }
 
 
 
