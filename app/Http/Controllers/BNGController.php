@@ -297,7 +297,7 @@ class BNGController extends Controller
                 "provider_trans_id" => $data["uid"],
                 "round_id" =>$data["args"]["round_id"],
                 "amount" =>$data["args"]["win"],
-                "game_transaction_type"=>1,
+                "game_transaction_type"=>2,
                 "provider_request" =>json_encode($data),
             );
             $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
