@@ -300,6 +300,19 @@ class ICGController extends Controller
         if($json["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             if($client_details){
+                $checkTransaction = GMT::checkGameTransactionExist($json["transactionId"],3);
+                if($checkTransaction){
+                    $msg = array(
+                        "data" => array(
+                            "statusCode" => 3,
+                        ),
+                        "error" => array(
+                            "title"=> "Refund Already Exist",
+                            "description"=> "Refund Already Exist"
+                        )
+                    );
+                    return response($msg,400)->header('Content-Type', 'application/json');
+                }
                 $game = GMT::getGameTransactionByTokenAndRoundId($json["token"],$json["transactionId"]);
                 if($game){
                     $game_details = Helper::getInfoPlayerGameRound($json["token"]);
@@ -325,18 +338,18 @@ class ICGController extends Controller
                         && $client_response->fundtransferresponse->status->code == "200"){
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                             Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$msg,$client_response);
-                            return response("",200)
+                            return response("OK",200)
                                 ->header('Content-Type', 'application/json');
                     }
                     else{
                         Helper::saveLog($winGametransactionExtId, 12, json_encode(array("provider"=>$json,"client"=>$client_response)), "cancel");
-                        return response("",200)
+                        return response("OK",200)
                                 ->header('Content-Type', 'application/json');
                     }
                 } 
                 else{
                     Helper::saveLog('nogamecancelBetGame(ICG)', 12, json_encode($request->getContent()), "cancel");
-                    return response("",200)
+                    return response("OK",200)
                             ->header('Content-Type', 'application/json');
                 }
             }
