@@ -300,7 +300,7 @@ class ICGController extends Controller
         if($json["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             if($client_details){
-                $checkTransaction = GMT::checkGameTransactionExist($json["transactionId"],3);
+                $checkTransaction = GMT::checkGameTransactionExist($json["transactionId"],false,3);
                 if($checkTransaction){
                     $msg = array(
                         "data" => array(
