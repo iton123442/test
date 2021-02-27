@@ -219,7 +219,7 @@ class AlController extends Controller
             $income = $update_bet_amount - $pay_amount ;
           }
           if($request->rollback_type == 'custom'){
-              $bet = $request->custom_bet;
+              // $bet = $request->custom_bet;
               $pay_amount = $request->custom_pay_amount;
               $income = $request->custom_income;
               $win_type = $request->custom_win_type;
