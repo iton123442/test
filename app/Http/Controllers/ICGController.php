@@ -325,12 +325,12 @@ class ICGController extends Controller
                         && $client_response->fundtransferresponse->status->code == "200"){
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                             Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$msg,$client_response);
-                            return response($msg,200)
+                            return response("",200)
                                 ->header('Content-Type', 'application/json');
                     }
                     else{
                         Helper::saveLog($winGametransactionExtId, 12, json_encode(array("provider"=>$json,"client"=>$client_response)), "cancel");
-                        return response($msg,200)
+                        return response("",200)
                                 ->header('Content-Type', 'application/json');
                     }
                 } 
