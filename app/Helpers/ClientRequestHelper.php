@@ -551,5 +551,94 @@ class ClientRequestHelper{
         // Helper::saveLog('updatecreateGameTransExt', 999, json_encode(DB::getQueryLog()), "TIME updatecreateGameTransExt");
         return ($update ? true : false);
     }
+
+
+    /**
+    *   @author FUNNTA
+    *   ONLY FUNTA FUNDTRANSFER
+    */
+    public static function fundTransferFunta($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array())
+    {
+        $sendtoclient =  microtime(true);
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer '.$client_details->client_access_token
+            ]
+        ]);
+        $requesttocient = [
+            "access_token" => $client_details->client_access_token,
+            "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+            "type" => "fundtransferrequest",
+            "datetsent" => Helper::datesent(),
+            "gamedetails" => [
+              "gameid" => $game_code,
+              "gamename" => $game_name
+            ],
+            "fundtransferrequest" => [
+                  "playerinfo" => [
+                  "player_username"=>$client_details->username,
+                  "client_player_id"=>$client_details->client_player_id,
+                  "token" => $client_details->player_token
+              ],
+              "fundinfo" => [
+                    "gamesessionid" => "",
+                    "transactiontype" => $type,
+                    "transactionId" => $transactionId, // this id is equivalent to game_transaction_ext game_trans_ext_id
+                    "roundId" => $roundId,// this id is equivalent to game_transaction game_trans_id
+                    "rollback" => $rollback,
+                    // "freespin" => false,
+                    "currencycode" => $client_details->default_currency,
+                    "amount" => $amount #change data here
+              ]
+            ]
+              ];
+
+            // if(count($action) > 0){
+            //     // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
+            // }
+
+            try{
+                $guzzle_response = $client->post($client_details->fund_transfer_url,
+                    [
+                        'on_stats' => function (TransferStats $stats) use ($requesttocient){
+                            $data = [
+                                'http_body' => $stats->getHandlerStats(),
+                                'request_body' => $requesttocient
+                            ];
+                            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
+                        },
+                        'body' => json_encode($requesttocient),
+                        'timeout' => '8.50'
+                    ],
+                    ['defaults' => [ 'exceptions' => false ]]
+                );
+                $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+                $client_response_time = microtime(true) - $sendtoclient;
+                Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
+                $client_reponse->requestoclient = $requesttocient;
+                //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
+                return $client_reponse;
+            }catch(\Exception $e){
+                if($type == 'credit'){
+                    $game_details_id = providerHelper::getGameDetailsByCodeName($game_name, $game_code);
+                    Providerhelper::createRestrictGame($game_details_id->game_id,$client_details->player_id,$transactionId, $requesttocient);
+                }
+                $response = array(
+                    "fundtransferresponse" => array(
+                        "status" => array(
+                            "code" => 504,
+                            "status" => "FAILED",
+                            "message" => $e->getMessage().' '.$e->getLine(),
+                        ),
+                        'balance' => 0.0
+                    )
+                );
+                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);
+                $client_reponse = json_decode(json_encode($response));
+                $client_reponse->requestoclient = $requesttocient;
+                return $client_reponse;
+            }
+    }
     
 }

@@ -608,6 +608,7 @@ class ProviderHelper{
 		 "5" => 'Transaction updated to Processing',
 		 "6" => 'Transaction FAILED - Low Balance',
 		 "99" => 'Transaction FAILED - FATAL ERROR',
+		 "504" => 'Client unable to response within 10s',
 		];
 		if(array_key_exists($win, $win_type)){
     		return $win_type[$win];

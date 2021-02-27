@@ -262,7 +262,7 @@ class TidyController extends Controller
 			$game_trans_ext_id = $this->createGameTransExt($game_trans_id,$provider_trans_id, $bet_id, $bet_amount, $game_transaction_type, $data, $data_response = null, $requesttosend = null, $client_response = null, $data_response = null);
 			
 			try {
-				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
+				$client_response = ClientRequestHelper::fundTransferFunta($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
 				$save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
 	        } catch (\Exception $e) {
 	            $response = array(
@@ -317,7 +317,7 @@ class TidyController extends Controller
 						);
 	          			// ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $client_response, $client_response->fundtransferresponse, $general_details);
 	          			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, $client_response->requestoclient, $client_response, $client_response->fundtransferresponse, $general_details);
-	          			ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 99);
+	          			ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 504);
 	          			Helper::saveLog('Tidy BET not_enough_balance_default', $this->provider_db_id, json_encode($request->all()), $response);
 	          			// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
 				}
@@ -637,4 +637,3 @@ class TidyController extends Controller
 	}
 
 }
-
