@@ -319,7 +319,7 @@ class ICGController extends Controller
                     $createGametransaction = array(
                         "win" =>4,
                         "pay_amount" =>round($json["amount"]/100,2),
-                        "income" =>$game->pay_amount-round($json["amount"]/100,2),
+                        "income" =>$game->bet_amount-round($json["amount"]/100,2),
                         "entry_id" =>2,
                     );
                     $game_transactionid = GMT::updateGametransaction($createGametransaction,$game->game_trans_id);
@@ -327,7 +327,7 @@ class ICGController extends Controller
                         "game_trans_id" => $game->game_trans_id,
                         "provider_trans_id" => $json["transactionId"],
                         "round_id" =>$json["roundId"],
-                        "amount" =>$json["amount"],
+                        "amount" =>round($json["amount"]/100,2),
                         "game_transaction_type"=>3,
                         "provider_request" =>json_encode($json),
                     );
