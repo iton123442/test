@@ -302,6 +302,7 @@ class ICGController extends Controller
             if($client_details){
                 $game = GMT::getGameTransactionByTokenAndRoundId($json["token"],$json["transactionId"]);
                 if($game){
+                    $game_details = Helper::getInfoPlayerGameRound($json["token"]);
                     $createGametransaction = array(
                         "win" =>4,
                         "pay_amount" =>round($json["amount"]/100,2),
