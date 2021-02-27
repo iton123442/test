@@ -332,7 +332,7 @@ class ICGController extends Controller
                         "provider_request" =>json_encode($json),
                     );
                     $winGametransactionExtId = GMT::createGameTransactionExt($wingametransactionext);
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"debit");
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit",true);
                     $balance = round($client_response->fundtransferresponse->balance,2);
                     if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
