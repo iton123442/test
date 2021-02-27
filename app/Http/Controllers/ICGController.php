@@ -15,6 +15,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use App\Models\GameTransaction as GMT;
 use DB;
 class ICGController extends Controller
 {
