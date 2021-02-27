@@ -294,9 +294,52 @@ class ICGController extends Controller
         } 
     }
     public function cancelBetGame(Request $request){
-        Helper::saveLog('cancelBetGame(ICG)', 12, json_encode($request->getContent()), "cancel");
-        return response("",200)
-                    ->header('Content-Type', 'application/json');
+        $json = json_decode($request->getContent(),TRUE);
+        // Helper::saveLog('winGame(ICG)', 2, json_encode($json), "data");
+        if($json["token"]){
+            $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
+            if($client_details){
+                $game = GMT::getGameTransactionByTokenAndRoundId($json["token"],$json["transactionId"]);
+                if($game){
+                    $createGametransaction = array(
+                        "win" =>4,
+                        "pay_amount" =>round($json["amount"]/100,2),
+                        "income" =>$game->pay_amount-round($json["amount"]/100,2),
+                        "entry_id" =>2,
+                    );
+                    $game_transactionid = GameTransaction::updateGametransaction($createGametransaction,$game->game_trans_id);
+                    $wingametransactionext = array(
+                        "game_trans_id" => $game->game_trans_id,
+                        "provider_trans_id" => $json["transactionId"],
+                        "round_id" =>$json["roundId"],
+                        "amount" =>$json["amount"],
+                        "game_transaction_type"=>3,
+                        "provider_request" =>json_encode($json),
+                    );
+                    $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"debit");
+                    $balance = round($client_response->fundtransferresponse->balance,2);
+                    if(isset($client_response->fundtransferresponse->status->code) 
+                        && $client_response->fundtransferresponse->status->code == "200"){
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                            Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$msg,$client_response);
+                            return response($msg,200)
+                                ->header('Content-Type', 'application/json');
+                    }
+                    else{
+                        Helper::saveLog($winGametransactionExtId, 12, json_encode(array("provider"=>$json,"client"=>$client_response)), "cancel");
+                        return response($msg,200)
+                                ->header('Content-Type', 'application/json');
+                    }
+                } 
+                else{
+                    Helper::saveLog('nogamecancelBetGame(ICG)', 12, json_encode($request->getContent()), "cancel");
+                    return response("",200)
+                            ->header('Content-Type', 'application/json');
+                }
+            }
+        } 
+        
     }
     public function winGame(Request $request){
         $json = json_decode($request->getContent(),TRUE);
