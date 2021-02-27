@@ -308,7 +308,7 @@ class ICGController extends Controller
                         "income" =>$game->pay_amount-round($json["amount"]/100,2),
                         "entry_id" =>2,
                     );
-                    $game_transactionid = GameTransaction::updateGametransaction($createGametransaction,$game->game_trans_id);
+                    $game_transactionid = GMT::updateGametransaction($createGametransaction,$game->game_trans_id);
                     $wingametransactionext = array(
                         "game_trans_id" => $game->game_trans_id,
                         "provider_trans_id" => $json["transactionId"],
@@ -317,7 +317,7 @@ class ICGController extends Controller
                         "game_transaction_type"=>3,
                         "provider_request" =>json_encode($json),
                     );
-                    $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
+                    $winGametransactionExtId = GMT::createGameTransactionExt($wingametransactionext);
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"debit");
                     $balance = round($client_response->fundtransferresponse->balance,2);
                     if(isset($client_response->fundtransferresponse->status->code) 
