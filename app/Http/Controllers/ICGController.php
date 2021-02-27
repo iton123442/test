@@ -300,13 +300,26 @@ class ICGController extends Controller
         if($json["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             if($client_details){
+                $checkTransaction = GMT::checkGameTransactionExist($json["transactionId"],false,3);
+                if($checkTransaction){
+                    $msg = array(
+                        "data" => array(
+                            "statusCode" => 3,
+                        ),
+                        "error" => array(
+                            "title"=> "Refund Already Exist",
+                            "description"=> "Refund Already Exist"
+                        )
+                    );
+                    return response($msg,400)->header('Content-Type', 'application/json');
+                }
                 $game = GMT::getGameTransactionByTokenAndRoundId($json["token"],$json["transactionId"]);
                 if($game){
                     $game_details = Helper::getInfoPlayerGameRound($json["token"]);
                     $createGametransaction = array(
                         "win" =>4,
                         "pay_amount" =>round($json["amount"]/100,2),
-                        "income" =>$game->pay_amount-round($json["amount"]/100,2),
+                        "income" =>$game->bet_amount-round($json["amount"]/100,2),
                         "entry_id" =>2,
                     );
                     $game_transactionid = GMT::updateGametransaction($createGametransaction,$game->game_trans_id);
@@ -314,29 +327,29 @@ class ICGController extends Controller
                         "game_trans_id" => $game->game_trans_id,
                         "provider_trans_id" => $json["transactionId"],
                         "round_id" =>$json["roundId"],
-                        "amount" =>$json["amount"],
+                        "amount" =>round($json["amount"]/100,2),
                         "game_transaction_type"=>3,
                         "provider_request" =>json_encode($json),
                     );
                     $winGametransactionExtId = GMT::createGameTransactionExt($wingametransactionext);
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"debit");
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit",true);
                     $balance = round($client_response->fundtransferresponse->balance,2);
                     if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                            Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$msg,$client_response);
-                            return response($msg,200)
+                            Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,"OK",$client_response);
+                            return response("OK",200)
                                 ->header('Content-Type', 'application/json');
                     }
                     else{
                         Helper::saveLog($winGametransactionExtId, 12, json_encode(array("provider"=>$json,"client"=>$client_response)), "cancel");
-                        return response($msg,200)
+                        return response("OK",200)
                                 ->header('Content-Type', 'application/json');
                     }
                 } 
                 else{
                     Helper::saveLog('nogamecancelBetGame(ICG)', 12, json_encode($request->getContent()), "cancel");
-                    return response("",200)
+                    return response("OK",200)
                             ->header('Content-Type', 'application/json');
                 }
             }
