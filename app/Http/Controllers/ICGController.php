@@ -337,7 +337,7 @@ class ICGController extends Controller
                     if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                            Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$msg,$client_response);
+                            Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,"OK",$client_response);
                             return response("OK",200)
                                 ->header('Content-Type', 'application/json');
                     }
