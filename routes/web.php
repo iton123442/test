@@ -538,3 +538,6 @@ $app->post('api/slotmill/appendwagerresult.json','SlotMillController@appendwager
 $app->post('api/slotmill/appendwagergoods.json','SlotMillController@appendwagergoods'); //bonus
 $app->post('api/slotmill/endwager.json','SlotMillController@endwager'); // win 
 $app->post('api/slotmill/reverse.json','SlotMillController@reverse');
+
+// CUT CALL FOR THE WIN CREDIT PROCESS
+$app->post('tigergames/bg-fundtransferV2','FundtransferProcessorController@bgFundTransferV2');
