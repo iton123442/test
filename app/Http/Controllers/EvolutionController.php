@@ -7,6 +7,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Helpers\EVGHelper;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
+use App\Models\GameTransaction;
 use DB;
 class EvolutionController extends Controller
 {
@@ -119,59 +120,39 @@ class EvolutionController extends Controller
                     return response($msg,200)->header('Content-Type', 'application/json');
                 }
                 else{
-                    $bet_amount = $game_transaction ? 0 : round($data["transaction"]["amount"],2);
-                    $bet_amount = $bet_amount < 0 ? 0 :$bet_amount;
-                    if(config("providerlinks.evolution.env") == 'test'){
-                        $game_details = EVGHelper::getGameDetails($data["game"]["details"]["table"]["id"],$data["game"]["type"],config("providerlinks.evolution.env"));
-                    }
-                    if(config("providerlinks.evolution.env") == 'production'){
-                        $game_details = EVGHelper::getGameDetails($data["game"]["details"]["table"]["id"],null,config("providerlinks.evolution.env"));
-                    }
-                    $json_data = array(
-                        "transid" => $data["transaction"]["id"],
-                        "amount" => round($data["transaction"]["amount"],2),
-                        "roundid" => $data["transaction"]["refId"]
+                    $game_details = EVGHelper::getGameDetails($data["game"]["details"]["table"]["id"],null,config("providerlinks.evolution.env"));
+                    $TransactionData = array(
+                        "provider_trans_id" => $data["transaction"]["id"],
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $game_details->game_id,
+                        "round_id" => $data["transaction"]["refId"],
+                        "bet_amount" => round($data["transaction"]["amount"],2),
+                        "win" =>5,
+                        "pay_amount" =>0,
+                        "income" =>round($data["transaction"]["amount"],2),
+                        "entry_id" =>1,
                     );
-                    if(!$game_transaction){
-                        $gametransactionid=EVGHelper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
-                    }
-                    $msg = array(
-                        "status"=>"OK",
-                        "balance"=>$client_details->balance-round($data["transaction"]["amount"],2),
-                        "uuid"=>$data["uuid"],
+                    $game_transactionid = GameTransaction::createGametransaction($TransactionData);
+                    $betgametransactionext = array(
+                        "game_trans_id" => $game_transactionid,
+                        "round_id" =>$data["transaction"]["refId"],
+                        "provider_trans_id" => $data["transaction"]["id"],
+                        "amount" =>round($data["transaction"]["amount"],2),
+                        "game_transaction_type"=>1,
+                        "provider_request" =>json_encode($data),
                     );
-					$action_payload = [
-						"type" => "custom", #genreral,custom :D # REQUIRED!
-						"custom" => [
-							"provider" => 'evolution',
-						],
-						"provider" => [
-							"provider_request" => $data, #R
-							"provider_trans_id"=>$data["transaction"]["id"], #R
-							"provider_round_id"=>$data["transaction"]["refId"], #R
-						],
-						"mwapi" => [
-							"roundId"=>$gametransactionid, #R
-							"type"=>2, #R
-							"game_id" => $game_details->game_id, #R
-							"player_id" => $client_details->player_id, #R
-							"mw_response" => $msg, #R
-						]
-					];
-
-                    $sendtoclient =  microtime(true);  
-            		$client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$gametransactionid,'debit',false,$action_payload);
-                    $client_response_time = microtime(true) - $sendtoclient;
+                    $betGametransactionExtId = GameTransaction::createGameTransactionExt($betgametransactionext);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit");
                     $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
-                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                        ProviderHelper::_insertOrUpdate($client_details->token_id,$balance);
                         $msg = array(
                             "status"=>"OK",
                             "balance"=>(float)$balance,
                             "uuid"=>$data["uuid"],
                         );
-                        //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
+                        Helper::updateGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$msg,$client_response);
                         
                        // Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                         return response($msg,200)
@@ -179,13 +160,16 @@ class EvolutionController extends Controller
                     }
                     elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
-                        $game = $this->getGameTransaction($client_details->player_token,$data["transaction"]["refId"]);
-                        Helper::updateGameTransaction($game,$json_data,"fail");
+                        $data = array(
+                            "win"=>2,
+                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                        );
+                        GameTransaction::updateGametransaction($data,$game_transactionid);
                         $msg = array(
                             "status"=>"INSUFFICIENT_FUNDS",
                             "uuid"=>$data["uuid"],
                         );
-                        Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
+                        Helper::updateGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$msg,$client_response);
                         return response($msg,200)
                         ->header('Content-Type', 'application/json');
                     }

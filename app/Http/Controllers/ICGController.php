@@ -284,8 +284,17 @@ class ICGController extends Controller
                             "title"=> "Not Enough Balance",
                             "description"=>"Not Enough Balance"
                         )
-                    ); 
-                    Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($json), $response);
+                    );
+                    try{
+                        $data = array(
+                            "win"=>2,
+                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                        );
+                        GMT::updateGametransaction($data,$gametransactionid);
+                        Helper::updateICGGameTransactionExt($transactionId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+                    }catch(\Exception $e){
+                        Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
+                    }
                     return response($response,400)
                     ->header('Content-Type', 'application/json');
                 }
