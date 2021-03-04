@@ -447,13 +447,13 @@ class FundtransferProcessorController extends Controller
     * VERSION TWO IF
     * @author NOTE:::: THIS FUNCTION USING FOR THE CREDIT CUT CALL
     *  [PROVIDER LIST ]
-    *  FUNTA , SLOTMILL,BOOMING, TGG ,NETENT, SPADE , PG COMPANY, PGSOFT, MAJA
+    *  FUNTA , SLOTMILL
     *
     *
     */
     public function bgFundTransferV2(Request $request){
         $details = json_decode(file_get_contents("php://input"), true);
-        Helper::saveLog('backgroundProcesstFund', 88, json_encode($details), "ENDPOINT HIT");
+        // Helper::saveLog('backgroundProcesstFund', 88, json_encode($details), "ENDPOINT HIT");
         $client_details = ProviderHelper::getClientDetails('token', $details["token"]);
         $game_details = Game::findbyid($details["game_details"]["game_id"]);
 
@@ -465,33 +465,53 @@ class FundtransferProcessorController extends Controller
         $game_trans_ext_id = $details["game_trans_ext_id"];
         $game_transaction_id = $details["game_transaction_id"];
         $type = $details["type"];
-        try {
-            $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, $type, $details["rollback"]);
-        } catch (\Exception $e) {
-            $response = [
-                "status" => "error",
-                "msg" => "FATAL ERROR",
-            ];
-            $mw_payload = ProviderHelper::fundTransfer_requestBody($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$type);
-            $this->updateGameTransactionExtV2Sucess($game_trans_ext_id,$details["provider_response"], $mw_payload, $response, "FATAL ERROR");
-            ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $mw_payload);
-            Helper::saveLog("FATAL ERROR", $game_trans_ext_id, json_encode($mw_payload), $response);
-            return $response;
-        }
-        if (isset($client_response->fundtransferresponse->status->code)) {
 
-                switch ($client_response->fundtransferresponse->status->code) {
-                    case '200':
-                        $this->updateGameTransactionExtV2Sucess($game_trans_ext_id,$details["provider_response"], $client_response->requestoclient, $client_response->fundtransferresponse, "success");
-                        ProviderHelper::updateGameTransactionStatus($game_transaction_id, $details["win"], $details["win"]);
-                        Helper::saveLog("success", $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
-                        break;
-                    case '402':
-                        $this->updateGameTransactionExtV2Sucess($game_trans_ext_id, $details["provider_response"], $client_response->requestoclient, $client_response->fundtransferresponse,"need to settlement");
-                        Helper::saveLog("bad response", $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
-                        break;
-                }
-        }
+        $is_not_proceess = false;
+
+        // FIVE ATTEMPT IF NOT sucess then stop if failed 5
+        $attempt_count = 1;
+        $is_succes = false;
+
+        $mw_payload = ProviderHelper::fundTransfer_requestBody($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$type);
+
+        do {
+            
+            try {
+                $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, $type, $details["rollback"]);
+            } catch (\Exception $e) {
+                $response = [
+                    "status" => "error",
+                    "msg" => "FATAL ERROR",
+                ];
+                $this->updateGameTransactionExtV2Sucess($game_trans_ext_id,$details["provider_response"], $mw_payload, $response, "FATAL ERROR");
+                ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $mw_payload);
+                Helper::saveLog("FATAL ERROR", $game_trans_ext_id, json_encode($mw_payload), $response);
+                $is_succes = true;
+                // return $response;
+            }
+            if (isset($client_response->fundtransferresponse->status->code)) {
+
+                    switch ($client_response->fundtransferresponse->status->code) {
+                        case '200':
+                            $this->updateGameTransactionExtV2Sucess($game_trans_ext_id,$details["provider_response"], $client_response->requestoclient, $client_response->fundtransferresponse, "success");
+                            ProviderHelper::updateGameTransactionStatus($game_transaction_id, $details["win"], $details["win"]);
+                            Helper::saveLog("success", $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
+                            $this->deleteGameRestrictedGame($game_trans_ext_id);
+                            $is_succes = true;
+                            break;
+                        case '402':
+                            $this->updateGameTransactionExtV2Sucess($game_trans_ext_id, $details["provider_response"], $client_response->requestoclient, $client_response->fundtransferresponse,"need to settlement");
+                            ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $mw_payload);
+                            Helper::saveLog("bad response attempt_count = " . $attempt_count , $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
+                            break;
+                    }
+            }
+
+            if($attempt_count++ == 5){ // if the last five attempt not success will be stop requesting
+                $is_succes = true;
+            } 
+        } while (!$is_succes);
+
         $response =[ "status" => "ok" , "msg" => "proccess complete"];
         return $response;
     }
@@ -504,6 +524,10 @@ class FundtransferProcessorController extends Controller
             "transaction_detail" => $details,
         );
         DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
+    }
+
+    public static function deleteGameRestrictedGame($identifier){
+        DB::select('delete from game_player_restriction where game_trans_ext_id = '.$identifier.' ');
     }
    
 }
