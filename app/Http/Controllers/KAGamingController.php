@@ -243,13 +243,13 @@ class KAGamingController extends Controller
         }
 
         # Check Game Restricted
-        $restricted_player = ProviderHelper::checkGameRestricted($game_information->game_id, $client_details->player_id);
-        if($restricted_player){
-            // $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($restricted_player);
-            // if(!$attempt_resend_transaction){
-                return  $response = ["status" => "failed - player restricted", "statusCode" =>  4];
-            // }
-        }
+        // $restricted_player = ProviderHelper::checkGameRestricted($game_information->game_id, $client_details->player_id);
+        // if($restricted_player){
+        //     // $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($restricted_player);
+        //     // if(!$attempt_resend_transaction){
+        //         return  $response = ["status" => "failed - player restricted", "statusCode" =>  4];
+        //     // }
+        // }
 
         // $all_round = $this->findAllGameExt($provider_trans_id, 'all', $round_id);
         // dd($all_round);
@@ -308,77 +308,153 @@ class KAGamingController extends Controller
         }
         if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
-            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-            $response = [
-                "balance" => $this->formatBalance($client_response->fundtransferresponse->balance),
-                "status" => "success",
-                "statusCode" =>  0
-            ];
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-            #2 CREDIT OPERATION   
-            $game_transextension_credit = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $win_amount, 2);
-            $client_response_credit = ClientRequestHelper::fundTransfer($client_details,abs($win_amount),$game_information->game_code,$game_information->game_name,$game_transextension_credit,$gamerecord, 'credit');
+                # NEW FLOW WIN
+                try {
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    $new_balance = $client_response->fundtransferresponse->balance + abs($win_amount);
+                    $response = [
+                        "balance" => $this->formatBalance($new_balance),
+                        "status" => "success",
+                        "statusCode" =>  0
+                    ];
+                    ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
 
-            if(isset($client_response_credit->fundtransferresponse->status->code) 
-             && $client_response_credit->fundtransferresponse->status->code == "402"){
+                    if($check_bet_round != 'false'){
+                        $pay_amount = $existing_bet_details->pay_amount + $win_amount;
+                        $bet_amount = $existing_bet_details->bet_amount + $bet_amount;
+                        $income = $bet_amount - $pay_amount; //$existing_bet_details->income;
+                        if($pay_amount > 0){
+                            $win_or_lost = 1;
+                            $entry_id = 2;
+                        }else{
+                            $win_or_lost = 0;
+                            $entry_id = 1;
+                        }
+                        $is_multiple = true;
+                        $update_betamount = $bet_amount;
+                    }else{
+                        $pay_amount = $win_amount;
+                        $income = $bet_amount - $pay_amount;
+                        if($pay_amount > 0){
+                        $win_or_lost = 1;
+                        $entry_id = 2;
+                        }else{
+                        $win_or_lost = 0;
+                        $entry_id = 1;
+                        }          
+                        $is_multiple = false;
+                        $update_betamount = 0;
+                    }
 
-                $response = [
-                    "balance" => $this->formatBalance($client_details->balance+$win_amount),
-                    "status" => "success",
-                    "statusCode" =>  0
-                ];
-                Providerhelper::updateGameTransactionExtCustom($game_transextension_credit, $data,$response);
-                Providerhelper::createRestrictGame($game_information->game_id,$client_details->player_id,$game_transextension_credit, $client_response_credit->requestoclient);
-                return $response;
+                    $action_payload = [
+                        "type" => "custom", #genreral,custom :D # REQUIRED!
+                        "custom" => [
+                            "provider" => 'kagaming',
+                            "win_or_lost" => $win_or_lost,
+                            "entry_id" => $entry_id,
+                            "pay_amount" => $pay_amount,
+                            "income" => $income,
+                            "is_multiple" => $is_multiple,
+                            "bet_amount" => $update_betamount
+                        ],
+                        "provider" => [
+                            "provider_request" => $data, #R
+                            "provider_trans_id"=> $provider_trans_id, #R
+                            "provider_round_id"=> $round_id, #R
+                        ],
+                        "mwapi" => [
+                            "roundId"=>$gamerecord, #R
+                            "type"=>2, #R
+                            "game_id" => $game_information->game_id, #R
+                            "player_id" => $client_details->player_id, #R
+                            "mw_response" => $response, #R
+                        ],
+                        'fundtransferrequest' => [
+                            'fundinfo' => [
+                                'freespin' => $is_freespin,
+                            ]
+                        ]
+                    ];
+                    $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details,abs($win_amount),$game_information->game_code,$game_information->game_name,$gamerecord,'credit',false,$action_payload);
+                } catch (\Exception $e) {
+                    return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
+                }
+                // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+                # END NEW FLOW WIN  
+             
+                # OLD FLOW
+                // ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                // $response = [
+                //     "balance" => $this->formatBalance($client_response->fundtransferresponse->balance),
+                //     "status" => "success",
+                //     "statusCode" =>  0
+                // ];
+                // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+                // #2 CREDIT OPERATION   
+                // $game_transextension_credit = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $win_amount, 2);
+                // $client_response_credit = ClientRequestHelper::fundTransfer($client_details,abs($win_amount),$game_information->game_code,$game_information->game_name,$game_transextension_credit,$gamerecord, 'credit');
 
-            }
+                // if(isset($client_response_credit->fundtransferresponse->status->code) 
+                //  && $client_response_credit->fundtransferresponse->status->code == "402"){
 
-            $general_details['client']['after_balance'] = KAHelper::amountToFloat($client_response_credit->fundtransferresponse->balance);
-            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response_credit->fundtransferresponse->balance);
-            $response = [
-                "balance" => $this->formatBalance($client_response_credit->fundtransferresponse->balance),
-                "status" => "success",
-                "statusCode" =>  0
-            ];
-            if($check_bet_round != 'false'){
-               // $win_or_lost = $existing_bet_details->win;
-                // $entry_id = $existing_bet_details->entry_id;
+                //     $response = [
+                //         "balance" => $this->formatBalance($client_details->balance+$win_amount),
+                //         "status" => "success",
+                //         "statusCode" =>  0
+                //     ];
+                //     Providerhelper::updateGameTransactionExtCustom($game_transextension_credit, $data,$response);
+                //     // Providerhelper::createRestrictGame($game_information->game_id,$client_details->player_id,$game_transextension_credit, $client_response_credit->requestoclient);
+                //     return $response;
 
-                $pay_amount = $existing_bet_details->pay_amount + $win_amount;
-                $bet_amount = $existing_bet_details->bet_amount + $bet_amount;
-                $income = $bet_amount - $pay_amount; //$existing_bet_details->income;
-                if($pay_amount > 0){ #val
-                    $win_or_lost = 1;
-                    $entry_id = 2;
-                 }else{
-                    $win_or_lost = 0;
-                    $entry_id = 1;
-                 }
-
-                // if($pay_amount == $bet_amount){
-                //     $win_or_lost = 3;
                 // }
 
-                ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id,'game_trans_id',$bet_amount,$multi_bet=true);
-            }else{
-                $pay_amount = $win_amount;
-                $income = $bet_amount - $pay_amount;
-                if($pay_amount > 0){
-                   $win_or_lost = 1;
-                   $entry_id = 2;
-                }else{
-                   $win_or_lost = 0;
-                   $entry_id = 1;
-                }           
+                // $general_details['client']['after_balance'] = KAHelper::amountToFloat($client_response_credit->fundtransferresponse->balance);
+                // ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response_credit->fundtransferresponse->balance);
+                // $response = [
+                //     "balance" => $this->formatBalance($client_response_credit->fundtransferresponse->balance),
+                //     "status" => "success",
+                //     "statusCode" =>  0
+                // ];
+                // if($check_bet_round != 'false'){
+                //    // $win_or_lost = $existing_bet_details->win;
+                //     // $entry_id = $existing_bet_details->entry_id;
 
-                // if($pay_amount == $bet_amount){
-                //     $win_or_lost = 3;
+                //     $pay_amount = $existing_bet_details->pay_amount + $win_amount;
+                //     $bet_amount = $existing_bet_details->bet_amount + $bet_amount;
+                //     $income = $bet_amount - $pay_amount; //$existing_bet_details->income;
+                //     if($pay_amount > 0){ #val
+                //         $win_or_lost = 1;
+                //         $entry_id = 2;
+                //      }else{
+                //         $win_or_lost = 0;
+                //         $entry_id = 1;
+                //      }
+
+                //     // if($pay_amount == $bet_amount){
+                //     //     $win_or_lost = 3;
+                //     // }
+
+                //     ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id,'game_trans_id',$bet_amount,$multi_bet=true);
+                // }else{
+                //     $pay_amount = $win_amount;
+                //     $income = $bet_amount - $pay_amount;
+                //     if($pay_amount > 0){
+                //        $win_or_lost = 1;
+                //        $entry_id = 2;
+                //     }else{
+                //        $win_or_lost = 0;
+                //        $entry_id = 1;
+                //     }           
+
+                //     // if($pay_amount == $bet_amount){
+                //     //     $win_or_lost = 3;
+                //     // }
+                    
+                //     ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
                 // }
-                
-                ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
-            }
-            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-            ProviderHelper::updatecreateGameTransExt($game_transextension_credit, $data, $response, $client_response_credit->requestoclient, $client_response_credit, $response,$general_details);
+                // // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+                // ProviderHelper::updatecreateGameTransExt($game_transextension_credit, $data, $response, $client_response_credit->requestoclient, $client_response_credit, $response,$general_details);
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
             if($check_bet_round == 'false'){
@@ -612,6 +688,16 @@ class KAGamingController extends Controller
            $pay_amount =  $existing_bet->pay_amount + abs($refund_amount);
            $income = $existing_bet->bet_amount - $pay_amount;
         }
+
+        // if($pay_amount > 0){
+        //     if(count($all_round) != 0){
+        //         $win_or_lost = 1; // 1 win,  5 processing
+        //     }else{
+        //         $win_or_lost = 4; // 4 refund,  5 processing
+        //     }
+        // }else{
+        //     $win_or_lost = 4; // 4 refund,  5 processing
+        // }
 
         if($pay_amount > 0){
             if(count($all_round) == 1){

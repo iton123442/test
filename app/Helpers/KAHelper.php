@@ -26,22 +26,42 @@ class KAHelper{
 		return $float;
 	}
 	
+	public static function formatBalance($amount){
+        return round($amount*100,2);
+    }
+
+    public static function formatAmounts($amount){
+         return round($amount/100,2);
+	}
+	
 	public static function saveLog($method, $provider_id = 0, $request_data, $response_data)
 	{
-		$data = [
-			"method_name" => $method,
-			"provider_id" => $provider_id,
-			"request_data" => json_encode(json_decode($request_data)),
-			"response_data" => json_encode($response_data)
-		];
-			
-		if(env('SAVELOG')){
-			if(env('Al_DEBUG')){
-				return DB::table('debug')->insert($data);
-			}else{
-				return DB::table('seamless_request_logs')->insert($data);
-			}
+		try{
+			$data = [
+				"method_name" => $method,
+				"provider_id" => $provider_id,
+				"request_data" => json_encode(json_decode($request_data)),
+				"response_data" => json_encode($response_data)
+			];
+			return DB::connection('savelog')->table('seamless_request_logs')->insert($data);
+		}catch(\Exception $e){
+			return 99999999;
 		}
+
+		// $data = [
+		// 	"method_name" => $method,
+		// 	"provider_id" => $provider_id,
+		// 	"request_data" => json_encode(json_decode($request_data)),
+		// 	"response_data" => json_encode($response_data)
+		// ];
+			
+		// if(env('SAVELOG')){
+		// 	if(env('Al_DEBUG')){
+		// 		return DB::table('debug')->insert($data);
+		// 	}else{
+		// 		return DB::table('seamless_request_logs')->insert($data);
+		// 	}
+		// }
 	}
 
 	public static function createGameTransExtV2($game_trans_id, $provider_trans_id, $round_id, $amount, $game_type, $provider_request = 'FAILED', $mw_response = 'FAILED', $mw_request = 'FAILED', $client_response = 'FAILED', $transaction_detail = 'FAILED', $general_details = null)
@@ -86,7 +106,7 @@ class KAHelper{
 			$where = 'where gte.game_trans_id = "' . $provider_identifier . '"';
 		}
 
-		$filter = 'LIMIT 1';
+		$filter = 'ORDER BY game_trans_ext_id DESC LIMIT 1';
 
 		$query = DB::select('select * from game_transaction_ext as gte ' . $where . ' ' . $filter . '');
 		$data = count($query);
@@ -179,6 +199,32 @@ class KAHelper{
 		$result = count($query);
 		return $result > 0 ? $query[0] : null;
 	}
+
+
+	public  static function findAllGameExt($provider_identifier, $type, $second_identifier='') {
+        $transaction_db = DB::table('game_transaction_ext as gte');
+        if ($type == 'transaction_id') {
+            $transaction_db->where([
+                ["gte.provider_trans_id", "=", $provider_identifier],
+            ]);
+        }
+        if ($type == 'round_id') {
+            $transaction_db->where([
+                ["gte.round_id", "=", $provider_identifier],
+            ]);
+        }  
+        if ($type == 'all') {
+            $transaction_db->where([
+                // ["gte.round_id", "=", $second_identifier],
+                ["gte.provider_trans_id", "=", $provider_identifier],
+                ["gte.transaction_detail", "!=", '"FAILED"'],
+            ]);
+        }  
+        // $result = $transaction_db->latest()->get();
+        $result = $transaction_db->get();
+        return $result ? $result : 'false';
+    }
+
 
 }
 
