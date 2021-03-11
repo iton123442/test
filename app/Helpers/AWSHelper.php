@@ -217,26 +217,39 @@ class AWSHelper{
 	/* PROVIDER HELPER GLOBAL FUNCTION BUT ISOLATED FOR MANUAL UPDATING THE PROVIDER */
 
 	public static function saveLog($method, $provider_id = 0, $request_data, $response_data) {
-		// $micro_date = microtime();
-		// $date_array = explode(" ", $micro_date);
-		// $date = date("Y-m-d H:i:s", $date_array[1]);
-		$now = DateTime::createFromFormat('U.u', microtime(true));
-		$data = [
+
+		try{
+			$data = [
 				"method_name" => $method,
 				"provider_id" => $provider_id,
 				"request_data" => json_encode(json_decode($request_data)),
-				"response_data" => json_encode($response_data),
-				"created_at" => $now->format("m-d-Y H:i:s.u"),
+				"response_data" => json_encode($response_data)
 			];
-		// return DB::table('seamless_request_logs')->insertGetId($data);
-		// return DB::table('debug')->insertGetId($data);
-		if(env('SAVELOG')){
-			if(env('Al_DEBUG')){
-				return DB::table('debug')->insert($data);
-			}else{
-				return DB::table('seamless_request_logs')->insert($data);
-			}
+			return DB::connection('savelog')->table('seamless_request_logs')->insert($data);
+		}catch(\Exception $e){
+			return 99999999;
 		}
+		
+		// // $micro_date = microtime();
+		// // $date_array = explode(" ", $micro_date);
+		// // $date = date("Y-m-d H:i:s", $date_array[1]);
+		// $now = DateTime::createFromFormat('U.u', microtime(true));
+		// $data = [
+		// 		"method_name" => $method,
+		// 		"provider_id" => $provider_id,
+		// 		"request_data" => json_encode(json_decode($request_data)),
+		// 		"response_data" => json_encode($response_data),
+		// 		"created_at" => $now->format("m-d-Y H:i:s.u"),
+		// 	];
+		// // return DB::table('seamless_request_logs')->insertGetId($data);
+		// // return DB::table('debug')->insertGetId($data);
+		// if(env('SAVELOG')){
+		// 	if(env('Al_DEBUG')){
+		// 		return DB::table('debug')->insert($data);
+		// 	}else{
+		// 		return DB::table('seamless_request_logs')->insert($data);
+		// 	}
+		// }
 	}
 
 	public static function createGameTransaction($token_id, $game_id, $bet_amount, $payout, $entry_id,  $win = 0, $transaction_reason = null, $payout_reason = null, $income = null, $provider_trans_id = null, $round_id = 1)
