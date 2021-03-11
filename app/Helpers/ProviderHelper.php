@@ -992,6 +992,9 @@ class ProviderHelper{
 		DB::select('delete from game_player_restriction '.$where.' '.$filter.'');
 	}
 
+	public static function criticalGameRestriction($gpr_id){
+        DB::table('game_player_restriction')->where('gpr_id', $gpr_id)->update(["retry_attempts" => 13 ]);
+    }
 
 	public static function checkClientPlayer($client_id, $client_player_id){
 		$player = DB::table('players')

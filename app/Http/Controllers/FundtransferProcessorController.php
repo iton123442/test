@@ -27,7 +27,7 @@ class FundtransferProcessorController extends Controller
 
         // Helper::saveLog('fundTransfer', 999, json_encode([]), "MAGIC END HIT");
         $payload = json_decode(file_get_contents("php://input"));
-        Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 200, json_encode($payload), 'TG_ARRIVED');
+        Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode($payload), 'TG_ARRIVED');
 
         if($payload->request_body->fundtransferrequest->fundinfo->transactiontype == 'credit'){
             $game_transaction_type = 2;
@@ -50,7 +50,7 @@ class FundtransferProcessorController extends Controller
                 );
             }
         }catch(\Exception $e){
-            Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 888, json_encode([]), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
+            Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode([]), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
         }
 
         $client = new Client([
@@ -167,8 +167,8 @@ class FundtransferProcessorController extends Controller
                     && $client_response->fundtransferresponse->status->code == "402"){
                         $api_error = true;
                         $re_attempt = true;
-                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($requesttocient), $client_response);
-                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($requesttocient), "STATUS 402");
+                        Providerhelper::criticalGameRestriction($restrict_id);
+                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
                     }
                 }catch(\Exception $e){
                     # Only HTTP Error Should Be Resended
@@ -179,7 +179,8 @@ class FundtransferProcessorController extends Controller
 
                 if($attempt_count++ == 5){ // if the last five attempt not success will be stop requesting
                     $is_succes = true;
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($requesttocient), "ATTEMP ADD ++");
+                    Providerhelper::criticalGameRestriction($restrict_id);
+                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 55555, json_encode($requesttocient), "ATTEMP ADD ++");
                 } 
 
             }else{
