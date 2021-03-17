@@ -44,6 +44,149 @@ class AlController extends Controller
     }
 
 
+    public function massResend(Request $request){
+        if(!$request->header('hashen')){
+          return ['al' => 'OOPS RAINDROPS'];
+        }
+        if(!Hash::check($request->header('hashen'),$this->hashen)){
+          return ['al' => 'OOPS RAINDROPS'];
+        }
+
+        $client_response_data = [];
+        $request_data = json_decode(json_encode($request->all()));
+
+        $al = 1;
+        foreach($request_data as $request){
+          $client_details = Providerhelper::getClientDetails('player_id',  $request->player_id);
+          if($client_details == 'false'){
+             return ['status'=>'failed', ['msg'=>'Player Not Found']];
+          }
+          $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+          if($player_details == 'false'){
+             $response = ["status" => "failed", "msg" =>  'Server Timeout'];
+             $client_response_data[$al++-1] = $response;
+             continue;
+          }
+
+          $round_id = ProviderHelper::findGameTransaction($request->round_id, 'game_transaction');
+          $provider_trans_id = $round_id->provider_trans_id;
+          $provider_round_id = $round_id->round_id;
+  
+          $general_details['client']['before_balance'] = ProviderHelper::amountToFloat($player_details->playerdetailsresponse->balance);
+  
+          $amount = $request->amount;
+          // $bet_amount = $request->has('bet_amount') ? $request->bet_amount : $round_id->bet_amount;
+          $bet_amount = $round_id->bet_amount;
+  
+          $win_type = $request->win_type;  // 0 Lost, 1 win, 2 failed, 3 draw, 4 refund, 5 processing
+          $entry_type = $win_type == 1 ? 2 : 1;
+          $game_ext_type = $request->game_ext_type; // 1 ber, 2 win, 3 refund
+  
+          $transaction_type = $request->transaction_type;
+          // $rollback = $request->has('rollback') ? $request->rollback : false;
+          $rollback = false;
+  
+          $game_information = DB::table('games')->where('game_id', $round_id->game_id)->first();
+          if($game_information == null){ 
+              $response = ["status" => "failed", "msg" =>  'game not found'];
+              $client_response_data[$al++-1] = $response;
+              continue;
+          }
+  
+          $pay_amount = $round_id->pay_amount + $amount;
+          $income = $bet_amount - $pay_amount;
+          $identifier_type = 'game_trans_id';
+          $update_bet = false;
+          $update_bet_amount = $round_id->bet_amount;
+        
+          if($win_type == 4){
+            if(!$request->has('rollback') || !$request->has('rollback_type')){
+              $response = ["status" => "failed", "msg" =>  'When type 4 it should have rollback parameter and rollback type parameter [round,bet,win])'];
+              $client_response_data[$al++-1] = $response;
+              continue;
+            }
+            if($request->rollback == 'false' || $request->rollback == false){
+              $response = ["status" => "failed", "msg" =>  'rollback parameter must be true'];
+              $client_response_data[$al++-1] = $response;
+              continue;
+            }
+            if($request->game_ext_type != 3){
+              $response = ["status" => "failed", "msg" =>  'Game Extension type should be 3'];
+              $client_response_data[$al++-1] = $response;
+              continue;
+            }
+            if($request->rollback_type == 'bet'){
+              if($transaction_type == 'debit'){
+                 $response = ["status" => "failed", "msg" =>  'refunding bet should be credit transaction type'];
+                 $client_response_data[$al++-1] = $response;
+                 continue;
+              }
+              // $update_bet = true;
+              // $update_bet_amount = $update_bet_amount - $amount;
+              $pay_amount = $round_id->pay_amount + $amount;
+              $income = $update_bet_amount - $pay_amount ;
+            }
+            if($request->rollback_type == 'win'){
+              if($transaction_type == 'credit'){
+                 $response = ["status" => "failed", "msg" => "refunding win should be debit transaction type"];
+                 $client_response_data[$al++-1] = $response;
+                 continue;
+              }
+              $pay_amount = $round_id->pay_amount - $amount;
+              $income = $update_bet_amount - $pay_amount ;
+            }
+            if($request->rollback_type == 'custom'){
+                // $bet = $request->custom_bet;
+                $pay_amount = $request->custom_pay_amount;
+                $income = $request->custom_income;
+                $win_type = $request->custom_win_type;
+                $entry_type = $request->custom_entry_type;
+            }
+          }
+  
+          $game_transextension = ProviderHelper::createGameTransExtV2($round_id->game_trans_id,$provider_trans_id, $provider_round_id, $amount, $game_ext_type);
+  
+          try {
+            $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension, $round_id->game_trans_id, $transaction_type, $rollback);
+            // Helper::saveLog('RESEND CRID '.$round_id->game_trans_id, 999,json_encode($request->all()), $client_response);
+          } catch (\Exception $e) {
+            $response = ["status" => "failed", "msg" => $e->getMessage()];
+            ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
+            // Helper::saveLog('RESEND - FATAL ERROR', 999, $response, Helper::datesent());
+            $client_response_data[$al++-1] = $response;
+            continue;
+          }
+  
+          if(isset($client_response->fundtransferresponse->status->code) 
+              && $client_response->fundtransferresponse->status->code == "200"){
+              $general_details['client']['after_balance'] = ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance);
+              $response = ["status" => "success", "msg" => 'transaction success', 'general_details' => $general_details,'data' => $client_response];      
+  
+             ProviderHelper::updateGameTransaction($round_id->game_trans_id, $pay_amount, $income, $win_type, $entry_type,$identifier_type,$update_bet_amount,$update_bet);
+             ProviderHelper::updatecreateGameTransExt($game_transextension, $request, $response, $client_response->requestoclient, $client_response, 'SUCCESS',$general_details);
+             $client_response_data[$al++-1] = $response;
+             continue;
+            }elseif(isset($client_response->fundtransferresponse->status->code) 
+              && $client_response->fundtransferresponse->status->code == "402"){
+              $response = ["status" => "failed", "msg" => 'transaction failed', 'general_details' => $general_details, "data" => $client_response];
+              ProviderHelper::updatecreateGameTransExt($game_transextension, $request, $response, $client_response->requestoclient, $client_response, 'FAILED',$general_details);
+              $client_response_data[$al++-1] = $response;
+              continue;
+            }else{ // Unknown Response Code
+              $response = ["status" => "failed", "msg" => 'Unknown Status Code', 'general_details' => $general_details, "data" => $client_response];
+              ProviderHelper::updatecreateGameTransExt($game_transextension, $request, $response, $client_response->requestoclient, $client_response, 'FAILED',$general_details);
+              $client_response_data[$al++-1] = $response;
+              continue;
+          }  
+  
+          Helper::saveLog('RESEND TRIGGERED', 999, json_encode($response), Helper::datesent());
+          
+        }
+
+        return json_encode($client_response_data);
+    }
+
+
     public function checkCLientPlayer(Request $request){
         if(!$request->header('hashen')){
           return ['al' => 'OOPS RAINDROPS'];
