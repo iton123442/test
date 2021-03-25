@@ -59,7 +59,7 @@ class MannaPlayController extends Controller
 				if ($client_details != null) {
 					$http_status = 200;
 					$response = [
-						"balance" => bcdiv($client_details->balance, 1, 2)
+						"balance" => ProviderHelper::amountToFloat($client_details->balance)
 					];
 				}
 			}
@@ -136,7 +136,7 @@ class MannaPlayController extends Controller
 								$http_status = 200;
 								$response = [
 									"transaction_id" => $json_data['transaction_id'],
-									"balance" => bcdiv($client_response->fundtransferresponse->balance, 1, 2) 
+									"balance" => ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance)
 								];
 								break;
 							case '402':
@@ -221,7 +221,7 @@ class MannaPlayController extends Controller
 						ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
 						$response = [
 								"transaction_id" => $json_data['transaction_id'],
-								"balance" => bcdiv($winbBalance, 1, 2) 
+								"balance" => ProviderHelper::amountToFloat($winbBalance)
 							];
 						
 			            $win_or_lost = $json_data["amount"] > 0 ?  1 : 0;
@@ -319,7 +319,7 @@ class MannaPlayController extends Controller
 						ProviderHelper::_insertOrUpdate($client_details->token_id, $rollbackbBalance); 
 						$response = [
 							"transaction_id" => $json_data['transaction_id'],
-							"balance" => bcdiv($rollbackbBalance, 1, 2) 
+							"balance" => ProviderHelper::amountToFloat($rollbackbBalance)
 						];
 
 						$win_or_lost = 4;
