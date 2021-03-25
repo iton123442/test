@@ -59,11 +59,13 @@ class AlController extends Controller
         foreach($request_data as $request){
           $client_details = Providerhelper::getClientDetails('player_id',  $request->player_id);
           if($client_details == 'false'){
-             return ['status'=>'failed', ['msg'=>'Player Not Found']];
+            $response = ['status'=>'failed', ['msg'=>'Player Not Found']];
+             $client_response_data[$al++-1] = $response;
+             continue;
           }
           $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
           if($player_details == 'false'){
-             $response = ["status" => "failed", "msg" =>  'Server Timeout'];
+             $response = ["status" => "failed", "msg" =>  'Server Timeout PlayerDetails END Failed'];
              $client_response_data[$al++-1] = $response;
              continue;
           }

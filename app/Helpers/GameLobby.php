@@ -708,48 +708,90 @@ class GameLobby{
         $player_id = "TG_".$client_details->player_id;
         $nickname = $client_details->username;
         
-        try{
-            $http = new Client();
-            $response = $http->post($api_url."/Player/Create",[
-               'form_params' => [
-                'secret_key' => $secret_key,
-                'operator_token' => $operator_token,
-                'player_name' => "TG_".$client_details->player_id,
-                ]
-            ]);
-            $golden_response = json_decode((string) $response->getBody(), true);
-            TransferWalletHelper::saveLog('GoldenF create_player', $provider_id, json_encode($data), $golden_response);
-            if(isset($golden_response['data']['action_result']) && $golden_response['data']['action_result'] == "Success"){
-                $gameluanch_url = $api_url."/Launch?secret_key=".$secret_key."&operator_token=".$operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
-
-                $response = $http->post($gameluanch_url);
-                $get_url = json_decode($response->getBody()->getContents());
-
-                if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
-                    TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
-                    TransferWalletHelper::saveLog('GoldenF gamelaunch', $provider_id, json_encode($data), $gameluanch_url);
-                    $data = array(
-                        "url" => urlencode($get_url->data->game_url),
-                        "token" => $client_details->player_token,
-                        "player_id" => $player_id,
-                        // "system_player_id" => $client_details->player_id,
-                        "exitUrl" => $data['exitUrl'],
-                    );
-                    $encoded_data = $aes->AESencode(json_encode($data));
-                    // return "https://play.betrnk.games/loadgame/goldenf?param=".urlencode($encoded_data);
-                    // return "http://play.betrnk.games:81/loadgame/goldenf?param=".urlencode($encoded_data);
-                    return config('providerlinks.play_betrnk')."/loadgame/goldenf?param=".urlencode($encoded_data);
+       if($client_details->wallet_id == 1){
+            try{
+                $http = new Client();
+                $form_body = [
+                    'secret_key' => GoldenFHelper::changeEnvironment($client_details)->secret_key,
+                    'operator_token' => GoldenFHelper::changeEnvironment($client_details)->operator_token,
+                    'player_name' => $client_details->player_id,
+                    'currency' => $client_details->default_currency,
+                ];
+                $parameters = [
+                    'form_body' => $form_body,
+                    'url' => GoldenFHelper::changeEnvironment($client_details)->api_url."/Player/Create",
+                ];
+                $response = $http->post(GoldenFHelper::changeEnvironment($client_details)->api_url."/Player/Create",[
+                   'form_params' => $form_body
+                ]);
+                $golden_response = json_decode((string) $response->getBody(), true);
+                TransferWalletHelper::saveLog('GoldenF create_player', $provider_id, json_encode($parameters), $golden_response);
+                if(isset($golden_response['data']['action_result']) && $golden_response['data']['action_result'] == "Success"){
+                    $gameluanch_url = GoldenFHelper::changeEnvironment($client_details)->api_url."/Launch?secret_key=".GoldenFHelper::changeEnvironment($client_details)->secret_key."&operator_token=".GoldenFHelper::changeEnvironment($client_details)->operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
+                    $response = $http->post($gameluanch_url);
+                    $get_url = json_decode($response->getBody()->getContents());
+                    TransferWalletHelper::saveLog('GoldenF get_url', $provider_id, json_encode($get_url), $data);
+                    if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
+                        // TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
+                        return $get_url->data->game_url;
+                    }else{
+                        return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                    }
                 }else{
-                    return 'false';
+                    return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
                 }
+            }catch(\Exception $e){
+                $error = ['error' => $e->getMessage()];
+                TransferWalletHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
+                return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
             }
-        }catch(\Exception $e){
-            $error = [
-                'error' => $e->getMessage()
-            ];
-            TransferWalletHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
-            // return $error;
-            return 'false';
+        }else{
+            // # IFRAME GAMELAUNCH    
+            try{
+                $http = new Client();
+                $form_body = [
+                    'secret_key' => GoldenFHelper::changeEnvironment($client_details)->secret_key,
+                    'operator_token' => GoldenFHelper::changeEnvironment($client_details)->operator_token,
+                    'player_name' => "TG_".$client_details->player_id,
+                    'currency' => $client_details->default_currency,
+                ];
+                $parameters = [
+                    'form_body' => $form_body,
+                    'url' => GoldenFHelper::changeEnvironment($client_details)->api_url."/Player/Create",
+                ];
+                $response = $http->post(GoldenFHelper::changeEnvironment($client_details)->api_url."/Player/Create",[
+                'form_params' => $form_body
+                ]);
+                $golden_response = json_decode((string) $response->getBody(), true);
+                TransferWalletHelper::saveLog('GoldenF create_player', $provider_id, json_encode($parameters), $golden_response);
+                if(isset($golden_response['data']['action_result']) && $golden_response['data']['action_result'] == "Success"){
+                    $gameluanch_url = GoldenFHelper::changeEnvironment($client_details)->api_url."/Launch?secret_key=".GoldenFHelper::changeEnvironment($client_details)->secret_key."&operator_token=".GoldenFHelper::changeEnvironment($client_details)->operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
+                    $response = $http->post($gameluanch_url);
+                    $get_url = json_decode($response->getBody()->getContents());
+
+                    if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
+                        TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
+                        TransferWalletHelper::saveLog('GoldenF gamelaunch', $provider_id, json_encode($data), $gameluanch_url);
+                        $data = array(
+                            "url" => urlencode($get_url->data->game_url),
+                            "token" => $client_details->player_token,
+                            "player_id" => $player_id,
+                            // "system_player_id" => $client_details->player_id,
+                            "exitUrl" => $data['exitUrl'],
+                        );
+                        $encoded_data = $aes->AESencode(json_encode($data));
+                        return config('providerlinks.play_betrnk')."/loadgame/goldenf?param=".urlencode($encoded_data);
+                    }else{
+                        return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                    }
+                }else{
+                    return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                }
+            }catch(\Exception $e){
+                $error = ['error' => $e->getMessage()];
+                TransferWalletHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
+                return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+            }
         }
     }
 

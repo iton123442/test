@@ -359,12 +359,36 @@ return [
         'PROVIDER_ID' => 18,
         'GAME_URL' => 'https://play-rghr.igplatform.net/agg_plus_public/launch/wallets/BETRNKMW/games/',
     ],
-
     'goldenF'=>[
-        'api_url'=> 'http://tgr.test.gf-gaming.com/gf',
-        'secrete_key' => 'b18d99f11861042e2c66f11a1f9a62cb',
-        'operator_token' => '009583d3138a9e3934787112c345ef10',
         'provider_id' => 41,
+        '1' => [ # Seamless Wallet Wallet Type 1
+            'USD' => [
+                'api_url'=> 'https://t14u.api.goldenf.me/gf',
+                'secret_key' => '2779e483717e1962164ee7e5b1959133',
+                'operator_token' => '4436d634017f06638d4faf9dce6deda3',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+            'CNY' => [
+                'api_url'=> 'https://t14c.api.goldenf.me/gf',
+                'secret_key' => 'd778a48c6779ef194b6aad7573c2c06d',
+                'operator_token' => 'e23103ada31f2038918f7d621e27e871',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+        ],
+        '2' => [ # Transfer Wallet Wallet Type 2
+            'USD' => [
+                'api_url'=> 'https://t14u.api.goldenf.me/gf',
+                'secret_key' => '2779e483717e1962164ee7e5b1959133',
+                'operator_token' => '4436d634017f06638d4faf9dce6deda3',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+            'CNY' => [
+                'api_url'=> 'https://t14c.api.goldenf.me/gf',
+                'secret_key' => 'd778a48c6779ef194b6aad7573c2c06d',
+                'operator_token' => 'e23103ada31f2038918f7d621e27e871',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+        ],
     ],
     'netent' => [
         'provider_db_id' => 44, //CHANGE THE PROVIDER ID THIS 45 IS FROM STAGING
