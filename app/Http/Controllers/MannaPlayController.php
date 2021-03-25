@@ -2,471 +2,368 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PlayerDetail;
-use App\Models\PlayerSessionToken;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ClientException;
+use App\Helpers\ClientRequestHelper;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Http\Request;
+use App\Helpers\CallParameters;
+use App\Helpers\ProviderHelper;
 use App\Helpers\Helper;
 use App\Helpers\GameTransaction;
-use App\Helpers\GameSubscription;
 use App\Helpers\GameRound;
 use App\Helpers\Game;
-use App\Helpers\CallParameters;
-use App\Helpers\PlayerHelper;
-use App\Helpers\TokenHelper;
-use App\Helpers\ProviderHelper;
-use App\Helpers\ClientRequestHelper;
-
-use App\Support\RouteParam;
-
-use Illuminate\Http\Request;
-
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Client;
-
 use DB;
 
 class MannaPlayController extends Controller
-{
-    public function __construct(){
-		/*$this->middleware('oauth', ['except' => ['index']]);*/
-		/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
+{   
+
+	public $client_api_key , $provider_db_id ;
+
+	public function __construct(){
+		$this->client_api_key = config("providerlinks.manna.CLIENT_API_KEY");
+		$this->provider_db_id = config("providerlinks.manna.PROVIDER_ID");
 	}
 
-	public function getBalance(Request $request) 
-	{
-		$http_status = 200;
-		$response = [
-						"errorCode" =>  10100,
-						"message" => "Server is not ready!",
-					];
+
+	public function getBalance(Request $request) {
 
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$api_key = $request->header('apiKey');
 
-		if(!CallParameters::check_keys($json_data, 'account', 'sessionId')) {
-				$http_status = 200;
-				$response = [
-						"errorCode" =>  10102,
-						"message" => "Post data is invalid!",
-					];
+		if(!CallParameters::check_keys($json_data, 'account', 'sessionId'))
+		{
+			$http_status = 200;
+			$response = [
+					"errorCode" =>  10102,
+					"message" => "Post data is invalid!",
+				];
 		}
 		else
 		{
-			if($api_key != config("providerlinks.manna.CLIENT_API_KEY")) {
+			if ($this->client_api_key != $api_key) {
 				$http_status = 200;
 				$response = [
-							"errorCode" =>  10105,
-							"message" => "Authenticate fail!",
-						];
-			}
-			else
-			{
+					"errorCode" =>  10105,
+					"message" => "Authenticate fail!",
+				];
+			} else {
 				$http_status = 200;
 				$response = [
-								"errorCode" =>  10204,
-								"message" => "Account is not exist!",
-							];
-
+					"errorCode" =>  10204,
+					"message" => "Account is not exist!",
+				];
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
-				// $client_details = $this->_getClientDetails('token', $json_data['sessionId']);
-				
-				if ($client_details) {
-					// $client_response = ClientRequestHelper::playerDetailsCall($client_details->player_token);
-
-					// if(isset($client_response->playerdetailsresponse->status->code) 
-					// && $client_response->playerdetailsresponse->status->code == "200") {
-
-					// 	$http_status = 200;
-					// 	$response = [
-					// 		"balance" => bcdiv($client_response->playerdetailsresponse->balance, 1, 2)
-					// 	];
-					// }
-
+				if ($client_details != null) {
 					$http_status = 200;
+					$response = [
+						"balance" => bcdiv($client_details->balance, 1, 2)
+					];
+				}
+			}
+
+		}
+		Helper::saveLog('manna_balance', $this->provider_db_id, file_get_contents("php://input"), $response);
+		return response()->json($response, $http_status);
+	}
+
+	public function debitProcess(Request $request){
+
+        $json_data = json_decode(file_get_contents("php://input"), true);
+		$api_key = $request->header('apiKey');
+		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
+		{
+			$http_status = 200;
+			$response = [
+					"errorCode" =>  10102,
+					"message" => "Post data is invalid!",
+				];
+		}
+		else
+		{
+			if ($this->client_api_key != $api_key) {
+				$http_status = 200;
+				$response = [
+					"errorCode" =>  10105,
+					"message" => "Authenticate fail!",
+				];
+			} else {
+
+				$http_status = 200;
+				$response = [
+					"errorCode" =>  10204,
+					"message" => "Account is not exist!",
+				];
+				// Find the player and client details
+				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				if ($client_details != null) {
+					
+					try{
+						ProviderHelper::idenpotencyTable($json_data['round_id']);
+					}catch(\Exception $e){
 						$response = [
-							"balance" => bcdiv($client_details->balance, 1, 2)
-					];
-				
-				}
-			}
-		}
-
-		Helper::saveLog('manna_balance', 16, file_get_contents("php://input"), $response);
-		return response()->json($response, $http_status);
-
-	}
-
-	public function debitProcess(Request $request) 
-	{
-		$http_status = 200;
-		$response = [
-						"errorCode" =>  10100,
-						"message" => "Server is not ready!",
-					];
-
-		$json_data = json_decode(file_get_contents("php://input"), true);
-		$api_key = $request->header('apiKey');
-
-		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id')) {
-				$http_status = 200;
-				$response = [
-						"errorCode" =>  10102,
-						"message" => "Post data is invalid!",
-					];
-		}
-		else
-		{
-			if($api_key != config("providerlinks.manna.CLIENT_API_KEY")) {
-				$http_status = 200;
-				$response = [
-							"errorCode" =>  10105,
-							"message" => "Authenticate fail!",
+							"errorCode" =>  10209,
+							"message" => "Round id is exists!",
 						];
-			}
-			else
-			{
-				$http_status = 200;
-				$response = [
-								"errorCode" =>  10204,
-								"message" => "Account is not exist!",
-							];
-
-				$body = ['error' => 'true'];
-				$game_transaction_id = 0;
-				$client_response = ['error' => 'true'];
-
-				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
-
-				if ($client_details/* && $player_details != NULL*/) {
-					GameRound::create($json_data['round_id'], $client_details->token_id);
-
-					// Check if the game is available for the client
-					/*$subscription = new GameSubscription();
-					$client_game_subscription = $subscription->check($client_details->client_id, 16, $json_data['game_id']);
-					
-					if(!$client_game_subscription) {
-						$http_status = 200;
-							$response = [
-								"errorCode" =>  10109,
-								"message" => "Game not found!",
-							];
+						return $response;
 					}
-					else
-					{*/
-						if(!GameRound::check($json_data['round_id'])) {
-							$http_status = 200;
-							$response = [
-								"errorCode" =>  10209,
-								"message" => "Round id is exists!",
-							];
-						}
-						else
-						{
-							$json_data['income'] = $json_data['amount'];
-							$json_data['roundid'] = $json_data['round_id'];
-							$json_data['transid'] = $json_data['transaction_id'];
-							$game_details = Game::find($json_data["game_id"], config("providerlinks.manna.PROVIDER_ID"));
 
-							$game_transaction_id = GameTransaction::save('debit', $json_data, $game_details, $client_details, $client_details);
-
-							$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 1);
-
-							// change $json_data['round_id'] to $game_transaction_id
-			                $client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-							
-
-							if(isset($client_response->fundtransferresponse->status->code) 
-						&& $client_response->fundtransferresponse->status->code == "402") {
-								$http_status = 200;
-								$response = [
-												"errorCode" =>  10203,
-												"message" => "Insufficient balance",
-											];
-
-							}
-							else
-							{
-								if(isset($client_response->fundtransferresponse->status->code) 
-							&& $client_response->fundtransferresponse->status->code == "200") {
-									ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-									$http_status = 200;
-									$response = [
-										"transaction_id" => $json_data['transaction_id'],
-										"balance" => bcdiv($client_response->fundtransferresponse->balance, 1, 2) 
-									];
-								}
-							}
-
-							ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
-						}
-					/*}*/
-				}
-			}
-		}
-		
-		Helper::saveLog('manna_debit', 16, file_get_contents("php://input"), $response);
-		return response()->json($response, $http_status);
-
-	}
-
-	public function creditProcess(Request $request)
-	{
-		$http_status = 200;
-		$response = [
+					$response = [
 						"errorCode" =>  10100,
 						"message" => "Server is not ready!",
 					];
 
-		$json_data = json_decode(file_get_contents("php://input"), true);
-		/*$client_code = RouteParam::get($request, 'brand_code');*/
-		$api_key = $request->header('apiKey');
+					$json_data['income'] = $json_data['amount'];
+					$json_data['roundid'] = $json_data['round_id'];
+					$json_data['transid'] = $json_data['transaction_id'];
+					$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
 
-		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id')) {
+					$game_transaction_id = GameTransaction::save('debit', $json_data, $game_details, $client_details, $client_details);
 
-				$http_status = 200;
-				$response = [
-						"errorCode" =>  10102,
-						"message" => "Post data is invalid!",
-					];
-		}
-		else
-		{
-			if($api_key != config("providerlinks.manna.CLIENT_API_KEY")) {
-				$http_status = 200;
-				$response = [
-							"errorCode" =>  10105,
-							"message" => "Authenticate fail!",
-						];
-			}
-			else
-			{
-				$http_status = 200;
-				$response = [
-								"errorCode" =>  10204,
-								"message" => "Account is not exist!",
-							];
+					$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 1);
 
-				$body = ['error' => 'true'];
-				$game_transaction_id = 0;
-				$client_response = ['error' => 'true'];
-
-				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
-
-				if ($client_details/* && $player_details != NULL*/) {
-
-					// Check if the game is available for the client
-					/*$subscription = new GameSubscription();
-					$client_game_subscription = $subscription->check($client_details->client_id, 16, $json_data['game_id']);
-
-					if(!$client_game_subscription) {
-						$http_status = 200;
-							$response = [
-								"errorCode" =>  10109,
-								"message" => "Game not found!",
-							];
-					}
-					else
-					{*/
-						if(!GameRound::check($json_data['round_id'])) {
-							$http_status = 200;
-								$response = [
-									"errorCode" =>  10209,
-									"message" => "Round id is exists!",
-								];
-						}
-						else
-						{
-							if($json_data['amount'] < 0) {
-								$http_status = 200;
-								$response = [
-									"errorCode" =>  10201,
-									"message" => "Warning value must not be less 0.",
-								];
-							}
-							else
-							{
-								if(GameTransaction::find($json_data['transaction_id']) ) {
-									$http_status = 200;
-									$response = [
-										"errorCode" =>  10208,
-										"message" => "Transaction id is exists!",
-									];
-								}
-								else
-								{
-									$game_details = Game::find($json_data["game_id"], config("providerlinks.manna.PROVIDER_ID"));
-
-									$json_data['income'] = $json_data['amount'] - $json_data["amount"];
-									$json_data['roundid'] = $json_data['round_id'];
-									$json_data['transid'] = $json_data['transaction_id'];
-
-									$game_transaction_id = GameTransaction::update('credit', $json_data, $game_details, $client_details, $client_details);
-
-									$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 2);
-
-									// change $json_data['round_id'] to $game_transaction_id
-			               			$client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'credit');
-
-									if(isset($client_response->fundtransferresponse->status->code) 
-								&& $client_response->fundtransferresponse->status->code == "200") {
-										ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-										$http_status = 200;
-										$response = [
-											"transaction_id" => $json_data['transaction_id'],
-											"balance" => bcdiv($client_response->fundtransferresponse->balance, 1, 2) 
-										];
-									}
-
-									ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
-								}
-							}
-						}
-					/*}*/
-				}
-			}
-		}
-		
-		Helper::saveLog('manna_credit', 16, file_get_contents("php://input"), $response);
-		return response()->json($response, $http_status);
-
-	}
-
-	public function rollBackTransaction(Request $request) 
-	{
-		$http_status = 200;
-		$response = [
-						"errorCode" =>  10100,
-						"message" => "Server is not ready!",
-					];
-
-		$json_data = json_decode(file_get_contents("php://input"), true);
-		/*$client_code = RouteParam::get($request, 'brand_code');*/
-		$api_key = $request->header('apiKey');
-
-		if(!CallParameters::check_keys($json_data, 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id')) {
-				$http_status = 200;
-				$response = [
-						"errorCode" =>  10102,
-						"message" => "Post data is invalid!",
-					];
-		}
-		else
-		{
-			if($api_key != config("providerlinks.manna.CLIENT_API_KEY")) {
-				$http_status = 200;
-				$response = [
-							"errorCode" =>  10105,
-							"message" => "Authenticate fail!",
-						];
-			}
-			else
-			{
-				$http_status = 200;
-				$response = [
-								"errorCode" =>  10204,
-								"message" => "Account is not exist!",
-							];
-
-
-
-				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
-				/*$player_details = PlayerHelper::getPlayerDetails($json_data['sessionId'], 'token');*/
-
-				if ($client_details/* && $player_details != NULL*/) {
+					// change $json_data['round_id'] to $game_transaction_id
+					ProviderHelper::updateGameTransactionStatus($game_transaction_id, 5, 5);
+			        $client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
 					
-					// Check if "originaltransid" is present in the Solid Gaming request
-					if(array_key_exists('transaction_id', $json_data)) {
-						
-						// Check if the transaction exist
-						$game_transaction = GameTransaction::find($json_data['transaction_id']);
+					if (isset($client_response->fundtransferresponse->status->code)) {
 
-						// If transaction is not found
-						if(!$game_transaction) {
-							$http_status = 200;
-							$response = [
-								"errorCode" =>  10210,
-								"message" => "Target transaction id not found!",
-							];
-						}
-						else
-						{
-							// If transaction is found, send request to the client
-							$json_data['roundid'] = $json_data['round_id'];
-							$json_data['transid'] = $json_data['transaction_id'];
-							$json_data['income'] = 0;
-							$game_details = Game::find($json_data["game_id"], config("providerlinks.manna.PROVIDER_ID"));
-
-							$game_transaction_id = GameTransaction::save('rollback', $json_data, $game_transaction, $client_details, $client_details);
-
-							$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 3);
-
-							// change $json_data['round_id'] to $game_transaction_id
-	               			$client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'credit', true);
-
-							
-							// If client returned a success response
-							if($client_response->fundtransferresponse->status->code == "200") {
+						switch ($client_response->fundtransferresponse->status->code) {
+							case '200':
 								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$http_status = 200;
 								$response = [
 									"transaction_id" => $json_data['transaction_id'],
-									/*"balance" => bcdiv($client_response->fundtransferresponse->balance, 1, 2) */
+									"balance" => bcdiv($client_response->fundtransferresponse->balance, 1, 2) 
 								];
-							}
-
-							ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
+								break;
+							case '402':
+								ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+								$http_status = 200;
+								$response = [
+									"errorCode" =>  10203,
+									"message" => "Insufficient balance",
+								];
+								break;
 						}
+
+						ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
+
 					}
-					
+						
+					Helper::saveLog('manna_debit', $this->provider_db_id, json_encode($json_data), $response);
+	                return response()->json($response, $http_status);
+
 				}
 			}
-		}
 
-		Helper::saveLog('manna_rollback', 16, file_get_contents("php://input"), $response);
+		}
+		Helper::saveLog('MannaPlay debit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
 		return response()->json($response, $http_status);
 
+    }
+
+    public function creditProcess(Request $request){
+
+        $json_data = json_decode(file_get_contents("php://input"), true);
+		$api_key = $request->header('apiKey');
+		$http_status = 200;
+		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
+		{
+			$response = [
+					"errorCode" =>  10102,
+					"message" => "Post data is invalid!",
+				];
+		}
+		else
+		{
+			if ($this->client_api_key != $api_key) {
+				$response = [
+					"errorCode" =>  10105,
+					"message" => "Authenticate fail!",
+				];
+			} else {
+
+				$response = [
+					"errorCode" =>  10204,
+					"message" => "Account is not exist!",
+				];
+				// Find the player and client details
+				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+
+				if ($client_details != null) {
+					
+					try{
+						ProviderHelper::idenpotencyTable($json_data['transaction_id']);
+					}catch(\Exception $e){
+						$response = [
+							"errorCode" =>  10208,
+							"message" => "Transaction id is exists!",
+						];
+						return $response;
+					}
+
+					if($json_data['amount'] < 0) {
+						$response = [
+							"errorCode" =>  10201,
+							"message" => "Warning value must not be less 0.",
+						];
+					}
+					else
+					{
+						
+						$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
+						$bet_transaction = ProviderHelper::findGameTransaction($json_data['round_id'], 'round_id',1);
+						
+						$winbBalance = $client_details->balance + $json_data["amount"];
+						ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
+						$response = [
+								"transaction_id" => $json_data['transaction_id'],
+								"balance" => bcdiv($winbBalance, 1, 2) 
+							];
+						
+			            $win_or_lost = $json_data["amount"] > 0 ?  1 : 0;
+			            $entry_id = $json_data["amount"] > 0 ?  2 : 1;
+			           	$income = $bet_transaction->bet_amount -  $json_data["amount"] ;
+
+						$action_payload = [
+			                "type" => "custom", #genreral,custom :D # REQUIRED!
+			                "custom" => [
+			                    "provider" => 'MannaPlay',
+			                    "win_or_lost" => $win_or_lost,
+			                    "entry_id" => $entry_id,
+			                    "pay_amount" => $json_data["amount"],
+			                    "income" => $income,
+			                ],
+			                "provider" => [
+			                    "provider_request" => $json_data, #R
+			                    "provider_trans_id"=> $json_data['transaction_id'], #R
+			                    "provider_round_id"=> $json_data['round_id'], #R
+			                ],
+			                "mwapi" => [
+			                    "roundId"=>$bet_transaction->game_trans_id, #R
+			                    "type"=>2, #R
+			                    "game_id" => $game_details->game_id, #R
+			                    "player_id" => $client_details->player_id, #R
+			                    "mw_response" => $response, #R
+			                ],
+			                'fundtransferrequest' => [
+			                    'fundinfo' => [
+			                        'freespin' => false,
+			                    ]
+			                ]
+			            ];
+			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$json_data["amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+
+					}
+				}
+			}
+
+		}
+		Helper::saveLog('MannaPlay credit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
+		return response()->json($response, $http_status);
+
+    }
+
+
+    public function rollbackTransaction(Request $request) {
+    	$json_data = json_decode(file_get_contents("php://input"), true);
+		$api_key = $request->header('apiKey');
+		$http_status = 200;
+		if(!CallParameters::check_keys($json_data, 'account','sessionId', 'game_id', 'round_id', 'transaction_id','target_transaction_id')) {
+			$response = [
+					"errorCode" =>  10102,
+					"message" => "Post data is invalid!",
+				];
+		}
+		else
+		{
+			if ($this->client_api_key != $api_key) {
+				$response = [
+					"errorCode" =>  10105,
+					"message" => "Authenticate fail!",
+				];
+			} else {
+
+				$response = [
+					"errorCode" =>  10204,
+					"message" => "Account is not exist!",
+				];
+				// Find the player and client details
+				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+
+				if ($client_details != null) {
+					try{
+						ProviderHelper::idenpotencyTable($json_data['transaction_id']);
+					}catch(\Exception $e){
+						$response = [
+							"errorCode" =>  10208,
+							"message" => "Transaction id is exists!",
+						];
+						return $response;
+					}
+
+					$game_transaction = ProviderHelper::findGameTransaction($json_data['target_transaction_id'],'transaction_id', 1);
+					
+					$response = [
+						"errorCode" =>  10210,
+						"message" => "Target transaction id not found!",
+					];
+
+					if ($game_transaction != 'false') {
+						$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
+						
+						$rollbackbBalance = $client_details->balance + $game_transaction->bet_amount;
+						ProviderHelper::_insertOrUpdate($client_details->token_id, $rollbackbBalance); 
+						$response = [
+							"transaction_id" => $json_data['transaction_id'],
+							"balance" => bcdiv($rollbackbBalance, 1, 2) 
+						];
+
+						$win_or_lost = 4;
+			            $entry_id = 2;
+			           	$income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;
+
+						$action_payload = [
+			                "type" => "custom", #genreral,custom :D # REQUIRED!
+			                "custom" => [
+			                    "provider" => 'MannaPlay',
+			                    "win_or_lost" => $win_or_lost,
+			                    "entry_id" => $entry_id,
+			                    "pay_amount" => $game_transaction->bet_amount,
+			                    "income" => $income,
+			                ],
+			                "provider" => [
+			                    "provider_request" => $json_data, #R
+			                    "provider_trans_id"=> $json_data['transaction_id'], #R
+			                    "provider_round_id"=> $json_data['round_id'], #R
+			                ],
+			                "mwapi" => [
+			                    "roundId"=>$game_transaction->game_trans_id, #R
+			                    "type"=>3, #R
+			                    "game_id" => $game_details->game_id, #R
+			                    "player_id" => $client_details->player_id, #R
+			                    "mw_response" => $response, #R
+			                ],
+			                'fundtransferrequest' => [
+			                    'fundinfo' => [
+			                        'freespin' => false,
+			                    ]
+			                ]
+			            ];
+			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$game_transaction->bet_amount,$game_details->game_code,$game_details->game_name,$game_transaction->game_trans_id,'credit',true,$action_payload);
+					}
+				}
+			}
+
+		}
+		Helper::saveLog('MannaPlay rollback', $this->provider_db_id, file_get_contents("php://input"), $response);
+		return response()->json($response, $http_status);
 	}
 
+	
 
-	/*private function _getClientDetails($client_code) {
-		$query = DB::table("clients AS c")
-				 ->select('c.client_id', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
-				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-				 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id")
-				 ->where('client_code', $client_code);
-
-				 $result= $query->first();
-
-		return $result;
-	}*/
-
-	private function _getClientDetails($type = "", $value = "") {
-		$query = DB::table("clients AS c")
-				 ->select('p.client_id', 'p.player_id', 'p.client_player_id', 'p.username', 'p.email', 'p.language', 'c.default_currency', 'c.default_currency AS currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
-				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
-				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
-				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-				 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
-				 
-				if ($type == 'token') {
-					$query->where([
-				 		["pst.player_token", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	]);
-				}
-
-				if ($type == 'player_id') {
-					$query->where([
-				 		["p.player_id", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	]);
-				}
-
-				 $result= $query->first();
-
-		return $result;
-
-	}
-
-
+	
 }
