@@ -152,6 +152,11 @@ class FundtransferProcessorController extends Controller
                             elseif($payload->action->custom->provider == 'bng'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
                             }
+                            elseif ($payload->action->custom->provider == 'MannaPlay') {
+                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                
+                            }
                             if($payload->action->custom->provider == 'tpp'){
                                 $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$gteid)->update(["amount" => $payload->request_body->fundtransferrequest->fundinfo->amount ,"game_transaction_type" => $game_transaction_type, "provider_request" => json_encode($payload->action->provider->provider_request),"mw_response" => json_encode($payload->action->mwapi->mw_response),"mw_request" => json_encode($requesttocient),"client_response" => json_encode($client_response),"transaction_detail" => "success" ]);
                             }
