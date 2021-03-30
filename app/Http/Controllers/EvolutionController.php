@@ -13,6 +13,7 @@ class EvolutionController extends Controller
 {
     //
     // # Rollback 01/06/20
+    private $prefix = 'evolution';
     public function authentication(Request $request){
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
@@ -111,15 +112,24 @@ class EvolutionController extends Controller
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
             if($client_details){
-                $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"]);
-                if($game_transaction){
+                try{
+                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_1');
+                }catch(\Exception $e){
                     $msg = array(
                         "status"=>"BET_ALREADY_EXIST",
                         "uuid"=>$data["uuid"],
                     );
                     return response($msg,200)->header('Content-Type', 'application/json');
                 }
-                else{
+                // $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"]);
+                // if($game_transaction){
+                //     $msg = array(
+                //         "status"=>"BET_ALREADY_EXIST",
+                //         "uuid"=>$data["uuid"],
+                //     );
+                //     return response($msg,200)->header('Content-Type', 'application/json');
+                // }
+                // else{
                     $game_details = EVGHelper::getGameDetails($data["game"]["details"]["table"]["id"],null,config("providerlinks.evolution.env"));
                     $TransactionData = array(
                         "provider_trans_id" => $data["transaction"]["id"],
@@ -173,7 +183,7 @@ class EvolutionController extends Controller
                         return response($msg,200)
                         ->header('Content-Type', 'application/json');
                     }
-                }
+                // }
             }
             else{
                 $msg = array(
@@ -198,15 +208,24 @@ class EvolutionController extends Controller
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
             if($client_details){
-                $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"]);
-                if($game_transaction){
+                try{
+                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_2');
+                }catch(\Exception $e){
                     $msg = array(
                         "status"=>"BET_ALREADY_SETTLED",
                         "uuid"=>$data["uuid"],
                     );
                     return response($msg,200)->header('Content-Type', 'application/json');
                 }
-                else{
+                // $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"]);
+                // if($game_transaction){
+                //     $msg = array(
+                //         "status"=>"BET_ALREADY_SETTLED",
+                //         "uuid"=>$data["uuid"],
+                //     );
+                //     return response($msg,200)->header('Content-Type', 'application/json');
+                // }
+                // else{
                     $win = $data["transaction"]["amount"] == 0 ? 0 : 1;
                     if(config("providerlinks.evolution.env") == 'test'){
                         $game_details = EVGHelper::getGameDetails($data["game"]["details"]["table"]["id"],$data["game"]["type"],config("providerlinks.evolution.env"));
@@ -288,7 +307,7 @@ class EvolutionController extends Controller
                         return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
-                }
+                // }
             }
             else{
                 $msg = array(
@@ -354,7 +373,11 @@ class EvolutionController extends Controller
                         );
                         $game = Helper::getGameTransaction($client_details->player_token,$data["transaction"]["refId"]);
                         if(!$game){
-                            $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
+                            $msg = array(
+                                "status"=>"BET_DOES_NOT_EXIST",
+                                "uuid"=>$data["uuid"],
+                            );
+                            return response($msg,200)->header('Content-Type', 'application/json'); 
                         }
                         else{
                             $gameupdate = Helper::updateGameTransaction($game,$json_data,"refund");
@@ -378,7 +401,7 @@ class EvolutionController extends Controller
                                 ->header('Content-Type', 'application/json');
                         }
                     }
-                }
+                // }
             }
             else{
                 $msg = array(
