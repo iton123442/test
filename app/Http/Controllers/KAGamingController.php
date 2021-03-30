@@ -216,7 +216,7 @@ class KAGamingController extends Controller
         // return $balance;
         #1DEBUGGING
         
-        $amount = $this->formatAmounts($data->betAmount);
+        $amount = $data->betAmount;
         $win_amount = $this->formatAmounts($data->winAmount);
         $pay_amount =  0; //abs($data['amount']);
         $method = 1;
