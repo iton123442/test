@@ -313,15 +313,15 @@ class EvolutionController extends Controller
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
             if($client_details){
-                $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"],$data["transaction"]["refId"],3);
-                if($game_transaction){
-                    $msg = array(
-                        "status"=>"BET_ALREADY_SETTLED",
-                        "uuid"=>$data["uuid"],
-                    );
-                    return response($msg,200)->header('Content-Type', 'application/json');
-                }
-                else{
+                // $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"],$data["transaction"]["refId"],3);
+                // if($game_transaction){
+                //     $msg = array(
+                //         "status"=>"BET_ALREADY_SETTLED",
+                //         "uuid"=>$data["uuid"],
+                //     );
+                //     return response($msg,200)->header('Content-Type', 'application/json');
+                // }
+                // else{
                     $check_bet_exist = Helper::checkGameTransaction($data["transaction"]["id"],$data["transaction"]["refId"],1);
                     if(!$check_bet_exist){
                         $msg = array(
@@ -331,6 +331,15 @@ class EvolutionController extends Controller
                         return response($msg,200)->header('Content-Type', 'application/json');
                     }
                     else{
+                        try{
+                        ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_3');
+                        }catch(\Exception $e){
+                            $msg = array(
+                                "status"=>"BET_ALREADY_SETTLED",
+                                "uuid"=>$data["uuid"],
+                            );
+                            return response($msg,200)->header('Content-Type', 'application/json');
+                        }
                         $win = 0;
                         if(config("providerlinks.evolution.env") == 'test'){
                             $game_details = EVGHelper::getGameDetails($data["game"]["details"]["table"]["id"],$data["game"]["type"],config("providerlinks.evolution.env"));
