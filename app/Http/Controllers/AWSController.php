@@ -177,10 +177,13 @@ class AWSController extends Controller
 		// AWSHelper::saveLog('AWS singleFundTransfer - getClientDetails CHECK', $this->provider_db_id, $data, 'DONE');
 
 		// # 01 COMMENT THIS OUT WHEN DEBUGGING IN LOCAL
-		$explode1 = explode('"betAmount":', $data);
-		$explode2 = explode('amount":', $explode1[0]);
-		$amount_in_string = trim(str_replace(',', '', $explode2[1]));
-		$amount_in_string = trim(str_replace('"', '', $amount_in_string));
+		// $explode1 = explode('"betAmount":', $data);
+		// $explode2 = explode('amount":', $explode1[0]);
+		// $amount_in_string = trim(str_replace(',', '', $explode2[1]));
+		// $amount_in_string = trim(str_replace('"', '', $amount_in_string));
+
+		$signature_amount = json_decode($data);
+		$amount_in_string = (string)$signature_amount->amount;
 
 		// AWSHelper::saveLog('AWS singleFundTransfer - KEY CHECK', $this->provider_db_id, $data, 'CHECK');
 		$merchant_id = AWSHelper::findMerchantIdByClientId($client_details->client_id)['merchant_id'];
@@ -479,19 +482,14 @@ class AWSController extends Controller
 		$details = json_decode($data);
 		AWSHelper::saveLog('AWS singleFundQuery EH', $this->provider_db_id, $data, Helper::datesent());
 
-		$explode1 = explode('"betAmount":', $data);
-		$explode2 = explode('amount":', $explode1[0]);
-		$amount_in_string = trim(str_replace(',', '', $explode2[1]));
-		$amount_in_string = trim(str_replace('"', '', $amount_in_string));
+		// $explode1 = explode('"betAmount":', $data);
+		// $explode2 = explode('amount":', $explode1[0]);
+		// $amount_in_string = trim(str_replace(',', '', $explode2[1]));
+		// $amount_in_string = trim(str_replace('"', '', $amount_in_string));
 
-		// if($signature != $details->sign){
-		// 	$response = [
-		// 		"msg"=> "Sign check encountered error, please verify sign is correct",
-		// 		"code"=> 9200
-		// 	];
-		// 	AWSHelper::saveLog('AWS singleFundQuery - Error Sign', $this->provider_db_id, $data, $response);
-		// 	return $response;
-		// }
+		$signature_amount = json_decode($data);
+		$amount_in_string = (string)$signature_amount->amount;
+
 
 		$prefixed_username = explode("_TG", $details->accountId);
 		$client_details = AWSHelper::getClientDetails('player_id', $prefixed_username[1]);
@@ -511,6 +509,16 @@ class AWSController extends Controller
 		$merchant_key = AWSHelper::findMerchantIdByClientId($client_details->client_id)['merchant_key'];
 
 		$signature = md5($merchant_id . $details->currentTime . $amount_in_string . $details->accountId . $details->currency . $details->txnId . $details->txnTypeId . $details->gameId . base64_encode($merchant_key));
+
+		
+		if($signature != $details->sign){
+			$response = [
+				"msg"=> "Sign check encountered error, please verify sign is correct",
+				"code"=> 9200
+			];
+			AWSHelper::saveLog('AWS singleFundQuery - Error Sign', $this->provider_db_id, $data, $response);
+			return $response;
+		}
 
 		if ($player_details == 'false') {
 			$response = [
