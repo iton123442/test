@@ -941,8 +941,8 @@ class GameLobby{
                 ['body' => json_encode(
                         [
                             "id" => "betrnk",
-                            "account" => $client_details->username,
-                            "currency" => 'USD',
+                            "account" => $client_details->player_id,
+                            "currency" => $client_details->default_currency,
                             "sessionId" => $token,
                             "channel" => ($client_details->test_player ? "demo" : "")
                         ]
@@ -963,7 +963,7 @@ class GameLobby{
         $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
                 ['body' => json_encode(
                         [
-                            "account" => $client_details->username,
+                            "account" => $client_details->player_id,
                             "sessionId" => $token,
                             "language" => "en-US",
                             "gameId" => $game_code,
