@@ -66,7 +66,7 @@ return [
         ],
         'usdagents'=>[
             'username' => 'tigergames',
-            'password' => 'Mm010935468-',
+            'password' => 'tigergamesxicg',
             'secure_code' => '20c60c1c-fc16-42b7-9269-291d2b2b0346',
         ],
     ],
