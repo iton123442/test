@@ -221,6 +221,7 @@ class KAGamingController extends Controller
         $pay_amount =  0; //abs($data['amount']);
         $method = 1;
         $income = $bet_amount - $pay_amount;
+        $amount2 = $win_amount;
         $entry_id = 1;
         $win_or_lost = 5; // 0 lost,  5 processing
         $payout_reason = 'Game Bets and Win';
@@ -253,6 +254,11 @@ class KAGamingController extends Controller
 
         // $all_round = $this->findAllGameExt($provider_trans_id, 'all', $round_id);
         // dd($all_round);
+        if(KAHelper::isNegativeBalance($amount2, $client_details)){
+            if($freeGames != true){
+               return  $response = ["status" => "failed", "statusCode" => 200];
+            }
+        }
         $game_ext_check = KAHelper::findGameExt($round_id, 1, 'round_id');
         if($game_ext_check != 'false'){ // Duplicate transaction
             if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){

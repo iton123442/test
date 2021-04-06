@@ -352,6 +352,11 @@ class AWSHelper{
 		}
 	}
 
+	# If amount will become negative deny it amount should never be negative
+	public static function isNegativeBalance($amount,$data){
+		return $amount-1 == (float)$data->amount ? ((float)$data->amount == -1 ? true : false) : ( $amount-1 == (float)$data->amount ? true : false);
+    }
+
 
 	public static function getClientDetails($type = "", $value = "", $gg=1, $providerfilter='all') {
 	    if ($type == 'token') {
@@ -375,7 +380,7 @@ class AWSHelper{
 
 		$filter = 'order by token_id desc LIMIT 1';
 		
-		$query = DB::select('select `p`.`client_id`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`p`.`created_at` from player_session_tokens pst inner join players as p using(player_id) inner join clients as c using (client_id) inner join client_endpoints as ce using (client_id) inner join operator as op using (operator_id) '.$where.' '.$filter.'');
+		$query = DB::select('select `p`.`client_id`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `amount`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`p`.`created_at` from player_session_tokens pst inner join players as p using(player_id) inner join clients as c using (client_id) inner join client_endpoints as ce using (client_id) inner join operator as op using (operator_id) '.$where.' '.$filter.'');
 
 		 $client_details = count($query);
 		 return $client_details > 0 ? $query[0] : 'false';
@@ -500,6 +505,8 @@ class AWSHelper{
 			return false;
 		}
 	}
+
+
 
 	/**
 	 * GLOBAL

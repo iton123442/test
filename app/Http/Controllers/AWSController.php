@@ -306,8 +306,7 @@ class AWSController extends Controller
 		}
 
 		try {
-			$gamerecord  = AWSHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
-		
+
 			$bet_amount_2way = abs($details->betAmount);
 			$win_amount_2way = abs($details->winAmount);
 
@@ -316,6 +315,13 @@ class AWSController extends Controller
 			} else {
 				$is_freespin = true;
 			}
+			if(AWSHelper::isNegativeBalance($win_amount_2way, $client_details)){
+				if($is_freespin != true){
+					$response = ["msg" => "Insufficient balance","code" => 1201];
+					return $response;
+				}
+			}
+			$gamerecord  = AWSHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
 
 			$game_transextension1 = AWSHelper::createGameTransExtV2($gamerecord, $provider_trans_id, $provider_trans_id, $bet_amount_2way, 1);
 

@@ -133,7 +133,7 @@ class FundtransferProcessorController extends Controller
                                 ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
                             }
                             elseif($payload->action->custom->provider == 'kagaming'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
                                 if($payload->action->custom->is_multiple){
                                     ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income, $payload->action->custom->win_or_lost, $payload->action->custom->entry_id, 'game_trans_id',$payload->action->custom->bet_amount,$multi_bet=true);
                                 }else{

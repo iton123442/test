@@ -131,6 +131,14 @@ return [
         '6THB' => [ // ASK b2c THB
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '7EUR' => [ // BESOFTED
+            'merchant_id' => 'TGBS',
+            'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
+        ],
+        '7TRY' => [ // BESOFTED
+            'merchant_id' => 'TGBS',
+            'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
         ]
     ],
     'cqgames' => [
