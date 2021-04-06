@@ -52,7 +52,7 @@ return [
         'tryagents'=>[
             'username' => 'betrnktry',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '93928542-4014-4736-a72e-3d99786df5ea',
+            'secure_code' => '218e1ad5-2745-4ebe-b694-16c4bf3d2828',
         ],
         'twdagents'=>[
             'username' => 'betrnkTWD',
