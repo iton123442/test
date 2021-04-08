@@ -77,6 +77,12 @@ class GoldenFHelper{
 		$holdPlayerBalance = GoldenFHelper::getHoldPlayerBalanceToBeDeducted($client_details);
 		return (double)$amount-$holdPlayerBalance;
 	}
+
+
+	# If amount will become negative deny it amount should never be negative
+	public static function isNegativeBalance($amount,$data){
+		return $amount-1 == (float)$data->amount ? ((float)$data->amount == -1 ? true : false) : ($amount < 0 ? true : false);
+    }
 	
 	// public static function updateHoldBlance($client_details, $amount){
 	// 	$holdPlayerBalance = GoldenFHelper::getHoldPlayerBalanceToBeDeducted($client_details);
