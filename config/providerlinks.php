@@ -260,6 +260,7 @@ return [
             "5"=>"askmebet",
             "6"=>"askmebet",
             "3"=>"xigolo",
+            "8"=>"tgbs"
         ],
         'operator' => 'tigergames',
         'license' => 'curacao',
