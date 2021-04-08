@@ -408,18 +408,18 @@ $app->get('game/list','GameLobby\GameLobbyController@getGameList');
 $app->get('game/provider/{provider_name}','GameLobby\GameLobbyController@getProviderDetails');
 $app->post('game/launchurl','GameLobby\GameLobbyController@gameLaunchUrl');
 $app->post('gamelobby/launchurl','GameLobby\GameLobbyController@gameLobbyLaunchUrl');
-$app->get('game/balance','GameLobby\GameLobbyController@getPlayerBalance');
-$app->post('game/addfavorite','GameLobby\GameFavoriteController@index');
-$app->post('game/playerinfo','GameLobby\GameFavoriteController@playerInfo');
-$app->post('game/playerfavoritelist','GameLobby\GameFavoriteController@playerFavorite');
-$app->get('game/newestgames','GameLobby\GameInfoController@getNewestGames');
-$app->get('game/mostplayed','GameLobby\GameInfoController@getMostPlayed');
-$app->post('game/demogame','GameLobby\GameInfoController@getDemoGame');
-$app->post('game/suggestions','GameLobby\GameInfoController@getGameSuggestions'); // DEPRECATED
-$app->get('game/topcharts','GameLobby\GameInfoController@getTopGames');
-$app->get('game/topcharts/numberone','GameLobby\GameInfoController@getTopProvider');
-$app->post('game/playerdetailsrequest','GameLobby\GameInfoController@getClientPlayerDetails');
-$app->post('game/betlist','GameLobby\GameInfoController@getBetList');
+// $app->get('game/balance','GameLobby\GameLobbyController@getPlayerBalance'); # Commented 4-8-21 -Al
+// $app->post('game/addfavorite','GameLobby\GameFavoriteController@index'); # Commented 4-8-21 -Al
+// $app->post('game/playerinfo','GameLobby\GameFavoriteController@playerInfo'); # Commented 4-8-21 -Al
+// $app->post('game/playerfavoritelist','GameLobby\GameFavoriteController@playerFavorite'); # Commented 4-8-21 -Al
+// $app->get('game/newestgames','GameLobby\GameInfoController@getNewestGames'); # Commented 4-8-21 -Al
+// $app->get('game/mostplayed','GameLobby\GameInfoController@getMostPlayed'); # Commented 4-8-21 -Al
+// $app->post('game/demogame','GameLobby\GameInfoController@getDemoGame'); # Commented 4-8-21 -Al
+// $app->post('game/suggestions','GameLobby\GameInfoController@getGameSuggestions'); // DEPRECATED 
+// $app->get('game/topcharts','GameLobby\GameInfoController@getTopGames'); # Commented 4-8-21 -Al 
+// $app->get('game/topcharts/numberone','GameLobby\GameInfoController@getTopProvider'); # Commented 4-8-21 -Al 
+// $app->post('game/playerdetailsrequest','GameLobby\GameInfoController@getClientPlayerDetails'); # Commented 4-8-21 -Al
+// $app->post('game/betlist','GameLobby\GameInfoController@getBetList'); # Commented 4-8-21 -Al
 $app->post('game/query','GameLobby\QueryController@queryData');
 // IWallet
 // $app->post('api/iwallet/makedeposit','IWalletController@makeDeposit');
