@@ -683,8 +683,6 @@ class GoldenFController extends Controller
             return $response = ["data" => null,"code" => 7103, 'msg'=> 'Member code does not exist'];
         }
 
-
-
         $game_information = Helper::getInfoPlayerGameRound($client_details->player_token);
 
         $general_details = ["aggregator" => [], "provider" => [], "client" => []];
@@ -704,11 +702,7 @@ class GoldenFController extends Controller
         $payout_reason = 'Game Bets and Win';
         $game_code = $game_information->game_id;
         $token_id = $client_details->token_id;
-
-         if(GoldenFHelper::isNegativeBalance($bet_amount, $client_details)){
-            $response = ["data" => null,"code" => 7202, 'msg' => 'Low Balance'];
-        }
-
+       
         // $game_ext_check = ProviderHelper::findGameExt($round_id, 1, 'round_id');
         $game_ext_check = ProviderHelper::findGameExt($provider_trans_id, 1, 'transaction_id');
         if($game_ext_check != 'false'){ // Duplicate transaction
