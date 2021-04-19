@@ -228,6 +228,16 @@ class BNGController extends Controller
                 )
             );
             $this->_setExtParameter($this->_getExtParameter()+1);
+            try{
+                $dataToSave = array(
+                    "win"=>2,
+                    "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                );
+                GameTransaction::updateGametransaction($dataToSave,$game_transactionid);
+                Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+            }catch(\Exception $e){
+                Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
+            }
             Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             return response($response,200)
                         ->header('Content-Type', 'application/json');
@@ -404,6 +414,16 @@ class BNGController extends Controller
                 )
             );
             $this->_setExtParameter($this->_getExtParameter()+1);
+            try{
+                $dataToSave = array(
+                    "win"=>2,
+                    "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                );
+                GameTransaction::updateGametransaction($dataToSave,$game_transactionid);
+                Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+            }catch(\Exception $e){
+                Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
+            }
             Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             return response($response,200)
                         ->header('Content-Type', 'application/json');
