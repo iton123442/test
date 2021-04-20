@@ -728,12 +728,12 @@ class TGGController extends Controller
 		$token = $data['token'];
 		$client_details = ProviderHelper::getClientDetails('token',$token);
 		if($client_details != null){
-			$player_details = TGGHelper::playerDetailsCall($client_details);
-			ProviderHelper::_insertOrUpdate($client_details->token_id, $player_details->playerdetailsresponse->balance); 
+			// $player_details = TGGHelper::playerDetailsCall($client_details);
+			// ProviderHelper::_insertOrUpdate($client_details->token_id, $player_details->playerdetailsresponse->balance); 
 				$data_response = [
 					'status' => 'ok',
 					'data' => [
-						'balance' => (string)$player_details->playerdetailsresponse->balance,
+						'balance' => (string)$client_details->balance,
 						'currency' => $client_details->default_currency,
 						'display_name' => $client_details->display_name
 					]
