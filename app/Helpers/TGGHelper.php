@@ -254,8 +254,7 @@ class TGGHelper{
 	 * @param [int] $[entry_id] [<1 bet, 2 win>]
 	 * 
 	 */
-	public static function 
-	($round_id, $pay_amount, $income, $win, $entry_id, $bet_amount = false) {
+	public static function updateBetTransaction($round_id, $pay_amount, $income, $win, $entry_id, $bet_amount = false) {
 		$update = DB::table('game_transactions')
 			 // ->where('round_id', $round_id)
 			 ->where('game_trans_id', $round_id) 
