@@ -265,9 +265,9 @@ class TidyController extends Controller
 				$client_response = ClientRequestHelper::fundTransferFunta($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
 				$save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
 	        } catch (\Exception $e) {
-	            $response = array(
-					'error_code' 	=> '99-001',
-					'error_msg'  	=> 'invalid_partner',
+				$response = array(
+					'error_code' 	=> '99-008',
+					'error_msg'  	=> 'token_expired',
 					'request_uuid'	=> $request_uuid
 				);
 				ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, 'FAILED', $e->getMessage(), $response, $general_details);
@@ -311,8 +311,8 @@ class TidyController extends Controller
 
 					default:
 						$response = array(
-							'error_code' 	=> '99-005',
-							'error_msg'  	=> 'not_enough_balance',
+							'error_code' 	=> '99-008',
+							'error_msg'  	=> 'token_expired',
 							'request_uuid'	=> $request_uuid
 						);
 	          			// ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $client_response, $client_response->fundtransferresponse, $general_details);

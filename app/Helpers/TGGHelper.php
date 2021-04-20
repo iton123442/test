@@ -153,6 +153,24 @@ class TGGHelper{
 		return $client_details > 0 ? $query[0] : 'false';
     }
 
+    public static  function findGameTransactionExstingBet($identifier, $type) {
+
+    	if ($type == 'transaction_id') {
+		 	$where = 'where gt.provider_trans_id = "'.$identifier.'" ';
+		}
+		if ($type == 'game_transaction') {
+		 	$where = 'where gt.game_trans_id = "'.$identifier.'"';
+		}
+		if ($type == 'round_id') {
+			$where = 'where gt.round_id = "'.$identifier.'" ';
+		}
+	 	
+	 	$filter = 'LIMIT 1';
+    	$query = DB::select('select gt.game_trans_id, gt.provider_trans_id, gt.game_id, gt.round_id, gt.bet_amount,gt.win, gt.pay_amount, gt.entry_id, gt.income from game_transactions gt '.$where.' '.$filter.'');
+    	$client_details = count($query);
+		return $client_details > 0 ? $query[0] : 'false';
+    }
+
 	public static function findGameTransID($game_trans_id){
 		$query = DB::select('select `game_trans_id`,`token_id`, `provider_trans_id`, `round_id`, `bet_amount`, `win`, `pay_amount`, `income`, `entry_id` from game_transactions where `game_trans_id`  = '.$game_trans_id.' ');
     	$data = count($query);
@@ -236,7 +254,8 @@ class TGGHelper{
 	 * @param [int] $[entry_id] [<1 bet, 2 win>]
 	 * 
 	 */
-	public static function updateBetTransaction($round_id, $pay_amount, $income, $win, $entry_id) {
+	public static function 
+	($round_id, $pay_amount, $income, $win, $entry_id, $bet_amount = false) {
 		$update = DB::table('game_transactions')
 			 // ->where('round_id', $round_id)
 			 ->where('game_trans_id', $round_id) 
@@ -244,6 +263,7 @@ class TGGHelper{
 				   'income' => $income, 
 				   'win' => $win, 
 				   'entry_id' => $entry_id,
+				   'bet_amount' => $bet_amount,
 				   'transaction_reason' => TGGHelper::updateReason($win),
 			 ]);
 	 return ($update ? true : false);

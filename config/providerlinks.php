@@ -197,6 +197,7 @@ return [
         'client_id' => 'c9c219fc',
         'usd_invite' => '00688c94',
         'thb_invite' => '3f330a37',
+        'try_invite' => 'dbf3d92b',
         'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
     ],
     'evoplay' => [
