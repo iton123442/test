@@ -321,8 +321,34 @@ class WazdanController extends Controller
                     }
                     $gametransactionid = $game->game_trans_id;
                 }
-                $transactionId= WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,2); 
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                //$transactionId= WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,2); 
+                $response = array(
+                    "status" => 0,
+                    "funds" => array(
+                        "balance" => $client_details->balance + round($datadecoded["amount"],2)
+                    )
+                );
+        
+                $action_payload = [
+                    "type" => "custom", #genreral,custom :D # REQUIRED!
+                    "custom" => [
+                        "provider" => 'wazdan',
+                    ],
+                    "provider" => [
+                        "provider_request" => $datadecoded, #R
+                        "provider_trans_id"=>$datadecoded["transactionId"], #R
+                        "provider_round_id"=>$datadecoded["roundId"], #R
+                    ],
+                    "mwapi" => [
+                        "roundId"=>$gametransactionid, #R
+                        "type"=>2, #R
+                        "game_id" => $game_details->game_id, #R
+                        "player_id" => $client_details->player_id, #R
+                        "mw_response" => $response, #R
+                    ]
+                ];
+                //$client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
@@ -333,7 +359,7 @@ class WazdanController extends Controller
                             "balance" => $balance
                         )
                     );
-                    Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
+                    //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
                     //Helper::saveLog('responseTime(WAZDANWIN)', 12, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
