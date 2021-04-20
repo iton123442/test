@@ -8,6 +8,7 @@ use App\Helpers\WazdanHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
+use App\Models\GameTransaction as GMT;
 use DB;
 class WazdanController extends Controller
 {
@@ -144,9 +145,9 @@ class WazdanController extends Controller
                     
                 $transactionId =WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,1);  
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
-                $balance = round($client_response->fundtransferresponse->balance,2);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
+                    $balance = round($client_response->fundtransferresponse->balance,2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $msg = array(
                         "status" => 0,
@@ -167,8 +168,17 @@ class WazdanController extends Controller
                         "message" => array(
                             "text"=>"Insufficient funds",
                         )
-                    ); 
-                    Helper::saveLog('betGameInsuficient(Wazdan)', 50, $data, $msg);
+                    );
+                    try{
+                        $data = array(
+                            "win"=>2,
+                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                        );
+                        GMT::updateGametransaction($data,$gametransactionid);
+                        Helper::updateGameTransactionExt($transactionId,$client_response->fundtransferresponse->status->message,$msg,'FAILED');
+                    }catch(\Exception $e){
+                        Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
+                    } 
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
@@ -240,9 +250,9 @@ class WazdanController extends Controller
                 }
                 $transactionId = WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,3);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
-                $balance = round($client_response->fundtransferresponse->balance,2);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
+                    $balance = round($client_response->fundtransferresponse->balance,2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $msg = array(
                         "status" => 0,
@@ -313,9 +323,9 @@ class WazdanController extends Controller
                 }
                 $transactionId= WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,2); 
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
-                $balance = round($client_response->fundtransferresponse->balance,2);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
+                    $balance = round($client_response->fundtransferresponse->balance,2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $msg = array(
                         "status" => 0,
