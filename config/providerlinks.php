@@ -336,9 +336,9 @@ return [
     ],
     'spade'=>[
         'prefix' => 'TIGERG', 
-        'api_url'=> 'https://merchantapi.silverkirin88.com/api/',
+        'api_url'=> 'https:/merchantapi.silverkirin88.com/api/',
         'merchantCode' => 'TIGERG',
-        'siteId' => 'SITE_USD1',
+        'siteId' => 'SITE_1',
         'provider_id' => 37,
     ],
     'majagames'=>[
