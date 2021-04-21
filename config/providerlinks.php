@@ -417,11 +417,14 @@ return [
     'slotmill'=>[
         'provider_db_id'=> 47,
         'brand' => "TigerGames",
-        'treasures' => "https://templar-treasures.slotmill.com/",
-        'starspell' => "https://starspell.slotmill.com/",
-        'wildfire' => "https://wildfire.slotmill.com/",
-        'vikings' => "https://vikings-creed.slotmill.com/",
-        'outlaws' => "https://outlaws.slotmill.com/"
+        '19002' => "https://templar-treasures.slotmill.com/",
+        '19003' => "https://starspell.slotmill.com/",
+        '19005' => "https://wildfire.slotmill.com/",
+        '19007' => "https://vikings-creed.slotmill.com/",
+        '19008' => "https://outlaws.slotmill.com/",
+        '19009' => "https://neon-dreams.slotmill.com/",
+        '19010' => "https://lucky-lucifer.slotmill.com",
+        '19011' => "https://vegas-gold.slotmill.com",
     ],
 ];
 
