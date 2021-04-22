@@ -617,9 +617,9 @@ class GameLobby{
         
     }
 
-    public static function spadeCuracaoLaunch($game_code,$token){
+    public static function spadeCuracaoLaunch($game_code,$token,$lang){
         $client_details = ProviderHelper::getClientDetails('token', $token);
-        $url = config('providerlinks.spade_curacao.lobby_url').'acctId=TIGERG_'.$client_details->player_id.'&language=en_US&token='.$token.'&game='.$game_code.'';
+        $url = config('providerlinks.spade_curacao.lobby_url').'acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
         return $url;
     }
     public static function habanerolaunchUrl( $game_code = null, $token = null){

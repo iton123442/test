@@ -604,7 +604,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==73){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::spadeCuracaoLaunch($request->game_code,$request->token),
+                        "url" => GameLobby::spadeCuracaoLaunch($request->game_code,$request->token,$request->lang),
                         "game_launch" => true
                     );
                     return response($msg,200)
