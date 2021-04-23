@@ -146,8 +146,15 @@ class BNGController extends Controller
         Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $data]), "");
         $game_transaction = GameTransaction::getGameTransactionDataByProviderTransactionId($data["uid"]);
         if(!empty($game_transaction)){
-            $response = json_decode($game_transaction->mw_response,TRUE);
-            return response($response,200)
+            $response = json_decode($game_transaction->mw_response);
+            $resp = array(
+                "uid"=> $response->uid,
+                "balance" => array(
+                    "value" => (string)$response->balance->value,
+                    "version"=> $response->balance->version
+                )
+            );
+            return response($resp,200)
                 ->header('Content-Type', 'application/json');
         }
         else{
@@ -209,7 +216,7 @@ class BNGController extends Controller
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
-                    "value" =>$balance,
+                    "value" =>(string)$balance,
                     "version" => $this->_getExtParameter()
                 ),
             );
@@ -280,7 +287,7 @@ class BNGController extends Controller
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
-                    "value" =>$balance,
+                    "value" =>(string)$balance,
                     "version" => $this->_getExtParameter()
                 ),
             );
@@ -310,49 +317,49 @@ class BNGController extends Controller
                 "game_transaction_type"=>2,
                 "provider_request" =>json_encode($data),
             );
-            $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
-            $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit");
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-            // $response =array(
-            //     "uid"=>$data["uid"],
-            //     "balance" => array(
-            //         "value" =>$client_details->balance +$data["args"]["win"],
-            //         "version" => $this->_getExtParameter()
-            //     ),
-            // );
+            // $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
+            // $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit");
+            // $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+            $response =array(
+                "uid"=>$data["uid"],
+                "balance" => array(
+                    "value" =>$client_details->balance +$data["args"]["win"],
+                    "version" => $this->_getExtParameter()
+                ),
+            );
 
-            // $action_payload = [
-            //     "type" => "custom", #genreral,custom :D # REQUIRED!
-            //     "custom" => [
-            //         "provider" => 'bng',
-            //     ],
-            //     "provider" => [
-            //         "provider_request" => $data, #R
-            //         "provider_trans_id"=>$data["uid"], #R
-            //         "provider_round_id"=>$data["args"]["round_id"], #R
-            //     ],
-            //     "mwapi" => [
-            //         "roundId"=>$game->game_trans_id, #R
-            //         "type"=>2, #R
-            //         "game_id" => $game_details->game_id, #R
-            //         "player_id" => $client_details->player_id, #R
-            //         "mw_response" => $response, #R
-            //     ]
-            // ];
-            // $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');        
+            $action_payload = [
+                "type" => "custom", #genreral,custom :D # REQUIRED!
+                "custom" => [
+                    "provider" => 'bng',
+                ],
+                "provider" => [
+                    "provider_request" => $data, #R
+                    "provider_trans_id"=>$data["uid"], #R
+                    "provider_round_id"=>$data["args"]["round_id"], #R
+                ],
+                "mwapi" => [
+                    "roundId"=>$game->game_trans_id, #R
+                    "type"=>2, #R
+                    "game_id" => $game_details->game_id, #R
+                    "player_id" => $client_details->player_id, #R
+                    "mw_response" => $response, #R
+                ]
+            ];
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
+                $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["method" =>"betNullWinNotNull","balance"=>$balance,"response_balance"=>$client_response->fundtransferresponse->balance]), "");
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>$balance,
+                        "value" =>(string)$balance,
                         "version" => $this->_getExtParameter()
                     ),
                 );
-                Helper::updateBNGGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+                //Helper::updateBNGGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$response,$client_response);
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
             }else{

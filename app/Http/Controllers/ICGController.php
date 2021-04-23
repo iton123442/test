@@ -389,11 +389,39 @@ class ICGController extends Controller
                     $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"credit");
                     $gametransactionid = $game[0]->game_trans_id;
                 }
-                $transactionId=Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,2);
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
-                $balance = round($client_response->fundtransferresponse->balance * 100,2);
+                $balanceTOsave = $client_details->balance +round($json["amount"]/100,2);
+                $response =array(
+                    "data" => array(
+                        "statusCode"=>0,
+                        "username" => $client_details->username,
+                        "balance" =>$balanceTOsave,
+                        "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balanceTOsave),
+                    ),
+                );
+                $action_payload = [
+                    "type" => "custom", #genreral,custom :D # REQUIRED!
+                    "custom" => [
+                        "provider" => 'icg',
+                    ],
+                    "provider" => [
+                        "provider_request" => $json, #R
+                        "provider_trans_id"=>$json["transactionId"], #R
+                        "provider_round_id"=>$json["roundId"], #R
+                    ],
+                    "mwapi" => [
+                        "roundId"=>$gametransactionid, #R
+                        "type"=>2, #R
+                        "game_id" => $game_details->game_id, #R
+                        "player_id" => $client_details->player_id, #R
+                        "mw_response" => $response, #R
+                    ]
+                ];
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
+                //$transactionId=Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,2);
+                //$client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
+                    $balance = round($client_response->fundtransferresponse->balance * 100,2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $response =array(
                         "data" => array(
@@ -403,12 +431,13 @@ class ICGController extends Controller
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
-                    Helper::updateICGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);  
+                    //Helper::updateICGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);  
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
                 elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
+                    $balance = round($client_response->fundtransferresponse->balance * 100,2);
                     $response =array(
                         "data" => array(
                             "statusCode"=>1,
