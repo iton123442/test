@@ -565,17 +565,12 @@ class GameLobbyController extends Controller
                     
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => $url->play_url,
+                        "url" => $url,
                         "game_launch" => true
                     );
-                    $array = [
-                        'game_code' => $request->input("game_code"),
-                        'url' =>  $url->play_url
-                    ];
-                    // Helper::saveLogCode('Booming GameCode', 36, json_encode($array), $url->session_id);
-
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
+
                 }
                 elseif($provider_code==59){
                     if($request->has('lang')){
@@ -604,7 +599,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==73){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::spadeCuracaoLaunch($request->game_code,$request->token),
+                        "url" => GameLobby::spadeCuracaoLaunch($request->game_code,$request->token,$request->lang),
                         "game_launch" => true
                     );
                     return response($msg,200)
