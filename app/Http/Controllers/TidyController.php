@@ -37,8 +37,8 @@ class TidyController extends Controller
 			$data_info = array(
 				'check' => '1',
 				'info' => [
-					'username' => $getClientDetails->username,
-					'nickname' => $getClientDetails->display_name,
+					'username' => 'TGW_' . $getClientDetails->player_id,
+					'nickname' => 'TGW_' . $getClientDetails->player_id,
 					'currency' => $get_code_currency,	
 					'enable'   => 1,
 					'created_at' => $getClientDetails->created_at
