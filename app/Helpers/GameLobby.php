@@ -411,9 +411,9 @@ class GameLobby{
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,
-                'username' => $client_details->username,
+                'username' => 'TGW_' . $client_details->player_id,
                 'token' => $token,
-                'uid' => 'TG_'.$client_details->player_id,
+                'uid' => 'TGW_'.$client_details->player_id,
                 'currency' => $get_code_currency,
                 'invite_code' => $invite_code
             ];
@@ -504,7 +504,7 @@ class GameLobby{
         Helper::saveLog('Booming session ', config('providerlinks.booming.provider_db_id'), json_encode($data), "ENDPOINT HIT");
         $url = config('providerlinks.booming.api_url').'/v2/session';
         $client_details = ProviderHelper::getClientDetails('token',$data["token"]);
-        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+        // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
       
         // $get_previous = ProviderHelper::getNonceprevious(config('providerlinks.booming.provider_db_id'));
 
@@ -522,11 +522,11 @@ class GameLobby{
 
             $requesttosend = array (
                 'game_id' => $data["game_code"],
-                'balance' => $player_details->playerdetailsresponse->balance,
+                'balance' => $client_details->balance,
                 'locale' => 'en',
                 'variant' => 'mobile', // mobile, desktop
                 'currency' => $client_details->default_currency,
-                'player_id' => (string)$client_details->player_id,
+                'player_id' => 'TG_'.$client_details->player_id,
                 'callback' =>  config('providerlinks.booming.call_back'),
                 'rollback_callback' =>  config('providerlinks.booming.roll_back')
             );
