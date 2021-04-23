@@ -411,9 +411,9 @@ class GameLobby{
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,
-                'username' => $client_details->username,
+                'username' => 'TGW_' . $client_details->player_id,
                 'token' => $token,
-                'uid' => 'TG_'.$client_details->player_id,
+                'uid' => 'TGW_'.$client_details->player_id,
                 'currency' => $get_code_currency,
                 'invite_code' => $invite_code
             ];
@@ -504,29 +504,18 @@ class GameLobby{
         Helper::saveLog('Booming session ', config('providerlinks.booming.provider_db_id'), json_encode($data), "ENDPOINT HIT");
         $url = config('providerlinks.booming.api_url').'/v2/session';
         $client_details = ProviderHelper::getClientDetails('token',$data["token"]);
-        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
-      
-        // $get_previous = ProviderHelper::getNonceprevious(config('providerlinks.booming.provider_db_id'));
-
+        Helper::savePLayerGameRoundBooming($data["game_code"],$data["token"],$provider_name);
         try{
          
             $nonce = $client_details->token_id;
 
-            // if(!($get_previous == "false")){
-            //     $i = 0;
-            //     do{
-            //         $nonce = date('YmdHis', strtotime('+'.$i.' hours'));
-            //         $i++;
-            //     }while($get_previous->response_data > $nonce);
-            // }   
-
             $requesttosend = array (
                 'game_id' => $data["game_code"],
-                'balance' => $player_details->playerdetailsresponse->balance,
+                'balance' => $client_details->balance,
                 'locale' => 'en',
                 'variant' => 'mobile', // mobile, desktop
                 'currency' => $client_details->default_currency,
-                'player_id' => (string)$client_details->player_id,
+                'player_id' => 'TG_'.$client_details->player_id,
                 'callback' =>  config('providerlinks.booming.call_back'),
                 'rollback_callback' =>  config('providerlinks.booming.roll_back')
             );
@@ -544,10 +533,8 @@ class GameLobby{
             ]);
             $guzzle_response = $client->post($url,  ['body' => json_encode($requesttosend)]);
             $client_response = json_decode($guzzle_response->getBody()->getContents());
-            // Helper::saveLogCode('Booming nonce', config('providerlinks.booming.provider_db_id'), $nonce, $nonce);
-            // Helper::saveLog('Booming session process', config('providerlinks.booming.provider_db_id'), json_encode($data), $client_response);
-            Helper::savePLayerGameRoundBooming($data["game_code"],$data["token"],$provider_name);
-            return $client_response;
+           
+            return $client_response->play_url;
 
         }catch(\Exception $e){
             $error = [
@@ -617,9 +604,9 @@ class GameLobby{
         
     }
 
-    public static function spadeCuracaoLaunch($game_code,$token){
+    public static function spadeCuracaoLaunch($game_code,$token,$lang){
         $client_details = ProviderHelper::getClientDetails('token', $token);
-        $url = config('providerlinks.spade_curacao.lobby_url').'acctId=TIGERG_'.$client_details->player_id.'&language=en_US&token='.$token.'&game='.$game_code.'';
+        $url = config('providerlinks.spade_curacao.lobby_url').'acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
         return $url;
     }
     public static function habanerolaunchUrl( $game_code = null, $token = null){
