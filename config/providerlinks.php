@@ -149,7 +149,35 @@ return [
             'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
         ]
     ],
-    'cqgames' => [
+    'justplay' => [
+        'provider_db_id' => 52,
+        'api_url' => 'http://api.justplay-gaming.com',
+        'USD' => [
+            'id_user' => 658,
+            'password' => '14d6a01e05c6a468ae01390b3eda1a7c'
+        ],
+        'EUR' => [
+            'id_user' => 657,
+            'password' => 'a92922dc006fded3236ad20183735838'
+        ],
+        'JPY' => [
+            'id_user' => 659,
+            'password' => '8b7a2cbdc87bfcb26d832dae51935a16'
+        ],
+        'PHP' => [
+            'id_user' => 660,
+            'password' => 'ac8f4a58d24442cb74bbc289709bc095'
+        ],
+        'THB' => [
+            'id_user' => 661,
+            'password' => 'f16eb1a45619280532c430a9f2a17adb'
+        ],
+          'INR' => [
+            'id_user' => 743,
+            'password' => 'd6efe4a276b41a4830580befaad096fc'
+        ],
+    ],
+     'cqgames' => [
         "prefix" => "TG",
         "pdbid"=> 30, // Database ID nothing todo with the provider!
         'api_url' => 'https://apie.cqgame.cc',

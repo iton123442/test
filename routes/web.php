@@ -542,3 +542,6 @@ $app->post('api/slotmill/reverse.json','SlotMillController@reverse');
 
 // CUT CALL FOR THE WIN CREDIT PROCESS
 $app->post('tigergames/bg-fundtransferV2','FundtransferProcessorController@bgFundTransferV2');
+
+//JUSTPLAY
+$app->get('api/justplay/callback', 'JustPlayController@callback'); 
