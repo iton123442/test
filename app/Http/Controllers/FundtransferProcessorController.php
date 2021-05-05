@@ -38,6 +38,8 @@ class FundtransferProcessorController extends Controller
         try{
             if($payload->action->custom->provider == 'tpp'){
                 $gteid = $payload->action->custom->idepotent_trans_id;
+            }else if ($payload->action->custom->provider == "OnlyPlay") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
             }else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
@@ -161,6 +163,12 @@ class FundtransferProcessorController extends Controller
                             elseif ($payload->action->custom->provider == 'MannaPlay') {
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
                                 ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                
+                            }elseif ($payload->action->custom->provider == 'OnlyPlay') {
+                                Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 696969, json_encode($client_response), 'Only play abot na');
+                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                ProviderHelper::updateGameTransactionFlowStatus($payload->action->mwapi->roundId, 3);
+                                // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
                                 
                             }
                             if($payload->action->custom->provider == 'tpp'){

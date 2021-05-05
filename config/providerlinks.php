@@ -426,6 +426,12 @@ return [
         '19010' => "https://lucky-lucifer.slotmill.com",
         '19011' => "https://vegas-gold.slotmill.com",
     ],
+    'onlyplay' => [
+        'provider_db_id'=> 54,
+        'partner_id' => 515,
+        'api_url' => 'https://int.onlyplay.net/api/get_frame',
+        'secret_key' => '1a8dNxc7NmZd688z86xRBrfyQbX1mxsW',
+    ],
 ];
 
 ?>

@@ -1182,6 +1182,53 @@ class GameLobby{
         $count = count($provider);
         return $count > 0 ? $provider[0]:null;
     }
+    public static function onlyplayLaunchUrl( $game_code = null, $token = null, $exiturl, $provider,$lang)
+    {
+         try{
+            $client_player_details = Providerhelper::getClientDetails('token', $token);
+            $balance = str_replace(".","", $client_player_details->balance);
+            // $balance = (int) $client_player_details->balance;
+            $formatBalance = (int) $balance;
+            $decimals = 2;
+            // dd($formatBalance);
+            $data = "balance".$formatBalance."callback_url".config('providerlinks.oauth_mw_api.mwurl').'/api/onlyplay'."currency".$client_player_details->default_currency."decimals".$decimals."game_bundle".$game_code."langen"."partner_id".config('providerlinks.onlyplay.partner_id')."token".$token.'user_idTG_'.$client_player_details->player_id; 
+            $signature = providerHelper::onlyplaySignature($data,config('providerlinks.onlyplay.secret_key'));
+            $url = config('providerlinks.onlyplay.api_url');
+            $requesttosend = [
+                'balance' => $formatBalance,
+                'callback_url' => config('providerlinks.oauth_mw_api.mwurl').'/api/onlyplay',
+                'currency' => $client_player_details->default_currency,
+                'decimals' => 2,
+                'game_bundle' => $game_code,
+                'lang' => $lang,
+                'partner_id' => config('providerlinks.onlyplay.partner_id'),
+                'sign' => $signature,
+                'token' => $token,
+                'user_id' => 'TG_'.$client_player_details->player_id,
+            ];
+            
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
+            );
+            $game_luanch_response = json_decode($guzzle_response->getBody()->getContents());
+            // dd($game_luanch_response);
+            Helper::saveLog('onlyplay launch',$provider, json_encode($requesttosend), $game_luanch_response);
+            return $game_luanch_response->url;
+        }catch(\Exception $e){
+            $requesttosend = [
+                  "success" => false,
+                  "code" => 2001,
+                  "message" => "Game not found, wrong bundle see GameList"
+            ];
+            Helper::saveLog('onlyPlay 2001', $provider, json_encode($requesttosend), $e->getMessage() );
+            return $e->getMessage();
+        }
+
+    }
     
 
 }

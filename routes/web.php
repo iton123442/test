@@ -542,3 +542,11 @@ $app->post('api/slotmill/reverse.json','SlotMillController@reverse');
 
 // CUT CALL FOR THE WIN CREDIT PROCESS
 $app->post('tigergames/bg-fundtransferV2','FundtransferProcessorController@bgFundTransferV2');
+
+// ONLYPLAY
+$app->post('/api/onlyplay/info','OnlyPlayController@getBalance');
+$app->post('/api/onlyplay/bet','OnlyPlayController@debitProcess');
+$app->post('/api/onlyplay/win','OnlyPlayController@creditProcess');
+$app->post('/api/onlyplay/cancel','OnlyPlayController@rollbackProcess');
+$app->post('/signature','OnlyPlayController@createSignature');
+

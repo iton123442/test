@@ -1126,5 +1126,8 @@ class ProviderHelper{
 	public static function idenpotencyTable($provider_trans_id){
 		return DB::select("INSERT INTO  transaction_idempotent (provider_trans_id) VALUEs ('".$provider_trans_id."')");
 	}
+	public static function onlyplaySignature($data,$secretKey){
+		return $signature = sha1($data.$secretKey);
+	}
 
 }
