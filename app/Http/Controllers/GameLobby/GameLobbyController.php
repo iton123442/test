@@ -477,7 +477,16 @@ class GameLobbyController extends Controller
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
-                } 
+                }
+                 elseif($provider_code==99){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::JustPlayLaunchURl($request->all()),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
 
                 elseif($provider_code==49){
 

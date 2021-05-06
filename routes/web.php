@@ -550,3 +550,5 @@ $app->post('/api/onlyplay/win','OnlyPlayController@creditProcess');
 $app->post('/api/onlyplay/cancel','OnlyPlayController@rollbackProcess');
 $app->post('/signature','OnlyPlayController@createSignature');
 
+//JUSTPLAY
+$app->get('api/justplay/callback', 'JustPlayController@callback'); 

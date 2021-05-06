@@ -94,6 +94,19 @@ class GameLobby{
         Helper::saveLog('GAMELAUNCH EDP', 11, json_encode(config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign), json_encode($sign));
         return config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign;
     }
+
+    public static function JustPlayLaunchURl($data){
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        $time = microtime(true);
+        $gg = 'id_user='.JustPlayHelper::changeEnvironment(($client_details))['id_user'].'time='.$time.'&id_customer='.$client_details->player_id.'&balance='.$client_details->balance.'&callback_url='.config('providerlinks.oauth_mw_api.mwurl').'/api/justplay/callback&id_game='.$data['game_code'];
+        parse_str($gg, $outputArray);
+        $url = config('providerlinks.justplay.api_url').'/api/v1/login?id_user='.JustPlayHelper::changeEnvironment(($client_details))['id_user'].'time='.$time.'&id_customer='.$client_details->player_id.'&balance='.$client_details->balance.'&callback_url='.config('providerlinks.oauth_mw_api.mwurl').'/api/justplay/callback&id_game='.$data['game_code'].'&Hash='.JustPlayHelper::createHash($outputArray,$client_details);
+        $http = new Client();
+        $response = $http->get($url);
+        $get_url = json_decode($response->getBody()->getContents());
+        return $get_url->url;
+
+    }
     public static function microgamingLaunchUrl($game_code,$token,$provider,$exitUrl){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         Helper::savePLayerGameRound($game_code,$token,$provider);
