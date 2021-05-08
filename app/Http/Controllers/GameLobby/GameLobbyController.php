@@ -478,7 +478,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                 elseif($provider_code==99){
+                 elseif($provider_code==92){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::JustPlayLaunchURl($request->all()),
@@ -708,7 +708,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-               elseif($provider_code==101){
+               elseif($provider_code==97){
                     $url = GameLobby::onlyplayLaunchUrl($request->game_code,$request->token,$request->exitUrl,$request->input('game_provider'),$request->lang);
                     $msg = array(
                         "game_code" => $request->input("game_code"),
