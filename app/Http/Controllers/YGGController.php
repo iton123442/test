@@ -80,23 +80,7 @@ class YGGController extends Controller
             Helper::saveLog("YGG wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
-        // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
-
-        // $gamecode = '';
-        // $game_name = '';
-        // for ($x = 1; $x <= 9; $x++) {
-        //     if($request['cat'.$x] != ''){
-        //         $qry = "select * from games where provider_id = ".$this->provider_id." and game_code = '".$request['cat'.$x]."'" ;
-        //         $game_details = DB::select($qry);
-        //     }else{
-        //         break;
-        //     }
-        //     if(count($game_details) > 0){
-        //         $gamecode = $game_details->game_code;
-        //         $game_name = $game_details->game_name;
-        //     }
-        // } 
-        
+  
         $balance = $client_details->balance;
         
         $tokenId = $client_details->token_id;
@@ -150,19 +134,30 @@ class YGGController extends Controller
             }
             
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
-
-            $response = array(
-                "code" => 0,
-                "data" => array(
-                    "currency" => $client_details->default_currency,
-                    "applicableBonus" => 0.00,
-                    "homeCurrency" => $client_details->default_currency,
-                    "organization" => $this->org,
-                    "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
-                    "nickName" => $client_details->display_name,
-                    "playerId" => "TGaming_".$client_details->player_id
-                ),
-            );
+            if(isset($client_response->fundtransferresponse->status->code) 
+             && $client_response->fundtransferresponse->status->code == "200"){
+                 $response = array(
+                     "code" => 0,
+                     "data" => array(
+                         "currency" => $client_details->default_currency,
+                         "applicableBonus" => 0.00,
+                         "homeCurrency" => $client_details->default_currency,
+                         "organization" => $this->org,
+                         "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
+                         "nickName" => $client_details->display_name,
+                         "playerId" => "TGaming_".$client_details->player_id
+                     ),
+                 );
+            }
+            if(isset($client_response->fundtransferresponse->status->code) 
+            && $client_response->fundtransferresponse->status->code == "402"){
+                $response = array(
+                    "code" => 1006,
+                    "msg" => "You do not have sufficient fundsfor the bet."
+                );
+                Helper::saveLog("YGG wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return $response;
+            }
             
             ProviderHelper::updatecreateGameTransExt($game_transextension, $request->all(), $response, $client_response->requestoclient, $client_response, $response);
             $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $client_response->fundtransferresponse->balance]);
@@ -196,18 +191,21 @@ class YGGController extends Controller
         }
         $provider_trans_id = $request->subreference;
         $round_id = $request->reference;
-        $checkTrans = DB::select("SELECT game_trans_id FROM game_transactions WHERE provdier_trans_id = '$request->subreference' AND round_id = '$request->reference' ");;
-        $game_details = DB::select("SELECT game_name, game_code FROM games WHERE game_id = '$checkTrans[0]->game_id' "); # DB::table("games")->where("game_id","=",$checkTrans[0]->game_id)->first();
-        $gamecode = $game_details[0]->game_code;
-        $game_name = $game_details[0]->game_name;
-        $bet_amount = $checkTrans[0]->bet_amount;
+        $checkTrans = DB::select("SELECT game_trans_id,amount FROM game_transaction_ext WHERE provider_trans_id = '$request->subreference' AND round_id = '$request->reference' ");;
+         # DB::table("games")->where("game_id","=",$checkTrans[0]->game_id)->first();
+      
+        
 
         
-        $game_trans_ext_v2 = ProviderHelper::createGameTransExtV2( $checkTrans[0]->game_trans_id, $provider_trans_id, $round_id, $bet_amount, '3');
+       
 
 
         if(count($checkTrans) > 0){
-            
+            $game_trans_ext_v2 = ProviderHelper::createGameTransExtV2( $checkTrans[0]->game_trans_id, $provider_trans_id, $round_id, $checkTrans[0]->amount, '3');
+            $bet_amount = $checkTrans[0]->bet_amount;
+            $game_details = DB::select("SELECT game_name, game_code FROM games WHERE game_id = '$checkTrans[0]->game_id' ");
+            $gamecode = $game_details[0]->game_code;
+            $game_name = $game_details[0]->game_name;
             $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             if($checkTrans[0]->win == 4){
                 $response = array(
@@ -284,7 +282,7 @@ class YGGController extends Controller
                 $game_name = $game_details[0]->game_name;
             }
         } 
-        $checkTrans = DB::select("SELECT game_trans_id FROM game_transactions WHERE provdier_trans_id = '$request->subreference' AND round_id = '$request->reference' ");
+        $checkTrans = DB::select("SELECT game_trans_id FROM game_transactions WHERE provider_trans_id = '$request->subreference' AND round_id = '$request->reference' ");
         // $checkTrans = DB::table('game_transactions')->where('provider_trans_id','=',$request->reference)->where('round_id','=',$request->reference)->get();
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         $balance = $player_details->playerdetailsresponse->balance;
@@ -380,14 +378,14 @@ class YGGController extends Controller
 
         $balance = $client_details->balance;
         $tokenId = $client_details->token_id;
-        $bet_amount = $request->amount;
+        $win_amount = $request->amount;
         $provider_trans_id = $request->subreference;
         $round_id = $request->reference;
         $getTrans = DB::select("SELECT * FROM game_transactions WHERE round_id = '$round_id' ");
         // $getTrans = DB::table('game_transactions')->where('provider_trans_id','=',$provider_trans_id)->get();
-        $income = $getTrans[0]->bet_amount - $bet_amount;
-        $entry_id = $bet_amount > 0 ? 2 : 1;
-        $win = $bet_amount > 0 ? 1 : 0;
+        $income = $getTrans[0]->bet_amount - $win_amount;
+        $entry_id = $win_amount > 0 ? 2 : 1;
+        $win = $win_amount > 0 ? 1 : 0;
         
         if(count($checkTrans) > 0){
             $response = array(
@@ -406,11 +404,8 @@ class YGGController extends Controller
             Helper::saveLog("YGG endwager(win) dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
-        // $game_trans_ext_v2 = ProviderHelper::createGameTransExtV2( $getTrans[0]->game_trans_id, $provider_trans_id, $round_id, $bet_amount, $entry_id);
-       
         try{
-            // $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_v2, $getTrans[0]->game_trans_id, 'credit');
-            $balance = $client_details->balance + $bet_amount;
+            $balance = $client_details->balance + $win_amount;
             $response = array(
                 "code" => 0,
                 "data" => array(
@@ -423,9 +418,11 @@ class YGGController extends Controller
                     "playerId" => "TGaming_".$client_details->player_id
                 ),
             );
+            $game_trans_ext_v2 = ProviderHelper::createGameTransExtV2( $getTrans[0]->game_trans_id, $provider_trans_id, $round_id, $win_amount, 2);
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED! 
                 "custom" => [
+                    "game_trans_ext_id" => $game_trans_ext_v2,
                     "provider" => 'ygg',
                 ],
                 "provider" => [
@@ -443,10 +440,9 @@ class YGGController extends Controller
             ];
             $update = DB::table('game_transactions')
                         ->where('game_trans_id','=',$getTrans[0]->game_trans_id)
-                        ->update(["win" => $win, "pay_amount" => $bet_amount, "entry_id" => $entry_id, "income" => $income]);
-
-            // $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext_v2)->update(["amount" => $bet_amount,"game_transaction_type" => $entry_id,"provider_request" => json_encode($request->all(),JSON_FORCE_OBJECT),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response->requestoclient),"client_response" => json_encode($client_response),"transaction_detail" => json_encode($response) ]);
-            $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, $bet_amount, $game_details->game_code, $game_details->game_name, $getTrans[0]->game_trans_id, 'credit', false, $action_payload);
+                        ->update(["win" => $win, "pay_amount" => $win_amount, "entry_id" => $entry_id, "income" => $income]);
+            $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, $win_amount, $game_details->game_code, $game_details->game_name, $getTrans[0]->game_trans_id, 'credit', false, $action_payload);
+            $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext_v2)->update(["amount" => $win_amount ,"game_transaction_type" => 2, "provider_request" => json_encode($request->all()),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response2->requestoclient),"client_response" => json_encode($client_response2->fundtransferresponse),"transaction_detail" => "Credit" ]);
             $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $balance]);
             Helper::saveLog("YGG endwager (win)", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
