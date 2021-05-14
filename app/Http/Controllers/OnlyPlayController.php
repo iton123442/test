@@ -180,8 +180,7 @@ class OnlyPlayController extends Controller
                     }else{
                         $win_or_lost = $pay_amount > 0 ?  1 : 0;
                     }
-                        ProviderHelper::updateGameTransactionV2Credit($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id", 2);
-
+                ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id",$bet_transaction->bet_amount); 
                 $game_trans_ext_id = ProviderHelper::createGameTransExtV2($bet_transaction->game_trans_id, $request->tx_id, $request->round_id, $pay_amount, 2,$data, $response);
 
 
