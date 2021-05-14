@@ -150,7 +150,7 @@ return [
         ]
     ],
     'justplay' => [
-        'provider_db_id' => 52,
+        'provider_db_id' => 49,
         'api_url' => 'http://api.justplay-gaming.com',
         'USD' => [
             'id_user' => 658,
@@ -184,10 +184,12 @@ return [
         'api_tokens' => [
         	'CNY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjZjNDIwYzkxOGI5ODAwMDE5YzM0ODgiLCJhY2NvdW50IjoidGVzdF9jbnkiLCJvd25lciI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsInBhcmVudCI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsImN1cnJlbmN5IjoiQ05ZIiwianRpIjoiODI1NTcwOTkwIiwiaWF0IjoxNjAwOTMwMzE2LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fwf2b4i5seyD_cEZyYkmpByTQaaxhPfH_IwEJGDRZ5A',
             'USD' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWY2MDYxYjQ4NTdhOTcwMDAxYmYwNzE1IiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiNjE0ODYyMDI5IiwiaWF0IjoxNjAwMTUxOTg4LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.XgbWboAdrRtrmKhvYymBXbdVqEwLccry0no0-8blFxI',
+            'KRW' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MDllMjk2YTJmZmUzNzAwMDFkYzdhMGYiLCJhY2NvdW50IjoidGdfcHJvZF9rcnciLCJvd25lciI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsInBhcmVudCI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsImN1cnJlbmN5IjoiS1JXIiwianRpIjoiNDU4NjQwNzIzIiwiaWF0IjoxNjIwOTc4MDI2LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.66x2XN6aZgaybUmfxbn7KXo673SfOwK8tGXZuDcgZIA',
         ],
         'wallet_token' => [
         	'CNY' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
             'USD' => 'avF0GzMKaFJuBLwZfEfq2SseM1ZKPLcf',
+            'KRW' => 'XtSqayV7PoOh76WlWgRZMUA6KlUeVxbB',
         ]
     ],
     'sagaming' => [
