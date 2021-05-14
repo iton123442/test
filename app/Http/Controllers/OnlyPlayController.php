@@ -256,7 +256,7 @@ class OnlyPlayController extends Controller
             $entry_id = 2;
             $income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;
 
-            ProviderHelper::updateGameTransactionV2Credit($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id", 4);
+            ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id",$bet_transaction->bet_amount);
             $game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction->game_trans_id, $request->tx_id, $game_transaction->round_id, $game_transaction->bet_amount, 3);
             $client_response = ClientRequestHelper::fundTransfer($get_client_details, $game_transaction->bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction->game_trans_id, 'credit', "true");
 
