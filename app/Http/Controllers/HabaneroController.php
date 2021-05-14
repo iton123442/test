@@ -147,9 +147,14 @@ class HabaneroController extends Controller
             }
             
             $checkIndepotent = DB::table('game_transactions')->where('round_id',$round_id)->where('provider_trans_id',$data->transferid)->get();
-
+            try{
+                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data->transferid);
+                $idenpotent = false;
+            }catch(\Exception $e){
+                $idenpotent = true;
+            }
             if($details->fundtransferrequest->funds->debitandcredit == true){
-                if(count($checkIndepotent) > 0){
+                if(count($checkIndepotent) > 0 || $idenpotent = true){
                     $response = [
                         "fundtransferresponse" => [
                             "status" => [
