@@ -147,6 +147,10 @@ return [
         '8TRY' => [ // BESOFTED
             'merchant_id' => 'TGBS',
             'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
+        ],
+        '10KRW' => [ // BESOFTED
+            'merchant_id' => 'TGMAS',
+            'merchant_key' => '7b03756e2a70143fe0bc36f7b2d5e1c92e011bb1fe49d7beee69b4bea0e5d73341c29d046242826bde925bf0764a9fff95940f6a67c4542cff189f15526711d0',
         ]
     ],
     'justplay' => [
