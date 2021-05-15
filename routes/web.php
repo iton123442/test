@@ -540,6 +540,15 @@ $app->post('api/slotmill/appendwagergoods.json','SlotMillController@appendwagerg
 $app->post('api/slotmill/endwager.json','SlotMillController@endwager'); // win 
 $app->post('api/slotmill/reverse.json','SlotMillController@reverse');
 
+
+//PGVIRTUAL
+$app->get('api/pgvirtual/validate/{auth_key}/{game_session_token}','PGCompanyController@auth_player');
+$app->get('api/pgvirtual/keepalive/{auth_key}/{game_session_token}','PGCompanyController@keepalive');
+$app->post('api/pgvirtual/placebet/{auth_key}/{game_session_token}','PGCompanyController@placebet');
+$app->post('api/pgvirtual/cancelbet/{auth_key}/{game_session_token}','PGCompanyController@cancelbet');
+$app->post('api/pgvirtual/syncbet/{auth_key}','PGCompanyController@syncbet');
+$app->post('api/pgvirtual/paybet/{auth_key}','PGCompanyController@paybet');
+
 // CUT CALL FOR THE WIN CREDIT PROCESS
 $app->post('tigergames/bg-fundtransferV2','FundtransferProcessorController@bgFundTransferV2');
 

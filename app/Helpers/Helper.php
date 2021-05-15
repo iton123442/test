@@ -566,4 +566,10 @@ class Helper
 		$game = DB::select('select g.game_id, g.game_code, g.game_name FROM player_game_rounds inner join games g using(game_id) where player_token = "'.$player_token.'" ');
 		return $game ? $game : false;
 	}
+
+	public static function getPGVirtualPlayerGameRound($game_session_token){
+		$token = DB::select("SELECT player_token,game_id FROM player_game_rounds WHERE uuid_token = '".$game_session_token."' ");
+		$data_rows = count($token);
+		return $data_rows > 0? $token[0] : false;
+	}
 }

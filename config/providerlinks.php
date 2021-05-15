@@ -460,6 +460,11 @@ return [
         '19010' => "https://lucky-lucifer.slotmill.com",
         '19011' => "https://vegas-gold.slotmill.com",
     ],
+    'pgvirtual' => [
+         'provider_db_id'=> 48,
+         'auth' => 'yDpnkv3UNHRx4zrtsMwrAPRdwWT5swAK',
+         'game_url' => 'https://tigergames.pgvirtual.eu/v-ui/?operator=tigergames&init_code=',
+    ],
     'onlyplay' => [
         'provider_db_id'=> 54,
         'partner_id' => 515,
