@@ -17,6 +17,7 @@ use App\Helpers\MGHelper;
 use App\Helpers\EVGHelper;
 use DOMDocument;
 use App\Services\AES;
+use Webpatser\Uuid\Uuid;
 
 use DB;             
 use Carbon\Carbon;

@@ -567,9 +567,31 @@ class Helper
 		return $game ? $game : false;
 	}
 
+	public static function isValidUUID($uuid)
+    {
+        if (!is_string($uuid) || (preg_match('/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i', $uuid) !== 1)) {
+            return false;
+        }
+
+        return true;
+    }
+
 	public static function getPGVirtualPlayerGameRound($game_session_token){
 		$token = DB::select("SELECT player_token,game_id FROM player_game_rounds WHERE uuid_token = '".$game_session_token."' ");
 		$data_rows = count($token);
 		return $data_rows > 0? $token[0] : false;
+	}
+
+	public static function playerGameRoundUuid($game_code,$player_token,$sub_provider_name,$uuid){
+		$sub_provider_id = DB::table("sub_providers")->where("sub_provider_name",$sub_provider_name)->first();
+		Helper::saveLog('SAVEPLAYERGAME(ICG)', 12, json_encode($sub_provider_id), $sub_provider_name);
+		$game = DB::table("games")->where("game_code",$game_code)->where("sub_provider_id",$sub_provider_id->sub_provider_id)->first();
+		$player_game_round = array(
+			"player_token" => $player_token,
+			"game_id" => $game->game_id,
+			"status_id" => 1,
+			"uuid_token" => $uuid
+		);
+		DB::table("player_game_rounds")->insert($player_game_round);
 	}
 }
