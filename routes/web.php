@@ -561,3 +561,14 @@ $app->post('/signature','OnlyPlayController@createSignature');
 
 //JUSTPLAY
 $app->get('api/justplay/callback', 'JustPlayController@callback'); 
+
+// Five Men
+$app->post('api/5men','FiveMenController@index');
+
+
+// Playstar
+$app->get('/api/playstar/auth','PlayStarController@getAuth');
+$app->get('/api/playstar/bet','PlayStarController@getBet');
+$app->get('/api/playstar/result','PlayStarController@getResult');
+$app->get('/api/playstar/refundbet','PlayStarController@getRefundBet');
+$app->get('/api/playstar/getbalance','PlayStarController@getBalance');

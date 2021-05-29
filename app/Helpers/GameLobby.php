@@ -78,6 +78,56 @@ class GameLobby{
         }
         
     }
+    public static function fivemenlaunchUrl( $game_code = null, $token = null, $exiturl, $provider){
+        $client_player_details = Providerhelper::getClientDetails('token', $token);
+        $requesttosend = [
+          "project" => config('providerlinks.5men.project_id'),
+          "version" => 1,
+          "token" => $token,
+          "game" => $game_code, //game_code, game_id
+          "settings" =>  [
+            'user_id'=> $client_player_details->player_id,
+            'language'=> $client_player_details->language ? $client_player_details->language : 'en',
+            'https' => 1,
+            'platform' => 'mobile'
+          ],
+          "denomination" => '1', // game to be launched with values like 1.0, 1, default
+          "currency" => $client_player_details->default_currency,
+          "return_url_info" => 1, // url link
+          "callback_version" => 2, // POST CALLBACK
+        ];
+        $signature =  ProviderHelper::getSignature($requesttosend, config('providerlinks.5men.api_key'));
+        $requesttosend['signature'] = $signature;
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ]
+        ]);
+        $response = $client->post(config('providerlinks.5men.api_url').'/game/geturl',[
+            'form_params' => $requesttosend,
+        ]);
+        $res = json_decode($response->getBody(),TRUE);
+        // Helper::saveLog('TGG GAMELAUNCH TOPGRADEGAMES', 29, json_encode($requesttosend), json_decode($response->getBody()));
+        $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
+        switch($client_player_details->wallet_type){
+            case 1:
+                return $gameurl;
+                // return TWGameLaunchHelper::TwLaunchUrl($token,'tgg',$gameurl,$client_player_details->player_id,$exiturl);
+            case 2:
+                return TWGameLaunchHelper::TwLaunchUrl($token,'tgg',$gameurl,$client_player_details->player_id,$exiturl);
+            default:
+                return false;
+        }
+        
+    }
+    public static function PlayStarLaunchURl($data){
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        $url = config('providerlinks.playstar.api_url').'/launch/?host_id='.config('providerlinks.playstar.host_id')[$client_details->default_currency].'&game_id='.$data['game_code'].'&lang=en-US&access_token='.$data['token'];
+        return $url;
+
+    
+
+    }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;
