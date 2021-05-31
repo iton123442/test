@@ -222,13 +222,13 @@ class Helper
 		DB::table("player_game_rounds")->insert($player_game_round);
 	}
 	public static function getInfoPlayerGameRound($player_token){
-		$game = DB::table("player_game_rounds as pgr")
-				->leftJoin("player_session_tokens as pst","pst.player_token","=","pgr.player_token")
-				->leftJoin("games as g" , "g.game_id","=","pgr.game_id")
-				->leftJoin("players as ply" , "pst.player_id","=","ply.player_id")
-				->where("pgr.player_token",$player_token)
-				->first();
-		return $game ? $game : false;
+		$query = DB::select('SELECT player_id, game_id, game_code, game_name FROM `player_game_rounds` pgr
+		INNER JOIN `player_session_tokens` pst USING (player_token)
+		INNER JOIN `games` g USING (game_id)
+		INNER JOIN `players` ply USING (player_id)
+		WHERE  `pgr` . `player_token`  = "'.$player_token.'"');
+		$client_details = count($query);
+		return $client_details > 0 ? $query[0] : false;
 	}
 	public static function getInfoPlayerGameRoundupdate($player_token,$game_id){
 		$game = DB::table("player_game_rounds as pgr")
