@@ -143,15 +143,14 @@ class OnlyPlayController extends Controller
                 ];
                 return $response;
             }
-            if($request->amount < 0) {
+            if($get_client_details == null) {
                 $response = [
                     "success" =>  false,
-                    "code" => 5010,
-                    "message" => "Bet is Less Than Minimum",
+                    "code" => 2401,
+                    "message" => "Session not found or expired",
                 ];
-
+                return $response;
             }
-            else{
                 $game_details = Game::find($request->game_bundle, $this->provider_db_id);
 
                 $bet_transaction = DB::select("select game_trans_id,bet_amount, pay_amount from game_transactions where round_id = '".$request->round_id."'");
@@ -213,7 +212,7 @@ class OnlyPlayController extends Controller
                                 ]
                             ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($get_client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-            }
+            
 
         }
 
@@ -285,7 +284,7 @@ class OnlyPlayController extends Controller
                 ->header('Content-Type', 'application/json');
 
     }
-    
+
     public function createSignature(Request $request){
     	$data = "partner_id515tokenw2b7b9b6ad52d3304d40cd766ccbacf23";
     	return ProviderHelper::onlyplaySignature($data,$this->secret_key);
