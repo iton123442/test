@@ -356,6 +356,12 @@ return [
         'AUTH_USER' => 'betrnkmw-prod',
         'AUTH_PASSWORD' => 'svYmaDbh3f2TQY93'
     ],
+    '5men' => [
+        'api_url' => 'http://api.flexcontentprovider.com',
+        'project_id' => '1473',
+        'api_key' => '4d66b1747cd34e73c5c64c2889ea70ec',
+        'provider_id' => 52,
+    ],
     'habanero'=>[
         'api_url' => 'https://app-a.insvr.com/go.ashx?',
         'brandID' => '6fc71b15-0ed7-ea11-a522-0050f23870d2',
@@ -452,6 +458,17 @@ return [
         'merchantId' => "tigergamesws",//soap api login
         'merchantPassword' => "G4Rvxun3BFJjULGp",//soap api login
     ],
+    'playstar' => [
+        'provider_db_id' => 56,
+        'api_url' => 'https://tigergames-api.claretfox.com',
+        'host_id' => [
+           'USD' => '3d3bfe1c05f600200af031e4c888f8e5',
+           'THB' => 'c1e9d133f03b08c29d6d03f3441a59e7',
+           'TRY' => 'bb9be14cbf5460a82277797dc39c46d0',
+           'IRR' => '79d9b5da1d79cfe588f2db352e617a34',
+           'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
+        ],
+    ],
     'slotmill'=>[
         'provider_db_id'=> 47,
         'brand' => "TigerGames",
@@ -464,6 +481,7 @@ return [
         '19010' => "https://lucky-lucifer.slotmill.com",
         '19011' => "https://vegas-gold.slotmill.com",
     ],
+
     'pgvirtual' => [
          'provider_db_id'=> 48,
          'auth' => 'yDpnkv3UNHRx4zrtsMwrAPRdwWT5swAK',
