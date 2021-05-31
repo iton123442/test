@@ -19,11 +19,12 @@ class FiveMenController extends Controller
     	$this->api_url = config('providerlinks.5men.api_url');
     	$this->startTime = microtime(true);
     	$this->prefix = "FIVEMEN";
-    	$this->middleware_api = config('providerlinks.oauth_mw_api.mwurl'); 
+    	$this->middleware_api = config('providerlinks.oauth_mw_api.mwurl');
+
 	}
 	
 	// public $provider_db_id = 29; // 29 on test ,, 27 prod
-	public $provider_db_id = 53; 
+	public $provider_db_id = 52;
 	
 	public function index(Request $request){
 
