@@ -1093,9 +1093,9 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
-        // return $link_result->url;
+        return $link_result->url;
         
-        switch($client_details->wallet_type){
+        /*switch($client_details->wallet_type){
             case 1:
                 return $link_result->url;
             case 2:
@@ -1104,7 +1104,7 @@ class GameLobby{
                 return PureTransferWalletHelper::PTwLaunchUrl($token, 'Ozashiki', $link_result->url, $client_details->player_id, $exitUrl);
             default:
                 return false;
-        }
+        }*/
         // return $link_result->url;
     }
 
