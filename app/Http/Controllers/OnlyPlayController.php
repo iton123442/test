@@ -143,15 +143,14 @@ class OnlyPlayController extends Controller
                 ];
                 return $response;
             }
-            if($request->amount < 0) {
+            if($get_client_details == null) {
                 $response = [
                     "success" =>  false,
-                    "code" => 5010,
-                    "message" => "Bet is Less Than Minimum",
+                    "code" => 2401,
+                    "message" => "Session not found or expired",
                 ];
-
+                return $response;
             }
-            else{
                 $game_details = Game::find($request->game_bundle, $this->provider_db_id);
 
                 $bet_transaction = DB::select("select game_trans_id,bet_amount, pay_amount from game_transactions where round_id = '".$request->round_id."'");
@@ -213,7 +212,7 @@ class OnlyPlayController extends Controller
                                 ]
                             ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($get_client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-            }
+            
 
         }
 
@@ -226,8 +225,10 @@ class OnlyPlayController extends Controller
         $data = $request->all();
          Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT ROLLBACK");
         // $user_id = explode('TG_',$request->user_id);
+        // $bet_transaction = DB::select("select game_trans_id,bet_amount, pay_amount from game_transactions where round_id = '".$request->round_id."'");
+        // $bet_transaction = $bet_transaction[0];
         $game_transaction = ProviderHelper::findGameTransaction($request->ref_tx_id,'transaction_id', 1);
-    	$get_client_details = ProviderHelper::getClientDetails("token_id",$game_transaction->token_id);
+        $get_client_details = ProviderHelper::getClientDetails("token_id",$game_transaction->token_id);
 
             try{
                 ProviderHelper::idenpotencyTable($request->tx_id);
@@ -241,22 +242,17 @@ class OnlyPlayController extends Controller
             }
 
             
-            // $response = [
-            //     "errorCode" =>  10210,
-            //     "message" => "Transaction not found!",
-            // ];
-            // dd($game_transaction);
             if ($game_transaction->win == 2) {
                 return response()->json($response);
             }
 
-            $game_details = Helper::getInfoPlayerGameRound($get_client_details->player_token);
+            $game_details = Game::find($request->game_bundle, $this->provider_db_id);
 
             $win_or_lost = 4;
             $entry_id = 2;
             $income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;
 
-            ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id",$bet_transaction->bet_amount);
+            ProviderHelper::updateGameTransaction($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id",$game_transaction->bet_amount);
             $game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction->game_trans_id, $request->tx_id, $game_transaction->round_id, $game_transaction->bet_amount, 3);
             $client_response = ClientRequestHelper::fundTransfer($get_client_details, $game_transaction->bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction->game_trans_id, 'credit', "true");
 
@@ -266,9 +262,11 @@ class OnlyPlayController extends Controller
                     case '200':
                         // ProviderHelper::updateGameTransactionFlowStatus($game_transaction->game_trans_id, 5);
                         ProviderHelper::_insertOrUpdate($get_client_details->token_id, $client_response->fundtransferresponse->balance);
+                        $balance = str_replace(".", "", $client_response->fundtransferresponse->balance);
+                        $formatBalance = (int) $balance;
                         $response = [
-                            "transaction_id" => $request->tx_id,
-                            "balance" => $client_response->fundtransferresponse->balance
+                            "success" => true,
+                            "balance" => $formatBalance
                         ];
                         break;
                 }
@@ -277,15 +275,16 @@ class OnlyPlayController extends Controller
 
             }
 
-    	// $response = [
-    	// 	'success' => true,
-    	// 	'balance' => $get_client_details->balance
-    	// ];
+        // $response = [
+        //  'success' => true,
+        //  'balance' => $get_client_details->balance
+        // ];
         Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()),$response);
-    	return response($response,200)
-				->header('Content-Type', 'application/json');
+        return response($response,200)
+                ->header('Content-Type', 'application/json');
 
     }
+
     public function createSignature(Request $request){
     	$data = "partner_id515tokenw2b7b9b6ad52d3304d40cd766ccbacf23";
     	return ProviderHelper::onlyplaySignature($data,$this->secret_key);
