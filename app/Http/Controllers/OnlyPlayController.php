@@ -86,10 +86,9 @@ class OnlyPlayController extends Controller
             $game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $request->tx_id, $request->round_id, $bet_amount, 1,$data);
 
             $client_response = ClientRequestHelper::fundTransfer($get_client_details, $bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-            // dd($client_response);
-            $balance = str_replace(".","", $client_response->fundtransferresponse->balance);
+            $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
+            $balance = str_replace(".","", $fundtransfer_bal);
             $formatBalance = (int) $balance;
-            // dd($formatBalance);
                         if (isset($client_response->fundtransferresponse->status->code)) {
                             // ProviderHelper::updateGameTransactionFlowStatus($game_transaction_id, 1);
                             ProviderHelper::_insertOrUpdate($get_client_details->token_id, $client_response->fundtransferresponse->balance);
