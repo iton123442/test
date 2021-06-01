@@ -499,7 +499,8 @@ return [
         'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
         'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
         'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP'
+        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+        'PLATFORM_ID' => 'tigergame'
     ],
 ];
 

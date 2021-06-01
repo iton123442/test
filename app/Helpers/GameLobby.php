@@ -1060,7 +1060,7 @@ class GameLobby{
         $auth_token_response = $auth_token->post(config("providerlinks.ozashiki.AUTH_URL"),
                 ['body' => json_encode(
                         [
-                            "id" => "betrnk",
+                            "id" => config("providerlinks.ozashiki.PLATFORM_ID"),
                             "account" => $client_details->player_id,
                             "currency" => $client_details->default_currency,
                             "sessionId" => $token,
