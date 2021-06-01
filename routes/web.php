@@ -572,3 +572,25 @@ $app->get('/api/playstar/bet','PlayStarController@getBet');
 $app->get('/api/playstar/result','PlayStarController@getResult');
 $app->get('/api/playstar/refundbet','PlayStarController@getRefundBet');
 $app->get('/api/playstar/getbalance','PlayStarController@getBalance');
+
+
+
+// TTG/TopTrendGaming
+$app->post('/api/toptrendgaming/test','TTGController@testing');
+$app->post('/api/toptrendgaming/getbalance','TTGController@getBalance');
+$app->post('/api/toptrendgaming/fundstransfer','TTGController@fundTransferTTG');
+$app->post('/api/login','TTGController@privateLogin');
+
+
+
+// Ozashiki Single Controller Endpoints
+$app->post('/api/ozashiki/fetchbalance', 'OzashikiController@getBalance');
+$app->post('/api/ozashiki/bet', 'OzashikiController@debitProcess');
+$app->post('/api/ozashiki/win', 'OzashikiController@creditProcess');
+$app->post('/api/ozashiki/betrollback', 'OzashikiController@rollbackTransaction');
+
+// Ozashiki Seamless and Semi Transfer Endpoints
+// $app->post('/api/ozashiki/fetchbalance', 'Ozashiki\MainController@getBalance');
+// $app->post('/api/ozashiki/bet', 'Ozashiki\MainController@debitProcess');
+// $app->post('/api/ozashiki/win', 'Ozashiki\MainController@creditProcess');
+// $app->post('/api/ozashiki/betrollback', 'Ozashiki\MainController@rollbackTransaction');

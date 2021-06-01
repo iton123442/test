@@ -493,6 +493,14 @@ return [
         'api_url' => 'https://int.onlyplay.net/api/get_frame',
         'secret_key' => '1a8dNxc7NmZd688z86xRBrfyQbX1mxsW',
     ],
+    'ozashiki'=>[
+        'PROVIDER_ID' => 57,
+        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
+        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
+        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP'
+    ],
 ];
 
 ?>
