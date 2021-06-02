@@ -360,7 +360,7 @@ return [
         'api_url' => 'http://api.flexcontentprovider.com',
         'project_id' => '1473',
         'api_key' => '4d66b1747cd34e73c5c64c2889ea70ec',
-        'provider_id' => 52,
+        'provider_db_id' => 52,
     ],
     'habanero'=>[
         'api_url' => 'https://app-a.insvr.com/go.ashx?',

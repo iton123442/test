@@ -80,6 +80,7 @@ class GameLobby{
     }
     public static function fivemenlaunchUrl( $game_code = null, $token = null, $exiturl, $provider){
         $client_player_details = Providerhelper::getClientDetails('token', $token);
+
         $requesttosend = [
           "project" => config('providerlinks.5men.project_id'),
           "version" => 1,
@@ -96,28 +97,25 @@ class GameLobby{
           "return_url_info" => 1, // url link
           "callback_version" => 2, // POST CALLBACK
         ];
+
         $signature =  ProviderHelper::getSignature($requesttosend, config('providerlinks.5men.api_key'));
+
         $requesttosend['signature'] = $signature;
+
         $client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ]
         ]);
+
         $response = $client->post(config('providerlinks.5men.api_url').'/game/geturl',[
             'form_params' => $requesttosend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
         // Helper::saveLog('TGG GAMELAUNCH TOPGRADEGAMES', 29, json_encode($requesttosend), json_decode($response->getBody()));
         $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
-        switch($client_player_details->wallet_type){
-            case 1:
-                return $gameurl;
-                // return TWGameLaunchHelper::TwLaunchUrl($token,'tgg',$gameurl,$client_player_details->player_id,$exiturl);
-            case 2:
-                return TWGameLaunchHelper::TwLaunchUrl($token,'tgg',$gameurl,$client_player_details->player_id,$exiturl);
-            default:
-                return false;
-        }
+        return $gameurl;   
+      
         
     }
     public static function PlayStarLaunchURl($data){
