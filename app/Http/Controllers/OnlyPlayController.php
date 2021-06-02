@@ -129,9 +129,6 @@ class OnlyPlayController extends Controller
         $formatBalance = (int) $balance;
         if($get_client_details != null){
 
-            // $query = DB::select("select game_trans_id, pay_amount from game_transactions where round_id = '".$request->round_id."' and provider_trans_id = '".$request->tx_id."'");
-
-
             try{
                 ProviderHelper::idenpotencyTable($request->tx_id);
             }catch(\Exception $e){
@@ -261,7 +258,8 @@ class OnlyPlayController extends Controller
                     case '200':
                         // ProviderHelper::updateGameTransactionFlowStatus($game_transaction->game_trans_id, 5);
                         ProviderHelper::_insertOrUpdate($get_client_details->token_id, $client_response->fundtransferresponse->balance);
-                        $balance = str_replace(".", "", $client_response->fundtransferresponse->balance);
+                        $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
+                        $balance = str_replace(".","", $fundtransfer_bal);
                         $formatBalance = (int) $balance;
                         $response = [
                             "success" => true,
