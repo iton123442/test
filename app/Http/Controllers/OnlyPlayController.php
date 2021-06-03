@@ -90,7 +90,6 @@ class OnlyPlayController extends Controller
             $balance = str_replace(".","", $fundtransfer_bal);
             $formatBalance = (int) $balance;
                         if (isset($client_response->fundtransferresponse->status->code)) {
-                            // ProviderHelper::updateGameTransactionFlowStatus($game_transaction_id, 1);
                             ProviderHelper::_insertOrUpdate($get_client_details->token_id, $client_response->fundtransferresponse->balance);
                             switch ($client_response->fundtransferresponse->status->code) {
                                 case '200':
@@ -152,8 +151,12 @@ class OnlyPlayController extends Controller
                 $bet_transaction = DB::select("select game_trans_id,bet_amount, pay_amount from game_transactions where round_id = '".$request->round_id."'");
                 $bet_transaction = $bet_transaction[0];
                 // dd($bet_transaction->pay_amount);
+                // $winbBalance = ($formatBalance/100) + $pay_amount;
+                // $formatWinBalance = $winbBalance*100;
                 $winbBalance = ($formatBalance/100) + $pay_amount;
-                $formatWinBalance = $winbBalance*100;
+                $win_bal = number_format($winbBalance,2,'.','');
+                $balance = str_replace(".","", $win_bal);
+                $formatWinBalance = (int) $balance;
                 
                 ProviderHelper::_insertOrUpdate($get_client_details->token_id, $winbBalance); 
                 $response = [
