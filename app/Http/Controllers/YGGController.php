@@ -454,7 +454,7 @@ class YGGController extends Controller
             ];
             $update = DB::table('game_transactions')
                         ->where('game_trans_id','=',$getTrans[0]->game_trans_id)
-                        ->update(["win" => $win, "pay_amount" => $win_amount, "entry_id" => $entry_id, "income" => $income, "flow_status" => 2 ]);
+                        ->update(["win" => $win, "pay_amount" => $win_amount, "entry_id" => $entry_id, "income" => $income ]);
             $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, $win_amount, $game_details->game_code, $game_details->game_name, $getTrans[0]->game_trans_id, 'credit', false, $action_payload);
             $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext_v2)->update(["amount" => $win_amount ,"game_transaction_type" => 2, "provider_request" => json_encode($request->all()),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response2->requestoclient),"client_response" => json_encode($client_response2->fundtransferresponse),"transaction_detail" => "Credit" ]);
             $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $balance]);

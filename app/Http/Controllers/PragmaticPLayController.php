@@ -476,6 +476,7 @@ class PragmaticPLayController extends Controller
         $game_name = $game_details->game_name;
         $game_code = $game_details->game_code;
         $token_id = $client_details->token_id;
+        $win = $bet_amount > 0 ? 1 : 0;
         if($game_trans[0]->win == 1){
             $response = array(
                 "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
@@ -483,6 +484,7 @@ class PragmaticPLayController extends Controller
                 "error" => 0,
                 "description" => "Success",
             );
+            return $response;
         }
 
         $game_trans_ext_v2 = ProviderHelper::createGameTransExtV2( $game_trans[0]->game_trans_id, $provider_trans_id, $round_id, $bet_amount, $entry_id);
@@ -514,7 +516,7 @@ class PragmaticPLayController extends Controller
                     "mw_response" => $response,
                 ]
             ];
-         
+            $update = DB::table('game_transactions')->where("game_trans_id","=",$game_trans[0]->game_trans_id)->update(["round_id" => $round_id, "win" => $win, "entry_id" => $entry_id ]);
             $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, $bet_amount, $game_code, $game_name, $game_trans[0]->game_trans_id, 'credit', false, $action_payload);
             $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext_v2)->update(["amount" => $bet_amount ,"game_transaction_type" => 2, "provider_request" => json_encode($data),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response2->requestoclient),"client_response" => json_encode($client_response2->fundtransferresponse),"transaction_detail" => "Credit" ]);
             $save_bal = DB::table("player_session_tokens")->where("token_id","=",$token_id)->update(["balance" => $balance]);
