@@ -27,7 +27,7 @@ return [
         'euragents'=>[
             'username' => 'betrnkeuro',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '4c7aa6fe-5559-4006-b995-b2414a472d0b',
+            'secure_code' => '2e40f6fe-b99c-433a-8a56-7c209f9cdb31',
         ],
         'cnyagents'=>[
             'username' => 'betrnkcny',
@@ -37,7 +37,7 @@ return [
         'krwagents'=>[
             'username' => 'betrnkkrw',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '0d18064c-cd77-4a04-9f17-2dc27bdb903a',
+            'secure_code' => 'e2d899ad-7545-4096-8892-3d6c751ee32a',
         ],
         'phpagents'=>[
             'username' => 'betrnkphp',
@@ -68,6 +68,16 @@ return [
             'username' => 'tigergames',
             'password' => 'tigergamesxicg',
             'secure_code' => '20c60c1c-fc16-42b7-9269-291d2b2b0346',
+        ],
+        'rubagents'=>[
+            'username' => 'betrnkrub',
+            'password' => ']WKtkT``mJCe8N3J',
+            'secure_code' => '540aeeaa-4de0-41fa-8195-52b7a4244c9d',
+        ],
+        'irragents'=>[
+            'username' => 'betrnkirr',
+            'password' => ']WKtkT``mJCe8N3J',
+            'secure_code' => '09f896ae-ada9-42a6-8178-6e8aa517acdd',
         ],
     ],
     'endorphina' => [

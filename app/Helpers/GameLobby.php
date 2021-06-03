@@ -938,6 +938,14 @@ class GameLobby{
                 $username = config("providerlinks.icgagents.twdagents.username");
                 $password = config("providerlinks.icgagents.twdagents.password");
             break;
+            case "RUB":
+                $username = config("providerlinks.icgagents.rubagents.username");
+                $password = config("providerlinks.icgagents.rubagents.password");
+            break;
+            case "IRR":
+                $username = config("providerlinks.icgagents.irragents.username");
+                $password = config("providerlinks.icgagents.irragents.password");
+            break;
             case "VND":
                 $username = config("providerlinks.icgagents.vndagents.username");
                 $password = config("providerlinks.icgagents.vndagents.password");
