@@ -505,13 +505,14 @@ return [
     ],
     'ozashiki'=>[
         'PROVIDER_ID' => 57,
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
-        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
+        'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/tigergame/authenticate/auth_token',
+        'GAME_LINK_URL' => 'https://api.manna-play.com/agent/specify/tigergame/gameLink/link',
+        'API_KEY'=> 'UrkiUyLGMUBAMQi25DOtncIMFI1cESXpInc#u9Lm',
+        'AUTH_API_KEY'=> 'UrkiUyLGMUBAMQi25DOtncIMFI1cESXpInc#u9Lm',
+        'CLIENT_API_KEY' => 'QTm6t5PFehcrCTu4rKL8sPCwv2RwtMrM',
         'PLATFORM_ID' => 'tigergame'
     ],
+
 ];
 
 ?>
