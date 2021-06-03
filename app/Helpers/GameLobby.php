@@ -80,6 +80,7 @@ class GameLobby{
     }
     public static function fivemenlaunchUrl( $game_code = null, $token = null, $exiturl, $provider){
         $client_player_details = Providerhelper::getClientDetails('token', $token);
+
         $requesttosend = [
           "project" => config('providerlinks.5men.project_id'),
           "version" => 1,
@@ -96,28 +97,25 @@ class GameLobby{
           "return_url_info" => 1, // url link
           "callback_version" => 2, // POST CALLBACK
         ];
+
         $signature =  ProviderHelper::getSignature($requesttosend, config('providerlinks.5men.api_key'));
+
         $requesttosend['signature'] = $signature;
+
         $client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ]
         ]);
+
         $response = $client->post(config('providerlinks.5men.api_url').'/game/geturl',[
             'form_params' => $requesttosend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
         // Helper::saveLog('TGG GAMELAUNCH TOPGRADEGAMES', 29, json_encode($requesttosend), json_decode($response->getBody()));
         $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
-        switch($client_player_details->wallet_type){
-            case 1:
-                return $gameurl;
-                // return TWGameLaunchHelper::TwLaunchUrl($token,'tgg',$gameurl,$client_player_details->player_id,$exiturl);
-            case 2:
-                return TWGameLaunchHelper::TwLaunchUrl($token,'tgg',$gameurl,$client_player_details->player_id,$exiturl);
-            default:
-                return false;
-        }
+        return $gameurl;   
+      
         
     }
     public static function PlayStarLaunchURl($data){
@@ -940,6 +938,14 @@ class GameLobby{
                 $username = config("providerlinks.icgagents.twdagents.username");
                 $password = config("providerlinks.icgagents.twdagents.password");
             break;
+            case "RUB":
+                $username = config("providerlinks.icgagents.rubagents.username");
+                $password = config("providerlinks.icgagents.rubagents.password");
+            break;
+            case "IRR":
+                $username = config("providerlinks.icgagents.irragents.username");
+                $password = config("providerlinks.icgagents.irragents.password");
+            break;
             case "VND":
                 $username = config("providerlinks.icgagents.vndagents.username");
                 $password = config("providerlinks.icgagents.vndagents.password");
@@ -1044,6 +1050,105 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
+
+    }
+
+    public static function ozashikiLaunchUrl($game_code,$token,$exitUrl) {
+        /*$client_details = GameLobby::getClientDetails('token', $token);*/
+        $client_details = ProviderHelper::getClientDetails('token', $token);
+        
+        // Authenticate New Token
+        $auth_token = new Client([ // auth_token
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY")
+                ]
+            ]);
+
+        $auth_token_response = $auth_token->post(config("providerlinks.ozashiki.AUTH_URL"),
+                ['body' => json_encode(
+                        [
+                            "id" => config("providerlinks.ozashiki.PLATFORM_ID"),
+                            "account" => $client_details->player_id,
+                            "currency" => $client_details->default_currency,
+                            "sessionId" => $token,
+                            "channel" => ($client_details->test_player ? "demo" : "")
+                        ]
+                )]
+            );
+
+        $auth_result = json_decode($auth_token_response->getBody()->getContents());
+
+        // Generate Game Link
+        $game_link = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY"),
+                    'token' => $auth_result->token
+                ]
+            ]);
+
+        $game_link_response = $game_link->post(config("providerlinks.ozashiki.GAME_LINK_URL"),
+                ['body' => json_encode(
+                        [
+                            "account" => $client_details->player_id,
+                            "sessionId" => $token,
+                            "language" => "en-US",
+                            "gameId" => $game_code,
+                            "exitUrl" => $exitUrl
+                        ]
+                )]
+            );
+
+        $link_result = json_decode($game_link_response->getBody()->getContents());
+        return $link_result->url;
+        
+        /*switch($client_details->wallet_type){
+            case 1:
+                return $link_result->url;
+            case 2:
+                return TWGameLaunchHelper::TwLaunchUrl($token, 'Ozashiki', $link_result->url, $client_details->player_id, $exitUrl);
+            case 3:
+                return PureTransferWalletHelper::PTwLaunchUrl($token, 'Ozashiki', $link_result->url, $client_details->player_id, $exitUrl);
+            default:
+                return false;
+        }*/
+        // return $link_result->url;
+    }
+
+    public static function dragonGamingLaunchUrl($request_data) {
+        $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
+        $game_launch = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+        
+        $game_launch_response = $game_launch->post(config("providerlinks.dragongaming.API_BASE_URL")."games/game-launch/",
+                ['body' => json_encode(
+                        [
+                            "api_key" => config("providerlinks.dragongaming.API_KEY"),
+                            "session_id" => $request_data['token'],
+                            "provider" => "dragongaming",
+                            "game_type" => "slots",
+                            "game_id" => $request_data['game_code'],
+                            "platform" => "desktop",
+                            "language" => "en",
+                            "amount_type" => ($client_details->test_player ? "fun" : "real"),
+                            "lobby_url" => $request_data['exitUrl'],
+                            "deposit_url" => "",
+                            "context" => [
+                                "id" => $client_details->player_id,
+                                "username" => $client_details->username,
+                                "country" => $client_details->country_code,
+                                "currency" => $client_details->default_currency,
+                                ]
+                        ]
+                )]
+            );
+        
+
+        $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
 
         return $link_result->url;
     }

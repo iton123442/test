@@ -19,27 +19,17 @@ class FiveMenController extends Controller
     	$this->api_url = config('providerlinks.5men.api_url');
     	$this->startTime = microtime(true);
     	$this->prefix = "FIVEMEN";
+    	$this->provider_db_id = config('providerlinks.5men.provider_db_id');
     	$this->middleware_api = config('providerlinks.oauth_mw_api.mwurl');
 
 	}
 	
 	// public $provider_db_id = 29; // 29 on test ,, 27 prod
-	public $provider_db_id = 52;
 	
 	public function index(Request $request){
+		
 
 		Helper::saveLog('5men index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
-
-		// $signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'check_signature');
-		// // return $signature_checker;
-		// if($signature_checker == 'false'):
-		// 	$msg = array(
-		// 				"status" => 'error',
-		// 				"error" => ["scope" => "user","no_refund" => 1,"message" => "Signature is invalid!"]
-		// 			);
-		// 	Helper::saveLog('TGG Signature Failed '.$request->name, $this->provider_db_id, json_encode($request->all()), $msg);
-		// 	return $msg;
-		// endif;
 	
 		if($request->name == 'init'){
 
@@ -79,8 +69,7 @@ class FiveMenController extends Controller
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
 	    // GAME DETAILS
-		$game_details = TGGHelper::findGameDetails('game_code', $this->provider_db_id, $game_id); 
-		
+		$game_details = TGGHelper::findGameDetails('game_code', $this->provider_db_id, $game_id);
 		$client_details = ProviderHelper::getClientDetails('token', $request['token']);
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 		// $game_ext = TGGHelper::checkTransactionExist($request['callback_id'], 1);
