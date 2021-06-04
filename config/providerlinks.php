@@ -519,7 +519,7 @@ return [
         'secret_key' => '1a8dNxc7NmZd688z86xRBrfyQbX1mxsW',
     ],
     'ozashiki'=>[
-        'PROVIDER_ID' => 57,
+        'PROVIDER_ID' => 58,
         'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/tigergame/authenticate/auth_token',
         'GAME_LINK_URL' => 'https://api.manna-play.com/agent/specify/tigergame/gameLink/link',
         'API_KEY'=> 'UrkiUyLGMUBAMQi25DOtncIMFI1cESXpInc#u9Lm',
