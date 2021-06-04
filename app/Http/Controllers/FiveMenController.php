@@ -24,8 +24,6 @@ class FiveMenController extends Controller
 
 	}
 	
-	// public $provider_db_id = 29; // 29 on test ,, 27 prod
-	
 	public function index(Request $request){
 		
 

@@ -228,7 +228,7 @@ class PlayStarController extends Controller
                     }else{
                         $win_or_lost = $bet_amount > 0 ?  1 : 0;
                     }
-                        ProviderHelper::updateGameTransactionV2Credit($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id", 2);
+                        ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id",$bet_transaction->bet_amount);
 
                 $game_trans_ext_id = ProviderHelper::createGameTransExtV2($bet_transaction->game_trans_id, $request->txn_id, $request->txn_id, $bet_amount, 2,$data, $response);
 
@@ -305,7 +305,7 @@ class PlayStarController extends Controller
             $income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;
             //dd($income);
 
-            ProviderHelper::updateGameTransactionV2Credit($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id", 4);
+            ProviderHelper::updateGameTransaction($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id", $bet_transaction->bet_amount);
             $game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction->game_trans_id, $request->txn_id, $game_transaction->round_id, $game_transaction->bet_amount, 3);
 
             $client_response = ClientRequestHelper::fundTransfer($client_details, $game_transaction->bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction->game_trans_id, 'credit', "true");
