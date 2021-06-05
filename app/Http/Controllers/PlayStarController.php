@@ -84,6 +84,7 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
 
+
             try{
                 ProviderHelper::idenpotencyTable($request->txn_id);
             }catch(\Exception $e){
@@ -105,7 +106,7 @@ class PlayStarController extends Controller
         
         }
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
-             
+              
             $gameTransactionData = array(
                         "provider_trans_id" => $data['txn_id'],
                         "token_id" => $client_details->token_id,
@@ -119,16 +120,17 @@ class PlayStarController extends Controller
                         "flow_status" => 0,
                     );
 
-           
             
                 $game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
+
+            
             
                     $game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $data['txn_id'], $data['txn_id'], $bet_amount, 1,$data);
 
                     // change $json_data['round_id'] to $game_transaction_id
                     // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 5, 5);
                     $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-                   
+                 
                     
                     if (isset($client_response->fundtransferresponse->status->code)) {
 
@@ -161,8 +163,8 @@ class PlayStarController extends Controller
                                 break;
                         }
 
-                        ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, $client_response->requestoclient, $client_response, $data);
-
+                       ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, $client_response->requestoclient, $client_response, $data);
+                            
                     }
                         
                     Helper::saveLog('PlayStar Debit', $this->provider_db_id, json_encode($data), $response);
@@ -180,8 +182,7 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_win/100;
         $balance = $client_details->balance;
-
-            try{
+ 
                 ProviderHelper::idenpotencyTable($request->ts);
             }catch(\Exception $e){
                 $response = [
@@ -189,7 +190,8 @@ class PlayStarController extends Controller
                     "description" => "Invalid Token",
                 ];
                 return $response;
-            }
+            }          // try{
+  
               
             if($client_details == null){
 
@@ -201,14 +203,14 @@ class PlayStarController extends Controller
             }
 
                 $game_details = Game::find($request->game_id, $this->provider_db_id);
+
                 $bet_transaction = DB::select("select game_trans_id,bet_amount, pay_amount from game_transactions where round_id = '".$request->txn_id."'");
                 $bet_transaction = $bet_transaction[0];
                 $winbBalance = $balance + $bet_amount; 
                 $formatWinBalance = $winbBalance;
-                $balance_format = str_replace(".","", $formatWinBalance);
-                $formatBalance = (int) $balance_format;
+                $formatBalance = (int)str_replace(".","", $formatWinBalance);
 
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
+                $test =ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
                 $response = [
                     'status_code' => 0,
                     'balance' => $formatBalance
@@ -222,15 +224,17 @@ class PlayStarController extends Controller
                 // }else{
                     $amount = $bet_amount + $bet_transaction->pay_amount;
                     $income = $bet_transaction->bet_amount -  $amount; 
-                // }
+                // }   
                     if($bet_transaction->pay_amount > 0){
                         $win_or_lost = 1;
                     }else{
                         $win_or_lost = $bet_amount > 0 ?  1 : 0;
                     }
-                        ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id",$bet_transaction->bet_amount);
+                    ;
+                    ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $amount, $income, $win_or_lost, $entry_id, "game_trans_id",$bet_transaction->bet_amount);
+                 
 
-                $game_trans_ext_id = ProviderHelper::createGameTransExtV2($bet_transaction->game_trans_id, $request->txn_id, $request->txn_id, $bet_amount, 2,$data, $response);
+                     $game_trans_ext_id = ProviderHelper::createGameTransExtV2($bet_transaction->game_trans_id, $request->txn_id, $request->txn_id, $bet_amount, 2,$data, $response);
 
 
                             $action_payload = [
