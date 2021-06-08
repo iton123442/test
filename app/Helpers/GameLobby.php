@@ -953,6 +953,10 @@ class GameLobby{
                 $username = config("providerlinks.icgagents.vndagents.username");
                 $password = config("providerlinks.icgagents.vndagents.password");
             break;
+            case "MMK":
+                $username = config("providerlinks.icgagents.mmkagents.username");
+                $password = config("providerlinks.icgagents.mmkagents.password");
+            break;
             default:
                 $username = config("providerlinks.icgagents.usdagents.username");
                 $password = config("providerlinks.icgagents.usdagents.password");

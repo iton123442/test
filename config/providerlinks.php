@@ -79,6 +79,11 @@ return [
             'password' => ']WKtkT``mJCe8N3J',
             'secure_code' => '09f896ae-ada9-42a6-8178-6e8aa517acdd',
         ],
+        'mmkagents'=>[
+            'username' => 'betrnkmmk',
+            'password' => ']WKtkT``mJCe8N3J',
+            'secure_code' => '2e072aee-d33e-475d-be7d-d1b019074bdc',
+        ],
     ],
     'endorphina' => [
         'url' => 'https://test.endorphina.network/api/sessions/seamless/rest/v1',

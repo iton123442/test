@@ -668,5 +668,8 @@ class ICGController extends Controller
         elseif($currency == "IRR"){
             return config("providerlinks.icgagents.irragents.secure_code");
         }
+        elseif($currency == "MMK"){
+            return config("providerlinks.icgagents.mmkagents.secure_code");
+        }
     }
 }
