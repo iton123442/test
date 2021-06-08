@@ -106,7 +106,7 @@ return [
             'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
         ],
     ],
-    'aws' => [
+    'awsxpartner' => [
         'api_url' => 'https://papi.awsxpartner.com/b2b',
         '1USD'=> [ // 
             'merchant_id' => 'TG',
@@ -132,10 +132,18 @@ return [
             'merchant_id' => 'BETSOFTED',
             'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
         ], 
+        '1MMK' => [ // ASKME for TG
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ], 
         '2THB' => [ // ASK b2b THB
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
         ],
+        '2MMK' => [ // ASK b2b MMK
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ], 
         '3USD' => [ // XIGOLO USD
             'merchant_id' => 'XIGOLO',
             'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
@@ -197,14 +205,18 @@ return [
             'password' => '8b7a2cbdc87bfcb26d832dae51935a16'
         ],
         'PHP' => [
-            'id_user' => 660,
-            'password' => 'ac8f4a58d24442cb74bbc289709bc095'
+            'id_user' => 758 ,
+            'password' => 'd6efe4a276b41a4830580befaad096fc'
         ],
         'THB' => [
             'id_user' => 661,
             'password' => 'f16eb1a45619280532c430a9f2a17adb'
         ],
-          'INR' => [
+        'INR' => [
+            'id_user' => 743,
+            'password' => 'd6efe4a276b41a4830580befaad096fc'
+        ],
+        'TRY' => [
             'id_user' => 743,
             'password' => 'd6efe4a276b41a4830580befaad096fc'
         ],
