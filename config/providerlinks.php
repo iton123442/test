@@ -106,7 +106,7 @@ return [
             'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
         ],
     ],
-    'awsxpartner' => [
+    'aws' => [
         'api_url' => 'https://papi.awsxpartner.com/b2b',
         '1USD'=> [ // 
             'merchant_id' => 'TG',
