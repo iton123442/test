@@ -117,7 +117,8 @@ class PGSoftController extends Controller
             $payout_reason = 'Bet';
             $provider_trans_id = $data['transaction_id']; //uniquee
 
-            $bet_transaction = Providerhelper::findGameExt($data['parent_bet_id'], 1, 'round_id');
+            // $bet_transaction = Providerhelper::findGameExt($data['parent_bet_id'], 1, 'round_id');
+            $bet_transaction = $this->findGameTransaction($data['parent_bet_id'], 'round_id');
             //if the bet ransaction not equal to fales this will be the freespin
             if ($bet_transaction != "false") {
                 
@@ -135,7 +136,7 @@ class PGSoftController extends Controller
                     return response($response,200)->header('Content-Type', 'application/json');
                 } else {
                     //side bet    
-                    $bet_transaction = Providerhelper::findGameTransaction($data['parent_bet_id'], 'round_id',1 );
+
                     $entry_id = 1;
                     $amount = $bet_transaction->bet_amount + $bet_amount;
                     $pay_amount = $bet_transaction->pay_amount;
@@ -326,12 +327,12 @@ class PGSoftController extends Controller
     public function transferIn(Request $request){
         Helper::saveLog('PGSoft Payout', $this->provider_db_id, json_encode($request->all(), JSON_FORCE_OBJECT),  "ENDPOINT HIT");
         $data = $request->all();
-        // if(($request->has('is_validate_bet') && $data["is_validate_bet"] == 'False') && 
-        //     ($request->has('is_adjustment') && $data["is_adjustment"] == 'False' )){
-        //         if($this->validateData($data) != 'false'){
-        //             return $this->validateData($data);
-        //         }
-        // }
+        if(($request->has('is_validate_bet') && $data["is_validate_bet"] == 'False') && 
+            ($request->has('is_adjustment') && $data["is_adjustment"] == 'False' )){
+                if($this->validateData($data) != 'false'){
+                    return $this->validateData($data);
+                }
+        }
 
         try{
             ProviderHelper::idenpotencyTable('PGSOFT_'.$data['transaction_id']);
@@ -366,15 +367,160 @@ class PGSoftController extends Controller
             //if the bet ransaction not equal to fales this will be the freespin
             if ($bet_transaction == "false") {
 
-                $response = array(
-                    'data' => null,
-                    'error' => [
-                        'code'  => '3021',
-                        'message'   => 'No bet exist.'
-                    ]
-                );
-                Helper::saveLog('PGSoft BET No bet exist', $this->provider_db_id, json_encode($request->all()),  $response);
-                return response($response,200)->header('Content-Type', 'application/json');
+                $explode = explode('-',$data['transaction_id']);
+                $transaction_type = (string)$explode[2];
+                // return $transaction_type;
+                //if not frespin or not bonus return error
+                if ($transaction_type != '400' && $transaction_type != '403') {
+                    $response = array(
+                        'data' => null,
+                        'error' => [
+                            'code'  => '3021',
+                            'message'   => 'No bet exist.'
+                        ]
+                    );
+                    Helper::saveLog('PGSoft BET No bet exist', $this->provider_db_id, json_encode($request->all()),  $response);
+                    return response($response,200)->header('Content-Type', 'application/json');
+                } else {
+
+                    $game_transaction_type = 1; // 1 Bet, 2 Win
+                    $game_code = $game_details->game_id;
+                    $token_id = $client_details->token_id;
+                    $bet_amount = 0;
+                    $pay_amount = $data['transfer_amount'];
+                    $income = $bet_amount - $pay_amount;
+                    $win_type = 0;
+                    $method = $pay_amount == 0 ? 1 : 2;
+                    $win_or_lost = 5; // 0 lost,  5 processing
+                    $payout_reason = $transaction_type == '400' ? 'BonusToCash' : 'FreeGameToCash';
+                    $provider_trans_id = $data['transaction_id']; //uniquee    
+
+                    $game_trans_id  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $data["parent_bet_id"]);
+                     
+                    $game_trans_ext_id = $this->createGameTransExt($game_trans_id,$provider_trans_id, $data["parent_bet_id"], $bet_amount, $game_transaction_type, $data, $data_response = null, $requesttosend = null, $client_response = null, $data_response = null);
+                    $type = "debit";
+                    $rollback = false;
+
+                    try {
+                        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,$type,$rollback);
+                    } catch (\Exception $e) {
+                        $balance = $client_details->balance + $pay_amount;
+                        $response =  [
+                            "data" => [
+                                "currency_code" => $client_details->default_currency,
+                                "balance_amount" => floatval(number_format((float)$balance, 2, '.', '')),
+                                "updated_time" => $data["updated_time"]
+                            ],
+                            "error" => null
+                        ];
+                        $general_details = ["aggregator" => [], "provider" => [], "client" => []];
+                        ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, 'NEED TO RESEND BET FREESPIN', 'NEED TO RESEND BET FREESPIN','NEED TO RESEND BET FREESPIN', $general_details);
+
+                       $game_trans_ext_id = $this->createGameTransExt($game_trans_id,$provider_trans_id, $data["parent_bet_id"], $pay_amount, 2, $data, $response, 'NEED TO RESEND WIN FREESPIN', 'NEED TO RESEND WIN FREESPIN', 'NEED TO RESEND WIN FREESPIN');
+                        // ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 99);
+                        Helper::saveLog('PGSoft transferOut failed', $this->provider_db_id, json_encode($request->all()), $response);
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                    if (isset($client_response->fundtransferresponse->status->code)) {
+                        $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
+                        switch ($client_response->fundtransferresponse->status->code) {
+                            case "200":
+                                $response =  [
+                                    "data" => [
+                                        "currency_code" => $client_details->default_currency,
+                                        "balance_amount" => floatval(number_format((float)$client_response->fundtransferresponse->balance, 2, '.', '')),
+                                        "updated_time" => $data["updated_time"]
+                                    ],
+                                    "error" => null
+                                ];
+                                $this->updateGameTransactionExt(
+                                    $game_trans_ext_id,
+                                    $client_response->requestoclient,
+                                    $response,
+                                    $client_response->fundtransferresponse);
+                                Helper::saveLog('PGSoft transferOut success', $this->provider_db_id, json_encode($request->all()), $response);
+
+
+                                $amount = $data['transfer_amount'];
+                                $transaction_uuid = $data['transaction_id']; // MW PROVIDER
+                                $reference_transaction_uuid = $data["parent_bet_id"]; //  MW -ROUND
+
+                                $balance = $client_response->fundtransferresponse->balance + $amount;
+                                ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                                $response =  [
+                                    "data" => [
+                                        "currency_code" => $client_details->default_currency,
+                                        "balance_amount" => floatval(number_format((float)$balance, 2, '.', '')),
+                                        "updated_time" => $data["updated_time"]
+                                    ],
+                                    "error" => null
+                                ];
+
+                                $game_trans_ext_id = $this->createGameTransExt($game_trans_id,$transaction_uuid, $reference_transaction_uuid, $amount, 2, $data, $response, 'NEEED TO SETTLE WIN',  'NEEED TO SETTLE WIN',  'NEEED TO SETTLE WIN');
+
+                                // $win_or_lost = 5; // 0 lost,  5 processing
+                                $win_or_lost = ($pay_amount) > 0 ?  1 : 0;    
+                                $provider_request = [];
+                                $body_details = [
+                                    "type" => "credit",
+                                    "win" => $win_or_lost,
+                                    "token" => $client_details->player_token,
+                                    "rollback" => false,
+                                    "game_details" => [
+                                        "game_id" => $game_details->game_id
+                                    ],
+                                    "game_transaction" => [
+                                        "provider_trans_id" => $transaction_uuid,
+                                        "round_id" => $reference_transaction_uuid,
+                                        "amount" => $amount
+                                    ],
+                                    "provider_request" => $provider_request,
+                                    "provider_response" => $response,
+                                    "game_trans_ext_id" => $game_trans_ext_id,
+                                    "game_transaction_id" => $game_trans_id
+
+                                ];
+                                try {
+                                    $client = new Client();
+                                    $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-fundtransferV2',
+                                        [ 'body' => json_encode($body_details), 'timeout' => '3.00']
+                                    );
+                                    //THIS RESPONSE IF THE TIMEOUT NOT FAILED
+                                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($body_details), $response);
+                                    return response($response,200)->header('Content-Type', 'application/json');
+                                } catch (\Exception $e) {
+                                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($body_details), $response);
+                                    return response($response,200)->header('Content-Type', 'application/json');
+                                }
+
+                                break;
+                                    
+                            default:
+                                $balance = $client_details->balance + $pay_amount;
+                                $response =  [
+                                    "data" => [
+                                        "currency_code" => $client_details->default_currency,
+                                        "balance_amount" => floatval(number_format((float)$balance, 2, '.', '')),
+                                        "updated_time" => $data["updated_time"]
+                                    ],
+                                    "error" => null
+                                ];
+                                 $this->updateGameTransactionExt(
+                                    $game_trans_ext_id,
+                                    $client_response->requestoclient,
+                                    $response,
+                                    $client_response->fundtransferresponse);
+                                  $game_trans_ext_id = $this->createGameTransExt($game_trans_id,$provider_trans_id, $data["parent_bet_id"], $pay_amount, 2, $data, $response, 'NEED TO RESEND WIN AND BET FREESPIN', 'NEED TO RESEND WIN AND BET FREESPIN', 'NEED TO RESEND WIN AND BET FREESPIN');
+                                // ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 6);
+                                Helper::saveLog('PGSoft BET not_enough_balance_default', $this->provider_db_id, json_encode($request->all()), $response);
+                        }
+                    }
+                    return response($response,200)
+                    ->header('Content-Type', 'application/json');    
+                } 
+
+
+                
 
             } else
             {
@@ -438,94 +584,6 @@ class PGSoftController extends Controller
                 
             }
 
-            
-          //   if($request->has('bet_transaction_id')  && $data['bet_transaction_id'] != ''){
-          //       $bet_transation_id = $data['bet_transaction_id'];
-          //       $bet_transaction = ProviderHelper::findGameTransaction($bet_transation_id, 'transaction_id', 1); 
-          //   }
-        
-
-          //   if($bet_transaction != 'false'){// Bet is existing, else the bet is already updated to win
-          //       //INITIALIZE DATA
-          //       $amount = abs($data['transfer_amount']);
-          //       $transaction_uuid = $data['transaction_id']; // MW PROVIDER
-          //       $reference_transaction_uuid = $bet_transation_id; //  MW -ROUND
-
-          //       // $bet_transaction = ProviderHelper::findGameTransaction($existing_bet->game_trans_id, 'game_transaction');
-
-                // $game_trans_ext_id = $this->createGameTransExt($bet_transaction->game_trans_id,$transaction_uuid, $reference_transaction_uuid, $amount, 2, $data, $data_response = null, $requesttosend = null, $client_response = null, $data_response = null);
-                 
-          //       //get game_trans_id and game_trans_ext
-          //       // $transaction_id = ProviderHelper::findGameExt($transaction_uuid, 2,'transaction_id');
-                
-          //       //requesttosend, and responsetoclient client side
-          //       $round_id = $bet_transaction->game_trans_id;
-          //       $type = "credit";
-          //       $rollback = false;
-          //       $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$round_id,$type,$rollback);
-                
-          //       //res
-          //       $response =  [
-          //           "data" => [
-          //               "currency_code" => $client_details->default_currency,
-          //               "balance_amount" => floatval(number_format((float)$client_response->fundtransferresponse->balance, 2, '.', '')),
-          //               "updated_time" => $data["updated_time"]
-          //           ],
-          //           "error" => null
-          //       ];
-
-          //       $win = $amount > 0  ?  1 : 0;  /// 1win 0lost
-          //       $type = $amount > 0  ? "credit" : "debit";
-          //       $request_data = [
-          //           'win' => $win,
-          //           'amount' => $amount,
-          //           'payout_reason' => $this->updateReason(1),
-          //       ];
-          //       //update transaction
-          //       Helper::updateGameTransaction($bet_transaction,$request_data,$type);
-          //       $this->updateGameTransactionExt($game_trans_ext_id,$client_response->requestoclient,$client_response->fundtransferresponse,$response);
-          //       Helper::saveLog('PGSoft Win process', $this->provider_db_id, json_encode($request->all(), JSON_FORCE_OBJECT), $response);
-          //       return $response;
-          //   } else {
-          //           //NO BET FOUND PROCESS BONUS
-          //           $explode = explode('-',$data['transaction_id']);
-          //           $transaction_type = $explode[2];
-                  
-          //           $game_transaction_type = 2; // 1 Bet, 2 Win
-          //           $game_code = $game_details->game_id;
-          //           $token_id = $client_details->token_id;
-          //           $bet_amount = 0;
-          //           $pay_amount = abs($data['transfer_amount']);
-          //           $income = $bet_amount - $pay_amount;
-          //           $method = $pay_amount == 0 ? 1 : 2;
-          //           $win_or_lost =  $pay_amount == 0 ? 0 : 1;; // 0 lost,  5 processing
-          //           $payout_reason = $transaction_type == 400 ? 'BonusToCash' : 'FreeGameToCash';
-          //           $provider_trans_id = $data['transaction_id'];
-    
-          //           //Create GameTransaction, GameExtension
-          //           $game_trans_id = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost,  $this->updateReason(1), $payout_reason, $income, $provider_trans_id, $data["bet_id"]);
-          //           $game_trans_ext_id = $this->createGameTransExt($game_trans_id,$provider_trans_id, $data["bet_id"], $pay_amount, $game_transaction_type, $data, $data_response = null, $requesttosend = null, $client_response = null, $data_response = null);
-                  
-          //           // $transaction_id = ProviderHelper::findGameExt($provider_trans_id, 2,'transaction_id');
-          //           // $round_id = ProviderHelper::findGameTransaction($provider_trans_id, 'transaction_id',2);
-          //           // dd($transaction_id);
-          //           $type = "credit";
-          //           $rollback = false;
-          //           $client_response = ClientRequestHelper::fundTransfer($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,$type,$rollback);
-
-          //           $response =  [
-          //               "data" => [
-          //                   "currency_code" => $client_details->default_currency,
-          //                   "balance_amount" => floatval(number_format((float)$client_response->fundtransferresponse->balance, 2, '.', '')),
-          //                   "updated_time" => $data["updated_time"]
-          //               ],
-          //               "error" => null
-          //           ];
-
-          //           $this->updateGameTransactionExt($game_trans_ext_id,$client_response->requestoclient,$client_response->fundtransferresponse,$response);
-          //           Helper::saveLog('PGSoft Bonus Process '.$data["transaction_id"], $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
-          //           return json_encode($response, JSON_FORCE_OBJECT); 
-          //       }
         }catch(\Exception $e){
             $msg = array(
                 "data" => null,
