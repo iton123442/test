@@ -124,7 +124,7 @@ class PlayStarController extends Controller
                     $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
                     if (isset($client_response->fundtransferresponse->status->code)) {
 
-                        $test=ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                        
                         switch ($client_response->fundtransferresponse->status->code) {
                             case '200':
@@ -169,6 +169,7 @@ class PlayStarController extends Controller
 
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
+
         $bet_amount = $request->total_win/100;
         $balance = $client_details->balance;
 
@@ -200,7 +201,7 @@ class PlayStarController extends Controller
                 $formatWinBalance = $winbBalance;
                 $formatBalance = (int)str_replace(".","", $formatWinBalance);
 
-                $test =ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
                 $response = [
                     'status_code' => 0,
                     'balance' => $formatBalance
