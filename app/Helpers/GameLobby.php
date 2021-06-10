@@ -555,7 +555,7 @@ class GameLobby{
             'https' => 1,
             'platform' => 'mobile'
           ],
-          "denomination" => '1', // game to be launched with values like 1.0, 1, default
+          "denomination" => 'default', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
           "return_url_info" => 1, // url link
           "callback_version" => 2, // POST CALLBACK
