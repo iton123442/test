@@ -563,8 +563,15 @@ $app->post('/signature','OnlyPlayController@createSignature');
 $app->get('api/justplay/callback', 'JustPlayController@callback'); 
 
 // Five Men
-$app->post('api/5men','FiveMenController@index');
+//$app->post('api/5men','FiveMenController@index');
 
+$app->post('/api/5men/gamelist', 'FiveMenController@getGamelist'); // launch game 
+$app->post('/api/5men/geturl', 'FiveMenController@getURL');// launch game
+$app->post('/api/5men', 'FiveMenController@index'); // Single Route
+$app->post('/api/5men/init', 'FiveMenController@gameInit');
+$app->post('/api/5men/bet', 'FiveMenController@gameBet');
+$app->post('/api/5men/win', 'FiveMenController@gameWin');
+$app->post('/api/5men/refund', 'FiveMenController@gameRefund');
 
 // Playstar
 $app->get('/api/playstar/auth','PlayStarController@getAuth');

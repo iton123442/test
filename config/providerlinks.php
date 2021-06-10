@@ -112,10 +112,6 @@ return [
             'merchant_id' => 'TG',
             'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
         ], 
-        '1TRY'=> [ // 
-            'merchant_id' => 'TGBS',
-            'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
-        ],
         '1KRW' => [ // BESOFTED for TG
             'merchant_id' => 'BETSOFTED',
             'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
@@ -128,14 +124,30 @@ return [
             'merchant_id' => 'BETSOFTED',
             'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
         ],
-        '1IRR' => [ // BESOFTED for TG
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ], 
-        '1MMK' => [ // ASKME for TG
+        '1CNY' => [ // ASK for CNY
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ], 
+        ],
+        '1IDR' => [ // ASK for IDR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1VND' => [ // ASK for VND
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1LAK' => [ // ASK for LAK
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1MYR' => [ // ASK for MR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1KHR' => [ // ASK for KHR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
         '2THB' => [ // ASK b2b THB
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
@@ -144,6 +156,34 @@ return [
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
         ], 
+        '2CNY' => [ // ASK b2b CNY
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2USD' => [ // ASK b2b USD
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2IDR' => [ // ASK b2b IDR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2VND' => [ // ASK b2b VND
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2LAK' => [ // ASK b2b LAK
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2MYR' => [ // ASK b2b MR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2KHR' => [ // ASK b2b KHR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
         '3USD' => [ // XIGOLO USD
             'merchant_id' => 'XIGOLO',
             'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
@@ -288,6 +328,7 @@ return [
             'RUB' => '74d40722',
             'KRW' => '98a6bfbd',
             'IRR' => 'f370867a',
+            'MMK' => 'b08b8fef',
         ],
         'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
     ],
