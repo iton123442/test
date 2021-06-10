@@ -328,6 +328,7 @@ return [
             'RUB' => '74d40722',
             'KRW' => '98a6bfbd',
             'IRR' => 'f370867a',
+            'MMK' => 'b08b8fef',
         ],
         'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
     ],
