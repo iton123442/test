@@ -40,7 +40,7 @@ class GameLobby{
     public static function fcLaunchUrl($game_code,$token,$exitUrl,$provider,$lang="en"){
         $client = GameLobby::getClientDetails("token",$token);
         Helper::savePLayerGameRound($game_code,$token,$provider);
-        $data = FCHelper::loginGame($client->player_id,$game_code,1,$exitUrl);
+        $data = FCHelper::loginGame($client->player_id,$game_code,1,$exitUrl,$client);
         Helper::saveLog('GAMELAUNCH FC', 11, json_encode($game_code), json_encode($data));
         return $data["Url"];
     }
