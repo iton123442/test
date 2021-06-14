@@ -24,8 +24,6 @@ class FiveMenController extends Controller
 
 	}
 	
-	// public $provider_db_id = 29; // 29 on test ,, 27 prod
-	
 	public function index(Request $request){
 		
 
@@ -67,10 +65,11 @@ class FiveMenController extends Controller
 	public function gameBet($request){
 		
 		$string_to_obj = json_decode($request['data']['details']);
+		dd($string_to_obj);
 	    $game_id = $string_to_obj->game->game_id;
 	    // GAME DETAILS
 		$game_details = TGGHelper::findGameDetails('game_code', $this->provider_db_id, $game_id);
-		$client_details = ProviderHelper::getClientDetails('token', $request['token']);
+		$client_details = ProviderHelper::getClientDetails('token', $request['token']); 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 		// $game_ext = TGGHelper::checkTransactionExist($request['callback_id'], 1);
 
@@ -726,13 +725,10 @@ class FiveMenController extends Controller
 		$token = $data['token'];
 		$client_details = ProviderHelper::getClientDetails('token',$token);
 		if($client_details != null){
-			$player_details = TGGHelper::playerDetailsCall($client_details);
-
-			ProviderHelper::_insertOrUpdate($client_details->token_id, $player_details->playerdetailsresponse->balance); 
 				$data_response = [
 					'status' => 'ok',
 					'data' => [
-						'balance' => (string)$player_details->playerdetailsresponse->balance,
+						'balance' => (string)$client_details->balance,
 						'currency' => $client_details->default_currency,
 						'display_name' => $client_details->display_name
 					]

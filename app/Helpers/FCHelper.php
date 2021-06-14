@@ -34,7 +34,7 @@ class FCHelper
         );
         return json_decode($provider_response->getBody(),TRUE);
     }
-    public static function loginGame($player_id,$game_code,$language,$exitURL){
+    public static function loginGame($player_id,$game_code,$language,$exitURL,$default_currency){
         $reqdata = array(
             "MemberAccount"=>$player_id,
             "GameID"=>$game_code,
@@ -49,7 +49,7 @@ class FCHelper
         $provider_response = $client->post(config('providerlinks.fcgaming.url').'/Login',
             ['form_params' => [
                 "AgentCode" =>config('providerlinks.fcgaming.AgentCode'),
-                "Currency" => "USD",
+                "Currency" => $default_currency,
                 "Params" => $Params,
                 "Sign" => $sign
                 ]

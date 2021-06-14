@@ -38,9 +38,9 @@ class GameLobby{
         }
     }
     public static function fcLaunchUrl($game_code,$token,$exitUrl,$provider,$lang="en"){
-        $client = GameLobby::getClientDetails("token",$token);
+        $client_details = ProviderHelper::getClientDetails("token",$token);
         Helper::savePLayerGameRound($game_code,$token,$provider);
-        $data = FCHelper::loginGame($client->player_id,$game_code,1,$exitUrl);
+        $data = FCHelper::loginGame($client->player_id,$game_code,1,$exitUrl,$client_details->default_currency);
         Helper::saveLog('GAMELAUNCH FC', 11, json_encode($game_code), json_encode($data));
         return $data["Url"];
     }
@@ -92,7 +92,7 @@ class GameLobby{
             'https' => 1,
             'platform' => 'mobile'
           ],
-          "denomination" => '1', // game to be launched with values like 1.0, 1, default
+          "denomination" => 'default', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
           "return_url_info" => 1, // url link
           "callback_version" => 2, // POST CALLBACK
@@ -462,12 +462,15 @@ class GameLobby{
         try{
             $url = config('providerlinks.tidygaming.url_lunch');
             $client_details = Providerhelper::getClientDetails('token', $token);
-            $invite_code = config('providerlinks.tidygaming.usd_invite');
-            if ($client_details->default_currency == "THB" ) {
-                $invite_code = config('providerlinks.tidygaming.thb_invite');
-            } elseif ($client_details->default_currency == "TRY") {
-                $invite_code = config('providerlinks.tidygaming.try_invite');
-            } 
+
+            // $invite_code = config('providerlinks.tidygaming.usd_invite');
+            // if ($client_details->default_currency == "THB" ) {
+            //     $invite_code = config('providerlinks.tidygaming.thb_invite');
+            // } elseif ($client_details->default_currency == "TRY") {
+            //     $invite_code = config('providerlinks.tidygaming.try_invite');
+            // } 
+            $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
+            
             $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
             $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             $requesttosend = [
@@ -552,7 +555,7 @@ class GameLobby{
             'https' => 1,
             'platform' => 'mobile'
           ],
-          "denomination" => '1', // game to be launched with values like 1.0, 1, default
+          "denomination" => 'default', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
           "return_url_info" => 1, // url link
           "callback_version" => 2, // POST CALLBACK
@@ -938,9 +941,21 @@ class GameLobby{
                 $username = config("providerlinks.icgagents.twdagents.username");
                 $password = config("providerlinks.icgagents.twdagents.password");
             break;
+            case "RUB":
+                $username = config("providerlinks.icgagents.rubagents.username");
+                $password = config("providerlinks.icgagents.rubagents.password");
+            break;
+            case "IRR":
+                $username = config("providerlinks.icgagents.irragents.username");
+                $password = config("providerlinks.icgagents.irragents.password");
+            break;
             case "VND":
                 $username = config("providerlinks.icgagents.vndagents.username");
                 $password = config("providerlinks.icgagents.vndagents.password");
+            break;
+            case "MMK":
+                $username = config("providerlinks.icgagents.mmkagents.username");
+                $password = config("providerlinks.icgagents.mmkagents.password");
             break;
             default:
                 $username = config("providerlinks.icgagents.usdagents.username");

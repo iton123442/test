@@ -162,6 +162,9 @@ class TidyHelper{
 	 		case 'DKK':
 	 			$code = '208';
 	 			break;
+	 		case 'IRR':
+	 			$code = '364';
+	 			break;
 	 	}
 
 	 	return $code;

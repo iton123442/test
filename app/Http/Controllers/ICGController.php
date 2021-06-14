@@ -662,5 +662,14 @@ class ICGController extends Controller
         elseif($currency == "VND"){
             return config("providerlinks.icgagents.vndagents.secure_code");
         }
+        elseif($currency == "RUB"){
+            return config("providerlinks.icgagents.rubagents.secure_code");
+        }
+        elseif($currency == "IRR"){
+            return config("providerlinks.icgagents.irragents.secure_code");
+        }
+        elseif($currency == "MMK"){
+            return config("providerlinks.icgagents.mmkagents.secure_code");
+        }
     }
 }

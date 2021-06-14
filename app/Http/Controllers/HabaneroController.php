@@ -141,29 +141,27 @@ class HabaneroController extends Controller
                 }
             
                 if($details->fundtransferrequest->isrecredit == true){
-                    $data = $details->fundtransferrequest->funds->fundinfo;
                     return $this->reCredit($details,$data,$client_details->player_token,$game_details,$round_id);
                 }
             }
             
             $checkIndepotent = DB::table('game_transactions')->where('round_id',$round_id)->where('provider_trans_id',$data->transferid)->get();
-            try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data->transferid);
-                $idenpotent = false;
-            }catch(\Exception $e){
-                $idenpotent = true;
-            }
+
             if($details->fundtransferrequest->funds->debitandcredit == true){
-                if(count($checkIndepotent) > 0 || $idenpotent = true){
+                if(count($checkIndepotent) > 0 ){
                     $response = [
                         "fundtransferresponse" => [
                             "status" => [
                                 "success" => true,
+                                "successdebit" => true,
+                                "successcredit" => true
                             ],
                             "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                             "currencycode" => $client_details->default_currency,
                             ]
                     ];
+                    Helper::saveLog('HBN trans duplicate', 24, json_encode($details), $response);
+                    return $response;
                 }
                 $data = $details->fundtransferrequest->funds->fundinfo;
                 return  $this->debitAndCredit($details,$data,$client_details,$game_details,$round_id);
@@ -179,13 +177,14 @@ class HabaneroController extends Controller
                             "currencycode" => $client_details->default_currency,
                             ]
                     ];
+                    return $response;
                 }
                 if($data->gamestatemode == 1){
                     $trans = DB::table('game_transactions')->where('round_id',$round_id)->get();
                     if(count($trans) > 0){
                         return $this->newBet($details,$data,$client_details,$trans[0],$game_details,$round_id);
                     }else{
-                        return $this->tableBet($data,$client_details,$game_details,$round_id);
+                        return $this->tableBet($details,$data,$client_details,$game_details,$round_id);
                     }
                 }
                 if($data->gamestatemode == 0){
@@ -213,21 +212,24 @@ class HabaneroController extends Controller
  
     public function debitAndCredit($details,$data,$client_details,$game_details,$round_id)
     {   
-        AWSHelper::saveLog("Habanero Request", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"debit credit");
+        AWSHelper::saveLog("Habanero Request debitAndCredit", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"debit credit");
         if(isset($data->{0})){$bet_details = $data->{0};}elseif(isset($data[0])){$bet_details = $data[0];}
         if($bet_details->gamestatemode == 1){$bet_amount = abs($bet_details->amount);$transferid = $bet_details->transferid;}
         $gamerecord = ProviderHelper::createGameTransaction($client_details->token_id, $game_details->game_id, $bet_amount,  0, 1, 5, "progressing", null, 0, $transferid, $round_id);
         foreach($data as $item){
             if($item->gamestatemode == 1){
                 $bet = $item;
+                AWSHelper::saveLog("Habanero Request bet ", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"BET BET BET");
                 $this->bet($details,$bet,$client_details,$game_details,$round_id,$gamerecord);
             }
             if($item->gamestatemode == 2){
                 $win = $item;
+                AWSHelper::saveLog("Habanero Request win ", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"WIN WIN WIN");
                 return $this->win($win,$client_details->player_token,$game_details,$round_id,$gamerecord,$bet_amount);
             }
             if($item->gamestatemode == 0){
                 $win = $item;
+                AWSHelper::saveLog("Habanero Request win ", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"WIN WIN WIN");
                 return $this->win($win,$client_details->player_token,$game_details,$round_id,$gamerecord,$bet_amount);
             }
             
@@ -237,25 +239,42 @@ class HabaneroController extends Controller
     public function bet($details,$data,$client_details,$game_details,$round_id,$gamerecord){
         AWSHelper::saveLog("Habanero Request BET", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"bet");
         $game_trans_ext = ProviderHelper::createGameTransExtV2($gamerecord,  $data->transferid, $round_id, $data->amount, 1);
-        $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext, $gamerecord, 'debit');
-        if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "200"){
-                // ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 1);
-                $response = [
-                    "fundtransferresponse" => [
-                        "status" => [
-                            "success" => true,
-                            "successdebit" => true,
-                            "successcredit" => true
-                        ],
-                        // "balance" => floatval(number_format($bet_balance, 2, '.', '')), #new_method
-                        "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')), #old_method
-                        "currencycode" => $client_details->default_currency,
+        try{
+            $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext, $gamerecord, 'debit');
+            if(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "200"){
+                    // ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 1);
+                    $response = [
+                        "fundtransferresponse" => [
+                            "status" => [
+                                "success" => true,
+                                "successdebit" => true,
+                                "successcredit" => true
+                            ],
+                            "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')), #old_method
+                            "currencycode" => $client_details->default_currency,
                         ]
-                ];
-        }
-        if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "402"){
+                    ];
+                    $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext)->update(["amount" => abs($data->amount),"game_transaction_type" => "1","provider_request" => json_encode($details),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response->requestoclient),"client_response" => json_encode($client_response),"transaction_detail" => "success" ]);    
+                    $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
+                    AWSHelper::saveLog("Habanero Response BET", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$response);
+            }elseif(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "402"){
+                    $response = [
+                        "fundtransferresponse" => [
+                            "status" => [
+                                "success" => false,
+                                "nofunds" => true,
+                            ],
+                            "balance" => $client_details->balance,
+                            "currencycode" => $client_details->default_currency
+                        ]
+                    ];
+                    Helper::saveLog('HBN trans balance not enough', 24, json_encode($data), $response);
+                    $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+                    ProviderHelper::updatecreateGameTransExt($game_trans_ext, $details, $response, $client_response->requestoclient, $client_response, $response);
+                    return $response;
+            }else{
                 $response = [
                     "fundtransferresponse" => [
                         "status" => [
@@ -267,11 +286,28 @@ class HabaneroController extends Controller
                     ]
                 ];
                 Helper::saveLog('HBN trans balance not enough', 24, json_encode($data), $response);
+                $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+                ProviderHelper::updatecreateGameTransExt($game_trans_ext, $details, $response, $client_response->requestoclient, $client_response, $response);
                 return $response;
+            }
+        }catch (\Exception $e) {
+            $msg = array("status" => 'error',"message" => $e->getMessage());
+            $response = [
+                "fundtransferresponse" => [
+                    "status" => [
+                        "success" => false,
+                        "nofunds" => true,
+                    ],
+                    "balance" => $client_details->balance,
+                    "currencycode" => $client_details->default_currency
+                ]
+            ];
+            ProviderHelper::updatecreateGameTransExt($gamerecord, $details, $msg, $e->getMessage(), $e->getMessage(), 'FAILED from try catch', 'FAILED');
+            Helper::saveLog('PP gameWin - FATAL ERROR', $this->provider_id, json_encode($data), Helper::datesent());
+            return $response;
         }
-        $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext)->update(["amount" => abs($data->amount),"game_transaction_type" => "1","provider_request" => json_encode($details),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response->requestoclient),"client_response" => json_encode($client_response),"transaction_detail" => "success" ]);    
-        $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
-        AWSHelper::saveLog("Habanero Response BET", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$client_response->fundtransferresponse->balance); 
+        
+        
     }
 
     public function win($data,$token,$game_details,$round_id,$gamerecord,$bet_amount){
@@ -398,22 +434,41 @@ class HabaneroController extends Controller
         }
 
         $game_trans_ext_v2 = ProviderHelper::createGameTransExtV2( $gamerecord->game_trans_id, $data->transferid, $round_id, abs($data->amount), '1');
-        $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext_v2, $gamerecord->game_trans_id, 'debit');
-        if(isset($client_response->fundtransferresponse->status->code) 
-        && $client_response->fundtransferresponse->status->code == "200"){
-            // ProviderHelper::updateGameTransactionFlowStatus($gamerecord->game_trans_id, 1);
-            $response = [
-                "fundtransferresponse" => [
-                    "status" => [
-                        "success" => true,
-                    ],
-                    "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
-                    "currencycode" => $client_details->default_currency,
-                    ]
-                ];
-        }
-        if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "402"){
+        try{
+            $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext_v2, $gamerecord->game_trans_id, 'debit');
+            if(isset($client_response->fundtransferresponse->status->code) 
+            && $client_response->fundtransferresponse->status->code == "200"){
+                $response = [
+                    "fundtransferresponse" => [
+                        "status" => [
+                            "success" => true,
+                        ],
+                        "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
+                        "currencycode" => $client_details->default_currency,
+                        ]
+                    ];
+                $update = DB::table('game_transactions')->where("game_trans_id","=",$gamerecord->game_trans_id)->update(["round_id" => $round_id, "bet_amount" => abs($data->amount) + $gamerecord->bet_amount, "pay_amount" => $gamerecord->pay_amount, "income" => abs($data->amount) + $gamerecord->bet_amount, "win" => 5 ]);
+                $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext_v2)->update(["amount" =>abs($data->amount),"game_transaction_type" => 1,"provider_request" => json_encode($details),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response->requestoclient),"client_response" => json_encode($client_response),"transaction_detail" => json_encode($response) ]);
+                $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
+                Helper::saveLog('HBN trans double', 24, json_encode($data), $response);
+                return $response;
+            }elseif(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "402"){
+                    $response = [
+                        "fundtransferresponse" => [
+                            "status" => [
+                                "success" => false,
+                                "nofunds" => true,
+                            ],
+                            "balance" => $client_details->balance,
+                            "currencycode" => $client_details->default_currency
+                        ]
+                    ];
+                    Helper::saveLog('HBN trans balance not enough', 24, json_encode($data), $response);
+                    $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+                    ProviderHelper::updatecreateGameTransExt($game_trans_ext_v2, $details, $response, $client_response->requestoclient, $client_response, $response);
+                    return $response;
+            }else{
                 $response = [
                     "fundtransferresponse" => [
                         "status" => [
@@ -422,17 +477,32 @@ class HabaneroController extends Controller
                         ],
                         "balance" => $client_details->balance,
                         "currencycode" => $client_details->default_currency
-                    ]
+                        ]
                 ];
                 Helper::saveLog('HBN trans balance not enough', 24, json_encode($data), $response);
+                $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+                ProviderHelper::updatecreateGameTransExt($game_trans_ext_v2, $details, $response, $client_response->requestoclient, $client_response, $response);
                 return $response;
+            }
+        }catch (\Exception $e) {
+            $msg = array("status" => 'error',"message" => $e->getMessage());
+            $response = [
+                "fundtransferresponse" => [
+                    "status" => [
+                        "success" => false,
+                        "nofunds" => true,
+                    ],
+                    "balance" => $client_details->balance,
+                    "currencycode" => $client_details->default_currency
+                ]
+            ];
+            $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+            ProviderHelper::updatecreateGameTransExt($gamerecord, $details, $msg, $e->getMessage(), $e->getMessage(), 'FAILED from try catch', 'FAILED');
+            Helper::saveLog('PP gameWin - FATAL ERROR', $this->provider_id, json_encode($data), Helper::datesent());
+            return $response;
         }
                 
-        $update = DB::table('game_transactions')->where("game_trans_id","=",$gamerecord->game_trans_id)->update(["round_id" => $round_id, "bet_amount" => abs($data->amount) + $gamerecord->bet_amount, "pay_amount" => $gamerecord->pay_amount, "income" => abs($data->amount) + $gamerecord->bet_amount, "win" => 5 ]);
-        $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext_v2)->update(["amount" =>abs($data->amount),"game_transaction_type" => 1,"provider_request" => json_encode($details),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response->requestoclient),"client_response" => json_encode($client_response),"transaction_detail" => json_encode($response) ]);
-        $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
-        Helper::saveLog('HBN trans double', 24, json_encode($data), $response);
-        return $response;
+      
     }
 
     public function newCredit($data,$token,$gamerecord,$game_details,$round_id){
@@ -550,28 +620,48 @@ class HabaneroController extends Controller
         return $response;
     }
 
-    public function tableBet($data,$client_details,$game_details,$round_id){
+    public function tableBet($details,$data,$client_details,$game_details,$round_id){
         AWSHelper::saveLog("Habanero Request tableBet", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"Recieved");
         $gamerecord = ProviderHelper::createGameTransaction($client_details->token_id, $game_details->game_id, abs($data->amount),  0, 1, 5, "progressing", null, 0, $data->transferid, $round_id);
         $game_trans_ext = ProviderHelper::createGameTransExtV2($gamerecord,  $data->transferid, $round_id, abs($data->amount), 1);
-        $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext, $gamerecord, 'debit');
-        if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "200"){
-                $response = [
-                    "fundtransferresponse" => [
-                        "status" => [
-                            "success" => true,
-                            "successdebit" => true,
-                            "successcredit" => true
-                        ],
-                        // "balance" => floatval(number_format($bet_balance, 2, '.', '')), #new_method
-                        "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')), #old_method
-                        "currencycode" => $client_details->default_currency,
+
+        try{
+            $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext, $gamerecord, 'debit');
+            if(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "200"){
+                    $response = [
+                        "fundtransferresponse" => [
+                            "status" => [
+                                "success" => true,
+                                "successdebit" => true,
+                                "successcredit" => true
+                            ],
+                            // "balance" => floatval(number_format($bet_balance, 2, '.', '')), #new_method
+                            "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')), #old_method
+                            "currencycode" => $client_details->default_currency,
+                            ]
+                    ];
+                    $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext)->update(["amount" => abs($data->amount),"game_transaction_type" => "1","provider_request" => json_encode($data),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response->requestoclient),"client_response" => json_encode($client_response),"transaction_detail" => "success" ]);    
+                    $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
+                    AWSHelper::saveLog("Habanero Request tableBet", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$response);
+                    return $response;
+            }elseif(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "402"){
+                    $response = [
+                        "fundtransferresponse" => [
+                            "status" => [
+                                "success" => false,
+                                "nofunds" => true,
+                            ],
+                            "balance" => $client_details->balance,
+                            "currencycode" => $client_details->default_currency
                         ]
-                ];
-        }
-        if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "402"){
+                    ];
+                    Helper::saveLog('HBN trans balance not enough', 24, json_encode($data), $response);
+                    $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+                    ProviderHelper::updatecreateGameTransExt($game_trans_ext, $details, $response, $client_response->requestoclient, $client_response, $response);
+                    return $response;
+            }else{
                 $response = [
                     "fundtransferresponse" => [
                         "status" => [
@@ -583,18 +673,35 @@ class HabaneroController extends Controller
                     ]
                 ];
                 Helper::saveLog('HBN trans balance not enough', 24, json_encode($data), $response);
+                $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+                ProviderHelper::updatecreateGameTransExt($game_trans_ext, $details, $response, $client_response->requestoclient, $client_response, $response);
                 return $response;
+
+            }
+        }catch (\Exception $e) {
+            $msg = array("status" => 'error',"message" => $e->getMessage());
+            $response = [
+                "fundtransferresponse" => [
+                    "status" => [
+                        "success" => false,
+                        "nofunds" => true,
+                    ],
+                    "balance" => $client_details->balance,
+                    "currencycode" => $client_details->default_currency
+                ]
+            ];
+            $updateGameTrans = DB::table('game_transactions')->where('game_trans_id','=',$gamerecord)->update([ "win" =>2]);
+            ProviderHelper::updatecreateGameTransExt($gamerecord, $details, $msg, $e->getMessage(), $e->getMessage(), 'FAILED from try catch', 'FAILED');
+            Helper::saveLog('PP gameWin - FATAL ERROR', $this->provider_id, json_encode($data), Helper::datesent());
+            return $response;
         }
-        $updateGameTransExt = DB::table('game_transaction_ext')->where('game_trans_ext_id','=',$game_trans_ext)->update(["amount" => abs($data->amount),"game_transaction_type" => "1","provider_request" => json_encode($data),"mw_response" => json_encode($response),"mw_request" => json_encode($client_response->requestoclient),"client_response" => json_encode($client_response),"transaction_detail" => "success" ]);    
-        $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
-        AWSHelper::saveLog("Habanero Request tableBet", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$response);
-        return $response;
+        
     }
 
     public function reCredit($details,$data,$token,$game_details,$round_id){
         AWSHelper::saveLog("Habanero Request ReCredit", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"Recieved");
         $client_details = Providerhelper::getClientDetails('token', $token);
-        $data = $data[0];
+
         $checkStatus = DB::table('game_transaction_ext')->where('round_id',$round_id)->where('provider_trans_id',$data->originaltransferid)->get();
         $gamerecord = DB::table('game_transactions')->where('round_id',$round_id)->get();
         $gamerecord = $gamerecord[0];
@@ -602,12 +709,13 @@ class HabaneroController extends Controller
             $response = [
                 "fundtransferresponse" => [
                     "status" => [
-                        "successNaay EXIST" => true,
+                        "success" => true,
                     ],
                     "balance" => $client_details->balance,
                     "currencycode" => $client_details->default_currency
                 ]
             ];
+            return $response;
         }
         $game_trans_ext_v2 = ProviderHelper::createGameTransExtV2( $gamerecord->game_trans_id, $data->transferid, $round_id, abs($data->amount), 2);
         $balance = $client_details->balance + abs($data->amount);

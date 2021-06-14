@@ -27,7 +27,7 @@ return [
         'euragents'=>[
             'username' => 'betrnkeuro',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '4c7aa6fe-5559-4006-b995-b2414a472d0b',
+            'secure_code' => '2e40f6fe-b99c-433a-8a56-7c209f9cdb31',
         ],
         'cnyagents'=>[
             'username' => 'betrnkcny',
@@ -37,7 +37,7 @@ return [
         'krwagents'=>[
             'username' => 'betrnkkrw',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '0d18064c-cd77-4a04-9f17-2dc27bdb903a',
+            'secure_code' => 'e2d899ad-7545-4096-8892-3d6c751ee32a',
         ],
         'phpagents'=>[
             'username' => 'betrnkphp',
@@ -69,6 +69,21 @@ return [
             'password' => 'tigergamesxicg',
             'secure_code' => '20c60c1c-fc16-42b7-9269-291d2b2b0346',
         ],
+        'rubagents'=>[
+            'username' => 'betrnkrub',
+            'password' => ']WKtkT``mJCe8N3J',
+            'secure_code' => '540aeeaa-4de0-41fa-8195-52b7a4244c9d',
+        ],
+        'irragents'=>[
+            'username' => 'betrnkirr',
+            'password' => ']WKtkT``mJCe8N3J',
+            'secure_code' => '09f896ae-ada9-42a6-8178-6e8aa517acdd',
+        ],
+        'mmkagents'=>[
+            'username' => 'betrnkmmk',
+            'password' => ']WKtkT``mJCe8N3J',
+            'secure_code' => '2e072aee-d33e-475d-be7d-d1b019074bdc',
+        ],
     ],
     'endorphina' => [
         'url' => 'https://test.endorphina.network/api/sessions/seamless/rest/v1',
@@ -91,36 +106,81 @@ return [
             'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
         ],
     ],
-    // 'aws' => [
-    //     'api_url' => 'https://papi.awsxpartner.com/b2b/',
-    //     '1'=> [ // Tiger Games USD // Production
-    //         'merchant_id' => 'TG',
-    //         'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
-    //     ], 
-    //     '2' => [ // XIGOLO USD
-    //         'merchant_id' => 'XIGOLO',
-    //         'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
-    //     ],
-    //     '3' => [ // TGC USD
-    //         'merchant_id' => 'TGC',
-    //         'merchant_key' => '129d637c1aa5d3f3c6b9ea759d04d00250c9f4be29d71f72abd189f0c8283f263e08a2a99b70663ee28dc4e025cca82a0b955e2a9fcca604c72aa9dc22cf5232',
-    //     ],
-    //     '4' => [ // ASKMEBET THB
-    //         'merchant_id' => 'ASKME',
-    //         'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-    //     ],
-    // ],
     'aws' => [
         'api_url' => 'https://papi.awsxpartner.com/b2b',
         '1USD'=> [ // 
             'merchant_id' => 'TG',
             'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
         ], 
-        '1TRY'=> [ // 
-            'merchant_id' => 'TGBS',
-            'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
-        ], 
+        '1KRW' => [ // BESOFTED for TG
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
+        ],
+        '1RUB' => [ // BESOFTED for TG
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
+        ],
+        '1EUR' => [ // BESOFTED for TG
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
+        ],
+        '1CNY' => [ // ASK for CNY
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1IDR' => [ // ASK for IDR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1VND' => [ // ASK for VND
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1LAK' => [ // ASK for LAK
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1MYR' => [ // ASK for MR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '1KHR' => [ // ASK for KHR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
         '2THB' => [ // ASK b2b THB
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2MMK' => [ // ASK b2b MMK
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ], 
+        '2CNY' => [ // ASK b2b CNY
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2USD' => [ // ASK b2b USD
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2IDR' => [ // ASK b2b IDR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2VND' => [ // ASK b2b VND
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2LAK' => [ // ASK b2b LAK
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2MYR' => [ // ASK b2b MR
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+        ],
+        '2KHR' => [ // ASK b2b KHR
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
         ],
@@ -140,19 +200,31 @@ return [
             'merchant_id' => 'XIGOLO',
             'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
         ],
-        '8EUR' => [ // BESOFTED
-            'merchant_id' => 'TGBS',
-            'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
+        '8USD' => [ // BESOFTED
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
+        ],
+        '8KRW' => [ // BESOFTED
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
+        ],
+        '8RUB' => [ // BESOFTED
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
         ],
         '8TRY' => [ // BESOFTED
-            'merchant_id' => 'TGBS',
-            'merchant_key' => '10e86638c0c6e8d494cecd05dad0b56c59b50bafc7271903a1087ba232bebbec52ce4c752ba4c8f1b0fcd35e5f5a0f08b1f6438d985f23167d85bbbd2bfa52ce',
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
+        ],
+        '8EUR' => [ // BESOFTED
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
+        ],
+        '8IRR' => [ // BESOFTED
+            'merchant_id' => 'BETSOFTED',
+            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
         ],
         '10KRW' => [ // MAS46
-            'merchant_id' => 'TGMAS',
-            'merchant_key' => '7b03756e2a70143fe0bc36f7b2d5e1c92e011bb1fe49d7beee69b4bea0e5d73341c29d046242826bde925bf0764a9fff95940f6a67c4542cff189f15526711d0',
-        ],
-        '1KRW' => [ // TIGERGAMES KRW
             'merchant_id' => 'TGMAS',
             'merchant_key' => '7b03756e2a70143fe0bc36f7b2d5e1c92e011bb1fe49d7beee69b4bea0e5d73341c29d046242826bde925bf0764a9fff95940f6a67c4542cff189f15526711d0',
         ],
@@ -173,14 +245,18 @@ return [
             'password' => '8b7a2cbdc87bfcb26d832dae51935a16'
         ],
         'PHP' => [
-            'id_user' => 660,
-            'password' => 'ac8f4a58d24442cb74bbc289709bc095'
+            'id_user' => 758 ,
+            'password' => 'd6efe4a276b41a4830580befaad096fc'
         ],
         'THB' => [
             'id_user' => 661,
             'password' => 'f16eb1a45619280532c430a9f2a17adb'
         ],
-          'INR' => [
+        'INR' => [
+            'id_user' => 743,
+            'password' => 'd6efe4a276b41a4830580befaad096fc'
+        ],
+        'TRY' => [
             'id_user' => 743,
             'password' => 'd6efe4a276b41a4830580befaad096fc'
         ],
@@ -193,11 +269,17 @@ return [
         	'CNY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjZjNDIwYzkxOGI5ODAwMDE5YzM0ODgiLCJhY2NvdW50IjoidGVzdF9jbnkiLCJvd25lciI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsInBhcmVudCI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsImN1cnJlbmN5IjoiQ05ZIiwianRpIjoiODI1NTcwOTkwIiwiaWF0IjoxNjAwOTMwMzE2LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fwf2b4i5seyD_cEZyYkmpByTQaaxhPfH_IwEJGDRZ5A',
             'USD' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWY2MDYxYjQ4NTdhOTcwMDAxYmYwNzE1IiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiNjE0ODYyMDI5IiwiaWF0IjoxNjAwMTUxOTg4LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.XgbWboAdrRtrmKhvYymBXbdVqEwLccry0no0-8blFxI',
             'KRW' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MDllMjk2YTJmZmUzNzAwMDFkYzdhMGYiLCJhY2NvdW50IjoidGdfcHJvZF9rcnciLCJvd25lciI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsInBhcmVudCI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsImN1cnJlbmN5IjoiS1JXIiwianRpIjoiNDU4NjQwNzIzIiwiaWF0IjoxNjIwOTc4MDI2LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.66x2XN6aZgaybUmfxbn7KXo673SfOwK8tGXZuDcgZIA',
+            'TRY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MGI5Nzc4NTA0YTRlOTAwMDExYmZlN2IiLCJhY2NvdW50IjoiVEdfVFJZIiwib3duZXIiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJwYXJlbnQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJjdXJyZW5jeSI6IlRSWSIsImp0aSI6IjQ0NDA1MzQ1NyIsImlhdCI6MTYyMjc2NzQ5MywiaXNzIjoiQ3lwcmVzcyIsInN1YiI6IlNTVG9rZW4ifQ.8YhPAkdc7rh9waHd7ExYhd5JJ4zhfZrMaDCm3SD1hmE',
+            'RUB' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MGI5NzdjY2ZmNTYxMjAwMDE1M2I2NjgiLCJhY2NvdW50IjoiVEdfUlVCIiwib3duZXIiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJwYXJlbnQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJjdXJyZW5jeSI6IlJVQiIsImp0aSI6IjE1OTc3MjE0MyIsImlhdCI6MTYyMjc2NzU2NCwiaXNzIjoiQ3lwcmVzcyIsInN1YiI6IlNTVG9rZW4ifQ.zR14KPImICvaGDVwhh05X2lRt1X2OA3seuT8SrjsyLA',
+            'EUR' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MGI5NzgxMzA0YTRlOTAwMDExYmZlN2QiLCJhY2NvdW50IjoiVEdfRVVSIiwib3duZXIiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJwYXJlbnQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJjdXJyZW5jeSI6IkVVUiIsImp0aSI6IjIyMDcxNTMwMyIsImlhdCI6MTYyMjc2NzYzNSwiaXNzIjoiQ3lwcmVzcyIsInN1YiI6IlNTVG9rZW4ifQ.c84pLaNnvP5Ht_iFtZoVL2zxviepy6eoJjn0qsbalvE',
         ],
         'wallet_token' => [
         	'CNY' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
             'USD' => 'avF0GzMKaFJuBLwZfEfq2SseM1ZKPLcf',
             'KRW' => 'XtSqayV7PoOh76WlWgRZMUA6KlUeVxbB',
+            'TRY' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
+            'RUB' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
+            'EUR' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
         ]
     ],
     'sagaming' => [
@@ -237,9 +319,17 @@ return [
         'url_lunch' => 'https://asia.h93r.com/api/game/outside/link',
         'API_URL' => 'https://asia.h93r.com/',
         'client_id' => 'c9c219fc',
-        'usd_invite' => '00688c94',
-        'thb_invite' => '3f330a37',
-        'try_invite' => 'dbf3d92b',
+        'currency' => [
+            'USD' => '00688c94',
+            'THB' => '3f330a37',
+            'TRY' => 'dbf3d92b',
+            'EUR' => '7e3d2b63',
+            'CNY' => 'e0178045',
+            'RUB' => '74d40722',
+            'KRW' => '98a6bfbd',
+            'IRR' => 'f370867a',
+            'MMK' => 'b08b8fef',
+        ],
         'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
     ],
     'evoplay' => [
@@ -303,7 +393,7 @@ return [
             "5"=>"askmebet",
             "6"=>"askmebet",
             "3"=>"xigolo",
-            "8"=>"tgbs"
+            "8"=>"betsofted",
         ],
         'operator' => 'tigergames',
         'license' => 'curacao',
@@ -494,14 +584,15 @@ return [
         'secret_key' => '1a8dNxc7NmZd688z86xRBrfyQbX1mxsW',
     ],
     'ozashiki'=>[
-        'PROVIDER_ID' => 57,
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
-        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
+        'PROVIDER_ID' => 58,
+        'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/tigergame/authenticate/auth_token',
+        'GAME_LINK_URL' => 'https://api.manna-play.com/agent/specify/tigergame/gameLink/link',
+        'API_KEY'=> 'UrkiUyLGMUBAMQi25DOtncIMFI1cESXpInc#u9Lm',
+        'AUTH_API_KEY'=> 'UrkiUyLGMUBAMQi25DOtncIMFI1cESXpInc#u9Lm',
+        'CLIENT_API_KEY' => 'QTm6t5PFehcrCTu4rKL8sPCwv2RwtMrM',
         'PLATFORM_ID' => 'tigergame'
     ],
+
 ];
 
 ?>
