@@ -100,7 +100,7 @@ class OzashikiController extends Controller
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				if ($client_details != null) {
-					Helper::errorDebug('ozashiki_debug', '1st step', json_encode($client_details), 'client_details');
+					Helper::errorDebug('ozashiki_debug_1st step', $this->provider_db_id , json_encode($client_details), 'client_details');
 					try{
 						ProviderHelper::idenpotencyTable($json_data['round_id']);
 					}catch(\Exception $e){
@@ -110,7 +110,7 @@ class OzashikiController extends Controller
 						];
 						return $response;
 					}
-					Helper::errorDebug('ozashiki_debug', '2nd step', json_encode($json_data['round_id']), 'idempotency passed');
+					Helper::errorDebug('ozashiki_debug_2nd step', $this->provider_db_id , json_encode($json_data['round_id']), 'idempotency passed');
 					$response = [
 						"errorCode" =>  10100,
 						"message" => "Server is not ready!",
@@ -121,7 +121,7 @@ class OzashikiController extends Controller
 					$json_data['transid'] = $json_data['transaction_id'];
 					$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
 					
-					Helper::errorDebug('ozashiki_debug', '3rd step', json_encode($game_details), 'game details found');
+					Helper::errorDebug('ozashiki_debug_3rd step', $this->provider_db_id , json_encode($game_details), 'game details found');
 					
 					$gameTransactionData = array(
 			            "provider_trans_id" => $json_data['transaction_id'],
@@ -137,20 +137,20 @@ class OzashikiController extends Controller
 			        );
 			        $game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
 
-					Helper::errorDebug('ozashiki_debug', '4th step', json_encode($game_transaction_id), 'game transaction saved');
+					Helper::errorDebug('ozashiki_debug_4th step', $this->provider_db_id , json_encode($game_transaction_id), 'game transaction saved');
 
 					$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 1,$json_data);
 					// change $json_data['round_id'] to $game_transaction_id
 					// ProviderHelper::updateGameTransactionStatus($game_transaction_id, 5, 5);
 			        
-			        Helper::errorDebug('ozashiki_debug', '5th step', json_encode($game_trans_ext_id), 'game transaction ext saved');
+			        Helper::errorDebug('ozashiki_debug_5th step', $this->provider_db_id , json_encode($game_trans_ext_id), 'game transaction ext saved');
 
 			        $client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
 
-			        Helper::errorDebug('ozashiki_debug', '6th step', json_encode($client_response), 'client fund transfer response');
+			        Helper::errorDebug('ozashiki_debug_6th step', $this->provider_db_id , json_encode($client_response), 'client fund transfer response');
 					
 					if (isset($client_response->fundtransferresponse->status->code)) {
-						ProviderHelper::updateGameTransactionFlowStatus($game_transaction_id, 1);
+						
 						switch ($client_response->fundtransferresponse->status->code) {
 							case '200':
 								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -172,7 +172,7 @@ class OzashikiController extends Controller
 
 						ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
 
-						Helper::errorDebug('ozashiki_debug', '7th step', '', 'update game trans ext success');
+						Helper::errorDebug('ozashiki_debug_7th step', $this->provider_db_id , '', 'update game trans ext success');
 
 
 					}
@@ -252,7 +252,7 @@ class OzashikiController extends Controller
 			            $entry_id = $json_data["amount"] > 0 ?  2 : 1;
 			           	$income = $bet_transaction->bet_amount -  $json_data["amount"] ;
 
-			           	ProviderHelper::updateGameTransactionV2Credit($bet_transaction->game_trans_id, $json_data["amount"], $income, $win_or_lost, $entry_id, "game_trans_id", 2);
+			           	ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $json_data["amount"], $income, $win_or_lost, $entry_id, "game_trans_id", 2);
 
 		                $game_trans_ext_id = ProviderHelper::createGameTransExtV2($bet_transaction->game_trans_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 2,$json_data, $response);
 
@@ -353,7 +353,7 @@ class OzashikiController extends Controller
 			            $entry_id = 2;
 			           	$income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;
 
-			           	ProviderHelper::updateGameTransactionV2Credit($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id", 4);
+			           	ProviderHelper::updateGameTransaction($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id", 4);
 
 			           	$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction->game_trans_id, $json_data['transaction_id'], $json_data['round_id'], $game_transaction->bet_amount, 3);
 
@@ -363,7 +363,6 @@ class OzashikiController extends Controller
 							
 							switch ($client_response->fundtransferresponse->status->code) {
 								case '200':
-									ProviderHelper::updateGameTransactionFlowStatus($game_transaction->game_trans_id, 5);
 									ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 									$http_status = 200;
 									$response = [
