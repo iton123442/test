@@ -132,8 +132,7 @@ class OzashikiController extends Controller
 			            "win" => 5,
 			            "pay_amount" => 0,
 			            "income" => 0,
-			            "entry_id" => 1,
-			            "flow_status" => 0,
+			            "entry_id" => 1
 			        );
 			        $game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
 
