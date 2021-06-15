@@ -121,7 +121,8 @@ class Helper
 	public static function errorDebug($method, $provider_id = 0, $request_data, $response_data) {
 
 		try{
-			if(env('SAVELOG')){
+			/*if(env('SAVELOG')){*/
+			if(1 == 1){
 				$data = [
 					"method_name" => $method,
 					"provider_id" => $provider_id,
