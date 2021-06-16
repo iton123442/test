@@ -243,7 +243,7 @@ class Helper
 		DB::table("player_game_rounds")->insert($player_game_round);
 	}
 	public static function getInfoPlayerGameRound($player_token){
-		$query = DB::select(' SELECT  `game_id` , `game_code` , `game_name` 
+		$query = DB::select('SELECT  `game_id` , `game_code` , `game_name` 
 								FROM `player_game_rounds` `pgr` 
 								INNER JOIN `games` `g` USING ( `game_id` ) 
 								WHERE `player_token` = "'.$player_token.'"');
