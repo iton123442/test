@@ -274,7 +274,7 @@ $app->post('/api/eightprovider/withdrawal', 'EightProviderController@gameWithdra
 $app->post('/api/gettransaction', 'AlController@testTransaction');
 
 //BNG Endpoints
-$app->post('/api/bng', 'BNGController@index');
+//$app->post('/api/bng', 'BNGController@index');
 $app->post('/api/bng/gamelaunch', 'BNGController@gameLaunchUrl');
 $app->post('/api/bng/generateGame','BNGController@generateGame');
 //FC GAMING Endpoints
