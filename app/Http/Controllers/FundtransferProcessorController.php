@@ -44,7 +44,7 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "evolutionmdb") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "bng") {
-                
+
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else{
                 $gteid = ClientRequestHelper::generateGTEID(
@@ -161,7 +161,7 @@ class FundtransferProcessorController extends Controller
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'bng'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'from fundtransfer','success' );
                             }
                             elseif($payload->action->custom->provider == 'wazdan'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
