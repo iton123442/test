@@ -496,6 +496,16 @@ $app->post('/api/evogaming/sid','EvolutionController@sid');
 $app->post('/api/evogaming/launch','EvolutionController@gameLaunch');
 $app->post('/api/evogaming/internalrefund','EvolutionController@internalrefund');
 
+//Evolution Gaming Endpoints
+
+$app->post('/api/evogaming2/check','EvolutionMDBController@authentication');
+$app->post('/api/evogaming2/balance','EvolutionMDBController@balance');
+$app->post('/api/evogaming2/debit','EvolutionMDBController@debit');
+$app->post('/api/evogaming2/credit','EvolutionMDBController@credit');
+$app->post('/api/evogaming2/cancel','EvolutionMDBController@cancel');
+$app->post('/api/evogaming2/sid','EvolutionMDBController@sid');
+$app->post('/api/evogaming2/launch','EvolutionMDBController@gameLaunch');
+$app->post('/api/evogaming2/internalrefund','EvolutionMDBController@internalrefund');
 
 //Golden F Game System
 $app->post('api/gf/Player/Create','GoldenFController@auth');

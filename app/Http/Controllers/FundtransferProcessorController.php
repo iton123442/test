@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Helpers\Game;
+use App\Models\GameTransactionMDB;
 use DB;
 
 
@@ -40,6 +41,8 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "OnlyPlay") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
+            }else if ($payload->action->custom->provider == "evolutionmdb") {
+                $gteid = $payload->action->custom->game_transaction_ext_id;
             }else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
@@ -150,6 +153,9 @@ class FundtransferProcessorController extends Controller
                             }
                             elseif($payload->action->custom->provider == 'evolution'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                            }
+                            elseif($payload->action->custom->provider == 'evolutionmdb'){
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'bng'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
