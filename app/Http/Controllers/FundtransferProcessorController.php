@@ -26,7 +26,7 @@ class FundtransferProcessorController extends Controller
 {
     public static function fundTransfer(Request $request){
 
-        Helper::saveLog('fundTransfer', 999, json_encode([]), "MAGIC END HIT");
+        // Helper::saveLog('fundTransfer', 999, json_encode([]), "MAGIC END HIT");
         $payload = json_decode(file_get_contents("php://input"));
         Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode($payload), 'TG_ARRIVED');
 
@@ -44,18 +44,17 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "evolutionmdb") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "bng") {
-                Helper::saveLog('fundTransfer_TG_BNG', 999, json_encode([$payload->action->custom->game_transaction_ext_id]), "fundTransfer_TG HIT");
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else{
-                // $gteid = ClientRequestHelper::generateGTEID(
-                //     $payload->request_body->fundtransferrequest->fundinfo->roundId,
-                //     $payload->action->provider->provider_trans_id, 
-                //     $payload->action->provider->provider_round_id, 
-                //     $payload->request_body->fundtransferrequest->fundinfo->amount,
-                //     $game_transaction_type, 
-                //     $payload->action->provider->provider_request, 
-                //     $payload->action->mwapi->mw_response
-                // );
+                $gteid = ClientRequestHelper::generateGTEID(
+                    $payload->request_body->fundtransferrequest->fundinfo->roundId,
+                    $payload->action->provider->provider_trans_id, 
+                    $payload->action->provider->provider_round_id, 
+                    $payload->request_body->fundtransferrequest->fundinfo->amount,
+                    $game_transaction_type, 
+                    $payload->action->provider->provider_request, 
+                    $payload->action->mwapi->mw_response
+                );
             }
         }catch(\Exception $e){
             Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode([]), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
@@ -161,7 +160,7 @@ class FundtransferProcessorController extends Controller
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'bng'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'from fundtransfer','success' );
+                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
                             }
                             elseif($payload->action->custom->provider == 'wazdan'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );

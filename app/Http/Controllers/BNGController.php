@@ -418,7 +418,9 @@ class BNGController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => "bng",
+                    //"isUpdate" => $winGameTransactionExt==null?false:true,
                     "game_transaction_ext_id" => $winGameTransactionExt==null?$winGametransactionExtId:$winGameTransactionExt->game_trans_ext_id,
+                    //"client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
                     "provider_request" => $data, #R
@@ -527,7 +529,9 @@ class BNGController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => "bng",
+                    //"isUpdate" => false,
                     "game_transaction_ext_id" => $winGametransactionExtId,
+                    //"client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
                     "provider_request" => $data, #R
