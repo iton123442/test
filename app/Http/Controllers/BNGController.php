@@ -19,27 +19,27 @@ class BNGController extends Controller
     public function __construct() {
         $this->startTime = microtime(true);
     }
-    // public function index(Request $request){
-    //     $data = json_decode($request->getContent(),TRUE);
-    //     $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
-    //     $invokeStart =  microtime(true);
-    //     if($data["name"]== "login"){
-    //         return $this->_authPlayer($data,$client_details);
-    //     }
-    //     elseif($data["name"]== "transaction"){
-    //         $data = $this->_transaction($data,$client_details);
-    //         $invokeEnd = microtime(true) - $invokeStart;
-    //         Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "indexTransaction" ,"Time" => $invokeEnd]), "");
-    //         return $data;
-    //         //return $this->_betGame($data);
-    //     }
-    //     elseif($data["name"]=="rollback"){
-    //         return $this->_rollbackGame($data,$client_details);
-    //     }
-    //     elseif($data["name"]=="getbalance"){
-    //         return $this->_getBalance($data,$client_details);
-    //     }
-    // }
+    public function index(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+        $invokeStart =  microtime(true);
+        if($data["name"]== "login"){
+            return $this->_authPlayer($data,$client_details);
+        }
+        elseif($data["name"]== "transaction"){
+            $data = $this->_transaction($data,$client_details);
+            $invokeEnd = microtime(true) - $invokeStart;
+            Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "indexTransaction" ,"Time" => $invokeEnd]), "");
+            return $data;
+            //return $this->_betGame($data);
+        }
+        elseif($data["name"]=="rollback"){
+            return $this->_rollbackGame($data,$client_details);
+        }
+        elseif($data["name"]=="getbalance"){
+            return $this->_getBalance($data,$client_details);
+        }
+    }
     public function generateGame(Request $request){
         $url = "https://gate-stage.betsrv.com/op/tigergames-stage/api/v1/game/list/";
         $client = new Client([
