@@ -44,18 +44,17 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "evolutionmdb") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "bng") {
-
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else{
-                $gteid = ClientRequestHelper::generateGTEID(
-                    $payload->request_body->fundtransferrequest->fundinfo->roundId,
-                    $payload->action->provider->provider_trans_id, 
-                    $payload->action->provider->provider_round_id, 
-                    $payload->request_body->fundtransferrequest->fundinfo->amount,
-                    $game_transaction_type, 
-                    $payload->action->provider->provider_request, 
-                    $payload->action->mwapi->mw_response
-                );
+                // $gteid = ClientRequestHelper::generateGTEID(
+                //     $payload->request_body->fundtransferrequest->fundinfo->roundId,
+                //     $payload->action->provider->provider_trans_id, 
+                //     $payload->action->provider->provider_round_id, 
+                //     $payload->request_body->fundtransferrequest->fundinfo->amount,
+                //     $game_transaction_type, 
+                //     $payload->action->provider->provider_request, 
+                //     $payload->action->mwapi->mw_response
+                // );
             }
         }catch(\Exception $e){
             Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode([]), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
