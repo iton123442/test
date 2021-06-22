@@ -33,10 +33,17 @@ class GameTransaction
 		$cnt = count($game);
         return $cnt > 0? $game[0]: null;
     }
+    // public static function getGameTransactionDataByProviderTransactionIdAndEntryType($provider_transaction_id,$entry_type){
+	// 	$game = DB::select("SELECT game_trans_ext_id,mw_response,round_id,game_trans_id,amount
+    //     FROM game_transaction_ext
+    //     where provider_trans_id='{$provider_transaction_id}' AND entry_type={$entry_type} limit 1");
+	// 	$cnt = count($game);
+    //     return $cnt > 0? $game[0]: null;
+    // }
     public static function getGameTransactionDataByProviderTransactionIdAndEntryType($provider_transaction_id,$entry_type){
 		$game = DB::select("SELECT game_trans_ext_id,mw_response,round_id,game_trans_id,amount
         FROM game_transaction_ext
-        where provider_trans_id='{$provider_transaction_id}' AND entry_type={$entry_type} limit 1");
+        where provider_trans_id='{$provider_transaction_id}' AND game_transaction_type={$entry_type} limit 1");
 		$cnt = count($game);
         return $cnt > 0? $game[0]: null;
     }
@@ -65,5 +72,8 @@ class GameTransaction
     }
     public static function createGameTransactionExt($gametransactionext){
         return DB::table("game_transaction_ext")->insertGetId($gametransactionext);
+    }
+    public static function updateGametransactionEXT($data,$game_trans_ext_id){
+        return DB::table('game_transaction_ext')->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
     }
 }

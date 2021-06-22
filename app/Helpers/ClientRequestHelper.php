@@ -6,6 +6,7 @@ use GuzzleHttp\TransferStats;
 use App\Helpers\Helper;
 use App\Helpers\GameLobby;
 use App\Helpers\ProviderHelper;
+use App\Models\GameTransaction;
 use App\Payment;
 use DB;
 use ErrorException;
@@ -94,6 +95,15 @@ class ClientRequestHelper{
                 Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
                 $client_reponse->requestoclient = $requesttocient;
                 //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
+                try{
+                    $dataToUpdate = array(
+                        "client_response" => json_encode($client_reponse),
+                        "mw_request" => json_encode($requesttocient),
+                    );
+                    GameTransaction::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                }catch(\Exception $e){
+                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$response);
+                }
                 return $client_reponse;
             }catch(\Exception $e){
                 if($type == 'credit'){
@@ -111,6 +121,15 @@ class ClientRequestHelper{
                     )
                 );
                 Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);
+                try{
+                    $dataToUpdate = array(
+                        "client_response" => json_encode($client_reponse),
+                        "mw_request" => json_encode($requesttocient),
+                    );
+                    GameTransaction::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                }catch(\Exception $e){
+                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$response);
+                }
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
                 return $client_reponse;

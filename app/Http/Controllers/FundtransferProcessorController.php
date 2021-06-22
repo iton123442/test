@@ -40,6 +40,8 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "OnlyPlay") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
+            }else if ($payload->action->custom->provider == "bng") {
+                $gteid = $payload->action->custom->game_transaction_ext_id;
             }else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
