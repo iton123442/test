@@ -99,6 +99,7 @@ $app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
 | can respond to, as well as the controllers that may handle them.
 |
 */
+$app->register('Sentry\Laravel\ServiceProvider');
 $app->configure("providerlinks");
 
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
