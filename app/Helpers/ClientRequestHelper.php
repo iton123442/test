@@ -6,6 +6,7 @@ use GuzzleHttp\TransferStats;
 use App\Helpers\Helper;
 use App\Helpers\GameLobby;
 use App\Helpers\ProviderHelper;
+use App\Models\GameTransaction;
 use App\Payment;
 use App\Models\GameTransactionMDB;
 use DB;
@@ -100,9 +101,9 @@ class ClientRequestHelper{
                         "client_response" => json_encode($client_reponse),
                         "mw_request" => json_encode($requesttocient),
                     );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    GameTransaction::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }catch(\Exception $e){
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage()),$response);
+                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$response);
                 }
                 return $client_reponse;
             }catch(\Exception $e){
@@ -123,12 +124,12 @@ class ClientRequestHelper{
                 Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);
                 try{
                     $dataToUpdate = array(
-                        "client_response" => json_encode($e->getMessage().'|'.$e->getLine()),
+                        "client_response" => json_encode($client_reponse),
                         "mw_request" => json_encode($requesttocient),
                     );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    GameTransaction::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }catch(\Exception $e){
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage()),$response);
+                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$response);
                 }
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
