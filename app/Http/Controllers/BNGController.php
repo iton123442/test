@@ -521,7 +521,7 @@ class BNGController extends Controller
                 "amount" => $data["args"]["win"],
                 "game_transaction_type"=>2,
                 "provider_request" =>json_encode($data),
-                "mw_response" => json_encode($response)
+                "mw_response" => json_encode("from controller")
             );
             $winGametransactionExtId = GameTransaction::createGameTransactionExt($wingametransactionext);
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
@@ -543,7 +543,7 @@ class BNGController extends Controller
                     "type"=>2, #R
                     "game_id" => $game_details->game_id, #R
                     "player_id" => $client_details->player_id, #R
-                    "mw_response" => $response, #R
+                    "mw_response" => "from funstransfer", #R
                 ]
             ];
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game_transactionid,'credit',false,$action_payload);
