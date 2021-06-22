@@ -26,7 +26,7 @@ class FundtransferProcessorController extends Controller
 {
     public static function fundTransfer(Request $request){
 
-        // Helper::saveLog('fundTransfer', 999, json_encode([]), "MAGIC END HIT");
+        Helper::saveLog('fundTransfer', 999, json_encode([]), "MAGIC END HIT");
         $payload = json_decode(file_get_contents("php://input"));
         Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode($payload), 'TG_ARRIVED');
 
