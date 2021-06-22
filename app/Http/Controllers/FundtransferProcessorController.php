@@ -44,6 +44,7 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "evolutionmdb") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "bng") {
+                Helper::saveLog('fundTransfer_TG_BNG', 999, json_encode([$payload->action->custom->game_transaction_ext_id]), "fundTransfer_TG HIT");
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else{
                 // $gteid = ClientRequestHelper::generateGTEID(
