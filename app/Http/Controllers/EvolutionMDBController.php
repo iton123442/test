@@ -227,6 +227,7 @@ class EvolutionMDBController extends Controller
                 } 
                     $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game"]["details"]["table"]["id"]);
                     $game = GameTransactionMDB::getGameTransactionByRoundId($data["transaction"]["refId"],$client_details);
+                    Helper::saveLog('EVGGames', 12, json_encode($game), "CREDIT");
                     if($game == null){
                         $msg = array(
                             "status"=>"BET_DOES_NOT_EXIST",
