@@ -101,7 +101,7 @@ $app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
 */
 $app->register('Sentry\Laravel\ServiceProvider');
 $app->configure("providerlinks");
-
+$app->configure("serverlist");
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../routes/web.php';
 });
