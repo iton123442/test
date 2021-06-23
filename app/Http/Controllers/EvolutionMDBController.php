@@ -116,6 +116,7 @@ class EvolutionMDBController extends Controller
             $data = json_decode($request->getContent(),TRUE);
             Helper::saveLog('EVG', 12, json_encode($data), "DEBIT");
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
+            Helper::saveLog('EVGclient_details', 12, json_encode($client_details), "CREDIT");
             if($client_details){
                     try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_1');
@@ -213,6 +214,7 @@ class EvolutionMDBController extends Controller
             $data = json_decode($request->getContent(),TRUE);
             Helper::saveLog('EVG', 12, json_encode($data), "CREDIT");
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
+            Helper::saveLog('EVGclient_details', 12, json_encode($client_details), "CREDIT");
             if($client_details){
                 try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_2');
