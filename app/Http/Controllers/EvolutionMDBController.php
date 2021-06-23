@@ -226,7 +226,7 @@ class EvolutionMDBController extends Controller
                     return response($msg,200)->header('Content-Type', 'application/json');
                 } 
                     $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game"]["details"]["table"]["id"]);
-                    $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId("player_token",$data["transaction"]["refId"],$client_details);
+                    $game = GameTransactionMDB::getGameTransactionByRoundId($data["transaction"]["refId"],$client_details);
                     if($game == null){
                         $msg = array(
                             "status"=>"BET_DOES_NOT_EXIST",
