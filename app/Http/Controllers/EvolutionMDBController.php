@@ -116,7 +116,7 @@ class EvolutionMDBController extends Controller
             $data = json_decode($request->getContent(),TRUE);
             Helper::saveLog('EVG', 12, json_encode($data), "DEBIT");
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
-            Helper::saveLog('EVGclient_details', 12, json_encode($client_details), "CREDIT");
+            Helper::saveLog('EVGclient_details', 12, json_encode($client_details), "DEBIT");
             if($client_details){
                     try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_1');
@@ -142,6 +142,7 @@ class EvolutionMDBController extends Controller
                         "entry_id" =>1,
                     );
                     $game_transactionid = GameTransactionMDB::createGametransaction($TransactionData,$client_details);
+                    Helper::saveLog('EVGDEBITGT', 12, json_encode($game_transactionid), "DEBIT");
                     $betgametransactionext = array(
                         "game_trans_id" => $game_transactionid,
                         "round_id" =>$data["transaction"]["refId"],
@@ -151,6 +152,7 @@ class EvolutionMDBController extends Controller
                         "provider_request" =>json_encode($data),
                     );
                     $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
+                    Helper::saveLog('EVGDEBITGTX', 12, json_encode($betGametransactionExtId), "DEBIT");
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit");
                     $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                     if(isset($client_response->fundtransferresponse->status->code) 
