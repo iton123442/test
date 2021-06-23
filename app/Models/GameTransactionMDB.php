@@ -145,7 +145,9 @@ class GameTransactionMDB
         $data['client_id'] = $client_details->client_id;
         $data['player_id'] = $client_details->player_id;
         if($connection != null){
+            Helper::saveLog('createGametransaction', 12, json_encode($connection), "createGametransaction");
             return DB::connection($connection["connection_name"])->table($connection['db_list'][1].'.game_transactions')->insertGetId($data);
+            
         }else{
             return null;
         }
