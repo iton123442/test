@@ -24,7 +24,7 @@ return [
                 'api_test' // game_transaction
             ]
         ],
-        "mysql" => [
+        "default" => [
             'connection_name'=>'mysql',
             'db_list'=> [
                 'api_test',//game_trasnaction_ext
