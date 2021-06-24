@@ -101,7 +101,7 @@ class ClientRequestHelper{
                         "client_response" => json_encode($client_reponse),
                         "mw_request" => json_encode($requesttocient),
                     );
-                    GameTransaction::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }catch(\Exception $e){
                     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$response);
                 }
@@ -127,7 +127,7 @@ class ClientRequestHelper{
                         "client_response" => json_encode($client_reponse),
                         "mw_request" => json_encode($requesttocient),
                     );
-                    GameTransaction::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }catch(\Exception $e){
                     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$response);
                 }
