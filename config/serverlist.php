@@ -24,14 +24,14 @@ return [
                 'api_test' // game_transaction
             ]
         ],
-        "server2-api_test2" =>[
+        "svr2apt2" =>[
             'connection_name'=>'server2',
             'db_list'=> [
                 'api_test2_Extension',  //game_trasnaction_ext
                 'api_test2' // game_transaction
             ]
         ],
-        "server3-api_test2" =>[
+        "svr3apt2" =>[
             'connection_name'=>'server3',
             'db_list'=> [
                 'api_test2_Extension', //game_trasnaction_ext
