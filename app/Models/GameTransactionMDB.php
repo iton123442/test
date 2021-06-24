@@ -209,7 +209,6 @@ class GameTransactionMDB
             DB::connection($connection_name)->getPdo();
             return true;
         } catch (\Exception $e){
-            Helper::saveLog('DB CONNECTION LOGS', 12, json_encode($game_transactionid), "DBCONN");
             return false;
         }
     }
