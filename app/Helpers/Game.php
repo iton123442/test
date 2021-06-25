@@ -24,7 +24,7 @@ class Game
 		// return ($search_result ? $search_result : false);
 
 		$details = "where g.game_id = ".$game_id." limit 1";
-		$game_details = DB::select('select g.game_name, g.game_code, g.game_id from games g inner join providers as p using (provider_id) '.$details.' ');
+		$game_details = DB::select('select g.game_name, g.game_code, g.game_id, p.provider_name from games g inner join providers as p using (provider_id) '.$details.' ');
 		
 	 	return $game_details ? $game_details[0] : false;
 	}

@@ -561,7 +561,7 @@ $app->post('api/pgvirtual/paybet/{auth_key}','PGCompanyController@paybet');
 
 // CUT CALL FOR THE WIN CREDIT PROCESS
 $app->post('tigergames/bg-fundtransferV2','FundtransferProcessorController@bgFundTransferV2');
-
+$app->post('tigergames/bg-bgFundTransferV2MultiDB','FundtransferProcessorController@bgFundTransferV2MultiDB');
 // ONLYPLAY
 $app->post('/api/onlyplay/info','OnlyPlayController@getBalance');
 $app->post('/api/onlyplay/bet','OnlyPlayController@debitProcess');

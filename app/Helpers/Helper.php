@@ -150,15 +150,21 @@ class Helper
 		DB::table('seamless_sent_logs')->insert($data);
 	}
 
-	/* NEW 061620 */
+	/* NEW 062521 */
 	public static function findGameDetails($type, $provider_id, $identification) {
 		    $game_details = DB::table("games as g")
-				->leftJoin("providers as p","g.provider_id","=","p.provider_id");
+				->join("providers as p","g.provider_id","=","p.provider_id");
 				
 		    if ($type == 'game_code') {
 				$game_details->where([
 			 		["g.provider_id", "=", $provider_id],
 			 		["g.game_code",'=', $identification],
+			 	]);
+			}
+			if ($type == 'game_id') {
+				$game_details->where([
+			 		["g.provider_id", "=", $provider_id],
+			 		["g.game_id",'=', $identification],
 			 	]);
 			}
 			$result= $game_details->first();
