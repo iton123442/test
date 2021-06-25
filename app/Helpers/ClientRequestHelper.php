@@ -74,6 +74,9 @@ class ClientRequestHelper{
 
             if(count($action) > 0){
                 // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
+                if(isset($action['provider_name'])){
+                    $requesttocient["gamedetails"]['provider_name'] = $action['provider_name'];
+                }
             }
 
             try{
