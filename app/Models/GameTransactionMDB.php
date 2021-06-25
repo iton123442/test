@@ -129,6 +129,7 @@ class GameTransactionMDB
                         $db = "{$connection['db_list'][1]}.game_transactions ";
                         break;
                 }
+                Helper::saveLog('checkAndGetFromOtherServer2', 12, json_encode($select.$db.$where), $connection["connection_name"]);
                 $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
                 $cnt = count($game);
                 if ($cnt > 0){
