@@ -204,7 +204,8 @@ class KAHelper{
 
 	public static function findGameDetails($type, $provider_id, $game_code)
 	{
-		$query = DB::Select("SELECT game_id,game_code,game_name FROM games WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
+		// $query = DB::Select("SELECT game_id,game_code,game_name FROM games WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
+		$query = DB::Select("SELECT game_id,game_code,game_name,provider_name FROM games inner join providers using (provider_id) WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
 		$result = count($query);
 		return $result > 0 ? $query[0] : null;
 	}
