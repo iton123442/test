@@ -76,4 +76,7 @@ class GameTransaction
     public static function updateGametransactionEXT($data,$game_trans_ext_id){
         return DB::table('game_transaction_ext')->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
     }
+    public static function createFailedTransaction($failed_data){
+        return DB::table("failed_transaction")->insert($failed_data);
+    }
 }

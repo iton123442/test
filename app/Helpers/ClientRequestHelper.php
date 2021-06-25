@@ -592,6 +592,32 @@ class ClientRequestHelper{
         }
     }
 
+     /**
+     * NOTE ONLY FOR UPDATE GAME TRANSACTION IN FUNDTRANSFER PROCESSOR CONTROLLER!  MDB
+     * CutCall Multi DB
+     */
+    public static function updateGameTransactionCCMD($data,$game_transaction_id,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].'.game_transactions')->where('game_trans_id',$game_transaction_id)->update($data);
+        }else{
+            return null;
+        }
+    }
+
+     /**
+     * NOTE ONLY FOR UPDATE GAME TRANSACTION EXT IN FUNDTRANSFER PROCESSOR CONTROLLER!  MDB
+     * CutCall Multi DB
+     */
+    public static function updateGametransactionEXTCCMD($data,$game_trans_ext_id,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].'.game_transaction_ext')->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+        }else{
+            return null;
+        }
+    }
+
     /**
     *   @author FUNNTA
     *   ONLY FUNTA FUNDTRANSFER
