@@ -120,6 +120,7 @@ class GameTransactionMDB
         foreach($connection_list as $connection){
             $status = self::checkDBConnection($connection["connection_name"]);
             if($status && $connection["connection_name"] != $connection_name){
+                Helper::saveLog('checkAndGetFromOtherServer', 12, json_encode($connection), "createGametransaction");
                 switch($type){
                     case 'gte':
                         $db = "{$connection['db_list'][0]}.game_transaction_ext ";
