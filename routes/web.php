@@ -487,25 +487,25 @@ $app->post('/api/microgaming/getPlayerBalance','MicroGamingController@getPlayerB
 
 //Evolution Gaming Endpoints
 
-$app->post('/api/evogaming/check','EvolutionController@authentication');
-$app->post('/api/evogaming/balance','EvolutionController@balance');
-$app->post('/api/evogaming/debit','EvolutionController@debit');
-$app->post('/api/evogaming/credit','EvolutionController@credit');
-$app->post('/api/evogaming/cancel','EvolutionController@cancel');
-$app->post('/api/evogaming/sid','EvolutionController@sid');
-$app->post('/api/evogaming/launch','EvolutionController@gameLaunch');
-$app->post('/api/evogaming/internalrefund','EvolutionController@internalrefund');
+// $app->post('/api/evogaming/check','EvolutionController@authentication');
+// $app->post('/api/evogaming/balance','EvolutionController@balance');
+// $app->post('/api/evogaming/debit','EvolutionController@debit');
+// $app->post('/api/evogaming/credit','EvolutionController@credit');
+// $app->post('/api/evogaming/cancel','EvolutionController@cancel');
+// $app->post('/api/evogaming/sid','EvolutionController@sid');
+// $app->post('/api/evogaming/launch','EvolutionController@gameLaunch');
+// $app->post('/api/evogaming/internalrefund','EvolutionController@internalrefund');
 
 //Evolution Gaming Endpoints
 
-$app->post('/api/evogaming2/check','EvolutionMDBController@authentication');
-$app->post('/api/evogaming2/balance','EvolutionMDBController@balance');
-$app->post('/api/evogaming2/debit','EvolutionMDBController@debit');
-$app->post('/api/evogaming2/credit','EvolutionMDBController@credit');
-$app->post('/api/evogaming2/cancel','EvolutionMDBController@cancel');
-$app->post('/api/evogaming2/sid','EvolutionMDBController@sid');
-$app->post('/api/evogaming2/launch','EvolutionMDBController@gameLaunch');
-$app->post('/api/evogaming2/internalrefund','EvolutionMDBController@internalrefund');
+$app->post('/api/evogaming/check','EvolutionMDBController@authentication');
+$app->post('/api/evogaming/balance','EvolutionMDBController@balance');
+$app->post('/api/evogaming/debit','EvolutionMDBController@debit');
+$app->post('/api/evogaming/credit','EvolutionMDBController@credit');
+$app->post('/api/evogaming/cancel','EvolutionMDBController@cancel');
+$app->post('/api/evogaming/sid','EvolutionMDBController@sid');
+$app->post('/api/evogaming/launch','EvolutionMDBController@gameLaunch');
+$app->post('/api/evogaming/internalrefund','EvolutionMDBController@internalrefund');
 
 //Golden F Game System
 $app->post('api/gf/Player/Create','GoldenFController@auth');

@@ -11,7 +11,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
 use App\Models\GameTransactionMDB;
 use DB;
-class BNGController extends Controller
+class BNGControllerMDB extends Controller
 {
     protected $startTime;
     private $prefix = 22;
@@ -230,255 +230,6 @@ class BNGController extends Controller
             return response($msg,200)->header('Content-Type', 'application/json');
         }
     }
-    private function betNotNullWinNotNullUpdate($data,$client_details,$game_details,$game_transaction){
-        $betStart =  microtime(true);
-        $gameTransactionData = array(
-            "provider_trans_id" => $data["uid"],
-            "token_id" => $client_details->token_id,
-            "game_id" => $game_details->game_id,
-            "round_id" => $data["args"]["round_id"],
-            "bet_amount" => $data["args"]["bet"],
-            "win" =>$data["args"]["win"] == 0 ? 0 : 1,
-            "pay_amount" =>$data["args"]["win"],
-            "income" =>$data["args"]["bet"]-$data["args"]["win"],
-            "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
-        );
-        GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transaction->game_trans_id,$client_details);
-        $betgametransactionext = array(
-            "game_trans_id" => $game_transaction->game_trans_id,
-            "provider_trans_id" => $data["uid"],
-            "round_id" => $data["args"]["round_id"],
-            "amount" => $data["args"]["bet"],
-            "game_transaction_type"=>1,
-            "provider_request" =>json_encode($data),
-        );
-        GameTransactionMDB::updateGametransactionEXT($betgametransactionext,$game_transaction->game_trans_ext_id,$client_details);
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$game_transaction->game_trans_ext_id,$game_transaction->game_trans_id,"debit");
-        if(isset($client_response->fundtransferresponse->status->code) 
-        && $client_response->fundtransferresponse->status->code == "200"){
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-            $client_details->balance = $balance;
-            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
-            $response =array(
-                "uid"=>$data["uid"],
-                "balance" => array(
-                    "value" =>(string)$balance,
-                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                ),
-            );
-            $dataToUpdate = array(
-                "mw_response" => json_encode($response)
-            );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transaction->game_trans_ext_id,$client_details);
-            //Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
-            $winGameTransactionExt=GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2,$client_details);
-            $response =array(
-                "uid"=>$data["uid"],
-                "balance" => array(
-                    "value" =>$client_details->balance +$data["args"]["win"],
-                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                ),
-            );
-            if($winGameTransactionExt!=null){
-                $wingametransactionext = array(
-                    "game_trans_id" => $game_transaction->game_trans_id,
-                    "provider_trans_id" => $data["uid"],
-                    "round_id" => $data["args"]["round_id"],
-                    "amount" => $data["args"]["win"],
-                    "game_transaction_type"=>2,
-                    "provider_request" =>json_encode($data),
-                    "mw_response" => json_encode($response)
-                );
-                GameTransactionMDB::updateGametransactionEXT($wingametransactionext,$winGameTransactionExt->game_trans_ext_id,$client_details);
-            }else{
-                $wingametransactionext = array(
-                    "game_trans_id" => $game_transaction->game_trans_id,
-                    "provider_trans_id" => $data["uid"],
-                    "round_id" => $data["args"]["round_id"],
-                    "amount" => $data["args"]["win"],
-                    "game_transaction_type"=>2,
-                    "provider_request" =>json_encode($data),
-                    "mw_response" => json_encode($response)
-                );
-                $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-            }
-            $winStart =  microtime(true);
-            //$this->_setExtParameter($this->_getExtParameter()+1);
-            $response =array(
-                "uid"=>$data["uid"],
-                "balance" => array(
-                    "value" =>$client_details->balance +$data["args"]["win"],
-                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                ),
-            );
-
-            $action_payload = [
-                "type" => "custom", #genreral,custom :D # REQUIRED!
-                "custom" => [
-                    "provider" => 'bng',
-                    "isUpdate" => $winGameTransactionExt==null?false:true,
-                    "game_transaction_ext_id" => $winGameTransactionExt==null?$winGametransactionExtId:$winGameTransactionExt->game_trans_ext_id,
-                    "client_connection_name" => $client_details->connection_name,
-                ],
-                "provider" => [
-                    "provider_request" => $data, #R
-                    "provider_trans_id"=>$data["uid"], #R
-                    "provider_round_id"=>$data["args"]["round_id"], #R
-                ],
-                "mwapi" => [
-                    "roundId"=>$game_transaction->game_trans_id, #R
-                    "type"=>2, #R
-                    "game_id" => $game_details->game_id, #R
-                    "player_id" => $client_details->player_id, #R
-                    "mw_response" => $response, #R
-                ]
-            ];
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game_transaction->game_trans_id,'credit',false,$action_payload);
-            if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "200"){
-                $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
-                $response =array(
-                    "uid"=>$data["uid"],
-                    "balance" => array(
-                        "value" =>(string)$balance,
-                        "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                    ),
-                );
-                //Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
-                $endWin = microtime(true) - $winStart;
-                Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "WinTime" ,"Time" => $endWin]), "");
-                return response($response,200)
-                    ->header('Content-Type', 'application/json');
-            }
-        }
-        elseif(isset($client_response->fundtransferresponse->status->code) 
-        && $client_response->fundtransferresponse->status->code == "402"){
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-            $client_details->balance = $balance;
-            $response =array(
-                "uid"=>$data["uid"],
-                "balance" => array(
-                    "value" =>number_format($client_details->balance,2,'.', ''),
-                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                ),
-                "error" => array(
-                    "code"=> "FUNDS_EXCEED",
-                )
-            );
-            //$this->_setExtParameter($this->_getExtParameter()+1);
-            try{
-                $dataToSave = array(
-                    "win"=>2,
-                    "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
-                );
-                GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
-                Helper::updateBNGGameTransactionExt($game_transaction->game_trans_ext_id,$client_response->fundtransferresponse->status->message,$response,'FAILED');
-            }catch(\Exception $e){
-                Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
-            }
-            Helper::updateBNGGameTransactionExt($game_transaction->game_trans_ext_id,$client_response->requestoclient,$response,$client_response);
-            return response($response,200)
-                        ->header('Content-Type', 'application/json');
-        }
-        
-    }
-    private function betNullWinNotNullUpdate($data,$client_details,$game_details){
-        $game = GameTransactionMDB::getGameTransactionByRoundId($data["args"]["round_id"],$client_details);
-        if($game != null){
-            $createGametransaction = array(
-                "win" =>$data["args"]["win"] == 0 && $game->pay_amount == 0 ? 0 : 1,
-                "pay_amount" =>$game->pay_amount+$data["args"]["win"],
-                "income" =>$game->income - $data["args"]["win"],
-                "entry_id" =>$data["args"]["win"] == 0 && $game->pay_amount == 0 ? 1 : 2,
-            );
-            $game_transactionid = GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
-            //$this->_setExtParameter($this->_getExtParameter()+1);
-            
-            // $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit");
-            // $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-            $response =array(
-                "uid"=>$data["uid"],
-                "balance" => array(
-                    "value" =>$client_details->balance +$data["args"]["win"],
-                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                ),
-            );
-            $winGameTransactionExt=GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2,$client_details);
-            if($winGameTransactionExt!=null){
-                $wingametransactionext = array(
-                    "game_trans_id" => $game->game_trans_id,
-                    "provider_trans_id" => $data["uid"],
-                    "round_id" => $data["args"]["round_id"],
-                    "amount" => $data["args"]["win"],
-                    "game_transaction_type"=>2,
-                    "provider_request" =>json_encode($data),
-                    "mw_response" => json_encode($response)
-                );
-                GameTransactionMDB::updateGametransactionEXT($wingametransactionext,$winGameTransactionExt->game_trans_ext_id,$client_details);
-            }else{
-                $wingametransactionext = array(
-                    "game_trans_id" => $game->game_trans_id,
-                    "provider_trans_id" => $data["uid"],
-                    "round_id" => $data["args"]["round_id"],
-                    "amount" => $data["args"]["win"],
-                    "game_transaction_type"=>2,
-                    "provider_request" =>json_encode($data),
-                    "mw_response" => json_encode($response)
-                );
-                $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-            }
-
-            $action_payload = [
-                "type" => "custom", #genreral,custom :D # REQUIRED!
-                "custom" => [
-                    "provider" => 'bng',
-                    "isUpdate" => $winGameTransactionExt==null?false:true,
-                    "game_transaction_ext_id" => $winGameTransactionExt==null?$winGametransactionExtId:$winGameTransactionExt->game_trans_ext_id,
-                    "client_connection_name" => $client_details->connection_name,
-                ],
-                "provider" => [
-                    "provider_request" => $data, #R
-                    "provider_trans_id"=>$data["uid"], #R
-                    "provider_round_id"=>$data["args"]["round_id"], #R
-                ],
-                "mwapi" => [
-                    "roundId"=>$game->game_trans_id, #R
-                    "type"=>2, #R
-                    "game_id" => $game_details->game_id, #R
-                    "player_id" => $client_details->player_id, #R
-                    "mw_response" => $response, #R
-                ]
-            ];
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
-            if(isset($client_response->fundtransferresponse->status->code) 
-            && $client_response->fundtransferresponse->status->code == "200"){
-                $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["method" =>"betNullWinNotNull","balance"=>$balance,"response_balance"=>$client_response->fundtransferresponse->balance]), "");
-                $response =array(
-                    "uid"=>$data["uid"],
-                    "balance" => array(
-                        "value" =>(string)$balance,
-                        "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                    ),
-                );
-                //Helper::updateBNGGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$response,$client_response);
-                return response($response,200)
-                    ->header('Content-Type', 'application/json');
-            }else{
-                $response =array(
-                    "uid"=>"Error on Client Timeout"
-                );
-                return response($response,503)
-                        ->header('Content-Type', 'application/json');
-            }
-        }
-        else{
-            Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode("GameTransactionDoesnotExist"), "");
-            return json_encode($game);
-        }
-    }
     private function betNotNullWinNotNull($data,$client_details,$game_details){
         $betStart =  microtime(true);
         $gameTransactionData = array(
@@ -502,7 +253,10 @@ class BNGController extends Controller
             "provider_request" =>json_encode($data),
         );
         $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit");
+        $fund_extra_data = [
+            'provider_name' => $game_details->provider_name
+        ];
+        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
@@ -552,6 +306,7 @@ class BNGController extends Controller
                     "provider_request" => $data, #R
                     "provider_trans_id"=>$data["uid"], #R
                     "provider_round_id"=>$data["args"]["round_id"], #R
+                    'provider_name' => $game_details->provider_name
                 ],
                 "mwapi" => [
                     "roundId"=>$game_transactionid, #R
@@ -653,6 +408,7 @@ class BNGController extends Controller
                     "provider_request" => $data, #R
                     "provider_trans_id"=>$data["uid"], #R
                     "provider_round_id"=>$data["args"]["round_id"], #R
+                    'provider_name' => $game_details->provider_name
                 ],
                 "mwapi" => [
                     "roundId"=>$game->game_trans_id, #R
@@ -712,7 +468,10 @@ class BNGController extends Controller
             "provider_request" =>json_encode($data),
         );
         $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit");
+        $fund_extra_data = [
+            'provider_name' => $game_details->provider_name
+        ];
+        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
@@ -881,7 +640,7 @@ class BNGController extends Controller
                     "amount" => round($refund_amount,2),
                     "roundid" => $data["args"]["round_id"],
                 );
-                $game = TransactionHelper::getGameTransaction($data["token"],$data["args"]["round_id"]);
+                $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
                 if(!$game){
                     $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
                 }
@@ -893,7 +652,10 @@ class BNGController extends Controller
                 if(!$game_transaction){
                     $transactionId=Helper::createBNGGameTransactionExt($gametransactionid,$data,null,null,null,3);
                 }
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true,$fund_extra_data);
                 $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
