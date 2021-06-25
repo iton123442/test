@@ -245,7 +245,8 @@ class Helper
 	public static function getInfoPlayerGameRound($player_token){
 		$query = DB::select('SELECT  `game_id` , `game_code` , `game_name` 
 								FROM `player_game_rounds` `pgr` 
-								INNER JOIN `games` `g` USING ( `game_id` ) 
+								INNER JOIN `games` `g` USING ( `game_id` )
+								INNER JOIN `providers` `pr` USING (`provider_id`)  
 								WHERE `player_token` = "'.$player_token.'"');
 		$client_details = count($query);
 		return $client_details > 0 ? $query[0] : false;

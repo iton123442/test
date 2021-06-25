@@ -51,9 +51,13 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "cqgames") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
-            }else if ($payload->action->custom->provider == "evolutionmdb") {
+            }else if ($payload->action->custom->provider == "evolution") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "bng") {
+                $gteid = $payload->action->custom->game_transaction_ext_id;
+            }else if ($payload->action->custom->provider == "icg") {
+                $gteid = $payload->action->custom->game_transaction_ext_id;
+            }else if ($payload->action->custom->provider == "wazdan") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else{
                 $gteid = ClientRequestHelper::generateGTEID(
@@ -222,19 +226,16 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'evolution'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                            }
-                            elseif($payload->action->custom->provider == 'evolutionmdb'){
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'bng'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'wazdan'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'icg'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif ($payload->action->custom->provider == 'MannaPlay') {
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );

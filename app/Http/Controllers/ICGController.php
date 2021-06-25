@@ -291,7 +291,10 @@ class ICGController extends Controller
                 //     $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
                 // }
                 // $transactionId = Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,1);
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit");
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance * 100,2);
@@ -379,8 +382,11 @@ class ICGController extends Controller
                         "game_transaction_type"=>3,
                         "provider_request" =>json_encode($json),
                     );
+                    $fund_extra_data = [
+                        'provider_name' => $game_details->provider_name
+                    ];
                     $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit",true);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit",true,$fund_extra_data);
                     $balance = round($client_response->fundtransferresponse->balance,2);
                     if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
@@ -480,6 +486,7 @@ class ICGController extends Controller
                             "provider_request" => $json, #R
                             "provider_trans_id"=>$json["transactionId"], #R
                             "provider_round_id"=>$json["roundId"], #R
+                            'provider_name' => $game_details->provider_name
                         ],
                         "mwapi" => [
                             "roundId"=>$game->game_trans_id, #R
@@ -632,6 +639,7 @@ class ICGController extends Controller
                             "provider_request" => $json, #R
                             "provider_trans_id"=>$json["transactionId"], #R
                             "provider_round_id"=>0, #R
+                            'provider_name' => $game_details->provider_name
                         ],
                         "mwapi" => [
                             "roundId"=>$game->game_trans_id, #R
@@ -745,7 +753,6 @@ class ICGController extends Controller
                     "round_id" => 0,
                     "bet_amount" => round($json["amount"]/100,2),
                     "pay_amount" =>0,
-                    "win" => 5,
                     "income" =>0,
                     "entry_id" =>1,
                 );
@@ -781,7 +788,10 @@ class ICGController extends Controller
                 //     $gametransactionid = $game[0]->game_trans_id;
                 // }
                 // $transactionId=Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,1);
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit");
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance * 100,2);
