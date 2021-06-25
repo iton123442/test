@@ -9,10 +9,12 @@ use GuzzleHttp\Client;
 use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransaction as GMT;
+use App\Models\GameTransactionMDB;
 use DB;
 class WazdanController extends Controller
 {
     //
+    private $prefix = 33;
     public function __construct() {
         $this->startTime = microtime(true);
     }
@@ -111,40 +113,43 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('getStake(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
+            try{
+                ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
+            }catch(\Exception $e){
+                $msg = array(
+                    "status" => 0,
+                    "funds" => array(
+                        "balance" => round($client_details->balance,2)
+                    ),
+                );
+                return response($msg,200)
+                ->header('Content-Type', 'application/json');
+            }
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
-                $game_transaction = Helper::checkGameTransaction($datadecoded["transactionId"]);
-                if(WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"])){
-                    $msg = array(
-                        "status" => 0,
-                        "funds" => array(
-                            "balance" => round($client_details->balance,2)
-                        ),
-                    );
-                    Helper::saveLog('betGameInsuficient(Wazdan)', 50, $data, $msg);
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
-                }
-                $game_details = Helper::getInfoPlayerGameRound($datadecoded["user"]["token"]);
-                $json_data = array(
-                    "transid" => $datadecoded["transactionId"],
-                    "amount" => round($datadecoded["amount"],2),
-                    "roundid" => $datadecoded["roundId"]
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                $gameTransactionData = array(
+                    "provider_trans_id" => $datadecoded["transactionId"],
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $datadecoded["roundId"],
+                    "bet_amount" => round($datadecoded["amount"],2),
+                    "pay_amount" =>0,
+                    "win" => 5,
+                    "income" =>0,
+                    "entry_id" =>1,
                 );
-                $game = WazdanHelper::getGameTransaction($datadecoded["user"]["token"],$datadecoded["roundId"]);
-                    if(!$game){
-                        $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
-                        // $game_transaction_id=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details);
-                        // Helper::saveGame_trans_ext($game_transaction_id,json_encode($json));
-                        // Helper::saveLog('betGame(ICG)', 12, json_encode($json), $response);
-                    }
-                    else{
-                        $gameupdate = WazdanHelper::updateGameTransaction($game,$json_data,"debit");
-                        $gametransactionid = $game->game_trans_id;
-                    }
-                    
-                $transactionId =WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,1);  
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
+                $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                $betgametransactionext = array(
+                    "game_trans_id" => $game_transactionid,
+                    "provider_trans_id" => $datadecoded["transactionId"],
+                    "round_id" => $datadecoded["roundId"],
+                    "amount" => round($datadecoded["amount"],2),
+                    "game_transaction_type"=>1,
+                    "provider_request" =>json_encode($datadecoded),
+                );
+                $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);    
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit");
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
@@ -155,9 +160,10 @@ class WazdanController extends Controller
                             "balance" => $balance
                         ),
                     );
-                    Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                    response($msg,200)->header('Content-Type', 'application/json');
-                    //Helper::saveLog('responseTime(WAZDANBET)', 12, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($msg)
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -174,8 +180,11 @@ class WazdanController extends Controller
                             "win"=>2,
                             "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
                         );
-                        GMT::updateGametransaction($data,$gametransactionid);
-                        Helper::updateGameTransactionExt($transactionId,$client_response->fundtransferresponse->status->message,$msg,'FAILED');
+                        GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
+                        $dataToUpdate = array(
+                            "mw_response" => json_encode($msg)
+                        );
+                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
                     } 
@@ -204,34 +213,36 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('rollbackStake(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
+        $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
         if($client_details){
-            $rollbackchecker = WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"]);
-            if($rollbackchecker){
-                $msg = array(
-                    "status" => 0,
-                    "funds" => array(
-                        "balance" => round(Helper::getBalance($client_details),2)
-                    )
-                );
-                Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
-                return response($msg,200)
-                ->header('Content-Type', 'application/json');
-            }
-           
-                $win = 0;
-                $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
-                $json_data = array(
-                    "transid" => $datadecoded["transactionId"],
-                    "amount" => round($datadecoded["amount"],2),
-                    "roundid" => 0,
-                );
-                $gameExtension = WazdanHelper::getTransactionExt($datadecoded["originalTransactionId"]);
-                if(!$gameExtension){
+                // $win = 0;
+                // $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+                // $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                // $json_data = array(
+                //     "transid" => $datadecoded["transactionId"],
+                //     "amount" => round($datadecoded["amount"],2),
+                //     "roundid" => 0,
+                // );
+                try{
+                    ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_3');
+                }catch(\Exception $e){
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
-                            "balance" => round(Helper::getBalance($client_details),2)
+                            "balance" => round($client_details->balance,2)
+                        ),
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                $gameExtension =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($datadecoded["originalTransactionId"],1,$client_details);
+                //$gameExtension = WazdanHelper::getTransactionExt($datadecoded["originalTransactionId"]);
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                if($gameExtension==null){
+                    $msg = array(
+                        "status" => 0,
+                        "funds" => array(
+                            "balance" => round($client_details->balance,2)
                         )
                     );
                     Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
@@ -239,17 +250,24 @@ class WazdanController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 $datadecoded["roundId"] = $gameExtension->round_id;
-                $game = WazdanHelper::getGameTransactionById($gameExtension->game_trans_id);
-                if(!$game){
-                    $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
-                }
-                else{
-                    $gameupdate = Helper::updateGameTransaction($game,$json_data,"refund");
-                    $gametransactionid = $game->game_trans_id;
-
-                }
-                $transactionId = WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,3);
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
+                $updateGametransaction = array(
+                    "win" =>4,
+                    "pay_amount" =>round($datadecoded["amount"],2),
+                    "income" =>$gameExtension->amount-round($datadecoded["amount"],2),
+                    "entry_id" =>2,
+                );
+                GameTransactionMDB::updateGametransaction($updateGametransaction,$gameExtension->game_trans_id,$client_details);
+                $refundgametransactionext = array(
+                    "game_trans_id" => $gameExtension->game_trans_id,
+                    "provider_trans_id" =>  $datadecoded["transactionId"],
+                    "round_id" =>$datadecoded["roundId"],
+                    "amount" =>round($datadecoded["amount"],2),
+                    "game_transaction_type"=>3,
+                    "provider_request" =>json_encode($datadecoded),
+                );
+                $refundgametransactionextId = GameTransactionMDB::createGameTransactionExt($refundgametransactionext,$client_details);
+                // $transactionId = WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,3);
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$refundgametransactionextId,$gameExtension->game_trans_id,"credit",true);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
@@ -260,7 +278,10 @@ class WazdanController extends Controller
                             "balance" => $balance
                         ),
                     );
-                    Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($msg)
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransactionext,$client_details);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -289,38 +310,59 @@ class WazdanController extends Controller
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
-                $returnWinTransaction = WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"]);
-                if($returnWinTransaction){
+                // $returnWinTransaction = WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"]);
+                // if($returnWinTransaction){
+                //     $msg = array(
+                //         "status" => 0,
+                //         "funds" => array(
+                //             "balance" => round($client_details->balance,2)
+                //         )
+                //     );
+                //     return response($msg,200)
+                //     ->header('Content-Type', 'application/json');
+                // }
+                // $win = $datadecoded["amount"] == 0 ? 0 : 1;
+                // $game_details = Helper::getInfoPlayerGameRound($datadecoded["user"]["token"]);
+                // $json_data = array(
+                //     "transid" => $datadecoded["transactionId"],
+                //     "amount" => round($datadecoded["amount"],2),
+                //     "roundid" => $datadecoded["roundId"],
+                //     "payout_reason" => null,
+                //     "win" => $win,
+                // );
+                try{
+                    ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_2');
+                }catch(\Exception $e){
+                    $msg = array(
+                        "status" => 0,
+                        "funds" => array(
+                            "balance" => round($client_details->balance,2)
+                        ),
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($datadecoded["user"]["token"],$datadecoded["roundId"],$client_details);
+                if($game==null){
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
                             "balance" => round($client_details->balance,2)
                         )
                     );
+                    Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                $win = $datadecoded["amount"] == 0 ? 0 : 1;
-                $game_details = Helper::getInfoPlayerGameRound($datadecoded["user"]["token"]);
-                $json_data = array(
-                    "transid" => $datadecoded["transactionId"],
-                    "amount" => round($datadecoded["amount"],2),
-                    "roundid" => $datadecoded["roundId"],
-                    "payout_reason" => null,
-                    "win" => $win,
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                $createGametransaction = array(
+                    "win" =>round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 0 : 1,
+                    "pay_amount" =>$game->pay_amount+round($datadecoded["amount"],2),
+                    "income" =>$game->income - round($datadecoded["amount"],2),
+                    "entry_id" =>round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
                 );
-                $game = WazdanHelper::getGameTransaction($datadecoded["user"]["token"],$datadecoded["roundId"]);
-                if(!$game){
-                    $gametransactionid=Helper::createGameTransaction('credit', $json_data, $game_details, $client_details); 
-                }
-                else{
-                    if($win == 0){
-                        $gameupdate = Helper::updateGameTransaction($game,$json_data,"debit");
-                    }else{
-                        $gameupdate = Helper::updateGameTransaction($game,$json_data,"credit");
-                    }
-                    $gametransactionid = $game->game_trans_id;
-                }
+                $game_transactionid = GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
+
                 //$transactionId= WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,2); 
                 $response = array(
                     "status" => 0,
@@ -328,11 +370,23 @@ class WazdanController extends Controller
                         "balance" => $client_details->balance + round($datadecoded["amount"],2)
                     )
                 );
+                $wingametransactionext = array(
+                    "game_trans_id" => $game->game_trans_id,
+                    "provider_trans_id" => $datadecoded["transactionId"],
+                    "round_id" => $datadecoded["roundId"],
+                    "amount" => round($datadecoded["amount"],2),
+                    "game_transaction_type"=>2,
+                    "provider_request" =>json_encode($datadecoded),
+                    "mw_response" => json_encode($response)
+                );
+                $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
         
                 $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
                         "provider" => 'wazdan',
+                        "game_transaction_ext_id" => $winGametransactionExtId,
+                        "client_connection_name" => $client_details->connection_name,
                     ],
                     "provider" => [
                         "provider_request" => $datadecoded, #R
@@ -340,7 +394,7 @@ class WazdanController extends Controller
                         "provider_round_id"=>$datadecoded["roundId"], #R
                     ],
                     "mwapi" => [
-                        "roundId"=>$gametransactionid, #R
+                        "roundId"=>$game->game_trans_id, #R
                         "type"=>2, #R
                         "game_id" => $game_details->game_id, #R
                         "player_id" => $client_details->player_id, #R
@@ -348,7 +402,7 @@ class WazdanController extends Controller
                     ]
                 ];
                 //$client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
-                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
