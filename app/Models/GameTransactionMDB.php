@@ -32,6 +32,7 @@ class GameTransactionMDB
     public static function getGameTransactionDataByProviderTransactionId($provider_transaction_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
+            Helper::saveLog('getGameTransactionDataByProviderTransactionId', 12, json_encode($connection), "createGametransaction");
             $select = "SELECT game_trans_ext_id,mw_response,round_id,game_trans_id,amount FROM ";
             $db = "{$connection['db_list'][0]}.game_transaction_ext ";
             $where = "where provider_trans_id='{$provider_transaction_id}' limit 1";
