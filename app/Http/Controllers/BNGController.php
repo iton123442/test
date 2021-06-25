@@ -11,7 +11,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
 use App\Models\GameTransactionMDB;
 use DB;
-class BNGControllerMDB extends Controller
+class BNGController extends Controller
 {
     protected $startTime;
     private $prefix = 22;
