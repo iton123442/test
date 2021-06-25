@@ -286,6 +286,12 @@ class GameTransactionMDB
         if ($type == 'game_transaction_ext_id') {
             $where = 'where gte.provider_trans_id = "' . $provider_identifier . '"';
         }
+        if ($type == 'provider_trans_id') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '"';
+        }
+        if ($type == 'game_trans_ext_id') {
+            $where = 'where gte.game_trans_ext_id = "' . $provider_identifier . '"';
+        }
         if ($type == 'game_trans_id') {
             $where = 'where gte.game_trans_id = "' . $provider_identifier . '"';
 
@@ -440,5 +446,37 @@ class GameTransactionMDB
     // }
 
 
+    # Queries That Query Default Server and Schema
+
+    /**
+     * Selector for provider who dont give the player details for other endpoints
+     * 
+     */
+    public  static function getProviderRoundTracer($provider_identifier, $type)
+    {
+        try {
+            if ($type == 'transaction_id') {
+                $where = 'where pt.provider_trans_id = "' . $provider_identifier . '" ';
+            }
+            if ($type == 'round_id') {
+                $where = 'where pt.round_id = "' . $provider_identifier . '" ';
+            }
+            $filter = 'LIMIT 1';
+            $query = DB::select('select * from provider_transactions as pt ' . $where . ' ' . $filter . '');
+            $data = count($query);
+            return $data > 0 ? $query[0] : 'false';
+        } catch (\Exception $e) {
+           return 'false';
+        }
+    }
+
+    /**
+     * Store the provider transaction identifier for selection later (Provider who dont send player details in the request body)
+     * 
+     */
+    public static function storeProviderRoundTracer($data){
+        return DB::table('provider_transactions')->insertGetId($data);
+    }
+    # END Queries That Query Default Server and Schema
 
 }
