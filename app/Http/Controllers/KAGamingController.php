@@ -487,7 +487,7 @@ class KAGamingController extends Controller
         }
         if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
-                ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 2);
+                // ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 2);
                 # NEW FLOW WIN
                 try {
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
