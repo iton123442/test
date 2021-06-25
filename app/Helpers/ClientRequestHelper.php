@@ -621,12 +621,11 @@ class ClientRequestHelper{
         }
     }
 
-    /**
+     /**
     *   @author FUNNTA
     *   ONLY FUNTA FUNDTRANSFER
     */
-    public static function fundTransferFunta($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array())
-    {
+    public static function fundTransferFunta($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
         $sendtoclient =  microtime(true);
         $client = new Client([
             'headers' => [ 
@@ -662,9 +661,13 @@ class ClientRequestHelper{
             ]
               ];
 
-            // if(count($action) > 0){
-            //     // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
-            // }
+
+            if(count($action) > 0){
+                // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
+                if(isset($action['provider_name'])){
+                    $requesttocient["gamedetails"]['provider_name'] = $action['provider_name'];
+                }
+            }
 
             try{
                 $guzzle_response = $client->post($client_details->fund_transfer_url,
@@ -677,7 +680,7 @@ class ClientRequestHelper{
                             Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
                         'body' => json_encode($requesttocient),
-                        'timeout' => '8.50'
+                        'timeout' => '5.00'
                     ],
                     ['defaults' => [ 'exceptions' => false ]]
                 );
@@ -688,10 +691,6 @@ class ClientRequestHelper{
                 //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
                 return $client_reponse;
             }catch(\Exception $e){
-                if($type == 'credit'){
-                    $game_details_id = providerHelper::getGameDetailsByCodeName($game_name, $game_code);
-                    Providerhelper::createRestrictGame($game_details_id->game_id,$client_details->player_id,$transactionId, $requesttocient);
-                }
                 $response = array(
                     "fundtransferresponse" => array(
                         "status" => array(

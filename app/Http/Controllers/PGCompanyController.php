@@ -7,6 +7,7 @@ use App\Helpers\ProviderHelper;
 use App\Helpers\Helper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
+use App\Models\GameTransactionMDB;
 use Carbon\Carbon;
 use DB;
 use Webpatser\Uuid\Uuid;
@@ -38,9 +39,9 @@ class PGCompanyController extends Controller
         Helper::saveLog('PGVirtual validate req', $this->provider_db_id, json_encode($request->all()), $auth_key."====".$game_session_token);
         if ($auth_key == $this->auth) {
             try {
-                $token = Helper::getPGVirtualPlayerGameRound($game_session_token);
+                $token = $this->getPGVirtualPlayerGameRound($game_session_token);
                 // $lang = Helper::getInfoPlayerGameRound($game_session_token);
-                $client_details = ProviderHelper::getClientDetails('token',$token->player_token);
+                $client_details = ProviderHelper::getClientDetails('token',$token->uuid_token);
                 $response = [
                     "status" => "1024",
                     "description" => "Success",
@@ -68,8 +69,8 @@ class PGCompanyController extends Controller
         Helper::saveLog('PGVirtual keepalive req', $this->provider_db_id, json_encode($request->all()), $auth_key."====".$game_session_token);
         if ($auth_key == $this->auth) {
             try {
-                $token = Helper::getPGVirtualPlayerGameRound($game_session_token);
-                $client_details = ProviderHelper::getClientDetails('token',$token->player_token);
+                $token = $this->getPGVirtualPlayerGameRound($game_session_token);
+                $client_details = ProviderHelper::getClientDetails('token',$token->uuid_token);
                 $response = [
                     "status" => "1024",
                     "description" => "Success",
@@ -93,10 +94,9 @@ class PGCompanyController extends Controller
             Helper::saveLog('PGVirtual placebet req', $this->provider_db_id, json_encode($request->all()), $auth_key."====".$game_session_token);
             if ($auth_key == $this->auth) {
                 $data = $request->all();
-                $game_round = Helper::getPGVirtualPlayerGameRound($game_session_token);
-                $client_details = ProviderHelper::getClientDetails('token',$game_round->player_token);
+                $game_round = $this->getPGVirtualPlayerGameRound($game_session_token);
+                $client_details = ProviderHelper::getClientDetails('token',$game_round->uuid_token);
                 //checking balance
-
                 $bet_amount = ($data["placeBet"]["amount"] / 100);
                 if ($bet_amount <= 0.00) {
                     $response = [
@@ -106,96 +106,143 @@ class PGCompanyController extends Controller
                     Helper::saveLog('PGVirtual not enought balance', $this->provider_db_id, json_encode($request->all()), $response);
                     return response($response,404)
                         ->header('Content-Type', 'application/json');
-
                 }
                 try{
-                    ProviderHelper::idenpotencyTable($this->prefix.'_'.$game_session_token.$data["placeBet"]["id"].'-B');
+                    ProviderHelper::idenpotencyTable($this->prefix.$data["placeBet"]["id"].'-B');
                 }catch(\Exception $e){
-                    $details = ProviderHelper::findGameExt($this->prefix.$data["placeBet"]["id"], 1, 'transaction_id');
-                    if ($details != "false") {
+                    $bet_transaction = GameTransactionMDB::findGameExt($this->prefix.$data["placeBet"]["id"], 1,'transaction_id', $client_details);
+                    if ($bet_transaction != 'false') {
+                        if ($bet_transaction->mw_response == 'null') {
+                            $response = [
+                                "status" => "404",
+                                "description" => "error",
+                            ];
+                            Helper::saveLog('SLOTMILL wager no response dubplicate', $this->provider_db_id, json_encode($request->all()), $response);
+                        }else {
+                            $response = $bet_transaction->mw_response;
+                        }
+
+                        Helper::saveLog('SLOTMILL wager duplicate_transaction', $this->provider_db_id, json_encode($request->all()), $response);
+                        return response($response,200)
+                        ->header('Content-Type', 'application/json');
+                        
+                    } else {
                         $response = [
-                            "status" => "1024",
-                            "description" => "Success",
+                            "status" => "404",
+                            "description" => "error",
                         ];
+                        Helper::saveLog('SLOTMILL wager not found dubplicate', $this->provider_db_id, json_encode($request->all()), $response);
                         return response($response,404)
                         ->header('Content-Type', 'application/json');
-                    }
-                    $response = [
-                        "status" => "404",
-                        "description" => "error",
-                    ];
-                    Helper::saveLog('PGVirtual BET duplicate_transaction', $this->provider_db_id, json_encode($request->all()),$response);
-                    return response($response,404)
-                        ->header('Content-Type', 'application/json');
+                    } 
                 }
-
                 $game_details = ProviderHelper::findGameID($game_round->game_id);
-                $game_code = $game_details->game_code;
-                $game_transaction_type = 1; // 1 Bet, 2 Win
-                $token_id = $client_details->token_id;
-                
-                $pay_amount = 0;
-                $income = 0;
-                $win_type = 0;
-                $method = 1;
-                $win_or_lost = 5; // 0 lost,  5 processing
-                $payout_reason = 'Bet';
                 $provider_trans_id = $this->prefix.$data["placeBet"]["id"];
-
-                $game_trans_id  = ProviderHelper::createGameTransaction($token_id, $game_details->game_id, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
-
-                $game_trans_ext_id = $this->createGameTransExt($game_trans_id,$provider_trans_id, $provider_trans_id, $bet_amount, $game_transaction_type, $data, $data_response = null, $requesttosend = null, $client_response = null, $data_response = null);
-
-
-                $general_details = ["aggregator" => [], "provider" => [], "client" => []];
+                $game_session_data = array(
+                    "game_session_token" => $game_session_token,
+                    "provider_transaction_id"  => $provider_trans_id,
+                    "game_id" => $game_details->game_id,
+                    "token_id" => $client_details->token_id,
+                    "status" => 1,
+                );
+                $this->createPlayerGameRoundSession($game_session_data);
+                    $gameTransactionData = array(
+                    "provider_trans_id" => $provider_trans_id,
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $provider_trans_id,
+                    "bet_amount" => $bet_amount,
+                    "win" => 5,
+                    "pay_amount" => 0,
+                    "income" => 0,
+                    "entry_id" =>1,
+                    "trans_status" =>1,
+                    "operator_id" => $client_details->operator_id,
+                    "client_id" => $client_details->client_id,
+                    "player_id" => $client_details->player_id,
+                );
+                $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+                $gameTransactionEXTData = array(
+                    "game_trans_id" => $game_trans_id,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" => $provider_trans_id,
+                    "amount" => $bet_amount,
+                    "game_transaction_type"=> 1,
+                    "provider_request" =>json_encode($request->all()),
+                );
+                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
                 try {
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
                 } catch (\Exception $e) {
                     $response = array(
                         "status" => "404",
                         "description" => "error",
                     );
-                    ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-                    ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 99);
-                    Helper::saveLog('PGVirtual BET FATAL ERROR' . $e->getMessage(), $this->provider_db_id, json_encode($request->all()), $response);
+                    $updateTransactionEXt = array(
+                        "mw_response" => json_encode($response),
+                        'mw_request' => json_encode("FAILED"),
+                        'client_response' => json_encode("FAILED"),
+                        "transaction_detail" => "FAILED",
+                        "general_details" =>"FAILED"
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    $updateGameTransaction = [
+                        "win" => 2,
+                        'trans_status' => 5
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+                    Helper::saveLog('PGVirtual BET FATAL ERROR', $this->provider_db_id, json_encode($request->all()), $response);
                     return response($response,404)
                         ->header('Content-Type', 'application/json');
                 }
-                
                 if (isset($client_response->fundtransferresponse->status->code)) {
-
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     switch ($client_response->fundtransferresponse->status->code) {
                         case "200":
-                            $num = $client_response->fundtransferresponse->balance;
                             $response = [
                                 "status" => "1024",
                                 "description" => "Success",
                             ];
-                            ProviderHelper::_insertOrUpdate($client_details->token_id, $num); 
-                            $this->updateGameTransactionExt(
-                                $game_trans_ext_id,
-                                $client_response->requestoclient,
-                                $response,
-                                $client_response->fundtransferresponse);
+                            $update_gametransactionext = array(
+                                "mw_response" =>json_encode($response),
+                                "mw_request"=>json_encode($client_response->requestoclient),
+                                "client_response" =>json_encode($client_response->fundtransferresponse),
+                                "transaction_detail" =>"success",
+                                "general_details" =>"success",
+                            );
+                            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
                             Helper::saveLog('PGVirtual BET success', $this->provider_db_id, json_encode($request->all()), $response);
                             return response($response,200)->header('Content-Type', 'application/json');
                             break;
-                        
-                        case "402":
+                        default:
                             $response = [
                                 "status" => "404",
                                 "description" => "error",
                             ];
-                            ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', $client_response, 'FAILED', $general_details);
-                            ProviderHelper::updateGameTransactionStatus($game_trans_id, 2, 99);
+                            $update_gametransactionext = array(
+                                "mw_response" =>json_encode($response),
+                                "mw_request"=>json_encode($client_response->requestoclient),
+                                "client_response" =>json_encode($client_response->fundtransferresponse),
+                                "transaction_detail" =>"FAILED",
+                                "general_details" =>"FAILED",
+                            );
+                            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
+                            $updateGameTransaction = [
+                                "win" => 2,
+                                'trans_status' => 5
+                            ];
+                            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
                             Helper::saveLog('PGVirtual BET not_enough_balance', $this->provider_db_id, json_encode($request->all()), $response);
-                            // ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
                             return response($response,404)->header('Content-Type', 'application/json');
-                            break;
                     }
                 }
-               
-
+            } else {
+                $response = [
+                    "status" => "404",
+                    "description" => "error",
+                ];
+                Helper::saveLog('PGVirtual BET AUTH', $this->provider_db_id, json_encode($request->all()), "NOT PARTNER");
+                return response($response,404)->header('Content-Type', 'application/json');
             }
         } catch (\Exception $e) {
             $response = [
@@ -214,93 +261,122 @@ class PGCompanyController extends Controller
         Helper::saveLog('PGVirtual cancelbet req', $this->provider_db_id, json_encode($request->all()), $auth_key."====".$game_session_token);
         if ($auth_key == $this->auth) {
             $data = $request->all();
-
-            $game_round = Helper::getPGVirtualPlayerGameRound($game_session_token);
-            $client_details = ProviderHelper::getClientDetails('token',$game_round->player_token);
-            $game_details = ProviderHelper::findGameID($game_round->game_id);
+            $token = $this->getPGVirtualPlayerGameRound($game_session_token);
+            $client_details = ProviderHelper::getClientDetails('token',$token->uuid_token);
             $ids = isset($data["cancelBet"]["ids"]) ? $data["cancelBet"]["ids"] : $data["cancelBet"]["ticketIds"];
             foreach ($ids as $ticketIds) {
-                try{
-                    ProviderHelper::idenpotencyTable($this->prefix.'_'.$game_session_token.$ticketIds."-C");
-                }catch(\Exception $e){
+                $bet_transation_id = $this->prefix.$ticketIds;
+                $getPlayerGameRoundSession = $this->getPlayerGameRoundSession($bet_transation_id);
+                if ($getPlayerGameRoundSession == 'false') {
                     $response = [
-                        "status" => "1024",
-                        "description" => "Success",
+                        "status" => "404",
+                        "description" => "BET NOT FOUND",
                     ];
-                    Helper::saveLog('PGVirtual Sync Bet already process', $this->provider_db_id, json_encode($request->all()), $response);
-                    return response($response,200)
-                        ->header('Content-Type', 'application/json');
+                    return response($response,200)->header('Content-Type', 'application/json');
                 }
-
-                $details = ProviderHelper::findGameExt($this->prefix.$ticketIds, 1, 'transaction_id');
-                if ($details != 'false') {
-
-                    $bet_transaction = ProviderHelper::findGameTransaction($details->game_trans_id, 'game_transaction');
-                    $game_transextension = $this->createGameTransExt($bet_transaction->game_trans_id,$this->prefix.$ticketIds, $this->prefix.$ticketIds, $bet_transaction->bet_amount, 3, $data, $data_response = null, $requesttosend = null, $client_response = null, $data_response = null);
-
-                    try {
-                        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_transaction->bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$details->game_trans_id,"credit","true");
-                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                    } catch (Exception $e) {
-                        $response = array(
-                            "status" => "404",
-                            "description" => "error",
+                if ($getPlayerGameRoundSession->status == 2) {
+                    $response = array(
+                        "status" => "404",
+                        "description" => "error",
+                    );
+                    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transation_id, 'round_id',false, $client_details);
+                    if ($bet_transaction != 'false') {
+                        $client_details->connection_name = $bet_transaction->connection_name;
+                        $gameTransactionEXTData = array(
+                            "game_trans_id" => $bet_transaction->game_trans_id,
+                            "provider_trans_id" => $getPlayerGameRoundSession->game_session_token,
+                            "round_id" => $bet_transation_id,
+                            "amount" => $bet_transaction->bet_amount,
+                            "game_transaction_type"=> 3,
+                            "provider_request" =>json_encode($request->all()),
+                            "mw_response" => json_encode($response),
+                            "mw_request"=> "DONT SENT TO CLIENT",
+                            "client_response" => "DONT SENT TO CLIENT",
+                            "transaction_detail" =>"DONT SENT TO CLIENT",
+                            "general_details" =>"DONT SENT TO CLIENT",
                         );
-                        ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-                        ProviderHelper::updateGameTransactionStatus($game_trans_id, 5, 6);
-                        Helper::saveLog('PGVirtual BET FATAL ERROR' . $e->getMessage(), $this->provider_db_id, json_encode($request->all()), $response);
-                        return response($response,404)
-                            ->header('Content-Type', 'application/json');
+                        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
                     }
-                    
-                    if (isset($client_response->fundtransferresponse->status->code)) {
-
-                        switch ($client_response->fundtransferresponse->status->code) {
-                            case "200":
-                                $request_data = [
-                                    'amount' => $bet_transaction->bet_amount,
-                                    'transid' => $this->prefix.$ticketIds,
-                                    'roundid' => $this->prefix.$ticketIds
-                                ];
-                                //update transaction
-                                Helper::updateGameTransaction($bet_transaction,$request_data,"refund");
-                                $response = [
-                                    "status" => "1024",
-                                    "description" => "Success",
-                                ];
-                                $this->updateGameTransactionExt(
-                                        $game_transextension,
-                                        $client_response->requestoclient,
-                                        $response,
-                                        $client_response->fundtransferresponse);
-                                Helper::saveLog('PGVirtual cancelbet success', $this->provider_db_id, json_encode($request->all()), $response);
-                                break;
-                            
-                            case "402":
-                                $response = [
-                                    "status" => "404",
-                                    "description" => "error",
-                                ];
-                                $general_details = [];
-                                ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $response, 'FAILED', $client_response, 'FAILED', $general_details);
-                                ProviderHelper::updateGameTransactionStatus($bet_transaction->game_trans_id, 5, 6);
-                                Helper::saveLog('PGVirtual BET not_enough_balance', $this->provider_db_id, json_encode($request->all()), $response);
-                                // ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
-                                return response($response,404)->header('Content-Type', 'application/json');
-                                break;
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }
+                try{
+                    ProviderHelper::idenpotencyTable($bet_transation_id.'-C');
+                }catch(\Exception $e){
+                    if ($getPlayerGameRoundSession->status == 3) {
+                        $bet_transaction = GameTransactionMDB::findGameExt($bet_transation_id, 3,'round_id', $client_details);
+                        if ($bet_transaction != 'false') {
+                            $response = [
+                                "status" => "1024",
+                                "description" => "Success",
+                            ];
+                            return response($response,200)
+                            ->header('Content-Type', 'application/json');
                         }
                     }
                     
-                } else {
-                    Helper::saveLog('PGVirtual cancelbet not found ', $this->provider_db_id, json_encode($request->all()), $this->prefix.$ticketIds);
+                }
+                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transation_id, 'round_id',false, $client_details);
+                $client_details->connection_name = $bet_transaction->connection_name;
+                $game_details = ProviderHelper::findGameID($bet_transaction->game_id);
+                $balance = $client_details->balance + $bet_transaction->bet_amount;
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+                $response = [
+                    "status" => "1024",
+                    "description" => "Success",
+                ];
+                $gameTransactionEXTData = array(
+                    "game_trans_id" => $bet_transaction->game_trans_id,
+                    "provider_trans_id" => $getPlayerGameRoundSession->game_session_token,
+                    "round_id" => $bet_transation_id,
+                    "amount" => $bet_transaction->bet_amount,
+                    "game_transaction_type"=> 3,
+                    "provider_request" =>json_encode($request->all()),
+                    "mw_response" => json_encode($response),
+                );
+                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+                $win =4;
+                $updateGameTransaction = [
+                    'win' => 5,
+                    'pay_amount' => $bet_transaction->bet_amount,
+                    'income' => 0,
+                    'entry_id' => 2,
+                    'trans_status' => 2
+                ];
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                $updatePlayerGameRoundSession = array(
+                    "status" => 3
+                );
+                $this->updatePlayerGameRoundSession($updatePlayerGameRoundSession,$getPlayerGameRoundSession->pg_id);
+                $body_details = [
+                    "type" => "credit",
+                    "win" => $win,
+                    "token" => $client_details->player_token,
+                    "rollback" => "true",
+                    "game_details" => [
+                        "game_id" => $game_details->game_id
+                    ],
+                    "game_transaction" => [
+                        "amount" =>$bet_transaction->bet_amount
+                    ],
+                    "connection_name" => $bet_transaction->connection_name,
+                    "game_trans_ext_id" => $game_trans_ext_id,
+                    "game_transaction_id" => $bet_transaction->game_trans_id
+
+                ];
+                try {
+                    $client = new Client();
+                    $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+                        [ 'body' => json_encode($body_details), 'timeout' => '2.00']
+                    );
+                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+                    return response($response,200)
+                            ->header('Content-Type', 'application/json');
+                } catch (\Exception $e) {
+                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+                    return response($response,200)
+                            ->header('Content-Type', 'application/json');
                 }
             }
-
-            $response = [
-                "status" => "1024",
-                "description" => "Success",
-            ];
-            return response($response,200)->header('Content-Type', 'application/json');
         }
         
     }
@@ -308,151 +384,106 @@ class PGCompanyController extends Controller
     public function syncbet(Request $request, $auth_key)
     {
         Helper::saveLog('PGVirtual syncbet req', $this->provider_db_id, json_encode($request->all()), $auth_key);
-
         if ($auth_key == $this->auth) {
             $data = $request->all();
             $bet_transation_id = $this->prefix.$data["syncBet"]["id"];
-
-            $status = $data["syncBet"]["status"];
-            $amount = round(($data["syncBet"]["amount_won"] / 100), 2);
-            
-            // $transaction_ext = ProviderHelper::findGameExt($bet_transation_id, 2, 'transaction_id');
-            // if ($transaction_ext != 'false') {
-            //     $response = [
-            //         "status" => "400",
-            //         "description" => "Sync Bet already process",
-            //     ];
-            //     Helper::saveLog('PGVirtual Sync Bet already process', $this->provider_db_id, json_encode($request->all()), $response);
-            //     return response($response,200)
-            //         ->header('Content-Type', 'application/json');
-            // }
-
-            try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["syncBet"]["id"]."-W");
-            }catch(\Exception $e){
+            $getPlayerGameRoundSession = $this->getPlayerGameRoundSession($bet_transation_id);
+            if ($getPlayerGameRoundSession == 'false') {
                 $response = [
-                    "status" => "1024",
-                    "description" => "Success",
+                    "status" => "404",
+                    "description" => "BET NOT FOUND",
                 ];
-                Helper::saveLog('PGVirtual Sync Bet already process', $this->provider_db_id, json_encode($request->all()), $response);
-                return response($response,200)
-                    ->header('Content-Type', 'application/json');
+                return response($response,200)->header('Content-Type', 'application/json');
             }
-            // $transaction_ext = ProviderHelper::findGameExt($bet_transation_id, 1, 'transaction_id'); 
-
-            $bet_transaction = ProviderHelper::findGameTransaction($bet_transation_id, 'transaction_id',1); 
-           
-            if ($bet_transaction != 'false') {
-                //GET BET TRANSACTION
-                try {
-                    //DEATILS FOR THE CLIENT REQUEST
-                    $client_details = ProviderHelper::getClientDetails('token_id',$bet_transaction->token_id);
-                    
-                    $game_details = ProviderHelper::findGameID($bet_transaction->game_id);
-                    //CREATE GAME EXTENSION
-                    $num = $client_details->balance + $amount;
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $num); 
-                    $response = [
-                        "status" => "1024",
-                        "description" => "Success",
-                    ];
-
-                    $game_trans_ext_id = $this->createGameTransExt($bet_transaction->game_trans_id,$bet_transation_id, $bet_transation_id, $amount, 2, $data, $response, $requesttosend = null, $client_response = null, $data_response = null);
-                    
-                    //Initialize data to pass
-                    $win = $amount > 0  ?  1 : 0;  /// 1win 0lost
-                    $type = $amount > 0  ? "credit" : "debit";
-                    $request_data = [
-                        'win' => 5,
-                        'amount' => $amount,
-                        'payout_reason' => ProviderHelper::updateReason(5),
-                    ];
-                    //update transaction
-                    Helper::updateGameTransaction($bet_transaction,$request_data,$type);
-                    $data = [];
-                    $body_details = [
-                        "type" => "credit",
-                        "win" => $win,
-                        "token" => $client_details->player_token,
-                        "rollback" => false,
-                        "game_details" => [
-                            "game_id" => $game_details->game_id
-                        ],
-                        "game_transaction" => [
-                            "provider_trans_id" => $bet_transation_id,
-                            "round_id" => $bet_transation_id,
-                            "amount" => $amount
-                        ],
-                        "provider_request" => $data,
-                        "provider_response" => $response,
-                        "game_trans_ext_id" => $game_trans_ext_id,
-                        "game_transaction_id" => $bet_transaction->game_trans_id
-
-                    ];
-                    try {
-                        $client = new Client();
-                        $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-fundtransferV2',
-                            [ 'body' => json_encode($body_details), 'timeout' => '3.00']
-                        );
-                        //THIS RESPONSE IF THE TIMEOUT NOT FAILED
-                        Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
-                        return response($response,200)
-                        ->header('Content-Type', 'application/json');
-                    } catch (\Exception $e) {
-                        Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+            $amount = ($data["syncBet"]["amount_won"] / 100);
+            $client_details = ProviderHelper::getClientDetails('token_id',$getPlayerGameRoundSession->token_id);
+            try{
+                ProviderHelper::idenpotencyTable($this->prefix.$data["syncBet"]["id"].'-W');
+            }catch(\Exception $e){
+                if ($getPlayerGameRoundSession->status == 2) {
+                    $bet_transaction = GameTransactionMDB::findGameExt($this->prefix.$data["syncBet"]["id"], 2,'round_id', $client_details);
+                    if ($bet_transaction != 'false') {
+                        $response = [
+                            "status" => "1024",
+                            "description" => "Success",
+                        ];
                         return response($response,200)
                         ->header('Content-Type', 'application/json');
                     }
-
-                } catch (\Exception $e) {
-                    $response = [
-                        "status" => "1024",
-                        "description" => "Success",
-                    ];
-                    Helper::saveLog('PGVirtual Sync Bet already fatal', $this->provider_db_id, json_encode($request->all()), $response);
-                    return response($response,200)
-                        ->header('Content-Type', 'application/json');
                 }
                 
-
-                // $type = "credit";
-                // $rollback = false;
-                
-                // $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$bet_transaction->game_id,$game_details->game_name,$game_trans_ext_id,$bet_transaction->game_trans_id,$type,$rollback);
-                // ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                // $win  = $status == "W" ? 1 : 0;  /// 1win 0lost
-                // $type = $status == "W" ? "credit" : "debit";
-                // $amount = $status == "L" ? 0 : $amount; 
-                // $request_data = [
-                //     'win' => $win,
-                //     'amount' => $amount,
-                //     'payout_reason' => ProviderHelper::updateReason($win),
-                // ];
-                // Helper::updateGameTransaction($bet_transaction,$request_data,$type);
-                // $response = [
-                //     "status" => "1024",
-                //     "description" => "Success",
-                // ];
-                // $this->updateGameTransactionExt(
-                //     $game_trans_ext_id,
-                //     $client_response->requestoclient,
-                //     $response,
-                //     $client_response->fundtransferresponse);
-
-                // Helper::saveLog('PGVirtual syncbet success', $this->provider_db_id, json_encode($request->all()), $response);
-                // return response($response,200)
-                //     ->header('Content-Type', 'application/json');
-            } else {
-                $response = [
-                    "status" => "404",
-                    "description" => "BET FAILED",
-                ];
-                Helper::saveLog('PGVirtual FAILED', $this->provider_db_id, json_encode($request->all()), $response);
-                return response($response,200)
-                    ->header('Content-Type', 'application/json');
             }
-            
-        }
+            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transation_id, 'round_id',false, $client_details);
+            $client_details->connection_name = $bet_transaction->connection_name;
+            $game_details = ProviderHelper::findGameID($bet_transaction->game_id);
+            $balance = $client_details->balance + $amount;
+            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+            $response = [
+                "status" => "1024",
+                "description" => "Success",
+            ];
+            $gameTransactionEXTData = array(
+                "game_trans_id" => $bet_transaction->game_trans_id,
+                "provider_trans_id" => $getPlayerGameRoundSession->game_session_token,
+                "round_id" => $bet_transation_id,
+                "amount" => $amount,
+                "game_transaction_type"=> 2,
+                "provider_request" =>json_encode($request->all()),
+                "mw_response" => json_encode($response),
+            );
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            $win = $amount > 0 ? 1 : 0;
+            $updateGameTransaction = [
+                'win' => 5,
+                'pay_amount' => $amount,
+                'income' => $bet_transaction->bet_amount - $amount,
+                'entry_id' => $amount > 0 ? 2 : 1,
+                'trans_status' => 2
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+            $updatePlayerGameRoundSession = array(
+                "status" => 2
+            );
+            $this->updatePlayerGameRoundSession($updatePlayerGameRoundSession,$getPlayerGameRoundSession->pg_id);
+            $body_details = [
+                "type" => "credit",
+                "win" => $win,
+                "token" => $client_details->player_token,
+                "rollback" => false,
+                "game_details" => [
+                    "game_id" => $game_details->game_id
+                ],
+                "game_transaction" => [
+                    "amount" => $amount
+                ],
+                "connection_name" => $bet_transaction->connection_name,
+                "game_trans_ext_id" => $game_trans_ext_id,
+                "game_transaction_id" => $bet_transaction->game_trans_id
+
+            ];
+            try {
+                $client = new Client();
+                $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+                    [ 'body' => json_encode($body_details), 'timeout' => '2.00']
+                );
+                //THIS RESPONSE IF THE TIMEOUT NOT FAILED
+                Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+                return response($response,200)
+                        ->header('Content-Type', 'application/json');
+            } catch (\Exception $e) {
+                Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+                return response($response,200)
+                        ->header('Content-Type', 'application/json');
+            }
+        } else {
+            $response = [
+                "status" => "404",
+                "description" => "AUTH NOT FOUND",
+            ];
+            Helper::saveLog('PGVirtual Sync AUTH NOT FOUND', $this->provider_db_id, json_encode($request->all()), $response);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');
+        } 
         
     }
 
@@ -466,21 +497,20 @@ class PGCompanyController extends Controller
             $ids = isset($data["payBet"]["ids"]) ? $data["payBet"]["ids"] : $data["payBet"]["ticketIds"];
             foreach ($ids as $ticketIds) {
                 $bet_transation_id = $this->prefix.$ticketIds;
-                $transaction_ext = ProviderHelper::findGameExt($bet_transation_id, 2, 'transaction_id');
-                if ($transaction_ext == 'false') {
-                    $transaction_ext = ProviderHelper::findGameExt($bet_transation_id, 3, 'transaction_id');
-                    if ($transaction_ext == 'false') {
+                $getPlayerGameRoundSession = $this->getPlayerGameRoundSession($bet_transation_id);
+                if ($getPlayerGameRoundSession != 'false') {
+                    if ($getPlayerGameRoundSession->status == 1) {
                         array_push($array, $ticketIds);
                         $bool = true;
                     }
                 }
             }
             if ($bool) {
-               $response = [
+                $response = [
                     "status" => "402",
                     "description" => $array,
                 ];
-                Helper::saveLog('PGVirtual '.$ids, $this->provider_db_id, json_encode($request->all()), $response);
+                Helper::saveLog('PGVirtual pay_error', $this->provider_db_id, json_encode($request->all()), $response);
                 return response($response,200)
                         ->header('Content-Type', 'application/json');
             } else {
@@ -496,31 +526,22 @@ class PGCompanyController extends Controller
         }
     }
 
-    public static function createGameTransExt($game_trans_id, $provider_trans_id, $round_id, $amount, $game_type, $provider_request, $mw_response, $mw_request, $client_response, $transaction_detail){
-        $gametransactionext = array(
-            "game_trans_id" => $game_trans_id,
-            "provider_trans_id" => $provider_trans_id,
-            "round_id" => $round_id,
-            "amount" => $amount,
-            "game_transaction_type"=>$game_type,
-            "provider_request" => json_encode($provider_request),
-            "mw_response" =>json_encode($mw_response),
-            "mw_request"=>json_encode($mw_request),
-            "client_response" =>json_encode($client_response),
-            "transaction_detail" =>json_encode($transaction_detail)
-        );
-        $gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-        return $gamestransaction_ext_ID;
+    public static function getPGVirtualPlayerGameRound($game_session_token){
+        $token = DB::select("SELECT player_token,game_id,uuid_token FROM player_game_rounds WHERE player_token = '".$game_session_token."' ");
+        $data_rows = count($token);
+        return $data_rows > 0? $token[0] : 'false';
     }
 
-    public static function updateGameTransactionExt($gametransextid,$mw_request,$mw_response,$client_response){
-        $gametransactionext = array(
-            "mw_request"=>json_encode($mw_request),
-            "mw_response" =>json_encode($mw_response),
-            "client_response" =>json_encode($client_response),
-            "transaction_detail" => "success",
-        );
-        DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
+    public static function getPlayerGameRoundSession($ticketIds){
+        $token = DB::select("SELECT game_session_token,provider_transaction_id,game_id,token_id,status,pg_id FROM pgvirtual_game_round WHERE provider_transaction_id = '".$ticketIds."' ");
+        $data_rows = count($token);
+        return $data_rows > 0? $token[0] : 'false';
     }
+    public static function updatePlayerGameRoundSession($data,$pg_id){
+        DB::table('pgvirtual_game_round')->where('pg_id',$pg_id)->update($data);
+    }
+    public static function createPlayerGameRoundSession($data){
+        return DB::table('pgvirtual_game_round')->insertGetId($data);
+    }   
 
 }
