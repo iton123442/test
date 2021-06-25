@@ -145,7 +145,6 @@ class BNGController extends Controller
 
     private function _transaction($data,$client_details){
         Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $data]), "");
-        $game_transaction = GameTransactionMDB::getGameTransactionDataByProviderTransactionId($data["uid"],$client_details);
         try{
             ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["uid"]);
         }catch(\Exception $e){
