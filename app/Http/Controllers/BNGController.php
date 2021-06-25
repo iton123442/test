@@ -10,6 +10,7 @@ use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
 use App\Models\GameTransactionMDB;
+use App\Models\GameTransaction;
 use DB;
 class BNGController extends Controller
 {
