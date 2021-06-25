@@ -207,6 +207,20 @@ class FundtransferProcessorController extends Controller
                                 $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                             }
+                            elseif($payload->action->custom->provider == 'sagaming'){
+                                if(!isset($payload->action->custom->update_transaction)){
+                                    $updateGameTransaction = [
+                                        "pay_amount" => $payload->action->custom->pay_amount,
+                                        "income" =>  $payload->action->custom->income,
+                                        "win" => $payload->action->custom->win_or_lost,
+                                        "entry_id" => $payload->action->custom->entry_id,
+                                        "trans_status" => 2,
+                                    ];
+                                }
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                            }
                             elseif($payload->action->custom->provider == 'evolution'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
                             }
