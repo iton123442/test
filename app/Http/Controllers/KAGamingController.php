@@ -380,10 +380,14 @@ class KAGamingController extends Controller
         }
 
         // $game_ext_check = KAHelper::findGameExt($round_id, 1, 'round_id');
-        $game_ext_check = GameTransactionMDB::findGameExt($round_id, 2,'round_id', $client_details);
+        $game_ext_check = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
         if($game_ext_check != 'false'){ // Duplicate transaction
             if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){
-                return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
+               // If Round has refund dont filter duplicate (PROCESS THE DATA)
+               $game_ext_check_is_refund_success = GameTransactionMDB::findGameExt($round_id, 3, 'round_id', $client_details);
+               if($game_ext_check_is_refund_success == 'false'){
+                   return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
+               }
             }
         }
 
