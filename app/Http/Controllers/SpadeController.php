@@ -160,7 +160,7 @@ class SpadeController extends Controller
 		if ($game_details == null) {
 			$response = [
 				"msg" => "System Error",
-				"code" => 1
+				"code" => 134444
 			];
 			Helper::saveLog('Spade '.$header['API'].'', $this->provider_db_id,  json_encode($details), $response);
 			return $response;
