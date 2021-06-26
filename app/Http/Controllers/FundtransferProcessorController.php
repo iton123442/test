@@ -124,144 +124,152 @@ class FundtransferProcessorController extends Controller
                     if($re_attempt == true){
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($requesttocient), "RE_ATTEMPT");
                     }
-                    $guzzle_response = $client->post($payload->header->endpoint,
-                    [
-                        'on_stats' => function (TransferStats $stats) use ($requesttocient){
-                            $data = [
-                                'http_body' => $stats->getHandlerStats(),
-                                'request_body' => $requesttocient
-                            ];
-                            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($data), $stats->getTransferTime() .' TG_SUCCESS');
-                        },
-                        'body' => json_encode($requesttocient)
-                    ],
-                    ['defaults' => [ 'exceptions' => false ]]
-                    );
-                    $client_response = json_decode($guzzle_response->getBody()->getContents());
 
-                    if(isset($client_response->fundtransferresponse->status->code) 
-                    && $client_response->fundtransferresponse->status->code == "200"){
-                        $is_succes = true;
-                        Providerhelper::deleteGameRestricted('id', $restrict_id);
-                        if($re_attempt == true){
-                            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($requesttocient), "RE_ATTEMPT_SUCCESS");
-                        }
-                        # NOTE DEBIT AND CREDIT SOMETIMES HAS DIFFERENT WAY OF UPDATING JUST USE YOUR CUSTOM!!
+                    try {
+                            $guzzle_response = $client->post($payload->header->endpoint,
+                            [
+                                'on_stats' => function (TransferStats $stats) use ($requesttocient){
+                                    $data = [
+                                        'http_body' => $stats->getHandlerStats(),
+                                        'request_body' => $requesttocient
+                                    ];
+                                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($data), $stats->getTransferTime() .' TG_SUCCESS');
+                                },
+                                'timeout' => 3, // 3 Seconds
+                                'body' => json_encode($requesttocient)
+                            ],
+                            ['defaults' => [ 'exceptions' => false ]]
+                            );
+                            $client_response = json_decode($guzzle_response->getBody()->getContents());
 
-                        # You can add your own helper for custom gametransaction update like general_details etc!
-                        # If you dont want to use custom update change payload type to general!
-                        if($payload->action->type == 'custom'){
-                            if($payload->action->custom->provider == 'allwayspin'){
-                                # No need to update my gametransaction data :) 1 way flight, only the gametransaction extension
-                                // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                                // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
-                                $updateGameTransaction = [
-                                    "pay_amount" => $payload->action->custom->pay_amount,
-                                    "income" =>  $payload->action->custom->income,
-                                    "win" => $payload->action->custom->win_or_lost,
-                                    "entry_id" => $payload->action->custom->entry_id,
-                                    "trans_status" => 2,
-                                ];
-                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
-                            }
-                            elseif($payload->action->custom->provider == 'kagaming'){
-                                // if($payload->action->custom->is_multiple){
-                                //     ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income, $payload->action->custom->win_or_lost, $payload->action->custom->entry_id, 'game_trans_id',$payload->action->custom->bet_amount,$multi_bet=true);
-                                // }else{
-                                //     ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
-                                // }
-                                // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                            if(isset($client_response->fundtransferresponse->status->code) 
+                            && $client_response->fundtransferresponse->status->code == "200"){
+                                $is_succes = true;
+                                Providerhelper::deleteGameRestricted('id', $restrict_id);
+                                if($re_attempt == true){
+                                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($requesttocient), "RE_ATTEMPT_SUCCESS");
+                                }
+                                # NOTE DEBIT AND CREDIT SOMETIMES HAS DIFFERENT WAY OF UPDATING JUST USE YOUR CUSTOM!!
 
-                                if(isset($payload->action->custom->is_multiple) && $payload->action->custom->is_multiple == true){
+                                # You can add your own helper for custom gametransaction update like general_details etc!
+                                # If you dont want to use custom update change payload type to general!
+                                if($payload->action->type == 'custom'){
+                                    if($payload->action->custom->provider == 'allwayspin'){
+                                        # No need to update my gametransaction data :) 1 way flight, only the gametransaction extension
+                                        // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                        // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
                                         $updateGameTransaction = [
-                                            "bet_amount" => $payload->action->custom->bet_amount,
                                             "pay_amount" => $payload->action->custom->pay_amount,
                                             "income" =>  $payload->action->custom->income,
                                             "win" => $payload->action->custom->win_or_lost,
                                             "entry_id" => $payload->action->custom->entry_id,
                                             "trans_status" => 2,
                                         ];
-                                    ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                        ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                        $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                        ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                    }
+                                    elseif($payload->action->custom->provider == 'kagaming'){
+                                        // if($payload->action->custom->is_multiple){
+                                        //     ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income, $payload->action->custom->win_or_lost, $payload->action->custom->entry_id, 'game_trans_id',$payload->action->custom->bet_amount,$multi_bet=true);
+                                        // }else{
+                                        //     ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                        // }
+                                        // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+
+                                        if(isset($payload->action->custom->is_multiple) && $payload->action->custom->is_multiple == true){
+                                                $updateGameTransaction = [
+                                                    "bet_amount" => $payload->action->custom->bet_amount,
+                                                    "pay_amount" => $payload->action->custom->pay_amount,
+                                                    "income" =>  $payload->action->custom->income,
+                                                    "win" => $payload->action->custom->win_or_lost,
+                                                    "entry_id" => $payload->action->custom->entry_id,
+                                                    "trans_status" => 2,
+                                                ];
+                                            ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                        }else{
+                                            $updateGameTransaction = [
+                                                "pay_amount" => $payload->action->custom->pay_amount,
+                                                "income" =>  $payload->action->custom->income,
+                                                "win" => $payload->action->custom->win_or_lost,
+                                                "entry_id" => $payload->action->custom->entry_id,
+                                                "trans_status" => 2,
+                                            ];
+                                            ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                        }
+                                        $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response)];
+                                        ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                    }
+                                    elseif($payload->action->custom->provider == 'evoplay'){
+                                        // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                        // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                        $updateGameTransaction = [
+                                            "pay_amount" => $payload->action->custom->pay_amount,
+                                            "income" =>  $payload->action->custom->income,
+                                            "win" => $payload->action->custom->win_or_lost,
+                                            "entry_id" => $payload->action->custom->entry_id,
+                                            "trans_status" => 2,
+                                        ];
+                                        ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                        $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                        ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                    }
+                                    elseif($payload->action->custom->provider == 'sagaming'){
+                                        if(!isset($payload->action->custom->update_transaction)){
+                                            $updateGameTransaction = [
+                                                "pay_amount" => $payload->action->custom->pay_amount,
+                                                "income" =>  $payload->action->custom->income,
+                                                "win" => $payload->action->custom->win_or_lost,
+                                                "entry_id" => $payload->action->custom->entry_id,
+                                                "trans_status" => 2,
+                                            ];
+                                        }
+                                        ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                        $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                        ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                    }
+                                    elseif($payload->action->custom->provider == 'evolution'){
+                                        $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                    }
+                                    elseif($payload->action->custom->provider == 'bng'){
+                                        $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                    }
+                                    elseif($payload->action->custom->provider == 'wazdan'){
+                                        $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                    }
+                                    elseif($payload->action->custom->provider == 'icg'){
+                                        $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                    }
+                                    elseif ($payload->action->custom->provider == 'MannaPlay') {
+                                        $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                        ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                        
+                                    }elseif ($payload->action->custom->provider == 'OnlyPlay') {
+                                        Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 696969, json_encode($client_response), 'Only play abot na');
+                                        $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                        ProviderHelper::updateGameTransactionFlowStatus($payload->action->mwapi->roundId, 3);
+                                        // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                        
+                                    }
+                                    if($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
+                                        $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                    }
                                 }else{
-                                    $updateGameTransaction = [
-                                        "pay_amount" => $payload->action->custom->pay_amount,
-                                        "income" =>  $payload->action->custom->income,
-                                        "win" => $payload->action->custom->win_or_lost,
-                                        "entry_id" => $payload->action->custom->entry_id,
-                                        "trans_status" => 2,
-                                    ];
-                                    ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                    # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!
+                                    $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
                                 }
-                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response)];
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 200, json_encode($requesttocient), " TG_DB_UPDATED");
+                            }elseif(isset($client_response->fundtransferresponse->status->code) 
+                            && $client_response->fundtransferresponse->status->code == "402"){
+                                $api_error = false; // true if stop on API CODE 402, false re rerun the 5 times resend
+                                $re_attempt = true;
+                                Providerhelper::criticalGameRestriction($restrict_id);
+                                Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
                             }
-                            elseif($payload->action->custom->provider == 'evoplay'){
-                                // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                                // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
-                                $updateGameTransaction = [
-                                    "pay_amount" => $payload->action->custom->pay_amount,
-                                    "income" =>  $payload->action->custom->income,
-                                    "win" => $payload->action->custom->win_or_lost,
-                                    "entry_id" => $payload->action->custom->entry_id,
-                                    "trans_status" => 2,
-                                ];
-                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
-                            }
-                            elseif($payload->action->custom->provider == 'sagaming'){
-                                if(!isset($payload->action->custom->update_transaction)){
-                                    $updateGameTransaction = [
-                                        "pay_amount" => $payload->action->custom->pay_amount,
-                                        "income" =>  $payload->action->custom->income,
-                                        "win" => $payload->action->custom->win_or_lost,
-                                        "entry_id" => $payload->action->custom->entry_id,
-                                        "trans_status" => 2,
-                                    ];
-                                }
-                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
-                            }
-                            elseif($payload->action->custom->provider == 'evolution'){
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
-                            }
-                            elseif($payload->action->custom->provider == 'bng'){
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
-                            }
-                            elseif($payload->action->custom->provider == 'wazdan'){
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
-                            }
-                            elseif($payload->action->custom->provider == 'icg'){
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
-                            }
-                            elseif ($payload->action->custom->provider == 'MannaPlay') {
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                                ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
-                                
-                            }elseif ($payload->action->custom->provider == 'OnlyPlay') {
-                                Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 696969, json_encode($client_response), 'Only play abot na');
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                                ProviderHelper::updateGameTransactionFlowStatus($payload->action->mwapi->roundId, 3);
-                                // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
-                                
-                            }
-                            if($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                            }
-                        }else{
-                            # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!
-                            $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                        }
-                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 200, json_encode($requesttocient), " TG_DB_UPDATED");
-                    }elseif(isset($client_response->fundtransferresponse->status->code) 
-                    && $client_response->fundtransferresponse->status->code == "402"){
-                        $api_error = false; // true if stop on API CODE 402, false re rerun the 5 times resend
-                        $re_attempt = true;
-                        Providerhelper::criticalGameRestriction($restrict_id);
-                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
+                    } catch (\Exception $e) {
+                         // Catch Time Out
+                         $re_attempt = true;
+                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
                     }
                 }catch(\Exception $e){
                     # Only HTTP Error Should Be Resended
