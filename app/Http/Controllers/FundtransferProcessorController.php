@@ -260,11 +260,34 @@ class FundtransferProcessorController extends Controller
                     && $client_response->fundtransferresponse->status->code == "402"){
                         $api_error = false; // true if stop on API CODE 402, false re rerun the 5 times resend
                         $re_attempt = true;
+                        if($payload->action->custom->provider == 'bng'){
+                            $updateGameTransaction = [
+                                "win" => 5,
+                            ];
+                            ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                        }
+                        Providerhelper::criticalGameRestriction($restrict_id);
+                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
+                    }else{
+                        $api_error = false; // true if stop on API CODE not 402, false re rerun the 5 times resend
+                        $re_attempt = true;
+                        if($payload->action->custom->provider == 'bng'){
+                            $updateGameTransaction = [
+                                "win" => 5,
+                            ];
+                            ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                        }
                         Providerhelper::criticalGameRestriction($restrict_id);
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
                     }
                 }catch(\Exception $e){
                     # Only HTTP Error Should Be Resended
+                    if($payload->action->custom->provider == 'bng'){
+                        $updateGameTransaction = [
+                            "win" => 5,
+                        ];
+                        ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                    }
                     $re_attempt = true;
                     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
                     // Providerhelper::createRestrictGame($payload->action->mwapi->game_id,$payload->action->mwapi->player_id,$gteid, $requesttocient);
