@@ -156,7 +156,9 @@ class SpadeController extends Controller
 			return $response;
 		}
 
-		$game_details = $this->findGameDetails('game_code', $this->provider_db_id, $details->gameCode);
+		// 59 = subprovider Spade Gaming
+		// $game_details = $this->findGameDetails('game_code', $this->provider_db_id, $details->gameCode);
+		$game_details = $this->findGameDetails('game_code', 59, $details->gameCode);
 		if ($game_details == null) {
 			$response = [
 				"msg" => "System Error",

@@ -260,34 +260,11 @@ class FundtransferProcessorController extends Controller
                     && $client_response->fundtransferresponse->status->code == "402"){
                         $api_error = false; // true if stop on API CODE 402, false re rerun the 5 times resend
                         $re_attempt = true;
-                        if($payload->action->custom->provider == 'bng'){
-                            $updateGameTransaction = [
-                                "win" => 5,
-                            ];
-                            ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                        }
-                        Providerhelper::criticalGameRestriction($restrict_id);
-                        Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
-                    }else{
-                        $api_error = false; // true if stop on API CODE not 402, false re rerun the 5 times resend
-                        $re_attempt = true;
-                        if($payload->action->custom->provider == 'bng'){
-                            $updateGameTransaction = [
-                                "win" => 5,
-                            ];
-                            ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                        }
                         Providerhelper::criticalGameRestriction($restrict_id);
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
                     }
                 }catch(\Exception $e){
                     # Only HTTP Error Should Be Resended
-                    if($payload->action->custom->provider == 'bng'){
-                        $updateGameTransaction = [
-                            "win" => 5,
-                        ];
-                        ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                    }
                     $re_attempt = true;
                     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
                     // Providerhelper::createRestrictGame($payload->action->mwapi->game_id,$payload->action->mwapi->player_id,$gteid, $requesttocient);
@@ -675,77 +652,6 @@ class FundtransferProcessorController extends Controller
 
     public static function deleteGameRestrictedGame($identifier){
         DB::select('delete from game_player_restriction where game_trans_ext_id = '.$identifier.' ');
-    }
-
-
-     public function bgFundTransferV2MultiDB(Request $request){
-        $details = json_decode(file_get_contents("php://input"), true);
-        // Helper::saveLog('backgroundProcesstFund', 88, json_encode($details), "ENDPOINT HIT");
-        $client_details = ProviderHelper::getClientDetails('token', $details["token"]);
-        $game_details = Game::findbyid($details["game_details"]["game_id"]);
-
-        $amount = $details["game_transaction"]["amount"]; // amount should be fixed after sending data
-
-        $game_trans_ext_id = $details["game_trans_ext_id"];
-        $game_transaction_id = $details["game_transaction_id"];
-        $connection_name = $details["connection_name"];
-        $client_details->connection_name = $connection_name;
-        $type = $details["type"];
-
-        $is_not_proceess = false;
-
-        // FIVE ATTEMPT IF NOT sucess then stop if failed 5
-        $attempt_count = 1;
-        $is_succes = false;
-
-        $fund_extra_data = [
-            'provider_name' => $game_details->provider_name
-        ];
-
-        do {
-            
-            try {
-                $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, $type, $details["rollback"], $fund_extra_data );
-            } catch (\Exception $e) {
-                $is_succes = true;
-            }
-            if (isset($client_response->fundtransferresponse->status->code)) {
-
-                    switch ($client_response->fundtransferresponse->status->code) {
-                        case '200':
-                             $updateTransactionEXt = array(
-                                'mw_request' => json_encode($client_response->requestoclient),
-                                'client_response' => json_encode($client_response->fundtransferresponse),
-                                'transaction_detail' => 'success',
-                                'general_details' => 'success',
-                            );
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                            $updateGameTransaction = [
-                                'win' => $details["win"]
-                            ];
-                            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
-                            Helper::saveLog("success", $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
-                            $is_succes = true;
-                            break;
-                        default:
-                            $updateTransactionEXt = array(
-                                'mw_request' => json_encode($client_response->requestoclient),
-                                'client_response' => json_encode($client_response->fundtransferresponse),
-                                'transaction_detail' => 'NEED TO SETTLEMENT',
-                                'general_details' => 'NEED TO SETTLEMENT',
-                            );
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                            Helper::saveLog("bad response attempt_count = " . $attempt_count , $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
-                    }
-            }
-
-            if($attempt_count++ == 10){ // if the last five attempt not success will be stop requesting
-                $is_succes = true;
-            } 
-        } while (!$is_succes);
-
-        $response =[ "status" => "ok" , "msg" => "proccess complete"];
-        return $response;
     }
    
 }
