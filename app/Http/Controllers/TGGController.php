@@ -29,16 +29,16 @@ class TGGController extends Controller
 	public function index(Request $request){
 		Helper::saveLog('TGG index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
 
-		$signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'check_signature');
+		// $signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'check_signature');
 		
-		if($signature_checker == 'false'):
-			$msg = array(
-						"status" => 'error',
-						"error" => ["scope" => "user","no_refund" => 1,"message" => "Signature is invalid!"]
-					);
-			Helper::saveLog('TGG Signature Failed '.$request->name, $this->provider_db_id, json_encode($request->all()), $msg);
-			return $msg;
-		endif;
+		// if($signature_checker == 'false'):
+		// 	$msg = array(
+		// 				"status" => 'error',
+		// 				"error" => ["scope" => "user","no_refund" => 1,"message" => "Signature is invalid!"]
+		// 			);
+		// 	Helper::saveLog('TGG Signature Failed '.$request->name, $this->provider_db_id, json_encode($request->all()), $msg);
+		// 	return $msg;
+		// endif;
 
 
 		$client_details = ProviderHelper::getClientDetails('token',$request["token"]);
