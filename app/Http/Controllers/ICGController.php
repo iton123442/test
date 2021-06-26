@@ -387,15 +387,15 @@ class ICGController extends Controller
                     ];
                     $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit",true,$fund_extra_data);
-                    $balance = round($client_response->fundtransferresponse->balance,2);
                     if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
+                            $balance = round($client_response->fundtransferresponse->balance,2);
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                             // Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,"OK",$client_response);
                             $dataToUpdate = array(
                                 "mw_response" => json_encode("OK")
                             );
-                            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$winGametransactionExtId,$client_details);
                             return response("OK",200)
                                 ->header('Content-Type', 'application/json');
                     }
