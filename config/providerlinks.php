@@ -1,6 +1,6 @@
 <?php
 
-$middleware_url_api = 'https://api.betrnk.games';
+$middleware_url_api = 'https://apiv2.betrnk.games';
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play.betrnk.games';
 
