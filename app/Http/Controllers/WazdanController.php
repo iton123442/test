@@ -116,6 +116,7 @@ class WazdanController extends Controller
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
             }catch(\Exception $e){
+                $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                 $msg = array(
                     "status" => 0,
                     "funds" => array(
@@ -229,6 +230,7 @@ class WazdanController extends Controller
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_3');
                 }catch(\Exception $e){
+                    $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
@@ -339,6 +341,7 @@ class WazdanController extends Controller
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_2');
                 }catch(\Exception $e){
+                    $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
