@@ -152,7 +152,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>(string)$client_details->balance,
+                        "value" =>"0.00",
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                     "error" => array(
@@ -189,7 +189,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>(string)$client_details->balance,
+                        "value" =>"0.00",
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                     "error" => array(
