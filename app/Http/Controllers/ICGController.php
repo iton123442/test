@@ -316,11 +316,12 @@ class ICGController extends Controller
                 }
                 elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
+                    $balance = round(0*100,2);
                     $response =array(
                         "data" => array(
                             "statusCode"=>2,
                             "username" => $client_details->username,
-                            "balance" =>round(0*100,2),
+                            "balance" =>$balance,
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                         "error" => array(
