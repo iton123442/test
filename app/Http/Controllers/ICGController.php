@@ -320,7 +320,7 @@ class ICGController extends Controller
                         "data" => array(
                             "statusCode"=>2,
                             "username" => $client_details->username,
-                            "balance" =>$balance,
+                            "balance" =>round(0*100,2),
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                         "error" => array(
