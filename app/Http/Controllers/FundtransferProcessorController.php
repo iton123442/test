@@ -720,7 +720,7 @@ class FundtransferProcessorController extends Controller
                             );
                             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                             $updateGameTransaction = [
-                                'win' => $details["win"]
+                                'win' => $details["win"],
                             ];
                             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
                             Helper::saveLog("success", $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
