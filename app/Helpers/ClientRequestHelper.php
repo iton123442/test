@@ -127,7 +127,7 @@ class ClientRequestHelper{
                 Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);
                 try{
                     $dataToUpdate = array(
-                        "client_response" => json_encode($client_reponse),
+                        "client_response" => json_encode($e->getMessage().' '.$e->getLine()),
                         "mw_request" => json_encode($requesttocient),
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
