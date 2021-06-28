@@ -583,6 +583,10 @@ return [
         'api_url' => 'https://int.onlyplay.net/api/get_frame',
         'secret_key' => '1a8dNxc7NmZd688z86xRBrfyQbX1mxsW',
     ],
+    'toptrendgaming' => [
+        'provider_db_id' => 57,
+        'api_url' => 'https://ams5-api.ttms.co:8443/cip/gametoken/',
+    ],
     'ozashiki'=>[
         'PROVIDER_ID' => 58,
         'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/tigergame/authenticate/auth_token',
