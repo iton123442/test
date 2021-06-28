@@ -525,14 +525,14 @@ class KAGamingController extends Controller
                         ## update on update transaction first Comment This If you want to rely on cut call
                         // ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id,'game_trans_id',$bet_amount,$multi_bet=true);
 
-                        $updateGameTransaction = [
-                            "bet_amount" => $bet_amount,
-                            "pay_amount" => $pay_amount,
-                            "income" =>  $income,
-                            "win" => $win_or_lost,
-                            "entry_id" => $entry_id,
-                        ];
-                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                        // $updateGameTransaction = [
+                        //     "bet_amount" => $bet_amount,
+                        //     "pay_amount" => $pay_amount,
+                        //     "income" =>  $income,
+                        //     "win" => $win_or_lost,
+                        //     "entry_id" => $entry_id,
+                        // ];
+                        // GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
                     }else{
                         $pay_amount = $win_amount;
                         $income = $bet_amount - $pay_amount;
@@ -548,13 +548,13 @@ class KAGamingController extends Controller
 
                         ## update on update transaction first Comment This If you want to rely on cut call
                         // ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
-                        $updateGameTransaction = [
-                            "pay_amount" => $pay_amount,
-                            "income" =>  $income,
-                            "win" => $win_or_lost,
-                            "entry_id" => $entry_id,
-                        ];
-                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                        // $updateGameTransaction = [
+                        //     "pay_amount" => $pay_amount,
+                        //     "income" =>  $income,
+                        //     "win" => $win_or_lost,
+                        //     "entry_id" => $entry_id,
+                        // ];
+                        // GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
                     }
 
                     # Exclude from cut call auto generate EXT
