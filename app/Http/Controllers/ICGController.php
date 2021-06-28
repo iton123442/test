@@ -447,7 +447,7 @@ class ICGController extends Controller
                 //     "payout_reason" => null,
                 //     "win" => $win,
                 // );
-                $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($request->token,$json["transactionId"],$client_details);
+                $game = GameTransactionMDB::getGameTransactionByRoundId($json["transactionId"],$client_details);
                 if($game){
                     $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $json["productId"]);
                     $createGametransaction = array(

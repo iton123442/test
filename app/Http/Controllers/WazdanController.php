@@ -351,7 +351,7 @@ class WazdanController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($datadecoded["user"]["token"],$datadecoded["roundId"],$client_details);
+                $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
                 if($game==null){
                     $msg = array(
                         "status" => 0,
