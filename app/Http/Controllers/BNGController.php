@@ -179,7 +179,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>$client_details->balance,
+                        "value" =>$data["args"]["win"],
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );
@@ -337,8 +337,6 @@ class BNGController extends Controller
         }
         elseif(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "402"){
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-            $client_details->balance = $balance;
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
