@@ -570,6 +570,7 @@ return [
         '19009' => "https://neon-dreams.slotmill.com/",
         '19010' => "https://lucky-lucifer.slotmill.com",
         '19011' => "https://vegas-gold.slotmill.com",
+        "19012" => "https://three-samurai.slotmill.com",
     ],
 
     'pgvirtual' => [
