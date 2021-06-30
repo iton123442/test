@@ -63,7 +63,10 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "TopTrendGaming") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
-            }else{
+            }else if ($payload->action->custom->provider == "SG") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }
+            else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
                     $payload->action->provider->provider_trans_id, 
@@ -271,6 +274,13 @@ class FundtransferProcessorController extends Controller
                                     "general_details" =>json_encode("success")
                                 );
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                            }
+                            elseif($payload->action->custom->provider == 'SG'){
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->custom->game_trans_id, $payload->action->custom->client_connection_name);
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             if($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
