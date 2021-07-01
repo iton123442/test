@@ -830,7 +830,7 @@ class ICGController extends Controller
                             "win"=>2,
                             "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
                         );
-                        GameTransactionMDB::updateGametransaction($data,$game_transactionid);
+                        GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
                         //Helper::updateICGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
