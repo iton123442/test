@@ -10,6 +10,7 @@ use App\Helpers\ProviderHelper;
 use App\Helpers\Helper;
 use App\Helpers\Game;
 use App\Models\GameTransaction;
+use App\Models\GameTransactionMDB;
 use DB;
 
 class OzashikiController extends Controller
@@ -100,7 +101,7 @@ class OzashikiController extends Controller
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				if ($client_details != null) {
-					Helper::errorDebug('ozashiki_debug_1st step', $this->provider_db_id , json_encode($client_details), 'client_details');
+					
 					try{
 						ProviderHelper::idenpotencyTable($json_data['round_id']);
 					}catch(\Exception $e){
@@ -110,7 +111,7 @@ class OzashikiController extends Controller
 						];
 						return $response;
 					}
-					Helper::errorDebug('ozashiki_debug_2nd step', $this->provider_db_id , json_encode($json_data['round_id']), 'idempotency passed');
+
 					$response = [
 						"errorCode" =>  10100,
 						"message" => "Server is not ready!",
@@ -119,10 +120,9 @@ class OzashikiController extends Controller
 					$json_data['income'] = $json_data['amount'];
 					$json_data['roundid'] = $json_data['round_id'];
 					$json_data['transid'] = $json_data['transaction_id'];
+
 					$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
-					
-					Helper::errorDebug('ozashiki_debug_3rd step', $this->provider_db_id , json_encode($game_details), 'game details found');
-					
+
 					$gameTransactionData = array(
 			            "provider_trans_id" => $json_data['transaction_id'],
 			            "token_id" => $client_details->token_id,
@@ -132,24 +132,37 @@ class OzashikiController extends Controller
 			            "win" => 5,
 			            "pay_amount" => 0,
 			            "income" => 0,
-			            "entry_id" => 1
+			            "entry_id" => 1, 
+			            /* "flow_status" => 0, */
 			        );
-			        $game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
 
-					Helper::errorDebug('ozashiki_debug_4th step', $this->provider_db_id , json_encode($game_transaction_id), 'game transaction saved');
+					$game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+			        /* $game_transaction_id = GameTransaction::createGametransaction($gameTransactionData); */
 
-					$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 1,$json_data);
+					$bet_game_transaction_ext = array(
+						"game_trans_id" => $game_transaction_id,
+						"provider_trans_id" => $json_data['transaction_id'],
+						"round_id" => $json_data['round_id'],
+						"amount" => $json_data['amount'],
+						"game_transaction_type" => 1,
+						"provider_request" => json_encode($json_data),
+					);
+	
+
+					/* $game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 1,$json_data); */
+					
+					$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details); 
+					
 					// change $json_data['round_id'] to $game_transaction_id
 					// ProviderHelper::updateGameTransactionStatus($game_transaction_id, 5, 5);
-			        
-			        Helper::errorDebug('ozashiki_debug_5th step', $this->provider_db_id , json_encode($game_trans_ext_id), 'game transaction ext saved');
+			        $fund_extra_data = [
+	                    'provider_name' => $game_details->provider_name
+	                ]; 
 
-			        $client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-
-			        Helper::errorDebug('ozashiki_debug_6th step', $this->provider_db_id , json_encode($client_response), 'client fund transfer response');
+			        $client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 					
 					if (isset($client_response->fundtransferresponse->status->code)) {
-						
+						/*ProviderHelper::updateGameTransactionFlowStatus($game_transaction_id, 1);*/
 						switch ($client_response->fundtransferresponse->status->code) {
 							case '200':
 								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -158,32 +171,50 @@ class OzashikiController extends Controller
 									"transaction_id" => $json_data['transaction_id'],
 									"balance" => ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance)
 								];
+
+								$data_to_update = array(
+			                        "mw_response" => json_encode($response)
+			                    );
+			                    GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+
 								break;
 							case '402':
-								ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
 								$http_status = 200;
 								$response = [
 									"errorCode" =>  10203,
 									"message" => "Insufficient balance",
 								];
+
+								try{
+			                        $data = array(
+			                            "win"=> 2,
+			                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+			                        );
+
+			                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
+			                        $data_to_update = array(
+			                            "mw_response" => json_encode($response)
+			                        );
+			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+			                    }catch(\Exception $e){
+			                        /*Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
+			                    } 
+
 								break;
 						}
-
-						ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
-
-						Helper::errorDebug('ozashiki_debug_7th step', $this->provider_db_id , '', 'update game trans ext success');
 
 
 					}
 						
-					Helper::saveLog('ozashiki_debit', $this->provider_db_id, json_encode($json_data), $response);
+					/*Helper::errorDebug('ozashiki_debit', config("providerlinks.ozashiki.PROVIDER_ID"), json_encode($json_data), $response);*/
 	                return response()->json($response, $http_status);
 
 				}
 			}
 
 		}
-		Helper::saveLog('Ozashiki debit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
+
+		/*Helper::errorDebug('ozashiki_debit', $this->provider_db_id, json_encode($json_data), $response);*/
 		return response()->json($response, $http_status);
 
     }
@@ -238,37 +269,60 @@ class OzashikiController extends Controller
 					{
 						
 						$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
-						$bet_transaction = ProviderHelper::findGameTransaction($json_data['round_id'], 'round_id',1);
+						/*$bet_transaction = ProviderHelper::findGameTransaction($json_data['round_id'], 'round_id',1);*/
 						
+						$bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($json_data['sessionId'], $json_data['round_id'], $client_details);
+
 						$winbBalance = $client_details->balance + $json_data["amount"];
 						ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
+						
 						$response = [
 								"transaction_id" => $json_data['transaction_id'],
 								"balance" => ProviderHelper::amountToFloat($winbBalance)
 							];
 						
-			            $win_or_lost = $json_data["amount"] > 0 ?  1 : 0;
+			            /*$win_or_lost = $json_data["amount"] > 0 ?  1 : 0;
 			            $entry_id = $json_data["amount"] > 0 ?  2 : 1;
-			           	$income = $bet_transaction->bet_amount -  $json_data["amount"] ;
+			           	$income = $bet_transaction->bet_amount -  $json_data["amount"] ;*/
 
-			           	ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $json_data["amount"], $income, $win_or_lost, $entry_id, "game_trans_id", 2);
+			           	/*ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $json_data["amount"], $income, $win_or_lost, $entry_id, "game_trans_id", 2);*/
+			           	
 
-		                $game_trans_ext_id = ProviderHelper::createGameTransExtV2($bet_transaction->game_trans_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 2,$json_data, $response);
+			           	$create_game_transaction = array(
+		                    "win" => $json_data["amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1,
+		                    "pay_amount" => $bet_transaction->pay_amount + $json_data["amount"],
+		                    "income" => $bet_transaction->income - $json_data["amount"],
+		                    "entry_id" => $json_data["amount"] == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
+		                );
+
+		                GameTransactionMDB::updateGametransaction($create_game_transaction, $bet_transaction->game_trans_id, $client_details);
+
+		                /*$game_trans_ext_id = ProviderHelper::createGameTransExtV2($bet_transaction->game_trans_id, $json_data['transaction_id'], $json_data['round_id'], $json_data['amount'], 2,$json_data, $response);*/
+
+						$win_game_transaction_ext = array(
+		                    "game_trans_id" => $bet_transaction->game_trans_id,
+		                    "provider_trans_id" => $json_data["transaction_id"],
+		                    "round_id" => $json_data["round_id"],
+		                    "amount" => $json_data["amount"],
+		                    "game_transaction_type"=> 2,
+		                    "provider_request" =>json_encode($json_data),
+		                    "mw_response" => json_encode($response)
+		                );		                
+
+						$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
 
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
 			                    "provider" => 'Ozashiki',
-			                    "win_or_lost" => $win_or_lost,
-			                    "entry_id" => $entry_id,
-			                    "pay_amount" => $json_data["amount"],
-			                    "income" => $income,
-			                    "game_trans_ext_id" => $game_trans_ext_id
+			                    "game_trans_ext_id" => $game_trans_ext_id,
+			                    "client_connection_name" => $client_details->connection_name
 			                ],
 			                "provider" => [
 			                    "provider_request" => $json_data, #R
 			                    "provider_trans_id"=> $json_data['transaction_id'], #R
 			                    "provider_round_id"=> $json_data['round_id'], #R
+			                    "provider_name"=> $game_details->provider_name
 			                ],
 			                "mwapi" => [
 			                    "roundId"=>$bet_transaction->game_trans_id, #R
@@ -276,21 +330,17 @@ class OzashikiController extends Controller
 			                    "game_id" => $game_details->game_id, #R
 			                    "player_id" => $client_details->player_id, #R
 			                    "mw_response" => $response, #R
-			                ],
-			                'fundtransferrequest' => [
-			                    'fundinfo' => [
-			                        'freespin' => false,
-			                    ]
 			                ]
 			            ];
-			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$json_data["amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+
+			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details, $json_data["amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
 
 					}
 				}
 			}
 
 		}
-		Helper::saveLog('Ozashiki credit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
+		/*Helper::errorDebug('ozashiki_credit', $this->provider_db_id, json_encode($json_data), $response);*/
 		return response()->json($response, $http_status);
 
     }
@@ -334,7 +384,8 @@ class OzashikiController extends Controller
 						return $response;
 					}
 
-					$game_transaction = ProviderHelper::findGameTransaction($json_data['target_transaction_id'],'transaction_id', 1);
+					$game_transaction =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($json_data["target_transaction_id"], 1, $client_details);
+					/*$game_transaction = ProviderHelper::findGameTransaction($json_data['target_transaction_id'],'transaction_id', 1);*/
 					$response = [
 						"errorCode" =>  10210,
 						"message" => "Target transaction id not found!",
@@ -342,48 +393,70 @@ class OzashikiController extends Controller
 					
 					if ($game_transaction != 'false') {
 
-						if ($game_transaction->win == 2) {
+						/*if ($game_transaction->win == 2) {
 							return response()->json($response, $http_status);
-						}
+						}*/
 
 						$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
 						
-						$win_or_lost = 4;
+						/*$win_or_lost = 4;
 			            $entry_id = 2;
-			           	$income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;
+			           	$income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;*/
 
-			           	ProviderHelper::updateGameTransaction($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id", 4);
+			           	$update_game_transaction = array(
+		                    "win" => 4,
+		                    "pay_amount" => $game_transaction->amount,
+		                    "income" => 0,
+		                    "entry_id" => 2
+		                );
 
-			           	$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction->game_trans_id, $json_data['transaction_id'], $json_data['round_id'], $game_transaction->bet_amount, 3);
+			           	/*ProviderHelper::updateGameTransaction($game_transaction->game_trans_id, $game_transaction->bet_amount, $income, $win_or_lost, $entry_id, "game_trans_id", 4);*/
+			           	GameTransactionMDB::updateGametransaction($update_game_transaction, $game_transaction->game_trans_id, $client_details);
 
-			           	$client_response = ClientRequestHelper::fundTransfer($client_details, $game_transaction->bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction->game_trans_id, 'credit', "true");
+			           	/*$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction->game_trans_id, $json_data['transaction_id'], $json_data['round_id'], $game_transaction->bet_amount, 3);*/
+				        $refund_game_transaction_ext = array(
+		                    "game_trans_id" => $game_transaction->game_trans_id,
+		                    "provider_trans_id" => $json_data["transaction_id"],
+		                    "round_id" => $json_data["round_id"],
+		                    "amount" => $game_transaction->amount,
+		                    "game_transaction_type"=> 3,
+		                    "provider_request" =>json_encode($json_data),
+		                );
+		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($refund_game_transaction_ext, $client_details);
+
+		                $fund_extra_data = [
+		                    'provider_name' => $game_details->provider_name
+		                ];  
+
+			           	$client_response = ClientRequestHelper::fundTransfer($client_details, $game_transaction->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction->game_trans_id, 'credit', "true", $fund_extra_data);
 					
 						if (isset($client_response->fundtransferresponse->status->code)) {
 							
 							switch ($client_response->fundtransferresponse->status->code) {
 								case '200':
+									/* ProviderHelper::updateGameTransactionFlowStatus($game_transaction->game_trans_id, 5); */
 									ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 									$http_status = 200;
 									$response = [
 										"transaction_id" => $json_data['transaction_id'],
 										"balance" => ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance)
 									];
+
+									$data_to_update = array(
+				                        "mw_response" => json_encode($response)
+				                    );
+
+				                    GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 									break;
 							}
-
-							ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $json_data, $response, $client_response->requestoclient, $client_response, $json_data);
-
 						}
 					}
 				}
 			}
 
 		}
-		Helper::saveLog('Ozashiki rollback', $this->provider_db_id, file_get_contents("php://input"), $response);
+		/*Helper::errorDebug('ozashiki_rollback', $this->provider_db_id, json_encode($json_data), $response);*/
 		return response()->json($response, $http_status);
 	}
 
-	
-
-	
 }
