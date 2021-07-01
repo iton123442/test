@@ -63,6 +63,10 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "TopTrendGaming") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
+            }else if ($payload->action->custom->provider == "MannaPlay") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }else if ($payload->action->custom->provider == "Ozashiki") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
             }else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
@@ -242,9 +246,24 @@ class FundtransferProcessorController extends Controller
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif ($payload->action->custom->provider == 'MannaPlay') {
-                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
-                                ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                            }
+                            elseif ($payload->action->custom->provider == 'Ozashiki') {
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
                                 
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                             }elseif ($payload->action->custom->provider == 'OnlyPlay') {
                                 $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
