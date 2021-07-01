@@ -1058,7 +1058,8 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
-
+        
+        return $link_result->url;
     }
 
     public static function ozashikiLaunchUrl($game_code,$token,$exitUrl) {
