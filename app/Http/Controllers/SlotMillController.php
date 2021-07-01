@@ -304,7 +304,8 @@ class SlotMillController extends Controller
 
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
         //Initialize data to pass
-        $win = $amount > 0  ?  1 : 0;  /// 1win 0lost
+        // $win = $amount > 0  ?  1 : 0;  /// 1win 0lost
+        $win = 4;  /// 1win 0lost
         $entry_id = $amount > 0  ?  2 : 1; 
 
         $updateGameTransaction = [
