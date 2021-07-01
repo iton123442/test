@@ -106,7 +106,7 @@ class ClientRequestHelper{
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }catch(\Exception $e){
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$response);
+                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
                 }
                 return $client_reponse;
             }catch(\Exception $e){
