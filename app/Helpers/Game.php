@@ -12,7 +12,7 @@ class Game
 		// return ($search_result ? $search_result : false);
 
 		$details = "where g.provider_id = ".$provider_id." and g.game_code = '".$game_code."' limit 1";
-		$game_details = DB::select('select g.game_name, g.game_code, g.game_id from games g inner join providers as p using (provider_id) '.$details.' ');
+		$game_details = DB::select('select g.game_name, g.game_code, g.game_id, p.provider_name from games g inner join providers as p using (provider_id) '.$details.' ');
 		
 	 	return $game_details ? $game_details[0] : false;
 	}
@@ -59,6 +59,14 @@ class Game
 		// 		$result = $query->first();	
 
 		return ($result ? $result[0] : false);
+	}
+
+	public static function findByGameID($game_id, $provider_id = 0) {
+
+		$details = "where g.game_id = ".$game_id." and g.provider_id = ".$provider_id." limit 1";
+		$game_details = DB::select('select g.game_name, g.game_code, g.game_id from games g inner join providers as p using (provider_id) '.$details.' ');
+		
+	 	return $game_details ? $game_details[0] : false;
 	}
 
 }
