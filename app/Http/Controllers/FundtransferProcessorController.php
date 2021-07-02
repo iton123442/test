@@ -67,7 +67,10 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "Ozashiki") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
-            }else{
+            }else if ($payload->action->custom->provider == "SG") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }
+            else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
                     $payload->action->provider->provider_trans_id, 
@@ -219,6 +222,20 @@ class FundtransferProcessorController extends Controller
                                 $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                             }
+                            elseif($payload->action->custom->provider == 'cqgames'){
+                                // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
+                                // ProviderHelper::updateGameTransaction($payload->action->mwapi->roundId, $payload->action->custom->pay_amount, $payload->action->custom->income,  $payload->action->custom->win_or_lost, $payload->action->custom->entry_id);
+                                $updateGameTransaction = [
+                                    "pay_amount" => $payload->action->custom->pay_amount,
+                                    "income" =>  $payload->action->custom->income,
+                                    "win" => $payload->action->custom->win_or_lost,
+                                    "entry_id" => $payload->action->custom->entry_id,
+                                    "trans_status" => 2,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                            }
                             elseif($payload->action->custom->provider == 'sagaming'){
                                 if(!isset($payload->action->custom->update_transaction)){
                                     $updateGameTransaction = [
@@ -290,6 +307,13 @@ class FundtransferProcessorController extends Controller
                                     "general_details" =>json_encode("success")
                                 );
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                            }
+                            elseif($payload->action->custom->provider == 'SG'){
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->custom->game_trans_id, $payload->action->custom->client_connection_name);
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             if($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
                                 $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
