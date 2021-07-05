@@ -662,22 +662,15 @@ class PragmaticPLayController extends Controller
         parse_str($enc_body, $data);
         $json_encode = json_encode($data, true);
         $data = json_decode($json_encode);
-        
         Helper::saveLog('PP getBalancePerGame request', $this->provider_id, json_encode($data) ,"getBalancePerGame");
-
         $playerId = ProviderHelper::explodeUsername('_',$data->userId);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
-
         $gameIdList = explode(",", $data->gameIdList);
-
         $response = array();
         foreach($gameIdList as $item):
-
-            $games = DB::select('select g.game_code, FORMAT(sum(gt.pay_amount- gt.bet_amount),2) as sub_total, case when  FORMAT(sum(gt.pay_amount- gt.bet_amount),2) > 0 then  FORMAT(sum(gt.pay_amount- gt.bet_amount),2) else 0 end as total from game_transactions gt inner join games g using (game_id) where g.provider_id = '.$this->provider_id.' and g.game_code = "'.$item.'"');
             $data = array(
                 "gameID" => $item,
-                // "cash" => floatval(number_format($games[0]->total, 2, '.', '')),
                 "cash" => floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', '')),
                 "bonus" => 0.00
             );
@@ -686,7 +679,6 @@ class PragmaticPLayController extends Controller
         $response = array(
              "gamesBalances" => $response
         );
-
         return $response;
     }
 
@@ -997,47 +989,6 @@ class PragmaticPLayController extends Controller
         return $response;
 
     }
-
-   
-
-    public function responsetosend($client_access_token,$client_api_key,$game_code,$game_name,$client_player_id,$player_token,$amount,$client,$fund_transfer_url,$transtype,$currency,$rollback=false){
-        $requesttosend = [
-            "access_token" => $client_access_token,
-            "hashkey" => md5($client_api_key.$client_access_token),
-            "type" => "fundtransferrequest",
-            "datesent" => Helper::datesent(),
-            "gamedetails" => [
-            "gameid" => $game_code, // $game_code
-            "gamename" => $game_name
-            ],
-            "fundtransferrequest" => [
-                "playerinfo" => [
-                "client_player_id" => $client_player_id,
-                "token" => $player_token,
-                ],
-                "fundinfo" => [
-                        "gamesessionid" => "",
-                        "transactiontype" => $transtype,
-                        "transferid" => "",
-                        "rollback" => $rollback,
-                        "currencycode" => $currency,
-                        "amount" => $amount
-                ],
-            ],
-        ];
-        
-        $guzzle_response = $client->post($fund_transfer_url,
-            ['body' => json_encode($requesttosend)]
-        );
-
-        $client_response = json_decode($guzzle_response->getBody()->getContents());
-        $data = [
-            'requesttosend' => $requesttosend,
-            'client_response' => $client_response,
-        ];
-        return $data;
-    }
-    
 
     public function hashParam($sortData){
         ksort($sortData);
