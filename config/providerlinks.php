@@ -22,7 +22,7 @@ return [
         'jpyagents'=>[
             'username' => 'betrnkjpy',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '60e7a70e-806a-479c-af0b-d3c83a6616c1',
+            'secure_code' => '851489a1-72b2-49fa-9c67-ceefad1a7ccf',
         ],
         'euragents'=>[
             'username' => 'betrnkeuro',
@@ -148,6 +148,10 @@ return [
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
         ],
+        '1JPY' => [ // EveryMatrix For JPY
+            'merchant_id' => 'TGEMB',
+            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
+        ],
         '2THB' => [ // ASK b2b THB
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
@@ -227,6 +231,18 @@ return [
         '10KRW' => [ // MAS46
             'merchant_id' => 'TGMAS',
             'merchant_key' => '7b03756e2a70143fe0bc36f7b2d5e1c92e011bb1fe49d7beee69b4bea0e5d73341c29d046242826bde925bf0764a9fff95940f6a67c4542cff189f15526711d0',
+        ],
+        '11JPY' => [ // EveryMatrix
+            'merchant_id' => 'TGEMB',
+            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
+        ],
+        '11USD' => [ // EveryMatrix
+            'merchant_id' => 'TGEMB',
+            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
+        ],
+        '11EUR' => [ // EveryMatrix
+            'merchant_id' => 'TGEMB',
+            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
         ],
     ],
     'justplay' => [
