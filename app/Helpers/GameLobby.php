@@ -1183,7 +1183,50 @@ class GameLobby{
 
         switch ($provider) {
             case 'Vivo Gaming':
-                $url = config("providerlinks.vivo.VIVO_URL").'?token='.$token.'&operatorid='.$operator_id.'&serverid='.$server_id.'&IsSwitchLobby=true&Application=lobby&language=EN&IsInternalPop=True';
+                // vivo live lobby
+                $url = config("providerlinks.vivo.VIVO_URL").'?token='.$token.'&operatorid='.$operator_id.'&serverid='.$server_id.'&IsSwitchLobby=true&Application=gtm-lobby&language=EN&IsInternalPop=True';
+
+                // intetionally case for dynamic table IDs, they might add more soon
+                if(strpos($game_code, 'GameRound:TableID') !== false){
+
+                    $table_id_arr = [
+                        'roulette' => [1, 43, 245, 244, 183, 13, 230, 177, 167, 266, 26, 229, 168, 182],
+                        'baccarat' => [3, 28, 27, 180, 181, 239, 240, 241, 242, 243, 154, 155, 156, 157, 158, 44, 14, 17, 21, 160, 161, 162, 163],
+                        'blackjack' => [16, 18, 212],
+                        'casinoholdem' => [256]
+                    ]; 
+                    
+                    $table_id = preg_replace('/[^0-9]/', '', $game_code);  
+
+                    switch ($game_code) {
+                        case in_array($table_id, $table_id_arr['roulette']):
+                            // roulette
+                             $url = config("providerlinks.vivo.VIVO_URL").'?token='.$token.'&operatorid='.$operator_id.'&tableid='.$table_id.'&serverid='.$server_id.'&modeselection=2D&language=EN&&Application=roulette';
+                            break;
+
+                        case in_array($table_id, $table_id_arr['baccarat']):
+                            // baccarat
+                            $url = config("providerlinks.vivo.VIVO_URL").'?token='.$token.'&operatorid='.$operator_id.'&tableid='.$table_id.'&serverid='.$server_id.'&language=EN&Application=baccarat';
+                            break;
+
+                        case in_array($table_id, $table_id_arr['blackjack']):
+                            // blackjack
+                            $url = config("providerlinks.vivo.VIVO_URL").'?token='.$token.'&operatorid='.$operator_id.'&tableid='.$table_id.'&serverid='.$server_id.'&language=EN&Application=blackjack';
+                            break;
+                        
+                        case in_array($table_id, $table_id_arr['casinoholdem']):
+                            // casino hold'em
+                            $url = config("providerlinks.vivo.VIVO_URL").'?token='.$token.'&operatorid='.$operator_id.'&tableid='.$table_id.'&serverid='.$server_id.'&language=EN&Application=casinoholdem';
+                            break;
+
+                        default:
+                            // launch lobby instead
+                            $url = config("providerlinks.vivo.VIVO_URL").'?token='.$token.'&operatorid='.$operator_id.'&serverid='.$server_id.'&IsSwitchLobby=true&Application=gtm-lobby&language=EN&IsInternalPop=True';
+                            break;
+                    }
+
+                }    
+
                 break;
 
             case 'Betsoft':
@@ -1205,7 +1248,7 @@ class GameLobby{
              case 'Platipus':
                 $launch_id = substr($game_code, strpos($game_code, "-") + 1);
 
-                $url = config("providerlinks.vivo.PLATIPUS_URL").'?token='.$token.'&operatorID='.$operator_id.'&room=154&gameconfig='.$launch_id.'';
+                $url = config("providerlinks.vivo.PLATIPUS_URL").'?token='.$token.'&operatorID='.$operator_id.'&room=125&gameconfig='.$launch_id.'';
                 break;
 
             case 'Leap':
