@@ -347,6 +347,7 @@ return [
             'KRW' => '98a6bfbd',
             'IRR' => 'f370867a',
             'MMK' => 'b08b8fef',
+            'JOY' => '5568b333',
         ],
         'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
     ],
