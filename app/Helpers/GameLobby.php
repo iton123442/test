@@ -126,6 +126,31 @@ class GameLobby{
     
 
     }
+
+    public static function NoLimitLaunchUrl($data){
+        try {
+            $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+
+            $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
+            $isMob = is_numeric(strpos($ua, "mobile"));
+
+            if($isMob == 1) {
+
+                  $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=mobile&language=en&operator=TG_DEV&game='.$data['game_code'].'&token='.$data['token']; 
+                      return $url;
+            }else {
+
+            $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=desktop&language=en&operator=TG_DEV&game='.$data['game_code'].'&token='.$data['token'];
+             return $url;
+        }
+         
+        } catch (\Exception $e) {
+
+            Helper::saveLog('Nolimit Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+            return $e->getMessage();
+        }
+        
+    }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;

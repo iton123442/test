@@ -616,6 +616,12 @@ return [
         'CLIENT_API_KEY' => 'QTm6t5PFehcrCTu4rKL8sPCwv2RwtMrM',
         'PLATFORM_ID' => 'tigergame'
     ],
+    'nolimit'=>[
+        'provider_db_id' => 59,
+        'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html',
+        'operator' =>'BETRNK',
+        'operator_key' => ''
+    ],
 
 ];
 
