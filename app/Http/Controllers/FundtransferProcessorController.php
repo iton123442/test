@@ -327,7 +327,7 @@ class FundtransferProcessorController extends Controller
                     && $client_response->fundtransferresponse->status->code == "402"){
                         $api_error = false; // true if stop on API CODE 402, false re rerun the 5 times resend
                         $re_attempt = true;
-                        if($payload->action->custom->provider == 'bng'){
+                        if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
                             $updateGameTransaction = [
                                 "win" => 5,
                             ];
@@ -338,7 +338,7 @@ class FundtransferProcessorController extends Controller
                     }else{
                         $api_error = false; // true if stop on API CODE not 402, false re rerun the 5 times resend
                         $re_attempt = true;
-                        if($payload->action->custom->provider == 'bng'){
+                        if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
                             $updateGameTransaction = [
                                 "win" => 5,
                             ];
@@ -349,7 +349,7 @@ class FundtransferProcessorController extends Controller
                     }
                 }catch(\Exception $e){
                     # Only HTTP Error Should Be Resended
-                    if($payload->action->custom->provider == 'bng'){
+                    if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
                         $updateGameTransaction = [
                             "win" => 5,
                         ];
