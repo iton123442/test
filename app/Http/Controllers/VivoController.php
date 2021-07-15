@@ -458,7 +458,7 @@ class VivoController extends Controller
 		{
 			
 			// Check if the transaction exist
-			$game_transaction = GameTransactionMDB::getGameTransactionDataByProviderTransactionId($request->casinoTransactionId);
+			$game_transaction = GameTransactionMDB::getGameTransactionDataByProviderTransactionId($request->casinoTransactionId, $client_details);
 			/*$game_transaction = GameTransaction::getGameTransactionDataByProviderTransactionId($request->casinoTransactionId);*/
 
 			// If transaction is not found
