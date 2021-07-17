@@ -197,7 +197,6 @@ class HabaneroController extends Controller
                 }
                 if($data->gamestatemode == 2){
                     $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
-                    dd($trans);
                     if($data->gameinfeature == true){
                         return $this->newCredit($data,$client_details->player_token,$trans,$game_details,$round_id);
                     }else{
