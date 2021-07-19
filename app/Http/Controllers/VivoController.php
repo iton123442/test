@@ -272,7 +272,6 @@ class VivoController extends Controller
 					        $client_response = ClientRequestHelper::fundTransfer($client_details, $request->Amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 							
 							if (isset($client_response->fundtransferresponse->status->code)) {
-								ProviderHelper::updateGameTransactionFlowStatus($game_transaction_id, 1);
 								switch ($client_response->fundtransferresponse->status->code) {
 									case '200':
 										ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -458,7 +457,7 @@ class VivoController extends Controller
 		{
 			
 			// Check if the transaction exist
-			$game_transaction = GameTransactionMDB::getGameTransactionDataByProviderTransactionId($request->casinoTransactionId);
+			$game_transaction = GameTransactionMDB::getGameTransactionDataByProviderTransactionId($request->casinoTransactionId, $client_details);
 			/*$game_transaction = GameTransaction::getGameTransactionDataByProviderTransactionId($request->casinoTransactionId);*/
 
 			// If transaction is not found
