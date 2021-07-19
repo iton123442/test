@@ -620,7 +620,7 @@ return [
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html',
         'operator' =>'BETRNK',
-        'operator_key' => ''
+        'operator_key' => 'Nu3baiChohKo'
     ],
 
 ];
