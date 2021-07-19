@@ -619,6 +619,7 @@ return [
     'nolimit'=>[
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html',
+        'Group_ID' => 'URBANSQUARE'
         'operator' =>'BETRNK',
         'operator_key' => 'Nu3baiChohKo'
     ],

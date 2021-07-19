@@ -22,6 +22,7 @@ class NolimitController extends Controller
         $this->api_url = config('providerlinks.nolimit.api_url');
         $this->operator =config('providerlinks.nolimit.operator');
         $this->operator_key = config('providerlinks.nolimit.operator_key');
+        $this->groupid = config('providerlinks.nolimit.Group_ID');
     
         
     
