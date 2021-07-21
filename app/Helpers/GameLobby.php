@@ -136,11 +136,11 @@ class GameLobby{
 
             if($isMob == 1) {
 
-                  $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=mobile&language=en&operator=TG_DEV&game='.$data['game_code'].'&token='.$data['token']; 
+                  $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=mobile&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token']; 
                       return $url;
             }else {
 
-            $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=desktop&language=en&operator=TG_DEV&game='.$data['game_code'].'&token='.$data['token'];
+            $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
              return $url;
         }
          
