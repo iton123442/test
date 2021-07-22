@@ -43,6 +43,8 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "PlayStar") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
+            }else if ($payload->action->custom->provider == "Nolimit City") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "kagaming") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "allwayspin") {
@@ -298,6 +300,15 @@ class FundtransferProcessorController extends Controller
                                     "general_details" =>json_encode("success")
                                 );
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                            }elseif ($payload->action->custom->provider == 'Nolimit City') {
+                                 $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                
                             }
                             elseif ($payload->action->custom->provider == 'TopTrendGaming') {
                                 $ext_data = array(

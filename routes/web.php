@@ -611,3 +611,6 @@ $app->post('/api/ozashiki/betrollback', 'OzashikiController@rollbackTransaction'
 // $app->post('/api/ozashiki/bet', 'Ozashiki\MainController@debitProcess');
 // $app->post('/api/ozashiki/win', 'Ozashiki\MainController@creditProcess');
 // $app->post('/api/ozashiki/betrollback', 'Ozashiki\MainController@rollbackTransaction');
+
+// NolimitCity Single Controller Endpoints
+$app->post('/api/nolimitcity', 'NolimitController@index');
