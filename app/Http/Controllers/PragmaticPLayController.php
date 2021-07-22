@@ -176,7 +176,7 @@ class PragmaticPLayController extends Controller
         
         // $checkDoubleBet = DB::select("SELECT game_trans_id,bet_amount FROM game_transactions WHERE round_id = '".$data->roundId."' ");
         $checkDoubleBet = GameTransactionMDB::findGameTransactionDetails($data->roundId,'round_id',false,$client_details);
-        if($checkGameTrans != 'false'){
+        if($checkDoubleBet != 'false'){
             // $checkDuplicate = DB::select("SELECT game_transaction_type FROM game_transaction_ext WHERE provider_trans_id = '".$data->reference."' ");
             $checkDuplicate = GameTransactionMDB::findGameExt($data->reference,2,'transaction_id',$client_details);
             if($checkDuplicate != 'false'){
