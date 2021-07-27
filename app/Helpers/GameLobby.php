@@ -151,6 +151,16 @@ class GameLobby{
         }
         
     }
+
+    public static function SmartsoftLaunchUrl($data){
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        $portal = config('providerlinks.smartsoft.PortalName');
+        $game_details = Helper::findGameDetails("game_code",60, $data["game_code"]);
+        $game_type = $game_details->info;
+        $url = config('providerlinks.smartsoft.api_url').'/Loader.aspx?GameCategory='.$game_type.'&GameName='.$data['game_code'].'&Token='.$data['token'].'&PortalName='.$portal.'&Lang=en&ReturnUrl='.$data["exitUrl"];
+        Helper::saveLog('Smartsoft Gameluanch ', 60, json_encode($data), 'Endpoint Hit');
+        return $url;
+    }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;

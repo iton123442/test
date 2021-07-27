@@ -756,6 +756,15 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                elseif($provider_code==106){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::SmartsoftLaunchUrl($request->all()), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
                 elseif($provider_code==91){ //pgvirtual
                     $msg = array(
                         "game_code" => $request->input("game_code"),

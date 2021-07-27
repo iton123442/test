@@ -624,6 +624,14 @@ return [
         'operator_key' => 'Nu3baiChohKo'
     ],
 
+    'smartsoft'=>[
+        'provider_db_id' => 60,
+        'api_url' => 'https://server.ssg-public.com/GameLauncher',
+        'PortalName' => 'tigergames',
+        'SecretHashKey' => '277eec99-07e4-48f2-9d9e-8d86f9351f69'
+
+    ],
+
 ];
 
 ?>
