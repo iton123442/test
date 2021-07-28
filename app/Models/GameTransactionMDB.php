@@ -371,7 +371,12 @@ class GameTransactionMDB
                     foreach($connection_list as $connection){
                         $status = self::checkDBConnection($connection["connection_name"]);
                         if($status && $connection_name != $connection["connection_name"]){
-                            $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                            if($type == 'all'){
+                                // removed limit
+                                $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                            }else{
+                                $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                            }
                             if ( count($data) > 0  ) {
                                 $connection_name = $connection["connection_name"];
                                 $details = $data;
