@@ -136,11 +136,11 @@ class GameLobby{
 
             if($isMob == 1) {
 
-                  $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=mobile&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token']; 
+                  $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=mobile&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token']; 
                       return $url;
             }else {
 
-            $url = 'https://partner.nolimitcdn.com/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
+            $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
              return $url;
         }
          
@@ -150,6 +150,16 @@ class GameLobby{
             return $e->getMessage();
         }
         
+    }
+
+    public static function SmartsoftLaunchUrl($data){
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        $portal = config('providerlinks.smartsoft.PortalName');
+        $game_details = Helper::findGameDetails("game_code",60, $data["game_code"]);
+        $game_type = $game_details->info;
+        $url = config('providerlinks.smartsoft.api_url').'/Loader.aspx?GameCategory='.$game_type.'&GameName='.$data['game_code'].'&Token='.$data['token'].'&PortalName='.$portal.'&Lang=en&ReturnUrl='.$data["exitUrl"];
+        Helper::saveLog('Smartsoft Gameluanch ', 60, json_encode($data), 'Endpoint Hit');
+        return $url;
     }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
         $timestamp = Carbon::now()->timestamp;

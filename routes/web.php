@@ -617,3 +617,12 @@ $app->post('/api/ozashiki/betrollback', 'OzashikiController@rollbackTransaction'
 
 // NolimitCity Single Controller Endpoints
 $app->post('/api/nolimitcity', 'NolimitController@index');
+
+//SmartSoft Gaming
+$app->post('api/smartsoft_gaming/ActivateSession', 'SmartsoftGamingController@ActiveSession');
+$app->get('api/smartsoft_gaming/GetBalance', 'SmartsoftGamingController@GetBalance');
+$app->post('api/smartsoft_gaming/Deposit', 'SmartsoftGamingController@Deposit');
+$app->post('api/smartsoft_gaming/Withdraw', 'SmartsoftGamingController@Withdraw');
+$app->post('api/smartsoft_gaming/RollbackTransaction', 'SmartsoftGamingController@Rollback');
+
+
