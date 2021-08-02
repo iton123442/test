@@ -364,7 +364,11 @@ class GameTransactionMDB
             $details = [];
             $connection = self::getAvailableConnection($client_details->connection_name);
             if ($connection != null) {
-                $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                if($type == 'all'){
+                    $details = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                }else{
+                    $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                }
                 $connection_name = $connection["connection_name"];
                 if ( !(count($details) > 0) )  {
                     $connection_list = config("serverlist.server_list");
