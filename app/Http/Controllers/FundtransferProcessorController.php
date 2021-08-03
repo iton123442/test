@@ -28,7 +28,7 @@ class FundtransferProcessorController extends Controller
 
         // Helper::saveLog('fundTransfer', 999, json_encode([]), "MAGIC END HIT");
         $payload = json_decode(file_get_contents("php://input"));
-        self::saveLogFund(env("CURRENT_SERVER", "NO SERVER"), 99,  json_encode($payload),"EXECUTE");
+        self::saveLogFund(env("CURRENT_SERVER", "NO SERVER"), 100,  json_encode($payload),$payload->request_body->fundtransferrequest->fundinfo->roundId);
         Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode($payload), 'TG_ARRIVED');
 
         if($payload->request_body->fundtransferrequest->fundinfo->transactiontype == 'credit'){
@@ -396,7 +396,7 @@ class FundtransferProcessorController extends Controller
                 // Helper::saveLog(123, 402, json_encode(['msg'=>123]), "API ERROR");
             } # End API ERROR
         } while (!$is_succes);
-        self::saveLogFund(env("CURRENT_SERVER", "NO SERVER"), 99,  json_encode($payload),"SUCCESS");
+        self::saveLogFund(env("CURRENT_SERVER", "NO SERVER"), 200,  json_encode($payload),$payload->request_body->fundtransferrequest->fundinfo->roundId);
     }
 
     public static function saveLogFund($method, $provider_id = 9999, $request_data, $response_data) {
