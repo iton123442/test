@@ -349,8 +349,6 @@ class FundtransferProcessorController extends Controller
                     && $client_response->fundtransferresponse->status->code == "402"){
 
                         // $method, $provider_id = 9999, $request_data, $response_data
-                        $this->saveLogFund('cutcall', 9999, env("SERVER_NAME", "NO SERVER"),env("SERVER_NAME", "NO SERVER"))
-
                         $api_error = false; // true if stop on API CODE 402, false re rerun the 5 times resend
                         $re_attempt = true;
                         if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
@@ -782,26 +780,6 @@ class FundtransferProcessorController extends Controller
             "transaction_detail" => $details,
         );
         DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
-    }
-
-    public static function saveLogFund($method, $provider_id = 9999, $request_data, $response_data) {
-
-        try{
-            if(env('SAVELOGFUND')){
-                $data = [
-                    "method_name" => $method,
-                    "provider_id" => $provider_id,
-                    "request_data" => json_encode(json_decode($request_data)),
-                    "response_data" => json_encode($response_data)
-                ];
-                return DB::connection('savelog')->table('seamless_request_logs')->insert($data);
-            }else{
-                return 8888888;
-            }
-        }catch(\Exception $e){
-            return 99999999;
-        }
-        
     }
 
     public static function deleteGameRestrictedGame($identifier){
