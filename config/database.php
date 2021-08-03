@@ -16,6 +16,9 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
+            'options'   => [
+                PDO::ATTR_EMULATE_PREPARES => true
+            ],
          ],
          'server2' => [
             'driver'    => 'mysql',
@@ -28,6 +31,9 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
+            'options'   => [
+                PDO::ATTR_EMULATE_PREPARES => true
+            ],
         ],
 
         'server3' => [
@@ -41,6 +47,9 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
+            'options'   => [
+                PDO::ATTR_EMULATE_PREPARES => true
+            ],
         ],
         'savelog' => [
             'driver'    => 'mysql',
@@ -53,6 +62,9 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
+            'options'   => [
+                PDO::ATTR_EMULATE_PREPARES => true
+            ],
         ],
     ],
 ];
