@@ -626,3 +626,26 @@ $app->post('api/smartsoft_gaming/Withdraw', 'SmartsoftGamingController@Withdraw'
 $app->post('api/smartsoft_gaming/RollbackTransaction', 'SmartsoftGamingController@Rollback');
 
 
+//TIGER GAMES TRANSFER WALLET
+$app->group(['prefix' => 'tw/api/'], function () use ($app) {
+    //transfer wallet endpoint
+    $app->post('game/launchurl', 'TransferWalletAggregator\GameLobbyController@gameLaunchUrl');
+    $app->post('tw_wallet/createPlayer', 'TransferWalletAggregator\WalletDetailsController@createPlayerBalance');
+    $app->post('tw_wallet/getBalance', 'TransferWalletAggregator\WalletDetailsController@getPlayerBalance');
+    $app->post('tw_wallet/deposit', 'TransferWalletAggregator\WalletDetailsController@makeTransferWallerDeposit');
+    $app->post('tw_wallet/withdraw', 'TransferWalletAggregator\WalletDetailsController@makeTransferWallerWithdraw');
+    $app->post('tw_wallet/bethistory', 'TransferWalletAggregator\WalletDetailsController@getBetHistory');
+    $app->post('tw_wallet/transactionchecker', 'TransferWalletAggregator\WalletDetailsController@checkTransactionDetails');
+
+    //seamless wallet fundster endpoint OPERATOR
+        $app->post('sm_wallet/getPlayerDetails', 'TransferWalletAggregator\DetailsAndFundTransferController@getPlayerDetails');
+    $app->post('sm_wallet/fundTransfer', 'TransferWalletAggregator\DetailsAndFundTransferController@fundTransfer');
+    $app->post('sm_wallet/transactionchecker', 'TransferWalletAggregator\DetailsAndFundTransferController@transactionchecker');
+
+
+    //EXPEREMENT
+    $app->post('sm_wallet/getPlayerDetailsExpo', 'TransferWalletAggregator\DetailsAndFundTransferControllerEXPERIMENT@getPlayerDetails');
+    $app->post('sm_wallet/fundTransferExpo', 'TransferWalletAggregator\DetailsAndFundTransferControllerEXPERIMENT@fundTransfer');
+    $app->post('sm_wallet/transactioncheckerExpo', 'TransferWalletAggregator\DetailsAndFundTransferControllerEXPERIMENT@transactionchecker');
+
+});
