@@ -566,7 +566,8 @@ class KAGamingController extends Controller
                         "game_transaction_type"=> 2,
                         "provider_request" =>json_encode($data),
                         "mw_response" => json_encode($response),
-                        "transaction_detail" => json_encode($response),
+                        // "transaction_detail" => json_encode($response),
+                        "transaction_detail" => "FAILED",
                         "general_details" => json_encode($general_details),
                     );
                     $credit_game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionCREDITEXTData,$client_details);
@@ -932,6 +933,7 @@ class KAGamingController extends Controller
             }
         }else{
             $win_or_lost = 4; // 4 refund,  5 processing
+            $pay_amount = 0;
         }
 
         #1 DEBIT OPERATION
