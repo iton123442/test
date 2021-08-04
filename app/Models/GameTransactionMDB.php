@@ -149,7 +149,7 @@ class GameTransactionMDB
         $data['player_id'] = $client_details->player_id;
         if($connection != null){
             Helper::saveLog('createGametransaction', 12, json_encode($connection), "createGametransaction");
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].'.game_transactions')->insertGetId($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->insertGetId($data);
         }else{
             return null;
         }
@@ -157,7 +157,7 @@ class GameTransactionMDB
     public static function updateGametransaction($data,$game_transaction_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].'.game_transactions')->where('game_trans_id',$game_transaction_id)->update($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->where('game_trans_id',$game_transaction_id)->update($data);
         }else{
             return null;
         }
@@ -175,7 +175,7 @@ class GameTransactionMDB
     public static function updateGametransactionEXT($data,$game_trans_ext_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].'.game_transaction_ext')->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
         }else{
             return null;
         }
@@ -308,14 +308,14 @@ class GameTransactionMDB
             $status = self::checkDBConnection($connection);
             if ( ($connection != null) && $status) {
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
-                $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                $details = DB::connection($connection["connection_name"])->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
             }
             if ( !(count($details) > 0) )  {
                 $connection_list = config("serverlist.server_list");
                 foreach($connection_list as $key => $connection){
                     $status = self::checkDBConnection($connection["connection_name"]);
                     if($status && $connection_name != $connection["connection_name"]){
-                        $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                        $data = DB::connection( $connection["connection_name"] )->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                         if ( count($data) > 0  ) {
                             $connection_name = $key;// key is the client connection_name
                             $details = $data;

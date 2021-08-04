@@ -580,7 +580,7 @@ class ClientRequestHelper{
     public static function updateGTEIDMDB($game_trans_ext_id, $mw_request, $client_response,$transaction_detail='success',$general_details='custom',$connection_name){
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
         if($connection != null){
-            $update = DB::connection($connection["connection_name"])->table($connection['db_list'][0].'.game_transaction_ext')
+            $update = DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")
             ->where('game_trans_ext_id', $game_trans_ext_id)
             ->update([
                 "mw_request"=>json_encode($mw_request),
@@ -602,7 +602,7 @@ class ClientRequestHelper{
     public static function updateGameTransactionCCMD($data,$game_transaction_id,$connection_name){
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].'.game_transactions')->where('game_trans_id',$game_transaction_id)->update($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->where('game_trans_id',$game_transaction_id)->update($data);
         }else{
             return null;
         }
@@ -615,7 +615,7 @@ class ClientRequestHelper{
     public static function updateGametransactionEXTCCMD($data,$game_trans_ext_id,$connection_name){
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].'.game_transaction_ext')->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
         }else{
             return null;
         }
