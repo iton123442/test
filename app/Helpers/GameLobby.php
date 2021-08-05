@@ -843,7 +843,7 @@ class GameLobby{
                     $get_url = json_decode($response->getBody()->getContents());
                     $response_bag["gameluanch_url"] = $gameluanch_url;
                     $response_bag["get_url"] = $get_url;
-                    return $response_bag;
+                    // return $response_bag;
                     Helper::saveLog('GoldenF get_url', $provider_id, json_encode($get_url), $data);
                     if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
                         // TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
