@@ -843,15 +843,18 @@ class GameLobby{
                         // TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
                         return $get_url->data->game_url;
                     }else{
-                        return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                        // return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                        return config('providerlinks.play_betrnk').'/tigergames/api?msg=Something went wrong url failed';
                     }
                 }else{
-                    return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                    // return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                    return config('providerlinks.play_betrnk').'/tigergames/api?msg=Something went wrong in creation';
                 }
             }catch(\Exception $e){
                 $error = ['error' => $e->getMessage()];
                 Helper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
-                return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                // return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
+                return config('providerlinks.play_betrnk').'/tigergames/api?msg='.$e->getMessage();
             }
         // }else{
         //     // # IFRAME GAMELAUNCH    
