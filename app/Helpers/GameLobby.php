@@ -813,7 +813,8 @@ class GameLobby{
         $secret_key = config("providerlinks.goldenF.secrete_key");
         $provider_id = config("providerlinks.goldenF.provider_id");
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-        $player_id = "TG_".$client_details->player_id;
+        $player_id = $client_details->player_id;
+        // $player_id = "TG_".$client_details->player_id;
         $nickname = $client_details->username;
         $response_bag = array();
        // if($client_details->wallet_id == 1){
