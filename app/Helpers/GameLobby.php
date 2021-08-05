@@ -833,7 +833,6 @@ class GameLobby{
                    'form_params' => $form_body
                 ]);
                 $golden_response = json_decode((string) $response->getBody(), true);
-                $response_bag["form_body"] = $form_body;
                 $response_bag["parameters"] = $parameters;
                 $response_bag["golden_response"] = $golden_response;
                 Helper::saveLog('GoldenF create_player', $provider_id, json_encode($parameters), $golden_response);
