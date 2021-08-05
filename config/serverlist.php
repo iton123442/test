@@ -17,6 +17,13 @@ return [
                 'api_test' // game_transaction
             ]
         ],
+        "server1-aplus" =>[
+            'connection_name'=>'mysql',
+            'db_list'=> [
+                'wt_mw_op_aplus_ext',  //game_trasnaction_ext
+                'wt_mw_op_aplus' // game_transaction
+            ]
+        ],
         "server1-askmebet" =>[
             'connection_name'=>'mysql',
             'db_list'=> [
@@ -66,13 +73,13 @@ return [
                 'wt_mw_op_xigolo' // game_transaction
             ]
         ],
-        // "server1-mas46" =>[
-        //     'connection_name'=>'mysql',
-        //     'db_list'=> [
-        //         'wt_mw_op_mas46_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_mas46' // game_transaction
-        //     ]
-        // ],
+        "server1-mas46" =>[
+            'connection_name'=>'mysql',
+            'db_list'=> [
+                'wt_mw_op_mas46_ext',  //game_trasnaction_ext
+                'wt_mw_op_mas46' // game_transaction
+            ]
+        ],
         "server2" =>[
             'connection_name'=>'server2',
             'db_list'=> [
@@ -85,6 +92,13 @@ return [
             'db_list'=> [
                 'api_test2_Extension',  //game_trasnaction_ext
                 'api_test2' // game_transaction
+            ]
+        ],
+        "server2-aplus" =>[
+            'connection_name'=>'mysql',
+            'db_list'=> [
+                'wt_mw_op_aplus_ext',  //game_trasnaction_ext
+                'wt_mw_op_aplus' // game_transaction
             ]
         ],
         "server2-askmebet" =>[
@@ -155,6 +169,13 @@ return [
             'db_list'=> [
                 'api_test2_Extension', //game_trasnaction_ext
                 'api_test2' // game_transaction
+            ]
+        ],
+        "server3-aplus" =>[
+            'connection_name'=>'mysql',
+            'db_list'=> [
+                'wt_mw_op_aplus_ext',  //game_trasnaction_ext
+                'wt_mw_op_aplus' // game_transaction
             ]
         ],
         "server3-askmebet" =>[

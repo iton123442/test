@@ -663,7 +663,8 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 } 
-                elseif($provider_code==71){ 
+                // elseif($provider_code==71){ 
+                elseif($provider_code==113){ 
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::goldenFLaunchUrl($request->all()), //TEST
