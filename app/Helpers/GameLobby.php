@@ -833,12 +833,12 @@ class GameLobby{
                    'form_params' => $form_body
                 ]);
                 $golden_response = json_decode((string) $response->getBody(), true);
-                TransferWalletHelper::saveLog('GoldenF create_player', $provider_id, json_encode($parameters), $golden_response);
+                Helper::saveLog('GoldenF create_player', $provider_id, json_encode($parameters), $golden_response);
                 if(isset($golden_response['data']['action_result']) && $golden_response['data']['action_result'] == "Success"){
                     $gameluanch_url = GoldenFHelper::changeEnvironment($client_details)->api_url."/Launch?secret_key=".GoldenFHelper::changeEnvironment($client_details)->secret_key."&operator_token=".GoldenFHelper::changeEnvironment($client_details)->operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
                     $response = $http->post($gameluanch_url);
                     $get_url = json_decode($response->getBody()->getContents());
-                    TransferWalletHelper::saveLog('GoldenF get_url', $provider_id, json_encode($get_url), $data);
+                    Helper::saveLog('GoldenF get_url', $provider_id, json_encode($get_url), $data);
                     if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
                         // TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
                         return $get_url->data->game_url;
@@ -850,7 +850,7 @@ class GameLobby{
                 }
             }catch(\Exception $e){
                 $error = ['error' => $e->getMessage()];
-                TransferWalletHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
+                Helper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
                 return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
             }
         // }else{
