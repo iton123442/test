@@ -841,6 +841,7 @@ class GameLobby{
                     $gameluanch_url = GoldenFHelper::changeEnvironment($client_details)->api_url."/Launch?secret_key=".GoldenFHelper::changeEnvironment($client_details)->secret_key."&operator_token=".GoldenFHelper::changeEnvironment($client_details)->operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
                     $response = $http->post($gameluanch_url);
                     $get_url = json_decode($response->getBody()->getContents());
+                    $response_bag["gameluanch_url"] = $gameluanch_url;
                     $response_bag["get_url"] = $get_url;
                     return $response_bag;
                     Helper::saveLog('GoldenF get_url', $provider_id, json_encode($get_url), $data);
