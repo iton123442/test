@@ -545,6 +545,18 @@ return [
                 'operator_token' => 'e23103ada31f2038918f7d621e27e871',
                 'wallet_code' => 'gf_gps_wallet',
             ],
+            'EUR' => [
+                'api_url'=> 'https://tgse.api.goldenf.me/gf',
+                'secret_key' => 'f6a2147790a0c03f2b5c72f1aaad86e3',
+                'operator_token' => '418e8116f262a4ab693400fa4c1d15b4',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+            'JPY' => [
+                'api_url'=> 'https://tgsw.api.goldenf.me/gf',
+                'secret_key' => 'a4ed4368b227c465a015fa48f6b59e07',
+                'operator_token' => '37328e4a3971f14f4b582a83f6b204e1',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
         ],
         '2' => [ # Transfer Wallet Wallet Type 2
             'USD' => [
