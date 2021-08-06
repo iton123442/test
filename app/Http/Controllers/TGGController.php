@@ -146,7 +146,7 @@ class TGGController extends Controller
 		try {
 			
 			$game_transaction_type = 1; // 1 Bet, 2 Win
-			$game_code = $game_details->game_id;
+			$game_code = $game_details->game_code;
 			$token_id = $client_details->token_id;
 			$bet_amount = $request['data']['amount'];
 			$pay_amount = 0;

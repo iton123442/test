@@ -138,6 +138,8 @@ class WalletDetailsController extends Controller
                 "player_id" => $getPlayerDetails->player_id,
                 "type" => 1,
                 "amount" => $request->amount,
+                "client_id" => $getPlayerDetails->client_id,
+                "operator_id" => $getPlayerDetails->operator_id,
                 "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id //UNIQUE TRANSACTION
             ];
             $account_id = TWHelpers::createTWPlayerAccounts($data_accounts);
@@ -237,6 +239,8 @@ class WalletDetailsController extends Controller
                 "player_id" => $getPlayerDetails->player_id,
                 "type" => 2,
                 "amount" => $amountToWithdraw,
+                "client_id" => $getPlayerDetails->client_id,
+                "operator_id" => $getPlayerDetails->operator_id,
                 "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id //UNIQUE TRANSACTION
             ];
             $account_id = TWHelpers::createTWPlayerAccounts($data_accounts);
@@ -323,7 +327,9 @@ class WalletDetailsController extends Controller
         if($request->has('end_time')){ 
             $to = date("Y-m-d H:i:s", strtotime($request->date." ".$request->end_time));
         }
-      
+
+        $partition = TWHelpers::multiplePartition($from,$to);
+        
         $and_player = "and player_id  = (SELECT player_id FROM players WHERE client_id = ".$request->client_id." AND client_player_id = '".$request->client_player_id."' LIMIT 1)  ";
         if ($request->client_player_id == "all") {
             $and_player = '';
@@ -335,7 +341,7 @@ class WalletDetailsController extends Controller
 
             try {
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
-                if ($client_details->connection_name == "server_TW" || $client_details->connection_name == "mysql" ) {
+                if ($client_details->connection_name == "server_TW" || $client_details->connection_name == "mysql"  || $client_details->connection_name == "default" ) {
                     //default
                     $connection["TG_GameInfo"] = $connection["db_list"][1];
                     $connection["TG_PlayerInfo"] = $connection["db_list"][1];
@@ -487,7 +493,7 @@ class WalletDetailsController extends Controller
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
                 $client_transaction_id = $request->client_id."_".$reference_id;
 
-                if ($client_details->connection_name == "server_TW" || $client_details->connection_name == "mysql" ) {
+                if ($client_details->connection_name == "server_TW" || $client_details->connection_name == "mysql" || $client_details->connection_name == "default" ) {
                     //default
                     $connection["TG_GameInfo"] = $connection["db_list"][1];
                     $connection["TG_PlayerInfo"] = $connection["db_list"][1];
