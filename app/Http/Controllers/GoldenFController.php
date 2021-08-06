@@ -626,7 +626,7 @@ class GoldenFController extends Controller
     public function swPlayerBalance(Request $request){
 
         
-        Helper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        GoldenFHelper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -657,7 +657,7 @@ class GoldenFController extends Controller
             ],
             "code" => 0
         ];
-        Helper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), $response);
+        GoldenFHelper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
 
@@ -668,7 +668,7 @@ class GoldenFController extends Controller
  public function swTransferOut(Request $request){
 
     
-        Helper::saveLog('GoldenF swTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        GoldenFHelper::saveLog('GoldenF swTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -720,7 +720,7 @@ class GoldenFController extends Controller
             $response = ["data" => null,"code" => 7000, 'msg'=> 'Server Error'];
             ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
             ProviderHelper::updatecreateGameTransExt($game_transextension, $data, json_encode($response), 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-            ProviderHelper::saveLog('GoldenF FATAL ERROR', $this->provider_db_id, $response, $e->getMessage());
+            GoldenFHelper::saveLog('GoldenF FATAL ERROR', $this->provider_db_id, $response, $e->getMessage());
             return $response;
         }
 
@@ -765,7 +765,7 @@ class GoldenFController extends Controller
     
 
     public function swTransferIn(Request $request){
-        Helper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HITT');
+        GoldenFHelper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HITT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -874,7 +874,7 @@ class GoldenFController extends Controller
             ];
             $after_balance = $calculatedbalance;
             Providerhelper::createRestrictGame($game_information->game_id,$client_details->player_id,$game_transextension, $client_response->requestoclient);
-            Helper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
+            GoldenFHelper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
             return $response;
         }
 
@@ -896,7 +896,7 @@ class GoldenFController extends Controller
             // dd(2);
         }
         ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-        Helper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
+        GoldenFHelper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
     
@@ -905,7 +905,7 @@ class GoldenFController extends Controller
      * Refund Cancel Payoff
      */
     public function swforceTransferOut(Request $request){
-        Helper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        GoldenFHelper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -1101,12 +1101,12 @@ class GoldenFController extends Controller
             return $response;
         }
         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-        Helper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), $response);
+        GoldenFHelper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
 
     public function swQuerytranslog(Request $request){
-        Helper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        GoldenFHelper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -1140,7 +1140,7 @@ class GoldenFController extends Controller
             ],
             "code" => 0
         ];
-        Helper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), $response);
+        GoldenFHelper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
 
