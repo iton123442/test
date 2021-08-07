@@ -521,6 +521,14 @@ $app->post('api/gf/Transaction/Record/Get','GoldenFController@TransactionRecordG
 $app->post('api/gf/Transaction/Record/Player/Get','GoldenFController@TransactionRecordPlayerGet');
 $app->post('api/gf/Bet/Record/Detail','GoldenFController@BetRecordDetail');
 
+# Golden F Seamless Wallet
+$app->post('api/gf/sw/player-balance', 'GoldenFController@swPlayerBalance');
+$app->post('api/gf/sw/transfer-out', 'GoldenFController@swTransferOut');
+$app->post('api/gf/sw/transfer-in', 'GoldenFController@swTransferIn');
+$app->post('api/gf/sw/force-transfer-out', 'GoldenFController@swforceTransferOut');
+$app->post('api/gf/sw/query-translog', 'GoldenFController@swQuerytranslog');
+
+
 
 $app->post('api/currency','AlController@currency');
 
