@@ -90,6 +90,9 @@ class DetailsAndFundTransferController extends Controller
 
                 $balance = $details->tw_balance;
 
+                
+
+
                 if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
 
                     if ( !($balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
@@ -101,7 +104,7 @@ class DetailsAndFundTransferController extends Controller
                                     "message" => "Insufficient funds."
                                 ),
                                 'balance'=> $balance,
-                                'currencycode' =>  "USD"
+                                'currencycode' =>  $details->default_currency
                             )
                         );
                         return response($response,200)
@@ -112,6 +115,30 @@ class DetailsAndFundTransferController extends Controller
                 }
                 else{
                     $current_balance = $balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
+
+                    try{
+                        TWHelpers::idenpotencyTable($decodedrequest["fundtransferrequest"]["fundinfo"]["transactionId"]);
+                    }catch(\Exception $e){
+                        $response = array(
+                            "fundtransferresponse" => array(
+                                "status" => array(
+                                    "code"=> 200,
+                                    "status" => "OK",
+                                    "message" => "The request was successfully completed."
+                                ),
+                                'accountid' =>  $details->tw_player_bal_id,
+                                'accountname' =>  $details->client_player_id,
+                                'email' =>  $details->email,
+                                'balance' => $balance,
+                                'currencycode' =>  $details->default_currency,
+                            )
+                        );
+    
+                        return response($response,200)
+                        ->header('Content-Type', 'application/json');
+                    }
+
+                    
                 } 
 
                 TWHelpers::updateTWBalance($current_balance, $details->tw_player_bal_id);
@@ -142,7 +169,7 @@ class DetailsAndFundTransferController extends Controller
                                 "message" => "Insufficient funds."
                             ),
                             'balance'=> $balance,
-                            'currencycode' =>  "USD"
+                            'currencycode' =>  $details->default_currency
                         )
                     );
                     return response($response,200)
@@ -155,10 +182,10 @@ class DetailsAndFundTransferController extends Controller
                         "status" => array(
                             "code"=>402,
                             "status" => "Failed",
-                            "message" => "UNAUTHENTICATED_REQUEST"
+                            "message" => "Player Not Found"
                         ),
                         'balance'=> "0.00",
-                        'currencycode' => "USD"
+                        'currencycode' => ""
                     )
                 );
                 return response($response,200)
@@ -173,7 +200,7 @@ class DetailsAndFundTransferController extends Controller
                         "message" => "UNAUTHENTICATED_REQUEST"
                     ),
                     'balance'=> "0.00",
-                    'currencycode' => "USD"
+                    'currencycode' => ""
                 )
             );
             return response($response,200)

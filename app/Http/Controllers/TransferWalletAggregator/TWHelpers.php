@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\TransferWalletAggregator;
 
 use App\Helpers\Helper;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+
 use DB;
 
 
@@ -241,6 +244,24 @@ class TWHelpers {
     public static function updateTWPlayerAccountsRequestLogs($data, $tw_log_id){
         return DB::table('tw_player_account_request_logs')->where('tw_log_id',$tw_log_id)->update($data);
     }
+
+    public static function idenpotencyTable($provider_trans_id){
+		return DB::select("INSERT INTO  tw_player_transaction_idom (tw_transaction_id) VALUES (".$provider_trans_id.")");
+	}
+
+    public static function multiplePartition($start,$end){
+		$period = CarbonPeriod::create(date("Y-m-d", strtotime($start)), date("Y-m-d", strtotime($end)) );
+        $partition_date = '';
+        foreach($period as $pdate){
+            if($pdate->format("Y-m-d") == date("Y-m-d", strtotime($start))){
+                $partition_date .= "p".$pdate->format("Ymd");
+            }else{
+                $partition_date .= ",p".$pdate->format("Ymd");
+            }
+        }
+        return  "partition ($partition_date)";
+	}
+
 }
 
 ?>
