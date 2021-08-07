@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Helpers\GoldenFHelper; # Migrated To TransferWalletHelper (Centralization) Query Builder To RAW SQL DONT REMOVE COMMENT FOR NOW - RiAN
 use App\Helpers\TransferWalletHelper;
 use App\Helpers\SessionWalletHelper;
+use App\Models\GameTransactionMDB;
 use DB;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
@@ -538,6 +539,7 @@ class GoldenFController extends Controller
 
     public function BetRecordPlayerGet($client_details, $game_transaction_id)
     {
+        Helper::saveLog('GoldenF BetRecordPlayerGet', $this->provider_db_id, json_encode($client_details), 'ENDPOINT HIT');
         $client_details = ProviderHelper::getClientDetails('player_id', 10210);
         $http = new Client();
         $response = $http->post(GoldenFHelper::changeEnvironment($client_details)->api_url."/Bet/Record/Player/Get",[
@@ -626,7 +628,7 @@ class GoldenFController extends Controller
     public function swPlayerBalance(Request $request){
 
         
-        GoldenFHelper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        Helper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -657,7 +659,7 @@ class GoldenFController extends Controller
             ],
             "code" => 0
         ];
-        GoldenFHelper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), $response);
+        Helper::saveLog('GoldenF swPlayerBalance', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
 
@@ -667,8 +669,7 @@ class GoldenFController extends Controller
      */
  public function swTransferOut(Request $request){
 
-    
-        GoldenFHelper::saveLog('GoldenF swTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        Helper::saveLog('GoldenF swTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -704,23 +705,56 @@ class GoldenFController extends Controller
         $token_id = $client_details->token_id;
        
         // $game_ext_check = ProviderHelper::findGameExt($round_id, 1, 'round_id');
-        $game_ext_check = ProviderHelper::findGameExt($provider_trans_id, 1, 'transaction_id');
+        $game_ext_check = $this->findGameExt($round_id, 1, 'round_id', $client_details);
+        // $game_ext_check = $game_ext_check[0];
+        // dd($game_ext_check->connection_name);
         if($game_ext_check != 'false'){ // Duplicate transaction
+            $client_details->connection_name = $game_ext_check->connection_name;
             if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){
                 return $response = ["data" => null,"code" => 7104, 'msg' => 'Duplicate Transaction'];
             }
         }
-
-        $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
-        $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type,$data);
+        $gameTransactionData = array(
+                "provider_trans_id" => $provider_trans_id,
+                "token_id" => $token_id,
+                "game_id" => $game_code,
+                "round_id" => $round_id,
+                "bet_amount" => $bet_amount,
+                "pay_amount" => $pay_amount,
+                "income" => $income,
+                "win" => $win_or_lost,
+                "entry_id" => $method,
+            );
+        $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+        // $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
+        $gametransactionext = array(
+                "game_trans_id" => $gamerecord,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" =>$round_id,
+                "amount" => $bet_amount,
+                "game_transaction_type"=> $game_transaction_type,
+                "provider_request" => json_encode($data),
+            );
+        $game_transextension = GameTransactionMDB::createGameTransactionExt($gametransactionext,$client_details);
+        // $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type,$data);
 
         try {
             $client_response = ClientRequestHelper::fundTransfer($client_details,abs($bet_amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, 'debit');
         } catch (\Exception $e) {
             $response = ["data" => null,"code" => 7000, 'msg'=> 'Server Error'];
-            ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, json_encode($response), 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-            GoldenFHelper::saveLog('GoldenF FATAL ERROR', $this->provider_db_id, $response, $e->getMessage());
+            // ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
+
+            $dataToUpdate = [
+                "provider_request" => $data,
+                "mw_response" => json_encode($response),
+                "mw_request"=> 'FAILED',
+                "client_response" => $e->getMessage(),
+                "transaction_detail" => 'FAILED',
+                "general_details" => $general_details
+            ];
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, json_encode($response), 'FAILED', $e->getMessage(), 'FAILED', $general_details);
+            ProviderHelper::saveLog('GoldenF FATAL ERROR', $this->provider_db_id, $response, $e->getMessage());
             return $response;
         }
 
@@ -752,12 +786,30 @@ class GoldenFController extends Controller
             $general_details['provider']['before_balance'] = $this->formatAmounts($general_details['client']['before_balance']);
             $general_details['provider']['amount'] =  $this->formatAmounts($bet_amount);
             $general_details['provider']['balance'] = $this->formatAmounts($client_response->fundtransferresponse->balance);
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+            $dataToUpdate = [
+                "provider_request" => json_encode($data),
+                "mw_response" => json_encode($response),
+                "mw_request"=> json_encode($client_response->requestoclient),
+                "client_response" => json_encode($client_response),
+                "transaction_detail" => json_encode($response),
+                "general_details" => json_encode($general_details)
+            ];
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
         }elseif(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402"){
             ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 6);
             $response = ["data" => null,"code" => 7202, 'msg' => 'Low Balance'];
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response,'FAILED', $client_response, 'FAILED', $general_details);
+            $dataToUpdate = [
+                "provider_request" => json_encode($data),
+                "mw_response" => json_encode($response),
+                "mw_request"=> 'FAILED',
+                "client_response" => json_encode($client_response),
+                "transaction_detail" => 'FAILED',
+                "general_details" => json_encode($general_details)
+            ];
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response,'FAILED', $client_response, 'FAILED', $general_details);
         }
         Helper::saveLog('GoldenF swTransferOut', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
@@ -765,7 +817,7 @@ class GoldenFController extends Controller
     
 
     public function swTransferIn(Request $request){
-        GoldenFHelper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HITT');
+        Helper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HITT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -811,25 +863,40 @@ class GoldenFController extends Controller
         $game_code = $game_information->game_id;
         $token_id = $client_details->token_id;
         //dd($client_details);
-        $game_ext_check = ProviderHelper::findGameExt($provider_trans_id, 2, 'transaction_id');
+        $game_ext_check = $this->findGameExt($provider_trans_id, 2, 'transaction_id', $client_details);
+        // $game_ext_check = ProviderHelper::findGameExt($provider_trans_id, 2, 'transaction_id');
         // $game_ext_check = ProviderHelper::findGameExt($round_id, 2, 'round_id');
         if($game_ext_check != 'false'){ // Duplicate transaction
+            $client_details->connection_name = $game_ext_check->connection_name;
             if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){
                 return $response = ["data" => null,"code" => 7000, 'msg' => 'Duplicate Transaction'];
             }
         }
-
-        $game_ext_check = ProviderHelper::findGameExt($round_id, 1, 'round_id');
+        
+        $game_ext_check = $this->findGameExt($round_id, 1, 'round_id', $client_details);
+        // dd($game_ext_check);
+        // $game_ext_check = ProviderHelper::findGameExt($round_id, 1, 'round_id');
         if($game_ext_check == 'false'){ // Duplicate transaction
             return $response = ["data" => null,"code" => 7105, 'msg' => 'No results'];
         }
-
         $gamerecord = $game_ext_check->game_trans_id;
-        $existing_bet = ProviderHelper::findGameTransaction($gamerecord,'game_transaction');
+        $existing_bet = GameTransactionMDB::findGameTransactionDetails($gamerecord, 'game_transaction', false, $client_details);
+        // $existing_bet = ProviderHelper::findGameTransaction($gamerecord,'game_transaction');
         $holded_balance = GoldenFHelper::getHoldPlayerBalanceToBeDeducted($client_details);
-        
+        $client_details->connection_name = $game_ext_check->connection_name;
+        // update while on other server
+       
         // $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
-        $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $amount, $game_transaction_type,$data);
+        $gametransactionext = array(
+                "game_trans_id" => $gamerecord,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" =>$round_id,
+                "amount" => $amount,
+                "game_transaction_type"=> $game_transaction_type,
+                "provider_request" => json_encode($data),
+            );
+        $game_transextension = GameTransactionMDB::createGameTransactionExt($gametransactionext,$client_details);
+        // $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $amount, $game_transaction_type,$data);
         $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, 'credit');
         if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
@@ -858,7 +925,15 @@ class GoldenFController extends Controller
                 "code" => 0
             ];
             $after_balance =$calculatedbalance;
-            ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
+            $trans_data = array(
+                  'win' => $win_or_lost,
+                  'pay_amount' => $pay_amount,
+                  'income' => $income,
+                  'entry_id' => $entry_id,
+                  // 'trans_status' => 2
+            );
+            GameTransactionMDB::updateGametransaction($trans_data,$gamerecord,$client_details);
+            // ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
         }elseif(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402"){
             $response = [
@@ -874,7 +949,7 @@ class GoldenFController extends Controller
             ];
             $after_balance = $calculatedbalance;
             Providerhelper::createRestrictGame($game_information->game_id,$client_details->player_id,$game_transextension, $client_response->requestoclient);
-            GoldenFHelper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
+            Helper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
             return $response;
         }
 
@@ -895,8 +970,17 @@ class GoldenFController extends Controller
             GoldenFHelper::updateHoldPlayerBalance($client_details, $this->formatAmounts($calculatedbalance), 'custom');
             // dd(2);
         }
-        ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-        GoldenFHelper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
+        $dataToUpdate = [
+            "provider_request" => json_encode($data),
+            "mw_response" => json_encode($response),
+            "mw_request"=> json_encode($client_response->requestoclient),
+            "client_response" => json_encode($client_response),
+            "transaction_detail" => json_encode($response),
+            "general_details" => json_encode($general_details)
+        ];
+        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
+        // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+        Helper::saveLog('GoldenF swTransferIn', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
     
@@ -905,7 +989,7 @@ class GoldenFController extends Controller
      * Refund Cancel Payoff
      */
     public function swforceTransferOut(Request $request){
-        GoldenFHelper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        Helper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -949,8 +1033,10 @@ class GoldenFController extends Controller
         //     }
         // }
 
-        $game_ext_check = ProviderHelper::findGameExt($round_id, 1, 'round_id');
+        // $game_ext_check = ProviderHelper::findGameExt($round_id, 1, 'round_id');
+        $game_ext_check = $this->findGameExt($round_id, 1, 'round_id', $client_details);
         if($game_ext_check == 'false'){ // Duplicate transaction
+            $client_details->connection_name = $game_ext_check->connection_name;
             return $response = ["data" => null,"code" => 7105, 'msg' => 'No results'];
         }
 
@@ -975,17 +1061,35 @@ class GoldenFController extends Controller
         // dd($client_details->balance);
         // dd($data->amount);
         $gamerecord = $game_ext_check->game_trans_id;
-        $existing_bet = ProviderHelper::findGameTransaction($gamerecord,'game_transaction');
-
+        $existing_bet = GameTransactionMDB::findGameTransactionDetails($gamerecord, 'game_transaction', false, $client_details);
+        // $existing_bet = ProviderHelper::findGameTransaction($gamerecord,'game_transaction');
+        $client_details->connection_name = $game_ext_check->connection_name;
         // $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
-        $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $amount, $game_transaction_type,$data);
-
+            $gametransactionext = array(
+                    "game_trans_id" => $gamerecord,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" =>$round_id,
+                    "amount" => $amount,
+                    "game_transaction_type"=> $game_transaction_type,
+                    "provider_request" => json_encode($data),
+                );
+            $game_transextension = GameTransactionMDB::createGameTransactionExt($gametransactionext,$client_details);
+        // $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $amount, $game_transaction_type,$data);
         try {
             $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, $transaction_type, true);
         } catch (\Exception $e) {
             $response = ["data" => null, "code" => 7000, 'msg'=>'Server Internal Error'];
-            ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, json_encode($response), 'FAILED', $e->getMessage(), 'FAILED', $general_details);
+            // ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
+            $dataToUpdate = [
+                "provider_request" => json_encode($data),
+                "mw_response" => json_encode($response),
+                "mw_request"=> 'FAILED',
+                "client_response" => json_encode($e->getMessage()),
+                "transaction_detail" =>  'FAILED',
+                "general_details" => json_encode($general_details)
+            ];
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, json_encode($response), 'FAILED', $e->getMessage(), 'FAILED', $general_details);
             ProviderHelper::saveLog('GoldenF FATAL ERROR', $this->provider_db_id, $response, $e->getMessage());
             // Providerhelper::createRestrictGame($game_information->game_id,$client_details->player_id,$game_transextension, $client_response->requestoclient);
             return $response;
@@ -1048,7 +1152,16 @@ class GoldenFController extends Controller
             $general_details['provider']['amount'] =  $this->formatAmounts($amount);
             $general_details['provider']['balance'] = $this->formatAmounts($balance);
             // ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+            $dataToUpdate = [
+                "provider_request" => json_encode($data),
+                "mw_response" => json_encode($response),
+                "mw_request"=> json_encode($client_response->requestoclient),
+                "client_response" => json_encode($client_response),
+                "transaction_detail" =>  json_encode($response),
+                "general_details" => json_encode($general_details)
+            ];
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
         }elseif(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402"){
             # NEED TO HOLD THE AMOUNT TO (player_balance)
@@ -1096,17 +1209,26 @@ class GoldenFController extends Controller
             $general_details['provider']['amount'] =  $this->formatAmounts($amount);
             $general_details['provider']['balance'] = $this->formatAmounts($balance);
             // $response = ["data" => null,"code" => 7202, 'msg' => 'Not Enough Balance'];
-            ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, "TOO_MUCH_ROLLBACK",$general_details);
+            $dataToUpdate = [
+                "provider_request" => json_encode($data),
+                "mw_response" => json_encode($response),
+                "mw_request"=> json_encode($client_response->requestoclient),
+                "client_response" => json_encode($client_response),
+                "transaction_detail" =>  "TOO_MUCH_ROLLBACK",
+                "general_details" => json_encode($general_details)
+            ];
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, "TOO_MUCH_ROLLBACK",$general_details);
             // Helper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), $response);
             return $response;
         }
         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-        GoldenFHelper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), $response);
+        Helper::saveLog('GoldenF swforceTransferOut', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
 
     public function swQuerytranslog(Request $request){
-        GoldenFHelper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+        Helper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = json_decode(json_encode($request->all()));
 
         if(!$request->has("wtoken")){
@@ -1140,7 +1262,7 @@ class GoldenFController extends Controller
             ],
             "code" => 0
         ];
-        GoldenFHelper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), $response);
+        Helper::saveLog('GoldenF swQuerytranslog', $this->provider_db_id, json_encode($request->all()), $response);
         return $response;
     }
 
@@ -1280,6 +1402,59 @@ class GoldenFController extends Controller
         ]);
         $result = $transaction_db->latest()->first(); 
         return $result ? $result : 'false';
+    }
+    public  static function findGameExt($provider_identifier, $game_transaction_type=false, $type,$client_details)
+    {
+        $game_trans_type = '';
+        if($game_transaction_type != false){
+            $game_trans_type = "and gte.game_transaction_type = ". $game_transaction_type;
+        }
+        if ($type == 'transaction_id') {
+            $where = 'where gte.provider_trans_id = "'.$provider_identifier.'" '.$game_trans_type.' AND gte.game_transaction_type = '.$game_transaction_type.' AND gte.transaction_detail != "FAILED"' ;
+        }
+        if ($type == 'round_id') {
+            $where = 'where gte.round_id = "' . $provider_identifier.'" '.$game_trans_type.' AND gte.game_transaction_type = '.$game_transaction_type.' AND gte.transaction_detail != "FAILED"' ;
+        }
+        if ($type == 'game_transaction_ext_id') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
+        }
+        if ($type == 'game_trans_id') {
+            $where = 'where gte.game_trans_id = "' . $provider_identifier . '" ';
+        }
+        try {
+            $connection_name = $client_details->connection_name;
+            $details = [];
+            $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
+            $status = GameTransactionMDB::checkDBConnection($connection);
+            if ( ($connection != null) && $status) {
+                $connection = config("serverlist.server_list.".$client_details->connection_name);
+                $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+            }
+            if ( !(count($details) > 0) )  {
+                $connection_list = config("serverlist.server_list");
+                foreach($connection_list as $key => $connection){
+                    $status = GameTransactionMDB::checkDBConnection($connection["connection_name"]);
+                    if($status && $connection_name != $connection["connection_name"]){
+                        $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                        if ( count($data) > 0  ) {
+                            $connection_name = $key;// key is the client connection_name
+                            $details = $data;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $count = count($details);
+            if ($count > 0) {
+                //apend on the details the connection which mean to rewrite the client_details
+                $details[0]->connection_name = $connection_name;
+            }
+            return $count > 0 ? $details[0] : 'false';
+        } catch (\Exception $e) {
+            return 'false';
+        }
+
     }
 
 }
