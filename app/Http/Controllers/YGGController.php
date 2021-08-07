@@ -276,7 +276,7 @@ class YGGController extends Controller
                 "game_trans_id" => $checkTrans->game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $round_id,
-                "amount" => $checkTrans->amount,
+                "amount" => $checkTrans->pay_amount,
                 "game_transaction_type"=> 3,
                 "provider_request" => json_encode($request->all()),
                 "mw_response" => json_encode($response)
