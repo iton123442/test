@@ -321,49 +321,53 @@ class WalletDetailsController extends Controller
 
         $from = date("Y-m-d H:i:s", strtotime($request->date));
         $to = date("Y-m-d H:i:s", strtotime($request->date." 23:59:59"));
+       
         if($request->has('start_time')){ 
             $from = date("Y-m-d H:i:s", strtotime($request->date." ".$request->start_time));
         }
         if($request->has('end_time')){ 
             $to = date("Y-m-d H:i:s", strtotime($request->date." ".$request->end_time));
         }
-
+       
         $partition = TWHelpers::multiplePartition($from,$to);
-        
         $and_player = "and player_id  = (SELECT player_id FROM players WHERE client_id = ".$request->client_id." AND client_player_id = '".$request->client_player_id."' LIMIT 1)  ";
         if ($request->client_player_id == "all") {
             $and_player = '';
         }
         $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
+
         $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
+
         $status = GameTransactionMDB::checkDBConnection($connection);
+
         if ( ($connection != null) && $status) {
 
             try {
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
-                if ($client_details->connection_name == "server_TW" || $client_details->connection_name == "mysql"  || $client_details->connection_name == "default" ) {
+
+                if ($connection["connection_name"] == "mysql" || $connection["connection_name"] == "server1" ) {
                     //default
                     $connection["TG_GameInfo"] = $connection["db_list"][1];
                     $connection["TG_PlayerInfo"] = $connection["db_list"][1];
                     $connection["TG_ClientInfo"] = $connection["db_list"][1];
 
                     //trans_id
-                    $connection["Trans_DB"] = "summary_report";
-                    $connection["Trans_Table"] = "trans_start_end";
-                    $transDate = "tse_date = '".$request->date."' ";
+                    // $connection["Trans_DB"] = "summary_report";
+                    // $connection["Trans_Table"] = "trans_start_end";
+                    // $transDate = "tse_date = '".$request->date."' ";
                 } else {
                     $connection["TG_GameInfo"] = "TG_GameInfo";
                     $connection["TG_PlayerInfo"] = "TG_PlayerInfo";
                     $connection["TG_ClientInfo"] = "TG_ClientInfo";
 
                     //trans id
-                    $connection["Trans_DB"] = $connection["db_list"][1];
-                    $connection["Trans_Table"] = "trans_id_tracer";
-                    $transDate = "trans_id_tracer = '".$request->date."' ";
+                    // $connection["Trans_DB"] = $connection["db_list"][1];
+                    // $connection["Trans_Table"] = "trans_id_tracer";
+                    // $transDate = "trans_id_tracer = '".$request->date."' ";
                 }
 
                 // api -test db
-                $get_trans_id = DB::connection( $connection["connection_name"] )->select('select min(start_id) start_id, max(end_id) end_id from '.$connection["Trans_DB"].'.'.$connection["Trans_Table"].' where '.$transDate.' limit 1 ')[0];
+                // $get_trans_id = DB::connection( $connection["connection_name"] )->select('select min(start_id) start_id, max(end_id) end_id from '.$connection["Trans_DB"].'.'.$connection["Trans_Table"].' where '.$transDate.' limit 1 ')[0];
 
                 //return if not empty
                 // if (count($get_trans_id) == 0) {
@@ -375,9 +379,10 @@ class WalletDetailsController extends Controller
                 $total_data = DB::connection( $connection["connection_name"] )->select("
                     select 
                     count(game_trans_id) total
-                    from ".$connection["db_list"][1].".game_transactions c 
-                    where game_trans_id between ".$get_trans_id->start_id." AND ".$get_trans_id->end_id." AND  c.client_id = ".$request->client_id." AND convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' ".$and_player.";
+                    from ".$connection["db_list"][1].".game_transactions $partition c 
+                    where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id."  ".$and_player.";
                     ")[0];
+              
 
                 $query = "
                     select 
@@ -398,8 +403,8 @@ class WalletDetailsController extends Controller
                         when win = 4 then 'refunded'
                     end as status,
                     convert_tz(c.created_at,'+00:00', '+08:00') created_at
-                    from ".$connection["db_list"][1].".game_transactions c 
-                    where game_trans_id between ".$get_trans_id->start_id." AND ".$get_trans_id->end_id." AND  c.client_id = ".$request->client_id." AND convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' ".$and_player."
+                    from ".$connection["db_list"][1].".game_transactions ".$partition." c 
+                    where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
                     order by game_trans_id desc
                     limit ".$request->page.", ".TWHelpers::getLimitAvailable($request->limit).";
                 ";
@@ -493,7 +498,7 @@ class WalletDetailsController extends Controller
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
                 $client_transaction_id = $request->client_id."_".$reference_id;
 
-                if ($client_details->connection_name == "server_TW" || $client_details->connection_name == "mysql" || $client_details->connection_name == "default" ) {
+                if ($connection["connection_name"] == "mysql" || $connection["connection_name"] == "server1" ) {
                     //default
                     $connection["TG_GameInfo"] = $connection["db_list"][1];
                     $connection["TG_PlayerInfo"] = $connection["db_list"][1];
