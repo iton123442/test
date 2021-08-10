@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\ProviderHelper;
 use App\Helpers\Helper;
+use App\Helpers\FreeSpinHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
@@ -136,11 +137,41 @@ class SlotMillController extends Controller
             "provider_request" =>json_encode($request->all()),
         );
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-        
-        $general_details = ["aggregator" => [], "provider" => [], "client" => []];
+        $fund_extra_data = [];
+        if(isset($request["prepaidref"])) {
+            $fund_extra_data = [
+	            'fundtransferrequest' => [
+					'fundinfo' => [
+						'freespin' => true
+					]
+				]
+	        ];
+           //getTransaction
+           $getFreespin = FreeSpinHelper::getFreeSpinDetails($request["prepaidref"], "provider_trans_id" );
+
+           if($getFreespin){
+             //update transaction
+                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                $updateFreespinData = [
+                    "status" => $status,
+                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                ];
+                $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                //create transction 
+                $createFreeRoundTransaction = array(
+                    "game_trans_id" => $game_trans_id,
+                    'freespin_id' => $getFreespin->freespin_id
+                );
+                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+           }
+          
+          
+        }
+
         try {
-            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit","false");
-            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+           
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit","false", $fund_extra_data);
+            
         } catch (\Exception $e) {
             $response = [
                 "code" => 1,
@@ -170,6 +201,7 @@ class SlotMillController extends Controller
 
             switch ($client_response->fundtransferresponse->status->code) {
                 case "200":
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $response = [
                         "code" => 0,
                         "data" => [
@@ -304,9 +336,8 @@ class SlotMillController extends Controller
 
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
         //Initialize data to pass
-        // $win = $amount > 0  ?  1 : 0;  /// 1win 0lost
         $win = 4;  /// 1win 0lost
-        $entry_id = $amount > 0  ?  2 : 1; 
+        $entry_id = 2;
 
         $updateGameTransaction = [
             'win' => 5,
@@ -321,7 +352,7 @@ class SlotMillController extends Controller
             "type" => "credit",
             "win" => $win,
             "token" => $client_details->player_token,
-            "rollback" => "true",
+            "rollback" => true,
             "game_details" => [
                 "game_id" => $game_details->game_id
             ],
@@ -448,7 +479,7 @@ class SlotMillController extends Controller
         
         $transaction_uuid = $request["reference"];
         $reference_transaction_uuid = $request["subreference"];
-        $amount = $request["amount"];
+        $amount = $request["amount"] + $request["bonusprize"];
 
         $balance = $client_details->balance + $amount;
         $response = [
