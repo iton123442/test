@@ -292,7 +292,7 @@ class ClientRequestHelper{
 
         try{
             # This will call our server for async request! Cut The Connection within 10ms and leave it to the server!
-            $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl').'/tigergames/fundtransfer',
+            $guzzle_response = $client->post(config('providerlinks.cut_call_server').'/tigergames/fundtransfer',
                 [
                     'on_stats' => function (TransferStats $stats) use ($requesttocient) {
                         $data = [

@@ -3,8 +3,9 @@
 $middleware_url_api = 'https://api.betrnk.games';
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play.betrnk.games';
-
+$cut_call ='https://cutcall.betrnk.games';
 return [
+    'cut_call_server' => $cut_call,
     'play_betrnk' => $play_betrnk,
     'tigergames' => $gamelobby_site,
     'oauth_mw_api' => [
