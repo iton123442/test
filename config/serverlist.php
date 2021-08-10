@@ -150,13 +150,13 @@ return [
                 'wt_mw_op_xigolo' // game_transaction
             ]
         ],
-        // "server2-mas46" =>[
-        //     'connection_name'=>'server2',
-        //     'db_list'=> [
-        //         'wt_mw_op_mas46_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_mas46' // game_transaction
-        //     ]
-        // ],
+        "server2-mas46" =>[
+            'connection_name'=>'server2',
+            'db_list'=> [
+                'wt_mw_op_mas46_ext',  //game_trasnaction_ext
+                'wt_mw_op_mas46' // game_transaction
+            ]
+        ],
         // "server3" =>[
         //     'connection_name'=>'server3',
         //     'db_list'=> [
