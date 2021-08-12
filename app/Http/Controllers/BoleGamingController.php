@@ -12,6 +12,7 @@ use App\Helpers\GameSubscription;
 use App\Helpers\GameRound;
 use App\Helpers\Game;
 use App\Helpers\CallParameters;
+use App\Models\GameTransactionMDB;
 
 use DB;
 use Illuminate\Http\Request;
@@ -160,7 +161,7 @@ class BoleGamingController extends Controller
 				return $data;
 			}
 			
-			$total_failed_req = count(ProviderHelper::findAllFailedGameExt($json_data->report_id, 'transaction_id'));
+			$total_failed_req = count($this::findAllFailedGameExt($json_data->report_id, 'transaction_id', $client_details));
 			if($total_failed_req > 2){
 				$data = [
 					"data" => [],
@@ -310,7 +311,7 @@ class BoleGamingController extends Controller
 							// OLD
 							// $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_details->game_id, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id);
 							// END OLD
-							$check_game_ext = ProviderHelper::findGameExt($json_data->report_id, 1, 'transaction_id');
+							$check_game_ext = GameTransactionMDB::findGameExt($json_data->report_id, 1, 'transaction_id',$client_details);
 							if($check_game_ext == 'false'){
 								// $data = ["resp_msg" => ["code" => 2,"message" => "order does not exist","errors" => []]];
 								$data = [
@@ -326,7 +327,9 @@ class BoleGamingController extends Controller
 								// $data = ["resp_msg" => ["code" => 43303,"message" => "order does not exist","errors" => []]];
 								return $data;
 							}
-							$existing_bet = ProviderHelper::findGameTransaction($check_game_ext->game_trans_id, 'game_transaction');
+							$existing_bet = GameTransactionMDB::findGameTransactionDetails($check_game_ext->game_trans_id, 'game_transaction', false, $client_details);
+							$client_details->connection_name = $existing_bet->connection_name;
+							// $existing_bet = ProviderHelper::findGameTransaction($check_game_ext->game_trans_id, 'game_transaction');
 							if($pay_amount == 0){
 								$method = 1;
 								$win_or_lost = 0;
@@ -334,18 +337,26 @@ class BoleGamingController extends Controller
 								$method = 2;
 								$win_or_lost = 1;
 							}
-							ProviderHelper::updateBetTransaction($existing_bet->round_id, $pay_amount, $income, $win_or_lost, $method);
-							$update = DB::table('game_transactions')
-		              	    ->where('round_id', $existing_bet->round_id)
-		               		->update(['pay_amount' => $pay_amount, 
-				        		  'income' => $existing_bet->bet_amount - $pay_amount, 
-				        		  'game_id' => $game_details->game_id, 
-				        		  'win' => $win_or_lost, 
-				        		  'entry_id' => $method,
-				        		  'transaction_reason' => ProviderHelper::updateReason($win_or_lost),
-			    			]);
+							$trans_data = array(
+						 		  'win' => $win_or_lost,
+		                          'pay_amount' => $pay_amount,
+		                          'income' => $income,
+		                          'entry_id' => $method,
+		                          // 'trans_status' => 2
+							);
+							GameTransactionMDB::updateGametransaction($trans_data,$existing_bet->game_trans_id,$client_details);
+							// ProviderHelper::updateBetTransaction($existing_bet->game_trans_id, $pay_amount, $income, $win_or_lost, $method);
+							// $update = DB::table('game_transactions')
+		     //          	    ->where('round_id', $existing_bet->round_id)
+		     //           		->update(['pay_amount' => $pay_amount, 
+				   //      		  'income' => $existing_bet->bet_amount - $pay_amount, 
+				   //      		  'game_id' => $game_details->game_id, 
+				   //      		  'win' => $win_or_lost, 
+				   //      		  'entry_id' => $method,
+				   //      		  'transaction_reason' => ProviderHelper::updateReason($win_or_lost),
+			    // 			]);
 						}else{
-							$check_game_ext = ProviderHelper::findGameExt($json_data->report_id, 1, 'transaction_id');
+							$check_game_ext = GameTransactionMDB::findGameExt($json_data->report_id, 1, 'transaction_id',$client_details);
 							if($check_game_ext == 'false'){
 								// $data = ["resp_msg" => ["code" => 2,"message" => "order does not exist","errors" => []]];
 								$data = [
@@ -362,18 +373,27 @@ class BoleGamingController extends Controller
 								Helper::saveLog('BOLE playerWalletCost - ORDER NOT EXIST '.$json_data->report_id, $this->provider_db_id,$request->getContent(), $data);
 								return $data;
 							}
-							$existing_bet = ProviderHelper::findGameTransaction($check_game_ext->game_trans_id, 'game_transaction');
-							ProviderHelper::updateBetTransaction($existing_bet->round_id, $pay_amount, $income, $win_or_lost, $method);
-
-							$update = DB::table('game_transactions')
-		              	    ->where('round_id', $existing_bet->round_id)
-		               		->update(['pay_amount' => $pay_amount, 
-				        		  'income' => $income, 
-				        		  'game_id' => $game_details->game_id, 
-				        		  'win' => $win_or_lost, 
-				        		  'entry_id' => $method,
-				        		  'transaction_reason' => ProviderHelper::updateReason($win_or_lost),
-			    			]);
+							$existing_bet = GameTransactionMDB::findGameTransactionDetails($check_game_ext->game_trans_id, 'game_transaction', false, $client_details);
+							$client_details->connection_name = $existing_bet->connection_name;
+							// ProviderHelper::updateBetTransaction($existing_bet->game_trans_id, $pay_amount, $income, $win_or_lost, $method);
+							$trans_data = array(
+						 		  'win' => $win_or_lost,
+		                          'pay_amount' => $pay_amount,
+		                          'income' => $income,
+		                          'entry_id' => $method,
+		                          // 'trans_status' => 2
+							);
+							GameTransactionMDB::updateGametransaction($trans_data,$existing_bet->game_trans_id,$client_details);
+							// $update = DB::table('game_transactions')
+		     //          	    // ->where('round_id', $existing_bet->round_id)
+		     //          	    ->where('round_id', $existing_bet->round_id)
+		     //           		->update(['pay_amount' => $pay_amount, 
+				   //      		  'income' => $income, 
+				   //      		  'game_id' => $game_details->game_id, 
+				   //      		  'win' => $win_or_lost, 
+				   //      		  'entry_id' => $method,
+				   //      		  'transaction_reason' => ProviderHelper::updateReason($win_or_lost),
+			    // 			]);
 						}
 
 						if(in_array($json_data->game_code, $contest_games)){
@@ -402,8 +422,17 @@ class BoleGamingController extends Controller
 
 						try
 						{	
-
-							$game_transextension = ProviderHelper::createGameTransExtV2($existing_bet->game_trans_id,$provider_trans_id, $json_data->report_id, $pay_amount, 2);
+							$gametransactionext = array(
+			                    "game_trans_id" => $existing_bet->game_trans_id,
+			                    "provider_trans_id" => $provider_trans_id,
+			                    "round_id" =>$json_data->report_id,
+			                    "amount" => $pay_amount,
+			                    "game_transaction_type"=>2,
+			                    "provider_request" => 'FAILED',
+			                    "mw_response" => 'FAILED'
+			                );
+			                $game_transextension = GameTransactionMDB::createGameTransactionExt($gametransactionext,$client_details);
+							// $game_transextension = ProviderHelper::createGameTransExtV2($existing_bet->game_trans_id,$provider_trans_id, $json_data->report_id, $pay_amount, 2);
 
 							// LOGGER
 							$general_details['aggregator']['transaction_type'] = $transaction_type;
@@ -418,7 +447,8 @@ class BoleGamingController extends Controller
 							   
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
-								ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
+
+								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
 								Helper::saveLog('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
 								return $data;
 							}
@@ -441,7 +471,7 @@ class BoleGamingController extends Controller
 									]
 								];
 
-								ProviderHelper::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details);
+								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details,$client_details);
 
 							}elseif(isset($client_response->fundtransferresponse->status->code) 
 					            && $client_response->fundtransferresponse->status->code == "402"){
@@ -460,8 +490,7 @@ class BoleGamingController extends Controller
 										"msg" => "Insufficient Balance"
 									]
 								];
-
-								ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details);
+								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details,$client_details);
 
 							}
 
@@ -555,8 +584,28 @@ class BoleGamingController extends Controller
 			                $round_id = $json_data->report_id;
 			                // TEST
 
-							$gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  0, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
-							$game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type);
+			                $gameTransactionData = array(
+			                    "token_id" => $token_id,
+								"game_id" => $game_code,
+								"round_id" => $round_id,
+								"bet_amount" => $bet_amount,
+								"provider_trans_id" => $provider_trans_id,
+								"pay_amount" => 0,
+								"income" => $income,
+								"entry_id" => $method,
+								"win" => $win_or_lost,
+			                );
+			                $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+							// $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  0, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
+							$gametransactionext = array(
+			                    "game_trans_id" => $gamerecord,
+			                    "provider_trans_id" => $provider_trans_id,
+			                    "round_id" => $round_id,
+			                    "amount" => $bet_amount,
+			                    "game_transaction_type"=> $game_transaction_type,
+			                );
+			                $game_transextension = GameTransactionMDB::createGameTransactionExt($gametransactionext,$client_details);
+							// $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $bet_amount, $game_transaction_type);
 
 							// LOGGER
 							$general_details['aggregator']['transaction_type'] = $transaction_type;
@@ -571,8 +620,8 @@ class BoleGamingController extends Controller
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 								if(isset($gamerecord)){
-									ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-							        ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
+									// ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
+							        $this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
 								}
 								Helper::saveLog('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
 								return $data;
@@ -594,16 +643,26 @@ class BoleGamingController extends Controller
 										"msg" => "success"
 									]
 								];
+								// $jData = json_decode($request->getContent());
+								// $dataToUpdate = [
+								// 	"provider_request" => json_encode($jData),
+								// 	"mw_response" => json_encode($data),
+								// 	"mw_request"=> $client_response->requestoclient,
+								// 	"client_response" => $client_response,
+								// 	"transaction_detail" => json_encode($data),
+								// 	"general_details" => json_encode($general_details)
+								// ];
+								// GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transextension,$client_details);
 
-								ProviderHelper::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details);
+								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details,$client_details);
 
 							}elseif(isset($client_response->fundtransferresponse->status->code) 
 					            && $client_response->fundtransferresponse->status->code == "402"){
-								if(ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)):
-									ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 6);
-								else:
-								   ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-								endif;
+								// if(ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)):
+								// 	ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 6);
+								// else:
+								//    ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
+								// endif;
 								// $data = ["resp_msg" => ["code" => 43802,"message" => "there is not enough gold","errors" => []]];
 								// $data = ["resp_msg" => ["code" => 1,"message" => "Insufficient Balance" ,"errors" => []]];
 								// LOGGER
@@ -620,8 +679,8 @@ class BoleGamingController extends Controller
 										"msg" => "Insufficient Balance"
 									]
 								];
-
-								ProviderHelper::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, 'FAILED', $general_details);
+								
+								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, 'FAILED', $general_details,$client_details);
 
 							}
 
@@ -630,9 +689,9 @@ class BoleGamingController extends Controller
 
 					    } catch (\Exception $e) {
 					    	// $data = ["resp_msg" => ["code" => -1,"message" => 'Failed',"errors" => []]];
-					    	if(isset($gamerecord)){
-									ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-							}
+					  //   	if(isset($gamerecord)){
+							// 		ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
+							// }
 					    	$data = [
 								"data" => [],
 								"status" => [
@@ -693,20 +752,42 @@ class BoleGamingController extends Controller
 			return $data;
 		}
 
-		public function findAllGameExt($provider_identifier, $type) {
-			$transaction_db = DB::table('game_transaction_ext as gte');
+		public static function findAllFailedGameExt($provider_identifier, $type, $client_details) {
+		$connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+		$transaction_db = DB::connection($connection["connection_name"])->table(''.$connection['db_list'][0].'.game_transaction_ext as gte');
 	        if ($type == 'transaction_id') {
 				$transaction_db->where([
 			 		["gte.provider_trans_id", "=", $provider_identifier],
+			 		["gte.transaction_detail", "=", '"FAILED"'] // Intentionally qouted for DB QUERY
 			 	]);
 			}
 			if ($type == 'round_id') {
 				$transaction_db->where([
 			 		["gte.round_id", "=", $provider_identifier],
+			 		["gte.transaction_detail", "=", '"FAILED"'] // Intentionally qouted for DB QUERY
 			 	]);
 			}  
-			$result = $transaction_db->latest()->get(); 
+			$result = $transaction_db->latest()->get();
 			return $result ? $result : 'false';
 		}
+		public  static function updatecreateGameTransExt($game_trans_ext_id, $provider_request, $mw_response, $mw_request, $client_response,$transaction_detail,$general_details='NO DATA',$client_details) {
+		// DB::enableQueryLog();
+		$connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+   	    $update = DB::connection($connection["connection_name"])
+   	    		->table($connection['db_list'][0].'.game_transaction_ext')
+                ->where('game_trans_ext_id', $game_trans_ext_id)
+                ->update([
+					"provider_request" => json_encode($provider_request),
+					"mw_response" =>json_encode($mw_response),
+					"mw_request"=>json_encode($mw_request),
+					"client_response" =>json_encode($client_response),
+					"transaction_detail" =>json_encode($transaction_detail),
+					"general_details" =>json_encode($general_details)
+	    		]);
+	    // Helper::saveLog('updatecreateGameTransExt', 999, json_encode(DB::getQueryLog()), "TIME updatecreateGameTransExt");
+		return ($update ? true : false);
+		}
+		
+
 
 }
