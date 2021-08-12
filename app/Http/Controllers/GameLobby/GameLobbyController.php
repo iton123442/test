@@ -88,7 +88,7 @@ class GameLobbyController extends Controller
 
 
     public function createFallbackLink($data){
-        $log_id = Helper::saveLog('GAME LAUNCH', 99, json_encode($data), 'FAILED LAUNCH');
+        $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH', 99, json_encode($data), 'FAILED LAUNCH');
         $url =config('providerlinks.tigergames').'/tigergames/api?msg=Something went wrong please contact Tiger Games&id='.$log_id;
         return $url;
     }
@@ -119,7 +119,7 @@ class GameLobbyController extends Controller
              # CLIENT SUBSCRIPTION FILTER
             $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
             if(!$subscription_checker){
-               $log_id = Helper::saveLog('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
+               $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
                $msg = array(
                    "game_code" => $request->input("game_code"),
                    "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(3).'&id='.$log_id,
@@ -129,11 +129,11 @@ class GameLobbyController extends Controller
             }
 
             # Save Every Gamelaunch from the client
-            Helper::saveLog('GAMELAUNCH LOG', 1223, json_encode($request->all()), $request->client_player_id);
+            ProviderHelper::saveLogGameLaunch('GAMELAUNCH LOG', 1223, json_encode($request->all()), $request->client_player_id);
 
             // Filters
             if(ClientHelper::checkClientID($request->all()) != 200){
-                $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
+                $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
                 $msg = array(
                     // "error_code" => ClientHelper::checkClientID($request->all()),
                     "message" => ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())),
@@ -175,7 +175,7 @@ class GameLobbyController extends Controller
                  # EXPERIMENTAL - GAME BALANCE INHOUSE (SAVE ALL PLAYER BALANCE)
                  $save_balance = ProviderHelper::saveBalance($request->token);
                  if($save_balance == false){
-                     $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH SAVE BALANCE'.$request->client_id);
+                     $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH SAVE BALANCE'.$request->client_id);
                      $msg = array(
                          "message" => ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())),
                          "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg=Balance Acquisition Failed&id='.$log_id,

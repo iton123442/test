@@ -26,12 +26,12 @@ class GameLobby{
         $client = GameLobby::getClientDetails("token",$token);
         
         $game_list =GameLobby::icgGameUrl($client->default_currency);
-        Helper::saveLog('GAMELAUNCH ICG', 11, json_encode($game_code), json_encode($game_list));
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH ICG', 11, json_encode($game_code), json_encode($game_list));
         foreach($game_list["data"] as $game){
             if($game["productId"] == $game_code){
                 $lang = GameLobby::getLanguage("Iconic Gaming",$lang);
                 Helper::savePLayerGameRound($game["productId"],$token,$provider);
-                Helper::saveLog('GAMELAUNCH ICG', 11, json_encode($game_code), json_encode($game["href"]));
+                ProviderHelper::saveLogGameLaunch('GAMELAUNCH ICG', 11, json_encode($game_code), json_encode($game["href"]));
                 return $game["href"].'&token='.$token.'&lang='.$lang.'&home_URL='.$exitUrl;
                 
             }
@@ -41,7 +41,7 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails("token",$token);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $data = FCHelper::loginGame($client_details->player_id,$game_code,1,$exitUrl,$client_details->default_currency);
-        Helper::saveLog('GAMELAUNCH FC', 11, json_encode($game_code), json_encode($data));
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH FC', 11, json_encode($game_code), json_encode($data));
         return $data["Url"];
     }
     public static function booongoLaunchUrl($game_code,$token,$provider,$exitUrl){
@@ -158,7 +158,7 @@ class GameLobby{
         $game_details = Helper::findGameDetails("game_code",60, $data["game_code"]);
         $game_type = $game_details->info;
         $url = config('providerlinks.smartsoft.api_url').'/Loader.aspx?GameCategory='.$game_type.'&GameName='.$data['game_code'].'&Token='.$data['token'].'&PortalName='.$portal.'&Lang=en&ReturnUrl='.$data["exitUrl"];
-        Helper::saveLog('Smartsoft Gameluanch ', 60, json_encode($data), 'Endpoint Hit');
+        ProviderHelper::saveLogGameLaunch('Smartsoft Gameluanch ', 60, json_encode($data), 'Endpoint Hit');
         return $url;
     }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
@@ -175,7 +175,7 @@ class GameLobby{
         $sha1key = sha1($exitUrl.''.config("providerlinks.endorphina.nodeId").''.$profile.''.$token.''.config("providerlinks.endorphina.secretkey"));
         $sign = $sha1key; 
         Helper::savePLayerGameRound($game_code,$token,$provider);
-        Helper::saveLog('GAMELAUNCH EDP', 11, json_encode(config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign), json_encode($sign));
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH EDP', 11, json_encode(config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign), json_encode($sign));
         return config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign;
     }
 
@@ -268,7 +268,7 @@ class GameLobby{
                 'form_params' => $data,
             ]);
             $client_response = json_decode($response->getBody()->getContents());
-            Helper::saveLog('GAMELAUNCH BOLE', 11, json_encode($data), json_decode($response->getBody()));
+            ProviderHelper::saveLogGameLaunch('GAMELAUNCH BOLE', 11, json_encode($data), json_decode($response->getBody()));
             return isset($client_response->resp_data->url) ? $client_response->resp_data->url : false;
         } catch (\Exception $e) {
             return false;        
@@ -305,7 +305,7 @@ class GameLobby{
             'form_params' => $requesttosend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
-        Helper::saveLog('8Provider GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), json_decode($response->getBody()));
+        ProviderHelper::saveLogGameLaunch('8Provider GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), json_decode($response->getBody()));
         return isset($res['data']['link']) ? $res['data']['link'] : false;
     }
 
@@ -324,14 +324,14 @@ class GameLobby{
         $merchant_id = AWSHelper::findMerchantIdByClientId($client_details->client_id)['merchant_id'];
         $player_check = AWSHelper::playerCheck($token);
         if(!$player_check){
-            Helper::saveLog('AWS Launch Game Failed', 21, json_encode($client_details), $client_details);
+            ProviderHelper::saveLogGameLaunch('AWS Launch Game Failed', 21, json_encode($client_details), $client_details);
             return 'false';
         }
         
         if($player_check->code == 100){ // Not Registered!
             $register_player = AWSHelper::playerRegister($token);
             if($register_player->code != 2217 && $register_player->code != 0){
-                 Helper::saveLog('AWS Launch Game Failed', 21, json_encode($register_player), $register_player);
+                 ProviderHelper::saveLogGameLaunch('AWS Launch Game Failed', 21, json_encode($register_player), $register_player);
                  return 'false';
             }
         }
@@ -355,7 +355,7 @@ class GameLobby{
             ['body' => json_encode($requesttosend)]
         );
         $provider_response = json_decode($guzzle_response->getBody()->getContents());
-        Helper::saveLog('AWS Launch Game', 21, json_encode($requesttosend), $provider_response);
+        ProviderHelper::saveLogGameLaunch('AWS Launch Game', 21, json_encode($requesttosend), $provider_response);
         return isset($provider_response->data->gameUrl) ? $provider_response->data->gameUrl : 'false';
     }
 
@@ -392,7 +392,7 @@ class GameLobby{
 
         $client_details = ProviderHelper::getClientDetails('token', $token, 2);
 
-        Helper::saveLog('Skywind Game Launch', config('providerlinks.skywind.provider_db_id'), json_encode($client_details), $client_details);
+        ProviderHelper::saveLogGameLaunch('Skywind Game Launch', config('providerlinks.skywind.provider_db_id'), json_encode($client_details), $client_details);
 
         $client = new Client([
               'headers' => [ 
@@ -411,12 +411,12 @@ class GameLobby{
 
             $response = $client->get($url);
             $response = json_encode(json_decode($response->getBody()->getContents()));
-            Helper::saveLog('Skywind Game Launch = '.$url, config('providerlinks.skywind.provider_db_id'), $response, $url);
+            ProviderHelper::saveLogGameLaunch('Skywind Game Launch = '.$url, config('providerlinks.skywind.provider_db_id'), $response, $url);
             $url = json_decode($response, true);
             return isset($url['url']) ? $url['url'] : 'false';
             
         } catch (\Exception $e) {
-            Helper::saveLog('Skywind Game Launch Failed = '.$url, config('providerlinks.skywind.provider_db_id'), json_encode($player_login), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('Skywind Game Launch Failed = '.$url, config('providerlinks.skywind.provider_db_id'), json_encode($player_login), $e->getMessage());
             return 'false';
         }
     }
@@ -450,7 +450,7 @@ class GameLobby{
             'form_params' => $requesttosend,
         ]);
         $game_launch = json_decode((string)$response->getBody(), true);
-        Helper::saveLog('CQ9 Game Launch', config('providerlinks.cqgames.pdbid'), json_encode($game_launch), $requesttosend);
+        ProviderHelper::saveLogGameLaunch('CQ9 Game Launch', config('providerlinks.cqgames.pdbid'), json_encode($game_launch), $requesttosend);
         foreach ($game_launch as $key => $value) {
             $url = isset($value['url']) ? $value['url'] : 'false';
             return $url;
@@ -526,13 +526,13 @@ class GameLobby{
             $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
             );
             $client_response = json_decode($guzzle_response->getBody()->getContents());
-            Helper::saveLog('Tidy Gameluanch 102', 23, json_encode($requesttosend), $client_response);
+            ProviderHelper::saveLogGameLaunch('Tidy Gameluanch 102', 23, json_encode($requesttosend), $client_response);
             return $client_response->link;
         }catch(\Exception $e){
             $requesttosend = [
                 'error' => 1010
             ];
-            Helper::saveLog('Tidy Gameluanch 101', 23, json_encode($requesttosend), $e->getMessage() );
+            ProviderHelper::saveLogGameLaunch('Tidy Gameluanch 101', 23, json_encode($requesttosend), $e->getMessage() );
             return $e->getMessage();
         }
         
@@ -607,7 +607,7 @@ class GameLobby{
             'form_params' => $requesttosend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
-        Helper::saveLog('TGG GAMELAUNCH TOPGRADEGAMES', 29, json_encode($requesttosend), json_decode($response->getBody()));
+        ProviderHelper::saveLogGameLaunch('TGG GAMELAUNCH TOPGRADEGAMES', 29, json_encode($requesttosend), json_decode($response->getBody()));
         return isset($res['data']['link']) ? $res['data']['link'] : false;
         
     }
@@ -619,7 +619,7 @@ class GameLobby{
     }
 
     public static function boomingGamingUrl($data, $provider_name){
-        Helper::saveLog('Booming session ', config('providerlinks.booming.provider_db_id'), json_encode($data), "ENDPOINT HIT");
+        ProviderHelper::saveLogGameLaunch('Booming session ', config('providerlinks.booming.provider_db_id'), json_encode($data), "ENDPOINT HIT");
         $url = config('providerlinks.booming.api_url').'/v2/session';
         $client_details = ProviderHelper::getClientDetails('token',$data["token"]);
         Helper::savePLayerGameRoundBooming($data["game_code"],$data["token"],$provider_name);
@@ -658,7 +658,7 @@ class GameLobby{
             $error = [
                 'error' => $e->getMessage()
             ];
-            Helper::saveLog('Booming session error', config('providerlinks.booming.provider_db_id'), json_encode($data), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('Booming session error', config('providerlinks.booming.provider_db_id'), json_encode($data), $e->getMessage());
             return $error;
         }
 
@@ -717,7 +717,7 @@ class GameLobby{
                 'error_code' => 500,
                 'error_msg' => $e->getMessage()
             ];
-            Helper::saveLog('MajaGames gamelaunch error', config('providerlinks.majagames.provider_id'), json_encode($error_code), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('MajaGames gamelaunch error', config('providerlinks.majagames.provider_id'), json_encode($error_code), $e->getMessage());
         }
         
     }
@@ -739,7 +739,7 @@ class GameLobby{
 
         // $url = "https://app-test.insvr.com/go.ashx?brandid=$brandID&keyname=$game_code&token=$token&mode=real&locale=en&mobile=0";
         $url = $api_url."brandid=$brandID&keyname=$game_code&token=$token&mode=real&locale=en&mobile=0";
-        Helper::saveLog('HBN gamelaunch', 24, json_encode($url), "");
+        ProviderHelper::saveLogGameLaunch('HBN gamelaunch', 24, json_encode($url), "");
         return $url;
     }
     
@@ -786,20 +786,20 @@ class GameLobby{
 
     public static function yggdrasillaunchUrl($data){
         $provider_id = config("providerlinks.ygg.provider_id");
-        Helper::saveLog('YGG gamelaunch', $provider_id, json_encode($data), "Endpoing hit");
+        ProviderHelper::saveLogGameLaunch('YGG gamelaunch', $provider_id, json_encode($data), "Endpoing hit");
         $url = config("providerlinks.ygg.api_url");
         $org = config("providerlinks.ygg.Org");
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         try{
             $url = $url."gameid=".$data['game_code']."&lang=".$client_details->language."&currency=".$client_details->default_currency."&org=".$org."&channel=pc&key=".$data['token'];
-            Helper::saveLog('YGG gamelaunch', $provider_id, json_encode($data), $url);
+            ProviderHelper::saveLogGameLaunch('YGG gamelaunch', $provider_id, json_encode($data), $url);
             return $url;
         }catch(\Exception $e){
             $error = [
                 'error' => $e->getMessage()
             ];
-            Helper::saveLog('YGG gamelaunch', $provider_id, json_encode($data), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('YGG gamelaunch', $provider_id, json_encode($data), $e->getMessage());
             return $error;
         }
 
@@ -836,7 +836,7 @@ class GameLobby{
                 $golden_response = json_decode((string) $response->getBody(), true);
                 $response_bag["parameters"] = $parameters;
                 $response_bag["golden_response"] = $golden_response;
-                GoldenFHelper::saveLog('GoldenF create_player', $provider_id, json_encode($parameters), $golden_response);
+                ProviderHelper::saveLogGameLaunch('GoldenF create_player', $provider_id, json_encode($parameters), $golden_response);
                 if(isset($golden_response['data']['action_result']) && $golden_response['data']['action_result'] == "Success"){
                     $gameluanch_url = GoldenFHelper::changeEnvironment($client_details)->api_url."/Launch?secret_key=".GoldenFHelper::changeEnvironment($client_details)->secret_key."&operator_token=".GoldenFHelper::changeEnvironment($client_details)->operator_token."&game_code=".$data['game_code']."&player_name=".$player_id."&nickname=".$nickname."&language=".$client_details->language;
                     $response = $http->post($gameluanch_url);
@@ -844,7 +844,7 @@ class GameLobby{
                     $response_bag["gameluanch_url"] = $gameluanch_url;
                     $response_bag["get_url"] = $get_url;
                     // return $response_bag;
-                    GoldenFHelper::saveLog('GoldenF get_url', $provider_id, json_encode($get_url), $data);
+                    ProviderHelper::saveLogGameLaunch('GoldenF get_url', $provider_id, json_encode($get_url), $data);
                     if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
                         // TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
                         return $get_url->data->game_url;
@@ -858,7 +858,7 @@ class GameLobby{
                 }
             }catch(\Exception $e){
                 $error = ['error' => $e->getMessage()];
-                GoldenFHelper::saveLog('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
+                ProviderHelper::saveLogGameLaunch('GoldenF gamelaunch err', $provider_id, json_encode($data), $e->getMessage());
                 // return config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(10);
                 return config('providerlinks.play_betrnk').'/tigergames/api?msg='.$e->getMessage();
             }
@@ -930,7 +930,7 @@ class GameLobby{
         $header = ['pch:'. config('providerlinks.iagaming.pch')];
         $timeout = 5;
         $client_response = IAHelper::curlData(config('providerlinks.iagaming.url_register'), $uhayuu, $header, $timeout);
-         Helper::saveLog('IA Launch Game', 15, json_encode($client_response), $params);
+        ProviderHelper::saveLogGameLaunch('IA Launch Game', 15, json_encode($client_response), $params);
         $data = json_decode(IAHelper::rehashen($client_response[1], true));
         if($data->status): // IF status is 1/true //user already register
             $data = IAHelper::userlunch($username);

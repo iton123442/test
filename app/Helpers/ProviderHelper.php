@@ -55,6 +55,27 @@ class ProviderHelper{
 		// 	}
 		// }
 	}
+
+	/*
+	 * Savelog Only For Gamelaunch Related Files
+	 */
+	public static function saveLogGameLaunch($method, $provider_id = 0, $request_data, $response_data) {
+        try{
+            if(env('SAVELOG_GAMELAUNCH')){
+                $data = [
+                    "method_name" => $method,
+                    "round_id" => $provider_id,
+                    "request_data" => json_encode(json_decode($request_data)),
+                    "response_data" => json_encode($response_data)
+                ];
+                return DB::connection('savelog')->table('seamless_request_logs')->insert($data);
+            }else{
+                return 8888888;
+            }
+        }catch(\Exception $e){
+            return 99999999;
+        }
+    }
 	
 	/**
 	 * EVOPLAY ONLY -RiAN
