@@ -106,6 +106,20 @@ return [
             'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
             'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
         ],
+        "JPY" => [
+            'AccessKeyId' => '94268123-ae55-476f-8f51-649e3102bf1e',
+            'access_key_secret' => '0346B02144F24E95110569C45F4CE3DDA376D62B',
+            'app_key' => 'RiANDRAFT',
+            'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
+            'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
+        ],
+        "EUR" => [
+            'AccessKeyId' => '942683bc-00ed-4fa8-972d-aac2201a3c44',
+            'access_key_secret' => '48D7EC57726805C57CCC867CF775090A33453B4C',
+            'app_key' => 'RiANDRAFT',
+            'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
+            'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
+        ],
     ],
     'aws' => [
         'api_url' => 'https://papi.awsxpartner.com/b2b',
