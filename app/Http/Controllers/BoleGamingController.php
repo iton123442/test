@@ -710,6 +710,7 @@ class BoleGamingController extends Controller
 
 		public function playerWalletBalance(Request $request)
 		{
+			ProviderHelper::saveLogWithExeption('BOLE playerWalletBalance HIT', $this->provider_db_id, $request->getContent(), 'END HIT');
 			$json_data = json_decode($request->getContent());
 			$client_details = ProviderHelper::getClientDetails('player_id', $json_data->player_account);
 			$this->changeConfig('player_id', $client_details->player_id);
