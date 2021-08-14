@@ -749,6 +749,7 @@ class BoleGamingController extends Controller
 					]
 				];
 			}
+			ProviderHelper::saveLogWithExeption('BOLE UNKNOWN CALL', $this->provider_db_id, $request->getContent(), $data);
 			return $data;
 		}
 
