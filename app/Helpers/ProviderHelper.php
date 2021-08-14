@@ -64,7 +64,7 @@ class ProviderHelper{
             if(env('SAVELOG_GAMELAUNCH')){
                 $data = [
                     "method_name" => $method,
-                    "round_id" => $provider_id,
+                    "provider_id" => $provider_id,
                     "request_data" => json_encode(json_decode($request_data)),
                     "response_data" => json_encode($response_data)
                 ];
