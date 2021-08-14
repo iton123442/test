@@ -89,7 +89,7 @@ class BoleGamingController extends Controller
 		public function playerLogout(Request $request)
 		{
 
-			 Helper::saveLog('BOLE_LOGOUT', $this->provider_db_id, 'logouted', 'BOLE CALL');
+			 ProviderHelper::saveLogWithExeption('BOLE_LOGOUT', $this->provider_db_id, 'logouted', 'BOLE CALL');
 			 $sign = $this->generateSign();
 
 			 $http = new Client();
@@ -152,7 +152,7 @@ class BoleGamingController extends Controller
 			];
 
 			$json_data = json_decode($request->getContent());
-			Helper::saveLog('BOLE playerWalletCost EH', $this->provider_db_id, $request->getContent(), Helper::datesent());
+			ProviderHelper::saveLogWithExeption('BOLE playerWalletCost EH', $this->provider_db_id, $request->getContent(), Helper::datesent());
 			$general_details = ["aggregator" => [], "provider" => [], "client" => []];
 			$client_details = ProviderHelper::getClientDetails('player_id', $json_data->player_account);
 			if($client_details == null){
@@ -170,7 +170,7 @@ class BoleGamingController extends Controller
 						"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
 					]
 				];
-				Helper::saveLog('BOLE playerWalletCost - FATAL ERROR '.$json_data->report_id, $this->provider_db_id, $request->getContent(), $data);
+				ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR '.$json_data->report_id, $this->provider_db_id, $request->getContent(), $data);
 				return $data;
 			}
 
@@ -198,7 +198,7 @@ class BoleGamingController extends Controller
 						"msg" => "Signature Error"
 					]
 				];
-	            Helper::saveLog('BOLE UNKNOWN CALL', $this->provider_db_id, $request->getContent(), 'UnknownboleReq');
+	            ProviderHelper::saveLogWithExeption('BOLE UNKNOWN CALL', $this->provider_db_id, $request->getContent(), 'UnknownboleReq');
 				return $data;
 			}
 
@@ -206,7 +206,7 @@ class BoleGamingController extends Controller
 			if($player_details_resp == 'false'){
 				$data = ["data" => [],"status" => ["code" => -1,"msg" => "Failed connecting to client"]];
                 // $data = ["resp_msg" => ["code" => 43900,"message" => 'game service error',"errors" => []]];
-			    Helper::saveLog('BOLE playerWalletCost - FATAL ERROR FAILED TO REACH PLAYER', $this->provider_db_id, $request->getContent(), $data);
+			    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR FAILED TO REACH PLAYER', $this->provider_db_id, $request->getContent(), $data);
 				return $data;
 			}
 
@@ -370,7 +370,7 @@ class BoleGamingController extends Controller
 									]
 								];
 								// $data = ["resp_msg" => ["code" => 43303,"message" => "order does not exist","errors" => []]];
-								Helper::saveLog('BOLE playerWalletCost - ORDER NOT EXIST '.$json_data->report_id, $this->provider_db_id,$request->getContent(), $data);
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - ORDER NOT EXIST '.$json_data->report_id, $this->provider_db_id,$request->getContent(), $data);
 								return $data;
 							}
 							$existing_bet = GameTransactionMDB::findGameTransactionDetails($check_game_ext->game_trans_id, 'game_transaction', false, $client_details);
@@ -443,13 +443,13 @@ class BoleGamingController extends Controller
 
 							try {
 								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$existing_bet->game_trans_id,$transaction_type);
-								Helper::saveLog('BOLE playerWalletCost CRID '.$existing_bet->game_trans_id, $this->provider_db_id,$request->getContent(), $client_response);
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost CRID '.$existing_bet->game_trans_id, $this->provider_db_id,$request->getContent(), $client_response);
 							   
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 
 								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
-								Helper::saveLog('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
 								return $data;
 							}
 
@@ -502,13 +502,13 @@ class BoleGamingController extends Controller
 							// }
 							// END OLD
 							
-							Helper::saveLog('BOLE playerWalletCost  - SUCCESS', $this->provider_db_id, $request->getContent(), $data);
+							ProviderHelper::saveLogWithExeption('BOLE playerWalletCost  - SUCCESS', $this->provider_db_id, $request->getContent(), $data);
 							return $data;
 		               }catch (\Exception $e){
 			                // $data = ["resp_msg" => ["code" => -1,"message" => 'Failed connecting to client',"errors" => []]];
 			                $data = ["data" => [],"status" => ["code" => -1,"msg" => "Failed connecting to client"]];
 			                // $data = ["resp_msg" => ["code" => 43900,"message" => 'game service error',"errors" => []]];
-						    Helper::saveLog('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $request->getContent(), $e->getMessage());
+						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $request->getContent(), $e->getMessage());
 							return $data;
 			           }
 
@@ -527,7 +527,7 @@ class BoleGamingController extends Controller
 						// 			"msg" => "success"
 						// 		]
 						// 	];
-						// 	Helper::saveLog('BOLE WALLET CALL GBI TG ONLY', $this->provider_db_id, $request->getContent(), $data);
+						// 	ProviderHelper::saveLogWithExeption('BOLE WALLET CALL GBI TG ONLY', $this->provider_db_id, $request->getContent(), $data);
 						// 	return $data;
 					 //    }else{
 					 //    	$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $json_data->game_code);
@@ -616,14 +616,14 @@ class BoleGamingController extends Controller
 
 							try {
 								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$gamerecord,$transaction_type);
-							    Helper::saveLog('BOLE playerWalletCost CRID '.$gamerecord, $this->provider_db_id, $request->getContent(), $client_response);
+							    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost CRID '.$gamerecord, $this->provider_db_id, $request->getContent(), $client_response);
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 								if(isset($gamerecord)){
 									// ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
 							        $this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
 								}
-								Helper::saveLog('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
 								return $data;
 							}
 
@@ -684,7 +684,7 @@ class BoleGamingController extends Controller
 
 							}
 
-							Helper::saveLog('BOLE playerWalletCost - SUCCESS', $this->provider_db_id, $request->getContent(), $data);
+							ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - SUCCESS', $this->provider_db_id, $request->getContent(), $data);
 							return $data;
 
 					    } catch (\Exception $e) {
@@ -700,7 +700,7 @@ class BoleGamingController extends Controller
 								]
 							];
 					    	// $data = ["resp_msg" => ["code" => 43900,"message" => 'game service error',"errors" => []]];
-						    Helper::saveLog('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $request->getContent(), $e->getMessage());
+						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $request->getContent(), $e->getMessage());
 							return $data;
 					    }
 
@@ -722,7 +722,7 @@ class BoleGamingController extends Controller
 						"msg" => "signature error"
 					]
 				];
-		        Helper::saveLog('BOLE UNKNOWN CALL', $this->provider_db_id, $request->getContent(), 'UnknownboleReq');
+		        ProviderHelper::saveLogWithExeption('BOLE UNKNOWN CALL', $this->provider_db_id, $request->getContent(), 'UnknownboleReq');
 				return $data;
 			}
 
@@ -784,7 +784,7 @@ class BoleGamingController extends Controller
 					"transaction_detail" =>json_encode($transaction_detail),
 					"general_details" =>json_encode($general_details)
 	    		]);
-	    // Helper::saveLog('updatecreateGameTransExt', 999, json_encode(DB::getQueryLog()), "TIME updatecreateGameTransExt");
+	    // ProviderHelper::saveLogWithExeption('updatecreateGameTransExt', 999, json_encode(DB::getQueryLog()), "TIME updatecreateGameTransExt");
 		return ($update ? true : false);
 		}
 		
