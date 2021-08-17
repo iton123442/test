@@ -191,7 +191,7 @@ class ProviderHelper{
 			}
 		}else{
 	        if ($type == 'player_id') {
-			   $where = 'where '.$type.' = "'.$value.'"';
+			   $where = 'where p.player_id = "'.$value.'"';
 			}
 		}
 		if ($type == 'username') {
