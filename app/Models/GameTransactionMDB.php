@@ -116,28 +116,51 @@ class GameTransactionMDB
     }
 
     public static function checkAndGetFromOtherServer($select,$where,$connection_name,$type){
-        $connection_list = config("serverlist.server_list");
-        foreach($connection_list as $connection){
-            $status = self::checkDBConnection($connection["connection_name"]);
-            if($status && $connection["connection_name"] != $connection_name){
-                Helper::saveLog('checkAndGetFromOtherServer', 12, json_encode($connection), "createGametransaction");
-                switch($type){
-                    case 'gte':
-                        $db = "{$connection['db_list'][0]}.game_transaction_ext ";
-                        break;
-                    case 'gt':
-                        $db = "{$connection['db_list'][1]}.game_transactions ";
-                        break;
-                }
-                Helper::saveLog('checkAndGetFromOtherServer2', 12, json_encode($select.$db.$where), $connection["connection_name"]);
-                $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
-                $cnt = count($game);
-                if ($cnt > 0){
-                    return $game[0];
-                }
+        $connection = config("serverlist.server_list.default");
+        
+        try {
+            switch($type){
+                case 'gte':
+                    $db = "{$connection['db_list'][0]}.game_transaction_ext ";
+                    break;
+                case 'gt':
+                    $db = "{$connection['db_list'][1]}.game_transactions ";
+                    break;
             }
+            Helper::saveLog('checkAndGetFromOtherServer2', 12, json_encode($select.$db.$where), $connection["connection_name"]);
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
+            $cnt = count($game);
+            if ($cnt > 0){
+                return $game[0];
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            return null;
         }
-        return null;
+
+        
+        // foreach($connection_list as $connection){
+        //     $status = self::checkDBConnection($connection["connection_name"]);
+        //     if($status && $connection["connection_name"] != $connection_name){
+        //         Helper::saveLog('checkAndGetFromOtherServer', 12, json_encode($connection), "createGametransaction");
+        //         switch($type){
+        //             case 'gte':
+        //                 $db = "{$connection['db_list'][0]}.game_transaction_ext ";
+        //                 break;
+        //             case 'gt':
+        //                 $db = "{$connection['db_list'][1]}.game_transactions ";
+        //                 break;
+        //         }
+        //         Helper::saveLog('checkAndGetFromOtherServer2', 12, json_encode($select.$db.$where), $connection["connection_name"]);
+        //         $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
+        //         $cnt = count($game);
+        //         if ($cnt > 0){
+        //             return $game[0];
+        //         }
+        //     }
+        // }
+        // return null;
     }
 
 
@@ -186,19 +209,24 @@ class GameTransactionMDB
      * @param  string $pref_connection_name - preffered connection name but return another connection if not available
      * @return array return null if no connection available
      */
-    public static function getAvailableConnection($pref_connection_name='mysql'){
-        $pref_connection_name = isset($pref_connection_name)?$pref_connection_name:'mysql';
+    public static function getAvailableConnection($pref_connection_name='default'){
+        $pref_connection_name = isset($pref_connection_name)?$pref_connection_name:'default';
         if(self::checkDBConnection(config("serverlist.server_list.".$pref_connection_name.".connection_name"))){
             return config("serverlist.server_list.".$pref_connection_name);
         }else{
-            $connection_list = config("serverlist.server_list");
-            foreach($connection_list as $connection){
-                $status = self::checkDBConnection($connection["connection_name"]);
-                if($status){
-                    return $connection;
-                }
-            }
+            
+            if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
+                return config("serverlist.server_list.default");
+            } 
             return null;
+            // $connection_list = config("serverlist.server_list.default");
+            // foreach($connection_list as $connection){
+            //     $status = self::checkDBConnection($connection["connection_name"]);
+            //     if($status){
+            //         return $connection;
+            //     }
+            // }
+            // return null;
         }
     }    
     /**
@@ -207,7 +235,7 @@ class GameTransactionMDB
      * @param  string $connection_name default connection 'mysql'
      * @return bool
      */
-    public static function checkDBConnection($connection_name='mysql'){
+    public static function checkDBConnection($connection_name='default'){
         try {
             DB::connection($connection_name)->getPdo();
             return true;
@@ -401,6 +429,60 @@ class GameTransactionMDB
            return 'false';
         }
         
+
+    }
+
+    public  static function GoldenFfindGameExt($provider_identifier, $game_transaction_type=false, $type,$client_details)
+    {
+        $game_trans_type = '';
+        if($game_transaction_type != false){
+            $game_trans_type = "and gte.game_transaction_type = ". $game_transaction_type;
+        }
+        if ($type == 'transaction_id') {
+            $where = 'where gte.provider_trans_id = "'.$provider_identifier.'" '.$game_trans_type.' AND gte.game_transaction_type = '.$game_transaction_type.' AND gte.transaction_detail != "FAILED"' ;
+        }
+        if ($type == 'round_id') {
+            $where = 'where gte.round_id = "' . $provider_identifier.'" '.$game_trans_type.' AND gte.game_transaction_type = '.$game_transaction_type.' AND gte.transaction_detail != "FAILED"' ;
+        }
+        if ($type == 'game_transaction_ext_id') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
+        }
+        if ($type == 'game_trans_id') {
+            $where = 'where gte.game_trans_id = "' . $provider_identifier . '" ';
+        }
+        try {
+            $connection_name = $client_details->connection_name;
+            $details = [];
+            $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
+            $status = self::checkDBConnection($connection);
+            if ( ($connection != null) && $status) {
+                $connection = config("serverlist.server_list.".$client_details->connection_name);
+                $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+            }
+            if ( !(count($details) > 0) )  {
+                $connection_list = config("serverlist.server_list");
+                foreach($connection_list as $key => $connection){
+                    $status = self::checkDBConnection($connection["connection_name"]);
+                    if($status && $connection_name != $connection["connection_name"]){
+                        $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                        if ( count($data) > 0  ) {
+                            $connection_name = $key;// key is the client connection_name
+                            $details = $data;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            $count = count($details);
+            if ($count > 0) {
+                //apend on the details the connection which mean to rewrite the client_details
+                $details[0]->connection_name = $connection_name;
+            }
+            return $count > 0 ? $details[0] : 'false';
+        } catch (\Exception $e) {
+            return 'false';
+        }
 
     }
     
