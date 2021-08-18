@@ -438,7 +438,7 @@ class VivoController extends Controller
 
 		$hash = md5($request->userId.$request->casinoTransactionId.config("providerlinks.vivo.PASS_KEY"));
 
-		if($hash != $request->hash) {
+		if($hash != $request->hash || $client_details == NULL) {
 			header("Content-type: text/xml; charset=utf-8");
 			$response = '<?xml version="1.0" encoding="utf-8"?>';
 			$response .= '<VGSSYSTEM>
