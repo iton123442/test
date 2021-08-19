@@ -259,7 +259,15 @@ class FundtransferProcessorController extends Controller
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'bng'){
+                                // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                //$gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                // ProviderHelper::updateGameTransactionFlowStatus($payload->action->mwapi->roundId, 3);
                             }
                             elseif($payload->action->custom->provider == 'wazdan'){
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);

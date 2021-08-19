@@ -145,6 +145,7 @@ class BNGController extends Controller
 
     private function _transaction($data,$client_details){
         Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $data]), "");
+        // $game_transaction = GameTransactionMDB::getGameTransactionDataByProviderTransactionId($data["uid"],$client_details);
         try{
             ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["uid"]);
         }catch(\Exception $e){
@@ -152,7 +153,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>"0.00",
+                        "value" =>(string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                     "error" => array(
@@ -179,7 +180,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>$data["args"]["win"],
+                        "value" =>(string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );
@@ -189,7 +190,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>"0.00",
+                        "value" =>(string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                     "error" => array(
@@ -232,13 +233,14 @@ class BNGController extends Controller
     }
     private function betNotNullWinNotNull($data,$client_details,$game_details){
         $betStart =  microtime(true);
+        $win_or_lost = $data["args"]["win"] == 0 ? 0 : 1;
         $gameTransactionData = array(
             "provider_trans_id" => $data["uid"],
             "token_id" => $client_details->token_id,
             "game_id" => $game_details->game_id,
             "round_id" => $data["args"]["round_id"],
             "bet_amount" => $data["args"]["bet"],
-            "win" =>$data["args"]["win"] == 0 ? 0 : 1,
+            "win" => 5,
             "pay_amount" =>$data["args"]["win"],
             "income" =>$data["args"]["bet"]-$data["args"]["win"],
             "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
@@ -301,6 +303,7 @@ class BNGController extends Controller
                     "isUpdate" => false,
                     "game_transaction_ext_id" => $winGametransactionExtId,
                     "client_connection_name" => $client_details->connection_name,
+                    "win_or_lost" => $win_or_lost,
                 ],
                 "provider" => [
                     "provider_request" => $data, #R
@@ -337,6 +340,8 @@ class BNGController extends Controller
         }
         elseif(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "402"){
+            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+            $client_details->balance = $balance;
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
@@ -367,8 +372,9 @@ class BNGController extends Controller
     private function betNullWinNotNull($data,$client_details,$game_details){
         $game = GameTransactionMDB::getGameTransactionByRoundId($data["args"]["round_id"],$client_details);
         if($game != null){
+            $win_or_lost = $data["args"]["win"] == 0 && $game->pay_amount == 0 ? 0 : 1;
             $createGametransaction = array(
-                "win" =>$data["args"]["win"] == 0 && $game->pay_amount == 0 ? 0 : 1,
+                "win" => 5,
                 "pay_amount" =>$game->pay_amount+$data["args"]["win"],
                 "income" =>$game->income - $data["args"]["win"],
                 "entry_id" =>$data["args"]["win"] == 0 && $game->pay_amount == 0 ? 1 : 2,
@@ -401,6 +407,7 @@ class BNGController extends Controller
                     "provider" => 'bng',
                     "game_transaction_ext_id" => $winGametransactionExtId,
                     "client_connection_name" => $client_details->connection_name,
+                    "win_or_lost" => $win_or_lost,
                 ],
                 "provider" => [
                     "provider_request" => $data, #R
@@ -446,13 +453,14 @@ class BNGController extends Controller
         }
     }
     private function betNotNullWinNull($data,$client_details,$game_details){
+        $win_or_lost = 0;
         $dataToSave = array(
             "provider_trans_id" => $data["uid"],
             "token_id" => $client_details->token_id,
             "game_id" => $game_details->game_id,
             "round_id" => $data["args"]["round_id"],
             "bet_amount" => $data["args"]["bet"],
-            "win" =>0,
+            "win" =>5,
             "pay_amount" =>0,
             "income" =>$data["args"]["bet"],
             "entry_id" =>1,
@@ -674,30 +682,30 @@ class BNGController extends Controller
     }
     private function _getClientDetails($type = "", $value = "") {
 
-		$query = DB::table("clients AS c")
-				 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
-				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
-				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
-				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-				 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
-				 
-				if ($type == 'token') {
-					$query->where([
-				 		["pst.player_token", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	]);
-				}
+        $query = DB::table("clients AS c")
+                 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
+                 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
+                 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
+                 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
+                 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
+                 
+                if ($type == 'token') {
+                    $query->where([
+                        ["pst.player_token", "=", $value],
+                        ["pst.status_id", "=", 1]
+                    ]);
+                }
 
-				if ($type == 'player_id') {
-					$query->where([
-				 		["p.player_id", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	]);
-				}
+                if ($type == 'player_id') {
+                    $query->where([
+                        ["p.player_id", "=", $value],
+                        ["pst.status_id", "=", 1]
+                    ]);
+                }
 
-				 $result= $query->first();
+                 $result= $query->first();
 
-		return $result;
+        return $result;
     }
     private function _getExtParameter(){
         $provider = DB::table("providers")->where("provider_id",22)->first();
