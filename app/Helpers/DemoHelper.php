@@ -30,7 +30,7 @@ class DemoHelper{
         $provider_id = GameLobby::checkAndGetProviderId($data->game_provider);
         $provider_code = $provider_id->sub_provider_id;
         
-        if($provider_code == 33){ // Bole Gaming
+        if(in_array($provider_code, [33, 104])){ // Static Game URL
             $response = array(
                 "game_code" => $data->game_code,
                 "url" => DemoHelper::getStaticUrl($data->game_code, $data->game_provider),
@@ -120,11 +120,19 @@ class DemoHelper{
 
     # Providers That Has Static URL DEMO LINK IN THE DATABASE
     public static function getStaticUrl($game_code, $game_provider){
-        $game_demo = DB::table('games as g')
+        // $game_demo = DB::table('games as g')
+        // ->select('g.game_demo')
+        // ->leftJoin('providers as p', "g.provider_id", "=", "p.provider_id")
+        // ->where('g.game_code', $game_code)
+        // ->where('p.provider_name', $game_provider)
+        // ->first();
+        // return $game_demo->game_demo;
+
+         $game_demo = DB::table('games as g')
         ->select('g.game_demo')
-        ->leftJoin('providers as p', "g.provider_id", "=", "p.provider_id")
+        ->leftJoin('sub_providers as sp', "g.sub_provider_id", "=", "sp.sub_provider_id")
         ->where('g.game_code', $game_code)
-        ->where('p.provider_name', $game_provider)
+        ->where('sp.sub_provider_name', $game_provider)
         ->first();
         return $game_demo->game_demo;
     }
