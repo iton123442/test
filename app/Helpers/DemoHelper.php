@@ -30,7 +30,7 @@ class DemoHelper{
         $provider_id = GameLobby::checkAndGetProviderId($data->game_provider);
         $provider_code = $provider_id->sub_provider_id;
         
-        if(in_array($provider_code, [33, 104])){ // Static Game URL
+        if(in_array($provider_code, [33, 104,38])){ // Static Game URL
             $response = array(
                 "game_code" => $data->game_code,
                 "url" => DemoHelper::getStaticUrl($data->game_code, $data->game_provider),
