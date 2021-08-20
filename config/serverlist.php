@@ -95,7 +95,7 @@ return [
             ]
         ],
         "server2-aplus" =>[
-            'connection_name'=>'mysql',
+            'connection_name'=>'server2',
             'db_list'=> [
                 'wt_mw_op_aplus_ext',  //game_trasnaction_ext
                 'wt_mw_op_aplus' // game_transaction
