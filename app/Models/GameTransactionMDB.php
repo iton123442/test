@@ -277,18 +277,31 @@ class GameTransactionMDB
                 $details = DB::connection( $connection["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
             }
             if ( !(count($details) > 0 )) {
-                $connection_list = config("serverlist.server_list");
-                foreach($connection_list as $key => $connection){
-                    $status = self::checkDBConnection($connection["connection_name"]);
-                    if($status && $connection_name != $connection["connection_name"]){
-                        $data = DB::connection( $connection["connection_name"] )->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
-                        if ( count($data) > 0  ) {
-                            $connection_name = $key;
-                            $details = $data;
-                            break;
-                        }
+
+                if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
+                    $connection_default = config("serverlist.server_list.default");
+                    $data = DB::connection( $connection_default["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection_default['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                    
+                    if ( count($data) > 0  ) {
+                        $connection_name = "default";
+                        $details = $data;
+                        
                     }
-                }
+                } 
+                // $connection_list = config("serverlist.server_list");
+                // foreach($connection_list as $key => $connection){
+                //     $status = self::checkDBConnection($connection["connection_name"]);
+                //     if($status && $connection_name != $connection["connection_name"]){
+                //         $data = DB::connection( $connection["connection_name"] )->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                //         if ( count($data) > 0  ) {
+                //             $connection_name = $key;
+                //             $details = $data;
+                //             break;
+                //         }
+                //     }
+                // }
+
+
             }
             $count = count($details);
             if ($count > 0 ) {
@@ -339,18 +352,28 @@ class GameTransactionMDB
                 $details = DB::connection($connection["connection_name"])->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
             }
             if ( !(count($details) > 0) )  {
-                $connection_list = config("serverlist.server_list");
-                foreach($connection_list as $key => $connection){
-                    $status = self::checkDBConnection($connection["connection_name"]);
-                    if($status && $connection_name != $connection["connection_name"]){
-                        $data = DB::connection( $connection["connection_name"] )->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
-                        if ( count($data) > 0  ) {
-                            $connection_name = $key;// key is the client connection_name
-                            $details = $data;
-                            break;
-                        }
+
+                if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
+                    $connection_default = config("serverlist.server_list.default");
+                    $data = DB::connection($connection_default["connection_name"])->select('select  * from  `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    if ( count($data) > 0  ) {
+                        $connection_name = "default";
+                        $details = $data;
+                        
                     }
-                }
+                } 
+                // $connection_list = config("serverlist.server_list");
+                // foreach($connection_list as $key => $connection){
+                //     $status = self::checkDBConnection($connection["connection_name"]);
+                //     if($status && $connection_name != $connection["connection_name"]){
+                //         $data = DB::connection( $connection["connection_name"] )->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                //         if ( count($data) > 0  ) {
+                //             $connection_name = $key;// key is the client connection_name
+                //             $details = $data;
+                //             break;
+                //         }
+                //     }
+                // }
             }
 
             $count = count($details);
@@ -399,23 +422,39 @@ class GameTransactionMDB
                 }
                 $connection_name = $connection["connection_name"];
                 if ( !(count($details) > 0) )  {
-                    $connection_list = config("serverlist.server_list");
-                    foreach($connection_list as $connection){
-                        $status = self::checkDBConnection($connection["connection_name"]);
-                        if($status && $connection_name != $connection["connection_name"]){
-                            if($type == 'all'){
-                                // removed limit
-                                $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
-                            }else{
-                                $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
-                            }
-                            if ( count($data) > 0  ) {
-                                $connection_name = $connection["connection_name"];
-                                $details = $data;
-                                break;
-                            }
+
+                    if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
+                        $connection_default = config("serverlist.server_list.default");
+                        if($type == 'all'){
+                            // removed limit
+                            $data = DB::connection( $connection_default["connection_name"] )->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                        }else{
+                            $data = DB::connection($connection_default["connection_name"])->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                         }
-                    }
+                        if ( count($data) > 0  ) {
+                            $connection_name = "default";
+                            $details = $data;
+                        }
+                        
+                    } 
+
+                    // $connection_list = config("serverlist.server_list");
+                    // foreach($connection_list as $connection){
+                    //     $status = self::checkDBConnection($connection["connection_name"]);
+                    //     if($status && $connection_name != $connection["connection_name"]){
+                    //         if($type == 'all'){
+                    //             // removed limit
+                    //             $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                    //         }else{
+                    //             $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    //         }
+                    //         if ( count($data) > 0  ) {
+                    //             $connection_name = $connection["connection_name"];
+                    //             $details = $data;
+                    //             break;
+                    //         }
+                    //     }
+                    // }
                 }
 
                 $count = count($details);
