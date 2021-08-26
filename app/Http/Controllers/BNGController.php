@@ -153,7 +153,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>(string)$client_details->balance,
+                        "value" => "0.00",
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                     "error" => array(
@@ -180,7 +180,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" =>(string)$client_details->balance,
+                        "value" => (string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );
@@ -354,9 +354,12 @@ class BNGController extends Controller
             );
             //$this->_setExtParameter($this->_getExtParameter()+1);
             try{
+                // $dataToSave = array(
+                //     "win"=>2,
+                //     "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                // );
                 $dataToSave = array(
-                    "win"=>2,
-                    "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                    "win"=>2
                 );
                 GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
                 Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
@@ -512,8 +515,7 @@ class BNGController extends Controller
             //$this->_setExtParameter($this->_getExtParameter()+1);
             try{
                 $dataToSave = array(
-                    "win"=>2,
-                    "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                    "win"=>2
                 );
                 GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
                 $dataToUpdate = array(
@@ -682,30 +684,30 @@ class BNGController extends Controller
     }
     private function _getClientDetails($type = "", $value = "") {
 
-        $query = DB::table("clients AS c")
-                 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
-                 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
-                 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
-                 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-                 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
-                 
-                if ($type == 'token') {
-                    $query->where([
-                        ["pst.player_token", "=", $value],
-                        ["pst.status_id", "=", 1]
-                    ]);
-                }
+		$query = DB::table("clients AS c")
+				 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
+				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
+				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
+				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
+				 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
+				 
+				if ($type == 'token') {
+					$query->where([
+				 		["pst.player_token", "=", $value],
+				 		["pst.status_id", "=", 1]
+				 	]);
+				}
 
-                if ($type == 'player_id') {
-                    $query->where([
-                        ["p.player_id", "=", $value],
-                        ["pst.status_id", "=", 1]
-                    ]);
-                }
+				if ($type == 'player_id') {
+					$query->where([
+				 		["p.player_id", "=", $value],
+				 		["pst.status_id", "=", 1]
+				 	]);
+				}
 
-                 $result= $query->first();
+				 $result= $query->first();
 
-        return $result;
+		return $result;
     }
     private function _getExtParameter(){
         $provider = DB::table("providers")->where("provider_id",22)->first();
