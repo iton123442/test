@@ -330,10 +330,14 @@ class ICGController extends Controller
                         )
                     );
                     try{
+                        // $data = array(
+                        //     "win"=>2,
+                        //     "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                        // );
                         $data = array(
-                            "win"=>2,
-                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                            "win"=>2
                         );
+                        // GameTransactionMDB::updateGametransaction($data,$game_transactionid);
                         GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
                         //Helper::updateICGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                     }catch(\Exception $e){
@@ -450,8 +454,10 @@ class ICGController extends Controller
                 $game = GameTransactionMDB::getGameTransactionByRoundId($json["transactionId"],$client_details);
                 if($game){
                     $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $json["productId"]);
+
+                    $win_or_lost =round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 0 : 1;
                     $createGametransaction = array(
-                        "win" =>round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 0 : 1,
+                        "win" => 5,
                         "pay_amount" =>$game->pay_amount+round($json["amount"]/100,2),
                         "income" =>$game->income - round($json["amount"]/100,2),
                         "entry_id" =>round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 1 : 2,
@@ -482,6 +488,7 @@ class ICGController extends Controller
                             "provider" => 'icg',
                             "game_transaction_ext_id" => $winGametransactionExtId,
                             "client_connection_name" => $client_details->connection_name,
+                            "win_or_lost" => $win_or_lost,
                         ],
                         "provider" => [
                             "provider_request" => $json, #R
@@ -602,8 +609,9 @@ class ICGController extends Controller
                 $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($request->token,0,$client_details);
                 if($game){
                     $game_details = Helper::getInfoPlayerGameRound($json["token"]);
+                    $win_or_lost = round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 0 : 1;
                     $createGametransaction = array(
-                        "win" =>round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 0 : 1,
+                        "win" => 5,
                         "pay_amount" =>$game->pay_amount+round($json["amount"]/100,2),
                         "income" =>$game->income - round($json["amount"]/100,2),
                         "entry_id" =>round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 1 : 2,
@@ -635,6 +643,7 @@ class ICGController extends Controller
                             "provider" => 'icg',
                             "game_transaction_ext_id" => $winGametransactionExtId,
                             "client_connection_name" => $client_details->connection_name,
+                            "win_or_lost" => $win_or_lost,
                         ],
                         "provider" => [
                             "provider_request" => $json, #R
@@ -753,6 +762,7 @@ class ICGController extends Controller
                     "game_id" => $game_details->game_id,
                     "round_id" => 0,
                     "bet_amount" => round($json["amount"]/100,2),
+                    "win" => 5,
                     "pay_amount" =>0,
                     "income" =>0,
                     "entry_id" =>1,
@@ -827,10 +837,9 @@ class ICGController extends Controller
                     ); 
                     try{
                         $data = array(
-                            "win"=>2,
-                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                            "win" => 2
                         );
-                        GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
+                        GameTransactionMDB::updateGametransaction($data,$game_transactionid, $client_details);
                         //Helper::updateICGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);

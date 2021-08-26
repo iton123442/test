@@ -116,7 +116,6 @@ class WazdanController extends Controller
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
             }catch(\Exception $e){
-                $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                 $msg = array(
                     "status" => 0,
                     "funds" => array(
@@ -129,18 +128,32 @@ class WazdanController extends Controller
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
-                $gameTransactionData = array(
-                    "provider_trans_id" => $datadecoded["transactionId"],
-                    "token_id" => $client_details->token_id,
-                    "game_id" => $game_details->game_id,
-                    "round_id" => $datadecoded["roundId"],
-                    "bet_amount" => round($datadecoded["amount"],2),
-                    "pay_amount" =>0,
-                    "win" => 5,
-                    "income" =>0,
-                    "entry_id" =>1,
-                );
-                $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($datadecoded["roundId"], 'round_id',false, $client_details);
+                if($bet_transaction != "false") {
+                    $client_details->connection_name = $bet_transaction->connection_name;
+                    $game_transactionid = $bet_transaction->game_trans_id;
+                    $updateGameTransaction = [
+                        'win' => 5,
+                        'bet_amount' => $bet_transaction->bet_amount + round($datadecoded["amount"],2),
+                        'entry_id' => 1,
+                        'trans_status' => 1
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                } else {
+                    $gameTransactionData = array(
+                        "provider_trans_id" => $datadecoded["transactionId"],
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $game_details->game_id,
+                        "round_id" => $datadecoded["roundId"],
+                        "bet_amount" => round($datadecoded["amount"],2),
+                        "pay_amount" =>0,
+                        "win" => 5,
+                        "income" =>0,
+                        "entry_id" =>1,
+                    );
+                    $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                }
+                
                 $betgametransactionext = array(
                     "game_trans_id" => $game_transactionid,
                     "provider_trans_id" => $datadecoded["transactionId"],
@@ -180,15 +193,21 @@ class WazdanController extends Controller
                         )
                     );
                     try{
-                        $data = array(
-                            "win"=>2,
-                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
-                        );
-                        GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
-                        $dataToUpdate = array(
-                            "mw_response" => json_encode($msg)
-                        );
-                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        if ($bet_transaction == "false") {
+                            // $data = array(
+                            //     "win"=>2,
+                            //     "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                            // );
+                            $data = array(
+                                "win"=>2
+                            );
+                            GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
+                            $dataToUpdate = array(
+                                "mw_response" => json_encode($msg)
+                            );
+                            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        }
+                        
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
                     } 
@@ -230,7 +249,6 @@ class WazdanController extends Controller
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_3');
                 }catch(\Exception $e){
-                    $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
@@ -341,7 +359,6 @@ class WazdanController extends Controller
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_2');
                 }catch(\Exception $e){
-                    $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
@@ -364,8 +381,10 @@ class WazdanController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+
+                $win_or_lost = round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 0 : 1;
                 $createGametransaction = array(
-                    "win" =>round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 0 : 1,
+                    "win" => 5,
                     "pay_amount" =>$game->pay_amount+round($datadecoded["amount"],2),
                     "income" =>$game->income - round($datadecoded["amount"],2),
                     "entry_id" =>round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
@@ -396,6 +415,7 @@ class WazdanController extends Controller
                         "provider" => 'wazdan',
                         "game_transaction_ext_id" => $winGametransactionExtId,
                         "client_connection_name" => $client_details->connection_name,
+                        "win_or_lost" => $win_or_lost,
                     ],
                     "provider" => [
                         "provider_request" => $datadecoded, #R
@@ -520,32 +540,5 @@ class WazdanController extends Controller
             return response($msg,200)->header('Content-Type', 'application/json');
         }
     }
-    private function _getClientDetails($type = "", $value = "") {
-
-		$query = DB::table("clients AS c")
-				 ->select('p.client_id', 'p.player_id', 'p.client_player_id','p.username', 'p.email', 'p.language', 'p.currency', 'pst.token_id', 'pst.player_token' , 'pst.status_id', 'p.display_name','c.default_currency', 'c.client_api_key', 'cat.client_token AS client_access_token', 'ce.player_details_url', 'ce.fund_transfer_url')
-				 ->leftJoin("players AS p", "c.client_id", "=", "p.client_id")
-				 ->leftJoin("player_session_tokens AS pst", "p.player_id", "=", "pst.player_id")
-				 ->leftJoin("client_endpoints AS ce", "c.client_id", "=", "ce.client_id")
-				 ->leftJoin("client_access_tokens AS cat", "c.client_id", "=", "cat.client_id");
-				 
-				if ($type == 'token') {
-					$query->where([
-				 		["pst.player_token", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	]);
-				}
-
-				if ($type == 'player_id') {
-					$query->where([
-				 		["p.player_id", "=", $value],
-				 		["pst.status_id", "=", 1]
-				 	]);
-				}
-
-				 $result= $query->first();
-
-		return $result;
-
-    }
+   
 }
