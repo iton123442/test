@@ -658,6 +658,11 @@ return [
         'SecretHashKey' => '277eec99-07e4-48f2-9d9e-8d86f9351f69'
 
     ],
+    'dragongaming'=>[
+        'PROVIDER_ID' => 50,
+        'API_BASE_URL'=> 'https://api.dragongaming.com/v1/',
+        'API_KEY'=> '9jipwlTSmds3vtGs',
+    ],
 
 ];
 

@@ -1171,6 +1171,9 @@ class GameLobby{
 
     public static function dragonGamingLaunchUrl($request_data) {
         $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
+        $game_type_name = DragonGamingHelper::getGameType($request_data['game_code'], config("providerlinks.dragongaming.PROVIDER_ID"));
+       
+        $game_type = ($game_type_name == 'Slots' ? 'slots' : 'table_games');
         $game_launch = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json'
@@ -1183,7 +1186,7 @@ class GameLobby{
                             "api_key" => config("providerlinks.dragongaming.API_KEY"),
                             "session_id" => $request_data['token'],
                             "provider" => "dragongaming",
-                            "game_type" => "slots",
+                            "game_type" => $game_type,
                             "game_id" => $request_data['game_code'],
                             "platform" => "desktop",
                             "language" => "en",
@@ -1203,7 +1206,11 @@ class GameLobby{
 
         $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
 
-        return $link_result->url;
+        if($game_launch_url) {
+            return $game_launch_url->result->launch_url;   
+        }
+
+        return $request_data['exitUrl'];    
     }
 
     public static function aoyamaLaunchUrl($game_code,$token,$exitUrl){
