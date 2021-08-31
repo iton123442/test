@@ -409,7 +409,7 @@ return [
         'api_key' => 'fff477943dd107dbe9827603a8f2eb48',
     ],
     'pgsoft' => [
-        'api_url' => 'http://api.pg-bo.me/external',
+        'api_url' => 'https://api.pg-bo.co/external',
         'operator_token' => '8DA94287-7B23-4976-ADC2-BC98B773EDB9',
         'secret_key' => 'AE180CC1E8FF48B08A759F9625D725D6',
     ],
