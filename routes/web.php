@@ -657,3 +657,10 @@ $app->group(['prefix' => 'tw/api/'], function () use ($app) {
     $app->post('sm_wallet/transactioncheckerExpo', 'TransferWalletAggregator\DetailsAndFundTransferControllerEXPERIMENT@transactionchecker');
 
 });
+
+// DragonGaming Endpoints
+$app->post('/api/dragongaming/get_session', 'DragonGamingController@getSession');
+$app->post('/api/dragongaming/get_balance', 'DragonGamingController@getBalance');
+$app->post('/api/dragongaming/debit', 'DragonGamingController@debitProcess');
+$app->post('/api/dragongaming/credit', 'DragonGamingController@creditProcess');
+$app->post('/api/dragongaming/refund', 'DragonGamingController@rollbackTransaction');
