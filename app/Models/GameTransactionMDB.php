@@ -198,7 +198,13 @@ class GameTransactionMDB
     public static function updateGametransactionEXT($data,$game_trans_ext_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+            try {
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+            } catch (\Exception $e) {
+                $data["mw_request"] .= $e->getMessage();
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+            }
+            return null;
         }else{
             return null;
         }
