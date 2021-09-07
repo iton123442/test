@@ -454,7 +454,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==38){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl), 
+                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
                         "game_launch" => true
                     );
                     return response($msg,200)
@@ -786,7 +786,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==104){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::ozashikiLaunchUrl($request->game_code,$request->token,$request->exitUrl), 
+                        "url" => GameLobby::ozashikiLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
                         "game_launch" => true
                     );
                     return response($msg,200)

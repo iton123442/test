@@ -1055,9 +1055,9 @@ class GameLobby{
         return $url;
     }
 
-    public static function mannaLaunchUrl($game_code,$token,$exitUrl){
+    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = ''){
         $client_details = GameLobby::getClientDetails('token', $token);
-
+        $lang = GameLobby::getLanguage("Manna Play", $lang);
         // Authenticate New Token
         $auth_token = new Client([ // auth_token
                 'headers' => [ 
@@ -1094,7 +1094,7 @@ class GameLobby{
                         [
                             "account" => $client_details->player_id,
                             "sessionId" => $token,
-                            "language" => "en-US",
+                            "language" => $lang,
                             "gameId" => $game_code,
                             "exitUrl" => $exitUrl
                         ]
@@ -1106,10 +1106,10 @@ class GameLobby{
         return $link_result->url;
     }
 
-    public static function ozashikiLaunchUrl($game_code,$token,$exitUrl) {
+    public static function ozashikiLaunchUrl($game_code,$token,$exitUrl, $lang = '') {
         /*$client_details = GameLobby::getClientDetails('token', $token);*/
         $client_details = ProviderHelper::getClientDetails('token', $token);
-        
+        $lang = GameLobby::getLanguage("Ozashiki", $lang);
         // Authenticate New Token
         $auth_token = new Client([ // auth_token
                 'headers' => [ 
@@ -1146,7 +1146,7 @@ class GameLobby{
                         [
                             "account" => $client_details->player_id,
                             "sessionId" => $token,
-                            "language" => "en-US",
+                            "language" => $lang,
                             "gameId" => $game_code,
                             "exitUrl" => $exitUrl
                         ]
