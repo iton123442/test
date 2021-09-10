@@ -42,17 +42,19 @@ class PGCompanyController extends Controller
                 $token = $this->getPGVirtualPlayerGameRound($game_session_token);
                 // $lang = Helper::getInfoPlayerGameRound($game_session_token);
                 $client_details = ProviderHelper::getClientDetails('token',$token->uuid_token);
-                $response = [
-                    "status" => "1024",
-                    "description" => "Success",
-                    "playerId" => "pgvirtual".$client_details->player_id,
-                    "currency" => $client_details->default_currency,
-                    // "lang" => $lang->uuid_token
-                    "lang" => "en-US"
-                ];
-                Helper::saveLog('PGVirtual validate response', $this->provider_db_id, json_encode($request->all()), $response);
-                return response($response,200)
-                        ->header('Content-Type', 'application/json');
+                if ($client_details != null) {
+                    $response = [
+                        "status" => "1024",
+                        "description" => "Success",
+                        "playerId" => "pgvirtual".$client_details->player_id,
+                        "currency" => $client_details->default_currency,
+                        // "lang" => $lang->uuid_token
+                        "lang" => "en-US"
+                    ];
+                    Helper::saveLog('PGVirtual validate response', $this->provider_db_id, json_encode($request->all()), $response);
+                    return response($response,200)
+                            ->header('Content-Type', 'application/json');
+                }
             }catch (\Exception $e){
                 Helper::saveLog('PGVirtual validate err', $this->provider_db_id,  $e->getMessage(),  $e->getMessage());
                 return response($e->getMessage(),404)
@@ -71,13 +73,15 @@ class PGCompanyController extends Controller
             try {
                 $token = $this->getPGVirtualPlayerGameRound($game_session_token);
                 $client_details = ProviderHelper::getClientDetails('token',$token->uuid_token);
-                $response = [
-                    "status" => "1024",
-                    "description" => "Success",
-                ];
-                Helper::saveLog('PGVirtual keepalive response', $this->provider_db_id, json_encode($request->all()), $response);
-                return response($response,200)
-                        ->header('Content-Type', 'application/json');
+                if($client_details != null) {
+                    $response = [
+                        "status" => "1024",
+                        "description" => "Success",
+                    ];
+                    Helper::saveLog('PGVirtual keepalive response', $this->provider_db_id, json_encode($request->all()), $response);
+                    return response($response,200)
+                            ->header('Content-Type', 'application/json');
+                }
             }catch (\Exception $e){
                 Helper::saveLog('PGVirtual keepalive err', $this->provider_db_id,  $e->getMessage(),  $e->getMessage());
                 return response($e->getMessage(),404)
@@ -97,8 +101,8 @@ class PGCompanyController extends Controller
                 $game_round = $this->getPGVirtualPlayerGameRound($game_session_token);
                 $client_details = ProviderHelper::getClientDetails('token',$game_round->uuid_token);
                 //checking balance
-                $bet_amount = ($data["placeBet"]["amount"] / 100);
-                if ($bet_amount <= 0.00) {
+                $bet_amount = $data["placeBet"]["amount"];
+                if ($bet_amount < 0.00) {
                     $response = [
                         "status" => "404",
                         "description" => "error",
@@ -263,7 +267,7 @@ class PGCompanyController extends Controller
             $data = $request->all();
             $token = $this->getPGVirtualPlayerGameRound($game_session_token);
             $client_details = ProviderHelper::getClientDetails('token',$token->uuid_token);
-            $ids = isset($data["cancelBet"]["ids"]) ? $data["cancelBet"]["ids"] : $data["cancelBet"]["ticketIds"];
+            $ids = isset($data["cancelBet"]["id"]) ? $data["cancelBet"]["id"] : $data["cancelBet"]["ticketIds"];
             foreach ($ids as $ticketIds) {
                 $bet_transation_id = $this->prefix.$ticketIds;
                 $getPlayerGameRoundSession = $this->getPlayerGameRoundSession($bet_transation_id);
@@ -351,7 +355,7 @@ class PGCompanyController extends Controller
                     "type" => "credit",
                     "win" => $win,
                     "token" => $client_details->player_token,
-                    "rollback" => "true",
+                    "rollback" => true,
                     "game_details" => [
                         "game_id" => $game_details->game_id
                     ],
@@ -395,7 +399,7 @@ class PGCompanyController extends Controller
                 ];
                 return response($response,200)->header('Content-Type', 'application/json');
             }
-            $amount = ($data["syncBet"]["amount_won"] / 100);
+            $amount = $data["syncBet"]["amount_won"];
             $client_details = ProviderHelper::getClientDetails('token_id',$getPlayerGameRoundSession->token_id);
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.$data["syncBet"]["id"].'-W');
@@ -494,7 +498,7 @@ class PGCompanyController extends Controller
             $data = $request->all();
             $array = [];
             $bool = false;
-            $ids = isset($data["payBet"]["ids"]) ? $data["payBet"]["ids"] : $data["payBet"]["ticketIds"];
+            $ids = isset($data["payBet"]["id"]) ? $data["payBet"]["id"] : $data["payBet"]["ticketIds"];
             foreach ($ids as $ticketIds) {
                 $bet_transation_id = $this->prefix.$ticketIds;
                 $getPlayerGameRoundSession = $this->getPlayerGameRoundSession($bet_transation_id);
