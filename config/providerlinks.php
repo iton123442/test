@@ -432,6 +432,7 @@ return [
             "6"=>"askmebet",
             "3"=>"xigolo",
             "8"=>"betsofted",
+            "14"=>"ismgaming",
         ],
         'operator' => 'tigergames',
         'license' => 'curacao',
