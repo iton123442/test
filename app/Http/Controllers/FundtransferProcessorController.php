@@ -129,9 +129,13 @@ class FundtransferProcessorController extends Controller
         }
 
         if(isset($payload->action->custom->client_connection_name) && isset($gteid)) {
-            $ext_Data = ['mw_request' => json_encode($requesttocient)];
-            Helper::saveLog($gteid, 999999, json_encode($ext_Data), "UPDATE TRANSACTION EXTENSION");
-            ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+            try{
+                $ext_Data = ['mw_request' => json_encode($requesttocient)];
+                // Helper::saveLog($gteid, 999999, json_encode($ext_Data), "UPDATE TRANSACTION EXTENSION");
+                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+            }catch (\Exception $e){
+                //Do nothing 
+            }
         }
 
         $attempt_count = 1; # Number Of Re Attempt
