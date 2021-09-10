@@ -259,6 +259,10 @@ return [
             'merchant_id' => 'TGEMB',
             'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
         ],
+        '14THB' => [ // ISMEBET
+            'merchant_id' => 'ISMEBET',
+            'merchant_key' => 'b9d6ef7faf12b39bee66eff44c0ddae6633ea7a104d538ede92ef04ee33e62e691c8e662bde5bb7212fae1d68c7a973d186d79de184bdfd49231fc24f119ca2b',
+        ],
     ],
     'justplay' => [
         'provider_db_id' => 49,
