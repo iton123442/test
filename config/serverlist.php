@@ -108,6 +108,13 @@ return [
                 'wt_mw_op_askmebet' // game_transaction
             ]
         ],
+        "server2-ism" =>[
+            'connection_name'=>'server2',
+            'db_list'=> [
+                'wt_mw_op_ism_ext',  //game_trasnaction_ext
+                'wt_mw_op_ism' // game_transaction
+            ]
+        ],
         "server2-betsofted" =>[
             'connection_name'=>'server2',
             'db_list'=> [
