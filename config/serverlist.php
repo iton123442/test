@@ -66,13 +66,13 @@ return [
                 'wt_mw_op_superslot' // game_transaction
             ]
         ],
-        // "server1-xigolo" =>[   // REMOVED CLIENT ALREADY SHUTDOWN!
-        //     'connection_name'=>'mysql',
-        //     'db_list'=> [
-        //         'wt_mw_op_xigolo_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_xigolo' // game_transaction
-        //     ]
-        // ],
+        "server1-xigolo" =>[   // REMOVED CLIENT ALREADY SHUTDOWN!
+            'connection_name'=>'mysql',
+            'db_list'=> [
+                'wt_mw_op_xigolo_ext',  //game_trasnaction_ext
+                'wt_mw_op_xigolo' // game_transaction
+            ]
+        ],
         "server1-mas46" =>[
             'connection_name'=>'mysql',
             'db_list'=> [
@@ -150,13 +150,13 @@ return [
                 'wt_mw_op_superslot' // game_transaction
             ]
         ],
-        // "server2-xigolo" =>[   // REMOVED CLIENT ALREADY SHUTDOWN!
-        //     'connection_name'=>'server2',
-        //     'db_list'=> [
-        //         'wt_mw_op_xigolo_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_xigolo' // game_transaction
-        //     ]
-        // ],
+        "server2-xigolo" =>[   // REMOVED CLIENT ALREADY SHUTDOWN!
+            'connection_name'=>'server2',
+            'db_list'=> [
+                'wt_mw_op_xigolo_ext',  //game_trasnaction_ext
+                'wt_mw_op_xigolo' // game_transaction
+            ]
+        ],
         "server2-mas46" =>[
             'connection_name'=>'server2',
             'db_list'=> [
@@ -164,83 +164,83 @@ return [
                 'wt_mw_op_mas46' // game_transaction
             ]
         ],
-        // "server3" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'api_test_Extension', //game_trasnaction_ext
-        //         'api_test' // game_transaction
-        //     ]
-        // ],
-        // "svr3apt2" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'api_test2_Extension', //game_trasnaction_ext
-        //         'api_test2' // game_transaction
-        //     ]
-        // ],
-        // "server3-aplus" =>[
-        //     'connection_name'=>'mysql',
-        //     'db_list'=> [
-        //         'wt_mw_op_aplus_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_aplus' // game_transaction
-        //     ]
-        // ],
-        // "server3-askmebet" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_askmebet_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_askmebet' // game_transaction
-        //     ]
-        // ],
-        // "server3-betsofted" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_betsofted_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_betsofted' // game_transaction
-        //     ]
-        // ],
-        // "server3-cazicazi" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_cazicazi_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_cazicazi' // game_transaction
-        //     ]
-        // ],
-        // "server3-everymatrix" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_everymatrix_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_everymatrix' // game_transaction
-        //     ]
-        // ],
-        // "server3-kuma" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_kuma_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_kuma' // game_transaction
-        //     ]
-        // ],
-        // "server3-superslot" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_superslot_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_superslot' // game_transaction
-        //     ]
-        // ],
-        // "server3-xigolo" =>[    // REMOVED CLIENT ALREADY SHUTDOWN!
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_xigolo_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_xigolo' // game_transaction
-        //     ]
-        // ],
-        // "server3-mas46" =>[
-        //     'connection_name'=>'server3',
-        //     'db_list'=> [
-        //         'wt_mw_op_mas46_ext',  //game_trasnaction_ext
-        //         'wt_mw_op_mas46' // game_transaction
-        //     ]
-        // ],
+        "server3" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'api_test_Extension', //game_trasnaction_ext
+                'api_test' // game_transaction
+            ]
+        ],
+        "svr3apt2" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'api_test2_Extension', //game_trasnaction_ext
+                'api_test2' // game_transaction
+            ]
+        ],
+        "server3-aplus" =>[
+            'connection_name'=>'mysql',
+            'db_list'=> [
+                'wt_mw_op_aplus_ext',  //game_trasnaction_ext
+                'wt_mw_op_aplus' // game_transaction
+            ]
+        ],
+        "server3-askmebet" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_askmebet_ext',  //game_trasnaction_ext
+                'wt_mw_op_askmebet' // game_transaction
+            ]
+        ],
+        "server3-betsofted" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_betsofted_ext',  //game_trasnaction_ext
+                'wt_mw_op_betsofted' // game_transaction
+            ]
+        ],
+        "server3-cazicazi" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_cazicazi_ext',  //game_trasnaction_ext
+                'wt_mw_op_cazicazi' // game_transaction
+            ]
+        ],
+        "server3-everymatrix" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_everymatrix_ext',  //game_trasnaction_ext
+                'wt_mw_op_everymatrix' // game_transaction
+            ]
+        ],
+        "server3-kuma" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_kuma_ext',  //game_trasnaction_ext
+                'wt_mw_op_kuma' // game_transaction
+            ]
+        ],
+        "server3-superslot" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_superslot_ext',  //game_trasnaction_ext
+                'wt_mw_op_superslot' // game_transaction
+            ]
+        ],
+        "server3-xigolo" =>[    // REMOVED CLIENT ALREADY SHUTDOWN!
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_xigolo_ext',  //game_trasnaction_ext
+                'wt_mw_op_xigolo' // game_transaction
+            ]
+        ],
+        "server3-mas46" =>[
+            'connection_name'=>'server3',
+            'db_list'=> [
+                'wt_mw_op_mas46_ext',  //game_trasnaction_ext
+                'wt_mw_op_mas46' // game_transaction
+            ]
+        ],
         
         
     ]

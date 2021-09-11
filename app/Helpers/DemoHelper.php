@@ -28,18 +28,18 @@ class DemoHelper{
         }
 
         $provider_id = GameLobby::checkAndGetProviderId($data->game_provider);
-        $provider_code = $provider_id->sub_provider_id;
+        $provider_code = $provider_id->sub_provider_id; // SUBPROVIDER ID!
         
-        if(in_array($provider_code, [33, 104,38])){ // Static Game URL
+        if($provider_code == 33){ // Bole Gaming
             $response = array(
                 "game_code" => $data->game_code,
-                "url" => DemoHelper::getStaticUrl($data->game_code, $data->game_provider),
+                "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
                 "game_launch" => true
             );
         }elseif($provider_code == 49){ // Bole Gaming
             $response = array(
                 "game_code" => $data->game_code,
-                "url" => DemoHelper::getStaticUrl($data->game_code, $data->game_provider),
+                "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
                 "game_launch" => true
             );
         }
@@ -51,6 +51,13 @@ class DemoHelper{
             );
             return response($msg,200)
             ->header('Content-Type', 'application/json');
+        }
+        elseif($provider_code == 104 ||$provider_code == 38){ // Manna Play Betrnk && Manna Play
+            $response = array(
+                "game_code" => $data->game_code,
+                "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
+                "game_launch" => true
+            );
         }
         elseif($provider_code == 60){ // ygg drasil direct
             $response = array(
@@ -119,20 +126,11 @@ class DemoHelper{
     }
 
     # Providers That Has Static URL DEMO LINK IN THE DATABASE
-    public static function getStaticUrl($game_code, $game_provider){
-        // $game_demo = DB::table('games as g')
-        // ->select('g.game_demo')
-        // ->leftJoin('providers as p', "g.provider_id", "=", "p.provider_id")
-        // ->where('g.game_code', $game_code)
-        // ->where('p.provider_name', $game_provider)
-        // ->first();
-        // return $game_demo->game_demo;
-
+    public static function getStaticUrl($game_code, $sub_provider_id){
          $game_demo = DB::table('games as g')
         ->select('g.game_demo')
-        ->leftJoin('sub_providers as sp', "g.sub_provider_id", "=", "sp.sub_provider_id")
         ->where('g.game_code', $game_code)
-        ->where('sp.sub_provider_name', $game_provider)
+        ->where('g.sub_provider_id', $sub_provider_id)
         ->first();
         return $game_demo->game_demo;
     }
@@ -148,7 +146,7 @@ class DemoHelper{
         ]);
         $result= $game_details->first();
         return $result ? $result : false;
-	}
+    }
 
     public static function oryxLaunchUrl($game_code, $lang, $exitUrl){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'ENG') : 'ENG';

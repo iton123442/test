@@ -93,6 +93,19 @@ class GameLobbyController extends Controller
         return $url;
     }
     public function gameLaunchUrl(Request $request){
+
+        // Save Every Gamelaunch from the client
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH LOG', 12, json_encode($request->all()), 'GAME REQUEST BODY');
+
+        // Demo Handler
+        // Required Parameter game_code, game_provider
+        if ($request->has("demo") && $request->input("demo") == true) {
+            if($request->has('game_code')
+                &&$request->has('game_provider')){
+                return DemoHelper::DemoGame($request->all());
+            }
+        }
+        
         if($request->has('client_id')
         &&$request->has('client_player_id')
         &&$request->has('username')
@@ -128,9 +141,6 @@ class GameLobbyController extends Controller
                return $msg;
             }
 
-            # Save Every Gamelaunch from the client
-            ProviderHelper::saveLogGameLaunch('GAMELAUNCH LOG', 1223, json_encode($request->all()), $request->client_player_id);
-
             // Filters
             if(ClientHelper::checkClientID($request->all()) != 200){
                 $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
@@ -149,9 +159,9 @@ class GameLobbyController extends Controller
             $lang = $request->has("lang")?$request->input("lang"):"en";
             if($token=Helper::checkPlayerExist($request->client_id,$request->client_player_id,$request->username,$request->email,$request->display_name,$request->token,$ip_address)){
 
-                if ($request->has("demo") && $request->input("demo") == true) {
-                    return DemoHelper::DemoGame($request->all());
-                }
+                // if ($request->has("demo") && $request->input("demo") == true) {
+                //     return DemoHelper::DemoGame($request->all());
+                // }
 
                     # Check if player is allowed to play a specific game
                     // Helper::savePLayerGameRound($request->input("game_code"), $request->input("token"), $request->input("game_provider"));
