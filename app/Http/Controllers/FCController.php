@@ -11,7 +11,7 @@ use App\Models\GameTransactionMDB;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use DB;
-class FCMDBController extends Controller
+class FCController extends Controller
 {
     //
     public $provider_db_id=27;
