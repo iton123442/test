@@ -13,6 +13,8 @@ use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
 use Carbon\Carbon;
 use DB;
+// use DOMDocument;
+// use SimpleXMLElement;
 
 class TTGController extends Controller
 { 
@@ -76,6 +78,8 @@ class TTGController extends Controller
 
     public function fundTransferTTG(Request $request){
       $fileContents = file_get_contents("php://input");
+      // $xml = new \SimpleXMLElement($fileContents);
+      // $array = (array)$xml;
       $json = json_encode(simplexml_load_string($fileContents));
       $array = json_decode($json,true);
       $acctid = $array['@attributes']['acctid'];
@@ -117,29 +121,39 @@ class TTGController extends Controller
                  $entry_id = 1 == 0.0 ? 1 : 2;// 1/bet/debit , 2//win/credit
                  // $provider_trans_id = $data['id_stat']; // 
                  $round_id = $array['@attributes']['handid'];// this is round
-                 
-                // GameTransactionMDB
-                $gameTransactionData = array(
-                    "provider_trans_id" => $provider_trans_id,
-                    "token_id" => $get_client_details->token_id,
-                    "game_id" => $game_details->game_id,
-                    "round_id" => $round_id,
-                    "bet_amount" => $bet_amount,
-                    "win" => 5,
-                    "pay_amount" => 0,
-                    "income" => 0,
-                    "entry_id" =>1,
-                );
-                  $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $get_client_details);
+
+                 $checkTransaction = GameTransactionMDB::findGameTransactionDetails($array['@attributes']['handid'],'round_id', 1, $get_client_details);
+                 if($checkTransaction == 'false'){
+                      $gameTransactionData = array(
+                            "provider_trans_id" => $provider_trans_id,
+                            "token_id" => $get_client_details->token_id,
+                            "game_id" => $game_details->game_id,
+                            "round_id" => $round_id,
+                            "bet_amount" => $bet_amount,
+                            "win" => 5,
+                            "pay_amount" => 0,
+                            "income" => 0,
+                            "entry_id" =>1,
+                        );
+                        $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $get_client_details);
+                  }else{
+                      // GameTransactionMDB
+                        // $bet_amount = $checkTransaction->bet_amount + $bet_amount;
+                        $updateGameTransaction = [
+                            "bet_amount" => $checkTransaction->bet_amount + $bet_amount,
+                        ];
+                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTransaction->game_trans_id, $get_client_details);
+                        $game_trans_id = $checkTransaction->game_trans_id;
+                  }
 
                   $gameTransactionEXTData = array(
-                      "game_trans_id" => $game_trans_id,
-                      "provider_trans_id" => $provider_trans_id,
-                      "round_id" => $round_id,
-                      "amount" => $bet_amount,
-                      "game_transaction_type"=> 1,
-                      "provider_request" =>json_encode($data),
-                      );
+                    "game_trans_id" => $game_trans_id,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" => $round_id,
+                    "amount" => $bet_amount,
+                    "game_transaction_type"=> 1,
+                    "provider_request" =>json_encode($data),
+                    );
                   $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$get_client_details);
   
                   $client_response = ClientRequestHelper::fundTransfer($get_client_details, $bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, 'debit');
