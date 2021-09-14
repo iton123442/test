@@ -59,8 +59,6 @@ class HabaneroController extends Controller
             return $response;
         }else{
             try{
-                $player_details = Providerhelper::playerDetailsCall($client_details->player_token,true);
-                $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', ''))]); #val
 
                 $response = [
                     "playerdetailresponse" => [
@@ -71,7 +69,7 @@ class HabaneroController extends Controller
                         ],
                         "accountid" => $client_details->player_id,
                         "accountname" => $client_details->username,
-                        "balance" => $player_details->playerdetailsresponse->balance,
+                        "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                         "currencycode" => $client_details->default_currency
                     ]
                 ];

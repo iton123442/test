@@ -35,9 +35,8 @@ class YGGController extends Controller
             return $response;
             Helper::saveLog("YGG playerinfo response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
         }
-        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);  
         $player_id = "TGaming_".$client_details->player_id;
-        $balance = floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', ''));
+        $balance = floatval(number_format($client_details->balance, 2, '.', ''));
         $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $balance]); #new method
         $response = array(
             "code" => 0,
@@ -50,7 +49,7 @@ class YGGController extends Controller
                 "currency" => $client_details->default_currency,
                 "homeCurrency" => $client_details->default_currency,
                 "nickName" => $client_details->display_name,
-                "country" => $player_details->playerdetailsresponse->country_code
+                "country" => $client_details->country_code
             ),
             "msg" => "Success"
         );
@@ -601,15 +600,14 @@ class YGGController extends Controller
         Helper::saveLog('Yggdrasil campaignpayout request', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), "");
         $playerId = ProviderHelper::explodeUsername('_',$request->playerid);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
-        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         $response = array(
             "code" => 0,
             "data" => array(
                 "currency" => $client_details->default_currency,
-                "applicableBonus" => floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', '')),
+                "applicableBonus" => floatval(number_format($client_details->balance, 2, '.', '')),
                 "homeCurrency" => $client_details->default_currency,
                 "organization" => $this->org,
-                "balance" => floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', '')),
+                "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                 "nickName" => $client_details->display_name,
                 "playerId" => "TGaming_".$client_details->player_id
             ),
@@ -630,9 +628,8 @@ class YGGController extends Controller
             return $response;
             Helper::saveLog("YGG playerinfo response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
         }
-        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);  
         $player_id = "TGaming_".$client_details->player_id;
-        $balance = floatval(number_format($player_details->playerdetailsresponse->balance, 2, '.', ''));
+        $balance = floatval(number_format($client_details->balance, 2, '.', ''));
 
         $response = array(
             "code" => 0,
