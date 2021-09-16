@@ -514,7 +514,7 @@ class SmartsoftGamingController extends Controller
                    return response($response,200)->header('Content-Type', 'application/json');
              } // End catch error
                 // $existing_bet = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
-            $existing_bet = GameTransactionMDB::findGameExt($round_id, false,'round_id', $client_details);
+            $existing_bet = GameTransactionMDB::findGameExt($rollback_id, false,'transaction_id', $client_details);
                $game_trans_type = $existing_bet->game_transaction_type;
                 if($existing_bet != 'false'){
 
