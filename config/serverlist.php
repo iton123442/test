@@ -109,7 +109,7 @@ return [
         //     ]
         // ],
         "server2-aplus" =>[
-            'connection_name'=>'server2',
+            'connection_name'=>'mysql',
             'db_list'=> [
                 'wt_mw_db_production',  //game_trasnaction_ext
                 'wt_mw_db_production' // game_transaction
@@ -200,7 +200,7 @@ return [
         //     ]
         // ],
         "server3-aplus" =>[
-            'connection_name'=>'server3',
+            'connection_name'=>'mysql',
             'db_list'=> [
                 'wt_mw_db_production',  //game_trasnaction_ext
                 'wt_mw_db_production' // game_transaction
