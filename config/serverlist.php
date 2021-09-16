@@ -17,11 +17,18 @@ return [
                 'api_test' // game_transaction
             ]
         ],
-        "server1-aplus" =>[
+        // "server1-aplus" =>[
+        //     'connection_name'=>'mysql',
+        //     'db_list'=> [
+        //         'wt_mw_op_aplus_ext',  //game_trasnaction_ext
+        //         'wt_mw_op_aplus' // game_transaction
+        //     ]
+        // ],
+        "server1-aplus" =>[  // Transfer Wallet
             'connection_name'=>'mysql',
             'db_list'=> [
-                'wt_mw_op_aplus_ext',  //game_trasnaction_ext
-                'wt_mw_op_aplus' // game_transaction
+                'wt_mw_db_production',  //game_trasnaction_ext
+                'wt_mw_db_production' // game_transaction
             ]
         ],
         "server1-askmebet" =>[
@@ -94,11 +101,18 @@ return [
                 'api_test2' // game_transaction
             ]
         ],
+        // "server2-aplus" =>[
+        //     'connection_name'=>'server2',
+        //     'db_list'=> [
+        //         'wt_mw_op_aplus_ext',  //game_trasnaction_ext
+        //         'wt_mw_op_aplus' // game_transaction
+        //     ]
+        // ],
         "server2-aplus" =>[
             'connection_name'=>'server2',
             'db_list'=> [
-                'wt_mw_op_aplus_ext',  //game_trasnaction_ext
-                'wt_mw_op_aplus' // game_transaction
+                'wt_mw_db_production',  //game_trasnaction_ext
+                'wt_mw_db_production' // game_transaction
             ]
         ],
         "server2-askmebet" =>[
@@ -178,11 +192,18 @@ return [
                 'api_test2' // game_transaction
             ]
         ],
+        // "server3-aplus" =>[
+        //     'connection_name'=>'mysql',
+        //     'db_list'=> [
+        //         'wt_mw_op_aplus_ext',  //game_trasnaction_ext
+        //         'wt_mw_op_aplus' // game_transaction
+        //     ]
+        // ],
         "server3-aplus" =>[
-            'connection_name'=>'mysql',
+            'connection_name'=>'server3',
             'db_list'=> [
-                'wt_mw_op_aplus_ext',  //game_trasnaction_ext
-                'wt_mw_op_aplus' // game_transaction
+                'wt_mw_db_production',  //game_trasnaction_ext
+                'wt_mw_db_production' // game_transaction
             ]
         ],
         "server3-askmebet" =>[
