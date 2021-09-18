@@ -162,7 +162,14 @@ class BNGController extends Controller
                         if($transactionClientChecker){
                             // check if the gameTransactionExtChecker["mw_response"] is not empty.
                             if($gameTransactionExtChecker->mw_response != null && !empty($gameTransactionExtChecker->mw_response) && isset($gameTransactionExtChecker->mw_response)){
-                                $response = json_encode($gameTransactionExtChecker->mw_response);
+                                $decodedResponse = json_decode($gameTransactionExtChecker->mw_response);
+                                $response =array(
+                                    "uid"=>$decodedResponse->uid,
+                                    "balance" => array(
+                                        "value" => (string)$decodedResponse->balance->value,
+                                        "version" => $decodedResponse->balance->version,//$this->_getExtParameter()
+                                    ),
+                                );
                                 return response($response,200)->header('Content-Type', 'application/json'); 
                             }
                             // if we get an empty or null gameTransactionExtChecker["mw_response"] 
