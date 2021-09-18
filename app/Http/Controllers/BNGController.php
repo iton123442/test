@@ -150,7 +150,7 @@ class BNGController extends Controller
             ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["uid"]);
         }catch(\Exception $e){
             if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
-                $gameTransactionExtChecker = GameTransaction::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2);
+                $gameTransactionExtChecker = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2,$client_details);
                 //check the gameTransaction if exist and check if not null 
                 if ($gameTransactionExtChecker != null && !empty($gameTransactionExtChecker)&& isset($gameTransactionExtChecker)){
                     // check the transation from the client if it is success or not found
@@ -180,7 +180,7 @@ class BNGController extends Controller
                         $response =array(
                             "uid"=>$data["uid"],
                             "balance" => array(
-                                "value" => $transactionClientChecker,
+                                "value" => "0.00",
                                 "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                             ),
                             "error" => array(
