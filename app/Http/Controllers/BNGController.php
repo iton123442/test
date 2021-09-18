@@ -150,25 +150,76 @@ class BNGController extends Controller
             ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["uid"]);
         }catch(\Exception $e){
             if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
-                $response =array(
-                    "uid"=>$data["uid"],
-                    "balance" => array(
-                        "value" => "0.00",
-                        "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                    ),
-                    "error" => array(
-                        "code"=> "OTHER_EXCEED",
-                    )
-                );
-                $failedData = array(
-                    "provider_transaction" => $data["uid"],
-                    "round_id" => $data["args"]["round_id"],
-                    "win_amount" => $data["args"]["win"],
-                    "bet_amount" => $data["args"]["bet"],
-                    "provider_id" => $this->prefix,
-                );
-                GameTransaction::createFailedTransaction($failedData);
-                return response($response,200)->header('Content-Type', 'application/json');  
+                $gameTransactionExtChecker = GameTransaction::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2);
+                //check the gameTransaction if exist and check if not null 
+                if ($gameTransactionExtChecker != null && !empty($gameTransactionExtChecker)&& isset($gameTransactionExtChecker)){
+                    // check the transation from the client if it is success or not found
+                    $transactionClientChecker = TransactionHelper::CheckTransactionToClient($client_details,$gameTransactionExtChecker->game_trans_ext_id,$gameTransactionExtChecker->game_trans_id);
+                    // if trasaction credit is found in the client side then we will response the same response as we did on the first request
+                    if($transactionClientChecker){
+                        // check if the gameTransactionExtChecker["mw_response"] is not empty.
+                        if($gameTransactionExtChecker->mw_response != null && !empty($gameTransactionExtChecker->mw_response) && isset($gameTransactionExtChecker->mw_response)){
+                            $response = json_encode($gameTransactionExtChecker->mw_response);
+                            return response($response,200)->header('Content-Type', 'application/json'); 
+                        }
+                        // if we get an empty or null gameTransactionExtChecker["mw_response"] 
+                        else{
+                            $response =array(
+                                "uid"=>$data["uid"],
+                                "balance" => array(
+                                    "value" => $client_details->balance,
+                                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                                ),
+                            );
+                            return response($response,200)
+                                ->header('Content-Type', 'application/json');
+                        }
+                     }
+                     // gameTransactionExtChecker ins empty or null then we will consider it as failed on the  provider side and reafund the client side
+                     else{
+                        $response =array(
+                            "uid"=>$data["uid"],
+                            "balance" => array(
+                                "value" => $transactionClientChecker,
+                                "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                            ),
+                            "error" => array(
+                                "code"=> "OTHER_EXCEED",
+                            )
+                        );
+                        $failedData = array(
+                            "provider_transaction" => $data["uid"],
+                            "round_id" => $data["args"]["round_id"],
+                            "win_amount" => $data["args"]["win"],
+                            "bet_amount" => $data["args"]["bet"],
+                            "provider_id" => $this->prefix,
+                        );
+                        GameTransaction::createFailedTransaction($failedData);
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                }
+                // gameTransactionExtChecker ins empty or null then we will consider it as failed on the  provider side and reafund the client side
+                else{
+                    $response =array(
+                        "uid"=>$data["uid"],
+                        "balance" => array(
+                            "value" => "0.00",
+                            "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                        ),
+                        "error" => array(
+                            "code"=> "OTHER_EXCEED",
+                        )
+                    );
+                    $failedData = array(
+                        "provider_transaction" => $data["uid"],
+                        "round_id" => $data["args"]["round_id"],
+                        "win_amount" => $data["args"]["win"],
+                        "bet_amount" => $data["args"]["bet"],
+                        "provider_id" => $this->prefix,
+                    );
+                    GameTransaction::createFailedTransaction($failedData);
+                    return response($response,200)->header('Content-Type', 'application/json');
+                } 
             }elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
                 $failedData = array(
                     "provider_transaction" => $data["uid"],

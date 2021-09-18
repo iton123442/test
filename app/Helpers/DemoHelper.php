@@ -66,6 +66,14 @@ class DemoHelper{
                 "game_launch" => true
             );
         }
+        elseif($provider_code == 95){ // 5Men Gaming
+            $game_provider = "5Men Gaming";
+            $response = array(
+                "game_code" => $data->game_code,
+                "url" => DemoHelper::fivemenlaunchUrl($data->game_code,$data->token,$data->exitUrl,$game_provider),
+                "game_launch" => true
+            );
+        }
         elseif($provider_code == 55){ // pgsoft
             $response = array(
                 "game_code" => $data->game_code,
@@ -202,5 +210,38 @@ class DemoHelper{
         ]);
         $res = json_decode($response->getBody(),TRUE);
         return isset($res['data']['link']) ? $res['data']['link'] : false;
+    }
+    public static function fivemenlaunchUrl( $game_code = null, $token = null, $exiturl, $provider){
+        $requesttosend = [
+          "project" => config('providerlinks.5men.project_id'),
+          "version" => 1,
+          "token" => "demo",
+          "game" => $game_code, //game_code, game_id
+          "settings" =>  [
+            'user_id'=> "14602",
+            'language'=> "en",
+            'https' => 1,
+            'platform' => 'mobile'
+          ],
+          "denomination" => '1', // game to be launched with values like 1.0, 1, default
+          "currency" => "USD",
+          "return_url_info" => 1, // url link
+          "callback_version" => 2, // POST CALLBACK
+        ];
+        $signature =  ProviderHelper::getSignature($requesttosend, config('providerlinks.5men.api_key'));
+        $requesttosend['signature'] = $signature;
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ]
+        ]);
+        $response = $client->post(config('providerlinks.5men.api_url').'/game/geturl',[
+            'form_params' => $requesttosend,
+        ]);
+        $res = json_decode($response->getBody(),TRUE);
+        // Helper::saveLog('TGG GAMELAUNCH TOPGRADEGAMES', 29, json_encode($requesttosend), json_decode($response->getBody()));
+        $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
+            return $gameurl;
+        
     }
 }

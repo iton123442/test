@@ -236,7 +236,7 @@ class SpadeController extends Controller
 			//requesttosend, and responsetoclient client side
 			try {
 				$type = "debit";
-				$rollback = "false";
+				$rollback = false;
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$details->amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,$type,$rollback);
 	        } catch (\Exception $e) {
 	        	$response = [
@@ -497,7 +497,7 @@ class SpadeController extends Controller
 	            "type" => "credit",
 	            "win" => $win,
 	            "token" => $client_details->player_token,
-	            "rollback" => "true",
+	            "rollback" => true,
 	            "game_details" => [
 	                "game_id" => $game_details->game_id
 	            ],
