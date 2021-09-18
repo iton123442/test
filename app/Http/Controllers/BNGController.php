@@ -153,6 +153,7 @@ class BNGController extends Controller
                 if($client_details){
                     ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($client_details),"IF");
                     $gameTransactionExtChecker = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2,$client_details);
+                    ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($gameTransactionExtChecker),"IFgameTransactionExtChecker");
                     //check the gameTransaction if exist and check if not null 
                     if ($gameTransactionExtChecker != null && !empty($gameTransactionExtChecker)&& isset($gameTransactionExtChecker)){
                         // check the transation from the client if it is success or not found
