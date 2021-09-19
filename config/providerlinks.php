@@ -516,7 +516,7 @@ return [
         'api_url'=> 'https:/merchantapi.silverkirin88.com/api/',
         'merchantCode' => 'TIGERG',
         'siteId' => 'SITE_1',
-        'provider_id' => 37,
+        'provider_id' => 59,
     ],
     'majagames'=>[
         'auth' => 'wsLQrQM1OC1bVscK',
