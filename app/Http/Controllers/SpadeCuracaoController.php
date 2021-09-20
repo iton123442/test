@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
-use App\Models\GameTransactionMDB;
 use GuzzleHttp\Client;
-use Carbon\Carbon;
+use App\Models\GameTransactionMDB;
 use App\Helpers\ClientRequestHelper;
 use DB;
 
@@ -21,7 +20,7 @@ class SpadeCuracaoController extends Controller
 		$this->api_url = config('providerlinks.spade_curacao.api_url');
 		$this->provider_db_id = config('providerlinks.spade_curacao.provider_id');
 	}
-
+	
 	public function generateSerialNo(){
     	// $guid = vsprintf('%s%s-%s-4000-8%.3s-%s%s%s0',str_split(dechex( microtime(true) * 1000 ) . bin2hex( random_bytes(8) ),4));
     	$guid = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);;
@@ -156,9 +155,7 @@ class SpadeCuracaoController extends Controller
 			return $response;
 		}
 
-		// 73 = subprovider Spade Gaming Eu
-		// $game_details = $this->findGameDetails('game_code', $this->provider_db_id, $details->gameCode);
-		$game_details = $this->findGameDetails('game_code', 73, $details->gameCode);
+		$game_details = $this->findGameDetails('game_code', $this->provider_db_id, $details->gameCode);
 		if ($game_details == null) {
 			$response = [
 				"msg" => "System Error",
@@ -197,8 +194,8 @@ class SpadeCuracaoController extends Controller
                 }
             } else {
                 $response = [
-					"msg" => "Acct Exist",
-					"code" => 50099
+					"msg" => "Acct Not Found",
+					"code" => 50100
 				];
 				Helper::saveLog('Spade '.$header['API'].' not found dubplicate', $this->provider_db_id,  json_encode($details), $response);
             } 
@@ -236,7 +233,7 @@ class SpadeCuracaoController extends Controller
 			//requesttosend, and responsetoclient client side
 			try {
 				$type = "debit";
-				$rollback = "false";
+				$rollback = false;
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$details->amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,$type,$rollback);
 	        } catch (\Exception $e) {
 	        	$response = [
@@ -283,8 +280,8 @@ class SpadeCuracaoController extends Controller
 						break;
 					default:
 						$response = [
-							"msg" => "BET INSUFFICIENT BALANCE",
-							"code" => 11101
+							"msg" => "INSUFFICIENT BALANCE",
+							"code" => 50110
 						];
 	          			$updateTransactionEXt = array(
 			                "mw_response" => json_encode($response),
@@ -330,8 +327,8 @@ class SpadeCuracaoController extends Controller
                 }
             } else {
                 $response = [
-					"msg" => "Acct Exist",
-					"code" => 50099
+					"msg" => "Acct Not Found",
+					"code" => 50100
 				];
 				Helper::saveLog('Spade '.$header['API'].' not found dubplicate', $this->provider_db_id,  json_encode($details), $response);
             } 
@@ -438,9 +435,9 @@ class SpadeCuracaoController extends Controller
                     Helper::saveLog('Spade '.$header['API'].' found dubplicate', $this->provider_db_id,  json_encode($details), json_decode($response));
                 }
             } else {
-                $response = [
-					"msg" => "Acct Exist",
-					"code" => 50099
+				$response = [
+					"msg" => "Acct Not Found",
+					"code" => 50100
 				];
 				Helper::saveLog('Spade '.$header['API'].' not found dubplicate', $this->provider_db_id,  json_encode($details), $response);
             } 
@@ -497,7 +494,7 @@ class SpadeCuracaoController extends Controller
 	            "type" => "credit",
 	            "win" => $win,
 	            "token" => $client_details->player_token,
-	            "rollback" => "true",
+	            "rollback" => true,
 	            "game_details" => [
 	                "game_id" => $game_details->game_id
 	            ],
@@ -533,83 +530,6 @@ class SpadeCuracaoController extends Controller
 	public function _bonus($details,$header){
 		return '_bonus';
 	}
-
-	public  static function findGameExt($provider_identifier, $type) {
-		$transaction_db = DB::table('game_transaction_ext as gte');
-        if ($type == 'transaction_id') {
-			$transaction_db->where([
-		 		["gte.provider_trans_id", "=", $provider_identifier]
-		 	
-		 	]);
-		}
-		if ($type == 'round_id') {
-			$transaction_db->where([
-		 		["gte.round_id", "=", $provider_identifier],
-		 	]);
-		}  
-		$result= $transaction_db->first();
-		return $result ? $result : 'false';
-	}
-
-	public static function createGameTransExt($game_trans_id, $provider_trans_id, $round_id, $amount, $game_type, $provider_request, $mw_response, $mw_request, $client_response, $transaction_detail){
-		$gametransactionext = array(
-			"game_trans_id" => $game_trans_id,
-			"provider_trans_id" => $provider_trans_id,
-			"round_id" => $round_id,
-			"amount" => $amount,
-			"game_transaction_type"=>$game_type,
-			"provider_request" => json_encode($provider_request),
-			"mw_response" =>json_encode($mw_response),
-			"mw_request"=>json_encode($mw_request),
-			"client_response" =>json_encode($client_response),
-			"transaction_detail" =>json_encode($transaction_detail)
-		);
-		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-		return $gamestransaction_ext_ID;
-	}
-
-	public static function updateGameTransactionExt($gametransextid,$mw_request,$mw_response,$client_response){
-		$gametransactionext = array(
-			"mw_request"=>json_encode($mw_request),
-			"mw_response" =>json_encode($mw_response),
-			"client_response" =>json_encode($client_response),
-		);
-		DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
-	}
-
-	public  function updateReason($win) {
-        $win_type = [
-        "1" => 'Transaction updated to win',
-        "2" => 'Transaction updated to bet',
-        "3" => 'Transaction updated to Draw',
-        "4" => 'Transaction updated to Refund',
-        "5" => 'Transaction updated to Processing',
-        ];
-        if(array_key_exists($win, $win_type)){
-            return $win_type[$win];
-        }else{
-            return 'Transaction Was Updated!';
-        }   
-    }
-
-    public static  function findGameTransactionExstingBet($identifier, $type) {
-
-    	if ($type == 'transaction_id') {
-		 	$where = 'where gt.provider_trans_id = "'.$identifier.'" ';
-		}
-		if ($type == 'game_transaction') {
-		 	$where = 'where gt.game_trans_id = "'.$identifier.'"';
-		}
-		if ($type == 'round_id') {
-			$where = 'where gt.round_id = "'.$identifier.'" ';
-		}
-	 	
-	 	$filter = 'LIMIT 1';
-    	$query = DB::select('select gt.game_trans_id, gt.provider_trans_id, gt.game_id, gt.round_id, gt.bet_amount,gt.win, gt.pay_amount, gt.entry_id, gt.income from game_transactions gt '.$where.' '.$filter.'');
-    	$client_details = count($query);
-		return $client_details > 0 ? $query[0] : 'false';
-    }
-
     public static function findGameDetails($type, $provider_id, $identification) {
 		    $game_details = DB::table("games as g")
 				->join("providers as p","g.provider_id","=","p.provider_id");

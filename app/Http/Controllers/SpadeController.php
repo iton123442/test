@@ -7,7 +7,6 @@ use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
 use App\Models\GameTransactionMDB;
-use Carbon\Carbon;
 use App\Helpers\ClientRequestHelper;
 use DB;
 
@@ -156,9 +155,7 @@ class SpadeController extends Controller
 			return $response;
 		}
 
-		// 59 = subprovider Spade Gaming
-		// $game_details = $this->findGameDetails('game_code', $this->provider_db_id, $details->gameCode);
-		$game_details = $this->findGameDetails('game_code', 59, $details->gameCode);
+		$game_details = $this->findGameDetails('game_code', $this->provider_db_id, $details->gameCode);
 		if ($game_details == null) {
 			$response = [
 				"msg" => "System Error",
@@ -197,8 +194,8 @@ class SpadeController extends Controller
                 }
             } else {
                 $response = [
-					"msg" => "Acct Exist",
-					"code" => 50099
+					"msg" => "Acct Not Found",
+					"code" => 50100
 				];
 				Helper::saveLog('Spade '.$header['API'].' not found dubplicate', $this->provider_db_id,  json_encode($details), $response);
             } 
@@ -283,8 +280,8 @@ class SpadeController extends Controller
 						break;
 					default:
 						$response = [
-							"msg" => "BET INSUFFICIENT BALANCE",
-							"code" => 11101
+							"msg" => "INSUFFICIENT BALANCE",
+							"code" => 50110
 						];
 	          			$updateTransactionEXt = array(
 			                "mw_response" => json_encode($response),
@@ -330,8 +327,8 @@ class SpadeController extends Controller
                 }
             } else {
                 $response = [
-					"msg" => "Acct Exist",
-					"code" => 50099
+					"msg" => "Acct Not Found",
+					"code" => 50100
 				];
 				Helper::saveLog('Spade '.$header['API'].' not found dubplicate', $this->provider_db_id,  json_encode($details), $response);
             } 
@@ -438,9 +435,9 @@ class SpadeController extends Controller
                     Helper::saveLog('Spade '.$header['API'].' found dubplicate', $this->provider_db_id,  json_encode($details), json_decode($response));
                 }
             } else {
-                $response = [
-					"msg" => "Acct Exist",
-					"code" => 50099
+				$response = [
+					"msg" => "Acct Not Found",
+					"code" => 50100
 				];
 				Helper::saveLog('Spade '.$header['API'].' not found dubplicate', $this->provider_db_id,  json_encode($details), $response);
             } 
@@ -533,83 +530,6 @@ class SpadeController extends Controller
 	public function _bonus($details,$header){
 		return '_bonus';
 	}
-
-	public  static function findGameExt($provider_identifier, $type) {
-		$transaction_db = DB::table('game_transaction_ext as gte');
-        if ($type == 'transaction_id') {
-			$transaction_db->where([
-		 		["gte.provider_trans_id", "=", $provider_identifier]
-		 	
-		 	]);
-		}
-		if ($type == 'round_id') {
-			$transaction_db->where([
-		 		["gte.round_id", "=", $provider_identifier],
-		 	]);
-		}  
-		$result= $transaction_db->first();
-		return $result ? $result : 'false';
-	}
-
-	public static function createGameTransExt($game_trans_id, $provider_trans_id, $round_id, $amount, $game_type, $provider_request, $mw_response, $mw_request, $client_response, $transaction_detail){
-		$gametransactionext = array(
-			"game_trans_id" => $game_trans_id,
-			"provider_trans_id" => $provider_trans_id,
-			"round_id" => $round_id,
-			"amount" => $amount,
-			"game_transaction_type"=>$game_type,
-			"provider_request" => json_encode($provider_request),
-			"mw_response" =>json_encode($mw_response),
-			"mw_request"=>json_encode($mw_request),
-			"client_response" =>json_encode($client_response),
-			"transaction_detail" =>json_encode($transaction_detail)
-		);
-		$gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
-		return $gamestransaction_ext_ID;
-	}
-
-	public static function updateGameTransactionExt($gametransextid,$mw_request,$mw_response,$client_response){
-		$gametransactionext = array(
-			"mw_request"=>json_encode($mw_request),
-			"mw_response" =>json_encode($mw_response),
-			"client_response" =>json_encode($client_response),
-		);
-		DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
-	}
-
-	public  function updateReason($win) {
-        $win_type = [
-        "1" => 'Transaction updated to win',
-        "2" => 'Transaction updated to bet',
-        "3" => 'Transaction updated to Draw',
-        "4" => 'Transaction updated to Refund',
-        "5" => 'Transaction updated to Processing',
-        ];
-        if(array_key_exists($win, $win_type)){
-            return $win_type[$win];
-        }else{
-            return 'Transaction Was Updated!';
-        }   
-    }
-
-    public static  function findGameTransactionExstingBet($identifier, $type) {
-
-    	if ($type == 'transaction_id') {
-		 	$where = 'where gt.provider_trans_id = "'.$identifier.'" ';
-		}
-		if ($type == 'game_transaction') {
-		 	$where = 'where gt.game_trans_id = "'.$identifier.'"';
-		}
-		if ($type == 'round_id') {
-			$where = 'where gt.round_id = "'.$identifier.'" ';
-		}
-	 	
-	 	$filter = 'LIMIT 1';
-    	$query = DB::select('select gt.game_trans_id, gt.provider_trans_id, gt.game_id, gt.round_id, gt.bet_amount,gt.win, gt.pay_amount, gt.entry_id, gt.income from game_transactions gt '.$where.' '.$filter.'');
-    	$client_details = count($query);
-		return $client_details > 0 ? $query[0] : 'false';
-    }
-
     public static function findGameDetails($type, $provider_id, $identification) {
 		    $game_details = DB::table("games as g")
 				->join("providers as p","g.provider_id","=","p.provider_id");
