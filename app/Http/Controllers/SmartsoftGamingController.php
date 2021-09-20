@@ -497,9 +497,14 @@ class SmartsoftGamingController extends Controller
         $rollback_id = $data['TransactionId'];
         $provider_trans_id = $data['CurrentTransactionId'];
         $round_id = $data['TransactionInfo']['RoundId'];
-        $game_code = $data['TransactionInfo']['GameName'];
-        $game_details = Game::find($game_code, $this->provider_db_id);
+        // $game_code = $data['TransactionInfo']['GameName'];
         $client_details = ProviderHelper::getClientDetails('token', $request->header('X-SessionId'));
+        if($data['TransactionInfo']['GameName'] != null){
+            $game_details = Game::find($data['TransactionInfo']['GameName'], $this->provider_db_id);
+        }else{
+            $getGameID = GameTransactionMDB::findGameTransactionDetails($rollback_id,'transaction_id', false, $client_details);
+            $game_details = Game::findByGameID($getGameID->game_id, $this->provider_db_id);
+        }
         try{
             ProviderHelper::idenpotencyTable($provider_trans_id);
         }catch(\Exception $e){
