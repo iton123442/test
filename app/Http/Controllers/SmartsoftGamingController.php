@@ -247,47 +247,92 @@ class SmartsoftGamingController extends Controller
             return $response;
         }
         if($method == 'CloseRound'){
-                Helper::saveLog('closeRound', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT");
-                $game_details = Game::find($game_code, $this->provider_db_id);
-                $client_details->connection_name = $bet_transaction->connection_name;
+            try {
+                    Helper::saveLog('closeRound', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT");
+                    $game_details = Game::find($game_code, $this->provider_db_id);
+                    $client_details->connection_name = $bet_transaction->connection_name;
 
+                    $response = [
+                        "TransactionId" => $provider_trans_id,  
+                        "Balance" => (float)$client_details->balance                                           
+                    ];
+
+                    if($bet_transaction->pay_amount > 0){
+                        $win_or_lost = $bet_transaction->win;
+                    }else{
+                        $win_or_lost = 0;
+                    }
+
+                    $entry_id = $pay_amount > 0 ?  2 : 1;
+                    $amount = $bet_transaction->pay_amount;
+                    $income = $bet_transaction->income;
+
+                    $updateGameTransaction = [
+                        'win' => $win_or_lost,
+                        'pay_amount' => $amount,
+                        'income' => $income,
+                        'entry_id' => $entry_id,
+                        'trans_status' => 2
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+
+                    $gameTransactionEXTData = array(
+                        "game_trans_id" => $bet_transaction->game_trans_id,
+                        "provider_trans_id" => $provider_trans_id,
+                        "round_id" => $round_id,
+                        "amount" => $pay_amount,
+                        "game_transaction_type"=> 2,
+                        "provider_request" =>json_encode($request->all()),
+                        "mw_response" => json_encode($response),
+                    );
+                    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+                    
+                    $action_payload = [
+                            "type" => "custom", #genreral,custom :D # REQUIRED!
+                            "custom" => [
+                                "provider" => 'Smartsoft Gaming',
+                                "client_connection_name" => $client_details->connection_name,
+                                "win_or_lost" => $win_or_lost,
+                                "entry_id" => $entry_id,
+                                "pay_amount" => $pay_amount,
+                                "income" => $income,
+                                "game_trans_ext_id" => $game_trans_ext_id
+                            ],
+                            "provider" => [
+                                "provider_request" => $data, #R
+                                "provider_trans_id"=> $provider_trans_id, #R
+                                "provider_round_id"=> $round_id, #R
+                            ],
+                            "mwapi" => [
+                                "roundId"=>$bet_transaction->game_trans_id, #R
+                                "type"=>2, #R
+                                "game_id" => $game_details->game_id, #R
+                                "player_id" => $client_details->player_id, #R
+                                "mw_response" => $response, #R
+                            ],
+                            'fundtransferrequest' => [
+                                'fundinfo' => [
+                                    'freespin' => false,
+                                ]
+                            ]
+                        ];
+                    $updateTransactionEXt = array(
+                        "provider_request" =>json_encode($request->all()),
+                        "mw_response" => json_encode($response),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+
+                  Helper::saveLog('SmartSoft Closeround Result', $this->provider_db_id, json_encode($request->all()),$response);
+                  return response($response,200)->header('Content-Type', 'application/json');
+            } catch (\Exception $e) {
                 $response = [
-                    "TransactionId" => $provider_trans_id,  
-                    "Balance" => (float)$client_details->balance                                           
-                ];
-
-                if($bet_transaction->pay_amount > 0){
-                    $win_or_lost = $bet_transaction->win;
-                }else{
-                    $win_or_lost = 0;
-                }
-
-                $entry_id = $pay_amount > 0 ?  2 : 1;
-                $amount = $bet_transaction->pay_amount;
-                $income = $bet_transaction->income;
-
-                $updateGameTransaction = [
-                    'win' => $win_or_lost,
-                    'pay_amount' => $amount,
-                    'income' => $income,
-                    'entry_id' => $entry_id,
-                    'trans_status' => 2
-                ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-
-                $gameTransactionEXTData = array(
-                    "game_trans_id" => $bet_transaction->game_trans_id,
-                    "provider_trans_id" => $provider_trans_id,
-                    "round_id" => $round_id,
-                    "amount" => $pay_amount,
-                    "game_transaction_type"=> 2,
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
-                );
-                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
-              Helper::saveLog('SmartSoft Closeround Result', $this->provider_db_id, json_encode($request->all()),$response);
-              return response($response,200)->header('Content-Type', 'application/json');
+                  "Error Code" => 500,
+                  "Message" => $e->getMessage()
+                ];    
+                Helper::saveLog('SmartSoft Callback error', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return response($response,200)->header('Content-Type', 'application/json');
+            }
         }//close round
         // ------------------------------------------------------------------------------------------------------------------------------
         try{
@@ -533,23 +578,19 @@ class SmartsoftGamingController extends Controller
                     Helper::saveLog('Smartsoft bet found 1 ', $this->provider_db_id, json_encode($request), $response);
                    return response($response,200)->header('Content-Type', 'application/json');
              } // End catch error
-                // $existing_bet = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
-               $existing_bet = GameTransactionMDB::findGameExt($rollback_id, false,'transaction_id', $client_details);
-               $game_trans_type = $existing_bet->game_transaction_type;
+        $existing_bet = GameTransactionMDB::findGameExt($rollback_id, false,'transaction_id', $client_details);
+        $game_trans_type = $existing_bet->game_transaction_type;
                 if($existing_bet != 'false'){
-
                         $client_details->connection_name = $existing_bet->connection_name;
                         $amount = $existing_bet->amount;
-                    if($game_trans_type == 1){
-
+                        if($game_trans_type == 1){
                             $type = "credit";
                             $balance = $client_details->balance + $amount;
-                         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                         }else{
-
                             $type = "debit";
                             $balance =  $client_details->balance - $amount;
-                        ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                         }
                         $response = [
 
