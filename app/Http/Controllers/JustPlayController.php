@@ -71,7 +71,7 @@ class JustPlayController extends Controller
              $gameTransactionData = array(
                         "provider_trans_id" => $data['id_stat'],
                         "token_id" => $client_details->token_id,
-                        "game_id" => $game_details->game_code,
+                        "game_id" => $game_details->game_id,
                         "round_id" => $data['id_stat'],
                         "bet_amount" => $bet_amount,
                         "win" => $win_or_lost,
