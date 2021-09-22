@@ -123,11 +123,19 @@ class DemoHelper{
         //     ->header('Content-Type', 'application/json');
         // }
         else{
-            $response = array(
-                "game_code" => $data->game_code,
-                "url" => config('providerlinks.play_betrnk') . '/tigergames/api?msg=No Demo Available',
-                "game_launch" => false
-            );
+           
+
+           try {
+                $http_client = new Client();
+                $response_client = $http_client->get('https://api-test.betrnk.games/public/game/launchurl/playforfun?game_code='.$data->game_code.'&provider_name='.$data->game_provider);
+                $response = $response_client->getBody();
+           } catch (\Throwable $th) {
+                $response = array(
+                    "game_code" => $data->game_code,
+                    "url" => config('providerlinks.play_betrnk') . '/tigergames/api?msg=No Demo Available',
+                    "game_launch" => false
+                );
+           }
         }
 
         return $response;     

@@ -445,11 +445,15 @@ class BNGController extends Controller
                     "win"=>2
                 );
                 GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
-                Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+                // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+                $dataToUpdate = array(
+                    "mw_response" => json_encode($response)
+                );
+                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             }catch(\Exception $e){
                 Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
             }
-            Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             return response($response,200)
                         ->header('Content-Type', 'application/json');
         }
@@ -608,7 +612,8 @@ class BNGController extends Controller
             }catch(\Exception $e){
                 Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
             }
-            Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            
             return response($response,200)
                         ->header('Content-Type', 'application/json');
         }
