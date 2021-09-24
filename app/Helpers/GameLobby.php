@@ -1573,13 +1573,22 @@ class GameLobby{
     }
 
     public static function PlayTechLaunch($data){
-        Helper::saveLog('PlayTech GAMELUANCH', 64, json_encode($data),  "HIT" );
+        Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($data),  "HIT" );
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-        $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
-        Helper::saveLog('PlayTech GAMELUANCH', 64, json_encode($gameUrl),  "HIT" );
-        return $gameUrl;
+        $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.playtech.provider_db_id'), $data['game_code']);
+        if($getGameDetails->game_type_id == "15"){
+            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$getGameDetails->info."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'].'&tableAlias='.$data['game_code'];
+            Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
+            return $gameUrl;
+        } else {
+            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
+            Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
+            return $gameUrl;
+        }
+
+        return "false";
+       
     }
-    
 
 }
 
