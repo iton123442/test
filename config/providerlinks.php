@@ -674,6 +674,13 @@ return [
         'API_BASE_URL'=> 'https://api.dragongaming.com/v1/',
         'API_KEY'=> '9jipwlTSmds3vtGs',
     ],
+    'playtech' => [
+        'provider_db_id'=> 68,
+        'secret_key' => 'c8wg8r7VWVZtCHVEBdnE',
+        'brand_id' => 255,
+        'brand_name' => 'TIGER_GAMES',
+        'api_url' => 'https://api.gmgoldmtn.com',
+    ],
 
 ];
 

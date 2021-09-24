@@ -664,3 +664,9 @@ $app->post('/api/dragongaming/get_balance', 'DragonGamingController@getBalance')
 $app->post('/api/dragongaming/debit', 'DragonGamingController@debitProcess');
 $app->post('/api/dragongaming/credit', 'DragonGamingController@creditProcess');
 $app->post('/api/dragongaming/refund', 'DragonGamingController@rollbackTransaction');
+
+
+// PlayTech
+$app->post('api/playtech/auth', 'PlayTechController@auth');
+$app->post('api/playtech/balance', 'PlayTechController@getBalance');
+$app->post('api/playtech/transaction', 'PlayTechController@transaction');

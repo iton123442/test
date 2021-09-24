@@ -1571,6 +1571,14 @@ class GameLobby{
 
 
     }
+
+    public static function PlayTechLaunch($data){
+        Helper::saveLog('PlayTech GAMELUANCH', 64, json_encode($data),  "HIT" );
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
+        Helper::saveLog('PlayTech GAMELUANCH', 64, json_encode($gameUrl),  "HIT" );
+        return $gameUrl;
+    }
     
 
 }
