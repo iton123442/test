@@ -674,6 +674,13 @@ return [
         'API_BASE_URL'=> 'https://api.dragongaming.com/v1/',
         'API_KEY'=> '9jipwlTSmds3vtGs',
     ],
+    'funkygames' => [
+        'provider_db_id'=> 66,
+        'Authentication' => '9c393c5e-10cf-4ebb-ac2d-9a8365274b70',
+        'User-Agent' =>'tg',
+        'api_url' => 'http://cfbb7e4b9e25.funplayfky.com/',
+        'api_report_url' => 'http://rs5kf13akf3f.funplayfky.com/',
+   ],
     'playtech' => [
         'provider_db_id'=> 68,
         'secret_key' => 'c8wg8r7VWVZtCHVEBdnE',

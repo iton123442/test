@@ -1589,6 +1589,60 @@ class GameLobby{
         return "false";
        
     }
+    public static function FunkyGamesLaunch($data){
+        Helper::saveLog('FunkyGames GAMELUANCH', 110, json_encode($data),  "HIT" );
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        if (!empty($_SERVER['HTTP_CLIENT_IP']))   
+          {
+            $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+          }
+        //whether ip is from proxy
+        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  
+          {
+            $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+          }
+        //whether ip is from remote address
+        else
+          {
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+          }
+        try {
+            
+                $paramsToSend = [
+                    'gameCode' => $data['game_code'],
+                    'userName' => $client_details->username,
+                    'playerId' => $client_details->player_id,
+                    'currency' => $client_details->default_currency,
+                    'language' => 'en',
+                    'playerIp' => $ip_address,
+                    'sessionId' => $data['token'],
+                    'isTestAccount' => true
+                ];
+                $client = new Client([
+                    'headers' => [ 
+                        'Content-Type' => 'application/json',
+                        'Authentication' => config('providerlinks.funkygames.Authentication'),
+                        'User-Agent' => config('providerlinks.funkygames.User-Agent'),
+                        'X-Request-ID' => $client_details->player_id,
+                    ]
+                ]);
+                $url = config('providerlinks.funkygames.api_url').'Funky/Game/LaunchGame';
+                $guzzle_response = $client->post($url,['body' => json_encode($paramsToSend)]
+                    );
+                $game_luanch_response = json_decode($guzzle_response->getBody()->getContents());
+                    Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $game_luanch_response);
+                // dd($game_luanch_response->data->gameUrl);
+                $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=https://daddy.betrnk.games/provider/FunkyGames";
+
+                Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $gameUrl);
+                return $gameUrl;
+
+        } catch (\Exception $e) {
+
+                return $e->getMessage();
+                
+        }
+    }
 
 }
 
