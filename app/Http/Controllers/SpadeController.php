@@ -420,27 +420,27 @@ class SpadeController extends Controller
 
 	public function _cancelbet($details,$header,$client_details,$game_details){
 		try{
-	 		ProviderHelper::idenpotencyTable($this->prefix.'_'.$details->serialNo);
+			ProviderHelper::idenpotencyTable($this->prefix.'_'.$details->transferId);
 		}catch(\Exception $e){
-			$bet_transaction = GameTransactionMDB::findGameExt($details->serialNo, 3,'round_id', $client_details);
+			$bet_transaction = GameTransactionMDB::findGameExt($details->transferId, 3,'transaction_id', $client_details);
 			if ($bet_transaction != 'false') {
-                if ($bet_transaction->mw_response == 'null') {
-                    $response = [
+				if ($bet_transaction->mw_response == 'null') {
+					$response = [
 						"msg" => "Acct Exist",
 						"code" => 50099
 					];
 					Helper::saveLog('Spade '.$header['API'].' null idom', $this->provider_db_id,  json_encode($details), $response);
-                }else {
-                    $response = $bet_transaction->mw_response;
-                    Helper::saveLog('Spade '.$header['API'].' found dubplicate', $this->provider_db_id,  json_encode($details), json_decode($response));
-                }
-            } else {
+				}else {
+					$response = $bet_transaction->mw_response;
+					Helper::saveLog('Spade '.$header['API'].' found dubplicate', $this->provider_db_id,  json_encode($details), json_decode($response));
+				}
+			} else {
 				$response = [
 					"msg" => "Acct Not Found",
 					"code" => 50100
 				];
 				Helper::saveLog('Spade '.$header['API'].' not found dubplicate', $this->provider_db_id,  json_encode($details), $response);
-            } 
+			} 
 			return $response;
 		}
 
