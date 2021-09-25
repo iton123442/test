@@ -679,7 +679,7 @@ return [
         'secret_key' => 'c8wg8r7VWVZtCHVEBdnE',
         'brand_id' => 255,
         'brand_name' => 'TIGER_GAMES',
-        'api_url' => 'https://api.gmgoldmtn.com',
+        'api_url' => 'https://game.gmhugegold.com',
     ],
 
 ];
