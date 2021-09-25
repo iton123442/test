@@ -670,3 +670,10 @@ $app->post('/api/dragongaming/refund', 'DragonGamingController@rollbackTransacti
 $app->post('api/playtech/auth', 'PlayTechController@auth');
 $app->post('api/playtech/balance', 'PlayTechController@getBalance');
 $app->post('api/playtech/transaction', 'PlayTechController@transaction');
+// FunkyGames
+$app->post('FunkyGames/GetGameList', 'FunkyGamesController@gameList');
+$app->post('/Funky/User/GetBalance','FunkyGamesController@GetBalance');
+$app->post('/Funky/Bet/CheckBet','FunkyGamesController@CheckBet');
+$app->post('/Funky/Bet/PlaceBet','FunkyGamesController@PlaceBet');
+$app->post('/Funky/Bet/SettleBet','FunkyGamesController@SettleBet');
+$app->post('/Funky/Bet/CancelBet','FunkyGamesController@CancelBet');
