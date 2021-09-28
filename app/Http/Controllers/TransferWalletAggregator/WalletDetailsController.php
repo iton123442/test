@@ -489,27 +489,27 @@ class WalletDetailsController extends Controller
 
         
        
-        $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
-        $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
-        $status = GameTransactionMDB::checkDBConnection($connection);
-        if ( ($connection != null) && $status) {
+        // $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
+        // $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
+        // $status = GameTransactionMDB::checkDBConnection($connection);
+        // if ( ($connection != null) && $status) {
 
             try {
-                $connection = config("serverlist.server_list.".$client_details->connection_name);
+                // $connection = config("serverlist.server_list.".$client_details->connection_name);
                 $client_transaction_id = $request->client_id."_".$reference_id;
 
-                if ($connection["connection_name"] == "mysql" || $connection["connection_name"] == "server1" ) {
-                    //default
-                    $connection["TG_GameInfo"] = $connection["db_list"][1];
-                    $connection["TG_PlayerInfo"] = $connection["db_list"][1];
-                    $connection["TG_ClientInfo"] = $connection["db_list"][1];
-                } else {
-                    $connection["TG_GameInfo"] = "TG_GameInfo";
-                    $connection["TG_PlayerInfo"] = "TG_PlayerInfo";
-                    $connection["TG_ClientInfo"] = "TG_ClientInfo";
-                }
+                // if ($connection["connection_name"] == "mysql" || $connection["connection_name"] == "server1" ) {
+                //     //default
+                //     $connection["TG_GameInfo"] = $connection["db_list"][1];
+                //     $connection["TG_PlayerInfo"] = $connection["db_list"][1];
+                //     $connection["TG_ClientInfo"] = $connection["db_list"][1];
+                // } else {
+                //     $connection["TG_GameInfo"] = "TG_GameInfo";
+                //     $connection["TG_PlayerInfo"] = "TG_PlayerInfo";
+                //     $connection["TG_ClientInfo"] = "TG_ClientInfo";
+                // }
               
-                $details = DB::connection( $connection["connection_name"] )->select("
+                $details = DB::select("
                     SELECT 
                         tw_account_id as id,
                         amount,
@@ -517,7 +517,7 @@ class WalletDetailsController extends Controller
                             when type = 1 then 'deposit'
                             when type = 2 then 'withdraw'
                         end as type
-                    FROM `".$connection["db_list"][1]."`.tw_player_accounts
+                    FROM tw_player_accounts
                     where client_transaction_id = '".$client_transaction_id."' limit 1; ");
                 if (count($details) == 0) {
                     $mw_response = [
@@ -551,11 +551,11 @@ class WalletDetailsController extends Controller
                 Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $e->getMessage());
                 return $mw_response;
             }
-        } else {
-            $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
-            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
-            return $mw_response;
-        }
+        // } else {
+        //     $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
+        //     Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+        //     return $mw_response;
+        // }
     }
 
     

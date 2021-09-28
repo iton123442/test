@@ -150,25 +150,108 @@ class BNGController extends Controller
             ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["uid"]);
         }catch(\Exception $e){
             if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
-                $response =array(
-                    "uid"=>$data["uid"],
-                    "balance" => array(
-                        "value" => "0.00",
-                        "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                    ),
-                    "error" => array(
-                        "code"=> "OTHER_EXCEED",
-                    )
-                );
-                $failedData = array(
-                    "provider_transaction" => $data["uid"],
-                    "round_id" => $data["args"]["round_id"],
-                    "win_amount" => $data["args"]["win"],
-                    "bet_amount" => $data["args"]["bet"],
-                    "provider_id" => $this->prefix,
-                );
-                GameTransaction::createFailedTransaction($failedData);
-                return response($response,200)->header('Content-Type', 'application/json');  
+                if($client_details){
+                    ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($client_details),"IF");
+                    $gameTransactionExtChecker = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2,$client_details);
+                    ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($gameTransactionExtChecker),"IFgameTransactionExtChecker");
+                    //check the gameTransaction if exist and check if not null 
+                    if ($gameTransactionExtChecker != null && !empty($gameTransactionExtChecker)&& isset($gameTransactionExtChecker)){
+                        // check the transation from the client if it is success or not found
+                        $transactionClientChecker = TransactionHelper::CheckTransactionToClient($client_details,$gameTransactionExtChecker->game_trans_ext_id,$gameTransactionExtChecker->game_trans_id);
+                        // if trasaction credit is found in the client side then we will response the same response as we did on the first request
+                        if($transactionClientChecker){
+                            // check if the gameTransactionExtChecker["mw_response"] is not empty.
+                            if($gameTransactionExtChecker->mw_response != null && !empty($gameTransactionExtChecker->mw_response) && isset($gameTransactionExtChecker->mw_response)){
+                                $decodedResponse = json_decode($gameTransactionExtChecker->mw_response);
+                                $response =array(
+                                    "uid"=>$decodedResponse->uid,
+                                    "balance" => array(
+                                        "value" => (string)$decodedResponse->balance->value,
+                                        "version" => $decodedResponse->balance->version,//$this->_getExtParameter()
+                                    ),
+                                );
+                                return response($response,200)->header('Content-Type', 'application/json'); 
+                            }
+                            // if we get an empty or null gameTransactionExtChecker["mw_response"] 
+                            else{
+                                $response =array(
+                                    "uid"=>$data["uid"],
+                                    "balance" => array(
+                                        "value" => $client_details->balance,
+                                        "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                                    ),
+                                );
+                                return response($response,200)
+                                    ->header('Content-Type', 'application/json');
+                            }
+                        }
+                        // gameTransactionExtChecker ins empty or null then we will consider it as failed on the  provider side and reafund the client side
+                        else{
+                            $response =array(
+                                "uid"=>$data["uid"],
+                                "balance" => array(
+                                    "value" => "0.00",
+                                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                                ),
+                                "error" => array(
+                                    "code"=> "OTHER_EXCEED",
+                                )
+                            );
+                            $failedData = array(
+                                "provider_transaction" => $data["uid"],
+                                "round_id" => $data["args"]["round_id"],
+                                "win_amount" => $data["args"]["win"],
+                                "bet_amount" => $data["args"]["bet"],
+                                "provider_id" => $this->prefix,
+                            );
+                            GameTransaction::createFailedTransaction($failedData);
+                            return response($response,200)->header('Content-Type', 'application/json');
+                        }
+                    }
+                    // gameTransactionExtChecker ins empty or null then we will consider it as failed on the  provider side and reafund the client side
+                    else{
+                        $response =array(
+                            "uid"=>$data["uid"],
+                            "balance" => array(
+                                "value" => "0.00",
+                                "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                            ),
+                            "error" => array(
+                                "code"=> "OTHER_EXCEED",
+                            )
+                        );
+                        $failedData = array(
+                            "provider_transaction" => $data["uid"],
+                            "round_id" => $data["args"]["round_id"],
+                            "win_amount" => $data["args"]["win"],
+                            "bet_amount" => $data["args"]["bet"],
+                            "provider_id" => $this->prefix,
+                        );
+                        GameTransaction::createFailedTransaction($failedData);
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                }else{
+                    ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($client_details),"ELSE");
+                    $response =array(
+                        "uid"=>$data["uid"],
+                        "balance" => array(
+                            "value" => "0.00",
+                            "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                        ),
+                        "error" => array(
+                            "code"=> "OTHER_EXCEED",
+                        )
+                    );
+                    $failedData = array(
+                        "provider_transaction" => $data["uid"],
+                        "round_id" => $data["args"]["round_id"],
+                        "win_amount" => $data["args"]["win"],
+                        "bet_amount" => $data["args"]["bet"],
+                        "provider_id" => $this->prefix,
+                    );
+                    GameTransaction::createFailedTransaction($failedData);
+                    return response($response,200)->header('Content-Type', 'application/json');
+                } 
             }elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
                 $failedData = array(
                     "provider_transaction" => $data["uid"],
@@ -258,7 +341,7 @@ class BNGController extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+        $client_response = ClientRequestHelper::fundTransferTimoutError($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
@@ -362,11 +445,15 @@ class BNGController extends Controller
                     "win"=>2
                 );
                 GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
-                Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+                // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+                $dataToUpdate = array(
+                    "mw_response" => json_encode($response)
+                );
+                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             }catch(\Exception $e){
                 Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
             }
-            Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             return response($response,200)
                         ->header('Content-Type', 'application/json');
         }
@@ -525,7 +612,8 @@ class BNGController extends Controller
             }catch(\Exception $e){
                 Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
             }
-            Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            
             return response($response,200)
                         ->header('Content-Type', 'application/json');
         }

@@ -268,7 +268,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==74){
+                elseif($provider_code== 74 || $provider_code == 115  || $provider_code == 119 ){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::evolutionLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl,$ip_address,$lang),
@@ -797,6 +797,24 @@ class GameLobbyController extends Controller
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::ozashikiLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code == 122){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::PlayTechLaunch($request->all()), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code == 120){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::FunkyGamesLaunch($request->all()), 
                         "game_launch" => true
                     );
                     return response($msg,200)

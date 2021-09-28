@@ -55,5 +55,45 @@ class TransactionHelper
 		/*var_dump($trans_data); die();*/
 		return DB::table('game_transactions')->where("game_trans_id",$existingdata[0]->game_trans_id)->update($trans_data);
 	}
+	public static function CheckTransactionToClient($client_details,$transactionID,$roundID){
+		$client = new Client([
+			'headers' => [ 
+				'Content-Type' => 'application/json',
+				'Authorization' => 'Bearer '.$client_details->client_access_token,
+			]
+		]);
+		$check_transaction = [
+			"access_token" => $client_details->client_access_token,
+			"hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+			"player_username" => $client_details->username,
+			"client_player_id " => $client_details->client_player_id,
+			"transactionId" => $transactionID,
+			"roundId" => $roundID,
+		];
+		try{
+			$check_transaction_response = $client->post($client_details->transaction_checker_url,
+                    [
+                        'body' => json_encode($check_transaction)
+                    ],
+                    ['defaults' => ['exceptions' => false]]
+                );
+			$checker_responser = json_decode($check_transaction_response->getBody()->getContents());
+			// if client responded a 200 transaction success then response will be true
+			if(isset($checker_responser)&& $checker_responser->code == 200){
+				return true;
+			}
+			// if client responded a 404 transaction not found thenresponse will be false
+			elseif(isset($checker_responser)&& $checker_responser->code == 404){
+				return false;
+			}
+			// if client responded other than 200 and 404 then  the response will be false
+			else{
+				return false;
+			}
+
+		}catch(\Exception $e){
+			return false;
+		}
+	}
 }
 ?>

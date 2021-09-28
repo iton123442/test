@@ -385,6 +385,12 @@ return [
         'merchant_data' => 'TIGERGAMESU',
         'merchant_password' => 'LmJfpioowcD8gspb',
     ],
+    'digitain' => [
+        'provider_db_id' => 14, // Database ID nothing todo with the provider!
+        'provider_and_sub_name' => 'Digitain', // Nothing todo with the provider
+        'digitain_key' => 'EzoQwS7hQB',
+        'operator_id' => '50E05F6D',
+    ],
     'payment'=>[
         'catpay'=>[
             'url_order'=>'http://celpay.vip/platform/submit/order',
@@ -516,7 +522,7 @@ return [
         'api_url'=> 'https:/merchantapi.silverkirin88.com/api/',
         'merchantCode' => 'TIGERG',
         'siteId' => 'SITE_1',
-        'provider_id' => 37,
+        'provider_id' => 59,
     ],
     'majagames'=>[
         'auth' => 'wsLQrQM1OC1bVscK',
@@ -667,6 +673,20 @@ return [
         'PROVIDER_ID' => 50,
         'API_BASE_URL'=> 'https://api.dragongaming.com/v1/',
         'API_KEY'=> '9jipwlTSmds3vtGs',
+    ],
+    'funkygames' => [
+        'provider_db_id'=> 66,
+        'Authentication' => '9c393c5e-10cf-4ebb-ac2d-9a8365274b70',
+        'User-Agent' =>'tg',
+        'api_url' => 'http://cfbb7e4b9e25.funplayfky.com/',
+        'api_report_url' => 'http://rs5kf13akf3f.funplayfky.com/',
+   ],
+    'playtech' => [
+        'provider_db_id'=> 68,
+        'secret_key' => 'c8wg8r7VWVZtCHVEBdnE',
+        'brand_id' => 255,
+        'brand_name' => 'TIGER_GAMES',
+        'api_url' => 'https://game.gmhugegold.com',
     ],
 
 ];

@@ -75,6 +75,9 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "SG") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
+            else if ($payload->action->custom->provider == "FunkyGames") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }
             else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
@@ -315,6 +318,15 @@ class FundtransferProcessorController extends Controller
                                 
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                             }elseif ($payload->action->custom->provider == 'OnlyPlay') {
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                            }
+                            elseif ($payload->action->custom->provider == 'FunkyGames') {
                                 $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
                                     "client_response" =>json_encode($client_response),
