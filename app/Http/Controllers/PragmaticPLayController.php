@@ -625,7 +625,7 @@ class PragmaticPLayController extends Controller
                 ],
                 "mwapi" => [
                     "roundId"=> $game_trans->game_trans_id,
-                    "type"=>2,
+                    "type"=> 2,
                     "game_id" => $game_details->game_id,
                     "player_id" => $client_details->player_id,
                     "mw_response" => $response,
@@ -634,7 +634,7 @@ class PragmaticPLayController extends Controller
             $updateGameTransaction = [
                 'win' => 0,
                 'income' => $game_trans->bet_amount,
-                'entry_id' => 2,
+                'entry_id' => 1,
                 'trans_status' => 2
             ];
             ClientRequestHelper::fundTransfer_TG($client_details, $bet_amount, $game_code, $game_name, $game_trans->game_trans_id, 'credit', false, $action_payload);
