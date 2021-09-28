@@ -295,7 +295,7 @@ class GameLobby{
         ];
         $signature =  ProviderHelper::getSignature($requesttosend, config('providerlinks.evoplay.secretkey'));
         $requesttosend['signature'] = $signature;
-        // Helper::saveLog('GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), json_encode($requesttosend));
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), json_encode($requesttosend));
         $client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/x-www-form-urlencoded',

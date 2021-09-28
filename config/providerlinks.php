@@ -120,6 +120,13 @@ return [
             'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
             'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
         ],
+        "THB" => [
+            'AccessKeyId' => '945ce921-96a5-4c0d-9ee2-941a4c4acba6',
+            'access_key_secret' => 'C6DD2BA5F8FD73E22503123BC0D40DCB4DD8FC5A',
+            'app_key' => 'RiANDRAFT',
+            'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
+            'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
+        ],
     ],
     'aws' => [
         'api_url' => 'https://papi.awsxpartner.com/b2b',
@@ -581,6 +588,12 @@ return [
                 'api_url'=> 'https://tgsw.api.goldenf.me/gf',
                 'secret_key' => 'a4ed4368b227c465a015fa48f6b59e07',
                 'operator_token' => '37328e4a3971f14f4b582a83f6b204e1',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+            'THB' => [
+                'api_url'=> 'https://tgth.api.goldenf.me/gf',
+                'secret_key' => '5d730eb8988255add1bd6e2cfcdd5fff',
+                'operator_token' => '54463a53086e8b5e990a474f810fdbfe',
                 'wallet_code' => 'gf_gps_wallet',
             ],
         ],
