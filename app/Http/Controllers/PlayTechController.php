@@ -53,7 +53,7 @@ class PlayTechController extends Controller
                         "playerName" => $client_details->display_name,
                         "playerSessionId" => $client_details->player_token,
                         "currency" =>$client_details->default_currency,
-                        "country" => "PH",
+                        "country" => "JP",
                         "error" => "0",
                         "message" => "success"
                     ];
