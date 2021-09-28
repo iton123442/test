@@ -295,15 +295,21 @@ class GameLobby{
         ];
         $signature =  ProviderHelper::getSignature($requesttosend, config('providerlinks.evoplay.secretkey'));
         $requesttosend['signature'] = $signature;
-        // Helper::saveLog('GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), json_encode($requesttosend));
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), json_encode($requesttosend));
         $client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/x-www-form-urlencoded',
             ]
         ]);
-        $response = $client->post(config('providerlinks.evoplay.api_url').'/game/geturl',[
-            'form_params' => $requesttosend,
-        ]);
+
+        try {
+             $response = $client->post(config('providerlinks.evoplay.api_url').'/game/geturl',[
+                'form_params' => $requesttosend,
+            ]);
+        } catch (\Exception $e) {
+            ProviderHelper::saveLogGameLaunch('GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), $e->getMessage());
+        }
+       
         $res = json_decode($response->getBody(),TRUE);
         ProviderHelper::saveLogGameLaunch('8Provider GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), json_decode($response->getBody()));
         return isset($res['data']['link']) ? $res['data']['link'] : false;
