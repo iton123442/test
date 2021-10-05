@@ -170,7 +170,7 @@ class SpadeController extends Controller
 		}else if($details->type == 2){
 			return $this->_cancelBet($details,$header,$client_details,$game_details);
 		}else if($details->type == 7){
-			return $this->_bonus($details,$header);
+			return $this->_bonus($details,$header,$client_details,$game_details);
 		}else if($details->type == 4){
 			return $this->_payout($details,$header,$client_details,$game_details);
 		}
@@ -527,8 +527,146 @@ class SpadeController extends Controller
 			return $response;
 		}
 	}
-	public function _bonus($details,$header){
-		return '_bonus';
+	public function _bonus($details,$header,$client_details,$game_details){
+		$bet_amount = 0;
+		$win_amount = $details->amount;
+		$provider_trans_id = $details->transferId;
+		$bet_id = $details->serialNo;
+		try{
+			ProviderHelper::idenpotencyTable($this->prefix.'_'.$details->transferId); //ticket id
+		}catch(\Exception $e){
+			$bet_transaction = GameTransactionMDB::findGameTransactionDetails($details->transferId, 'round_id',false, $client_details);
+			if ($bet_transaction != 'false') {
+				$response = [
+					"transferId" => (string)$provider_trans_id,
+					"merchantCode" => $this->merchantCode,
+					"acctId" => $details->acctId,
+					"balance" => floatval(number_format((float)$client_details->balance, 2, '.', '')),
+					"msg" => "success",
+					"code" => 0,
+					"serialNo" => $details->serialNo,
+				];
+				return $response;
+			} // end fist if game_transaction not found
+		}
+		$gameTransactionData = array(
+			"provider_trans_id" => $bet_id,
+			"token_id" => $client_details->token_id,
+			"game_id" => $game_details->game_id,
+			"round_id" => $provider_trans_id,
+			"bet_amount" => 0,
+			"win" => 5,
+			"pay_amount" => $win_amount,
+			"income" => $bet_amount - $win_amount,
+			"entry_id" => 2,
+			"trans_status" => 1,
+			"operator_id" => $client_details->operator_id,
+			"client_id" => $client_details->client_id,
+			"player_id" => $client_details->player_id,
+		);
+		$game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+		$gameTransactionEXTData = array(
+			"game_trans_id" => $game_trans_id,
+			"provider_trans_id" => $provider_trans_id,
+			"round_id" => $bet_id,
+			"amount" => $bet_amount,
+			"game_transaction_type"=> 1,
+			"provider_request" =>json_encode($details),
+			'transaction_detail' => 'FAILED',
+			'general_details' => 'FAILED',
+		);
+		$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+		$fund_extra_data = [
+			'fundtransferrequest' => [
+				'fundinfo' => [
+					'freespin' => true
+				]
+			]
+		];
+		$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false, $fund_extra_data);
+		if (isset($client_response->fundtransferresponse->status->code)) {
+			ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+			switch ($client_response->fundtransferresponse->status->code) {
+				case "200":
+					$num = $client_response->fundtransferresponse->balance;
+					$response = [
+						"transferId" => (string)$provider_trans_id,
+						"merchantCode" => $this->merchantCode,
+						"acctId" => $details->acctId,
+						"balance" => floatval(number_format((float)$num, 2, '.', '')),
+						"msg" => "success",
+						"code" => 0,
+						"serialNo" => $details->serialNo,
+					];
+					$updateTransactionEXt = array(
+						"mw_response" => json_encode($response),
+						'mw_request' => json_encode($client_response->requestoclient),
+						'client_response' => json_encode($client_response->fundtransferresponse),
+						'transaction_detail' => 'success',
+						'general_details' => 'success',
+					);
+					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+					$balance = $client_response->fundtransferresponse->balance + $details->amount;
+					ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+					$response = [
+						"transferId" => (string)$details->transferId,
+						"merchantCode" => $this->merchantCode,
+						"acctId" => $details->acctId,
+						"balance" => floatval(number_format((float)$balance, 2, '.', '')),
+						"msg" => "success",
+						"code" => 0,
+						"serialNo" => $details->serialNo
+					];
+					$gameTransactionEXTData = array(
+						"game_trans_id" => $game_trans_id,
+						"provider_trans_id" => $details->transferId,
+						"round_id" => $details->ticketId,
+						"amount" => $details->amount,
+						"game_transaction_type"=> 2,
+						"provider_request" =>json_encode($details),
+						"mw_response" => json_encode($response),
+						'transaction_detail' => 'success',
+						'general_details' => 'success',
+					);
+					$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+					//Initialize data to pass
+					$win = $win_amount > 0  ?  1 : 0;  /// 1win 0lost
+					$body_details = [
+						"type" => "credit",
+						"win" => $win,
+						"token" => $client_details->player_token,
+						"rollback" => false,
+						"game_details" => [
+							"game_id" => $game_details->game_id
+						],
+						"game_transaction" => [
+							"amount" => $details->amount
+						],
+						"connection_name" => $client_details->connection_name,
+						"game_trans_ext_id" => $game_trans_ext_id,
+						"game_transaction_id" => $game_trans_id
+		
+					];
+					try {
+						$client = new Client();
+						$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+							[ 'body' => json_encode($body_details), 'timeout' => '2.00']
+						);
+						//THIS RESPONSE IF THE TIMEOUT NOT FAILED
+					} catch (\Exception $e) {
+					}
+					Helper::saveLog('Spade '.$header['API'].' RESPONSE', $this->provider_db_id, json_encode($details), $response);
+					return $response;
+					break;
+				default:
+					$response = [
+						"msg" => "System Error",
+						"code" => 1
+					];
+			}
+		}
+		Helper::saveLog('Spade '.$header['API'].' RESPONSE', $this->provider_db_id,  json_encode($details), $response);
+		return $response;
 	}
     public static function findGameDetails($type, $provider_id, $identification) {
 		    $game_details = DB::table("games as g")
