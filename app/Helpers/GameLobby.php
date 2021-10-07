@@ -1211,7 +1211,7 @@ class GameLobby{
         
 
         $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
-        var_dump($game_launch_url); die();
+        
         if($game_launch_url) {
             return $game_launch_url->result->launch_url;   
         }
