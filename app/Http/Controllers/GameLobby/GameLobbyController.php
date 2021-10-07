@@ -497,7 +497,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code == 94) { // DragonGaming
+                elseif($provider_code == 96) { // DragonGaming
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" =>  GameLobby::dragonGamingLaunchUrl($request->all()),
