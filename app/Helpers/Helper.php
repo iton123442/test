@@ -621,4 +621,29 @@ class Helper
 		);
 		DB::table("player_game_rounds")->insert($player_game_round);
 	}
+
+	public static function createPGVitualGameRoundSessionRound($game_code,$player_token,$sub_provider_name,$uuid,$client_details){
+		$sub_provider_id = DB::table("sub_providers")->where("sub_provider_name",$sub_provider_name)->first();
+		$game = DB::table("games")->where("game_code",$game_code)->where("sub_provider_id",$sub_provider_id->sub_provider_id)->first();
+		$player_game_round = array(
+			"game_session_token" => $uuid,
+			"provider_transaction_id" => "LAUNCHID_".$client_details->token_id,
+			"game_id" => $game->game_id,
+			"token_id" => $client_details->token_id,
+			"status" => 2
+		);
+		DB::table("pgvirtual_game_round")->insert($player_game_round);
+	}
+
+	public static function createPGVitualGameRoundSession($game_code,$sub_provider_name,$uuid,$client_details){
+		$sub_provider_id = DB::table("sub_providers")->where("sub_provider_name",$sub_provider_name)->first();
+		$game = DB::table("games")->where("game_code",$game_code)->where("sub_provider_id",$sub_provider_id->sub_provider_id)->first();
+		$player_game_round = array(
+			"game_session_token" => $uuid,
+			"player_id" => $client_details->player_id,
+			"game_id" => $game->game_id,
+			"token_id" => $client_details->token_id
+		);
+		DB::table("pgvirtual_game_session_token")->insert($player_game_round);
+	}
 }

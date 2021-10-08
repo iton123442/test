@@ -566,15 +566,27 @@ class GameLobby{
         }
     }
 
-      public static function pgvirtual($request){
+    public static function pgvirtual($request){
+        // $client_details = Providerhelper::getClientDetails('token', $request["token"]);
+        
+        // $pg_uuid = Uuid::generate()->string;
+        // if(Helper::isValidUUID($pg_uuid)) {
+        //     // $pg_uuid = str_replace("-","",$pg_uuid);
+        //     // Helper::playerGameRoundUuid($request["game_code"],$request["token"],$request["game_provider"],$pg_uuid);
+        //     Helper::playerGameRoundUuid($request["game_code"],$pg_uuid,$request["game_provider"],$request["token"]);
+        //     // Helper::playerGameRoundUuid($request["game_code"],$pg_uuid,$request["game_provider"],$request["lang"]);
+        //     $url = config("providerlinks.pgvirtual.game_url").$pg_uuid; 
+        //     return $url;
+        // } else {
+        //     Helper::saveLog('PGVirtual gamelaunch invalid uuid',47, $request["token"], $pg_uuid);
+        //     return $request["exitUrl"];
+        // }
         $client_details = Providerhelper::getClientDetails('token', $request["token"]);
         
         $pg_uuid = Uuid::generate()->string;
         if(Helper::isValidUUID($pg_uuid)) {
-            // $pg_uuid = str_replace("-","",$pg_uuid);
-            // Helper::playerGameRoundUuid($request["game_code"],$request["token"],$request["game_provider"],$pg_uuid);
-            Helper::playerGameRoundUuid($request["game_code"],$pg_uuid,$request["game_provider"],$request["token"]);
-            // Helper::playerGameRoundUuid($request["game_code"],$pg_uuid,$request["game_provider"],$request["lang"]);
+            Helper::createPGVitualGameRoundSessionRound($request["game_code"],$request["token"],$request["game_provider"],$pg_uuid,$client_details);
+            Helper::createPGVitualGameRoundSession($request["game_code"],$request["game_provider"],$pg_uuid,$client_details);
             $url = config("providerlinks.pgvirtual.game_url").$pg_uuid; 
             return $url;
         } else {

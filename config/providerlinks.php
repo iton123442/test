@@ -646,7 +646,8 @@ return [
     'pgvirtual' => [
          'provider_db_id'=> 48,
          'auth' => 'yDpnkv3UNHRx4zrtsMwrAPRdwWT5swAK',
-         'game_url' => 'https://tigergames.pgvirtual.eu/v-ui/?operator=tigergames&init_code=',
+        //  'game_url' => 'https://tigergames.pgvirtual.eu/v-ui/?operator=tigergames&init_code=',
+         'game_url' => 'https://tigergames.pgvirtual.pg.company/v-ui/?operator=tigergames&init_code=',
     ],
     'onlyplay' => [
         'provider_db_id'=> 54,
