@@ -684,7 +684,7 @@ return [
 
     ],
     'dragongaming'=>[
-        'PROVIDER_ID' => 50,
+        'PROVIDER_ID' => 53,
         'API_BASE_URL'=> 'https://api.dragongaming.com/v1/',
         'API_KEY'=> '9jipwlTSmds3vtGs',
     ],

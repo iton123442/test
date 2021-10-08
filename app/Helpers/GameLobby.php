@@ -11,6 +11,7 @@ use App\Helpers\AWSHelper;
 use App\Helpers\SAHelper;
 use App\Helpers\TidyHelper;
 use App\Helpers\TransferWalletHelper;
+use App\Helpers\DragonGamingHelper;
 use App\Helpers\FCHelper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\MGHelper;
@@ -1189,9 +1190,13 @@ class GameLobby{
 
     public static function dragonGamingLaunchUrl($request_data) {
         $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
-        $game_type_name = DragonGamingHelper::getGameType($request_data['game_code'], config("providerlinks.dragongaming.PROVIDER_ID"));
-       
-        $game_type = ($game_type_name == 'Slots' ? 'slots' : 'table_games');
+        $game_type_id = DragonGamingHelper::getGameType($request_data['game_code'], config("providerlinks.dragongaming.PROVIDER_ID"));
+        
+        $game_type_arr = [
+            '1' => 'slots',
+            '5' => 'table_games'
+        ];
+
         $game_launch = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json'
@@ -1204,7 +1209,7 @@ class GameLobby{
                             "api_key" => config("providerlinks.dragongaming.API_KEY"),
                             "session_id" => $request_data['token'],
                             "provider" => "dragongaming",
-                            "game_type" => $game_type,
+                            "game_type" => $game_type_arr[$game_type_id],
                             "game_id" => $request_data['game_code'],
                             "platform" => "desktop",
                             "language" => "en",
@@ -1223,7 +1228,7 @@ class GameLobby{
         
 
         $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
-        
+
         if($game_launch_url) {
             return $game_launch_url->result->launch_url;   
         }
