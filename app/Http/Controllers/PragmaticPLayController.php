@@ -742,7 +742,7 @@ class PragmaticPLayController extends Controller
             $game_details = Helper::findGameDetails('game_code', $this->provider_id, $data->gameId);
             $roundId = $data->roundId;
             $provider_trans_id = $data->reference;
-            $bet_amount = $game_trans->bet_amount;
+            $bet_amount = $data->amount;
             $create_gametransactionext = array(
                 "game_trans_id" =>$game_trans->game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
