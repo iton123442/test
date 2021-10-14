@@ -766,7 +766,7 @@ class PragmaticPLayController extends Controller
                 ],
                 "provider" => [
                     "provider_request" => $data,
-                    "provider_trans_id"=>$data->transferid,
+                    "provider_trans_id"=>$provider_trans_id,
                     "provider_round_id"=>$roundId,
                 ],
                 "mwapi" => [
