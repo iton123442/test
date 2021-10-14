@@ -749,8 +749,7 @@ class PragmaticPLayController extends Controller
                 "round_id" => $roundId,
                 "amount" => $bet_amount,
                 "game_transaction_type"=> 3,
-                "provider_request" => json_encode($data),
-                "mw_response" =>json_encode($response)
+                "provider_request" => json_encode($data)
             );
             $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
             $response = array(
