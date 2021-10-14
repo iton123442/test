@@ -787,6 +787,10 @@ class PragmaticPLayController extends Controller
                 'trans_status' => 2
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans->game_trans_id, $client_details);
+            $update_gametransactionext = array(
+                "mw_response" =>json_encode($response),
+            );
+            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
             Helper::saveLog('PP refund request', $this->provider_id, json_encode($data) , $response);
             return $response;
         }else{
