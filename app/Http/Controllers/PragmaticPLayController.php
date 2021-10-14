@@ -736,7 +736,15 @@ class PragmaticPLayController extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_trans = GameTransactionMDB::findGameTransactionDetails($data->roundId,'round_id',false,$client_details);
         $checkExt = GameTransactionMDB::findGameExt($data->reference,3,'transaction_id',$client_details);
-
+        $checkExt2 = GameTransactionMDB::findGameExt($data->reference,1,'transaction_id',$client_details);
+        Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $checkExt2);
+        if($checkExt2 == 'false'){
+            $response = array(
+                "error" => 0,
+                "description" => "Success"
+            );
+            return $response;
+        }
         // return count($game_trans);
         if($checkExt == 'false'){
             $game_details = Helper::findGameDetails('game_code', $this->provider_id, $data->gameId);
