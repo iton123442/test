@@ -133,8 +133,8 @@ class PragmaticPLayController extends Controller
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $data->gameId);
         $playerId = ProviderHelper::explodeUsername('_',$data->userId);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
-        $databaseName = DB::connection($client_details->connection_name)->getDatabaseName();
-        AWSHelper::saveLog('TPP bet recieved', $this->provider_id, json_encode($data), $databaseName);
+        
+        AWSHelper::saveLog('TPP bet recieved', $this->provider_id, json_encode($data), "bet received");
       
         $tokenId = $client_details->token_id;
         $game_code = $data->gameId;
