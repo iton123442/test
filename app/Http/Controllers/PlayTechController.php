@@ -150,7 +150,7 @@ class PlayTechController extends Controller
                             "error" => "P_04",
                             "message" => "Player not found"
                         ];
-                        Helper::saveLog('PlayTech transaction IDOM', $this->provider_db_id, json_encode($response),  "response" );
+                        // Helper::saveLog('PlayTech transaction IDOM', $this->provider_db_id, json_encode($response),  "response" );
                         return response($response,200)
                         ->header('Content-Type', 'application/json');
                     }
@@ -184,7 +184,7 @@ class PlayTechController extends Controller
                                             ];
                                         }
                                     }
-                                    Helper::saveLog('PlayTech transaction IDOM', $this->provider_db_id, json_encode($response),  "response" );
+                                    // Helper::saveLog('PlayTech transaction IDOM', $this->provider_db_id, json_encode($response),  "response" );
                                     return response($response,200)
                                     ->header('Content-Type', 'application/json');
                                 } else {
@@ -194,7 +194,7 @@ class PlayTechController extends Controller
                                         "message" => "Bet limit was exceeded"
                                     ];
                                 } 
-                                Helper::saveLog('PlayTech transaction IDOM', $this->provider_db_id, json_encode($response),  "response" );
+                                // Helper::saveLog('PlayTech transaction IDOM', $this->provider_db_id, json_encode($response),  "response" );
                                 return response($response,200)
                                     ->header('Content-Type', 'application/json');
                             }
@@ -214,7 +214,7 @@ class PlayTechController extends Controller
                         "error" => "G_01",
                         "message" => "Game not found"
                     ];
-                    Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
+                    // Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
                     return response($response,200)
                     ->header('Content-Type', 'application/json');
                 }
@@ -223,7 +223,7 @@ class PlayTechController extends Controller
                     "error" => "P_08",
                     "message" => "Invalid session, the session does not exist"
                 ];
-                Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
+                // Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
                 return response($response,200)
                 ->header('Content-Type', 'application/json');
             }
@@ -232,7 +232,7 @@ class PlayTechController extends Controller
                 "error" => "P_03",
                 "message" => "Invalid brandId"
             ];
-            Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
+            // Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
             return response($response,200)
             ->header('Content-Type', 'application/json');
         }
@@ -241,7 +241,7 @@ class PlayTechController extends Controller
             "error" => "P_02",
             "message" => "Invalid hash"
         ];
-        Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
+        // Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
         return response($response,200)
         ->header('Content-Type', 'application/json');
     }
@@ -254,7 +254,7 @@ class PlayTechController extends Controller
                 "error" => "R_01",
                 "message" => "Round is closed when bet"
             ];
-			Helper::saveLog('PlayTech transaction BET', $this->provider_db_id, json_encode($response),  "response" );
+			// Helper::saveLog('PlayTech transaction BET', $this->provider_db_id, json_encode($response),  "response" );
 			return $response;
 		}
         $gameTransactionData = array(
@@ -294,7 +294,7 @@ class PlayTechController extends Controller
                 'trans_status' => 5
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-            Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
+            // Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
             return $response;
         }
         $fund_extra_data = [
@@ -321,7 +321,7 @@ class PlayTechController extends Controller
                 'trans_status' => 5
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-            Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
+            // Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
             return $response;
         }
         if (isset($client_response->fundtransferresponse->status->code)) {
@@ -387,7 +387,7 @@ class PlayTechController extends Controller
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
             }
         }
-        Helper::saveLog('PlayTech transaction BET', $this->provider_db_id, json_encode($response),  "response" );
+        // Helper::saveLog('PlayTech transaction BET', $this->provider_db_id, json_encode($response),  "response" );
         return $response;
     }
 
@@ -399,7 +399,7 @@ class PlayTechController extends Controller
                 "error" => "R_02",
                 "message" => "Invalid round when win"
             ];
-			Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
+			// Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
 			return $response;
 		}
         $client_details->connection_name = $bet_transaction->connection_name;
@@ -455,10 +455,10 @@ class PlayTechController extends Controller
                 [ 'body' => json_encode($body_details), 'timeout' => '2.00']
             );
             //THIS RESPONSE IF THE TIMEOUT NOT FAILED
-            Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
+            // Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
             return $response;
         } catch (\Exception $e) {
-            Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
+            // Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
             return $response;
         }
     }
@@ -471,7 +471,7 @@ class PlayTechController extends Controller
                 "error" => "T_03",
                 "message" => "Transaction does not exist when cancel"
             ];
-			Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
+			// Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
 			return $response;
 		}
         $transaction = GameTransactionMDB::findGameExt($request["referenceId"], false,'transaction_id', $client_details);
@@ -481,7 +481,7 @@ class PlayTechController extends Controller
                 "error" => "T_03",
                 "message" => "Transaction does not exist when cancel"
             ];
-			Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
+			// Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
 			return $response;
         }
         $client_details->connection_name = $bet_transaction->connection_name;
@@ -535,10 +535,10 @@ class PlayTechController extends Controller
                 [ 'body' => json_encode($body_details), 'timeout' => '2.00']
             );
             //THIS RESPONSE IF THE TIMEOUT NOT FAILED
-            Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
+            // Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
             return $response;
         } catch (\Exception $e) {
-            Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
+            // Helper::saveLog('PlayTech transaction WIN', $this->provider_db_id, json_encode($response),  "response" );
             return $response;
         }
 
