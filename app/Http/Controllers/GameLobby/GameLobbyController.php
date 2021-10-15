@@ -121,6 +121,7 @@ class GameLobbyController extends Controller
             else{
                 $ip_address = "127.0.0.1";
             }
+            $device = $request->has("device")? $request->input("device"): 'desktop'; // default desktop [desktop,mobile]
             $provider_id = GameLobby::checkAndGetProviderId($request->game_provider);
             if($provider_id){
                 $provider_code = $provider_id->sub_provider_id;
@@ -769,7 +770,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==105){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::NoLimitLaunchUrl($request->all()), 
+                        "url" => GameLobby::NoLimitLaunchUrl($request->all(), $device), 
                         "game_launch" => true
                     );
                     return response($msg,200)

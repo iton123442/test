@@ -59,6 +59,7 @@ class GameLobbyController extends Controller
 
             $lang = $request->has("lang")?$request->input("lang"):"en";
             $country_code = $request->has("country_code")?$request->input("country_code"): '';
+            $device = $request->has("device")? $request->input("device"): 'desktop'; // default desktop [desktop,mobile]
             $datatopass = [
                 "token" => $request->token,
                 "client_id" => $request->client_id,
@@ -72,6 +73,7 @@ class GameLobbyController extends Controller
                 'lang' => $lang,
                 'ip_address' => $ip_address,
                 'country_code' => $country_code,
+                'device' => $device,
             ];
             $response = $http_client->post( config("providerlinks.oauth_mw_api.mwurl"). '/game/launchurl', [            
                 'form_params' => $datatopass,

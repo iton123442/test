@@ -128,22 +128,24 @@ class GameLobby{
 
     }
 
-    public static function NoLimitLaunchUrl($data){
+    public static function NoLimitLaunchUrl($data,$device){
         try {
-            $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+        //     $client_details =ProviderHelper::getClientDetails('token',$data['token']);
 
-            $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-            $isMob = is_numeric(strpos($ua, "mobile"));
+        //     $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
+        //     $isMob = is_numeric(strpos($ua, "mobile"));
 
-            if($isMob == 1) {
+        //     if($isMob == 1) {
 
-                  $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=mobile&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token']; 
-                      return $url;
-            }else {
+        //           $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=mobile&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token']; 
+        //               return $url;
+        //     }else {
 
-            $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
-             return $url;
-        }
+        //     $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
+        //      return $url;
+        // }
+        $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device='.$device.'&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
+        return $url;
          
         } catch (\Exception $e) {
 
