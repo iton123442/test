@@ -554,7 +554,7 @@ class SAGamingController extends Controller
                 ]
             ];
 
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$game_trans_ext->game_trans_id,2,false,$action_payload);
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$game_trans_ext->game_trans_id,"credit",false,$action_payload);
             
 
             // When Player Lost Auto Callback 0 winning
@@ -757,7 +757,7 @@ class SAGamingController extends Controller
                 ]
             ];
 
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$game_trans_ext->game_trans_id,2,false,$action_payload);
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$game_trans_ext->game_trans_id,"credit",false,$action_payload);
 
             Helper::saveLog('SA PlaceBetCancel - SUCCESS', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
             echo $this->makeArrayXML($data_response);
