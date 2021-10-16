@@ -121,6 +121,7 @@ class VivoController extends Controller
 		else
 		{
 			if ($client_details) {
+				$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 			/*GameRound::create($request->roundId, $client_details->token_id);*/
 
 			/*if(!GameRound::check($request->roundId)) {
@@ -147,12 +148,12 @@ class VivoController extends Controller
 						}
 
 						// initial check
-						$game_details = Game::find($request->gameId, $this->provider_db_id);
+						// $game_details = Game::find($request->gameId, $this->provider_db_id);
 
-						if (!$game_details) {
-							//check if vivo active table
-							$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
-						}
+						// if (!$game_details) {
+						// 	//check if vivo active table
+						// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
+						// }
 						
 						/*$win_or_lost = 4;
 			            $entry_id = 2;
@@ -231,12 +232,12 @@ class VivoController extends Controller
 							$json_data['transid'] = $request->TransactionID;
 							
 							// initial check
-							$game_details = Game::find($request->gameId, $this->provider_db_id);
+							// $game_details = Game::find($request->gameId, $this->provider_db_id);
 
-							if (!$game_details) {
-								//check if vivo active table
-								$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
-							}
+							// if (!$game_details) {
+							// 	//check if vivo active table
+							// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
+							// }
 
 							$gameTransactionData = array(
 					            "provider_trans_id" => $request->TransactionID,
@@ -329,12 +330,12 @@ class VivoController extends Controller
 							{
 								
 								// initial check
-								$game_details = Game::find($request->gameId, $this->provider_db_id);
+								// $game_details = Game::find($request->gameId, $this->provider_db_id);
 
-								if (!$game_details) {
-									//check if vivo active table
-									$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
-								}
+								// if (!$game_details) {
+								// 	//check if vivo active table
+								// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
+								// }
 
 								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
 								/*$bet_transaction = ProviderHelper::findGameTransaction($request->roundId, 'round_id', 1);*/

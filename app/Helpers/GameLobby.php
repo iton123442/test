@@ -1256,7 +1256,7 @@ class GameLobby{
         $client_details = Providerhelper::getClientDetails('token', $token); // New
         $operator_id = config("providerlinks.vivo.OPERATOR_ID");
         $server_id = config("providerlinks.vivo.SERVER_ID");
-
+        Helper::savePLayerGameRound($game_code,$token,$provider);
         switch ($provider) {
             case 'Vivo Gaming':
                 // vivo live lobby
