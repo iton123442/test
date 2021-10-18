@@ -191,8 +191,8 @@ class PragmaticPLayController extends Controller
                 Helper::saveLog('PP bet duplicate in double', $this->provider_id,json_encode($data) , $response);
                 return $response;
             }
-            $amount = $checkDoubleBet[0]->bet_amount + $data->amount;
-            // $game_transextension = ProviderHelper::createGameTransExtV2($checkDoubleBet[0]->game_trans_id,$provider_trans_id, $roundId, $data->amount, 1);
+            $amount = $checkDoubleBet->bet_amount + $data->amount;
+            // $game_transextension = ProviderHelper::createGameTransExtV2($checkDoubleBet->game_trans_id,$provider_trans_id, $roundId, $data->amount, 1);
             $gameTransactionEXTData = array(
                 "game_trans_id" => $checkDoubleBet->game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
@@ -203,10 +203,10 @@ class PragmaticPLayController extends Controller
             );
             $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
              try {
-                $client_response = ClientRequestHelper::fundTransfer($client_details, $data->amount,$game_details->game_code,$game_details->game_name,$game_transextension,$checkDoubleBet[0]->game_trans_id,'debit');
-                $updateDoubleBet = DB::table('game_transactions')->where('game_trans_id','=',$checkDoubleBet[0]->game_trans_id)->update(["bet_amount" => $amount, "transaction_reason" => "Double Bet"]);
+                $client_response = ClientRequestHelper::fundTransfer($client_details, $data->amount,$game_details->game_code,$game_details->game_name,$game_transextension,$checkDoubleBet->game_trans_id,'debit');
+                $updateDoubleBet = DB::table('game_transactions')->where('game_trans_id','=',$checkDoubleBet->game_trans_id)->update(["bet_amount" => $amount, "transaction_reason" => "Double Bet"]);
                 $response_log = array(
-                    "transactionId" => $checkDoubleBet[0]->game_trans_id,
+                    "transactionId" => $checkDoubleBet->game_trans_id,
                     "currency" => $client_details->default_currency,
                     "cash" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
                     "bonus" => 0.00,
@@ -215,7 +215,7 @@ class PragmaticPLayController extends Controller
                     "description" => "Success"
                 );
                 $trans_details = array(
-                    "game_trans_id" => $checkDoubleBet[0]->game_trans_id,
+                    "game_trans_id" => $checkDoubleBet->game_trans_id,
                     "bet_amount" => $amount,
                     "win" => false,
                     "response" => $response_log

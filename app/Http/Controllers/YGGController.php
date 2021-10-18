@@ -103,6 +103,14 @@ class YGGController extends Controller
             Helper::saveLog("YGG wager dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
+        if($balance < $request->amount){
+            $response = array(
+                "code" => 1006,
+                "msg" => "You do not have sufficient fundsfor the bet."
+            );
+            Helper::saveLog("YGG wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            return $response;
+        }
         $gameTransactionData = array(
             "provider_trans_id" => $provider_trans_id,
             "token_id" => $tokenId,
@@ -125,14 +133,7 @@ class YGGController extends Controller
             "provider_request" =>json_encode($request->all()),
         );
         $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-        if($balance < $request->amount){
-            $response = array(
-                "code" => 1006,
-                "msg" => "You do not have sufficient fundsfor the bet."
-            );
-            Helper::saveLog("YGG wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
-            return $response;
-        }
+        
         try{
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
             if(isset($client_response->fundtransferresponse->status->code) 
