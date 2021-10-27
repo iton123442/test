@@ -144,7 +144,7 @@ class GameLobby{
         //     $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
         //      return $url;
         // }
-        $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device='.$device.'&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
+        $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device='.$device.'&language='.$data['lang'].'&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
          
         } catch (\Exception $e) {
