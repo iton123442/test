@@ -1,16 +1,16 @@
 <?php
 
-$middleware_url_api = 'https://api-test.betrnk.games/public';   
+$middleware_url_api = 'https://api-test2.betrnk.games';   
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play-test.betrnk.games';
 $iframe_url = 'https://play-test.betrnk.games/loadgame/transferwallet?param=';
 $puretransferwallet_iframe = 'https://play-test.betrnk.games/api/tw/loadgame?param=';
-$cut_call ='https://api-test.betrnk.games/public';
+$cut_call ='https://api-test2.betrnk.games';
 return [
     'cut_call_server' => $cut_call,
     'play_betrnk' => $play_betrnk,
     'tigergames' => $gamelobby_site,
-    'demo_api_url' => 'https://api-test.betrnk.games/public',
+    'demo_api_url' => $middleware_url_api,
     'iframe' =>$iframe_url,
     'puretransferwallet_iframe' =>$puretransferwallet_iframe,
     'oauth_mw_api' => [
