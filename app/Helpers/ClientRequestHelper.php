@@ -233,7 +233,8 @@ class ClientRequestHelper{
      */
     // public static function fundTransfer_TG($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
     public static function fundTransfer_TG($client_details,$amount,$game_code,$game_name,$roundId,$type,$rollback=false,$action=array()){
-        Helper::saveLog($roundId, 999, json_encode([]), "fundTransfer_TG HIT");
+        // Helper::saveLog($roundId, 999, json_encode([]), "fundTransfer_TG HIT");
+        Helper::saveLog("fundTransfer TG", 133443, json_encode($client_details), "CUT CALL HIT");
         // if($type == 'credit'){
         //     $game_transaction_type = 2;
         // }else{
@@ -282,6 +283,7 @@ class ClientRequestHelper{
             ],
         ];
         
+        Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 1");
         # REQUIRED PARAMETER IN ACTION ARRAY
         if(count($action) > 0){
             $requesttocient["action"] = $action;
@@ -289,6 +291,8 @@ class ClientRequestHelper{
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
             }
         }
+        Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 2");
+        Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), config('providerlinks.cut_call_server')."/tigergames/fundtransfer");
 
         try{
             # This will call our server for async request! Cut The Connection within 10ms and leave it to the server!
@@ -325,6 +329,7 @@ class ClientRequestHelper{
             );
             $client_reponse = json_decode(json_encode($response));
             $client_reponse->requestoclient = $requesttocient;
+            Helper::saveLog("fundTransfer TG Catch", 133443, json_encode($client_reponse), $e->getMessage());
             return $client_reponse;
         }
         // $client_reponse = json_decode($guzzle_response->getBody()->getContents());
