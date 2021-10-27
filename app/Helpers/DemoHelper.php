@@ -19,12 +19,13 @@ class DemoHelper{
         $game_details = DemoHelper::findGameDetails($data->game_provider, $data->game_code);
 
         if($game_details == false){
-            $msg = array(
+            $response = array(
                 "game_code" => $data->game_code,
                 "url" => config('providerlinks.play_betrnk') . '/tigergames/api?msg=No Game Found',
                 "game_launch" => false
             );
-            return $msg;
+            return response($response,200)
+            ->header('Content-Type', 'application/json');  
         }
 
         $provider_id = GameLobby::checkAndGetProviderId($data->game_provider);
@@ -44,13 +45,11 @@ class DemoHelper{
             );
         }
         elseif(in_array($provider_code, [39, 78, 79, 80, 81, 82, 83])){
-            $msg = array(
+            $response = array(
                 "game_code" => $data->game_code,
                 "url" => DemoHelper::oryxLaunchUrl($data->game_code, $lang, $exitUrl), 
                 "game_launch" => true
             );
-            return response($msg,200)
-            ->header('Content-Type', 'application/json');
         }
         elseif($provider_code == 104 ||$provider_code == 38){ // Manna Play Betrnk && Manna Play
             $response = array(
@@ -138,7 +137,8 @@ class DemoHelper{
            }
         }
 
-        return $response;     
+        return response($response,200)
+            ->header('Content-Type', 'application/json');  
     }
 
     # Providers That Has Static URL DEMO LINK IN THE DATABASE
