@@ -1,18 +1,13 @@
 <?php
 
 $middleware_url_api = 'https://api-test.betrnk.games/public';   
-// $middleware_url_api = 'https://api-svr3.betrnk.games/';
-// $middleware_url_api = 'http://localhost:8010';
-// $middleware_url_api = 'http://localhost:5000';
-//$middleware_url_api = 'https://api-test.betrnk.games/public';
-// $middleware_url_api = 'https://api-svr3.betrnk.games/';
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play-test.betrnk.games';
 $iframe_url = 'https://play-test.betrnk.games/loadgame/transferwallet?param=';
 $puretransferwallet_iframe = 'https://play-test.betrnk.games/api/tw/loadgame?param=';
-// $puretransferwallet_iframe = 'http://localhost:9999/api/tw/loadgame?param=';
-// $play_betrnk = 'http://localhost:2020/';
+$cut_call ='https://api-test.betrnk.games/public';
 return [
+    'cut_call_server' => $cut_call,
     'play_betrnk' => $play_betrnk,
     'tigergames' => $gamelobby_site,
     'demo_api_url' => 'https://api-test.betrnk.games/public',
