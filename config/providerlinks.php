@@ -1,13 +1,23 @@
 <?php
 
-$middleware_url_api = 'https://api.betrnk.games';
+$middleware_url_api = 'https://api-test.betrnk.games/public';   
+// $middleware_url_api = 'https://api-svr3.betrnk.games/';
+// $middleware_url_api = 'http://localhost:8010';
+// $middleware_url_api = 'http://localhost:5000';
+//$middleware_url_api = 'https://api-test.betrnk.games/public';
+// $middleware_url_api = 'https://api-svr3.betrnk.games/';
 $gamelobby_site = 'https://daddy.betrnk.games';
-$play_betrnk = 'https://play.betrnk.games';
-$cut_call ='https://cutcall.betrnk.games';
+$play_betrnk = 'https://play-test.betrnk.games';
+$iframe_url = 'https://play-test.betrnk.games/loadgame/transferwallet?param=';
+$puretransferwallet_iframe = 'https://play-test.betrnk.games/api/tw/loadgame?param=';
+// $puretransferwallet_iframe = 'http://localhost:9999/api/tw/loadgame?param=';
+// $play_betrnk = 'http://localhost:2020/';
 return [
-    'cut_call_server' => $cut_call,
     'play_betrnk' => $play_betrnk,
     'tigergames' => $gamelobby_site,
+    'demo_api_url' => 'https://api-test.betrnk.games/public',
+    'iframe' =>$iframe_url,
+    'puretransferwallet_iframe' =>$puretransferwallet_iframe,
     'oauth_mw_api' => [
         'access_url' => $middleware_url_api.'/oauth/access_token',
         'mwurl' => $middleware_url_api,
@@ -17,18 +27,18 @@ return [
         'password' => '_^+T3chSu4rt+^_',
         'grant_type' => 'password',
     ],
-    'icgaminglogin' => 'https://admin.iconic-gaming.com/service/login',
-    'icgaminggames' => 'https://admin.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
+    'icgaminglogin' => 'https://admin-stage.iconic-gaming.com/service/login',
+    'icgaminggames' => 'https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
     'icgagents'=>[
         'jpyagents'=>[
             'username' => 'betrnkjpy',
-            'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '851489a1-72b2-49fa-9c67-ceefad1a7ccf',
+            'password' => ']WKtkT``mJCe8N3J',   
+            'secure_code' => '60e7a70e-806a-479c-af0b-d3c83a6616c1',
         ],
         'euragents'=>[
             'username' => 'betrnkeuro',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '2e40f6fe-b99c-433a-8a56-7c209f9cdb31',
+            'secure_code' => '4c7aa6fe-5559-4006-b995-b2414a472d0b',
         ],
         'cnyagents'=>[
             'username' => 'betrnkcny',
@@ -38,7 +48,7 @@ return [
         'krwagents'=>[
             'username' => 'betrnkkrw',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => 'e2d899ad-7545-4096-8892-3d6c751ee32a',
+            'secure_code' => '0d18064c-cd77-4a04-9f17-2dc27bdb903a',
         ],
         'phpagents'=>[
             'username' => 'betrnkphp',
@@ -48,12 +58,12 @@ return [
         'thbagents'=>[
             'username' => 'betrnkthb',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '41aa6cf7-ab5f-49e1-86e0-93ee217b6c79',
+            'secure_code' => 'e2d411bd-ddea-41b1-a173-483d2f98f7cf',
         ],
         'tryagents'=>[
             'username' => 'betrnktry',
             'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '218e1ad5-2745-4ebe-b694-16c4bf3d2828',
+            'secure_code' => '93928542-4014-4736-a72e-3d99786df5ea',
         ],
         'twdagents'=>[
             'username' => 'betrnkTWD',
@@ -66,30 +76,15 @@ return [
             'secure_code' => '99d78fd7-d342-4fa5-932a-029a65b8a1f1',
         ],
         'usdagents'=>[
-            'username' => 'tigergames',
-            'password' => 'tigergamesxicg',
-            'secure_code' => '20c60c1c-fc16-42b7-9269-291d2b2b0346',
-        ],
-        'rubagents'=>[
-            'username' => 'betrnkrub',
-            'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '540aeeaa-4de0-41fa-8195-52b7a4244c9d',
-        ],
-        'irragents'=>[
-            'username' => 'betrnkirr',
-            'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '09f896ae-ada9-42a6-8178-6e8aa517acdd',
-        ],
-        'mmkagents'=>[
-            'username' => 'betrnkmmk',
-            'password' => ']WKtkT``mJCe8N3J',
-            'secure_code' => '2e072aee-d33e-475d-be7d-d1b019074bdc',
+            'username' => 'betrnk',
+            'password' => 'betrnk168!^*',
+            'secure_code' => '2c00c099-f32b-4fc1-a69d-661d8c51c6ae',
         ],
     ],
     'endorphina' => [
         'url' => 'https://test.endorphina.network/api/sessions/seamless/rest/v1',
-        'nodeId' => 1004,
-        'secretkey' => 'E5A8E26AEA2D4F2C9D2BB9BBC6B9A715',
+        'nodeId' => 1002,
+        'secretkey' => '67498C0AD6BD4D2DB8FDFE59BD9039EB',
     ],
     'bolegaming' => [
     	"CNY" => [
@@ -106,281 +101,117 @@ return [
             'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
             'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
         ],
-        "JPY" => [
-            'AccessKeyId' => '94268123-ae55-476f-8f51-649e3102bf1e',
-            'access_key_secret' => '0346B02144F24E95110569C45F4CE3DDA376D62B',
-            'app_key' => 'RiANDRAFT',
-            'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
-            'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
-        ],
-        "EUR" => [
-            'AccessKeyId' => '942683bc-00ed-4fa8-972d-aac2201a3c44',
-            'access_key_secret' => '48D7EC57726805C57CCC867CF775090A33453B4C',
-            'app_key' => 'RiANDRAFT',
-            'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
-            'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
-        ],
-        "THB" => [
-            'AccessKeyId' => '945ce921-96a5-4c0d-9ee2-941a4c4acba6',
-            'access_key_secret' => 'C6DD2BA5F8FD73E22503123BC0D40DCB4DD8FC5A',
-            'app_key' => 'RiANDRAFT',
-            'login_url' => 'https://api.bole-game.com:16800/v1/player/login',
-            'logout_url' => 'https://api.bole-game.com:16800/v1/player/logout',
-        ],
     ],
     'aws' => [
-        'api_url' => 'https://papi.awsxpartner.com/b2b',
+        'api_url' => 'https://sapi.awsxpartner.com/b2b',
+        '24USD'=> [ //
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ],
         '1USD'=> [ // 
             'merchant_id' => 'TG',
-            'merchant_key' => 'ff6d8f150ff9a98e218b62c7d10371a659c3431f98dd9d64cbe72d402d74f9fb717c0b0b1ae2c4e0e21f109780ea5ef63d12fb03b52570214d391eea437393fe',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
         ], 
-        '1KRW' => [ // BESOFTED for TG
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '1RUB' => [ // BESOFTED for TG
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '1EUR' => [ // BESOFTED for TG
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '1CNY' => [ // ASK for CNY
+        '6THB' => [ // ASK THB
             'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
+            'merchant_key' => 'a44c3ca52ef01f55b0a8b3859610f554b05aa57ca36e4a508addd9ddae539a84d43f9407c72d555bc3093bf3516663d504e98b989f3ec3e3ff8407171f43ccdc',
         ],
-        '1IDR' => [ // ASK for IDR
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '1VND' => [ // ASK for VND
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '1LAK' => [ // ASK for LAK
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '1MYR' => [ // ASK for MR
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '1KHR' => [ // ASK for KHR
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '1JPY' => [ // EveryMatrix For JPY
-            'merchant_id' => 'TGEMB',
-            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
-        ],
-        '2THB' => [ // ASK b2b THB
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '2MMK' => [ // ASK b2b MMK
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ], 
-        '2CNY' => [ // ASK b2b CNY
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '2USD' => [ // ASK b2b USD
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '2IDR' => [ // ASK b2b IDR
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '2VND' => [ // ASK b2b VND
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '2LAK' => [ // ASK b2b LAK
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '2MYR' => [ // ASK b2b MR
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '2KHR' => [ // ASK b2b KHR
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '3USD' => [ // XIGOLO USD
+        '5USD' => [ // XIGOLO USD
             'merchant_id' => 'XIGOLO',
-            'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
+            'merchant_key' => 'b7943fc2e48c3b74a2c31514aebdce25364bd2b1a97855f290c01831052b25478c35bdebdde8aa7a963e140a8c1e6401102321a2bd237049f9e675352c35c4cc',
         ],
-        '4USD' => [  // TGC ME THB
+        '15EUR' => [ // XIGOLO USD
+            'merchant_id' => 'TGEM',
+            'merchant_key' => '0d403e21c44d857d2c1847cb35ea16b5c4a8acbb3b669bda2e45ced7c736d4d51f3b23486e64a0a4b9ff2b3359e53af6c4ab8caa59ba728479114a2cc51096be',
+        ],
+        '7USD' => [  // ASK ME USD
             'merchant_id' => 'TGC',
-            'merchant_key' => '129d637c1aa5d3f3c6b9ea759d04d00250c9f4be29d71f72abd189f0c8283f263e08a2a99b70663ee28dc4e025cca82a0b955e2a9fcca604c72aa9dc22cf5232',
-        ], 
-        '6THB' => [ // ASK b2c THB
-            'merchant_id' => 'ASKME',
-            'merchant_key' => 'a93f62228b46aeac1f4cfcc3bcb98032453cdf93e21d4c601c0e350dcb8afd6e65cfd99f3ac11baad382f310398e5b89fca10b56b102f8b9304e41e5aa3c9bb9',
-        ],
-        '7USD' => [ // XIGOLO/CAZICAZI
-            'merchant_id' => 'XIGOLO',
-            'merchant_key' => '44c1c6e19674e57ef7f5dfb0d538cccc2387cb13c3f5277c09876c463e508175a31dba77a8a27c708f67cdec7a24e39c996e2a4ea30dff528134877a8b2884dd',
-        ],
-        '8USD' => [ // BESOFTED
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '8KRW' => [ // BESOFTED
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '8RUB' => [ // BESOFTED
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '8TRY' => [ // BESOFTED
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '8EUR' => [ // BESOFTED
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '8IRR' => [ // BESOFTED
-            'merchant_id' => 'BETSOFTED',
-            'merchant_key' => '57e66f5778cda00a6048772a337f65cef3eac9d7bf44d0ae79748b0e71c31ac16feadbd9caf5cf750a55bc4958aca985bdedf8a2250d6fabf29f58c2cb263ef4',
-        ],
-        '10KRW' => [ // MAS46
-            'merchant_id' => 'TGMAS',
-            'merchant_key' => '7b03756e2a70143fe0bc36f7b2d5e1c92e011bb1fe49d7beee69b4bea0e5d73341c29d046242826bde925bf0764a9fff95940f6a67c4542cff189f15526711d0',
-        ],
-        '11JPY' => [ // EveryMatrix
-            'merchant_id' => 'TGEMB',
-            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
-        ],
-        '11USD' => [ // EveryMatrix
-            'merchant_id' => 'TGEMB',
-            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
-        ],
-        '11EUR' => [ // EveryMatrix
-            'merchant_id' => 'TGEMB',
-            'merchant_key' => 'fbe83b9b128a01c7f19386d6e72b36dbb9677056d3c8a7a9a5b20c32f721b4c50a1b7fdba45672162c912160dcc001bb3432ee4a10b1056050b974da775cb5e8',
-        ],
-        '14THB' => [ // ISMEBET
-            'merchant_id' => 'ISMEBET',
-            'merchant_key' => 'b9d6ef7faf12b39bee66eff44c0ddae6633ea7a104d538ede92ef04ee33e62e691c8e662bde5bb7212fae1d68c7a973d186d79de184bdfd49231fc24f119ca2b',
-        ],
+            'merchant_key' => 'cb1bc0a2fc16bddfd549bdd8aae0954fba28c9b11c6a25e6ef886b56e846b033ae5fe29880be69fd8741ab400e6c4cb2f8c0f05e49dcc4568362370278ba044d',
+        ]
     ],
-    'justplay' => [
-        'provider_db_id' => 49,
-        'api_url' => 'http://api.justplay-gaming.com',
-        'USD' => [
-            'id_user' => 658,
-            'password' => '14d6a01e05c6a468ae01390b3eda1a7c'
-        ],
-        'EUR' => [
-            'id_user' => 657,
-            'password' => 'a92922dc006fded3236ad20183735838'
-        ],
-        'JPY' => [
-            'id_user' => 659,
-            'password' => '8b7a2cbdc87bfcb26d832dae51935a16'
-        ],
-        'PHP' => [
-            'id_user' => 758 ,
-            'password' => 'd6efe4a276b41a4830580befaad096fc'
-        ],
-        'THB' => [
-            'id_user' => 661,
-            'password' => 'f16eb1a45619280532c430a9f2a17adb'
-        ],
-        'INR' => [
-            'id_user' => 743,
-            'password' => 'd6efe4a276b41a4830580befaad096fc'
-        ],
-        'TRY' => [
-            'id_user' => 743,
-            'password' => 'd6efe4a276b41a4830580befaad096fc'
-        ],
-    ],
-     'cqgames' => [
+    'cqgames' => [
         "prefix" => "TG",
         "pdbid"=> 30, // Database ID nothing todo with the provider!
-        'api_url' => 'https://apie.cqgame.cc',
+        'api_url' => 'https://api.cqgame.games',
+        // 'api_token' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjIyODY1ZWNkNTY1ZjAwMDEzZjUyZDAiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWYyMjg2NWVjZDU2NWYwMDAxM2Y1MmQwIiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiMjQ3NDQ1MTQzIiwiaWF0IjoxNTk2MDk4MTQyLCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fdoQCWGPkYNLoROGR9jzMs4axnZbRJCnnLZ8T2UDCwU',
         'api_tokens' => [
-        	'CNY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjZjNDIwYzkxOGI5ODAwMDE5YzM0ODgiLCJhY2NvdW50IjoidGVzdF9jbnkiLCJvd25lciI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsInBhcmVudCI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsImN1cnJlbmN5IjoiQ05ZIiwianRpIjoiODI1NTcwOTkwIiwiaWF0IjoxNjAwOTMwMzE2LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fwf2b4i5seyD_cEZyYkmpByTQaaxhPfH_IwEJGDRZ5A',
-            'USD' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWY2MDYxYjQ4NTdhOTcwMDAxYmYwNzE1IiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiNjE0ODYyMDI5IiwiaWF0IjoxNjAwMTUxOTg4LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.XgbWboAdrRtrmKhvYymBXbdVqEwLccry0no0-8blFxI',
-            'KRW' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MDllMjk2YTJmZmUzNzAwMDFkYzdhMGYiLCJhY2NvdW50IjoidGdfcHJvZF9rcnciLCJvd25lciI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsInBhcmVudCI6IjVmNjA2MWI0ODU3YTk3MDAwMWJmMDcxNSIsImN1cnJlbmN5IjoiS1JXIiwianRpIjoiNDU4NjQwNzIzIiwiaWF0IjoxNjIwOTc4MDI2LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.66x2XN6aZgaybUmfxbn7KXo673SfOwK8tGXZuDcgZIA',
-            'TRY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MGI5Nzc4NTA0YTRlOTAwMDExYmZlN2IiLCJhY2NvdW50IjoiVEdfVFJZIiwib3duZXIiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJwYXJlbnQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJjdXJyZW5jeSI6IlRSWSIsImp0aSI6IjQ0NDA1MzQ1NyIsImlhdCI6MTYyMjc2NzQ5MywiaXNzIjoiQ3lwcmVzcyIsInN1YiI6IlNTVG9rZW4ifQ.8YhPAkdc7rh9waHd7ExYhd5JJ4zhfZrMaDCm3SD1hmE',
-            'RUB' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MGI5NzdjY2ZmNTYxMjAwMDE1M2I2NjgiLCJhY2NvdW50IjoiVEdfUlVCIiwib3duZXIiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJwYXJlbnQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJjdXJyZW5jeSI6IlJVQiIsImp0aSI6IjE1OTc3MjE0MyIsImlhdCI6MTYyMjc2NzU2NCwiaXNzIjoiQ3lwcmVzcyIsInN1YiI6IlNTVG9rZW4ifQ.zR14KPImICvaGDVwhh05X2lRt1X2OA3seuT8SrjsyLA',
-            'EUR' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MGI5NzgxMzA0YTRlOTAwMDExYmZlN2QiLCJhY2NvdW50IjoiVEdfRVVSIiwib3duZXIiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJwYXJlbnQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJjdXJyZW5jeSI6IkVVUiIsImp0aSI6IjIyMDcxNTMwMyIsImlhdCI6MTYyMjc2NzYzNSwiaXNzIjoiQ3lwcmVzcyIsInN1YiI6IlNTVG9rZW4ifQ.c84pLaNnvP5Ht_iFtZoVL2zxviepy6eoJjn0qsbalvE',
-            'JPY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MGRmZDBkZmQ3MTlkNTAwMDExZWM5NWEiLCJhY2NvdW50IjoidGlnZXJfanB5Iiwib3duZXIiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJwYXJlbnQiOiI1ZjYwNjFiNDg1N2E5NzAwMDFiZjA3MTUiLCJjdXJyZW5jeSI6IkpQWSIsImp0aSI6IjM1MjI5OTkwMSIsImlhdCI6MTYyNTI4MDczNSwiaXNzIjoiQ3lwcmVzcyIsInN1YiI6IlNTVG9rZW4ifQ.foeFKbfomkJNcjYjaZknslVuSn6FGARUsHok9y_r--Y',
+            'USD' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjIyODY1ZWNkNTY1ZjAwMDEzZjUyZDAiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWYyMjg2NWVjZDU2NWYwMDAxM2Y1MmQwIiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiMjQ3NDQ1MTQzIiwiaWF0IjoxNTk2MDk4MTQyLCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fdoQCWGPkYNLoROGR9jzMs4axnZbRJCnnLZ8T2UDCwU',
+            'CNY' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjM0ZDg1YWNkNTY1ZjAwMDE0MDBjZTYiLCJhY2NvdW50IjoidGlnZXJnYW1lc19jbnkiLCJvd25lciI6IjVmMjI4NjVlY2Q1NjVmMDAwMTNmNTJkMCIsInBhcmVudCI6IjVmMjI4NjVlY2Q1NjVmMDAwMTNmNTJkMCIsImN1cnJlbmN5IjoiQ05ZIiwianRpIjoiNjY2MjE3MzgxIiwiaWF0IjoxNTk3Mjk4Nzc4LCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.5xRfW4vHJLi7PeBmZGckSAIw9KoeL_al-dwcnV5dYL4',
+            'KRW' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2MDVhOTM3YmZlMjZkZjAwMDFiYmNkNDEiLCJhY2NvdW50IjoidGlnZXJnYW1lc19rcnciLCJvd25lciI6IjVmMjI4NjVlY2Q1NjVmMDAwMTNmNTJkMCIsInBhcmVudCI6IjVmMjI4NjVlY2Q1NjVmMDAwMTNmNTJkMCIsImN1cnJlbmN5IjoiS1JXIiwianRpIjoiMjUxOTU3MjI4IiwiaWF0IjoxNjE2NTQ4NzMxLCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.VYaJzPWsVglRzQeiwmEjXIrY5aJCBIbqEFcOz0T3xqU',
         ],
         'wallet_token' => [
-        	'CNY' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
-            'USD' => 'avF0GzMKaFJuBLwZfEfq2SseM1ZKPLcf',
-            'KRW' => 'XtSqayV7PoOh76WlWgRZMUA6KlUeVxbB',
-            'TRY' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
-            'RUB' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
-            'EUR' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
-            'JPY' => '6yyn5jQvwEKdEwG2ghlRpqAGgBCziGx6',
+            'USD' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI1ZjIyODY1ZWNkNTY1ZjAwMDEzZjUyZDAiLCJhY2NvdW50IjoidGlnZXJnYW1lcyIsIm93bmVyIjoiNWYyMjg2NWVjZDU2NWYwMDAxM2Y1MmQwIiwicGFyZW50Ijoic2VsZiIsImN1cnJlbmN5IjoiVVNEIiwianRpIjoiMjQ3NDQ1MTQzIiwiaWF0IjoxNTk2MDk4MTQyLCJpc3MiOiJDeXByZXNzIiwic3ViIjoiU1NUb2tlbiJ9.fdoQCWGPkYNLoROGR9jzMs4axnZbRJCnnLZ8T2UDCwU',
+            'CNY' => '7CBCiX3qf5zMfYijIAmanbP2JB2HiBAi',
+            'KRW' => '7CBCiX3qf5zMfYijIAmanbP2JB2HiBAi',
         ]
     ],
     'sagaming' => [
         "pdbid"=> 25, // Database ID nothing todo with the provider!
         "prefix" => "TGSA", // Nothing todo with the provider
         "lobby" => "A3107",
-        "API_URL" => "http://api.sa-apisvr.com/api/api.aspx",
+        "API_URL" => "http://sai-api.sa-apisvr.com/api/api.aspx",
         "MD5Key" => "GgaIMaiNNtg",
         "EncryptKey" => "g9G16nTs",
         "SAAPPEncryptKey" =>"M06!1OgI",
-        "SecretKey" => "4A96929A87814D89B77115F741C4E8C6",
+        "SecretKey" => "87B41ED0FB20437E85DE569B16EAA1DB",
     ],
     'kagaming' => [
         "pdbid"=> 32, // Database ID nothing todo with the provider!
-        "gamelaunch" => "https://gamessea.kaga88.com",
-        "ka_api" => "https://rmpsea.kaga88.com/kaga/",
+        "gamelaunch" => "https://gamesstage.kaga88.com",
+        "ka_api" => "https://rmpstage.kaga88.com/kaga/",
         "access_key" => "A95383137CE37E4E19EAD36DF59D589A",
         "secret_key" => "40C6AB9E806C4940E4C9D2B9E3A0AA25",
         "partner_name" => "TIGER",
+        "tw_gamelaunch" => "https://gamesstage.kaga88.com",
+        "tw_ka_api" => "https://rmpstage.kaga88.com/kaga/",
+        "tw_access_key" => "40762F59A507E9182F28D6893975E0FD",
+        "tw_secret_key" => "40C6AB9E806C4940E4C9D2B9E3A0AA25",
+        "tw_partner_name" => "TIGER2",
     ],
     'iagaming' => [
-        'auth_key' => '6230204245ebbf14dfdc0ee40960134d',
-        'pch' => 'TG01',
-        'prefix' => 'TGAMES',
-        'iv' => '1650cbec4319180b',
-        'url_lunch' => 'https://api.ilustre-analysis.net/user/lunch',
-        'url_register' => 'https://api.ilustre-analysis.net/user/register',
-        'url_withdraw' => 'https://api.ilustre-analysis.net/user/withdraw',
-        'url_deposit' => 'https://api.ilustre-analysis.net/user/deposit',
-        'url_balance' => 'https://api.ilustre-analysis.net/user/balance',
-        'url_wager' => 'https://api.ilustre-analysis.net/wager/getproject',
-        'url_hotgames' => 'https://api.ilustre-analysis.net/index/gethotgame',
-        'url_orders' => 'https://api.ilustre-analysis.net/user/searchprders',
-        'url_activity_logs' => 'https://api.ilustre-analysis.net/user/searchprders',
+        'auth_key' => '54bc08c471ae3d656e43735e6ffc9bb6',
+        'pch' => 'BRNK', 
+        'prefix' => 'TGAMES', // Nothing todo with the provider
+        'iv' => '45b80556382b48e5',
+        // 'url_lunch' => 'http://apitest.ilustretest.com/user/lunch',
+        // 'url_register' => 'http://apitest.ilustretest.com/user/register',
+        'url_lunch' => 'http://api.ilustretest.com/user/lunch',
+        'url_register' => 'http://api.ilustretest.com/user/register',
+        'url_withdraw' => 'http://api.ilustretest.com/user/withdraw',
+        'url_deposit' => 'http://api.ilustretest.com/user/deposit',
+        'url_balance' => 'http://api.ilustretest.com/user/balance',
+        'url_wager' => 'http://api.ilustretest.com/user/getproject',
+        'url_hotgames' => 'http://api.ilustretest.com/user/gethotgame',
+        'url_orders' => 'http://api.ilustretest.com/user/searchprders',
+        'url_activity_logs' => 'http://api.ilustretest.com/user/searchprders',
     ],
     'tidygaming' => [
-        'url_lunch' => 'https://asia.h93r.com/api/game/outside/link',
-        'API_URL' => 'https://asia.h93r.com/',
-        'client_id' => 'c9c219fc',
+        'url_lunch' => 'https://api.laksjd.net/api/game/outside/link',
+        // 'API_URL' => 'http://staging-v1-api.tidy.zone',
+        'API_URL' => 'https://api.laksjd.net',
+        'client_id' => '8440a5b6',
         'currency' => [
-            'USD' => '00688c94',
-            'THB' => '3f330a37',
-            'TRY' => 'dbf3d92b',
-            'EUR' => '7e3d2b63',
-            'CNY' => 'e0178045',
-            'RUB' => '74d40722',
-            'KRW' => '98a6bfbd',
-            'IRR' => 'f370867a',
-            'MMK' => 'b08b8fef',
-            'JPY' => '5568b333',
+            'USD' => 'af4f3164',
+            'MMK' => 'af4f3164',
+            'THB' => '6d31ece9',
+            'EUR' => 'aa73348e',
+            'TRY' => 'a8a26728',
+            'CNY' => '969c2910',
+            'RUB' => '50679e6c',
+            'KRW' => 'bdafae9a',
+            'IRR' => 'da104cef',
         ],
-        'SECRET_KEY' => '7f4c25b95934bf4cfcf6a48d7de80b73',
+        'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
+        'TransferWallet' => [
+            "client_id" => '2efa763b',
+            "API_URL" => 'https://api.laksjd.net',
+            "SECRET_KEY" => '9448cb4264f631cfcb6d1fb9109fc967',
+        ]
     ],
     'evoplay' => [
-        'api_url' => 'https://api.8provider.com',
-        'project_id' => '1045',
-        'secretkey' => '900980b4fe8ad2d771713f77cde79333',
+        'api_url' => 'http://api.8provider.com',
+        'project_id' => '1042',
+        'secretkey' => 'c270d53d4d83d69358056dbca870c0ce',
     ],
     'skywind' => [
         'provider_db_id' => 28, // Database ID nothing todo with the provider!
@@ -395,8 +226,8 @@ return [
     'digitain' => [
         'provider_db_id' => 14, // Database ID nothing todo with the provider!
         'provider_and_sub_name' => 'Digitain', // Nothing todo with the provider
-        'digitain_key' => 'EzoQwS7hQB',
-        'operator_id' => '50E05F6D',
+        'digitain_key' => 'BetRNK3184223',
+        'operator_id' => 'B9EC7C0A',
     ],
     'payment'=>[
         'catpay'=>[
@@ -409,218 +240,123 @@ return [
         ]
         ],
     'boongo'=>[
-        'PLATFORM_SERVER_URL'=>'https://gate2.betsrv.com/op/',
-        'PROJECT_NAME'=>'tigergames',
+        'PLATFORM_SERVER_URL'=>'https://gate-stage.betsrv.com/op/',
+        'PROJECT_NAME'=>'tigergames-stage',
         'WL'=>'prod',
-        'API_TOKEN'=>'BX0qal8GSe5srFozvnZ2azkYB',
+        'WL2'=>'prod1',
+        'API_TOKEN'=>'hj1yPYivJmIX4X1I1Z57494re',
     ],
     'fcgaming'=>[
-        'url' => 'http://ap1.fcg1688.net',
+        'url' => 'http://api.fcg666.net',
         'AgentCode' => 'TG',
-        'AgentKey' => 'trU20TV8677Ay45W',
+        'AgentKey' => '8t4A17537S1d5rwz',
         
     ],
     'tgg' => [
-        'api_url' => 'https://api.flexcontentprovider.com',
-        'project_id' => '1423',
-        'api_key' => 'fff477943dd107dbe9827603a8f2eb48',
+        'api_url' => 'http://api.flexcontentprovider.com',
+        'project_id' => '1421',
+        'api_key' => '29abd3790d0a5acd532194c5104171c8',
+        'provider_id' => 29,
+    ],
+    '5men' => [
+        'api_url' => 'http://api.flexcontentprovider.com',
+        'project_id' => '1471',
+        'api_key' => '4516cf2200fec6953f8bce3547c3a6cc',
+        'provider_id' => 53,
     ],
     'pgsoft' => [
-        'api_url' => 'https://api.pg-bo.co/external',
-        'operator_token' => '8DA94287-7B23-4976-ADC2-BC98B773EDB9',
-        'secret_key' => 'AE180CC1E8FF48B08A759F9625D725D6',
+        'api_url' => 'http://api.pg-bo.me/external',
+        'operator_token' => '642052d1627c8cae4a288fc82a8bf892',
+        'secret_key' => '02f314db35a0dfe4635dff771b607f34',
     ],
     'tpp' => [
-        'gamelaunch_url' => 'https://tigergames-tw.pragmaticplay.net/gs2c/playGame.do',
-        // 'gamelaunch_url' => 'https://tigergames-dk2.pragmaticplay.net/gs2c/playGame.do',
+        'gamelaunch_url' => 'https://tigergames-sg0.prerelease-env.biz/gs2c/playGame.do',
         'secureLogin' => 'tg_tigergames', //or stylename
-        'secret_key' => 'VV23U65sif2AnZ9d',
-        // 'secret_key' => 'uSPij46kVe977JH2',
+        'secret_key' => 'testKey',
+        'casinoId' => 'ppcdk00000004874',
+        'wsUri' => 'wss://prelive-dga.pragmaticplaylive.net/ws',
     ],
     'wazdan'=>[
-        'operator_data' =>[
-            "1"=>"tigergames",
-            "2"=>"askmebet",
-            "5"=>"askmebet",
-            "6"=>"askmebet",
-            "3"=>"xigolo",
-            "8"=>"betsofted",
-            "14"=>"ismgaming",
-        ],
         'operator' => 'tigergames',
         'license' => 'curacao',
-        'hmac_scret_key' => '2QvSiQ2KXX8mBM0LyexfAcNNgI5eXzcx',
+        'hmac_scret_key' => 'uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1',
         'partnercode'=> 'gd1wiurg',
-        'gamelaunchurl' => 'https://gamelaunch.wazdan.com/'
+        'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
+        'operator_data' =>[
+            "1"=>"tigergames",
+            "5"=>"xigolo",
+            "6"=>"askmebet",
+            "7"=>"tgc",
+            "8"=>"askmebet",
+            "9"=>"tigergames",
+        ]
     ],
     'evolution'=>[
-        'host' => 'https://babylontgg.evo-games.com',
-        'ua2Token' => 'caad3c0956c0522e86419d668a69516c6326ae2e',
-        'gameHistoryApiToken' => '943a243607186a48dea41ae1f334979b69f6131f',
-        'externalLobbyApiToken'=> '4eb42bf658049ce0adbd90f56aed2afd0bf515a0',
-        'owAuthToken' => '&-gTqe8bYGCm#pgFBP6G$!5k4m?DjnPM',
-        'ua2AuthenticationUrl' => 'https://babylontgg.evo-games.com/ua/v1/babylontgg000001/caad3c0956c0522e86419d668a69516c6326ae2e',
+        'host' => 'https://babylontgg.uat1.evo-test.com',
+        'ua2Token' => 'test123',
+        'gameHistoryApiToken' => 'test123',
+        'externalLobbyApiToken'=> 'test123',
+        'owAuthToken' => 'TigerGames@2020',
+        'ua2AuthenticationUrl' => 'https://babylontgg.uat1.evo-test.com/ua/v1/babylontgg000001/test123',
         'env'=>'production'
 
     ],
     'png'=>[
-        'root_url'=> 'https://agacw.playngonetwork.com',
+        'root_url'=> 'https://agastage.playngonetwork.com',
         'pid' => 8888,
+        'pid2'=>8956,
         'channel'=> 'desktop',
         'practice'=>0
     ],
     'microgaming'=>[
         'grant_type'=> 'client_credentials',
+        'client_id' => 'Tiger_USD_Agent_Test',
+        'client_secret'=> '204973dbe37949cfbae301f545ba0e',
+    ],
+    'upg'=>[
+        'grant_type'=> 'client_credentials',
         'client_id' => 'Tiger_UPG_USD_MA_Test',
         'client_secret'=> 'd4e59abcbf0b4fd88e3904f12c3dfb',
     ],
     'booming' => [
-        'api_url' => 'https://api.asia.booming-games.com',
-        'api_secret' => 'FWepCk1Pv+dzC++tO+RbnrSAc7HeRLCWDpddESCN/c9oGp0Bw5jpNZSWYAFHNJT2',
-        'api_key' =>'GIvbUT7vjwwWczBi1StdMA==',
-        'call_back' => 'https://api.betrnk.games/api/booming/callback',
-        'roll_back' => 'https://api.betrnk.games/api/booming/rollback',
+        'api_url' => 'https://api.intgr.booming-games.com',
+        'api_secret' => 'NQGRafUDbe/esU8r+zVWWW7cx6xZKE2gpqWXv4Fs17j88u0djV6NBi9Tgdtc0R6w',
+        'api_key' =>'xvkwXPp52AUPLBGCXmD5UA==',
+        'call_back' => 'https://api-test.betrnk.games/public/api/booming/callback',
+        'roll_back' => 'https://api-test.betrnk.games/public/api/booming/rollback',
         'provider_db_id' => 36,
     ],
-    'manna'=>[
-        'PROVIDER_ID' => 16,
-        'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/betrnk/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.manna-play.com/agent/specify/betrnk/gameLink/link',
-        'AUTH_API_KEY'=> 'kzHFKTpWG%49vaM&C2BdQcf3$*5mi!NUDwubj#nE',
-        'CLIENT_API_KEY'=> 'Az5Rm8K56s3TJVjF',
-        'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-    ],
-    'solid'=>[
-        'PROVIDER_ID' => 1,
-        'LAUNCH_URL'=> 'https://ingametw.solidgaming.net/api/launch/',
-        'API_ENDPOINT' => 'https://inapitw.solidgaming.net/api/wallet/',
-        'BRAND' => 'BETRNKMW',
-        'AUTH_USER' => 'betrnkmw-prod',
-        'AUTH_PASSWORD' => 'svYmaDbh3f2TQY93'
-    ],
-    '5men' => [
-        'api_url' => 'http://api.flexcontentprovider.com',
-        'project_id' => '1473',
-        'api_key' => '4d66b1747cd34e73c5c64c2889ea70ec',
+    'justplay' => [
         'provider_db_id' => 52,
-    ],
-    'habanero'=>[
-        'api_url' => 'https://app-a.insvr.com/go.ashx?',
-        'brandID' => '6fc71b15-0ed7-ea11-a522-0050f23870d2',
-        'apiKey' => '94FF6FB7-4E01-4EDB-9185-44E3B2BC0AAC',
-        'passKey' => '78b5cc87-e0c5-4008-9a7e-dcebfd40642a'
-    ],
-    'simpleplay' => [
-        'PROVIDER_ID' => 35,
-        'LOBBY_CODE' => 'S592',
-        'SECRET_KEY' => '355860191C1D421B8883D9933CA9ACBA',
-        'MD5_KEY' => 'GgaIMaiNNtg',
-        'ENCRYPT_KEY' => 'g9G16nTs',
-        'API_URL' => 'http://api.sp-connection.com/api/api.aspx'
-    ],
-    'ygg'=>[
-        'api_url' => 'https://static-prod-tw.248ka.com/init/launchClient.html?',
-        'Org' => 'TIGERGAMES',
-        'topOrg' => 'TIGERGAMESGroup',
-        'provider_id' => 38,
-    ],
-    'spade'=>[
-        'prefix' => 'TIGERG', 
-        'api_url'=> 'https:/merchantapi.silverkirin88.com/api/',
-        'merchantCode' => 'TIGERG',
-        'siteId' => 'SITE_1',
-        'provider_id' => 59,
-    ],
-    'majagames'=>[
-        'auth' => 'wsLQrQM1OC1bVscK',
-        'provider_id' => 39,
-        'prefix' => 'MAJA_', 
-        'api_url'=> 'https://api.sagq3ktbaxo.com/api/MOGI', //slot api
-        'tapbet_api_url'=> 'https://tbb.sagq3ktbaxo.com/api', //tapbet api
-    ],
-    'spade_curacao'=>[
-        'prefix' => 'TIGERG', 
-        'api_url'=> 'https://merchantapi.oliveloris.com/api/',
-        'lobby_url'=> 'https://lobby.olivelorisplay.com/TIGEREU/auth/?',
-        'merchantCode' => 'TIGEREU',
-        'siteId' => 'SITE_EU1',
-        'provider_id' => 73,
-    ],
-    'vivo' => [
-        'PROVIDER_ID' => 34,
-        'OPERATOR_ID' => '3003033',
-        'SERVER_ID' => '6401748',
-        'PASS_KEY' => 'V0TS97aPNV',
-        'VIVO_URL' => 'https://games.vivogaming.com/',
-        'BETSOFT_URL' => 'https://2vivo.com/FlashRunGame/RunRngGame.aspx',
-        'SPINOMENAL_URL' => 'https://www.2vivo.com/flashRunGame/RunSPNRngGame.aspx',
-        'TOMHORN_URL' => 'https:///www.2vivo.com/FlashRunGame/Prod/RunTomHornGame.aspx',
-        'NUCLEUS_URL' => 'https://www.2vivo.com/FlashRunGame/set2/RunNucGame.aspx',
-        'PLATIPUS_URL' => 'https://www.2vivo.com/flashrungame/set2/RunPlatipusGame.aspx',
-        'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx'
-    ],
-    'oryx' => [
-        'PROVIDER_ID' => 18,
-        'GAME_URL' => 'https://play-rghr.igplatform.net/agg_plus_public/launch/wallets/BETRNKMW/games/',
-    ],
-    'goldenF'=>[
-        'provider_id' => 41,
-        '1' => [ # Seamless Wallet Wallet Type 1
-            'USD' => [
-                'api_url'=> 'https://t14u.api.goldenf.me/gf',
-                'secret_key' => '2779e483717e1962164ee7e5b1959133',
-                'operator_token' => '4436d634017f06638d4faf9dce6deda3',
-                'wallet_code' => 'gf_gps_wallet',
-            ],
-            'CNY' => [
-                'api_url'=> 'https://t14c.api.goldenf.me/gf',
-                'secret_key' => 'd778a48c6779ef194b6aad7573c2c06d',
-                'operator_token' => 'e23103ada31f2038918f7d621e27e871',
-                'wallet_code' => 'gf_gps_wallet',
-            ],
-            'EUR' => [
-                'api_url'=> 'https://tgse.api.goldenf.me/gf',
-                'secret_key' => 'f6a2147790a0c03f2b5c72f1aaad86e3',
-                'operator_token' => '418e8116f262a4ab693400fa4c1d15b4',
-                'wallet_code' => 'gf_gps_wallet',
-            ],
-            'JPY' => [
-                'api_url'=> 'https://tgsw.api.goldenf.me/gf',
-                'secret_key' => 'a4ed4368b227c465a015fa48f6b59e07',
-                'operator_token' => '37328e4a3971f14f4b582a83f6b204e1',
-                'wallet_code' => 'gf_gps_wallet',
-            ],
-            'THB' => [
-                'api_url'=> 'https://tgth.api.goldenf.me/gf',
-                'secret_key' => '5d730eb8988255add1bd6e2cfcdd5fff',
-                'operator_token' => '54463a53086e8b5e990a474f810fdbfe',
-                'wallet_code' => 'gf_gps_wallet',
-            ],
+        'api_url' => 'http://api.justplay-gaming.com',
+        'USD' => [
+            'id_user' => 658,
+            'password' => '14d6a01e05c6a468ae01390b3eda1a7c'
         ],
-        '2' => [ # Transfer Wallet Wallet Type 2
-            'USD' => [
-                'api_url'=> 'https://t14u.api.goldenf.me/gf',
-                'secret_key' => '2779e483717e1962164ee7e5b1959133',
-                'operator_token' => '4436d634017f06638d4faf9dce6deda3',
-                'wallet_code' => 'gf_gps_wallet',
-            ],
-            'CNY' => [
-                'api_url'=> 'https://t14c.api.goldenf.me/gf',
-                'secret_key' => 'd778a48c6779ef194b6aad7573c2c06d',
-                'operator_token' => 'e23103ada31f2038918f7d621e27e871',
-                'wallet_code' => 'gf_gps_wallet',
-            ],
+        'EUR' => [
+            'id_user' => 657,
+            'password' => 'a92922dc006fded3236ad20183735838'
         ],
-    ],
-    'netent' => [
-        'provider_db_id' => 44, //CHANGE THE PROVIDER ID THIS 45 IS FROM STAGING
-        'casinoID' => "tigergames",//casinoID
-        'merchantId' => "tigergamesws",//soap api login
-        'merchantPassword' => "G4Rvxun3BFJjULGp",//soap api login
+        'JPY' => [
+            'id_user' => 659,
+            'password' => '8b7a2cbdc87bfcb26d832dae51935a16'
+        ],
+        'PHP' => [
+            'id_user' => 660,
+            'password' => 'ac8f4a58d24442cb74bbc289709bc095'
+        ],
+        'THB' => [
+            'id_user' => 661,
+            'password' => 'f16eb1a45619280532c430a9f2a17adb'
+        ],
+          'INR' => [
+            'id_user' => 743,
+            'password' => 'd6efe4a276b41a4830580befaad096fc'
+        ],
     ],
     'playstar' => [
-        'provider_db_id' => 56,
-        'api_url' => 'https://tigergames-api.claretfox.com',
+        'provider_db_id' => 55,
+        'api_url' => 'https://stage-api.iplaystar.net',
         'host_id' => [
            'USD' => '3d3bfe1c05f600200af031e4c888f8e5',
            'THB' => 'c1e9d133f03b08c29d6d03f3441a59e7',
@@ -629,80 +365,256 @@ return [
            'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
         ],
     ],
-    'slotmill'=>[
-        'provider_db_id'=> 47,
-        'brand' => "TigerGames",
-        '19002' => "https://templar-treasures.slotmill.com/",
-        '19003' => "https://starspell.slotmill.com/",
-        '19005' => "https://wildfire.slotmill.com/",
-        '19007' => "https://vikings-creed.slotmill.com/",
-        '19008' => "https://outlaws.slotmill.com/",
-        '19009' => "https://neon-dreams.slotmill.com/",
-        '19010' => "https://lucky-lucifer.slotmill.com",
-        '19011' => "https://vegas-gold.slotmill.com",
-        "19012" => "https://three-samurai.slotmill.com",
+    'manna'=>[
+        'PROVIDER_ID' => 16,
+        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/betrnk/authenticate/auth_token',
+        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/betrnk/gameLink/link',
+        'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+        'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP'
     ],
-
+    'solid'=>[
+        'PROVIDER_ID' => 1,
+        'LAUNCH_URL'=> 'https://instage.solidgaming.net/api/launch/',
+        'API_ENDPOINT' => 'https://instage.solidgaming.net/api/wallet/',
+        'BRAND' => 'BETRNKMW',
+        'AUTH_USER' => 'betrnkmw-stage',
+        'AUTH_PASSWORD' => 'wyE4PEGHWkWyU5TjdNk2g'
+    ],
+    'habanero'=>[
+        'api_url' => 'https://app-test.insvr.com/go.ashx?',
+        'brandID' => '2416208c-f3cb-ea11-8b03-281878589203',
+        'apiKey' => '3C3C5A48-4FE0-4E27-A727-07DE6610AAC8',
+        'passKey' => 'Rja5ZK4kN1GA0R8C',
+        'tw_game_launch_url' => 'https://app-test.insvr.com/play?',
+        'tw_api_url' => 'https://ws-test.insvr.com/jsonapi',
+        'tw_brandID' => '5e2b7240-ac7d-eb11-b566-00155db545d0',
+        'tw_apiKey' => '54806FDE-3622-43B3-A407-46ED64B517B0',
+        'provider_id' => '24'
+    ],
+    'simpleplay' => [
+        'PROVIDER_ID' => 35,
+        'LOBBY_CODE' => 'S592',
+        'SECRET_KEY' => 'A872BAFDFA8349CC824A460E7AC02515',
+        'MD5_KEY' => 'GgaIMaiNNtg',
+        'ENCRYPT_KEY' => 'g9G16nTs',
+        'API_URL' => 'http://api.sp-portal.com/api/api.aspx'
+    ],
+    'ygg'=>[
+        'api_url' => 'https://static-stage-tw.248ka.com/init/launchClient.html?',
+        'Org' => 'TIGERGAMES',
+        'topOrg' => 'TIGERGAMESGroup',
+        'provider_id' => 38,
+    ],
+    'spade'=>[
+        'prefix' => 'TIGERG', 
+        'api_url'=> 'https://api-egame-staging.sgplay.net/api',
+        'merchantCode' => 'TIGERG',  
+        'siteId' => 'SITE_USD1',
+        'provider_id' => 59, // sub_provider_id
+    ],
+    'spadetw'=>[
+        'prefix' => 'TIGERGTW', 
+        'api_url'=> 'https://api-egame-staging.sgplay.net/api',
+        'game_url' => 'https://lobby-egame-staging.sgplay.net/TGTW/auth/',
+        'merchantCode' => 'TGTW',  
+        'currency' => "JPY",
+    ],
+    'majagames'=>[
+        'auth' => 'wsLQrQM1OC1bVscK',
+        'provider_id' => 39,
+        'prefix' => 'MAJA_', 
+        'api_url'=> 'http://api-integration.mj-02.com/api/MOGI', //slot api
+        'tapbet_api_url'=> 'https://tbb-integration.mj-02.com/api', //tapbet api
+    ],
+    'spade_curacao'=>[
+        'prefix' => 'TIGERG', 
+        'api_url'=> 'https://api-egame-staging.spadecasino777.com/api',
+        'lobby_url'=> 'https://lobby-egame-staging.spadecasino777.com/TIGEREU/auth/?',
+        'merchantCode' => 'TIGEREU',
+        'siteId' => 'SITE_EU1',
+        'provider_id' => 73, // sub_provider_id
+    ],
+    'vivo' => [
+        'PROVIDER_ID' => 34,
+        'OPERATOR_ID' => '3003616',
+        'SERVER_ID' => '6401748',
+        'PASS_KEY' => '7f1c5d',
+        'VIVO_URL' => 'https://games.vivogaming.com/',
+        'BETSOFT_URL' => 'https://2vivo.com/FlashRunGame/RunRngGame.aspx',
+        'SPINOMENAL_URL' => 'https://www.2vivo.com/flashRunGame/RunSPNRngGame.aspx',
+        'TOMHORN_URL' => 'https:///www.2vivo.com/FlashRunGame/Prod/RunTomHornGame.aspx',
+        'NUCLEUS_URL' => 'https://2vivo.com/FlashRunGame/set2/RunNucGame.aspx',
+        'PLATIPUS_URL' => 'https://www.2vivo.com/flashrungame/set2/RunPlatipusGame.aspx',
+        'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
+        '7MOJOS_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
+    ],
+    'oryx' => [
+        'PROVIDER_ID' => 18,
+        'GAME_URL' => 'https://play-prodcopy.oryxgaming.com/agg_plus_public/launch/wallets/WELLTREASURETECH/games/'
+    ],
+    'netent' => [
+        'provider_db_id' => 45,
+        'casinoID' => "tigergames",//casinoID
+        'merchantId' => "testmerchant",//soap api login
+        'merchantPassword' => "testing",//soap api login
+    ],
+    'goldenF'=>[
+        'provider_id' => 41,
+        '1' => [ # Seamless Wallet Wallet Type 1
+            'USD' => [
+                'api_url'=> 'http://t14u.test.gf-gaming.com/gf',
+                'secret_key' => '2779e483717e1962164ee7e5b1959133',
+                'operator_token' => '4436d634017f06638d4faf9dce6deda3',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+            'CNY' => [
+                'api_url'=> 'http://t14c.test.gf-gaming.com/gf',
+                'secret_key' => 'd778a48c6779ef194b6aad7573c2c06d',
+                'operator_token' => 'e23103ada31f2038918f7d621e27e871',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+        ],
+        '2' => [ # Transfer Wallet Wallet Type 2
+            'USD' => [
+                'api_url'=> 'http://tigu.test.gf-gaming.com/gf',
+                'secret_key' => '33ba14b74a26e3fea1bf87db53a9f371',
+                'operator_token' => 'b18ba7f03f11c602ae4e001ae0be0c20',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+            'CNY' => [
+                'api_url'=> 'http://tgr.test.gf-gaming.com/gf',
+                'secret_key' => 'b18d99f11861042e2c66f11a1f9a62cb',
+                'operator_token' => '009583d3138a9e3934787112c345ef10',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+        ],
+        '3' => [ # Pure Transfer Wallet Wallet Type 3
+            'USD' => [
+                'api_url'=> 'http://tigu.test.gf-gaming.com/gf',
+                'secret_key' => '33ba14b74a26e3fea1bf87db53a9f371',
+                'operator_token' => 'b18ba7f03f11c602ae4e001ae0be0c20',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+            'CNY' => [
+                'api_url'=> 'http://tgr.test.gf-gaming.com/gf',
+                'secret_key' => 'b18d99f11861042e2c66f11a1f9a62cb',
+                'operator_token' => '009583d3138a9e3934787112c345ef10',
+                'wallet_code' => 'gf_gps_wallet',
+            ],
+        ],
+    ],
+    'ultraplay'=>[
+        'domain_url'=> 'https://stage-tet.ultraplay.net',
+    ],
+    'slotmill'=>[
+        'provider_db_id'=> 46,
+        'brand' => "TigerGames",
+        '19002' => "https://templar-treasures.stage.slotmill.com/",
+        '19003' => "https://starspell.stage.slotmill.com/",
+        '19005' => "https://wildfire.stage.slotmill.com/",
+        '19007' => "https://vikings-creed.stage.slotmill.com/",
+        '19008' => "https://outlaws.stage.slotmill.com/",
+        '19009' => "https://neon-dreams.stage.slotmill.com/",
+        "19010" => "https://lucky-lucifer.stage.slotmill.com",
+        "19011" => "https://vegas-gold.stage.slotmill.com",
+        "19012" => "https://three-samurai.stage.slotmill.com",
+        "TransferWallet" => [
+            "provider_db_id" => 51,
+            "secret_key" => "490efb5be3435334282833e1afd0514a",
+            "host" => "https://stageapi.slotmill.com",
+            "org" => "TigerGames",
+        ],
+    ],
     'pgvirtual' => [
-         'provider_db_id'=> 48,
-         'auth' => 'yDpnkv3UNHRx4zrtsMwrAPRdwWT5swAK',
-        //  'game_url' => 'https://tigergames.pgvirtual.eu/v-ui/?operator=tigergames&init_code=',
-         'game_url' => 'https://tigergames.pgvirtual.pg.company/v-ui/?operator=tigergames&init_code=',
+         'provider_db_id'=> 47,
+         'auth' => 'b5d687d6e639f305a14ccd6acafcd284',
+         'game_url' => 'https://staging.tigergames.pgvirtual.pg.company/v-ui/?operator=tigergames&init_code=',
+        //  'game_url' => 'https://tigergames.pg.company/v-ui/?operator=tigergames&init_code=',
+         
+    ],
+    'dragongaming'=>[
+        'PROVIDER_ID' => 50,
+        'API_BASE_URL'=> 'https://staging-api.dragongaming.com/v1/',
+        'API_KEY'=> '9jipwlTSmds3vtGs',
     ],
     'onlyplay' => [
         'provider_db_id'=> 54,
         'partner_id' => 515,
-        'api_url' => 'https://int.onlyplay.net/api/get_frame',
-        'secret_key' => '1a8dNxc7NmZd688z86xRBrfyQbX1mxsW',
+        'api_url' => 'https://int.stage.onlyplay.net/api/get_frame',
+        'secret_key' => '1242aVGdpeZRDiG5aS8iss6E5dE5sLOe',
     ],
     'toptrendgaming' => [
-        'provider_db_id' => 57,
-        'api_url' => 'https://ams5-api.ttms.co:8443/cip/gametoken/',
+        'provider_db_id' => 56,
+        'api_url' => 'https://ams-api.stg.ttms.co:8443/cip/gametoken/',
     ],
     'ozashiki'=>[
         'PROVIDER_ID' => 58,
-        'AUTH_URL'=> 'https://api.manna-play.com/agent/specify/tigergame/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.manna-play.com/agent/specify/tigergame/gameLink/link',
-        'API_KEY'=> 'UrkiUyLGMUBAMQi25DOtncIMFI1cESXpInc#u9Lm',
-        'AUTH_API_KEY'=> 'UrkiUyLGMUBAMQi25DOtncIMFI1cESXpInc#u9Lm',
-        'CLIENT_API_KEY' => 'QTm6t5PFehcrCTu4rKL8sPCwv2RwtMrM',
+        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
+        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
+        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+        'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
         'PLATFORM_ID' => 'tigergame'
     ],
     'nolimit'=>[
         'provider_db_id' => 59,
-        'api_url' => 'https://prod.nlcasiacdn.net/loader/game-loader.html',
-        'Group_ID' => 'URBANSQUARE',
-        'operator' =>'BETRNK',
-        'operator_key' => 'Nu3baiChohKo'
+        'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html',
+        'operator' =>'TG_DEV',
+        'operator_key' => 'on2ha5xie7Hu'
     ],
-
-    'smartsoft'=>[
+    'bgaming' => [
+         'PROVIDER_ID'=> 49,
+         'CASINO_ID' => 'tigergames-int',
+         'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
+         'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM'
+    ],
+     'smartsoft'=>[
         'provider_db_id' => 60,
-        'api_url' => 'https://server.ssg-public.com/GameLauncher',
+        'api_url' => 'https://eu-staging.ssgportal.com/GameLauncher',
         'PortalName' => 'tigergames',
-        'SecretHashKey' => '277eec99-07e4-48f2-9d9e-8d86f9351f69'
-
+        'SecretHashKey' => '97bce50a-86bd-4b88-b052-32cf7059afa5'
     ],
-    'dragongaming'=>[
-        'PROVIDER_ID' => 53,
-        'API_BASE_URL'=> 'https://api.dragongaming.com/v1/',
-        'API_KEY'=> '9jipwlTSmds3vtGs',
+    'mancala' => [
+         'PROVIDER_ID'=> 61,
+         'BRAND_NAME' => 'Tiger Conexion',
+         'PARTNER_ID' => 264,
+         'RGS_URL' => 'https://slots-test.mancalagroup.net/api/partners/partners',
+         'API_KEY' => 'QNGIXXAI'
     ],
-    'funkygames' => [
-        'provider_db_id'=> 66,
-        'Authentication' => '9c393c5e-10cf-4ebb-ac2d-9a8365274b70',
+    'idnpoker' => [
+        'PROVIDER_ID'=> 110,
+        'URL' => 'https://scr.idngame.com:2800/',
+        "agent" => [
+            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e",
+        ]
+   ],  
+   'funkygames' => [
+        'provider_db_id'=> 63,
+        'Authentication' => '558b0897-67f3-4b50-8fd0-fbf9503522c5',
         'User-Agent' =>'tg',
-        'api_url' => 'http://cfbb7e4b9e25.funplayfky.com/',
-        'api_report_url' => 'http://rs5kf13akf3f.funplayfky.com/',
+        'api_url' => 'http://trial-gp-api.funkytest.com/',
+        'api_report_url' => 'http://trial-gp-api-report.funkytest.com/',
    ],
-    'playtech' => [
-        'provider_db_id'=> 68,
-        'secret_key' => 'c8wg8r7VWVZtCHVEBdnE',
-        'brand_id' => 255,
+   'crashgaming' => [
+        'provider_db_id'=> 101,
+        'authToken' => 'HtVTkjRFi87fIF7QgixJPYx1lNkBBpkD',
+   ],
+   'vcci' => [
+        'PROVIDER_ID'=> 000,
+        'API_KEY' => 'eIPk0Bxz-R4crhhPY-zL5SHSpC-MQ8xkICD',
+   ],
+   'playtech' => [
+        'provider_db_id'=> 64,
+        'secret_key' => 'L9MfZ3iLdaD3hiT7cv2W',
+        'brand_id' => 239,
         'brand_name' => 'TIGER_GAMES',
-        'api_url' => 'https://game.gmhugegold.com',
-    ],
+        'api_url' => 'https://api-stg.gmgiantgold.com',
+   ],
+
+
 
 ];
 
 ?>
+
