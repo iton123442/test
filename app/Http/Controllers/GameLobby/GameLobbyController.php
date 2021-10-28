@@ -25,9 +25,9 @@ class GameLobbyController extends Controller
     public $image_url = 'https://bo-test.betrnk.games/';
     //
     public function __construct(){
-		//$this->middleware('oauth', ['except' => ['index']]);
-		/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
-	}
+        //$this->middleware('oauth', ['except' => ['index']]);
+        /*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
+    }
     public function getGameList(Request $request){
         if($request->has("client_id")){
             
@@ -61,8 +61,10 @@ class GameLobbyController extends Controller
                             if($game->game_type){
                                 $game = array(
                                     "game_id" => $game->game_id,
-                                    "game_name"=>$game->game_name,
-                                    "game_code"=>$game->game_code,
+                                    "game_name"=> $game->game_name,
+                                    "game_code"=> $game->game_code,
+                                    "min_bet"=> $game->min_bet == null ? 10 : $game->min_bet,
+                                    "max_bet"=> $game->max_bet == null ? 1000 : $game->max_bet,
                                     "game_provider"=>$sub_provider->sub_provider_name,
                                     "game_type" => $game->game_type->game_type_name,
                                     "game_icon" => $game->icon,
@@ -88,14 +90,14 @@ class GameLobbyController extends Controller
 
 
     public function createFallbackLink($data){
-        $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH', 99, json_encode($data), 'FAILED LAUNCH');
+        $log_id = Helper::saveLog('GAME LAUNCH', 99, json_encode($data), 'FAILED LAUNCH');
         $url =config('providerlinks.tigergames').'/tigergames/api?msg=Something went wrong please contact Tiger Games&id='.$log_id;
         return $url;
     }
     public function gameLaunchUrl(Request $request){
 
         // Save Every Gamelaunch from the client
-        ProviderHelper::saveLogGameLaunch('GAMELAUNCH LOG', 12, json_encode($request->all()), 'GAME REQUEST BODY');
+        ProviderHelper::saveLogWithExeption('GAMELAUNCH LOG', 12, json_encode($request->all()), 'GAME REQUEST BODY');
 
         // Demo Handler
         // Required Parameter game_code, game_provider
@@ -105,7 +107,7 @@ class GameLobbyController extends Controller
                 return DemoHelper::DemoGame($request->all());
             }
         }
-        
+
         if($request->has('client_id')
         &&$request->has('client_player_id')
         &&$request->has('username')
@@ -129,22 +131,22 @@ class GameLobbyController extends Controller
                 return response(["error_code"=>"404","message"=>"Provider Code Doesnt Exist/Not Found"],200)
                  ->header('Content-Type', 'application/json');
             }
-
-             # CLIENT SUBSCRIPTION FILTER
-            $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
-            if(!$subscription_checker){
-               $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
+            // CLIENT SUBSCRIPTION FILTER
+            
+           $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
+           if(!$subscription_checker){
+               $log_id = Helper::saveLog('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
                $msg = array(
                    "game_code" => $request->input("game_code"),
                    "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(3).'&id='.$log_id,
                    "game_launch" => false
                );
                return $msg;
-            }
+           }
 
-            // Filters
+            // // Filters
             if(ClientHelper::checkClientID($request->all()) != 200){
-                $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
+                $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
                 $msg = array(
                     // "error_code" => ClientHelper::checkClientID($request->all()),
                     "message" => ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())),
@@ -154,48 +156,50 @@ class GameLobbyController extends Controller
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-
+            
+            
            $solid_gamings = [2, 3, 5, 6, 7, 8, 10, 9, 11, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 26, 28];
 
             $lang = $request->has("lang")?$request->input("lang"):"en";
             if($token=Helper::checkPlayerExist($request->client_id,$request->client_player_id,$request->username,$request->email,$request->display_name,$request->token,$ip_address)){
 
-                // if ($request->has("demo") && $request->input("demo") == true) {
-                //     return DemoHelper::DemoGame($request->all());
+               
+
+                # Check if player is allowed to play a specific game
+                Helper::savePLayerGameRound( $request->input("game_code"), $request->input("token"), $request->input("game_provider"));
+                // $checkplayer = ProviderHelper::checkClientPlayer($request->client_id, $request->client_player_id);
+                // $check_game_details = ProviderHelper::getSubGameDetails($provider_code, $request->input("game_code"));
+                // $isRestricted = ProviderHelper::checkGameRestricted($check_game_details->game_id,$checkplayer->player_id);
+                // if($isRestricted){
+                //     // $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($isRestricted);
+                //     // if(!$attempt_resend_transaction){
+                //         $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH GAME RESTRICTED '.$request->client_id);
+                //         $msg = array(
+                //             "message" => ClientHelper::getClientErrorCode(10),
+                //             "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg=Player is Restricted&id='.$log_id,
+                //             "game_launch" => false
+                //         );
+                //         return response($msg,200)
+                //         ->header('Content-Type', 'application/json');
+                //     // }
                 // }
 
-                    # Check if player is allowed to play a specific game
-                    // Helper::savePLayerGameRound($request->input("game_code"), $request->input("token"), $request->input("game_provider"));
-                    // $checkplayer = ProviderHelper::checkClientPlayer($request->client_id, $request->client_player_id);
-                    // $check_game_details = ProviderHelper::getSubGameDetails($provider_code, $request->input("game_code"));
-                    // $isRestricted = ProviderHelper::checkGameRestricted($check_game_details->game_id,$checkplayer->player_id);
-                    // if($isRestricted){
-                    //     // $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($isRestricted);
-                    //     // if(!$attempt_resend_transaction){
-                    //         $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH GAME RESTRICTED '.$request->client_id);
-                    //         $msg = array(
-                    //             "message" => ClientHelper::getClientErrorCode(10),
-                    //             "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg=Player is Restricted&id='.$log_id,
-                    //             "game_launch" => false
-                    //         );
-                    //         return response($msg,200)
-                    //         ->header('Content-Type', 'application/json');
-                    //     // }
-                    // }
-
                  # EXPERIMENTAL - GAME BALANCE INHOUSE (SAVE ALL PLAYER BALANCE)
+
                  $save_balance = ProviderHelper::saveBalance($request->token);
+
                  if($save_balance == false){
-                     $log_id = ProviderHelper::saveLogGameLaunch('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH SAVE BALANCE'.$request->client_id);
+                     $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH SAVE BALANCE'.$request->client_id);
                      $msg = array(
                          "message" => ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())),
-                         "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg=Balance Acquisition Failed&id='.$log_id,
+                         "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(ClientHelper::checkClientID($request->all())).'&id='.$log_id,
                          "game_launch" => false
                      );
                      return response($msg,200)
                      ->header('Content-Type', 'application/json');
                  }
 
+                
                 if($provider_code==35){
                     $url = GameLobby::icgLaunchUrl($request->game_code,$token,$request->exitUrl,$request->input('game_provider'),$lang);
                     $msg = array(
@@ -215,6 +219,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                
                 elseif($provider_code==34){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
@@ -260,7 +265,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==82){
+                elseif($provider_code==77){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::microgamingLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl),
@@ -269,19 +274,21 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code== 74 || $provider_code == 115  || $provider_code == 119 ){
+                elseif($provider_code== 74 || $provider_code == 107  || $provider_code == 108 ){
+                    Helper::saveLog('HIT_EVG_LAUNCHURL', 12, json_encode(["msg"=>$request->all() ,"player_id"=>$token]), ["authentication"]);
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::evolutionLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl,$ip_address,$lang),
                         "game_launch" => true
                     );
+                    Helper::saveLog('reqlaunchURL(EVG)', 12, json_encode(["msg"=> $msg,"player_id"=>$token]), ["authentication"]);
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
                  elseif($provider_code==33){
                     $country_code =  $request->has('country_code') ? $request->country_code : 'PH';
-                    $url = GameLobby::boleLaunchUrl($request->game_code,$token,$request->exitUrl,$country_code);
-                    if($url){
+                    $url = GameLobby::boleLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl,$country_code);
+                    if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
@@ -299,18 +306,27 @@ class GameLobbyController extends Controller
                 elseif($provider_code==36){ // request->token
                     Helper::saveLog('DEMO CALL', 14, json_encode($request->all()), 'DEMO');
                     $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::rsgLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang,$request->input('game_provider')), //TEST
-                        "game_launch" => true
-                    );
+                    $url = GameLobby::rsgLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang,$request->input('game_provider'));
+                    if($url != false && $url != 'false'){
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "url" => $url, //TEST
+                            "game_launch" => true
+                        );
+                    }else{
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "url" => $this->createFallbackLink($request->all()),
+                            "game_launch" => false
+                        );
+                    }
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
                 
                 elseif($provider_code==52){ // request->token
                     $url = GameLobby::skyWindLaunch($request->game_code,$token);
-                    if($url!= 'false'){
+                    if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
@@ -328,8 +344,8 @@ class GameLobbyController extends Controller
                 }
                 elseif($provider_code==54){ // request->token
                     // $url = GameLobby::cq9LaunchUrl($request->game_code,$token);
-                    $url = GameLobby::cq9LaunchUrl($request->game_code,$token,$request->input('game_provider'));
-                    if($url!= 'false'){
+                    $url = GameLobby::cq9LaunchUrl($request->game_code,$token,$request->input('game_provider'), $request->exitUrl);
+                    if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
@@ -347,7 +363,7 @@ class GameLobbyController extends Controller
                 }
                 elseif($provider_code==48){ // request->token
                     $url = GameLobby::saGamingLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang);
-                    if($url){
+                    if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
@@ -368,7 +384,7 @@ class GameLobbyController extends Controller
                         $lang = ProviderHelper::getLanguage($request->game_provider,$request->lang,$type='name');
                     }
                     $url = GameLobby::kaGamingLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang, $request->all());
-                    if($url){
+                    if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
@@ -417,8 +433,8 @@ class GameLobbyController extends Controller
                 }
                 elseif($provider_code==43){
                     $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
-                    $url = GameLobby::awsLaunchUrl($request->token,$request->game_code,$lang);
-                    if($url){
+                    $url = GameLobby::awsLaunchUrl($request->token,$request->game_provider,$request->game_code,$lang,$request->exitUrl);
+                    if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
@@ -435,8 +451,8 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==40){
-                    $url = GameLobby::evoplayLunchUrl($request->token,$request->game_code);
-                    if($url){
+                    $url = GameLobby::evoplayLunchUrl($request->token,$request->game_code,$request->game_provider, $request->exitUrl);
+                    if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
@@ -480,36 +496,25 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif(in_array($provider_code, [39, 76, 77, 78, 79, 80, 83])){
+                elseif(in_array($provider_code, [39, 79, 83, 84, 85, 86, 87])){
+                    $lang = 'en';
+                    if($request->has('lang')){
+                        $lang = $request->lang;
+                        /*Temporarily disabled*/
+                        /*$lang = GameLobby::getLanguage($request->game_provider,$request->lang);*/
+                    }
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::oryxLaunchUrl($request->game_code,$request->token,$request->exitUrl), 
+                        "url" => GameLobby::oryxLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang), 
                         "game_launch" => true
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
-                }
-                 elseif($provider_code==92){
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::JustPlayLaunchURl($request->all()),
-                        "game_launch" => true
-                    );
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
-                }
-                elseif($provider_code == 96) { // DragonGaming
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" =>  GameLobby::dragonGamingLaunchUrl($request->all()),
-                        "game_launch" => true
-                    );
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
-                }
+                } 
+
                 elseif($provider_code==49){
 
-                    $url = GameLobby::pragmaticplaylauncher($request->game_code,$request->token,$request->exitUrl);
+                    $url = GameLobby::pragmaticplaylauncher($request->game_code,$request->token,$request->exitUrl,$request->input('game_provider'));
                     if($url){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
@@ -533,43 +538,50 @@ class GameLobbyController extends Controller
                     // return response($msg,200)
                     // ->header('Content-Type', 'application/json');
                 } 
-                elseif($provider_code==46){ 
+                elseif($provider_code==46){
+                    
                     // $msg = array(
                     //     "game_code" => $request->input("game_code"),
                     //     "url" => GameLobby::tidylaunchUrl($request->game_code,$request->token), //TEST
                     //     "game_launch" => true
                     // );
+                   
+                    // if($request->has("game_code")  && $request->game_code == "1")
+                    // {
+                        
+                    //     $url = GameLobby::funtaTransferLuanch($request->all());
+                    // } 
+                    // else 
+                    // {
+                    //     // SEAMLESS WALLET
+                    //     $url = GameLobby::tidylaunchUrl($request->game_code,$request->token);
+                    // }
+                    $url = GameLobby::tidylaunchUrl($request->game_code,$request->token, $request->game_provider, $request->exitUrl);
 
-                    $url = GameLobby::tidylaunchUrl($request->game_code,$request->token);
-                    if($url){
+                    // return $url;
+                    if($url)
+                    {
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
                             "game_launch" => true
                         );
-                    }else{
+                    }
+                    else
+                    {
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $this->createFallbackLink($request->all()),
                             "game_launch" => false
                         );
                     }
-                    return $msg;
-                    // return response($msg,200)
-                    // ->header('Content-Type', 'application/json');
-                    
-                }
-                elseif($provider_code==90){ //slotmill
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" =>  GameLobby::slotmill($request->all()),
-                        "game_launch" => true
-                    );
+                    // return $msg;
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
+                    
                 }
                 elseif($provider_code == 53){ 
-                    $url = GameLobby::tgglaunchUrl($request->game_code,$request->token);
+                    $url = GameLobby::tgglaunchUrl($request->game_code,$request->token,$request->exitUrl,$request->input('game_provider'));
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => $url,
@@ -596,9 +608,10 @@ class GameLobbyController extends Controller
                         "url" => $url,
                         "game_launch" => true
                     );
+                    // Helper::saveLogCode('Booming GameCode', 36, json_encode($array), $url->session_id);
+
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
-
                 }
                 elseif($provider_code==59){
                     if($request->has('lang')){
@@ -609,7 +622,7 @@ class GameLobbyController extends Controller
                     $exitUrl = $request->has('exitUrl') ? $request->exitUrl : '';
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::spadeLaunch($request->game_code,$request->token,$exitUrl,$lang),
+                        "url" => GameLobby::spadeLaunch($request->game_code,$request->token,$exitUrl,$lang, $request->game_provider),
                         "game_launch" => true
                     );
                     return response($msg,200)
@@ -625,6 +638,11 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==73){
+                    // if($request->has('lang')){
+                    //     $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
+                    // }else{
+                    //     $lang = GameLobby::getLanguage($request->game_provider, 'en');
+                    // }
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::spadeCuracaoLaunch($request->game_code,$request->token,$request->lang),
@@ -633,7 +651,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==83){
+                elseif($provider_code==76){
                     $url = GameLobby::netEntDirect($request->all());
                     if($url){
                         $msg = array(
@@ -657,7 +675,7 @@ class GameLobbyController extends Controller
                     // $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::habanerolaunchUrl($request->game_code,$request->token), //TEST
+                        "url" => GameLobby::habanerolaunchUrl($request->game_code, $request->token, $request->exitUrl, $request->input('game_provider')), //TEST
                         "game_launch" => true
                     );
 
@@ -676,14 +694,13 @@ class GameLobbyController extends Controller
                 elseif($provider_code==60){ 
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::yggdrasillaunchUrl($request->all()), //TEST
+                        "url" => GameLobby::yggdrasillaunchUrl($request->all(), $request->input('game_provider')), //TEST
                         "game_launch" => true
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 } 
-                // elseif($provider_code==71){ 
-                elseif($provider_code==113){ 
+                elseif($provider_code==71){ 
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::goldenFLaunchUrl($request->all()), //TEST
@@ -692,7 +709,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 } 
-                elseif(in_array($provider_code, [69, 61, 62, 63, 64, 65, 66])){
+                elseif(in_array($provider_code, [69, 61, 62, 63, 64, 65, 66, 114])){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::vivoGamingLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->input('game_provider')), 
@@ -710,45 +727,78 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code== 89){ // NEED TO CHANGE PROVIDER CODE
-                    $url = GameLobby::netEntDirect($request->all());
-                    if($url){
+                elseif($provider_code==89){ //slotmill
+
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" =>  GameLobby::slotmill($request->all()),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code==97){ //Slotmill TW
+                    Helper::saveLog('slotmillTW Gameluanch', 51, json_encode($request->all()), "Player response");
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" =>  GameLobby::slotmillTW($request->all()),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code==90){ //pgvirtual
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" =>  GameLobby::pgvirtual($request->all()),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code==92){ //funta transferwallet
+                    $url = GameLobby::funtaTransferLuanch($request->all());
+                    if($url)
+                    {
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $url,
                             "game_launch" => true
-                        ); 
-                    }else{
+                        );
+                    }
+                    else
+                    {
                         $msg = array(
                             "game_code" => $request->input("game_code"),
                             "url" => $this->createFallbackLink($request->all()),
                             "game_launch" => false
                         );
                     }
+                    // return $msg;
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
+                        
+                  
                 }
-               elseif($provider_code==97){
-                    $url = GameLobby::onlyplayLaunchUrl($request->game_code,$request->token,$request->exitUrl,$request->input('game_provider'),$request->lang);
+                elseif($provider_code==99){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => $url,
+                        "url" => GameLobby::JustPlayLaunchURl($request->all()),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }    
+                elseif($provider_code==102){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::PlayStarLaunchUrl($request->all()),
                         "game_launch" => true
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==100){
-                    $url = GameLobby::TopTrendGamingLaunchUrl($request->all());
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" => $url,
-                        "game_launch" => true
-                    );
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
-                }
-                elseif($provider_code==95){
                     $url = GameLobby::fivemenlaunchUrl($request->game_code,$request->token,$request->exitUrl,$request->input('game_provider'));
                     $msg = array(
                         "game_code" => $request->input("game_code"),
@@ -758,15 +808,43 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==99){
+                elseif($provider_code==94) { // DragonGaming
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::PlayStarLaunchUrl($request->all()),
+                        "url" =>  GameLobby::dragonGamingLaunchUrl($request->all()),
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }elseif($provider_code==101){
+                    $url = GameLobby::onlyplayLaunchUrl($request->game_code,$request->token,$request->exitUrl,$request->input('game_provider'),$request->lang);
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => $url,
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }elseif($provider_code==103){
+                    $url = GameLobby::TopTrendGamingLaunchUrl($request->all());
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => $url,
                         "game_launch" => true
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                elseif($provider_code==104){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::ozashikiLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+
                 elseif($provider_code==105){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
@@ -785,37 +863,51 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==91){ //pgvirtual
+                elseif($provider_code == 93){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" =>  GameLobby::pgvirtual($request->all()),
+                        "url" => GameLobby::BGamingLaunchUrl($request->all()), 
                         "game_launch" => true
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==104){
+                elseif($provider_code == 109){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::ozashikiLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
+                        "url" => GameLobby::MancalaLaunchUrl($request->all()), 
                         "game_launch" => true
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
-                }
-                elseif($provider_code == 122){
+                } 
+                elseif($provider_code == 110){
+                    $URL = GameLobby::IDNPoker($request->all());
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::PlayTechLaunch($request->all()), 
                         "game_launch" => true
                     );
+                    if ($URL != "false") {
+                        $msg["url"] = $URL;
+                    } else {
+                        $msg["url"] = $this->createFallbackLink($request->all()) ;
+                    }
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code == 120){
+                elseif($provider_code == 112){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::FunkyGamesLaunch($request->all()), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code == 113){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::PlayTechLaunch($request->all()), 
                         "game_launch" => true
                     );
                     return response($msg,200)
@@ -899,7 +991,8 @@ class GameLobbyController extends Controller
             return $data;
     }
 
-   public function checkGameAccess($client_id, $game_code, $sub_provider_id){
+   
+    public function checkGameAccess($client_id, $game_code, $sub_provider_id){
 
             $excludedlist = ClientGameSubscribe::with("selectedProvider")->with("gameExclude")->with("subProviderExcluded")->where("client_id",$client_id)->get();
             if(count($excludedlist)>0){  # No Excluded Provider
@@ -940,7 +1033,7 @@ class GameLobbyController extends Controller
             }
    }
 
-    public static  function getLanguage(Request $request){
+    public static function getLanguage(Request $request){
         return GameLobby::getLanguage($request->provider_name,$request->language);
     }
 
