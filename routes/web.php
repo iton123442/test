@@ -407,6 +407,9 @@ $app->post('/public/payment/transaction','Payments\PaymentLobbyController@getPay
 $app->post('/public/payment/cancel','Payments\PaymentLobbyController@cancelPayTransaction');
 $app->post('/public/currency/convert','Payments\PaymentLobbyController@currencyConverter');
 //GameLobby
+$app->post('/public/game/demo','GameLobby\DemoGameController@GameDemo');
+$app->get('/public/game/launchurl/playforfun', 'GameLobby\GameDemoClientController@gameLaunchDemo');
+
 $app->get('/public/game/list','GameLobby\GameLobbyController@getGameList');
 $app->get('/public/game/provider/{provider_name}','GameLobby\GameLobbyController@getProviderDetails');
 $app->post('/public/game/launchurl','GameLobby\GameLobbyController@gameLaunchUrl');
