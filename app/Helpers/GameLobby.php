@@ -1087,7 +1087,8 @@ class GameLobby{
                 ]
             ]);
 
-        $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL"),
+        try {
+            $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL"),
                 ['body' => json_encode(
                         [
                             "id" => "betrnk",
@@ -1100,7 +1101,11 @@ class GameLobby{
             );
 
         $auth_result = json_decode($auth_token_response->getBody()->getContents());
-
+        } catch (\Exception $e) {
+             ProviderHelper::saveLogGameLaunch('MannaPlay', 15, json_encode($client_details), $e->getMessage());
+            return $exitUrl
+        }
+        
         // Generate Game Link
         $game_link = new Client([
                 'headers' => [ 
