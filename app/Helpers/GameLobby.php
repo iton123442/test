@@ -1105,7 +1105,7 @@ class GameLobby{
                 $auth_result = json_decode($auth_token_response->getBody()->getContents());
             } catch (\Exception $e) {
                  ProviderHelper::saveLogGameLaunch('MannaPlay', 15, json_encode($client_details), $e->getMessage());
-                return $exitUrl
+                return $exitUrl;
             }
             
             // Generate Game Link
@@ -1134,7 +1134,7 @@ class GameLobby{
             return $link_result->url;
         } catch (\Exception $e) {
             ProviderHelper::saveLogGameLaunch('MannaPlay', 15, json_encode($client_details), $e->getMessage());
-            return $exitUrl
+            return $exitUrl;
         }
 
        
