@@ -1103,6 +1103,7 @@ class GameLobby{
                 );
 
                 $auth_result = json_decode($auth_token_response->getBody()->getContents());
+                ProviderHelper::saveLogGameLaunch('MannaPlay Auth Response', 15, json_encode($client_details), $auth_result);
             } catch (\Exception $e) {
                  ProviderHelper::saveLogGameLaunch('MannaPlay', 15, json_encode($client_details), $e->getMessage());
                 return $exitUrl;
