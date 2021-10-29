@@ -683,7 +683,7 @@ $app->post('/public/Funky/Bet/CancelBet','FunkyGamesController@CancelBet');
 
 
 // Amuse Gaming
-$app->post('/publicGetPlayerBalance', 'AmuseGamingController@GetPlayerBalance');
-$app->post('/publicWithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDeposit');
-$app->post('/publicCancel', 'AmuseGamingController@Cancel');
+$app->post('/public/GetPlayerBalance', 'AmuseGamingController@GetPlayerBalance');
+$app->post('/public/WithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDeposit');
+$app->post('/public/Cancel', 'AmuseGamingController@Cancel');
 $app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGamelist');
