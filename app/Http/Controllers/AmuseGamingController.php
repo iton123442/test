@@ -28,14 +28,14 @@ class AmuseGamingController extends Controller
     public function GetPlayerBalance(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
-        Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($xmlparser), "");
+        // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($xmlparser), "");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
         $array_data = array(
             "status" => "ok",
             "balance" => $client_details->balance
         );
         $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
-        Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
+        // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
         return response($response,200)
 				->header('Content-Type', 'application/xml');
     }
