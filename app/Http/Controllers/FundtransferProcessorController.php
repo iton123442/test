@@ -38,7 +38,11 @@ class FundtransferProcessorController extends Controller
         }
         // sleep(10);
         try{
-            if ($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
+            if ($payload->action->custom->provider == 'hbn'){
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }else if ($payload->action->custom->provider == "tpp") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }else if ($payload->action->custom->provider == "ygg") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "AmuseGaming") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
@@ -379,7 +383,7 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->custom->game_trans_id, $payload->action->custom->client_connection_name);
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
-                            elseif($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
+                            elseif($payload->action->custom->provider == 'hbn'){
                                 $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
                                     "client_response" =>json_encode($client_response),
@@ -387,6 +391,27 @@ class FundtransferProcessorController extends Controller
                                     "general_details" =>json_encode("success")
                                 );
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                Helper::saveLog("Habanero Gaming Success Client Request", 24, json_encode($requesttocient), json_encode($client_response));
+                            }
+                            elseif($payload->action->custom->provider == 'tpp' ){
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                Helper::saveLog("Pragmatic Play Success Client Request", 26, json_encode($requesttocient), json_encode($client_response));
+                            }
+                            elseif($payload->action->custom->provider == 'ygg' ){
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                Helper::saveLog("Yggdrasil Direct Success Client Request", 38, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif($payload->action->custom->provider == 'AmuseGaming' ){
                                 $ext_data = array(
