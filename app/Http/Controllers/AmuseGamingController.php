@@ -362,7 +362,7 @@ class AmuseGamingController extends Controller
         $game_trans = GameTransactionMDB::findGameTransactionDetails($provider_trans_id,'transaction_id',false,$client_details);
         if($game_trans != 'false'){
             $checkExt = GameTransactionMDB::findGameExt($provider_trans_id,3,'transaction_id',$client_details);
-            $game_details = Helper::findGameDetails('game_id', $this->provider_id, $game_trans->game_id);
+            $game_details = Helper::findGameDetails('game_id', $this->provider_db_id, $game_trans->game_id);
             if($checkExt != 'false'){
                 $array_data = array(
                     "status" => "ok",
