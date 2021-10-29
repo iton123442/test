@@ -772,7 +772,7 @@ class GameLobby{
         $casinoId = config('providerlinks.tpp.casinoId');
         $wsUri = config('providerlinks.tpp.wsUri');
         $host = config('providerlinks.tpp.host');
-        
+
         $client_details = Providerhelper::getClientDetails('token', $token);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         // $game_details = DB::select("SELECT * FROM games WHERE provider_id = '26' AND game_code = '".$game_code."' order by created  ");
@@ -803,7 +803,8 @@ class GameLobby{
         ]);
         $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
         $client_response = json_decode($guzzle_response->getBody()->getContents());
-        dd($client_response);
+        $url = $data->gameURL;
+        return $url;
         // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
         // $url = "$gameluanch_url?key=$paramEncoded&stylename=$stylename";
         // $result = json_encode($url);
