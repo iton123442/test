@@ -606,7 +606,14 @@ return [
         'brand_name' => 'TIGER_GAMES',
         'api_url' => 'https://api-stg.gmgiantgold.com',
    ],
-
+   'amusegaming' => [
+        'provider_db_id'=> 65,
+        'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S',
+        'operator_id' => 'betrnkUSDtest',
+        'public_key' => 'EI4gh2M62f7V9mmH9SNI',
+        'launch_url' => 'https://static.slotomatic.net/launch/index.html',
+        'api_url' => 'https://api4.slotomatic.net/api/',
+    ],
 
 
 ];

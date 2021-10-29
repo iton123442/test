@@ -1683,6 +1683,27 @@ class GameLobby{
                 
         }
     }
+    
+    public static function AmuseGamingGameLaunch($data){
+        Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
+        $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
+        $launch_url = config('providerlinks.amusegaming.launch_url');
+        $api_url = config('providerlinks.amusegaming.api_url');
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        $getDetails = AmuseGamingHelper::createPlayerAndCheckPlayer($client_details->player_id);
+        if ($getDetails) {
+            $token = AmuseGamingHelper::requestTokenFromProvider($client_details->player_id, "real");
+            if($token != "false"){
+                $getGameDetails = Helper::findGameDetails( "game_code", $proivder_db_id, $data['game_code']);
+                $brand = AmuseGamingHelper::getBrand($data['game_code'],$proivder_db_id);
+                $url = $launch_url."?token=".$token. "&brand=".$brand."&technology=html5&game=".$getGameDetails->game_code."&server=api4.slotomatic.net";
+                Helper::saveLog('AMUSEGAMING LAUNCH URL', 65, json_encode($data),  $url );
+                return $url;
+            }
+        }
+        Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
+        return "false";
+    }
 
 }
 
