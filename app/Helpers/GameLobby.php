@@ -803,7 +803,7 @@ class GameLobby{
         ]);
         $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
         $client_response = json_decode($guzzle_response->getBody()->getContents());
-        $url = $data->gameURL;
+        $url = $client_response->gameURL;
         return $url;
         // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
         // $url = "$gameluanch_url?key=$paramEncoded&stylename=$stylename";
