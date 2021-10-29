@@ -394,6 +394,7 @@ class FundtransferProcessorController extends Controller
                                     "general_details" =>json_encode("success")
                                 );
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                Helper::saveLog("Amuse Gaming Success Client Request", 65, json_encode($requesttocient), json_encode($client_response));
                             }
                         }else{
                             # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!
