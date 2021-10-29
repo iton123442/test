@@ -377,7 +377,16 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->custom->game_trans_id, $payload->action->custom->client_connection_name);
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
-                            if($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
+                            elseif($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                            }
+                            elseif($payload->action->custom->provider == 'AmuseGaming' ){
                                 $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
                                     "client_response" =>json_encode($client_response),
