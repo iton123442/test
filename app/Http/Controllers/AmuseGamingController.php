@@ -358,7 +358,7 @@ class AmuseGamingController extends Controller
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog("AmuseGaming Cancel", $this->provider_db_id, json_encode($xmlparser), "REQUEST");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
-        $provider_trans_id = $xmlparser->TransactionId;
+        $provider_trans_id = json_decode($xmlparser->TransactionId);
         $game_trans = GameTransactionMDB::findGameTransactionDetails($provider_trans_id,'transaction_id',false,$client_details);
         if($game_trans != 'false'){
             $checkExt = GameTransactionMDB::findGameExt($provider_trans_id,3,'transaction_id',$client_details);
