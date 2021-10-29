@@ -772,7 +772,7 @@ class GameLobby{
         $casinoId = config('providerlinks.tpp.casinoId');
         $wsUri = config('providerlinks.tpp.wsUri');
         $host = config('providerlinks.tpp.host');
-
+        dd($data);
         $client_details = Providerhelper::getClientDetails('token', $token);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         // $game_details = DB::select("SELECT * FROM games WHERE provider_id = '26' AND game_code = '".$game_code."' order by created  ");
