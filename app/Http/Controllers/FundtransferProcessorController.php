@@ -40,6 +40,8 @@ class FundtransferProcessorController extends Controller
         try{
             if ($payload->action->custom->provider == 'hbn' || $payload->action->custom->provider == 'tpp' || $payload->action->custom->provider == 'ygg'){
                 $gteid = $payload->action->custom->game_trans_ext_id;
+            }else if ($payload->action->custom->provider == "AmuseGaming") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "OnlyPlay") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "PlayStar") {
