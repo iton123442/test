@@ -270,6 +270,7 @@ return [
         'secret_key' => 'testKey',
         'casinoId' => 'ppcdk00000004874',
         'wsUri' => 'wss://prelive-dga.pragmaticplaylive.net/ws',
+        'host' => 'https://api.prerelease-env.biz/IntegrationService/v3/http/CasinoGameAPI/game/url',
     ],
     'wazdan'=>[
         'operator' => 'tigergames',

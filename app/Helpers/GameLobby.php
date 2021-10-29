@@ -764,13 +764,14 @@ class GameLobby{
         return $url;
     }
     
-    public static function pragmaticplaylauncher($game_code = null, $token = null)
+    public static function pragmaticplaylauncher($game_code = null, $token = null,$data)
     {
         $stylename = config('providerlinks.tpp.secureLogin');
         $key = config('providerlinks.tpp.secret_key');
         $gameluanch_url = config('providerlinks.tpp.gamelaunch_url');
         $casinoId = config('providerlinks.tpp.casinoId');
         $wsUri = config('providerlinks.tpp.wsUri');
+        $host = config('providerlinks.tpp.host');
 
         $client_details = Providerhelper::getClientDetails('token', $token);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
@@ -780,11 +781,32 @@ class GameLobby{
 
         $userid = "TGaming_".$client_details->player_id;
         $currency = $client_details->default_currency;
-        $hashCreatePlayer = md5('currency='.$currency.'&externalPlayerId='.$userid.'&secureLogin='.$stylename.$key);
+        $hash = md5("currency=".$currency."&language=".$data['lang']."&lobbyUrl=".$data['exitUrl']."&platform=WEB&secureLogin=".$stylename."&stylename=".$stylename."&symbol=".$game_code."&technology=H5&token=".$token."".$key);
+        // $hashCreatePlayer = md5('currency='.$currency.'&externalPlayerId='.$userid.'&secureLogin='.$stylename.$key);
 
-        $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
-        $url = "$gameluanch_url?key=$paramEncoded&stylename=$stylename";
-        $result = json_encode($url);
+        $form_body = [
+            "currency" => $currency,
+            "language" => $data['lang'],
+            "lobbyUrl" => $data['exitUrl'],
+            "platform" => "WEB",
+            "secureLogin" => $stylename,
+            "stylename" => $stylename,
+            "symbol" => $game_code,
+            "technology" => "H5",
+            "token" => $token,
+            "hash" => $hash
+        ];
+        $client = new Client([
+            'headers' => [ 
+                'Authorization' => config('providerlinks.majagames.auth')
+            ]
+        ]);
+        $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
+        $client_response = json_decode($guzzle_response->getBody()->getContents());
+        dd($client_response);
+        // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
+        // $url = "$gameluanch_url?key=$paramEncoded&stylename=$stylename";
+        // $result = json_encode($url);
 
         // $aes = new AES();
         // $data = array(
@@ -801,7 +823,7 @@ class GameLobby{
         //     return $url;
         // }else{
         //     Helper::saveLog('start game url PP', 26, $result,"$result");
-        return $url;
+        // return $url;
         // }
     }
 
@@ -1683,7 +1705,7 @@ class GameLobby{
                 
         }
     }
-    
+
     public static function AmuseGamingGameLaunch($data){
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
         $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
