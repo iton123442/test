@@ -95,7 +95,7 @@ class AWSHelper{
 		];
 		$requesttosend['sign'] = AWSHelper::hashen($requesttosend,$client_details->player_token);
 		$requesttosend['language'] = $lang;
-		ProviderHelper::saveLogWithExeption('AWS BO Register Request', 21, json_encode($client_response), $requesttosend);
+		ProviderHelper::saveLogWithExeption('AWS BO Register Request', 21, json_encode($requesttosend), $requesttosend);
 		$guzzle_response = $client->post(config('providerlinks.aws.api_url').'/api/register',
 		    ['body' => json_encode($requesttosend)]
 		);
@@ -149,7 +149,7 @@ class AWSHelper{
 			"username" => $merchant_id.'_TG'.$client_details->player_id,
 		];
 		$requesttosend['sign'] = AWSHelper::hashen($requesttosend,$client_details->player_token);
-		ProviderHelper::saveLogWithExeption('AWS BO Register Request', 21, json_encode($client_response), $requesttosend);
+		ProviderHelper::saveLogWithExeption('AWS BO Register Request', 21, json_encode($requesttosend), $requesttosend);
 		$guzzle_response = $client->post(config('providerlinks.aws.api_url').'/user/status',
 		    ['body' => json_encode($requesttosend)]
 		);
