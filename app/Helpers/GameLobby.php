@@ -155,6 +155,56 @@ class GameLobby{
         
     }
 
+    public static function BGamingLaunchUrl($request_data, $device){
+        $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
+        $balance = str_replace(".", "", $client_player_details->balance);
+
+        /* CREATE SESSION REQUEST */
+        $game_launch = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+        
+        list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
+
+        $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
+                ['body' => json_encode(
+                        [
+                            "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
+                            "game" => $request_data['game_code'],
+                            "currency" => $client_player_details->default_currency,
+                            "locale" => "en",
+                            "ip" => $request_data['ip_address'],
+                            "balance" => $balance,
+                            "client_type" => $device,
+                            "urls" => [
+                                "deposit_url" => "https://example.com/deposit",
+                                "return_url" => $request_data['exitUrl']
+                            ],
+                            "user" => [
+                                "id" => $client_player_details->player_id,
+                                "email" => $client_player_details->email,
+                                "firstname" => $client_player_details->username,
+                                "lastname" => $client_player_details->username,
+                                "nickname" => $client_player_details->display_name,
+                                "city" => $request_data['country_code'],
+                                "country" => $request_data['country_code'],
+                                "date_of_birth" => "2021-01-29",
+                                "gender" => "m",
+                                "registered_at" => $registration_date
+                            ]
+                        ]
+                )]
+            );
+        
+        Helper::saveLog('Bgaming Launhing', 49, json_encode($request_data), $game_launch_response);
+        $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
+        
+        return $game_launch_url->launch_options->game_url;        
+    }
+
+
     public static function SmartsoftLaunchUrl($data){
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $portal = config('providerlinks.smartsoft.PortalName');

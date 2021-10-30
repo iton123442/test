@@ -586,6 +586,10 @@ $app->post('/public/signature','OnlyPlayController@createSignature');
 //JUSTPLAY
 $app->get('/public/api/justplay/callback', 'JustPlayController@callback'); 
 
+// BGaming Single Controller Endpoints
+$app->post('/api/bgaming/play', 'BGamingController@gameTransaction');
+$app->post('/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
+
 // Five Men
 //$app->post('/public/api/5men','FiveMenController@index');
 

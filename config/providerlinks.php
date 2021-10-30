@@ -259,6 +259,12 @@ return [
         'api_key' => '4516cf2200fec6953f8bce3547c3a6cc',
         'provider_id' => 53,
     ],
+    'bgaming' => [
+        'PROVIDER_ID'=> 49,
+        'CASINO_ID' => 'tigergames-int',
+        'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
+        'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM'
+   ],
     'pgsoft' => [
         'api_url' => 'http://api.pg-bo.me/external',
         'operator_token' => '642052d1627c8cae4a288fc82a8bf892',
