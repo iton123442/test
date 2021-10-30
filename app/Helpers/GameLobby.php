@@ -1197,6 +1197,7 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
+        ProviderHelper::saveLogGameLaunch('MannaPlayBEtrnk Link', 15, json_encode($link_result), $auth_result);
         return $link_result->url;
         
         /*switch($client_details->wallet_type){
