@@ -1147,7 +1147,6 @@ class GameLobby{
         $lang = GameLobby::getLanguage("Ozashiki", $lang);
         // Authenticate New Token
 
-
         try {
             $auth_token = new Client([ // auth_token
                 'headers' => [ 
@@ -1169,9 +1168,9 @@ class GameLobby{
 
             $auth_result = json_decode($auth_token_response->getBody()->getContents());
 
-            ProviderHelper::saveLogGameLaunch('MannaPlayBEtrnk Auth Response', 15, json_encode($client_details), $auth_result);
+            ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Auth Response', 15, json_encode($client_details), $auth_result);
         } catch (\Exception $e) {
-             ProviderHelper::saveLogGameLaunch('MannaPlayBEtrnk', 15, json_encode($client_details), $e->getMessage());
+             ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki', 15, json_encode($client_details), $e->getMessage());
             return $exitUrl;
         }
 
@@ -1197,7 +1196,7 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
-        ProviderHelper::saveLogGameLaunch('MannaPlayBEtrnk Link', 15, json_encode($link_result), $auth_result);
+        ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Link', 15, json_encode($link_result), $auth_result);
         return $link_result->url;
         
         /*switch($client_details->wallet_type){
