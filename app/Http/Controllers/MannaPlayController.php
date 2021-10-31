@@ -74,6 +74,7 @@ class MannaPlayController extends Controller
 	public function debitProcess(Request $request){
 
         $json_data = json_decode(file_get_contents("php://input"), true);
+		Helper::saveLog('manna_debit', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
 		$api_key = $request->header('apiKey');
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
 		{
@@ -218,6 +219,7 @@ class MannaPlayController extends Controller
     public function creditProcess(Request $request){
    		
         $json_data = json_decode(file_get_contents("php://input"), true);
+		Helper::saveLog('manna_creditProcess', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
 		$api_key = $request->header('apiKey');
 		$http_status = 200;
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
