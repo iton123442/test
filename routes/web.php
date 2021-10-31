@@ -684,3 +684,6 @@ $app->post('/public/Funky/Bet/CheckBet','FunkyGamesController@CheckBet');
 $app->post('/public/Funky/Bet/PlaceBet','FunkyGamesController@PlaceBet');
 $app->post('/public/Funky/Bet/SettleBet','FunkyGamesController@SettleBet');
 $app->post('/public/Funky/Bet/CancelBet','FunkyGamesController@CancelBet');
+
+//FREGAME OR FREEROUND BY PROVIDER
+$app->post('game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
