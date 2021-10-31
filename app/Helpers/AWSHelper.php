@@ -95,12 +95,13 @@ class AWSHelper{
 		];
 		$requesttosend['sign'] = AWSHelper::hashen($requesttosend,$client_details->player_token);
 		$requesttosend['language'] = $lang;
+		ProviderHelper::saveLogWithExeption('AWS BO Register Request', 21, json_encode($requesttosend), $requesttosend);
 		$guzzle_response = $client->post(config('providerlinks.aws.api_url').'/api/register',
 		    ['body' => json_encode($requesttosend)]
 		);
 
 	    $client_response = json_decode($guzzle_response->getBody()->getContents());
-	    AWSHelper::saveLog('AWS BO Register Resp', 21, json_encode($client_response), $requesttosend);
+	    ProviderHelper::saveLogWithExeption('AWS BO Register Response', 21, json_encode($client_response), $requesttosend);
 	    return $client_response;
 	}
 
@@ -148,12 +149,13 @@ class AWSHelper{
 			"username" => $merchant_id.'_TG'.$client_details->player_id,
 		];
 		$requesttosend['sign'] = AWSHelper::hashen($requesttosend,$client_details->player_token);
+		ProviderHelper::saveLogWithExeption('AWS BO Register Request', 21, json_encode($requesttosend), $requesttosend);
 		$guzzle_response = $client->post(config('providerlinks.aws.api_url').'/user/status',
 		    ['body' => json_encode($requesttosend)]
 		);
 
 	    $client_response = json_decode($guzzle_response->getBody()->getContents());
-	    AWSHelper::saveLog('AWS BO Player Check Resp', 21, json_encode($client_response), $requesttosend);
+	    ProviderHelper::saveLogWithExeption('AWS BO Player Check Response', 21, json_encode($client_response), $requesttosend);
 	    return $client_response;
 	}
 

@@ -1169,35 +1169,42 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token', $token);
         $lang = GameLobby::getLanguage("Ozashiki", $lang);
         // Authenticate New Token
-        $auth_token = new Client([ // auth_token
+
+        try {
+            $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
                     'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY")
                 ]
             ]);
+            $auth_token_response = $auth_token->post(config("providerlinks.ozashiki.AUTH_URL"),
+                    ['body' => json_encode(
+                            [
+                                "id" => config("providerlinks.ozashiki.PLATFORM_ID"),
+                                "account" => $client_details->player_id,
+                                "currency" => $client_details->default_currency,
+                                "sessionId" => $token,
+                                "channel" => ($client_details->test_player ? "demo" : "")
+                            ]
+                    )]
+                );
 
-        $auth_token_response = $auth_token->post(config("providerlinks.ozashiki.AUTH_URL"),
-                ['body' => json_encode(
-                        [
-                            "id" => config("providerlinks.ozashiki.PLATFORM_ID"),
-                            "account" => $client_details->player_id,
-                            "currency" => $client_details->default_currency,
-                            "sessionId" => $token,
-                            "channel" => ($client_details->test_player ? "demo" : "")
-                        ]
-                )]
-            );
+            $auth_result = json_decode($auth_token_response->getBody()->getContents());
 
-        $auth_result = json_decode($auth_token_response->getBody()->getContents());
+            ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Auth Response', 15, json_encode($client_details), $auth_result);
+        } catch (\Exception $e) {
+             ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki', 15, json_encode($client_details), $e->getMessage());
+            return $exitUrl;
+        }
 
         // Generate Game Link
         $game_link = new Client([
-                'headers' => [ 
-                    'Content-Type' => 'application/json',
-                    'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY"),
-                    'token' => $auth_result->token
-                ]
-            ]);
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY"),
+                'token' => $auth_result->token
+            ]
+        ]);
 
         $game_link_response = $game_link->post(config("providerlinks.ozashiki.GAME_LINK_URL"),
                 ['body' => json_encode(
@@ -1212,6 +1219,7 @@ class GameLobby{
             );
 
         $link_result = json_decode($game_link_response->getBody()->getContents());
+        ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Link', 15, json_encode($link_result), $auth_result);
         return $link_result->url;
         
         /*switch($client_details->wallet_type){
