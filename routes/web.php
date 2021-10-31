@@ -685,9 +685,11 @@ $app->post('/public/Funky/Bet/PlaceBet','FunkyGamesController@PlaceBet');
 $app->post('/public/Funky/Bet/SettleBet','FunkyGamesController@SettleBet');
 $app->post('/public/Funky/Bet/CancelBet','FunkyGamesController@CancelBet');
 
-
 // Amuse Gaming
 $app->post('/public/GetPlayerBalance', 'AmuseGamingController@GetPlayerBalance');
 $app->post('/public/WithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDeposit');
 $app->post('/public/Cancel', 'AmuseGamingController@Cancel');
 $app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGamelist');
+//FREGAME OR FREEROUND BY PROVIDER
+$app->post('game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
+
