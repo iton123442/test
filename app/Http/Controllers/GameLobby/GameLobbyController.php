@@ -866,7 +866,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code == 93){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::BGamingLaunchUrl($request->all()), 
+                        "url" => GameLobby::BGamingLaunchUrl($request->all(),$device), 
                         "game_launch" => true
                     );
                     return response($msg,200)
