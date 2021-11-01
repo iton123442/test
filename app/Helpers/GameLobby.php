@@ -215,11 +215,13 @@ class GameLobby{
         return $url;
     }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
+        $client_details = ProviderHelper::getClientDetails('token', $token);
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;
         $lang = GameLobby::getLanguage("PlayNGo",$lang);
         Helper::savePLayerGameRound($game_code,$token,$provider);
-        $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.config('providerlinks.png.pid').'&gid='.$game_code.'&channel='.
+        $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
+        $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
                    config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
         return $gameurl;
     }

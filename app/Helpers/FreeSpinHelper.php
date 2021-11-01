@@ -140,10 +140,11 @@ class FreeSpinHelper{
         $client = new Client();
 
         $uid = "admin1";
-        $pwd = "kOi37Vxaq";
+        $pwd = "MNKWwPjL8w";
         $org = "TigerGames";
         $walletid = "TigerGamesTransfer";
-        $URL = "https://api.slotmill.com/game.admin.web/services/game/createprepaid.json?";
+        $URL = "https://stageapi.slotmill.com/game.admin.web/services/game/createprepaid.json?";
+
         try {
             $provider_response = $client->post( $URL. 'uid='.$uid.'&pwd='.$pwd.'&org='.$org.'&nativeId='.$player_prefix.$player_details->player_id.'&currency='.$player_details->default_currency.'&amount='.$data["details"]["denomination"].'&gameid='.$data["game_code"].'&consumebefore='.$endtime.'&ref='.$prefix.$id.'&lang=en&createType=Yes&Count='.$data["details"]["rounds"].'&walletid='.$walletid);
             $dataresponse = json_decode($provider_response->getBody()->getContents());
