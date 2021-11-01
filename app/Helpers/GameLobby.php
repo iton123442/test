@@ -167,7 +167,6 @@ class GameLobby{
             ]);
         
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
-
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode(
                         [
