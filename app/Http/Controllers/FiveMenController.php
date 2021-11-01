@@ -102,6 +102,7 @@ public function gameBet($request, $client_details)
 	    $game_id = $string_to_obj->game->game_id;
 
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
+		dd($game_details);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 
