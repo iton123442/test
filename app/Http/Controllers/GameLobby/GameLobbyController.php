@@ -514,7 +514,7 @@ class GameLobbyController extends Controller
 
                 elseif($provider_code==49){
 
-                    $url = GameLobby::pragmaticplaylauncher($request->game_code,$request->token,$request->exitUrl,$request->input('game_provider'));
+                    $url = GameLobby::pragmaticplaylauncher($request->game_code, $request->token, $request->all());
                     if($url){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
@@ -908,6 +908,15 @@ class GameLobbyController extends Controller
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::PlayTechLaunch($request->all()), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code == 115 || $provider_code == 116 || $provider_code == 117 || $provider_code == 118 || $provider_code == 119 || $provider_code == 120){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::AmuseGamingGameLaunch($request->all()), 
                         "game_launch" => true
                     );
                     return response($msg,200)
