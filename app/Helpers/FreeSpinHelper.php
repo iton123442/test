@@ -126,14 +126,18 @@ class FreeSpinHelper{
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
         $player_prefix = "TG_";
-        $freeroundtransac = [
-            "player_id" => $player_details->player_id,
-            "game_id" => $game_details->game_id,
-            "total_spin" => $data["details"]["rounds"],
-            "spin_remaining" => $data["details"]["rounds"],
-            "denominations" => $data["details"]["denomination"],
-            "date_expire" => $data["details"]["expiration_date"]
-        ];
+        try{
+            $freeroundtransac = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"]
+            ];
+        } catch (\Exception $e) {
+            return 400;
+        }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
         $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
         $client = new Client();
@@ -178,17 +182,20 @@ class FreeSpinHelper{
     public static function createFreeRoundPNG($player_details,$data, $sub_provder_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
-        $freeroundtransac = [
-            "player_id" => $player_details->player_id,
-            "game_id" => $game_details->game_id,
-            "total_spin" => $data["details"]["rounds"],
-            "spin_remaining" => $data["details"]["rounds"],
-            "denominations" => $data["details"]["denomination"],
-            "date_expire" => $data["details"]["expiration_date"],
-            "date_start" => $data["details"]["start_time"],
-            "lines" => $data["details"]["lines"],
-            "coins" => $data["details"]["coins"],
-        ];
+        try{
+            $freeroundtransac = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+                "lines" => $data["details"]["lines"],
+                "coins" => $data["details"]["coins"],
+            ];
+        } catch (\Exception $e) {
+            return 400;
+        }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
         $client = new Client();
         $game_array = "<arr:int>".$game_details->info."</arr:int>";
@@ -245,16 +252,18 @@ class FreeSpinHelper{
     public static function createFreeRoundMannaplay($player_details,$data, $sub_provder_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
-        
-        $freeroundtransac = [
-            "player_id" => $player_details->player_id,
-            "game_id" => $game_details->game_id,
-            "total_spin" => $data["details"]["rounds"],
-            "spin_remaining" => $data["details"]["rounds"],
-            "denominations" => $data["details"]["denomination"],
-            "date_expire" => $data["details"]["expiration_date"],
-            "date_start" => $data["details"]["start_time"],
-        ];
+        try{
+            $freeroundtransac = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+            ];
+        } catch (\Exception $e) {
+            return 400;
+        }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
         $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
         $transaction_id = $prefix.$id;
