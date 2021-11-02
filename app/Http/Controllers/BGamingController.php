@@ -243,10 +243,7 @@ public function gameBet($request, $client_details){
             	if($payload['actions'][1]['action'] == 'win'){
             	$win_load = $payload['actions'][1]['action_id'];
             	$pay_amount = $payload['actions'][1]['amount']/100;
-            	}if($payload['actions'][1]['action'] == 'bet'){
-                $win_load = $payload['actions'][1]['action_id'];
-            	$pay_amount = $payload['actions'][1]['amount']/100;
-                }
+            	}
             }else{
             	if($action_status == true){
             		$pay_amount = 0;
