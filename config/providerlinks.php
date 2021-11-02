@@ -521,7 +521,7 @@ return [
         "19010" => "https://lucky-lucifer.stage.slotmill.com",
         "19011" => "https://vegas-gold.stage.slotmill.com",
         "19012" => "https://three-samurai.stage.slotmill.com",
-        "19013" => "https://thunder-wheel.stage.slotmill.com"
+        "19013" => "https://thunder-wheel.stage.slotmill.com",
         "TransferWallet" => [
             "provider_db_id" => 51,
             "secret_key" => "490efb5be3435334282833e1afd0514a",
