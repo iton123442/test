@@ -76,6 +76,8 @@ class BGamingController extends Controller
                     ],
                    ],
                   ];
+                  return response($response,200)
+                  ->header('Content-Type', 'application/json');
 
               }
              }
