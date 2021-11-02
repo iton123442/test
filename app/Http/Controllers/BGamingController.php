@@ -251,6 +251,17 @@ public function gameBet($request, $client_details){
             	}         	
             }
             try{
+                ProviderHelper::idenpotencyTable($win_load);
+            }catch(\Exception $e){
+                $response = [
+              		"code" => 400,
+              		"message" => "Bad request",
+              		"balance" =>"0"
+
+                ];
+                return $response;
+            }
+            try{
 	            Helper::saveLog('BG WinAmount', $this->provider_db_id, json_encode($request),$pay_amount);
 	             $provider_trans_id = $action_status == true ? $providertemp : $win_load;
 	             $round_id = $payload['game_id'];		 
