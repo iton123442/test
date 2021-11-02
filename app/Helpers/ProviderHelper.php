@@ -1147,7 +1147,7 @@ class ProviderHelper{
 				['body' => json_encode($datatosend)]
 			);
 			$client_response = json_decode($guzzle_response->getBody()->getContents());
-			ProviderHelper::saveLog('PLAYER DETAILS LOG', 999, json_encode($client_response), $datatosend);
+			Helper::saveLog('PLAYER DETAILS LOG', 999, json_encode($client_response), $datatosend);
 			if(isset($client_response->playerdetailsresponse->status->code) && $client_response->playerdetailsresponse->status->code == 200){
 				ProviderHelper::_insertOrUpdate($client_details->token_id,$client_response->playerdetailsresponse->balance);
 				return true;
