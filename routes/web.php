@@ -591,22 +591,22 @@ $app->post('/public/api/bgaming/play', 'BGamingController@gameTransaction');
 $app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
 
 // Five Men
-//$app->post('/public/api/5men','FiveMenController@index');
+$app->post('/public/api/5men','FiveMenController@index');
 
-$app->post('/public/api/5men/gamelist', 'FiveMenController@getGamelist'); // launch game 
-$app->post('/public/api/5men/geturl', 'FiveMenController@getURL');// launch game
-$app->post('/public/api/5men', 'FiveMenController@index'); // Single Route
-$app->post('/public/api/5men/init', 'FiveMenController@gameInit');
-$app->post('/public/api/5men/bet', 'FiveMenController@gameBet');
-$app->post('/public/api/5men/win', 'FiveMenController@gameWin');
-$app->post('/public/api/5men/refund', 'FiveMenController@gameRefund');
+// $app->post('/public/api/5men/gamelist', 'FiveMenController@getGamelist'); // launch game 
+// $app->post('/public/api/5men/geturl', 'FiveMenController@getURL');// launch game
+// $app->post('/public/api/5men', 'FiveMenController@index'); // Single Route
+// $app->post('/public/api/5men/init', 'FiveMenController@gameInit');
+// $app->post('/public/api/5men/bet', 'FiveMenController@gameBet');
+// $app->post('/public/api/5men/win', 'FiveMenController@gameWin');
+// $app->post('/public/api/5men/refund', 'FiveMenController@gameRefund');
 
 // Playstar
-$app->get('/public//api/playstar/auth','PlayStarController@getAuth');
-$app->get('/public//api/playstar/bet','PlayStarController@getBet');
-$app->get('/public//api/playstar/result','PlayStarController@getResult');
-$app->get('/public//api/playstar/refundbet','PlayStarController@getRefundBet');
-$app->get('/public//api/playstar/getbalance','PlayStarController@getBalance');
+$app->get('/public/api/playstar/auth','PlayStarController@getAuth');
+$app->get('/public/api/playstar/bet','PlayStarController@getBet');
+$app->get('/public/api/playstar/result','PlayStarController@getResult');
+$app->get('/public/api/playstar/refundbet','PlayStarController@getRefundBet');
+$app->get('/public/api/playstar/getbalance','PlayStarController@getBalance');
 
 
 
