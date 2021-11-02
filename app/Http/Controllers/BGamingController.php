@@ -268,6 +268,8 @@ public function gameBet($request, $client_details){
 	             $client_details1 = ProviderHelper::getClientDetails('player_id', $player_id);
                  $balance = str_replace(".", "", $client_details1->balance);
 	             Helper::saveLog('BG start to process and get bal win', $this->provider_db_id, json_encode($request),$balance);
+                 if($pay_amount == '0'){
+
 	             $response = [
                       "balance" => (float)$balance,
                       "game_id" => $request['game_id'],
@@ -277,13 +279,27 @@ public function gameBet($request, $client_details){
                       	"tx_id" =>  (string)$bet_transaction->game_trans_id,
                       	"processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                       ],
-                      [
-                        "action_id" =>$winaction_id,
-                      	"tx_id" =>$str,
-                      	"processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
-                      ],
                      ],
                     ];
+                }else{
+                    $response = [
+                        "balance" => (float)$balance,
+                        "game_id" => $request['game_id'],
+                        "transactions" =>[
+                            [
+                            "action_id" =>$payload['actions'][0]['action_id'],
+                            "tx_id" =>  (string)$bet_transaction->game_trans_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                        [
+                          "action_id" =>$winaction_id,
+                            "tx_id" =>$str,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                       ],
+                      ];
+
+                }
                     $entry_id = $pay_amount > 0 ?  2 : 1;
                     $amount = $pay_amount + $bet_transaction->pay_amount;
                     $income = $bet_transaction->bet_amount -  $amount; 

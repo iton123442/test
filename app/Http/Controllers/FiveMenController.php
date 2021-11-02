@@ -56,17 +56,12 @@ class FiveMenController extends Controller
                 ->header('Content-Type', 'application/json');
 		}
 
-
-		
-		
 		if($request->name == 'init'){
 
 			$response = $this->gameInit($request->all(), $client_details);
 			return response($response,200)
-                ->header('Content-Type', 'application/json');
-		
+                ->header('Content-Type', 'application/json');		
 		}
-
 		if($request->name == 'bet'){
 			
 			$response = $this->gameBet($request->all(), $client_details);
@@ -74,7 +69,6 @@ class FiveMenController extends Controller
                 ->header('Content-Type', 'application/json');
 		
 		}
-
 		if($request->name == 'win'){
 
 			$response = $this->gameWin($request->all(), $client_details);
