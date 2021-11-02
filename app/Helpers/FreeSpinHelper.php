@@ -132,8 +132,7 @@ class FreeSpinHelper{
             "total_spin" => $data["details"]["rounds"],
             "spin_remaining" => $data["details"]["rounds"],
             "denominations" => $data["details"]["denomination"],
-            "date_expire" => $data["details"]["expiration_date"],
-            "date_start" => $data["details"]["start_time"],
+            "date_expire" => $data["details"]["expiration_date"]
         ];
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
         $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
