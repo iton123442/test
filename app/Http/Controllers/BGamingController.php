@@ -56,6 +56,29 @@ class BGamingController extends Controller
 			return response($response,200)
                 ->header('Content-Type', 'application/json');	
 		}
+
+    if(isset($payload['actions'][0]['action'])){
+            if($payload['actions'][0]['action'] == 'bet' && $payload['actions'][1]['action'] == 'bet' ){
+                $processtime = new DateTime('NOW');
+                $response = [
+                    "balance" => (float)$client_details->balance,
+                    "game_id" => $request['game_id'],
+                    "transactions" =>[
+                        [
+                        "action_id" =>$payload['actions'][0]['action_id'],
+                        "tx_id" =>  "55556642",
+                        "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                    ],
+                    [
+                      "action_id" =>"55662113",
+                        "tx_id" =>"55556643",
+                        "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                    ],
+                   ],
+                  ];
+
+              }
+             }
 	  if(isset($payload['actions'][0]['action'])){
 	   if($payload['actions'][0]['action'] == 'bet'){
 			 $this->gameBet($request->all(), $client_details);
