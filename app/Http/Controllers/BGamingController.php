@@ -40,7 +40,7 @@ class BGamingController extends Controller
                             "balance" => '0'
                         ];
 
-         return response($response,200)->header('Content-Type', 'application/json');
+         return response($response,400)->header('Content-Type', 'application/json');
 		}
 		if($client_details == 'false'){
             $http_status = 400;
