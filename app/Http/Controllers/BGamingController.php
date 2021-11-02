@@ -285,24 +285,6 @@ public function gameBet($request, $client_details){
                  $balance = str_replace(".", "", $client_details1->balance);
 	             Helper::saveLog('BG start to process and get bal win', $this->provider_db_id, json_encode($request),$balance);
                  if($pay_amount == '0' || $payload['actions'][0]['action'] == 'win' ){
-                    if($pay_amount == '0' && $payload['actions'][1]['action'] == 'bet'){
-                        $response = [
-                            "balance" => (float)$balance,
-                            "game_id" => $request['game_id'],
-                            "transactions" =>[
-                                [
-                                "action_id" =>$payload['actions'][0]['action_id'],
-                                "tx_id" =>  (string)$bet_transaction->game_trans_id,
-                                "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
-                            ],
-                            [
-                              "action_id" =>$winaction_id,
-                                "tx_id" =>$str,
-                                "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
-                            ],
-                           ],
-                          ]; 
-                    }
 	             $response = [
                       "balance" => (float)$balance,
                       "game_id" => $request['game_id'],
