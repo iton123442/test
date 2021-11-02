@@ -304,11 +304,11 @@ public function gameBet($request, $client_details){
                             "tx_id" =>  (string)$bet_transaction->game_trans_id,
                             "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                         ],
-                        [
-                          "action_id" =>$winaction_id,
-                            "tx_id" =>$str,
-                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
-                        ],
+                        // [
+                        //   "action_id" =>$winaction_id,
+                        //     "tx_id" =>$str,
+                        //     "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        // ],
                        ],
                       ];
 
