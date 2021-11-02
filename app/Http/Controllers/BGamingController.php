@@ -56,6 +56,16 @@ class BGamingController extends Controller
 			return response($response,200)
                 ->header('Content-Type', 'application/json');	
 		}
+    if(isset($payload['actions'][0]['action'])){
+            Helper::saveLog('bet and bet', $this->provider_db_id, json_encode($request->all()), "HIT na HIT");
+                if($payload['actions'][0]['action'] == 'bet' && $payload['actions'][1]['action']== 'bet'){
+                      $this->gameBet($request->all(), $client_details);
+                     if(!isset($payload['actions'][1]['action'])){
+                         $response = $this->gameWin($request->all(), $client_details,true);
+                         return response($response,200)->header('Content-Type', 'application/json');
+                       }
+                  }
+        }	
 	  if(isset($payload['actions'][0]['action'])){
 	   if($payload['actions'][0]['action'] == 'bet'){
 			 $this->gameBet($request->all(), $client_details);
@@ -65,15 +75,7 @@ class BGamingController extends Controller
 	  		}
          }
         }
-     if(isset($payload['actions'][0]['action'])){
-            if($payload['actions'][0]['action'] == 'bet' && $payload['actions'][1]['action']=='bet'){
-                  $this->gameBet($request->all(), $client_details);
-                 if(!isset($payload['actions'][1]['action'])){
-                     $response = $this->gameWin($request->all(), $client_details,true);
-                     return response($response,200)->header('Content-Type', 'application/json');
-                   }
-              }
-             }	
+  
 	  if(isset($payload['actions'][1]['action'])){
 	  	if($payload['actions'][1]['action'] == 'win' || $$payload['actions'][0]['action'] == 'win'){
 	  		$response = $this->gameWin($request->all(), $client_details);
