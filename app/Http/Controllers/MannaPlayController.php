@@ -579,7 +579,7 @@ class MannaPlayController extends Controller
 							
 
 							$win_game_transaction_ext = array(
-								"game_trans_id" => $game_transaction_id->game_trans_id,
+								"game_trans_id" => $game_transaction_id,
 								"provider_trans_id" => $json_data["transaction_id"],
 								"round_id" => $json_data["round_id"],
 								"amount" => $amount_win,
@@ -604,14 +604,14 @@ class MannaPlayController extends Controller
 									"provider_name"=> $game_details->provider_name
 								],
 								"mwapi" => [
-									"roundId"=>$game_transaction_id->game_trans_id, #R
+									"roundId"=>$game_transaction_id, #R
 									"type"=>2, #R
 									"game_id" => $game_details->game_id, #R
 									"player_id" => $client_details->player_id, #R
 									"mw_response" => $response, #R
 								]
 							];
-							$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount_win,$game_details->game_code,$game_details->game_name,$game_transaction_id->game_trans_id,'credit',false,$action_payload);
+							$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount_win,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
 							Helper::saveLog('manna_freeround_response', $this->provider_db_id, json_encode($json_data), $response);
 							return response()->json($response, $http_status);
 							break;
