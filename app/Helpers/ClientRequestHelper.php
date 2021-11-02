@@ -77,6 +77,10 @@ class ClientRequestHelper{
                 if(isset($action['provider_name'])){
                     $requesttocient["gamedetails"]['provider_name'] = $action['provider_name'];
                 }
+
+                if(isset( $action["fundtransferrequest"]['fundinfo']['freespin'] )){
+                    $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
+                }
             }
 
             try{

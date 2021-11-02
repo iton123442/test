@@ -587,7 +587,8 @@ class GameLobby{
      public static function slotmill($request){
         try {
             $client_details = Providerhelper::getClientDetails('token', $request["token"]);
-            $url = config("providerlinks.slotmill")[$request["game_code"]]; 
+            $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.slotmill.provider_db_id'), $request['game_code']);
+            // $url = config("providerlinks.slotmill")[$request["game_code"]]; 
             // if ($request["game_code"] == "19002") {
             //    $url = config("providerlinks.slotmill.treasures"); 
             // } elseif ($request["game_code"] == "19003") {
@@ -599,7 +600,7 @@ class GameLobby{
             // } elseif ($request["game_code"] == "19008") {
             //    $url =  config("providerlinks.slotmill.outlaws"); 
             // }
-            return $url = $url."?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
+            return $url = $getGameDetails->info."/?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
 
         } catch (\Exception $e){
             return $request["exitUrl"];
