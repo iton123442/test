@@ -295,6 +295,19 @@ public function gameBet($request, $client_details){
                      ],
                     ];
                 }else{
+                    if($payload['actions'][0]['action_id'] == 'win'){
+                        $response = [
+                            "balance" => (float)$balance,
+                            "game_id" => $request['game_id'],
+                            "transactions" =>[
+                                [
+                                "action_id" =>$payload['actions'][0]['action_id'],
+                                "tx_id" =>  (string)$bet_transaction->game_trans_id,
+                                "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                            ],
+                           ],
+                          ];
+                    }else{
                     $response = [
                         "balance" => (float)$balance,
                         "game_id" => $request['game_id'],
@@ -311,6 +324,7 @@ public function gameBet($request, $client_details){
                         ],
                        ],
                       ];
+                    }
 
                 }
                     $entry_id = $pay_amount > 0 ?  2 : 1;
