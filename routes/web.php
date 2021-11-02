@@ -88,7 +88,7 @@ $app->post('/public/api/manna/{brand_code}/fetchbalance', 'MannaPlayController@g
 $app->post('/public/api/manna/{brand_code}/bet', 'MannaPlayController@debitProcess');
 $app->post('/public/api/manna/{brand_code}/win', 'MannaPlayController@creditProcess');
 $app->post('/public/api/manna/{brand_code}/betrollback', 'MannaPlayController@rollbackTransaction');
-
+$app->post('/public/api/manna/{brand_code}/fs_win', 'MannaPlayController@freeRound');
 // QTech Games Endpoints
 $app->get('/public/api/qtech/{brand_code}/accounts/{player_id}/session?gameId={game_id}', 'QTechController@authPlayer');
 $app->post('/public/api/qtech/{brand_code}/accounts/{player_id}/balance?gameId={game_id}', 'QTechController@getBalance');
