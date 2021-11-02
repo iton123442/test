@@ -612,7 +612,7 @@ class MannaPlayController extends Controller
 								]
 							];
 							$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount_win,$game_details->game_code,$game_details->game_name,$game_transaction_id->game_trans_id,'credit',false,$action_payload);
-							Helper::saveLog('manna_freeround', $this->provider_db_id, json_encode($json_data), $response);
+							Helper::saveLog('manna_freeround_response', $this->provider_db_id, json_encode($json_data), $response);
 							return response()->json($response, $http_status);
 							break;
 						case '402':
