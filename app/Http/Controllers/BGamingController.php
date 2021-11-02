@@ -281,7 +281,7 @@ public function gameBet($request, $client_details){
 	             $client_details1 = ProviderHelper::getClientDetails('player_id', $player_id);
                  $balance = str_replace(".", "", $client_details1->balance);
 	             Helper::saveLog('BG start to process and get bal win', $this->provider_db_id, json_encode($request),$balance);
-                 if($pay_amount == '0'){
+                 if($pay_amount == '0' || $payload['actions'][0]['action'] == 'win' ){
 
 	             $response = [
                       "balance" => (float)$balance,
