@@ -167,7 +167,6 @@ class GameLobby{
             ]);
         
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
-
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode(
                         [
@@ -1755,7 +1754,7 @@ class GameLobby{
                     Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $game_luanch_response);
                 // dd($game_luanch_response->data->gameUrl);
                 // $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=https://daddy.betrnk.games/provider/FunkyGames";
-                $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=".$data["exitUrl"];
+                $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=";
 
                 Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $gameUrl);
                 return $gameUrl;

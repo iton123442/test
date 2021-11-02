@@ -139,6 +139,7 @@ class AmuseGamingHelper{
                 "filter_categories" => "VideoSlots,TableGames",
             ];
             $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", config('providerlinks.amusegaming.secret_key'), true ) );
+            Helper::saveLog('AMUSEGAMING GAMELIST', 65, json_encode($param),  $param );
             $response = $header->post( config('providerlinks.amusegaming.api_url').$endpoint, [
                 'form_params' => $param,
             ]);
