@@ -561,7 +561,7 @@ return [
     ],
     'nolimit'=>[
         'provider_db_id' => 59,
-        'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html',
+        'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
         'operator' =>'TG_DEV',
         'operator_key' => 'on2ha5xie7Hu'
     ],
