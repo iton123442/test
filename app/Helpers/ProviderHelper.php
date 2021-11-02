@@ -1156,6 +1156,7 @@ class ProviderHelper{
 			}
 		}catch (\Exception $e){
 			// return $e->getMessage();
+			Helper::saveLog('PLAYER DETAILS LOG', 999, json_encode($datatosend), $e->getMessage() );
 			return false;
 		 }
 	}
