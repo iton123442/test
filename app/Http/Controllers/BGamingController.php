@@ -251,7 +251,7 @@ public function gameBet($request, $client_details){
             	}         	
             }
             try{
-                ProviderHelper::idenpotencyTable($win_load);
+                ProviderHelper::idenpotencyTable($providertemp);
             }catch(\Exception $e){
                 $response = [
               		"code" => 400,
