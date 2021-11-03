@@ -330,7 +330,7 @@ public function gameBet($request, $client_details){
                     "game_id" => $request['game_id'],
                     "transactions" =>[
                       [
-                      "action_id" =>$win_load,
+                      "action_id" =>"6dc4dc18-a61e-4c30-8271-61a55691b346",
                       "tx_id" => (string)$txnid,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
