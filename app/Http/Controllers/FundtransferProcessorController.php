@@ -905,6 +905,10 @@ class FundtransferProcessorController extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
+       
+        if(isset($details["fundtransferrequest"]["fundinfo"]["freespin"] )) {
+            $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
+        }
 
         do {
             

@@ -520,6 +520,8 @@ class SlotMillController extends Controller
         ];
         GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
 
+
+       
         $body_details = [
             "type" => "credit",
             "win" => $win,
@@ -537,6 +539,16 @@ class SlotMillController extends Controller
 
         ];
 
+        if(isset($request["prepaidref"])) {
+            $body_details = [
+	            'fundtransferrequest' => [
+					'fundinfo' => [
+						'freespin' => true
+					]
+				]
+	        ];
+        }
+        
         try {
             $client = new Client();
             $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
