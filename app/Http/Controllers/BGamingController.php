@@ -114,12 +114,18 @@ public function gameBet($request, $client_details){
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
+                $balance = str_replace(".", "", $client_details->balance);
                 $response = [
-              		"code" => 400,
-              		"message" => "Bad request",
-              		"balance" =>"0"
-
-                ];
+                    "balance" => (float)$balance,
+                    "game_id" => $request['game_id'],
+                    "transactions" =>[
+                      [
+                      "action_id" =>$payload['actions'][0]['action_id'],
+                      "tx_id" =>  (string)$game_transaction_id,
+                      "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                    ],
+                   ],
+                  ];
                 return $response;
             }
             if($client_details == null){
@@ -286,10 +292,10 @@ public function gameBet($request, $client_details){
 			$time = time();
 			$payload = $request;
             if(isset($payload['actions'][1]['action_id'])){
-                $providertemp = "W_".$payload['actions'][1]['action_id'];
+                $providertemp = "TG_".$payload['actions'][1]['action_id'];
             }else{
                 // $providertemp = $time."_".$payload['actions'][0]['action_id'];
-                $providertemp = "W_".$payload['actions'][0]['action_id'];
+                $providertemp = "TG_".$payload['actions'][0]['action_id'];
             }
             $player_id = $payload['user_id'];
             $provider_game_name = $payload['game'];
@@ -312,11 +318,10 @@ public function gameBet($request, $client_details){
             try{
                 ProviderHelper::idenpotencyTable($providertemp);
             }catch(\Exception $e){
-                $balance = str_replace(".", "", $client_details->balance);
                 $response = [
               		"code" => 400,
               		"message" => "Bad request",
-              		"balance" => (float)$balance
+              		"balance" => 0
 
                 ];
                 return $response;
