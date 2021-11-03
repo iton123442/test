@@ -152,7 +152,7 @@ public function gameBet($request, $client_details){
                             "game_id" => $game_details->game_id,
                             "round_id" => $round_id,
                             "bet_amount" => $bet_amount,
-                            "win" => 5,
+                            "win" => 0,
                             "pay_amount" => 0,
                             "income" => 0,
                             "entry_id" => 1,
