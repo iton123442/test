@@ -310,10 +310,11 @@ public function gameBet($request, $client_details){
             try{
                 ProviderHelper::idenpotencyTable($providertemp);
             }catch(\Exception $e){
+                $balance = str_replace(".", "", $client_details->balance);
                 $response = [
               		"code" => 400,
               		"message" => "Bad request",
-              		"balance" =>"0"
+              		"balance" => (float)$balance
 
                 ];
                 return $response;
