@@ -80,14 +80,14 @@ class BGamingController extends Controller
                 }
             }
         }
+  
   }
 
   /**
 	 * Initialize the balance 
 	 */
  public function GetBalance($request, $client_details){
-        $formatBalance = number_format($client_details->balance,2);
-		$balance = str_replace(".", "", $formatBalance);
+		$balance = str_replace(".", "", $client_details->balance);
 			$response = [
 				"balance" => (float)$balance
 			];
@@ -190,8 +190,8 @@ public function gameBet($request, $client_details){
                                 case '200':
                                     if(isset($payload['actions'][1]['action']) && $payload['actions'][1]['action'] == 'win'){
                                          $http_status = 200;
-                                         $formatBalance = number_format($client_response->fundtransferresponse->balance,2);
-                                         $balance = str_replace(".", "", $formatBalance);
+                                         $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
+                                         $balance = str_replace(".", "", $fundtransfer_bal);
                                          $response = [
                                               "balance" =>(float)$balance,
                                               "game_id" => $payload['game_id'],
@@ -203,8 +203,8 @@ public function gameBet($request, $client_details){
                                             ];
                                     }elseif(isset($payload['actions'][1]['action']) && $payload['actions'][1]['action'] == 'bet'){
                                         $http_status = 200;
-                                        $formatBalance = number_format($client_response->fundtransferresponse->balance,2);
-                                        $balance = str_replace(".", "", $formatBalance);
+                                        $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
+                                         $balance = str_replace(".", "", $fundtransfer_bal);
                                         $response = [
                                             "balance" => (float)$balance,
                                             "game_id" => $request['game_id'],
@@ -224,8 +224,8 @@ public function gameBet($request, $client_details){
                                           return $response;
                                     }else{
                                         $http_status = 200;
-                                         $formatBalance = number_format($client_response->fundtransferresponse->balance,2);
-                                         $balance = str_replace(".", "", $formatBalance);
+                                         $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
+                                         $balance = str_replace(".", "", $fundtransfer_bal);
                                          $response = [
                                           "balance" =>(float)$balance,
                                           "game_id" => $payload['game_id'],
@@ -334,8 +334,7 @@ public function gameBet($request, $client_details){
 	             $processtime = new DateTime('NOW');
 	             ProviderHelper::_insertOrUpdate($client_details->token_id,$winbBalance);
 	             $client_details1 = ProviderHelper::getClientDetails('player_id', $player_id);
-                 $formatBalance = number_format($client_details1->balance,2);
-                 $balance = str_replace(".", "", $formatBalance);
+                 $balance = str_replace(".", "", $client_details1->balance);
 	             Helper::saveLog('BG start to process and get bal win', $this->provider_db_id, json_encode($request),$balance);
                  if(isset($payload['actions'][1]['action'])){
                     if($payload['actions'][1]['action'] == 'win' ){
