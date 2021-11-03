@@ -104,6 +104,7 @@ public function gameBet($request, $client_details){
 			 $provider_game_name = $payload['game'];
 			 $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
 			 $round_id = $payload['game_id'];
+             $time = time();
              if(isset($payload['actions'][1]['action']) && $payload['actions'][1]['action'] == 'bet'){
                  $bet_amount = ($payload['actions'][0]['amount'] + $payload['actions'][1]['amount'])/100;
              }else{
@@ -121,7 +122,7 @@ public function gameBet($request, $client_details){
                     "transactions" =>[
                       [
                       "action_id" =>$payload['actions'][0]['action_id'],
-                      "tx_id" =>  (string)$game_transaction_id,
+                      "tx_id" =>  (string)$time,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
                    ],
