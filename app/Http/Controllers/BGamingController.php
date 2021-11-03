@@ -227,14 +227,16 @@ public function gameBet($request, $client_details){
                                          $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
                                          $balance = str_replace(".", "", $fundtransfer_bal);
                                          $response = [
-                                          "balance" =>(float)$balance,
-                                          "game_id" => $payload['game_id'],
-                                          "transaction" =>[
-                                            "action_id" =>$payload['actions'][0]['action_id'],
-                                            "tx_id" =>  (string)$game_transaction_id,
-                                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
-                                          ],
-                                        ];
+                                            "balance" => (float)$balance,
+                                            "game_id" => $request['game_id'],
+                                            "transactions" =>[
+                                              [
+                                              "action_id" =>$payload['actions'][0]['action_id'],
+                                              "tx_id" =>  (string)$bet_transaction->game_trans_id,
+                                              "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                                            ],
+                                           ],
+                                          ];
                                         return $response;
                                     }
 
