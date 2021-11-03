@@ -330,7 +330,7 @@ public function gameBet($request, $client_details){
                     "game_id" => $request['game_id'],
                     "transactions" =>[
                       [
-                      "action_id" =>$win_load,
+                      "action_id" =>$payload['actions'][0]['action_id'],
                       "tx_id" =>  (string)$txid,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
@@ -363,7 +363,7 @@ public function gameBet($request, $client_details){
                             "game_id" => $request['game_id'],
                             "transactions" =>[
                                 [
-                                "action_id" =>$winaction_id,
+                                "action_id" =>$payload['actions'][0]['action_id'],
                                 "tx_id" => (string)$txnid,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
@@ -381,7 +381,7 @@ public function gameBet($request, $client_details){
                       "game_id" => $request['game_id'],
                       "transactions" =>[
                         [
-                        "action_id" =>$winaction_id,
+                        "action_id" =>$payload['actions'][0]['action_id'],
                         "tx_id" =>  (string)$txnid,
                         "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                       ],
