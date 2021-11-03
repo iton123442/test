@@ -318,15 +318,24 @@ public function gameBet($request, $client_details){
             		$pay_amount = $payload['actions'][0]['amount']/100;
             	}         	
             }
+
+            $txn_explode = explde("-", $win_load);
+            $txnid = $txn_explode[4];
             try{
                 ProviderHelper::idenpotencyTable($providertemp);
             }catch(\Exception $e){
+                $balance = str_replace(".", "", $client_details->balance);
                 $response = [
-              		"code" => 400,
-              		"message" => "Bad request",
-              		"balance" => 0
-
-                ];
+                    "balance" => (float)$balance,
+                    "game_id" => $request['game_id'],
+                    "transactions" =>[
+                      [
+                      "action_id" =>$payload['actions'][0]['action_id'],
+                      "tx_id" =>  (string)$txid,
+                      "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                    ],
+                   ],
+                  ];
                 return $response;
             }
             try{
@@ -355,12 +364,12 @@ public function gameBet($request, $client_details){
                             "transactions" =>[
                                 [
                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                "tx_id" => (string)$bet_transaction->game_trans_id,
+                                "tx_id" => (string)$txnid,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
                             [
                               "action_id" =>$winaction_id,
-                                "tx_id" =>(string)$bet_transaction->game_trans_id,
+                                "tx_id" =>(string)$txnid,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
                            ],
@@ -373,7 +382,7 @@ public function gameBet($request, $client_details){
                       "transactions" =>[
                         [
                         "action_id" =>$payload['actions'][0]['action_id'],
-                        "tx_id" =>  (string)$bet_transaction->game_trans_id,
+                        "tx_id" =>  (string)$txnid,
                         "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                       ],
                      ],
