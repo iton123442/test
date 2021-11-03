@@ -319,7 +319,7 @@ public function gameBet($request, $client_details){
             	}         	
             }
 
-            $txn_explode = explde("-", $win_load);
+            $txn_explode = explode("-", $win_load);
             $txnid = $txn_explode[4];
             try{
                 ProviderHelper::idenpotencyTable($providertemp);
@@ -363,7 +363,7 @@ public function gameBet($request, $client_details){
                             "game_id" => $request['game_id'],
                             "transactions" =>[
                                 [
-                                "action_id" =>$payload['actions'][0]['action_id'],
+                                "action_id" =>$winaction_id,
                                 "tx_id" => (string)$txnid,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
@@ -381,7 +381,7 @@ public function gameBet($request, $client_details){
                       "game_id" => $request['game_id'],
                       "transactions" =>[
                         [
-                        "action_id" =>$payload['actions'][0]['action_id'],
+                        "action_id" =>$winaction_id,
                         "tx_id" =>  (string)$txnid,
                         "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                       ],
