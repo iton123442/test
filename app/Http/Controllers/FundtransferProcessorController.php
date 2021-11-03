@@ -138,7 +138,9 @@ class FundtransferProcessorController extends Controller
         if(isset($payload->action->provider->provider_name)){
             $requesttocient["gamedetails"]['provider_name'] = $payload->action->provider->provider_name;
         }
-
+        if(isset($payload->request_body->fundtransferrequest->fundinfo->freespin)){
+            $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $payload->request_body->fundtransferrequest->fundinfo->freespin;
+        }
         if(isset($payload->action->custom->client_connection_name) && isset($gteid)) {
             try{
                 $ext_Data = ['mw_request' => json_encode($requesttocient)];
