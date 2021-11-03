@@ -33,14 +33,14 @@ class BGamingController extends Controller
         $secret = config('providerlinks.bgaming.AUTH_TOKEN');
 		$signature = hash_hmac('sha256',json_encode($payload),$secret);
 		Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
-		if($request_sign != $request_sign){
+		if($signature != $request_sign){
                 $response = [
                             "code" =>  403,
                             "message" => "Forbidden",
                             "balance" => '0'
                         ];
 
-         return response($response,200)->header('Content-Type', 'application/json');
+         return response($response,400)->header('Content-Type', 'application/json');
 		}
 		if($client_details == 'false'){
             $http_status = 400;
@@ -56,6 +56,7 @@ class BGamingController extends Controller
 			return response($response,200)
                 ->header('Content-Type', 'application/json');	
 		}
+
 	  if(isset($payload['actions'][0]['action'])){
 	   if($payload['actions'][0]['action'] == 'bet'){
 			 $this->gameBet($request->all(), $client_details);
@@ -64,7 +65,8 @@ class BGamingController extends Controller
 				return response($response,200)->header('Content-Type', 'application/json');
 	  		}
          }
-        }	
+        }
+  
 	  if(isset($payload['actions'][1]['action'])){
 	  	if($payload['actions'][1]['action'] == 'win' || $$payload['actions'][0]['action'] == 'win'){
 	  		$response = $this->gameWin($request->all(), $client_details);
@@ -251,6 +253,17 @@ public function gameBet($request, $client_details){
             	}         	
             }
             try{
+                ProviderHelper::idenpotencyTable($providertemp);
+            }catch(\Exception $e){
+                $response = [
+              		"code" => 400,
+              		"message" => "Bad request",
+              		"balance" =>"0"
+
+                ];
+                return $response;
+            }
+            try{
 	            Helper::saveLog('BG WinAmount', $this->provider_db_id, json_encode($request),$pay_amount);
 	             $provider_trans_id = $action_status == true ? $providertemp : $win_load;
 	             $round_id = $payload['game_id'];		 
@@ -268,6 +281,7 @@ public function gameBet($request, $client_details){
 	             $client_details1 = ProviderHelper::getClientDetails('player_id', $player_id);
                  $balance = str_replace(".", "", $client_details1->balance);
 	             Helper::saveLog('BG start to process and get bal win', $this->provider_db_id, json_encode($request),$balance);
+                 if($pay_amount == '0' || $payload['actions'][0]['action'] == 'win' ){
 	             $response = [
                       "balance" => (float)$balance,
                       "game_id" => $request['game_id'],
@@ -277,13 +291,26 @@ public function gameBet($request, $client_details){
                       	"tx_id" =>  (string)$bet_transaction->game_trans_id,
                       	"processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                       ],
-                      [
-                        "action_id" =>$winaction_id,
-                      	"tx_id" =>$str,
-                      	"processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
-                      ],
                      ],
                     ];
+                }else{
+                    $response = [
+                        "balance" => (float)$balance,
+                        "game_id" => $request['game_id'],
+                        "transactions" =>[
+                            [
+                            "action_id" =>$payload['actions'][0]['action_id'],
+                            "tx_id" =>  (string)$bet_transaction->game_trans_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                        [
+                          "action_id" =>$winaction_id,
+                            "tx_id" =>$str,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                       ],
+                      ];
+                }
                     $entry_id = $pay_amount > 0 ?  2 : 1;
                     $amount = $pay_amount + $bet_transaction->pay_amount;
                     $income = $bet_transaction->bet_amount -  $amount; 

@@ -24,7 +24,8 @@ class FiveMenController extends Controller
 	}
 	
 	// public $provider_db_id = 29; // 29 on test ,, 27 prod
-	public $provider_db_id = 52; 
+	public $provider_db_id = 53; 
+
 	public function index(Request $request){
 		Helper::saveLog('5Men index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
 
@@ -55,17 +56,12 @@ class FiveMenController extends Controller
                 ->header('Content-Type', 'application/json');
 		}
 
-
-		
-		
 		if($request->name == 'init'){
 
 			$response = $this->gameInit($request->all(), $client_details);
 			return response($response,200)
-                ->header('Content-Type', 'application/json');
-		
+                ->header('Content-Type', 'application/json');		
 		}
-
 		if($request->name == 'bet'){
 			
 			$response = $this->gameBet($request->all(), $client_details);
@@ -73,7 +69,6 @@ class FiveMenController extends Controller
                 ->header('Content-Type', 'application/json');
 		
 		}
-
 		if($request->name == 'win'){
 
 			$response = $this->gameWin($request->all(), $client_details);
@@ -94,15 +89,12 @@ class FiveMenController extends Controller
 	}
 
 public function gameBet($request, $client_details)
-{
-		
-		
+{	
 	    // GAME DETAILS
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
 
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
-		dd($game_details);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 
@@ -810,5 +802,11 @@ public function gameBet($request, $client_details)
 			 ]);
 	 return ($update ? true : false);
  	}
+ 	public function getRTP(Request $request){
+ 		// dd($request->game);
+ 		// getSignature($system_id, $version, array $args, $system_key,$type);
+ 		$signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'get_signature');
 
+ 		return $signature_checker;
+ 	}
 }
