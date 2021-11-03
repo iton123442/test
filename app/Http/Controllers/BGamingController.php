@@ -112,6 +112,8 @@ public function gameBet($request, $client_details){
              }
              $processtime = new DateTime('NOW');
 		     $provider_trans_id = $bet_data['action_id'];
+             $txn_explode = explode("-", $provider_trans_id);
+             $txid = $txn_explode[4];
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
@@ -122,7 +124,7 @@ public function gameBet($request, $client_details){
                     "transactions" =>[
                       [
                       "action_id" =>$payload['actions'][0]['action_id'],
-                      "tx_id" =>  (string)$time,
+                      "tx_id" =>  (string)$txid,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
                    ],
@@ -204,7 +206,7 @@ public function gameBet($request, $client_details){
                                               "game_id" => $payload['game_id'],
                                               "transaction" =>[
                                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                                "tx_id" =>  (string)$game_transaction_id,
+                                                "tx_id" =>  (string)$txid,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                               ],
                                             ];
@@ -218,12 +220,12 @@ public function gameBet($request, $client_details){
                                             "transactions" =>[
                                                 [
                                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                                "tx_id" => (string)$game_transaction_id,
+                                                "tx_id" => (string)$txid,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                             [
                                               "action_id" =>$payload['actions'][1]['action_id'],
-                                                "tx_id" => (string)$game_transaction_id,
+                                                "tx_id" => (string)$txid,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                            ],
@@ -239,7 +241,7 @@ public function gameBet($request, $client_details){
                                             "transactions" =>[
                                               [
                                               "action_id" =>$payload['actions'][0]['action_id'],
-                                              "tx_id" =>  (string)$game_transaction_id,
+                                              "tx_id" =>  (string)$txid,
                                               "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                            ],
@@ -490,7 +492,7 @@ public function gameBet($request, $client_details){
         					];
 
         	foreach ($payload['actions'] as $action_key => $action_value) {
-        		if($action_value['action'] = "rollback") {
+        		if($action_value['action'] == "rollback") {
         			$rollback_transaction_id = $action_value['action_id'];
         			$original_transaction_id = $action_value['original_action_id'];
 
