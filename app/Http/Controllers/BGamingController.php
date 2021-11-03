@@ -305,6 +305,7 @@ public function gameBet($request, $client_details){
 			$game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
             $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
             ProviderHelper::_insertOrUpdate($client_details->token_id,$client_details->balance);
+            $processtime = new DateTime('NOW');
             if(isset($payload['actions'][1]['action'])){
             	if($payload['actions'][1]['action'] == 'win'){
             	$win_load = $payload['actions'][1]['action_id'];
@@ -330,7 +331,7 @@ public function gameBet($request, $client_details){
                     "game_id" => $request['game_id'],
                     "transactions" =>[
                       [
-                      "action_id" =>"6dc4dc18-a61e-4c30-8271-61a55691b346",
+                      "action_id" =>$win_load,
                       "tx_id" => (string)$txnid,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
