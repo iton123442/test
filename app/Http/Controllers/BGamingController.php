@@ -327,11 +327,11 @@ public function gameBet($request, $client_details){
                 $balance = str_replace(".", "", $client_details->balance);
                 $response = [
                     "balance" => (float)$balance,
-                    "game_id" => $payload['game_id'],
+                    "game_id" => $request['game_id'],
                     "transactions" =>[
                       [
                       "action_id" =>$payload['actions'][0]['action_id'],
-                      "tx_id" =>  (string)$txnid,
+                      "tx_id" => (string)$txnid,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
                    ],
