@@ -691,5 +691,6 @@ $app->post('/public/WithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDepos
 $app->post('/public/Cancel', 'AmuseGamingController@Cancel');
 $app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGamelist');
 //FREGAME OR FREEROUND BY PROVIDER
-$app->post('game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
+$app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
+$app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
 
