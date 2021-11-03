@@ -540,15 +540,9 @@ class SlotMillController extends Controller
         ];
 
         if(isset($request["prepaidref"])) {
-            $body_details = [
-	            'fundtransferrequest' => [
-					'fundinfo' => [
-						'freespin' => true
-					]
-				]
-	        ];
+            $body_details["fundtransferrequest"]["fundinfo"]["freespin"] = true;
         }
-        
+
         try {
             $client = new Client();
             $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
