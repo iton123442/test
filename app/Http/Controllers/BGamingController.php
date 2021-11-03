@@ -89,7 +89,7 @@ class BGamingController extends Controller
         $formatBalance = number_format($client_details->balance,2);
 		$balance = str_replace(".", "", $formatBalance);
 			$response = [
-				"balance" => (int)$balance
+				"balance" => (float)$balance
 			];
 		Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request), $response);	
 		return $response;
@@ -193,7 +193,7 @@ public function gameBet($request, $client_details){
                                          $formatBalance = number_format($client_response->fundtransferresponse->balance,2);
                                          $balance = str_replace(".", "", $formatBalance);
                                          $response = [
-                                              "balance" =>(int)$balance,
+                                              "balance" =>(float)$balance,
                                               "game_id" => $payload['game_id'],
                                               "transaction" =>[
                                                 "action_id" =>$payload['actions'][0]['action_id'],
@@ -206,7 +206,7 @@ public function gameBet($request, $client_details){
                                         $formatBalance = number_format($client_response->fundtransferresponse->balance,2);
                                         $balance = str_replace(".", "", $formatBalance);
                                         $response = [
-                                            "balance" => (int)$balance,
+                                            "balance" => (float)$balance,
                                             "game_id" => $request['game_id'],
                                             "transactions" =>[
                                                 [
@@ -227,7 +227,7 @@ public function gameBet($request, $client_details){
                                          $formatBalance = number_format($client_response->fundtransferresponse->balance,2);
                                          $balance = str_replace(".", "", $formatBalance);
                                          $response = [
-                                          "balance" =>(int)$balance,
+                                          "balance" =>(float)$balance,
                                           "game_id" => $payload['game_id'],
                                           "transaction" =>[
                                             "action_id" =>$payload['actions'][0]['action_id'],
@@ -340,7 +340,7 @@ public function gameBet($request, $client_details){
                  if(isset($payload['actions'][1]['action'])){
                     if($payload['actions'][1]['action'] == 'win' ){
                          $response = [
-                            "balance" => (int)$balance,
+                            "balance" => (float)$balance,
                             "game_id" => $request['game_id'],
                             "transactions" =>[
                                 [
@@ -358,7 +358,7 @@ public function gameBet($request, $client_details){
                     }
                  }else{
                     $response = [
-                      "balance" => (int)$balance,
+                      "balance" => (float)$balance,
                       "game_id" => $request['game_id'],
                       "transactions" =>[
                         [
