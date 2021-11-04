@@ -280,8 +280,9 @@ class MannaPlayController extends Controller
 								"balance" => ProviderHelper::amountToFloat($winbBalance)
 							];
 						
+						$win = $json_data["amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
 			            $update_game_transaction = array(
-		                    "win" => $json_data["amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1,
+		                    "win" => 5,
 		                    "pay_amount" => $bet_transaction->pay_amount + $json_data["amount"],
 		                    "income" => $bet_transaction->income - $json_data["amount"],
 		                    "entry_id" => $json_data["amount"] == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
@@ -307,7 +308,8 @@ class MannaPlayController extends Controller
 			                "custom" => [
 			                    "provider" => 'MannaPlay',
 			                    "game_trans_ext_id" => $game_trans_ext_id,
-			                    "client_connection_name" => $client_details->connection_name
+			                    "client_connection_name" => $client_details->connection_name,
+								"win_or_lost" => $win
 			                ],
 			                "provider" => [
 			                    "provider_request" => $json_data, #R

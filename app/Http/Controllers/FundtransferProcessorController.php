@@ -317,6 +317,10 @@ class FundtransferProcessorController extends Controller
                                 );
 
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                             }
                             elseif ($payload->action->custom->provider == 'Ozashiki') {
                                 $ext_data = array(
