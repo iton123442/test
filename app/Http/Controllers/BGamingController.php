@@ -365,12 +365,12 @@ public function gameBet($request, $client_details){
                             "transactions" =>[
                                 [
                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                "tx_id" => (string)$txnid,
+                                "tx_id" => $bet_transaction->game_trans_id,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
                             [
                               "action_id" =>$winaction_id,
-                                "tx_id" =>(string)$txnid,
+                                "tx_id" =>$bet_transaction->game_trans_id,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
                            ],
@@ -383,7 +383,7 @@ public function gameBet($request, $client_details){
                       "transactions" =>[
                         [
                         "action_id" =>$payload['actions'][0]['action_id'],
-                        "tx_id" =>  (string)$txnid,
+                        "tx_id" =>  $bet_transaction->game_trans_id,
                         "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                       ],
                      ],
