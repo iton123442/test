@@ -207,7 +207,7 @@ public function gameBet($request, $client_details){
                                               "game_id" => $payload['game_id'],
                                               "transaction" =>[
                                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                                "tx_id" =>  $provider_trans_id,
+                                                "tx_id" =>  $game_transaction_id,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                               ],
                                             ];
@@ -221,12 +221,12 @@ public function gameBet($request, $client_details){
                                             "transactions" =>[
                                                 [
                                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                                "tx_id" => $provider_trans_id,
+                                                "tx_id" => $game_transaction_id,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                             [
                                               "action_id" =>$payload['actions'][1]['action_id'],
-                                                "tx_id" => $provider_trans_id,
+                                                "tx_id" => $game_transaction_id,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                            ],
@@ -242,7 +242,7 @@ public function gameBet($request, $client_details){
                                             "transactions" =>[
                                               [
                                               "action_id" =>$payload['actions'][0]['action_id'],
-                                              "tx_id" =>  $provider_trans_id,
+                                              "tx_id" =>  $game_transaction_id,
                                               "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                            ],
@@ -325,6 +325,7 @@ public function gameBet($request, $client_details){
                                         GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                          Helper::saveLog('BG 200 Debit Success', $this->provider_db_id, json_encode($request), $response);	
                                 }//end else payload finished true      
+
 				             return $response;
                                     break;
                                 case '402':
@@ -430,12 +431,12 @@ public function gameBet($request, $client_details){
                             "transactions" =>[
                                 [
                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                "tx_id" => $payload['actions'][1]['action_id'],
+                                "tx_id" => $bet_transaction->game_trans_id,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
                             [
                               "action_id" =>$winaction_id,
-                                "tx_id" =>$payload['actions'][1]['action_id'],
+                                "tx_id" =>$bet_transaction->game_trans_id,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
                            ],
@@ -448,7 +449,7 @@ public function gameBet($request, $client_details){
                       "transactions" =>[
                         [
                         "action_id" =>$payload['actions'][0]['action_id'],
-                        "tx_id" =>  $payload['actions'][1]['action_id'],
+                        "tx_id" =>  $bet_transaction->game_trans_id,
                         "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                       ],
                      ],
