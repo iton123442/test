@@ -43,13 +43,6 @@ class BGamingController extends Controller
 
          return response($response,400)->header('Content-Type', 'application/json');
 		}
-        // if($payload['actions'][0]['amount'] > $client_details->balance){
-        //     $response = [
-        //         "code" => 100,
-        //         "message" => "Not enough funds",
-        //     ];
-        //     return response($response,412)->header('Content-Type', 'application/json');
-        // }
 		if($client_details == 'false'){
             $http_status = 400;
                 $response = [
@@ -68,8 +61,16 @@ class BGamingController extends Controller
         if(isset($payload['actions'][0]['action'])){
             if(!isset($payload['actions'][1]['action'])){
                 if($payload['actions'][0]['action'] == 'bet'){
-    			     $response = $this->gameBet($request->all(), $client_details);
-                     return response($response,200)->header('Content-Type', 'application/json');
+                    if($payload['actions'][0]['amount'] > $client_details->balance){
+                        $response = [
+                            "code" => 100,
+                            "message" => "Not enough funds",
+                        ];
+                        return response($response,412)->header('Content-Type', 'application/json');
+                    }else{
+        			     $response = $this->gameBet($request->all(), $client_details);
+                         return response($response,200)->header('Content-Type', 'application/json');
+                    }
                 }
                 if($payload['actions'][0]['action'] == 'win'){
                     $response = $this->gameWin($request->all(), $client_details);
