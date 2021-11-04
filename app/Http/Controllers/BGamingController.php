@@ -87,20 +87,12 @@ class BGamingController extends Controller
 	 * Initialize the balance 
 	 */
  public function GetBalance($request, $client_details){
-        if($client_details->balance == 0 || $client_details->balance == "0"){
-            $response = [
-                "code" => 100,
-                "message" => "Not enough funds",
-            ];
-            return response($response,412)->header('Content-Type', 'application/json');
-        }else{
             $balance = str_replace(".", "", $client_details->balance);
 			$response = [
 				"balance" => (float)$balance
 			];
     		Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request), $response);	
     		return $response;
-        }
 	}
 
 public function gameBet($request, $client_details){	
@@ -122,6 +114,15 @@ public function gameBet($request, $client_details){
 		     $provider_trans_id = $bet_data['action_id'];
              // $txn_explode = explode("-", $provider_trans_id);
              // $txid = $txn_explode[4];
+
+            if($payload['actions'][0]['amount'] > $client_details->balance){
+                $response = [
+                    "code" => 100,
+                    "message" => "Not enough funds",
+                ];
+                http_response_code(412);
+                return $response;
+            }
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
