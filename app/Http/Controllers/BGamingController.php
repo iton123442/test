@@ -191,7 +191,7 @@ public function gameBet($request, $client_details){
                     return $response;
                 } 
 
-               Helper::saveLog('bgaming after client_response', $this->provider_db_id, json_encode($payload), $client_details);
+               Helper::saveLog('bgaming after client_response', $this->provider_db_id, json_encode($payload), $client_response->fundtransferresponse->status->code);
               if (isset($client_response->fundtransferresponse->status->code)) {
 
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
