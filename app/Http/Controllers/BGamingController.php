@@ -87,12 +87,20 @@ class BGamingController extends Controller
 	 * Initialize the balance 
 	 */
  public function GetBalance($request, $client_details){
-		$balance = str_replace(".", "", $client_details->balance);
+        if($client_details->balance == 0 || $client_details->balance == "0"){
+            $response = [
+                "code" => 100,
+                "message" => "Not enough funds",
+            ];
+            return response($response,412)->header('Content-Type', 'application/json');
+        }else{
+            $balance = str_replace(".", "", $client_details->balance);
 			$response = [
 				"balance" => (float)$balance
 			];
-		Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request), $response);	
-		return $response;
+    		Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request), $response);	
+    		return $response;
+        }
 	}
 
 public function gameBet($request, $client_details){	
