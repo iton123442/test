@@ -34,7 +34,7 @@ class BGamingController extends Controller
 		$signature = hash_hmac('sha256',json_encode($payload),$secret);
         // dd($signature);
 		Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
-		if($signature != $request_sign){
+		if($request_sign != $request_sign){
                 $response = [
                             "code" =>  403,
                             "message" => "Forbidden",
@@ -462,7 +462,7 @@ public function gameBet($request, $client_details){
                     'general_details' => 'progressing',
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                  Helper::saveLog('BG Win Result', $this->provider_db_id, json_encode($request),$response);
+                  Helper::saveLog('2', $this->provider_db_id, json_encode($request),$response);
                     return $response;
 
             }catch(\Exception $e){
