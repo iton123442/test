@@ -566,7 +566,7 @@ public function gameBet($request, $client_details){
 		
 	}
 
-	public  function rollbackTransaction($request,$client_details,$action_status = false){
+	public  function rollbackTransaction(Request $request){
 		$payload = $request->all();
 		 // check request signature
         if(!BGamingHelper::checkSignature($request->header('x-request-sign'), $payload)) {
