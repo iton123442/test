@@ -578,7 +578,19 @@ public function gameBet($request, $client_details){
                         ];
             return response()->json($response, $http_status);
         }
+    if(isset($payload['actions'][0]['action'])){
+      if(!isset($payload['actions'][1]['action'])){
+        if($payload['actions'][0]['original_action_id'] == "unkown"){
+            $response = [
+                  "code" => 404,
+                  "message" => "Not found",
+                  "balance" =>"0"
 
+            ];
+                return $response;
+            }
+        }
+        }
         $player_id = $payload['user_id'];
         $provider_game_name = $payload['game'];
         $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
@@ -599,15 +611,7 @@ public function gameBet($request, $client_details){
             $getGameID = GameTransactionMDB::findGameTransactionDetails($rollback_id,'transaction_id', false, $client_details);
             $game_details = Game::findByGameID($getGameID->game_id, $this->provider_db_id);
         }
-        if($payload['actions'][0]['original_action_id'] == "unkown"){
-            $response = [
-                  "code" => 404,
-                  "message" => "Not found",
-                  "balance" =>"0"
 
-            ];
-          return $response;
-    }
 		try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
