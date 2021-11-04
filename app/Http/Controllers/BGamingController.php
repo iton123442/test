@@ -110,13 +110,13 @@ public function gameBet($request, $client_details){
              }else{
 			     $bet_amount = $bet_data['amount']/100;
              }
+         Helper::saveLog('Bgaming bet2', $this->provider_db_id, json_encode($request), json_encode($bet_amount));
              $processtime = new DateTime('NOW');
 		     $provider_trans_id = $bet_data['action_id'];
              $txn_explode = explode("-", $provider_trans_id);
              $txid = $txn_explode[4];
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
-                 Helper::saveLog(' Bgaming bet idom', $this->provider_db_id, json_encode($request), $provider_trans_id);
             }catch(\Exception $e){
                 $balance = str_replace(".", "", $client_details->balance);
                 $response = [
@@ -131,7 +131,6 @@ public function gameBet($request, $client_details){
                    ],
                   ];
                 return $response;
-                Helper::saveLog(' Bgaming bet catch idom', $this->provider_db_id, json_encode($request), $response);
             }
             if($client_details == null){
                 $response = [
