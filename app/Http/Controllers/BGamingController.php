@@ -171,6 +171,7 @@ public function gameBet($request, $client_details){
 
                           Helper::saveLog('Bet gameTransactionData', $this->provider_db_id, json_encode($request), 'ENDPOINT HIT');
                         $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+            }//end find bet trans
                         $gameTransactionEXTData = array(
                             "game_trans_id" => $game_transaction_id,
                             "provider_trans_id" => $provider_trans_id,
@@ -182,16 +183,16 @@ public function gameBet($request, $client_details){
                         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
                         $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
 
-               if($client_response == false){
-                  $response = [
+                       if($client_response == false){
+                          $response = [
 
-                    'code' => 504,
-                    'message' => 'Request timed out',
-                    'balance' => '0'
-                    ];
+                            'code' => 504,
+                            'message' => 'Request timed out',
+                            'balance' => '0'
+                            ];
 
-                    return $response;
-                } 
+                            return $response;
+                        } 
 
                Helper::saveLog('bgaming after client_response', $this->provider_db_id, json_encode($payload), $client_response->fundtransferresponse->status->code);
               if (isset($client_response->fundtransferresponse->status->code)) {
@@ -353,7 +354,6 @@ public function gameBet($request, $client_details){
 				              return $response;
                                     break;
                             }             
-            }
 
         }
     }
