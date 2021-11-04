@@ -644,13 +644,12 @@ public function gameBet($request, $client_details){
                     $balance_rollback = $client_details->balance - $amount;
                     $balance = str_replace(".", "", $balance_rollback);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                }else{
+                    $type = "debit";
+                    $balance_rollback =  $client_details->balance - $amount;
+                    $balance = str_replace(".", "", $balance_rollback);
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                 }
-                // }else{
-                //     $type = "debit";
-                //     $balance_rollback =  $client_details->balance + $amount;
-                //     $balance = str_replace(".", "", $balance_rollback);
-                //     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
-                // }
                 if(isset($payload['actions'][1]['action'])){
                     if($payload['actions'][1]['action'] == 'rollback' ){
                          $response = [
