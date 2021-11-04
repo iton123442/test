@@ -34,8 +34,8 @@ return [
         "mysql" => [
             'connection_name'=>'mysql',
             'db_list'=> [
-                'api_test',//game_trasnaction_ext
-                'api_test' // game_transaction
+                'mwapi_db',//game_trasnaction_ext
+                'mwapi_db' // game_transaction
             ]
         ],
 
