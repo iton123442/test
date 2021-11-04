@@ -117,6 +117,7 @@ public function gameBet($request, $client_details){
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
+                $game_transaction = GameTransactionMDB::findGameTransactionDetails($provider_trans_id, 'transaction_id',false, $client_details);
                 $balance = str_replace(".", "", $client_details->balance);
                 $response = [
                     "balance" => (float)$balance,
@@ -124,7 +125,7 @@ public function gameBet($request, $client_details){
                     "transactions" =>[
                       [
                       "action_id" =>$payload['actions'][0]['action_id'],
-                      "tx_id" =>  $provider_trans_id,
+                      "tx_id" =>  $game_transaction->game_trans_id,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
                    ],
@@ -362,9 +363,11 @@ public function gameBet($request, $client_details){
 			$payload = $request;
             if(isset($payload['actions'][1]['action_id'])){
                 $providertemp = "TG_".$payload['actions'][1]['action_id'];
+                $provider_trans_id = $payload['actions'][1]['action_id'];
             }else{
                 // $providertemp = $time."_".$payload['actions'][0]['action_id'];
                 $providertemp = "TG_".$payload['actions'][0]['action_id'];
+                $provider_trans_id = $payload['actions'][0]['action_id'];
             }
             $player_id = $payload['user_id'];
             $provider_game_name = $payload['game'];
@@ -391,6 +394,7 @@ public function gameBet($request, $client_details){
             try{
                 ProviderHelper::idenpotencyTable($providertemp);
             }catch(\Exception $e){
+                $game_transaction = GameTransactionMDB::findGameTransactionDetails($provider_trans_id, 'transaction_id',false, $client_details);
                 $balance = str_replace(".", "", $client_details->balance);
                 $response = [
                     "balance" => (float)$balance,
@@ -398,7 +402,7 @@ public function gameBet($request, $client_details){
                     "transactions" =>[
                       [
                       "action_id" =>$win_load,
-                      "tx_id" => $payload['actions'][1]['action_id'],
+                      "tx_id" => $game_transaction->game_trans_id,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
                    ],
