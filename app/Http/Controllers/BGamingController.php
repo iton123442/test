@@ -599,7 +599,6 @@ public function gameBet($request, $client_details){
             $getGameID = GameTransactionMDB::findGameTransactionDetails($rollback_id,'transaction_id', false, $client_details);
             $game_details = Game::findByGameID($getGameID->game_id, $this->provider_db_id);
         }
-    if(isset($payload['actions'][0]['action'])){
         if($payload['actions'][0]['original_action_id'] == "unkown"){
             $response = [
                   "code" => 404,
@@ -607,8 +606,7 @@ public function gameBet($request, $client_details){
                   "balance" =>"0"
 
             ];
-            return $response;
-        }
+          return $response;
     }
 		try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
