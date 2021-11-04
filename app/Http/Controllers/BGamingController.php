@@ -34,7 +34,7 @@ class BGamingController extends Controller
 		$signature = hash_hmac('sha256',json_encode($payload),$secret);
         // dd($signature);
 		Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
-		if($request_sign != $request_sign){
+		if($signature != $request_sign){
                 $response = [
                             "code" =>  403,
                             "message" => "Forbidden",
