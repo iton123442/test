@@ -172,6 +172,7 @@ public function gameBet($request, $client_details){
                 $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
                 } catch (\Exception $e) {
                     return $e;
+                    Helper::saveLog('Bet error', $this->provider_db_id, json_encode($request), $e);
                 }
                 $gameTransactionEXTData = array(
                     "game_trans_id" => $game_transaction_id,
