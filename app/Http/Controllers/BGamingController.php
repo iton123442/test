@@ -112,9 +112,7 @@ public function gameBet($request, $client_details){
              }
              $processtime = new DateTime('NOW');
 		     $provider_trans_id = $bet_data['action_id'];
-             $txn_explode = explode("-", $provider_trans_id);
-             $txid = $txn_explode[4];
-             Helper::saveLog('Bgaming bet2', $this->provider_db_id, json_encode($request), json_encode($txn_explode));
+             Helper::saveLog('Bgaming bet2', $this->provider_db_id, json_encode($request), json_encode($provider_trans_id));
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
