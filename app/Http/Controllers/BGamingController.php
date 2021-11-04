@@ -112,8 +112,8 @@ public function gameBet($request, $client_details){
              }
              $processtime = new DateTime('NOW');
 		     $provider_trans_id = $bet_data['action_id'];
-             $txn_explode = explode("-", $provider_trans_id);
-             $txid = $txn_explode[4];
+             // $txn_explode = explode("-", $provider_trans_id);
+             // $txid = $txn_explode[4];
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
@@ -124,7 +124,7 @@ public function gameBet($request, $client_details){
                     "transactions" =>[
                       [
                       "action_id" =>$payload['actions'][0]['action_id'],
-                      "tx_id" =>  (string)$txid,
+                      "tx_id" =>  $provider_trans_id,
                       "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
                    ],
@@ -141,7 +141,6 @@ public function gameBet($request, $client_details){
                 return $response;
             }//End of client Details null
             $game_details = Game::find($game_code, $this->provider_db_id);
-         Helper::saveLog('Bgaming bet2', $this->provider_db_id, json_encode($request), json_encode($game_details));
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
             if ($bet_transaction != 'false') {
                 $client_details->connection_name = $bet_transaction->connection_name;
