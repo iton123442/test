@@ -584,13 +584,19 @@ public function gameBet($request, $client_details){
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         $rollback_id = $payload['actions'][0]['original_action_id'];
         if($rollback_id == "unknown"){
+            $balance = str_replace(".", "", $client_details->balance);
             $response = [
-                "code" => 404,
-                "message" => "Not found",
-                "balance" =>"0"
-
-          ];
-              return $response;
+                "balance" => (float)$balance,
+                "game_id" => $payload['game_id'],
+                "transactions" =>[
+                  [
+                  "action_id" =>$payload['actions'][0]['action_id'],
+                  "tx_id" => $payload['session_id'],
+                  "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                ],
+               ],
+              ];
+            return $response;
         }
         $provider_trans_id = $payload['actions'][0]['action_id'];
         $processtime = new DateTime('NOW');
