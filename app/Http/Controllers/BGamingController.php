@@ -86,9 +86,9 @@ class BGamingController extends Controller
                         return response($response,412)->header('Content-Type', 'application/json');
                     }else{
                         $this->gameBet($request->all(), $client_details);
-                        $response = $this->gameWin($request->all(), $client_details);
-                        return response($response,200)->header('Content-Type', 'application/json');
                     }
+                    $response = $this->gameWin($request->all(), $client_details);
+                    return response($response,200)->header('Content-Type', 'application/json');
                 }
                 if($payload['actions'][0]['action'] == 'bet' && $payload['actions'][1]['action'] == 'bet'){
                      $response = $this->gameBet($request->all(), $client_details);
@@ -351,13 +351,11 @@ public function gameBet($request, $client_details){
                                     break;
                                 case '402':
                                     // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
-                                    $http_status = 412;
+                                    $http_status = 402;
                                     $response = [
                                         
-                                         $response = [
-                                            "code" => 100,
-                                            "message" => "Not enough funds",
-                                        ];  
+                                         "Error Code" => 500,
+                                         "Message" => "Internal Error"
                                       
                                     ];
 
