@@ -155,7 +155,8 @@ public function gameBet($request, $client_details){
                Helper::saveLog(' Bgaming Sidebet success', $this->provider_db_id, json_encode($request), 'ENDPOINT HIT');
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
             }else{
-            $gameTransactionData = array(
+                try {
+                    $gameTransactionData = array(
                             "provider_trans_id" => $provider_trans_id,
                             "token_id" => $client_details->token_id,
                             "game_id" => $game_details->game_id,
@@ -169,6 +170,9 @@ public function gameBet($request, $client_details){
 
                   Helper::saveLog('Bet gameTransactionData', $this->provider_db_id, json_encode($request), 'ENDPOINT HIT');
                 $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+                } catch (\Exception $e) {
+                    return $e;
+                }
                 $gameTransactionEXTData = array(
                     "game_trans_id" => $game_transaction_id,
                     "provider_trans_id" => $provider_trans_id,
