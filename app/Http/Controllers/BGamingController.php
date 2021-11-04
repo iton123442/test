@@ -206,7 +206,7 @@ public function gameBet($request, $client_details){
                                               "game_id" => $payload['game_id'],
                                               "transaction" =>[
                                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                                "tx_id" =>  (string)$txid,
+                                                "tx_id" =>  $game_transaction_id,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                               ],
                                             ];
@@ -220,12 +220,12 @@ public function gameBet($request, $client_details){
                                             "transactions" =>[
                                                 [
                                                 "action_id" =>$payload['actions'][0]['action_id'],
-                                                "tx_id" => (string)$txid,
+                                                "tx_id" => $game_transaction_id,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                             [
                                               "action_id" =>$payload['actions'][1]['action_id'],
-                                                "tx_id" => (string)$txid,
+                                                "tx_id" => $game_transaction_id,
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                            ],
@@ -241,7 +241,7 @@ public function gameBet($request, $client_details){
                                             "transactions" =>[
                                               [
                                               "action_id" =>$payload['actions'][0]['action_id'],
-                                              "tx_id" =>  (string)$txid,
+                                              "tx_id" =>  $game_transaction_id,
                                               "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                             ],
                                            ],
