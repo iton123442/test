@@ -369,7 +369,7 @@ class GameLobby{
         return isset($res['data']['link']) ? $res['data']['link'] : false;
     }
 
-     public static function awsLaunchUrl($token,$game_code,$lang='en'){
+     public static function awsLaunchUrl($token,$provider,$game_code,$lang='en',$exit_url=null){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         if($client_details == 'false'){
             return 'false';

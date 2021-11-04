@@ -693,3 +693,9 @@ $app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGame
 //FREGAME OR FREEROUND BY PROVIDER
 $app->post('game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
 
+// Crash Gaming (TigerGames)
+$app->post('api/crashgame/balance', 'CrashGameController@Balance');
+$app->post('api/crashgame/debit', 'CrashGameController@Debit');
+$app->post('api/crashgame/credit', 'CrashGameController@Credit');
+$app->post('api/crashgame/refund', 'CrashGameController@Refund');
+$app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
