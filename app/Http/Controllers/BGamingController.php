@@ -110,7 +110,6 @@ public function gameBet($request, $client_details){
              }else{
 			     $bet_amount = $bet_data['amount']/100;
              }
-         Helper::saveLog('Bgaming bet2', $this->provider_db_id, json_encode($request), json_encode($bet_amount));
              $processtime = new DateTime('NOW');
 		     $provider_trans_id = $bet_data['action_id'];
              $txn_explode = explode("-", $provider_trans_id);
@@ -142,6 +141,7 @@ public function gameBet($request, $client_details){
                 return $response;
             }//End of client Details null
             $game_details = Game::find($game_code, $this->provider_db_id);
+         Helper::saveLog('Bgaming bet2', $this->provider_db_id, json_encode($request), json_encode($game_details));
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
             if ($bet_transaction != 'false') {
                 $client_details->connection_name = $bet_transaction->connection_name;
