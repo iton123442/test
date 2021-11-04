@@ -578,24 +578,20 @@ public function gameBet($request, $client_details){
                         ];
             return response()->json($response, $http_status);
         }
-    if(isset($payload['actions'][0]['action'])){
-      if(!isset($payload['actions'][1]['action'])){
-        if($payload['actions'][0]['original_action_id'] == "unkown"){
-            $response = [
-                  "code" => 404,
-                  "message" => "Not found",
-                  "balance" =>"0"
-
-            ];
-                return $response;
-            }
-        }
-        }
         $player_id = $payload['user_id'];
         $provider_game_name = $payload['game'];
         $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         $rollback_id = $payload['actions'][0]['original_action_id'];
+        if($rollback_id == "unknown"){
+            $response = [
+                "code" => 404,
+                "message" => "Not found",
+                "balance" =>"0"
+
+          ];
+              return $response;
+        }
         $provider_trans_id = $payload['actions'][0]['action_id'];
         $processtime = new DateTime('NOW');
         // if(isset($payload['actions'][1]['action'])){
