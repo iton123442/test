@@ -43,6 +43,14 @@ class BGamingController extends Controller
 
          return response($response,400)->header('Content-Type', 'application/json');
 		}
+        if($request['actions'][0]['amount'] > $client_details->balance){
+            $response = [
+                "code" => 100,
+                "message" => "Not enough funds",
+            ];
+            // http_response_code(412);
+            return response($response,412)->header('Content-Type', 'application/json');
+        }
 		if($client_details == 'false'){
             $http_status = 400;
                 $response = [
@@ -115,14 +123,7 @@ public function gameBet($request, $client_details){
              // $txn_explode = explode("-", $provider_trans_id);
              // $txid = $txn_explode[4];
 
-            if($payload['actions'][0]['amount'] > $client_details->balance){
-                $response = [
-                    "code" => 100,
-                    "message" => "Not enough funds",
-                ];
-                // http_response_code(412);
-                return response($response,412)->header('Content-Type', 'application/json');
-            }
+            
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
