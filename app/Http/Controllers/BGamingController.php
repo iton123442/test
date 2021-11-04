@@ -639,14 +639,14 @@ public function gameBet($request, $client_details){
                 // $rollback_action_id = $action_status == false ? $rollback_load  : $payload['actions'][0]['action_id'];
                 $client_details->connection_name = $existing_bet->connection_name;
                 $amount = $existing_bet->amount;
-                if($game_trans_type == 1){
+                if($game_trans_type == 2){
                     $type = "credit";
-                    $balance_rollback = $client_details->balance + $amount;
+                    $balance_rollback = $client_details->balance - $amount;
                     $balance = str_replace(".", "", $balance_rollback);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                 }else{
                     $type = "debit";
-                    $balance_rollback =  $client_details->balance - $amount;
+                    $balance_rollback =  $client_details->balance + $amount;
                     $balance = str_replace(".", "", $balance_rollback);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                 }
