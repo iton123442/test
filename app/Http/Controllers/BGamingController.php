@@ -120,8 +120,8 @@ public function gameBet($request, $client_details){
                     "code" => 100,
                     "message" => "Not enough funds",
                 ];
-                http_response_code(412);
-                return $response;
+                // http_response_code(412);
+                return response($response,412)->header('Content-Type', 'application/json');
             }
 			try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
