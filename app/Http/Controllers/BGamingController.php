@@ -583,6 +583,7 @@ public function gameBet($request, $client_details){
         $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         $rollback_id = $payload['actions'][0]['original_action_id'];
+        $processtime = new DateTime('NOW');
         if($rollback_id == "unknown"){
             $balance = str_replace(".", "", $client_details->balance);
             $response = [
@@ -599,7 +600,7 @@ public function gameBet($request, $client_details){
             return $response;
         }
         $provider_trans_id = $payload['actions'][0]['action_id'];
-        $processtime = new DateTime('NOW');
+      
         // if(isset($payload['actions'][1]['action'])){
         //     if($payload['actions'][1]['action'] == 'rollback'){
         //     $rollback_load = $payload['actions'][1]['action_id'];
