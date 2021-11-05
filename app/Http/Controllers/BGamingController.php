@@ -52,15 +52,6 @@ class BGamingController extends Controller
                     ];
             return response()->json($response, $http_status);
         }
-        $game_details = Game::find($request['game'], $this->provider_db_id);
-        if($game_details == false){
-            $http_status = 405;
-                $response = [
-                        "code" =>  405,
-                        "message" => "Game is not available to your casino",
-                    ];
-            return response()->json($response, $http_status);
-        }
         if(!isset($payload['actions'][0]['action'])){
 			$response = $this->GetBalance($request->all(), $client_details);
 			return response($response,200)
@@ -112,7 +103,6 @@ class BGamingController extends Controller
 	 * Initialize the balance 
 	 */
  public function GetBalance($request, $client_details){
-            
             $balance = str_replace(".", "", $client_details->balance);
 			$response = [
 				"balance" => (float)$balance
