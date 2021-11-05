@@ -633,7 +633,7 @@ public function gameBet($request, $client_details){
                 return $response;
             }
 
-            $existing_bet = GameTransactionMDB::findGameExt($rollback_id, false,'transaction_id', $client_details);
+            $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][1]['original_action_id'], false,'transaction_id', $client_details);
             $game_trans_type = $existing_bet->game_transaction_type;
             if ($existing_bet != 'false') {
                 // $rollback_action_id = $action_status == false ? $rollback_load  : $payload['actions'][0]['action_id'];
@@ -662,7 +662,7 @@ public function gameBet($request, $client_details){
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
                             [
-                              "action_id" =>$payload['actions'][0]['action_id'],
+                              "action_id" =>$payload['actions'][1]['action_id'],
                                 "tx_id" =>$existing_bet->game_trans_id,
                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                             ],
@@ -737,7 +737,6 @@ public function gameBet($request, $client_details){
             }
 
 	}
-
 
 		private function _toPennies($value)
 	{
