@@ -726,7 +726,7 @@ public function gameBet($request, $client_details){
                             "provider_round_id"=> $payload['game_id'], #R
                         ],
                         "mwapi" => [
-                            "roundId"=>$existing_bet2->game_trans_id, #R
+                            "roundId"=>$existing_bet->game_trans_id, #R
                             "type"=>2, #R
                             "game_id" => $game_details->game_id, #R
                             "player_id" => $client_details->player_id, #R
@@ -743,7 +743,7 @@ public function gameBet($request, $client_details){
                     "mw_response" => json_encode($response),
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$balance_rollback,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$balance_rollback,$game_details->game_code,$game_details->game_name,$existing_bet->game_trans_id,'credit',false,$action_payload);
     
                 return $response;
                
