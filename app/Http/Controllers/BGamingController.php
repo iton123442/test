@@ -709,43 +709,35 @@ public function gameBet($request, $client_details){
                 ];
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
     
-                $action_payload = [
-                        "type" => "custom", #genreral,custom :D # REQUIRED!
-                        "custom" => [
-                            "provider" => 'BGaming',
-                            "client_connection_name" => $client_details->connection_name,
-                            "win_or_lost" => $win_or_lost,
-                            "entry_id" => $entry_id,
-                            "pay_amount" => $amount,
-                            "income" => $income,
-                            "game_trans_ext_id" => $game_trans_ext_id
-                        ],
-                        "provider" => [
-                            "provider_request" => $payload, #R
-                            "provider_trans_id"=> $provider_trans_id, #R
-                            "provider_round_id"=> $payload['game_id'], #R
-                        ],
-                        "mwapi" => [
-                            "roundId"=>$existing_bet->game_trans_id, #R
-                            "type"=>2, #R
-                            "game_id" => $game_details->game_id, #R
-                            "player_id" => $client_details->player_id, #R
-                            "mw_response" => $response, #R
-                        ],
-                        'fundtransferrequest' => [
-                            'fundinfo' => [
-                                'freespin' => false,
-                            ]
-                        ]
-                    ];
-                $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_details->game_code,$game_details->game_name,$existing_bet->game_trans_id,'credit',false,$action_payload);
+                $body_details = [
+                    "type" => "credit",
+                    "win" => $win_or_lost,
+                    "token" => $client_details->player_token,
+                    "rollback" => "true",
+                    "game_details" => [
+                        "game_id" => $game_details->game_id
+                    ],
+                    "game_transaction" => [
+                        "amount" => $amount
+                    ],
+                    "connection_name" => $existing_bet->connection_name,
+                    "game_trans_ext_id" => $game_trans_ext_id,
+                    "game_transaction_id" => $existing_bet->game_trans_id
     
-                return $response;
+                ];
+    
+                try {
+                    $client = new Client();
+                     $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+                         [ 'body' => json_encode($body_details), 'timeout' => '2.00']
+                     );
+                     //THIS RESPONSE IF THE TIMEOUT NOT FAILED
+                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+                    return $response;
+                } catch (\Exception $e) {
+                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+                    return $response;
+                }
                
             }
 
