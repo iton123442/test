@@ -649,7 +649,7 @@ public function gameBet($request, $client_details){
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance_rollback); 
                 }else{
                     $type = "debit";
-                    $balance_rollback =  $balance + $amount;
+                    $balance_rollback =  $client_details->balance + $amount;
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance_rollback); 
                 }
                 $formatbal = number_format($balance_rollback,2,'.','');
@@ -699,7 +699,7 @@ public function gameBet($request, $client_details){
                 
                 $win_or_lost = 4;
                 $entry_id = 2;
-                   $income = 0 ;
+                $income = 0 ;
                 $updateGameTransaction = [
                     'win' => 5,
                     "pay_amount" => $amount,
