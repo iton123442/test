@@ -650,7 +650,7 @@ public function gameBet($request, $client_details){
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                 }else{
                     $type = "debit";
-                    $balance_rollback =  $client_details->balance + $amount;
+                    $balance_rollback =  ($client_details->balance + $amount) - $getGameID->bet_amount;
                     $balance = str_replace(".", "", $balance_rollback);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                 }
