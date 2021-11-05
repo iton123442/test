@@ -428,7 +428,7 @@ public function gameBet($request, $client_details){
                   ];
                 return $response;
             }
-            try{
+            // try{
 	            Helper::saveLog('BG WinAmount', $this->provider_db_id, json_encode($request),$pay_amount);
 	             $provider_trans_id = $action_status == true ? $providertemp : $win_load;
 	             $round_id = $payload['game_id'];		 
@@ -439,12 +439,10 @@ public function gameBet($request, $client_details){
                  $winbBalance = $client_details->balance + $pay_amount;
                  $winaction_id = $action_status == false ? $win_load  : $payload['actions'][0]['action_id'];
 	             $http_status = 200;
-	             $toint = (int)$bet_transaction->game_trans_id + 1;
-	             $str = (string)$toint;
 	             $processtime = new DateTime('NOW');
 	             ProviderHelper::_insertOrUpdate($client_details->token_id,$winbBalance);
-	             $client_details1 = ProviderHelper::getClientDetails('player_id', $player_id);
-                 $balance = str_replace(".", "", $client_details1->balance);
+                 $win_bal = number_format($winbBalance,2,'.','');
+                 $balance = str_replace(".", "", $win_bal);
 	             Helper::saveLog('BG start to process and get bal win', $this->provider_db_id, json_encode($request),$balance);
                  if(isset($payload['actions'][1]['action'])){
                     if($payload['actions'][1]['action'] == 'win' ){
@@ -495,7 +493,7 @@ public function gameBet($request, $client_details){
                         'entry_id' => $entry_id,
                         'trans_status' => 2
                     ];
-               Helper::saveLog('BG find client_detailss', $this->provider_db_id, json_encode($request),$client_details1);
+               Helper::saveLog('BG find client_detailss', $this->provider_db_id, json_encode($request),$client_details);
               GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                     $gameTransactionEXTData = array(
                         "game_trans_id" => $bet_transaction->game_trans_id,
@@ -539,7 +537,7 @@ public function gameBet($request, $client_details){
                             ];
                   Helper::saveLog('Bg Create Ext.', $this->provider_db_id, json_encode($request),$action_payload);
                  $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-                 ProviderHelper::_insertOrUpdate($client_details1->token_id,$winbBalance);
+                 ProviderHelper::_insertOrUpdate($client_details->token_id,$winbBalance);
                  Helper::saveLog('Bg Winbalance Response.', $this->provider_db_id, json_encode($request),$winbBalance);
                  Helper::saveLog('Bg Client Response.', $this->provider_db_id, json_encode($request),$client_response);
                  $updateTransactionEXt = array(
@@ -554,14 +552,14 @@ public function gameBet($request, $client_details){
                   Helper::saveLog('2', $this->provider_db_id, json_encode($request),$response);
                     return $response;
 
-            }catch(\Exception $e){
-                     $response = [
-                            	"message" => $e
-                            ];    
-            Helper::saveLog('BG Callback error', $this->provider_db_id, json_encode($request,JSON_FORCE_OBJECT), $response);
-           return $response;
+           //  }catch(\Exception $e){
+           //           $response = [
+           //                  	"message" => $e
+           //                  ];    
+           //  Helper::saveLog('BG Callback error', $this->provider_db_id, json_encode($request,JSON_FORCE_OBJECT), $response);
+           // return $response;
 
-            }// End of Catch 
+           //  }// End of Catch 
 
 		
 	}
@@ -648,14 +646,14 @@ public function gameBet($request, $client_details){
                 if($game_trans_type == 2){
                     $type = "credit";
                     $balance_rollback = $client_details->balance - $amount;
-                    $balance = str_replace(".", "", $balance_rollback);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance_rollback); 
                 }else{
                     $type = "debit";
-                    $balance_rollback =  $client_details->balance + $amount;
-                    $balance = str_replace(".", "", $balance_rollback);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                    $balance_rollback =  $balance + $amount;
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance_rollback); 
                 }
+                $formatbal = number_format($balance_rollback,2,'.','');
+                $balance = str_replace(".","", $formatbal);
                 if(isset($payload['actions'][1]['action'])){
                     if($payload['actions'][1]['action'] == 'rollback' ){
                          $response = [
