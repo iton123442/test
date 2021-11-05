@@ -632,8 +632,12 @@ public function gameBet($request, $client_details){
                   ];
                 return $response;
             }
-
-            $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][1]['original_action_id'], false,'transaction_id', $client_details);
+            if(isset($payload['actions'][1]['original_action_id'])){
+                $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][1]['original_action_id'], false,'transaction_id', $client_details);
+            }else{
+                $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][0]['original_action_id'], false,'transaction_id', $client_details);
+            }
+            
             $game_trans_type = $existing_bet->game_transaction_type;
             if ($existing_bet != 'false') {
                 // $rollback_action_id = $action_status == false ? $rollback_load  : $payload['actions'][0]['action_id'];
