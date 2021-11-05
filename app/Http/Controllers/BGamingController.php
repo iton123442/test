@@ -634,15 +634,17 @@ public function gameBet($request, $client_details){
             }
             if(isset($payload['actions'][1]['original_action_id'])){
                 $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][1]['original_action_id'], false,'transaction_id', $client_details);
+                $existing_bet2 = GameTransactionMDB::findGameExt($payload['actions'][0]['original_action_id'], false,'transaction_id', $client_details);
+                $amount = $existing_bet->amount - $existing_bet2;
             }else{
                 $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][0]['original_action_id'], false,'transaction_id', $client_details);
+                $amount = $existing_bet->amount;
             }
             
             $game_trans_type = $existing_bet->game_transaction_type;
             if ($existing_bet != 'false') {
                 // $rollback_action_id = $action_status == false ? $rollback_load  : $payload['actions'][0]['action_id'];
                 $client_details->connection_name = $existing_bet->connection_name;
-                $amount = $existing_bet->amount;
                 if($game_trans_type == 2){
                     $type = "credit";
                     $balance_rollback = $client_details->balance - $amount;
@@ -650,7 +652,7 @@ public function gameBet($request, $client_details){
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                 }else{
                     $type = "debit";
-                    $balance_rollback =  ($client_details->balance + $amount) - $getGameID->bet_amount;
+                    $balance_rollback =  $client_details->balance + $amount;
                     $balance = str_replace(".", "", $balance_rollback);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                 }
