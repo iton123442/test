@@ -638,6 +638,7 @@ public function gameBet($request, $client_details){
                 $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][0]['original_action_id'], false,'transaction_id', $client_details);
                 $amount = $existing_bet->amount;
             }
+            
             $game_trans_type = $existing_bet->game_transaction_type;
             if ($existing_bet != 'false') {
                 // $rollback_action_id = $action_status == false ? $rollback_load  : $payload['actions'][0]['action_id'];
@@ -742,7 +743,7 @@ public function gameBet($request, $client_details){
                     "mw_response" => json_encode($response),
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_details->game_code,$game_details->game_name,$existing_bet->game_trans_id,$type,false,$action_payload);
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_details->game_code,$game_details->game_name,$existing_bet->game_trans_id,'credit',false,$action_payload);
     
                 return $response;
                
