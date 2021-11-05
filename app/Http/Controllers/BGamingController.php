@@ -635,7 +635,7 @@ public function gameBet($request, $client_details){
             if(isset($payload['actions'][1]['original_action_id'])){
                 $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][1]['original_action_id'], false,'transaction_id', $client_details);
                 $existing_bet2 = GameTransactionMDB::findGameExt($payload['actions'][0]['original_action_id'], false,'transaction_id', $client_details);
-                $amount = $existing_bet->amount - $existing_bet2;
+                $amount = $existing_bet->amount - $existing_bet2->amount;
             }else{
                 $existing_bet = GameTransactionMDB::findGameExt($payload['actions'][0]['original_action_id'], false,'transaction_id', $client_details);
                 $amount = $existing_bet->amount;
