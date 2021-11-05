@@ -723,7 +723,7 @@ public function gameBet($request, $client_details){
                         "provider" => [
                             "provider_request" => $payload, #R
                             "provider_trans_id"=> $provider_trans_id, #R
-                            "provider_round_id"=> $round_id, #R
+                            "provider_round_id"=> $payload['game_id'], #R
                         ],
                         "mwapi" => [
                             "roundId"=>$existing_bet2->game_trans_id, #R
