@@ -646,7 +646,6 @@ public function gameBet($request, $client_details){
                 if($game_trans_type == 2){
                     $type = "credit";
                     $balance_rollback = $client_details->balance - $amount;
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance_rollback); 
                 }else{
                     $type = "debit";
                     $balance_rollback =  $client_details->balance + $amount;
@@ -708,35 +707,69 @@ public function gameBet($request, $client_details){
                     'trans_status' => 3
                 ];
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
-    
-                $body_details = [
-                    "type" => "credit",
-                    "win" => $win_or_lost,
-                    "token" => $client_details->player_token,
-                    "rollback" => "true",
-                    "game_details" => [
-                        "game_id" => $game_details->game_id
-                    ],
-                    "game_transaction" => [
-                        "amount" => $amount
-                    ],
-                    "connection_name" => $existing_bet->connection_name,
-                    "game_trans_ext_id" => $game_trans_ext_id,
-                    "game_transaction_id" => $existing_bet->game_trans_id
-    
-                ];
-    
-                try {
-                    $client = new Client();
-                     $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
-                         [ 'body' => json_encode($body_details), 'timeout' => '2.00']
-                     );
-                     //THIS RESPONSE IF THE TIMEOUT NOT FAILED
-                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
-                    return $response;
-                } catch (\Exception $e) {
-                    Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
-                    return $response;
+                if($type == 'credit'){
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$amount, $game_code, $game_details->game_name, $game_trans_ext_id, $existing_bet->game_trans_id, 'debit');
+                    if (isset($client_response->fundtransferresponse->status->code)) {
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                            switch ($client_response->fundtransferresponse->status->code) {
+                                case '200':
+                                return $response;
+                                break;
+                                case '402':
+                                    // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                    $http_status = 402;
+                                    $response = [
+                                        
+                                         "Error Code" => 500,
+                                         "Message" => "Internal Error"
+                                      
+                                    ];
+
+                                $updateTransactionEXt = array(
+                                    "provider_request" =>json_encode($request->all()),
+                                    "mw_response" => json_encode($response),
+                                    'mw_request' => json_encode($client_response->requestoclient),
+                                    'client_response' => json_encode($client_response->fundtransferresponse),
+                                    'transaction_detail' => 'failed',
+                                    'general_details' => 'failed',
+                                );
+                                     Helper::saveLog('Bgaming after 402 updateTransactionEXt', $this->provider_db_id, json_encode($payload), 'ENDPOINT HIT');   
+                                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                Helper::saveLog('BG Debit failed', $this->provider_db_id, json_encode($request), $response);    
+                                  return $response;
+                                    break;
+                            }
+                    }
+                }else{
+                    $body_details = [
+                        "type" => "credit",
+                        "win" => $win_or_lost,
+                        "token" => $client_details->player_token,
+                        "rollback" => "true",
+                        "game_details" => [
+                            "game_id" => $game_details->game_id
+                        ],
+                        "game_transaction" => [
+                            "amount" => $amount
+                        ],
+                        "connection_name" => $existing_bet->connection_name,
+                        "game_trans_ext_id" => $game_trans_ext_id,
+                        "game_transaction_id" => $existing_bet->game_trans_id
+        
+                    ];
+        
+                    try {
+                        $client = new Client();
+                         $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+                             [ 'body' => json_encode($body_details), 'timeout' => '2.00']
+                         );
+                         //THIS RESPONSE IF THE TIMEOUT NOT FAILED
+                        Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+                        return $response;
+                    } catch (\Exception $e) {
+                        Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+                        return $response;
+                    }
                 }
                
             }
