@@ -1753,7 +1753,7 @@ class GameLobby{
         }
     }
 
-    public static function AmuseGamingGameLaunch($data){
+    public static function AmuseGamingGameLaunch($data,$device){
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
         $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
         $launch_url = config('providerlinks.amusegaming.launch_url');

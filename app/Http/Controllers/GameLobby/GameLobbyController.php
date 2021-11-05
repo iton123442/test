@@ -913,10 +913,10 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code == 115 || $provider_code == 116 || $provider_code == 117 || $provider_code == 118 || $provider_code == 119 || $provider_code == 120){
+                elseif($provider_code == 115 || $provider_code == 116 || $provider_code == 117 || $provider_code == 118 || $provider_code == 119 || $provider_code == 120 || $provider_code == 121 || $provider_code == 122 || $provider_code == 123 || $provider_code == 124 || $provider_code == 125){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::AmuseGamingGameLaunch($request->all()), 
+                        "url" => GameLobby::AmuseGamingGameLaunch($request->all(),$device), 
                         "game_launch" => true
                     );
                     return response($msg,200)
