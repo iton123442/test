@@ -293,6 +293,12 @@ $app->post('/public/api/png/reserve','PNGController@reserve');
 $app->post('/public/api/png/release','PNGController@release');
 $app->post('/public/api/png/balance','PNGController@balance');
 $app->post('/public/api/png/cancelReserve','PNGController@cancelReserve');
+//PNG BETSOFTED
+$app->post('/api/png/betsofted/authenticate','PNGControllerBetsofted@authenticate');
+$app->post('/api/png/betsofted/reserve','PNGControllerBetsofted@reserve');
+$app->post('/api/png/betsofted/release','PNGControllerBetsofted@release');
+$app->post('/api/png/betsofted/balance','PNGControllerBetsofted@balance');
+$app->post('/api/png/betsofted/cancelReserve','PNGController@cancelReserve');
 //Wazdan Endpoints
 $app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
 $app->post('/public/api/wazdan/getStake','WazdanController@getStake');
@@ -587,8 +593,8 @@ $app->post('/public/signature','OnlyPlayController@createSignature');
 $app->get('/public/api/justplay/callback', 'JustPlayController@callback'); 
 
 // BGaming Single Controller Endpoints
-$app->post('/api/bgaming/play', 'BGamingController@gameTransaction');
-$app->post('/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
+$app->post('/public/api/bgaming/play', 'BGamingController@gameTransaction');
+$app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
 
 // Five Men
 //$app->post('/public/api/5men','FiveMenController@index');
@@ -685,9 +691,17 @@ $app->post('/public/Funky/Bet/PlaceBet','FunkyGamesController@PlaceBet');
 $app->post('/public/Funky/Bet/SettleBet','FunkyGamesController@SettleBet');
 $app->post('/public/Funky/Bet/CancelBet','FunkyGamesController@CancelBet');
 
-
 // Amuse Gaming
 $app->post('/public/GetPlayerBalance', 'AmuseGamingController@GetPlayerBalance');
 $app->post('/public/WithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDeposit');
 $app->post('/public/Cancel', 'AmuseGamingController@Cancel');
 $app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGamelist');
+//FREGAME OR FREEROUND BY PROVIDER
+$app->post('game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
+
+// Crash Gaming (TigerGames)
+$app->post('api/crashgame/balance', 'CrashGameController@Balance');
+$app->post('api/crashgame/debit', 'CrashGameController@Debit');
+$app->post('api/crashgame/credit', 'CrashGameController@Credit');
+$app->post('api/crashgame/refund', 'CrashGameController@Refund');
+$app->post('api/crashgame/cancel', 'CrashGameController@Cancel');

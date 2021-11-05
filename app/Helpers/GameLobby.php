@@ -167,7 +167,6 @@ class GameLobby{
             ]);
         
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
-
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode(
                         [
@@ -215,11 +214,13 @@ class GameLobby{
         return $url;
     }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
+        $client_details = ProviderHelper::getClientDetails('token', $token);
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;
         $lang = GameLobby::getLanguage("PlayNGo",$lang);
         Helper::savePLayerGameRound($game_code,$token,$provider);
-        $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.config('providerlinks.png.pid').'&gid='.$game_code.'&channel='.
+        $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
+        $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
                    config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
         return $gameurl;
     }
@@ -368,7 +369,7 @@ class GameLobby{
         return isset($res['data']['link']) ? $res['data']['link'] : false;
     }
 
-     public static function awsLaunchUrl($token,$game_code,$lang='en'){
+     public static function awsLaunchUrl($token,$provider,$game_code,$lang='en',$exit_url=null){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         if($client_details == 'false'){
             return 'false';
@@ -1753,7 +1754,7 @@ class GameLobby{
                     Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $game_luanch_response);
                 // dd($game_luanch_response->data->gameUrl);
                 // $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=https://daddy.betrnk.games/provider/FunkyGames";
-                $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=".$data["exitUrl"];
+                $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=";
 
                 Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $gameUrl);
                 return $gameUrl;
