@@ -138,14 +138,18 @@ class SlotMillController extends Controller
         );
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         $fund_extra_data = [];
+        $fund_extra_data = [
+            'provider_name' => $game_details->provider_name
+        ]; 
         if(isset($request["prepaidref"])) {
-            $fund_extra_data = [
-	            'fundtransferrequest' => [
-					'fundinfo' => [
-						'freespin' => true
-					]
-				]
-	        ];
+            $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
+            // $fund_extra_data = [
+	        //     'fundtransferrequest' => [
+			// 		'fundinfo' => [
+			// 			'freespin' => true
+			// 		]
+			// 	]
+	        // ];
            //getTransaction
            $getFreespin = FreeSpinHelper::getFreeSpinDetails($request["prepaidref"], "provider_trans_id" );
 
@@ -520,6 +524,8 @@ class SlotMillController extends Controller
         ];
         GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
 
+
+       
         $body_details = [
             "type" => "credit",
             "win" => $win,
@@ -536,6 +542,10 @@ class SlotMillController extends Controller
             "game_transaction_id" => $bet_transaction->game_trans_id
 
         ];
+
+        if(isset($request["prepaidref"])) {
+            $body_details["fundtransferrequest"]["fundinfo"]["freespin"] = true;
+        }
 
         try {
             $client = new Client();
