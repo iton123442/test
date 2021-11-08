@@ -138,7 +138,9 @@ class FundtransferProcessorController extends Controller
         if(isset($payload->action->provider->provider_name)){
             $requesttocient["gamedetails"]['provider_name'] = $payload->action->provider->provider_name;
         }
-
+        if(isset($payload->request_body->fundtransferrequest->fundinfo->freespin)){
+            $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $payload->request_body->fundtransferrequest->fundinfo->freespin;
+        }
         if(isset($payload->action->custom->client_connection_name) && isset($gteid)) {
             try{
                 $ext_Data = ['mw_request' => json_encode($requesttocient)];
@@ -315,6 +317,10 @@ class FundtransferProcessorController extends Controller
                                 );
 
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                             }
                             elseif ($payload->action->custom->provider == 'Ozashiki') {
                                 $ext_data = array(
@@ -903,6 +909,10 @@ class FundtransferProcessorController extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
+       
+        if(isset($details["fundtransferrequest"]["fundinfo"]["freespin"] )) {
+            $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
+        }
 
         do {
             

@@ -130,21 +130,7 @@ class GameLobby{
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
-        //     $client_details =ProviderHelper::getClientDetails('token',$data['token']);
-
-        //     $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-        //     $isMob = is_numeric(strpos($ua, "mobile"));
-
-        //     if($isMob == 1) {
-
-        //           $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=mobile&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token']; 
-        //               return $url;
-        //     }else {
-
-        //     $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
-        //      return $url;
-        // }
-        $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device='.$device.'&language='.$data['lang'].'&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
+        $url = config("providerlinks.nolimit.api_url").'device='.$device.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
          
         } catch (\Exception $e) {
@@ -601,7 +587,8 @@ class GameLobby{
      public static function slotmill($request){
         try {
             $client_details = Providerhelper::getClientDetails('token', $request["token"]);
-            $url = config("providerlinks.slotmill")[$request["game_code"]]; 
+            $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.slotmill.provider_db_id'), $request['game_code']);
+            // $url = config("providerlinks.slotmill")[$request["game_code"]]; 
             // if ($request["game_code"] == "19002") {
             //    $url = config("providerlinks.slotmill.treasures"); 
             // } elseif ($request["game_code"] == "19003") {
@@ -613,7 +600,7 @@ class GameLobby{
             // } elseif ($request["game_code"] == "19008") {
             //    $url =  config("providerlinks.slotmill.outlaws"); 
             // }
-            return $url = $url."?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
+            return $url = $getGameDetails->info."/?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
 
         } catch (\Exception $e){
             return $request["exitUrl"];
@@ -1766,7 +1753,7 @@ class GameLobby{
         }
     }
 
-    public static function AmuseGamingGameLaunch($data){
+    public static function AmuseGamingGameLaunch($data,$device){
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
         $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
         $launch_url = config('providerlinks.amusegaming.launch_url');
