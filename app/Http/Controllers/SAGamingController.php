@@ -532,7 +532,7 @@ class SAGamingController extends Controller
                     "game_transaction_ext_id" => $game_transextension,
                     "client_connection_name" => $client_details->connection_name,
                     "provider" => 'sagaming',
-                    "win_or_lost" => 1,
+                    "win_or_lost" => 0,
                     "entry_id" => 2,
                     "pay_amount" => $game_transaction->pay_amount,
                     "income" => $game_transaction->income,
