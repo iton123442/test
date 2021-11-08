@@ -841,6 +841,7 @@ class GameLobby{
         ]);
         $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
         $client_response = json_decode($guzzle_response->getBody()->getContents());
+        Helper::saveLog('Game Launch Pragmatic Play', 26, json_encode($form_body), json_encode($client_response));
         $url = $client_response->gameURL;
         return $url;
         // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
