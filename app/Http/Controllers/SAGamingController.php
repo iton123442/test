@@ -129,7 +129,6 @@ class SAGamingController extends Controller
         $gametype = $data['gametype'];
         $game_id = $this->game_db_code;
         // $betdetails = $data['betdetails'];
-        // $round_id = $data['txnid'];
         $round_id = $data['gameid']; // gameId is unique per table click
 
         $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
@@ -176,7 +175,6 @@ class SAGamingController extends Controller
                 $win_or_lost = 5; // 0 lost,  5 processing
                 $payout_reason = 'Bet';
                 $provider_trans_id = $txnid;
-                // $round_id = $round_id; // Changed to txnId
                 $round_id = $round_id;  // gameId is unique per table click
 
                 $game_trans_ext = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
@@ -321,7 +319,6 @@ class SAGamingController extends Controller
         $gametype = $data['gametype'];
         $game_id = $this->game_db_code;
         $round_id = $data['gameid']; // gameId is unique per table click
-        // $round_id = $data['txnid'];
 
         $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
         if($client_details == null){
@@ -481,7 +478,6 @@ class SAGamingController extends Controller
             $gametype = $data['gametype'];
             $game_id = $this->game_db_code;
             $round_id = $data['gameid']; // gameId is unique per table click
-            // $round_id = $data['txnid'];
 
             $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
             if($client_details == null){
@@ -615,7 +611,6 @@ class SAGamingController extends Controller
             $txn_reverse_id = $data['txn_reverse_id'];
             $game_id = $this->game_db_code;
             $round_id = $data['gameid']; // gameId is unique per table click
-            // $round_id = $data['txnid'];
             $transaction_type = 'credit';
 
             $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
