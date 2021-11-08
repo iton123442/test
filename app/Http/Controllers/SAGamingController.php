@@ -177,7 +177,7 @@ class SAGamingController extends Controller
                 $payout_reason = 'Bet';
                 $provider_trans_id = $txnid;
                 // $round_id = $round_id; // Changed to txnId
-                $round_id = $txnid; // Changed to txnId
+                $round_id = $round_id;  // gameId is unique per table click
 
                 $game_trans_ext = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
                 if($game_trans_ext == 'false'){
@@ -356,7 +356,7 @@ class SAGamingController extends Controller
             $check_win_entry = GameTransactionMDB::findGameExt($round_id, 2,'round_id', $client_details);
             if($check_win_entry != 'false'){
                 $data_response = ["username" => $username,"currency" => $currency, "amount" => $client_details->balance, "error" => 0]; //122 win already exist!
-                ProviderHelper::saveLogWithExeption('SA PlayerWin - Win Already Processed', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
+                ProviderHelper::saveLogWithExeption('SA PlayerWin - Win Duplicate', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
                 echo $this->makeArrayXML($data_response);
                 return;
             }
@@ -364,7 +364,7 @@ class SAGamingController extends Controller
             $transaction_check = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
             if($transaction_check == 'false'){
                 $data_response = ["username" => $username,"currency" => $currency, "amount" => $client_details->balance, "error" => 0]; //152
-                ProviderHelper::saveLogWithExeption('SA PlayerWin - Win Duplicate', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
+                ProviderHelper::saveLogWithExeption('SA PlayerWin - Bet not Found', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
                 echo $this->makeArrayXML($data_response);
                 return;
             }
