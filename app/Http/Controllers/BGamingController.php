@@ -700,7 +700,7 @@ public function gameBet($request, $client_details){
                 $entry_id = 2;
                 $income = 0 ;
                 $updateGameTransaction = [
-                    'win' => 5,
+                    'win' => $win_or_lost,
                     "pay_amount" => $amount,
                     'income' => $income,
                     'entry_id' => $entry_id,
