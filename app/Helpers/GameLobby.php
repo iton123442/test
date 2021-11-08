@@ -142,6 +142,7 @@ class GameLobby{
     }
 
     public static function BGamingLaunchUrl($request_data, $device){
+        Helper::saveLog('Bgaming create session', 49, json_encode($request_data), "BGamingLaunchUrl");
         $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
         $balance = str_replace(".", "", $client_player_details->balance);
 
@@ -151,7 +152,8 @@ class GameLobby{
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        
+        Helper::saveLog('Bgaming create session', 49, json_encode($request_data), $game_launch);
+
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode(
