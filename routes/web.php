@@ -294,11 +294,11 @@ $app->post('/public/api/png/release','PNGController@release');
 $app->post('/public/api/png/balance','PNGController@balance');
 $app->post('/public/api/png/cancelReserve','PNGController@cancelReserve');
 //PNG BETSOFTED
-$app->post('/api/png/betsofted/authenticate','PNGControllerBetsofted@authenticate');
-$app->post('/api/png/betsofted/reserve','PNGControllerBetsofted@reserve');
-$app->post('/api/png/betsofted/release','PNGControllerBetsofted@release');
-$app->post('/api/png/betsofted/balance','PNGControllerBetsofted@balance');
-$app->post('/api/png/betsofted/cancelReserve','PNGController@cancelReserve');
+$app->post('/public/api/png/betsofted/authenticate','PNGControllerBetsofted@authenticate');
+$app->post('/public/api/png/betsofted/reserve','PNGControllerBetsofted@reserve');
+$app->post('/public/api/png/betsofted/release','PNGControllerBetsofted@release');
+$app->post('/public/api/png/betsofted/balance','PNGControllerBetsofted@balance');
+$app->post('/public/api/png/betsofted/cancelReserve','PNGController@cancelReserve');
 //Wazdan Endpoints
 $app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
 $app->post('/public/api/wazdan/getStake','WazdanController@getStake');
