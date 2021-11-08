@@ -251,7 +251,7 @@ class GameLobby{
         $url = EVGHelper::gameLaunch($token,$player_ip,$game_code,$lang,$exitUrl,config('providerlinks.evolution.env'));
         return $url;
     }
-    public static function boleLaunchUrl($game_code,$token,$exitUrl, $country_code='PH'){
+    public static function boleLaunchUrl($game_code,$token,$game_provider,$exitUrl, $country_code='PH'){
 
         $client_details = ProviderHelper::getClientDetails('token', $token);
         if($client_details != null){
@@ -318,7 +318,7 @@ class GameLobby{
         
     }
 
-    public static function evoplayLunchUrl($token,$game_code){
+    public static function evoplayLunchUrl($token,$game_code,$game_provider,$exit_url){
         $client_player_details = GameLobby::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.evoplay.project_id'),
@@ -528,7 +528,7 @@ class GameLobby{
             }
 
             if(isset($login_token['Token'])){
-                $url = 'https://web.sa-globalxns.com/app.aspx?username='.config('providerlinks.sagaming.prefix').$client_details->player_id.'&token='.$login_token['Token'].'&lobby='.config('providerlinks.sagaming.lobby').'&lang='.$lang.'&returnurl='.$url.'';
+                $url = 'https://www.sai.slgaming.net/app.aspx?username='.config('providerlinks.sagaming.prefix').$client_details->player_id.'&token='.$login_token['Token'].'&lobby='.config('providerlinks.sagaming.lobby').'&lang='.$lang.'&returnurl='.$url.'';
                 return $url;
             }else{
                 return false;

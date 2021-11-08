@@ -30,14 +30,14 @@ class SAHelper{
                 's' => $md5Signature
             ],
         ]);
-        Helper::saveLog('SA UserManagement '.$method, config('providerlinks.sagaming.pdbid'), json_encode($response->getBody()->getContents()), $querystring);
+        ProviderHelper::saveLogWithExeption('SA UserManagement '.$method, config('providerlinks.sagaming.pdbid'), json_encode($response->getBody()->getContents()), $querystring);
         // $xml = simplexml_load_string($response->getBody()->getContents());
         $xml = simplexml_load_string($response->getBody());
         $json = json_encode($xml);
         $array = json_decode($json,TRUE);
 
-        Helper::saveLog('SA UserManagement '.$method, config('providerlinks.sagaming.pdbid'), json_encode($querystring), $array);
-        Helper::saveLog('SA UserManagement '.$method, config('providerlinks.sagaming.pdbid'), json_encode($querystring), $array);
+        ProviderHelper::saveLogWithExeption('SA UserManagement '.$method, config('providerlinks.sagaming.pdbid'), json_encode($querystring), $array);
+        ProviderHelper::saveLogWithExeption('SA UserManagement '.$method, config('providerlinks.sagaming.pdbid'), json_encode($querystring), $array);
         return $array;
     }
 
