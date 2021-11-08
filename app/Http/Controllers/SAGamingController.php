@@ -129,7 +129,8 @@ class SAGamingController extends Controller
         $gametype = $data['gametype'];
         $game_id = $this->game_db_code;
         // $betdetails = $data['betdetails'];
-        $round_id = $data['txnid'];
+        // $round_id = $data['txnid'];
+        $round_id = $data['gameid']; // gameId is unique per table click
 
         $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
         if($client_details == null){
@@ -319,8 +320,8 @@ class SAGamingController extends Controller
         $txnid = $data['txnid'];
         $gametype = $data['gametype'];
         $game_id = $this->game_db_code;
-        // $round_id = $data['gameid'];
-        $round_id = $data['txnid'];
+        $round_id = $data['gameid']; // gameId is unique per table click
+        // $round_id = $data['txnid'];
 
         $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
         if($client_details == null){
@@ -479,8 +480,8 @@ class SAGamingController extends Controller
             $txnid = $data['txnid'];
             $gametype = $data['gametype'];
             $game_id = $this->game_db_code;
-            // $round_id = $data['gameid'];
-            $round_id = $data['txnid'];
+            $round_id = $data['gameid']; // gameId is unique per table click
+            // $round_id = $data['txnid'];
 
             $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
             if($client_details == null){
@@ -613,8 +614,8 @@ class SAGamingController extends Controller
             $gamecancel = $data['gamecancel'];
             $txn_reverse_id = $data['txn_reverse_id'];
             $game_id = $this->game_db_code;
-            // $round_id = $data['gameid'];
-            $round_id = $data['txnid'];
+            $round_id = $data['gameid']; // gameId is unique per table click
+            // $round_id = $data['txnid'];
             $transaction_type = 'credit';
 
             $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
