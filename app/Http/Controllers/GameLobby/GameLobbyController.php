@@ -864,6 +864,7 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code == 93){
+                    Helper::saveLog('Bgaming Gameluanch', 49, json_encode($request->all()), "Gamelaunch response");
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::BGamingLaunchUrl($request->all(),$device), 
