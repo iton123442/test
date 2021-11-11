@@ -546,7 +546,7 @@ class AWSController extends Controller
 					$updateGameTransaction = [
 						"pay_amount" => $pay_amount,
 						"income" =>  $income,
-						"win" => $win_type,
+						// "win" => $win_type,
 						"entry_id" => $method,
 					];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);

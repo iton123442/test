@@ -28,14 +28,14 @@ class AmuseGamingController extends Controller
     public function GetPlayerBalance(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
-        Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($xmlparser), "");
+        // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($xmlparser), "");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
         $array_data = array(
             "status" => "ok",
             "balance" => $client_details->balance
         );
         $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
-        Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
+        // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
         return response($response,200)
 				->header('Content-Type', 'application/xml');
     }
@@ -89,7 +89,13 @@ class AmuseGamingController extends Controller
                     ->header('Content-Type', 'application/xml');
         }
         if($xmlparser->WithdrawAmount == 0){
-            $credit_response = $this->credit($xmlparser,true);
+            // if($xmlparser->GameBrand == 'netent'){
+            // // if($xmlparser->GameBrand == 'novomatic' || $xmlparser->GameBrand == 'amatic' || $xmlparser->GameBrand == 'quickspin'){
+            //     $freespin = true;
+            // }else{
+                $freespin = false;
+            // }
+            $credit_response = $this->credit($xmlparser,$freespin);
             // $credit_response = new SimpleXMLElement($credit_response);
             Helper::saveLog("AmuseGaming Deposit Request", $this->provider_db_id, json_encode($credit_response), "RESPONSE");
             $response = $credit_response;
@@ -104,23 +110,12 @@ class AmuseGamingController extends Controller
         $game_details = Helper::findGameDetails('game_code', $this->provider_db_id,$request->GameId);
         $player_balance = $client_details->balance;
         $player_tokenID = $client_details->token_id;
-        $provider_round_id = $request->BetId;
-        $provider_trans_id = $request->TransactionId;
+        $provider_round_id = json_decode($request->BetId);
+        $provider_trans_id = json_decode($request->TransactionId);
         $provider_bet_amount = json_decode($request->WithdrawAmount);
         $provider_game_code = $request->GameId;
         $provider_game_brand = $request->GameBrand;
 
-        // $checkTrans = GameTransactionMDB::findGameTransactionDetails($request->BetId,'transaction_id',false,$client_details);
-        // if($checkTrans != 'false'){
-        //     $array_data = array(
-        //         "status" => "ok",
-        //         "balance" => $client_details->balance
-        //     );
-        //     $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
-        //     Helper::saveLog("AmuseGaming Withdraw Transactions Alraedy Exist", $this->provider_db_id, json_encode($response), "RESPONSE");
-        //     return response($response,200)
-		// 		->header('Content-Type', 'application/xml');
-        // }
         if($player_balance < $provider_bet_amount){
             $array_data = array(
                 "status" => "INSUFFICIENT_BALANCE"
@@ -247,22 +242,26 @@ class AmuseGamingController extends Controller
             //         ->header('Content-Type', 'application/xml');
         }
     }
+
     public function credit($request,$freespin=false){
         $client_details = ProviderHelper::getClientDetails('player_id', $request->UserId);
         $game_details = Helper::findGameDetails('game_code', $this->provider_db_id,$request->GameId);
         $player_balance = $client_details->balance;
         $player_tokenID = $client_details->token_id;
-        $provider_round_id = $request->BetId;
-        $provider_trans_id = $request->TransactionId;
-        $provider_game_code = $request->GameId;
+        $provider_round_id = json_decode($request->BetId);
+        $provider_trans_id = json_decode($request->TransactionId);
+        $provider_game_code = json_decode($request->GameId);
         $provider_game_brand = $request->GameBrand;
         $checkTrans = GameTransactionMDB::findGameTransactionDetails($provider_round_id,'round_id',false,$client_details);
+        Helper::saveLog("AmuseGaming Deposit Transactions findGameTransactionDetails", $this->provider_db_id, json_encode($checkTrans), "bet details");
         if($freespin == false){
             $provider_win_amount = json_decode($request->DepositAmount);
-            $win_amount = json_decode($request->DepositAmount);
+            $win_amount = $checkTrans->pay_amount + $provider_win_amount;
+            Helper::saveLog("AmuseGaming Deposit Transactions freespin=false", $this->provider_db_id, $provider_win_amount, $win_amount);
         }else{
             $provider_win_amount = json_decode($request->DepositAmount) - $checkTrans->pay_amount;
             $win_amount = $checkTrans->pay_amount + $provider_win_amount;
+            Helper::saveLog("AmuseGaming Deposit Transactions freespin=false", $this->provider_db_id, $provider_win_amount, $win_amount);
         }
         $checkTransExt = GameTransactionMDB::findGameExt($provider_trans_id,2,'transaction_id',$client_details);
         $income = $checkTrans->bet_amount - $win_amount;
@@ -287,7 +286,7 @@ class AmuseGamingController extends Controller
             "game_trans_id" => $checkTrans->game_trans_id,
             "provider_trans_id" => $provider_trans_id,
             "round_id" => $provider_round_id,
-            "amount" => $win_amount,
+            "amount" => $provider_win_amount,
             "game_transaction_type"=> 2,
             "provider_request" => json_encode($request),
             "mw_response" => json_encode($response)
