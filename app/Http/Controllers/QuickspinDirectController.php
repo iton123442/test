@@ -16,7 +16,7 @@ use DB;
 class QuickspinDirectController extends Controller
 {
     public function Authenticate(Request $req){
-        Helper::saveLog('QuickSpinDirect verifyToken', 65, json_encode($req),  "HIT" );
+        Helper::saveLog('QuickSpinDirect verifyToken', 65, json_encode($req->all()),  "HIT" );
         $client_details = ProviderHelper::getClientDetails('token',$req['token']);
         if($client_details != null){
             $response = [
