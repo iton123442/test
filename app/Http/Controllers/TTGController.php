@@ -227,7 +227,7 @@ class TTGController extends Controller
                   // ProviderHelper::updateGameTransaction($bet_transaction->game_trans_id, $pay_amount, $income, $win_or_lost, $entry_id, "game_trans_id",$bet_transaction->bet_amount);
 
                   $updateGameTransaction = [
-                          'win' => $win_or_lost,
+                          'win' => 5,
                           'pay_amount' => $pay_amount,
                           'income' => $income,
                           'entry_id' => $entry_id,

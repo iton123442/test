@@ -268,7 +268,7 @@ class SmartsoftGamingController extends Controller
                     $income = $bet_transaction->income;
 
                     $updateGameTransaction = [
-                        'win' => $win_or_lost,
+                        'win' => 5,
                         'pay_amount' => $amount,
                         'income' => $income,
                         'entry_id' => $entry_id,
