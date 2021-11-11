@@ -570,14 +570,19 @@ $app->post('/public/api/slotmill/appendwagergoods.json','SlotMillController@appe
 $app->post('/public/api/slotmill/endwager.json','SlotMillController@endwager'); // win 
 $app->post('/public/api/slotmill/reverse.json','SlotMillController@reverse');
 
-
-//PGVIRTUAL
-$app->get('/public/api/pgvirtual/validate/{auth_key}/{game_session_token}','PGCompanyController@auth_player');
-$app->get('/public/api/pgvirtual/keepalive/{auth_key}/{game_session_token}','PGCompanyController@keepalive');
-$app->post('/public/api/pgvirtual/placebet/{auth_key}/{game_session_token}','PGCompanyController@placebet');
-$app->post('/public/api/pgvirtual/cancelbet/{auth_key}','PGCompanyController@cancelbet');
-$app->post('/public/api/pgvirtual/syncbet/{auth_key}','PGCompanyController@syncbet');
-$app->post('/public/api/pgvirtual/paybet/{auth_key}','PGCompanyController@paybet');
+$app->get('/public/api/pg/validate/{auth_key}/{game_session_token}','PGCompanyController@auth_player');
+$app->get('/public/api/pg/keepalive/{auth_key}/{game_session_token}','PGCompanyController@keepalive');
+$app->post('/public/api/pg/placebet/{auth_key}/{game_session_token}','PGCompanyController@placebet');
+$app->post('/public/api/pg/cancelbet/{auth_key}','PGCompanyController@cancelbet');
+$app->post('/public/api/pg/syncbet/{auth_key}','PGCompanyController@syncbet');
+$app->post('/public/api/pg/paybet/{auth_key}','PGCompanyController@paybet');
+// //PGVIRTUAL
+// $app->get('/public/api/pgvirtual/validate/{auth_key}/{game_session_token}','PGCompanyController@auth_player');
+// $app->get('/public/api/pgvirtual/keepalive/{auth_key}/{game_session_token}','PGCompanyController@keepalive');
+// $app->post('/public/api/pgvirtual/placebet/{auth_key}/{game_session_token}','PGCompanyController@placebet');
+// $app->post('/public/api/pgvirtual/cancelbet/{auth_key}','PGCompanyController@cancelbet');
+// $app->post('/public/api/pgvirtual/syncbet/{auth_key}','PGCompanyController@syncbet');
+// $app->post('/public/api/pgvirtual/paybet/{auth_key}','PGCompanyController@paybet');
 
 // CUT CALL FOR THE WIN CREDIT PROCESS
 $app->post('/public/tigergames/bg-fundtransferV2','FundtransferProcessorController@bgFundTransferV2');
