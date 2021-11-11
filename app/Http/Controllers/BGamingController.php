@@ -118,7 +118,11 @@ public function gameBet($request, $client_details){
 			 $bet_data = $payload['actions'][0];   
 			 $player_id = $payload['user_id'];
 			 $provider_game_name = $payload['game'];
-			 $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
+             if($provider_game_name != 'DragonsGold100' ){
+                $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
+             }else{
+                $game_code = $provider_game_name;
+             }  
 			 $round_id = $payload['game_id'];
              $time = time();
              if(isset($payload['actions'][1]['action']) && $payload['actions'][1]['action'] == 'bet'){
@@ -390,7 +394,11 @@ public function gameBet($request, $client_details){
             }
             $player_id = $payload['user_id'];
             $provider_game_name = $payload['game'];
-			$game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
+            if($provider_game_name != 'DragonsGold100' ){
+                $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
+             }else{
+                $game_code = $provider_game_name;
+             } 
             $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
             ProviderHelper::_insertOrUpdate($client_details->token_id,$client_details->balance);
             $processtime = new DateTime('NOW');
@@ -578,7 +586,11 @@ public function gameBet($request, $client_details){
         }
         $player_id = $payload['user_id'];
         $provider_game_name = $payload['game'];
-        $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
+        if($provider_game_name != 'DragonsGold100' ){
+            $game_code = preg_replace('/[^\\/\-a-z\s]/i', '', $provider_game_name);
+         }else{
+            $game_code = $provider_game_name;
+         } 
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         $rollback_id = $payload['actions'][0]['original_action_id'];
         $processtime = new DateTime('NOW');

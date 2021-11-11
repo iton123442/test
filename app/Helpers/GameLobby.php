@@ -142,6 +142,7 @@ class GameLobby{
     }
 
     public static function BGamingLaunchUrl($request_data, $device){
+        Helper::saveLog('Bgaming create session', 49, json_encode($request_data), "BGamingLaunchUrl");
         $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
         $balance = str_replace(".", "", $client_player_details->balance);
 
@@ -151,7 +152,8 @@ class GameLobby{
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        
+        Helper::saveLog('Bgaming create session', 49, json_encode($request_data), $game_launch);
+
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode(
@@ -841,6 +843,7 @@ class GameLobby{
         ]);
         $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
         $client_response = json_decode($guzzle_response->getBody()->getContents());
+        Helper::saveLog('Game Launch Pragmatic Play', 26, json_encode($form_body), json_encode($client_response));
         $url = $client_response->gameURL;
         return $url;
         // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
