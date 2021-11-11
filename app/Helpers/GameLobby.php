@@ -1777,7 +1777,6 @@ class GameLobby{
         return "false";
     }
     public static function QuickSpinDGameLaunch($data){
-        dd($data);
         Helper::saveLog('QuickSpin Direct LAUNCH', 66, json_encode($data),  "HIT" );
         $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
         $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=web&ticket=".$data['token'];
