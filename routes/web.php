@@ -713,4 +713,4 @@ $app->post('api/crashgame/refund', 'CrashGameController@Refund');
 $app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
 
 // QUickSpins Direct
-$app->post('api/quickspin/verifyToken', 'QuickspinDirectController@Authenticate');
+$app->post('/api/quickspin/verifyToken', 'QuickspinDirectController@Authenticate');
