@@ -336,7 +336,7 @@ class FunkyGamesController extends Controller
 
 
         $updateGameTransaction = [
-			  'win' => $win_or_lost,
+			  'win' => 5,
 	          'pay_amount' => $pay_amount,
 	          'income' => $income,
 	          'entry_id' => $entry_id,
