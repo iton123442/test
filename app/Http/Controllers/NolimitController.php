@@ -400,7 +400,7 @@ class NolimitController extends Controller
                     // }else{
                     //     $win_or_lost = $pay_amount > 0 ?  1 : 0;
                     // }
-                    $win_or_lost = $pay_amount == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1
+                    $win_or_lost = $pay_amount == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
                    $updateGameTransaction = [
                         'win' => 5,
                         'pay_amount' => $amount,
