@@ -51,7 +51,7 @@ class DemoHelper{
                 "game_launch" => true
             );
         }
-        elseif($provider_code == 104 ||$provider_code == 38){ // Manna Play Betrnk && Manna Play
+        elseif($provider_code == 104){ // Manna Play Betrnk && Manna Play
             $response = array(
                 "game_code" => $data->game_code,
                 "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
