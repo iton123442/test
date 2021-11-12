@@ -275,7 +275,7 @@ public function gameBet($request, $client_details){
                                     if(!isset($payload['actions'][1])){
                                             if($payload['finished'] == true){
                                                      $updateGameTransaction = [
-                                                                'win' => 0,
+                                                                'win' => 5,
                                                                 'pay_amount' => 0,
                                                                 'income' => $bet_amount,
                                                                 'entry_id' => 1,
@@ -495,7 +495,7 @@ public function gameBet($request, $client_details){
                     }
                 
                    $updateGameTransaction = [
-                        'win' =>$win_or_lost,
+                        'win' =>5,
                         'pay_amount' => $amount,
                         'income' => $income,
                         'entry_id' => $entry_id,

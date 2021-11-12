@@ -622,7 +622,11 @@ return [
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',
         'api_url' => 'https://api4.slotomatic.net/api/',
     ],
-
+    'quickspinDirect' => [
+        'provider_db_id'=> 66,
+        'api_url' => 'https://d1oij17g4yikkz.cloudfront.net',
+        'partner_id' => 2076,
+    ],
 
 ];
 
