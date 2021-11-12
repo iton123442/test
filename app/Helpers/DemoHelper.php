@@ -94,6 +94,14 @@ class DemoHelper{
                 "game_launch" => true
             );
         }
+
+        elseif($provider_code==38){ // Mannaplay
+            $response = array(
+                "game_code" => $data->game_code,
+                "url" => DemoHelper::mannaLaunchUrl($data->game_code,$lang,$exitUrl),
+                "game_launch" => true
+            );
+        }
         // elseif($provider_code == 34){ // EDP
         //     // / $client = new Client();
         //     // $guzzle_response = $client->get('https://edemo.endorphina.com/api/link/accountId/1002 /hash/' . md5("endorphina_4OfAKing@ENDORPHINA") . '/returnURL/' . $returnURL);
@@ -251,5 +259,30 @@ class DemoHelper{
         $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
             return $gameurl;
         
+    }
+
+    public static function mannaLaunchUrl($game_code, $lang ,$exitUrl){
+        $lang = GameLobby::getLanguage("Manna Play", $lang);
+        // Authenticate New Token
+        try {
+            // Generate Game Link
+            $game_link = new Client();
+            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
+                    ['body' => json_encode(
+                            [
+                                "mode" => "demo",
+                                "language" => $lang,
+                                "gameId" => $game_code,
+                                "exitUrl" => $exitUrl
+                            ]
+                    )]
+                );
+            $link_result = json_decode($game_link_response->getBody()->getContents());
+            return $link_result->url;
+        } catch (\Exception $e) {
+            return $exitUrl;
+        }
+
+       
     }
 }
