@@ -51,7 +51,7 @@ class DemoHelper{
                 "game_launch" => true
             );
         }
-        elseif($provider_code == 104 ||$provider_code == 38){ // Manna Play Betrnk && Manna Play
+        elseif($provider_code == 104){ // Manna Play Betrnk && Manna Play
             $response = array(
                 "game_code" => $data->game_code,
                 "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
@@ -91,6 +91,14 @@ class DemoHelper{
             $response = array(
                 "game_code" => $data->game_code,
                 "url" => DemoHelper::kagaming($data->game_code,$lang,$exitUrl),
+                "game_launch" => true
+            );
+        }
+
+        elseif($provider_code==38){ // Mannaplay
+            $response = array(
+                "game_code" => $data->game_code,
+                "url" => DemoHelper::mannaLaunchUrl($data->game_code,$lang,$exitUrl),
                 "game_launch" => true
             );
         }
@@ -251,5 +259,30 @@ class DemoHelper{
         $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
             return $gameurl;
         
+    }
+
+    public static function mannaLaunchUrl($game_code, $lang ,$exitUrl){
+        $lang = GameLobby::getLanguage("Manna Play", $lang);
+        // Authenticate New Token
+        try {
+            // Generate Game Link
+            $game_link = new Client();
+            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
+                    ['body' => json_encode(
+                            [
+                                "mode" => "demo",
+                                "language" => $lang,
+                                "gameId" => $game_code,
+                                "exitUrl" => $exitUrl
+                            ]
+                    )]
+                );
+            $link_result = json_decode($game_link_response->getBody()->getContents());
+            return $link_result->url;
+        } catch (\Exception $e) {
+            return $exitUrl;
+        }
+
+       
     }
 }
