@@ -16,8 +16,13 @@ use DB;
 class QuickspinDirectController extends Controller
 {
     public function Authenticate(Request $req){
-        Helper::saveLog('QuickSpinDirect verifyToken', 65, json_encode($req->all()),  "HIT" );
+        Helper::saveLog('QuickSpinDirect verifyToken', 66, json_encode($req->all()),  "HIT" );
         $client_details = ProviderHelper::getClientDetails('token',$req['token']);
+        if($client_details->country_code != null){
+            $countryCode = $client_details->country_code;
+        }else{
+            $countryCode = "PH";
+        }
         if($client_details != null){
             $response = [
                 "customerid" => $client_details->player_id,
@@ -25,7 +30,7 @@ class QuickspinDirectController extends Controller
                 "cashiertoken" => $client_details->player_token,
                 "customercurrency" => $client_details->default_currency,
                 "balance" => (int)$client_details->balance/100,
-                "jurisdiction" => "PH",
+                "jurisdiction" => $countryCode,
                 "classification" => "vip",
                 "playermessage" => [
                     "title" => "",
