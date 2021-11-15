@@ -714,3 +714,7 @@ $app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
 
 // QUickSpins Direct
 $app->post('/public/api/quickspin/verifyToken', 'QuickspinDirectController@Authenticate');
+$app->post('/public/api/quickspin/getBalance', 'QuickspinDirectController@getBalance');
+$app->post('/public/api/quickspin/withdraw', 'QuickspinDirectController@betProcess');
+$app->post('/public/api/quickspin/deposit', 'QuickspinDirectController@winProcess');
+$app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollbackProcess');
