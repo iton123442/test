@@ -37,7 +37,7 @@ class PlayerOperatorPortController extends Controller
 			return response()->json($response, $http_status);
 		}
 
-		$client_details = ProviderHelper::getClientDetails('ptw', $payload['client_player_id'], $payload['client_id'], 'all', $payload['client_id']);
+		$client_details = ProviderHelper::getPlayerOperatorDetails('ptw', $payload['client_player_id'], $payload['client_id']);
 		
 		if ($client_details == null) {
 			$http_status = 407;
