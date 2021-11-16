@@ -180,7 +180,7 @@ class ProviderHelper{
 	 * @param $[value] [<value to be searched>]
 	 * 
 	 */
-    public static function getClientDetails($type = "", $value = "", $gg=1, $providerfilter='all') {
+    public static function getClientDetails($type = "", $value = "", $gg=1, $providerfilter='all', $client_id = 1) {
     	// DB::enableQueryLog();
 	    if ($type == 'token') {
 		 	$where = 'where pst.player_token = "'.$value.'"';
@@ -200,6 +200,11 @@ class ProviderHelper{
 		if ($type == 'token_id') {
 			$where = 'where pst.token_id = "'.$value.'"';
 		}
+		
+		if ($type == 'ptw') {
+			$where = 'where p.client_player_id = "'.$value.'"  AND  p.client_id = "'.$client_id.'"';
+		}
+
 		if($providerfilter=='fachai'){
 		 	$filter = 'LIMIT 1';
 		}else{

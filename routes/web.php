@@ -718,3 +718,6 @@ $app->post('/public/api/quickspin/getBalance', 'QuickspinDirectController@getBal
 $app->post('/public/api/quickspin/withdraw', 'QuickspinDirectController@betProcess');
 $app->post('/public/api/quickspin/deposit', 'QuickspinDirectController@winProcess');
 $app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollbackProcess');
+
+// Player Operator Details
+$app->post('api/player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
