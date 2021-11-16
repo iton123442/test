@@ -706,3 +706,7 @@ $app->post('api/crashgame/debit', 'CrashGameController@Debit');
 $app->post('api/crashgame/credit', 'CrashGameController@Credit');
 $app->post('api/crashgame/refund', 'CrashGameController@Refund');
 $app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
+
+
+// Player Operator Details
+$app->post('api/player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
