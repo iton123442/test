@@ -714,3 +714,6 @@ $app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
 
 // QUickSpins Direct
 $app->post('/api/quickspin/verifyToken', 'QuickspinDirectController@Authenticate');
+
+// Player Operator Details
+$app->post('api/player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
