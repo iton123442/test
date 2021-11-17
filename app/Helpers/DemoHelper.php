@@ -297,6 +297,7 @@ class DemoHelper{
 
     public static function slotmill($game_code, $lang ,$exitUrl){
         // Authenticate New Token
+        $lang = $lang == '' ? 'en' : $lang; 
         $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.slotmill.provider_db_id'), $game_code);
         try {
             return $url = $getGameDetails->game_demo."/?language=".$lang."&org=".config("providerlinks.slotmill.brand")."&currency=USD&homeurl=".$exitUrl;
