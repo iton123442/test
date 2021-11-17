@@ -102,6 +102,15 @@ class DemoHelper{
                 "game_launch" => true
             );
         }
+        elseif($provider_code==89){ //slotmill
+
+            $response = array(
+                "game_code" =>$data->game_code,
+                "url" =>  DemoHelper::slotmill($data->game_code,$lang,$exitUrl),
+                "game_launch" => true
+            );
+            
+        }
         // elseif($provider_code == 34){ // EDP
         //     // / $client = new Client();
         //     // $guzzle_response = $client->get('https://edemo.endorphina.com/api/link/accountId/1002 /hash/' . md5("endorphina_4OfAKing@ENDORPHINA") . '/returnURL/' . $returnURL);
@@ -283,6 +292,17 @@ class DemoHelper{
             return $exitUrl;
         }
 
+       
+    }
+
+    public static function slotmill($game_code, $lang ,$exitUrl){
+        // Authenticate New Token
+        $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.slotmill.provider_db_id'), $game_code);
+        try {
+            return $url = $getGameDetails->game_demo."/?language=".$lang."&org=".config("providerlinks.slotmill.brand")."&currency=USD&homeurl=".$exitUrl;
+        } catch (\Exception $e) {
+            return $exitUrl;
+        }
        
     }
 }
