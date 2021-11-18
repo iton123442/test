@@ -62,7 +62,6 @@ class PlayerOperatorPortController extends Controller
 		    'test_player' => $client_details->test_player,
 		    'username' => $client_details->username,
 		    'created_at' => $client_details->created_at,
-		    'player_token' => $client_details->player_token,
 		    'client_url' => $client_details->client_url,
 		    'default_currency' => $client_details->default_currency,
 		    'wallet_type' => $client_details->wallet_type,
