@@ -1437,7 +1437,7 @@ class GameLobby{
         $client_details = Providerhelper::getClientDetails('token', $token);
 
         /* [START] LoginRequest */
-        $queryString = "method=LoginRequest&Key=".$secretKey."&Time=".$dateTime."&Username=".$client_details->username."&CurrencyType=".$client_details->default_currency."&GameCode=".$game_code."&Mobile=0";
+        $queryString = "method=LoginRequest&Key=".$secretKey."&Time=".$dateTime."&Username=".$client_details->player_id."&CurrencyType=".$client_details->default_currency."&GameCode=".$game_code."&Mobile=0";
         $hashedString = md5($queryString.$md5Key.$dateTime.$secretKey);
         $response = ProviderHelper::simplePlayAPICall($queryString, $hashedString);
         $url = (string) $response['data']->GameURL;
