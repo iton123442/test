@@ -130,7 +130,7 @@ class GameLobby{
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
-        $url = config("providerlinks.nolimit.api_url").'device='.$device.'&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
+        $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
          
         } catch (\Exception $e) {
