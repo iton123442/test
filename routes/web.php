@@ -718,3 +718,8 @@ $app->post('/public/api/quickspin/getBalance', 'QuickspinDirectController@getBal
 $app->post('/public/api/quickspin/withdraw', 'QuickspinDirectController@betProcess');
 $app->post('/public/api/quickspin/deposit', 'QuickspinDirectController@winProcess');
 $app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollbackProcess');
+
+// Player Operator Details
+$app->group(['prefix' => 'api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
+    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+});
