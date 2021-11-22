@@ -709,4 +709,6 @@ $app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
 
 
 // Player Operator Details
-$app->post('api/player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+$app->group(['prefix' => 'api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
+    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+});
