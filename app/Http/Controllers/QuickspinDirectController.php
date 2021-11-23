@@ -219,13 +219,9 @@ class QuickspinDirectController extends Controller
             "txid" => (int) $provider_trans_id,
             "remotetxid" => (string)$bet_transaction->game_trans_id
         ];
-        if($pay_amount >0 ){
-            $status = 1;
-        }else{
-            $status = 2;
-        }
+        
         $updateGameTransaction = [
-              'win' => $status,
+              'win' => 5,
               'pay_amount' => $pay_amount,
               'income' => $income,
               'entry_id' => $entry_id,
@@ -273,8 +269,9 @@ class QuickspinDirectController extends Controller
                 ]
             ]
         ];
-        $client_response = ClientRequestHelper::fundTransfer_TGggg($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
         if($client_response != false){  
+
         $updateTransactionEXt = array(
               "provider_request" =>json_encode($req->all()),
               "mw_response" => json_encode($res),
