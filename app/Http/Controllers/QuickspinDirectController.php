@@ -127,7 +127,7 @@ class QuickspinDirectController extends Controller
                 "provider_request" =>json_encode($req->all()),
             );
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
-            // $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
                     if(isset($client_response->fundtransferresponse->status->code)){
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         switch ($client_response->fundtransferresponse->status->code) {
