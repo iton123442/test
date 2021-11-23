@@ -1416,9 +1416,26 @@ class GameLobby{
             case 'Leap':
                 // $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency=USD';
 
-            $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency='.$client_details->default_currency.'';
-                break;
-            
+                $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency='.$client_details->default_currency.'';
+            break;
+
+            case '7 Mojos':
+                $get_game_type = DragonGamingHelper::getGameType($game_code, config("providerlinks.vivo.PROVIDER_ID"));
+                
+                $game_type_arr = [
+                    '1' => 'slots',
+                    '5' => 'live'
+                ];
+
+                if($game_type_arr[$get_game_type] == 'slots') {
+                    $url = config("providerlinks.vivo.7MOJOS_URL").'?tableguid=J37809HJDJ348HNH232221&token='.$token.'&operatorID='.$operator_id.'&operatorToken='. config("providerlinks.vivo.OPERATOR_TOKEN") .'&homeURL='.$exitUrl.'&gameid='.$game_code.'&mode=real&language=EN&currency='.$client_details->default_currency.'&host=https://de-se.svmsrv.com&gametype=slots';
+                }
+                else
+                {
+                    $url = config("providerlinks.vivo.7MOJOS_URL").'?tableguid=J37809HJDJ348HNH232221&token='.$token.'&operatorID='.$operator_id.'&operatorToken='. config("providerlinks.vivo.OPERATOR_TOKEN") .'&homeURL='.$exitUrl.'&gameid='.$game_code.'&mode=real&language=EN&currency='.$client_details->default_currency.'&host=https://de-lce.svmsrv.com&gametype=live';
+                }
+            break;
+    
             default:
                 # code...
                 break;
