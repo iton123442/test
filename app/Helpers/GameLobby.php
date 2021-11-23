@@ -1777,10 +1777,16 @@ class GameLobby{
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
         return "false";
     }
-    public static function QuickSpinDGameLaunch($data, $device){
+    public static function QuickSpinDGameLaunch($data,$device){
         Helper::saveLog('QuickSpin Direct LAUNCH', 66, json_encode($data),  "HIT" );
+        if($device == 'desktop'){
+            $channel = 'web';
+        }else{
+
+            $channel = 'mobile';
+        }
         $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
-        $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$device."&ticket=".$data['token'];
+        $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$channel."&ticket=".$data['token'];
         return $gameUrl;
     }
 }
