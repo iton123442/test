@@ -70,6 +70,7 @@ $app->routeMiddleware([
     'oauth' => \LucaDegasperi\OAuth2Server\Middleware\OAuthMiddleware::class,
     // 'oauth-user'=> \LucaDegasperi\OAuth2Server\Middleware\OAuthUserOwnerMiddleware::class,
     'authorize' => App\Http\Middleware\Authorize::class,
+    'json_accept' => App\Http\Middleware\JsonRequestMiddleware::class,
 ]);
 
 /*

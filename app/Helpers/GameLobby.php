@@ -130,7 +130,7 @@ class GameLobby{
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
-        $url = config("providerlinks.nolimit.api_url").'device='.$device.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
+        $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
          
         } catch (\Exception $e) {
@@ -589,6 +589,7 @@ class GameLobby{
      public static function slotmill($request){
         try {
             $client_details = Providerhelper::getClientDetails('token', $request["token"]);
+            $exit_url = $request["exitUrl"] ? $request["exitUrl"] : "";
             $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.slotmill.provider_db_id'), $request['game_code']);
             // $url = config("providerlinks.slotmill")[$request["game_code"]]; 
             // if ($request["game_code"] == "19002") {
@@ -602,7 +603,7 @@ class GameLobby{
             // } elseif ($request["game_code"] == "19008") {
             //    $url =  config("providerlinks.slotmill.outlaws"); 
             // }
-            return $url = $getGameDetails->info."/?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
+            return $url = $getGameDetails->info."/?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token."&homeurl=".$exit_url;
 
         } catch (\Exception $e){
             return $request["exitUrl"];
@@ -1436,7 +1437,7 @@ class GameLobby{
         $client_details = Providerhelper::getClientDetails('token', $token);
 
         /* [START] LoginRequest */
-        $queryString = "method=LoginRequest&Key=".$secretKey."&Time=".$dateTime."&Username=".$client_details->username."&CurrencyType=".$client_details->default_currency."&GameCode=".$game_code."&Mobile=0";
+        $queryString = "method=LoginRequest&Key=".$secretKey."&Time=".$dateTime."&Username=".$client_details->player_id."&CurrencyType=".$client_details->default_currency."&GameCode=".$game_code."&Mobile=0";
         $hashedString = md5($queryString.$md5Key.$dateTime.$secretKey);
         $response = ProviderHelper::simplePlayAPICall($queryString, $hashedString);
         $url = (string) $response['data']->GameURL;
@@ -1775,6 +1776,12 @@ class GameLobby{
         }
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
         return "false";
+    }
+    public static function QuickSpinDGameLaunch($data){
+        Helper::saveLog('QuickSpin Direct LAUNCH', 66, json_encode($data),  "HIT" );
+        $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
+        $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=web&ticket=".$data['token'];
+        return $gameUrl;
     }
 
 }

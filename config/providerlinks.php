@@ -1,6 +1,7 @@
 <?php
 
-$middleware_url_api = 'https://api-test.betrnk.games/public';   
+$middleware_url_api = 'https://api-test.betrnk.games/public'; 
+// $middleware_url_api = 'http://localhost:1010'; 
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play-test.betrnk.games';
 $iframe_url = 'https://play-test.betrnk.games/loadgame/transferwallet?param=';
@@ -622,7 +623,11 @@ return [
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',
         'api_url' => 'https://api4.slotomatic.net/api/',
     ],
-
+    'quickspinDirect' => [
+        'provider_db_id'=> 66,
+        'api_url' => 'https://d1oij17g4yikkz.cloudfront.net',
+        'partner_id' => 2076,
+    ],
 
 ];
 
