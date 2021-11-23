@@ -441,6 +441,7 @@ return [
     'vivo' => [
         'PROVIDER_ID' => 34,
         'OPERATOR_ID' => '3003616',
+        'OPERATOR_TOKEN' => 'ODHr6OYKEblDZbQd23vNTfdjNXrriazJ',
         'SERVER_ID' => '6401748',
         'PASS_KEY' => '7f1c5d',
         'VIVO_URL' => 'https://games.vivogaming.com/',
