@@ -1768,7 +1768,7 @@ class GameLobby{
             if($token != "false"){
                 $getGameDetails = Helper::findGameDetails( "game_code", $proivder_db_id, $data['game_code']);
                 $brand = AmuseGamingHelper::getBrand($data['game_code'],$proivder_db_id);
-                $url = $launch_url."?token=".$token. "&brand=".$brand."&technology=html5&game=".$getGameDetails->game_code."&server=api4.slotomatic.net";
+                $url = $launch_url."?token=".$token. "&brand=".$brand."&technology=html5&game=".$getGameDetails->game_code."&closeURL=".$data['exitUrl']."&server=api4.slotomatic.net";
                 Helper::saveLog('AMUSEGAMING LAUNCH URL', 65, json_encode($data),  $url );
                 return $url;
             }
