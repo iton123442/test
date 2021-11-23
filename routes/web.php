@@ -88,7 +88,7 @@ $app->post('/public/api/manna/{brand_code}/fetchbalance', 'MannaPlayController@g
 $app->post('/public/api/manna/{brand_code}/bet', 'MannaPlayController@debitProcess');
 $app->post('/public/api/manna/{brand_code}/win', 'MannaPlayController@creditProcess');
 $app->post('/public/api/manna/{brand_code}/betrollback', 'MannaPlayController@rollbackTransaction');
-
+$app->post('/public/api/manna/{brand_code}/fs_win', 'MannaPlayController@freeRound');
 // QTech Games Endpoints
 $app->get('/public/api/qtech/{brand_code}/accounts/{player_id}/session?gameId={game_id}', 'QTechController@authPlayer');
 $app->post('/public/api/qtech/{brand_code}/accounts/{player_id}/balance?gameId={game_id}', 'QTechController@getBalance');
@@ -294,11 +294,11 @@ $app->post('/public/api/png/release','PNGController@release');
 $app->post('/public/api/png/balance','PNGController@balance');
 $app->post('/public/api/png/cancelReserve','PNGController@cancelReserve');
 //PNG BETSOFTED
-$app->post('/api/png/betsofted/authenticate','PNGControllerBetsofted@authenticate');
-$app->post('/api/png/betsofted/reserve','PNGControllerBetsofted@reserve');
-$app->post('/api/png/betsofted/release','PNGControllerBetsofted@release');
-$app->post('/api/png/betsofted/balance','PNGControllerBetsofted@balance');
-$app->post('/api/png/betsofted/cancelReserve','PNGController@cancelReserve');
+$app->post('/public/api/png/betsofted/authenticate','PNGControllerBetsofted@authenticate');
+$app->post('/public/api/png/betsofted/reserve','PNGControllerBetsofted@reserve');
+$app->post('/public/api/png/betsofted/release','PNGControllerBetsofted@release');
+$app->post('/public/api/png/betsofted/balance','PNGControllerBetsofted@balance');
+$app->post('/public/api/png/betsofted/cancelReserve','PNGController@cancelReserve');
 //Wazdan Endpoints
 $app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
 $app->post('/public/api/wazdan/getStake','WazdanController@getStake');
@@ -312,14 +312,14 @@ $app->post('/public/api/betrnk/lotto', 'BetrnkController@getUrl');
 
 // TIDY
 // $app->post('/public/tidy/api/auth', 'TidyController@conecteccc');
-$app->post('/public/api/tidy/api/game/outside/link', 'TidyController@getGameUrl'); // CENTRALIZED
-$app->post('/public/api/tidy/api/checkplayer', 'TidyController@autPlayer');
-$app->post('/public/api/tidy/api/gamelist', 'TidyController@getGamelist');
-$app->post('/public/api/tidy/api/gameurl', 'TidyController@gameUrl');
-$app->post('/public/api/tidy/api/transaction/bet', 'TidyController@gameBet');
-$app->post('/public/api/tidy/api/transaction/rollback', 'TidyController@gameRollback');
-$app->post('/public/api/tidy/api/transaction/win', 'TidyController@gameWin');
-$app->post('/public/api/tidy/api/user/balance', 'TidyController@checkBalance');
+$app->post('/public/tidy/api/game/outside/link', 'TidyController@getGameUrl'); // CENTRALIZED
+$app->post('/public/tidy/api/checkplayer', 'TidyController@autPlayer');
+$app->post('/public/tidy/api/gamelist', 'TidyController@getGamelist');
+$app->post('/public/tidy/api/gameurl', 'TidyController@gameUrl');
+$app->post('/public/tidy/api/transaction/bet', 'TidyController@gameBet');
+$app->post('/public/tidy/api/transaction/rollback', 'TidyController@gameRollback');
+$app->post('/public/tidy/api/transaction/win', 'TidyController@gameWin');
+$app->post('/public/tidy/api/user/balance', 'TidyController@checkBalance');
 
 //TGG
 $app->post('/public/api/tgg/gamelist', 'TGGController@getGamelist'); // launch game 
@@ -597,22 +597,22 @@ $app->post('/public/api/bgaming/play', 'BGamingController@gameTransaction');
 $app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
 
 // Five Men
-//$app->post('/public/api/5men','FiveMenController@index');
+$app->post('/public/api/5men','FiveMenController@index');
 
-$app->post('/public/api/5men/gamelist', 'FiveMenController@getGamelist'); // launch game 
-$app->post('/public/api/5men/geturl', 'FiveMenController@getURL');// launch game
-$app->post('/public/api/5men', 'FiveMenController@index'); // Single Route
-$app->post('/public/api/5men/init', 'FiveMenController@gameInit');
-$app->post('/public/api/5men/bet', 'FiveMenController@gameBet');
-$app->post('/public/api/5men/win', 'FiveMenController@gameWin');
-$app->post('/public/api/5men/refund', 'FiveMenController@gameRefund');
+// $app->post('/public/api/5men/gamelist', 'FiveMenController@getGamelist'); // launch game 
+// $app->post('/public/api/5men/geturl', 'FiveMenController@getURL');// launch game
+// $app->post('/public/api/5men', 'FiveMenController@index'); // Single Route
+// $app->post('/public/api/5men/init', 'FiveMenController@gameInit');
+// $app->post('/public/api/5men/bet', 'FiveMenController@gameBet');
+// $app->post('/public/api/5men/win', 'FiveMenController@gameWin');
+// $app->post('/public/api/5men/refund', 'FiveMenController@gameRefund');
 
 // Playstar
-$app->get('/public//api/playstar/auth','PlayStarController@getAuth');
-$app->get('/public//api/playstar/bet','PlayStarController@getBet');
-$app->get('/public//api/playstar/result','PlayStarController@getResult');
-$app->get('/public//api/playstar/refundbet','PlayStarController@getRefundBet');
-$app->get('/public//api/playstar/getbalance','PlayStarController@getBalance');
+$app->get('/public/api/playstar/auth','PlayStarController@getAuth');
+$app->get('/public/api/playstar/bet','PlayStarController@getBet');
+$app->get('/public/api/playstar/result','PlayStarController@getResult');
+$app->get('/public/api/playstar/refundbet','PlayStarController@getRefundBet');
+$app->get('/public/api/playstar/getbalance','PlayStarController@getBalance');
 
 
 
@@ -697,7 +697,8 @@ $app->post('/public/WithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDepos
 $app->post('/public/Cancel', 'AmuseGamingController@Cancel');
 $app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGamelist');
 //FREGAME OR FREEROUND BY PROVIDER
-$app->post('game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
+$app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
+$app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
 
 // Crash Gaming (TigerGames)
 $app->post('api/crashgame/balance', 'CrashGameController@Balance');
@@ -705,3 +706,9 @@ $app->post('api/crashgame/debit', 'CrashGameController@Debit');
 $app->post('api/crashgame/credit', 'CrashGameController@Credit');
 $app->post('api/crashgame/refund', 'CrashGameController@Refund');
 $app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
+
+
+// Player Operator Details
+$app->group(['prefix' => 'api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
+    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+});

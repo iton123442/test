@@ -130,21 +130,7 @@ class GameLobby{
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
-        //     $client_details =ProviderHelper::getClientDetails('token',$data['token']);
-
-        //     $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-        //     $isMob = is_numeric(strpos($ua, "mobile"));
-
-        //     if($isMob == 1) {
-
-        //           $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=mobile&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token']; 
-        //               return $url;
-        //     }else {
-
-        //     $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&language=en&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
-        //      return $url;
-        // }
-        $url = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device='.$device.'&language='.$data['lang'].'&operator=BETRNK&game='.$data['game_code'].'&token='.$data['token'];
+        $url = config("providerlinks.nolimit.api_url").'device='.$device.'&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
          
         } catch (\Exception $e) {
@@ -156,6 +142,7 @@ class GameLobby{
     }
 
     public static function BGamingLaunchUrl($request_data, $device){
+        Helper::saveLog('Bgaming create session', 49, json_encode($request_data), "BGamingLaunchUrl");
         $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
         $balance = str_replace(".", "", $client_player_details->balance);
 
@@ -165,7 +152,8 @@ class GameLobby{
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        
+        Helper::saveLog('Bgaming create session', 49, json_encode($request_data), $game_launch);
+
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode(
@@ -263,7 +251,7 @@ class GameLobby{
         $url = EVGHelper::gameLaunch($token,$player_ip,$game_code,$lang,$exitUrl,config('providerlinks.evolution.env'));
         return $url;
     }
-    public static function boleLaunchUrl($game_code,$token,$exitUrl, $country_code='PH'){
+    public static function boleLaunchUrl($game_code,$token,$game_provider,$exitUrl, $country_code='PH'){
 
         $client_details = ProviderHelper::getClientDetails('token', $token);
         if($client_details != null){
@@ -330,7 +318,7 @@ class GameLobby{
         
     }
 
-    public static function evoplayLunchUrl($token,$game_code){
+    public static function evoplayLunchUrl($token,$game_code,$game_provider,$exit_url){
         $client_player_details = GameLobby::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.evoplay.project_id'),
@@ -540,7 +528,7 @@ class GameLobby{
             }
 
             if(isset($login_token['Token'])){
-                $url = 'https://web.sa-globalxns.com/app.aspx?username='.config('providerlinks.sagaming.prefix').$client_details->player_id.'&token='.$login_token['Token'].'&lobby='.config('providerlinks.sagaming.lobby').'&lang='.$lang.'&returnurl='.$url.'';
+                $url = 'https://www.sai.slgaming.net/app.aspx?username='.config('providerlinks.sagaming.prefix').$client_details->player_id.'&token='.$login_token['Token'].'&lobby='.config('providerlinks.sagaming.lobby').'&lang='.$lang.'&returnurl='.$url.'';
                 return $url;
             }else{
                 return false;
@@ -601,7 +589,8 @@ class GameLobby{
      public static function slotmill($request){
         try {
             $client_details = Providerhelper::getClientDetails('token', $request["token"]);
-            $url = config("providerlinks.slotmill")[$request["game_code"]]; 
+            $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.slotmill.provider_db_id'), $request['game_code']);
+            // $url = config("providerlinks.slotmill")[$request["game_code"]]; 
             // if ($request["game_code"] == "19002") {
             //    $url = config("providerlinks.slotmill.treasures"); 
             // } elseif ($request["game_code"] == "19003") {
@@ -613,7 +602,7 @@ class GameLobby{
             // } elseif ($request["game_code"] == "19008") {
             //    $url =  config("providerlinks.slotmill.outlaws"); 
             // }
-            return $url = $url."?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
+            return $url = $getGameDetails->info."/?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
 
         } catch (\Exception $e){
             return $request["exitUrl"];
@@ -854,6 +843,7 @@ class GameLobby{
         ]);
         $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
         $client_response = json_decode($guzzle_response->getBody()->getContents());
+        Helper::saveLog('Game Launch Pragmatic Play', 26, json_encode($form_body), json_encode($client_response));
         $url = $client_response->gameURL;
         return $url;
         // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
@@ -1766,7 +1756,7 @@ class GameLobby{
         }
     }
 
-    public static function AmuseGamingGameLaunch($data){
+    public static function AmuseGamingGameLaunch($data,$device){
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
         $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
         $launch_url = config('providerlinks.amusegaming.launch_url');

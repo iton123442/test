@@ -7,16 +7,17 @@ use Illuminate\Http\Request;
 use App\Helpers\GameLobby;
 use App\Models\ClientGameSubscribe;
 use App\Models\GameSubProvider;
+use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use App\Helpers\Helper;
 use App\Helpers\FreeSpinHelper;
 use App\Helpers\ClientHelper;
 use DB;
 class FreeRoundController extends Controller
 {
-    //
-    // public function __construct(){
-    //     $this->middleware('oauth', ['except' => ['index']]);
-    // }
+    
+    public function __construct(){
+        $this->middleware('oauth', ['except' => ['index']]);
+    }
     public function freeRoundController(Request $request){
         if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code')|| !$request->has('details') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
@@ -148,5 +149,121 @@ class FreeRoundController extends Controller
         } elseif ($sub_provder_id == 38) {
             return FreeSpinHelper::createFreeRoundMannaplay($player_details, $data, $sub_provder_id);
         }
+    }
+
+
+    // @return
+    // client_id
+    // player id
+    // round id
+    // bet amount 
+    // pay amount
+    // game name
+    // game_id
+    // game_code
+    // sub provider
+    // status (win lose refund failed progressing)
+    // create_at
+    public function getQuery(Request $request)
+    {
+        // if($request->has('client_id')&&$request->has('player_id')&&$request->has('dateStart')&&$request->has('dateEnd')){
+        Helper::saveLog('getQuery', $request->has('client_id') , json_encode($request->all()), "getQuery");
+        if( !$request->has('client_id') || !$request->has('date') || !$request->has('page') || !$request->has('limit') ){
+            $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
+            return response($mw_response,200)
+            ->header('Content-Type', 'application/json');
+        }
+
+        $Client_SecurityHash = $this->Client_SecurityHash($request->client_id);
+        if($Client_SecurityHash !== true){
+             $mw_response = ["error_code"=>"408","error_description"=>"Client Disabled"];
+            return response($mw_response,200)
+            ->header('Content-Type', 'application/json');
+        }
+
+        $from = date("Y-m-d H:i:s", strtotime($request->date));
+        $to = date("Y-m-d H:i:s", strtotime($request->date." 23:59:59"));
+        if($request->has('start_time')){ 
+            $from = date("Y-m-d H:i:s", strtotime($request->date." ".$request->start_time));
+        }
+        if($request->has('end_time')){ 
+            $to = date("Y-m-d H:i:s", strtotime($request->date." ".$request->end_time));
+        }
+       
+        // $partition = TWHelpers::multiplePartition($from,$to);
+        $and_player = "and player_id  = (SELECT player_id FROM players WHERE client_id = ".$request->client_id." AND client_player_id = '".$request->client_player_id."' LIMIT 1)  ";
+        if ($request->client_player_id == "all") {
+            $and_player = '';
+        }
+        try {
+            $total_data = DB::select("
+                select 
+                count(freespin_id) total
+                from freespin fs
+                inner join players using (player_id)
+                inner join clients using (client_id)
+                where convert_tz(fs.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND client_id = ".$request->client_id."  ".$and_player.";
+                ")[0];
+            
+            $query = "
+                    select 
+                    p.client_player_id, g.game_code,
+                    (select sub_provider_name from sub_providers where sub_provider_id = g.sub_provider_id) as game_provider,
+                    total_spin as rounds,
+                    spin_remaining,
+                    fs.denominations,
+                    fs.lines,
+                    fs.coins,
+                    case when fs.status = 0 then 'pending' when fs.status = 1 then 'running' when fs.status = 2 then 'completed'   else 'failed' end as status,
+                    date_expire,
+                    fs.created_at
+                    from freespin fs
+                    inner join players p using (player_id)
+                    inner join clients c using (client_id)
+                    inner join games g using(game_id)
+                where convert_tz(fs.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
+                order by freespin_id desc
+                limit ".$request->page.", ".TWHelpers::getLimitAvailable($request->limit).";
+            ";
+            $details = DB::select($query);
+            if (count($details) == 0) {
+                $details = ["data" => null,"status" => ["code" => "200","message" => TWHelpers::getPTW_Message(200)]];
+                Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $query);
+                return response()->json($details); 
+            }
+
+           
+            $data = array();//this is to add data and reformat the $table object to datatables standard array
+            foreach($details as $datas){
+                $datatopass['client_player_id']=$datas->client_player_id;
+                $datatopass['game_code']=$datas->game_code;
+                $datatopass['rounds']=$datas->rounds;
+                $datatopass['spin_remaining']=$datas->spin_remaining;
+                $datatopass['denominations']=$datas->denominations;
+                $datatopass['lines']=$datas->lines;
+                $datatopass['coins']=$datas->coins;
+                $datatopass['status']=$datas->status;
+                $datatopass['date_expire']=$datas->date_expire;
+                $datatopass['created_at']=$datas->created_at;
+                $data[]=$datatopass;
+            }
+            $mw_response = [
+                "data" => $data,
+                "Total" => $total_data->total,
+                "Page" => $request->page,
+                "Limit" =>  TWHelpers::getLimitAvailable($request->limit),
+                "status" => [
+                    "code" => 200,
+                    "message" => TWHelpers::getPTW_Message(200)
+                ]
+            ];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $query);
+            return response()->json($mw_response); 
+        }catch (\Exception $e){
+            $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
+            return response($mw_response,200)
+            ->header('Content-Type', 'application/json');
+        }
+     
     }
 }

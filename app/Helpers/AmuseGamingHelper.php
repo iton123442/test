@@ -128,16 +128,22 @@ class AmuseGamingHelper{
              * CHECK PLAYER REQUEST 
              * 
              ******************************************************************/
-            $param = [
-                "pubkey" => config('providerlinks.amusegaming.public_key'),
-                "time" => time(),
-                "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
-                "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
-                "filter_brands" => $brand,
-                "filter_channel" => $channel,
-                "filter_technology" => "html5",
-                "filter_categories" => "VideoSlots,TableGames",
-            ];
+            if($brand != ''){
+                $param = [
+                    "pubkey" => config('providerlinks.amusegaming.public_key'),
+                    "time" => time(),
+                    "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
+                    "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
+                    "filter_brands" => $brand,
+                ];
+            }else{
+                $param = [
+                    "pubkey" => config('providerlinks.amusegaming.public_key'),
+                    "time" => time(),
+                    "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
+                    "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
+                ];
+            }
             $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", config('providerlinks.amusegaming.secret_key'), true ) );
             Helper::saveLog('AMUSEGAMING GAMELIST', 65, json_encode($param),  $param );
             $response = $header->post( config('providerlinks.amusegaming.api_url').$endpoint, [
@@ -153,9 +159,33 @@ class AmuseGamingHelper{
             return false;
         }
     }
+
     public static function getBrand($game_code,$provider_id){
-        $game_details = DB::SELECT("SELECT game_code,game_name,game_name,sub_provider_name as brand FROM games g INNER JOIN sub_providers using (sub_provider_id) where game_code = '".$game_code."' and g.provider_id = ".$provider_id." ");
-        $brand = str_replace("AG ", "", $game_details[0]->brand);
+        $game_details = DB::SELECT("SELECT game_code,game_name,game_name, sub_provider_id as brand_code, sub_provider_name as brand FROM games g INNER JOIN sub_providers  sp using (sub_provider_id) where game_code = '".$game_code."' and g.provider_id = ".$provider_id." ");
+        // $brand = str_replace("AG ", "", $game_details[0]->brand);
+        if($game_details[0]->brand == 'AG Microgaming'){
+            $brand = 'microgaming';
+        }elseif($game_details[0]->brand == 'AG Playtech'){
+            $brand = 'playtech';
+        }elseif($game_details[0]->brand == 'AG IGT'){
+            $brand = 'igt';
+        }elseif($game_details[0]->brand == 'AG Play\'n GO' || $game_details[0]->brand_code == '124'){
+            $brand = 'playngo';
+        }elseif($game_details[0]->brand == 'AG EGT Original'){
+            $brand = 'egt';
+        }elseif($game_details[0]->brand == 'AG Wazdan'){
+            $brand = 'wazdan';
+        }elseif($game_details[0]->brand == 'AG NetEnt'){
+            $brand = 'netent';
+        }elseif($game_details[0]->brand == 'AG QuickSpin'){
+            $brand = 'quickspin';
+        }elseif($game_details[0]->brand == 'AG Amatic'){
+            $brand = 'amatic';
+        }elseif($game_details[0]->brand == 'AG Novomatic'){
+            $brand = 'novomatic';
+        }elseif($game_details[0]->brand == 'AG PragmaticPlay'){
+            $brand = 'pragmaticplay';
+        }
         return $brand;
     }
     public static function arrayToXml($array, $rootElement = null, $xml = null){
