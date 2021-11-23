@@ -917,7 +917,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code == 126){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::QuickSpinDGameLaunch($request->all()), 
+                        "url" => GameLobby::QuickSpinDGameLaunch($request->all(), $device), 
                         "game_launch" => true
                     );
                     return response($msg,200)
