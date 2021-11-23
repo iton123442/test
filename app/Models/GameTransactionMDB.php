@@ -343,7 +343,7 @@ class GameTransactionMDB
             $where = 'where gte.round_id = "' . $provider_identifier.'" '.$game_trans_type;
         }
         if ($type == 'game_transaction_ext_id') {
-            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
+            $where = 'where gte.game_trans_ext_id = "' . $provider_identifier . '" ';
         }
         if ($type == 'game_trans_id') {
             $where = 'where gte.game_trans_id = "' . $provider_identifier . '" ';

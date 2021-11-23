@@ -143,6 +143,7 @@ $app->post('/public/rsg/betwin', 'DigitainController@betwin');
 $app->post('/public/rsg/refund', 'DigitainController@refund');
 $app->post('/public/rsg/amend', 'DigitainController@amend');
 $app->post('/public/rsg/promowin', 'DigitainController@PromoWin');
+$app->post('/public/rsg/charge', 'DigitainController@makeCharge');
 $app->post('/public/rsg/checktxstatus', 'DigitainController@CheckTxStatus');
 // IA SPORTS
 $app->post('/public/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
