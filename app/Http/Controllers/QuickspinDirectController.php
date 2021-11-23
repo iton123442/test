@@ -219,9 +219,13 @@ class QuickspinDirectController extends Controller
             "txid" => (int) $provider_trans_id,
             "remotetxid" => (string)$bet_transaction->game_trans_id
         ];
-
+        if($pay_amount >0 ){
+            $status = 1;
+        }else{
+            $status = 2;
+        }
         $updateGameTransaction = [
-              'win' => 5,
+              'win' => $status,
               'pay_amount' => $pay_amount,
               'income' => $income,
               'entry_id' => $entry_id,
