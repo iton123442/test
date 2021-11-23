@@ -185,6 +185,13 @@ class PNGController extends Controller
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token',$xmlparser->externalGameSessionId);
             if($client_details){
+                if($xmlparser->roundId == 0){
+                    $array_data = array(
+                        "real" => $client_details->balance,
+                        "statusCode" => 0,
+                    );
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
+                }
                 $returnWinTransaction = GameTransactionMDB::checkGameTransactionExist($xmlparser->transactionId,false,false,$client_details);
                 if($returnWinTransaction){
                     $array_data = array(
