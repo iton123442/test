@@ -270,6 +270,7 @@ class QuickspinDirectController extends Controller
             ]
         ];
         // $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+        if($client_response != false){
         $updateTransactionEXt = array(
               "provider_request" =>json_encode($req->all()),
               "mw_response" => json_encode($res),
@@ -282,6 +283,16 @@ class QuickspinDirectController extends Controller
       Helper::saveLog('QuickSpinD Win success', config('providerlinks.quickspinDirect.provider_db_id'), json_encode($req->all()), $res);
         return response($res,200)
                 ->header('Content-Type', 'application/json');
+    }else{
+        $http_status = 500;
+        $res = [
+            "errorcode" => "UNHANDLED",
+            "errormessage" => "internal server error"
+        ];
+        return response($res,$http_status)
+                ->header('Content-Type', 'application/json');
+
+      }
 
     }// end function win process
     public function rollbackProcess(Request $req){
