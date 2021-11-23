@@ -275,8 +275,8 @@ class QuickspinDirectController extends Controller
               "mw_response" => json_encode($res),
               'mw_request' => json_encode($client_response->requestoclient),
               'client_response' => json_encode($client_response->fundtransferresponse),
-              'transaction_detail' => 'success',
-              'general_details' => 'success',
+              'transaction_detail' => 'Failed',
+              'general_details' => 'Failed',
         );
         GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
       Helper::saveLog('QuickSpinD Win success', config('providerlinks.quickspinDirect.provider_db_id'), json_encode($req->all()), $res);
