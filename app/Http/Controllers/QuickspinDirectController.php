@@ -269,8 +269,8 @@ class QuickspinDirectController extends Controller
                 ]
             ]
         ];
-        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false);
-        if($client_response != false){
+        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload)== false;
+        if($client_response != false){  
         $updateTransactionEXt = array(
               "provider_request" =>json_encode($req->all()),
               "mw_response" => json_encode($res),
