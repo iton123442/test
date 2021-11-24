@@ -785,7 +785,7 @@ class DigitainController extends Controller
 			$json_data['items'][$i - 1]['client_details'] = $client_details;
 
 
-			if ($client_details != null) { // Wrong Player ID
+			if ($client_details != null && $client_details == 'false') { // Wrong Player ID
 				if ($client_details->player_id != $key["playerId"]) {
 					$items_array[] = [
 						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
@@ -916,7 +916,7 @@ class DigitainController extends Controller
 					$provider_trans_id = 'RSGNOTXID';
 				}
 
-				$client_details = $key['client_details'];
+				// $client_details = $key['client_details'];
 				$game_details = $key['game_details'];
 
 				$bet_payout = 0; // Bet always 0 payout!
