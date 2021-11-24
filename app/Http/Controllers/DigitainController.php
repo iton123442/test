@@ -807,19 +807,19 @@ class DigitainController extends Controller
 					continue;
 				}
 				// $client_player = DigitainHelper::playerDetailsCall($client_details);
-				$client_player = ProviderHelper::playerDetailsCall($client_details->player_token);
-				if ($client_player == 'false') { // client cannot be reached! http errors etc!
-					$items_array[] = [
-						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
-						"errorCode" => 999, // transaction already refunded
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
-					];
-					$global_error = 999;
-					$error_encounter = 1;
-					continue;
-				}
-				$json_data['items'][$i - 1]['client_player'] = $client_player;
-				if (abs($client_player->playerdetailsresponse->balance) < $total_bets) {
+				// $client_player = ProviderHelper::playerDetailsCall($client_details->player_token);
+				// if ($client_player == 'false') { // client cannot be reached! http errors etc!
+				// 	$items_array[] = [
+				// 		"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+				// 		"errorCode" => 999, // transaction already refunded
+				// 		"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+				// 	];
+				// 	$global_error = 999;
+				// 	$error_encounter = 1;
+				// 	continue;
+				// }
+				$json_data['items'][$i - 1]['client_player'] = $client_details;
+				if (abs($client_details->balance) < $total_bets) {
 					$items_array[] = [
 						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
 						"errorCode" => 6, // transaction already refunded
