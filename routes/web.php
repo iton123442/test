@@ -134,7 +134,7 @@ $app->post('/public/api/marriott/balance', 'MarriottController@getBalance'); #/
 $app->post('/public/api/marriott/debit', 'MarriottController@debitProcess'); #/
 // RGS Gaming Endpoints
 $app->post('/public/rsg/authenticate', 'DigitainController@authenticate');
-$app->post('/public/rsg/creategamesession', 'DigitainController@createGameSession');
+// $app->post('/public/rsg/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
 $app->post('/public/rsg/getbalance', 'DigitainController@getbalance');
 $app->post('/public/rsg/refreshtoken', 'DigitainController@refreshtoken');
 $app->post('/public/rsg/bet', 'DigitainController@bet');
