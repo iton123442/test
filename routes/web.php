@@ -702,8 +702,8 @@ $app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoun
 $app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
 
 // Crash Gaming (TigerGames)
-$app->post('api/crashgame/balance', 'CrashGameController@Balance');
-$app->post('api/crashgame/debit', 'CrashGameController@Debit');
-$app->post('api/crashgame/credit', 'CrashGameController@Credit');
-$app->post('api/crashgame/refund', 'CrashGameController@Refund');
-$app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
+$app->post('/public/api/crashgame/balance', 'CrashGameController@Balance');
+$app->post('/public/api/crashgame/debit', 'CrashGameController@Debit');
+$app->post('/public/api/crashgame/credit', 'CrashGameController@Credit');
+$app->post('/public/api/crashgame/refund', 'CrashGameController@Refund');
+$app->post('/public/api/crashgame/cancel', 'CrashGameController@Cancel');
