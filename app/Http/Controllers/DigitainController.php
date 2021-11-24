@@ -2505,7 +2505,7 @@ class DigitainController extends Controller
 					$isset_allbets_amount = 1;
 				}
 
-				$client_details = $key['client_details'];
+				// $client_details = $key['client_details'];
 				// $client_player = $key['client_player'];
 			
 				# Provider Transaction Logger
@@ -3599,7 +3599,7 @@ class DigitainController extends Controller
 						}
 					}
 				}
-				$client_details = $key['client_details'];
+				// $client_details = $key['client_details'];
 				$client_player = $key['client_player'];
 				
 
@@ -4439,7 +4439,7 @@ class DigitainController extends Controller
 					continue;
 				}
 
-				$client_details = $key['client_details'];
+				// $client_details = $key['client_details'];
 				$game_details = $key["game_details"];
 				
 				if ($isset_allbets_amount == 0) { # Calculate all total bets
