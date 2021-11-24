@@ -390,6 +390,36 @@ class QuickspinDirectController extends Controller
                 ->header('Content-Type', 'application/json');
     }
     public function freeRound(Request $req){
-        dd($req->all());
+        // dd($req->all());
+        $client_details = ProviderHelper::getClientDetails('player_id', $req->remoteusername);
+            if ($client_details != null) {
+                try{
+                    ProviderHelper::idenpotencyTable($req->txid);
+                }catch(\Exception $e){
+                    $response = [
+                        "status" =>  'error',
+                        "errorcode" => "INVALID_PARAMETERS",
+                    ];
+                    return $response;
+                }
+                $game_details = Game::find($req->gameid, config('providerlinks.quickspinDirect.provider_db_id'));
+                // dd($game_details);
+                $win_type = $amount_win > 0 ? 1 : 0;
+                $gameTransactionData = array(
+                    "provider_trans_id" => $req->txid,
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $req->txid,
+                    "bet_amount" => 0,
+                    "win" => $win_type,
+                    "pay_amount" => $amount_win,
+                    "income" => 0 - $amount_win,
+                    "entry_id" => 1,
+                    /*"flow_status" => 0,*/
+                );
+                
+                $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+        }//end client details
+
     }
 }
