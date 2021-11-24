@@ -772,7 +772,7 @@ class DigitainController extends Controller
 			$json_data['items'][$i - 1]['game_details'] = $game_details;
 
 			$client_details = ProviderHelper::getClientDetails('token', $key["token"]);
-			if ($client_details == null) { // SessionNotFound
+			if ($client_details == null && $client_details != 'false') { // SessionNotFound
 				$items_array[] = [
 					"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
 					"errorCode" => 2, // transaction already refunded
@@ -2381,7 +2381,7 @@ class DigitainController extends Controller
 					$isset_allbets_amount = 1;
 				}
 				$client_details = ProviderHelper::getClientDetails('token', $key["token"]);
-				if ($client_details == null) { // SessionNotFound
+				if ($client_details == null && $client_details != 'false') { // SessionNotFound
 					$items_array[] = [
 						"betInfo" => isset($key['betInfo']) ? $key['betInfo'] : '', // Info from RSG, MW Should Return it back!
 						"winInfo" => isset($key['winInfo']) ? $key['winInfo'] : '', // Info from RSG, MW Should Return it back!
@@ -3439,7 +3439,7 @@ class DigitainController extends Controller
 				}
 
 				// $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
-				// if ($client_details == null) {
+				// if ($client_details == null && $client_details != 'false') {
 				// 	$items_array[] = [
 				// 		"info" => $key['info'],
 				// 		"errorCode" => 4,
@@ -4235,7 +4235,7 @@ class DigitainController extends Controller
 					continue;
 				}
 				$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
-				if ($client_details == null) {
+				if ($client_details == null && $client_details != 'false') {
 					$items_array[] = [
 						"info" => $key['info'], // Info from RSG, MW Should Return it back!
 						"errorCode" => 4, //The playerId was not found
