@@ -629,6 +629,10 @@ return [
         'api_url' => 'https://d1oij17g4yikkz.cloudfront.net',
         'partner_id' => 2076,
     ],
+    'spearhead' => [
+        'provider_db_id'=> 68,
+        'api_url' => 'https://gamelaunch.everymatrix.com/',
+    ],
 
 ];
 

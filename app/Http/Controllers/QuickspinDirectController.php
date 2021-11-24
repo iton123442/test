@@ -389,5 +389,7 @@ class QuickspinDirectController extends Controller
         return response($res,200)
                 ->header('Content-Type', 'application/json');
     }
-
+    public function freeRound(Request $req){
+        dd($req->all());
+    }
 }

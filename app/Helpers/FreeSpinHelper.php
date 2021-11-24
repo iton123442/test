@@ -336,5 +336,9 @@ class FreeSpinHelper{
         $array = json_decode(json_encode((array)$body), TRUE);
         return $array;
     }
+    public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id){
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        dd($player_details);
+    }
 }
 ?>
