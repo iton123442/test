@@ -540,6 +540,36 @@ class GameLobby{
        
     }
 
+    public static function CrashGaming($data){
+        try{
+            $url = 'https://dev.crashbetrnk.com/gamelaunch';// config('providerlinks.tidygaming.url_lunch');
+            $client_details = Providerhelper::getClientDetails('token', $token);
+            $requesttosend = [
+                'session_id' =>  $client_details->player_token,
+                'user_id' => $client_details->player_id,
+                'user_name' => $client_details->player_id,
+                'currencycode' => $client_details->default_currency,
+                'balance' => $client_details->balance,
+                'uuid' => $client_details->player_token,
+                'exit_url' => isset($data['exitUrl']) ? $data['exitUrl'] : ""
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'AuthToken' => config('providerlinks.crashgaming.authToken')
+                ]
+            ]);
+            $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
+            );
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $client_response);
+            return $client_response->link;
+        }catch(\Exception $e){
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage());
+            return false;
+        }
+    }
+
     public static function tidylaunchUrl( $game_code = null, $token = null){
         Helper::saveLog('Tidy Gameluanch', 23, "", "");
         try{

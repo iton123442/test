@@ -143,6 +143,7 @@ $app->post('/public/rsg/betwin', 'DigitainController@betwin');
 $app->post('/public/rsg/refund', 'DigitainController@refund');
 $app->post('/public/rsg/amend', 'DigitainController@amend');
 $app->post('/public/rsg/promowin', 'DigitainController@PromoWin');
+$app->post('/public/rsg/charge', 'DigitainController@makeCharge');
 $app->post('/public/rsg/checktxstatus', 'DigitainController@CheckTxStatus');
 // IA SPORTS
 $app->post('/public/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
@@ -706,6 +707,7 @@ $app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoun
 $app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
 
 // Crash Gaming (TigerGames)
+<<<<<<< HEAD
 $app->post('api/crashgame/balance', 'CrashGameController@Balance');
 $app->post('api/crashgame/debit', 'CrashGameController@Debit');
 $app->post('api/crashgame/credit', 'CrashGameController@Credit');
@@ -723,3 +725,10 @@ $app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollback
 $app->group(['prefix' => 'api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
     $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
 });
+=======
+$app->post('/public/api/crashgame/balance', 'CrashGameController@Balance');
+$app->post('/public/api/crashgame/debit', 'CrashGameController@Debit');
+$app->post('/public/api/crashgame/credit', 'CrashGameController@Credit');
+$app->post('/public/api/crashgame/refund', 'CrashGameController@Refund');
+$app->post('/public/api/crashgame/cancel', 'CrashGameController@Cancel');
+>>>>>>> a8a32b427d212b7a935459b15b10433a900b2274
