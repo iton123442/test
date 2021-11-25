@@ -696,6 +696,8 @@ class DigitainController extends Controller
 		$isset_allbets_amount = 0;
 		$i = 0;
 
+		$json_data_ii = array();
+
 		foreach ($json_data['items'] as $key => $value) { // FOREACH CHECK
 
 			# Missing Parameters
