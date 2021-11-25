@@ -403,6 +403,9 @@ class GameTransactionMDB
         if ($type == 'all') {
             $where = 'where gte.provider_trans_id = "' . $provider_identifier  . '" AND gte.transaction_detail != "FAILED"';
         }
+        if ($type == 'allround') {
+            $where = 'where gte.round_id = "' . $provider_identifier  . '" AND gte.transaction_detail != "FAILED"';
+        }
         if ($type == 'transaction_id') {
             $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
         }
@@ -431,7 +434,7 @@ class GameTransactionMDB
 
                     if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
                         $connection_default = config("serverlist.server_list.default");
-                        if($type == 'all'){
+                        if($type == 'all' || $type == 'allround'){
                             // removed limit
                             $data = DB::connection( $connection_default["connection_name"] )->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                         }else{

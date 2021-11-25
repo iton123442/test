@@ -2952,7 +2952,7 @@ class DigitainController extends Controller
 				$entry_type = $datatrans->game_transaction_type == 1 ? 'debit' : 'credit';
 	    		if($key['refundRound'] == true){
 					// $all_rounds = $this->getAllRounds($datatrans->round_id);
-					$all_rounds = GameTransactionMDB::findGameExtAll($datatrans->round_id, 'round_id', $client_details);
+					$all_rounds = GameTransactionMDB::findGameExtAll($datatrans->round_id, 'allround', $client_details);
 	    			foreach ($all_rounds as $al_round) {
 	    				if($al_round->game_transaction_type == 1){
 	    					$bet_item = [
