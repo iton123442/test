@@ -3493,8 +3493,11 @@ class DigitainController extends Controller
 					}
 				}
 
-				$json_data['items'][$i - 1]['client_details'] = $client_details;
-				$json_data['items'][$i - 1]['client_player'] = $client_details;
+				// $json_data['items'][$i - 1]['client_details'] = $client_details;
+				// $json_data['items'][$i - 1]['client_player'] = $client_details;
+				$value['client_details'] = $client_details;
+				$value['client_player'] = $client_details;
+
 
 		} // #1 END FOREACH CHECK
 
