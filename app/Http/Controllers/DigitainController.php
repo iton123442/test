@@ -127,7 +127,7 @@ class DigitainController extends Controller
 			return $this->authError();
 		}
 		$client_details = ProviderHelper::getClientDetails('token', $json_data["token"]);	
-		if ($client_details == null && $client_details == 'false'){
+		if ($client_details == null || $client_details == 'false'){
 			$response = [
 				"timestamp" => date('YmdHisms'),
 				"signature" => $this->createSignature(date('YmdHisms')),
@@ -205,7 +205,7 @@ class DigitainController extends Controller
 			return $this->authError();
 		}
 		$client_details = ProviderHelper::getClientDetails('token', $json_data["token"]);	
-		if ($client_details == null && $client_details == 'false'){
+		if ($client_details == null || $client_details == 'false'){
 			$response = [
 				"timestamp" => date('YmdHisms'),
 				"signature" => $this->createSignature(date('YmdHisms')),
@@ -280,7 +280,7 @@ class DigitainController extends Controller
 			return $this->authError();
 		}
 		$client_details = ProviderHelper::getClientDetails('token', $json_data["token"]);	
-		if ($client_details == null && $client_details == 'false'){ // SessionNotFound
+		if ($client_details == null || $client_details == 'false'){ // SessionNotFound
 			$response = ["timestamp" => date('YmdHisms'),"signature" => $this->createSignature(date('YmdHisms')),"errorCode" => 2];
 			ProviderHelper::saveLogWithExeption('RSG refreshtoken', $this->provider_db_id, file_get_contents("php://input"), $response);
 			return $response;
@@ -457,7 +457,7 @@ class DigitainController extends Controller
         	    continue;
 			}
 			$client_details = ProviderHelper::getClientDetails('token', $key["token"]);	
-			if($client_details == null && $client_details == 'false'){ // SessionNotFound
+			if($client_details == null || $client_details == 'false'){ // SessionNotFound
 				$items_array[] = [
 					 "info" => $key['info'], 
 					 "errorCode" => 2, 
@@ -772,7 +772,7 @@ class DigitainController extends Controller
 			$json_data['items'][$i - 1]['game_details'] = $game_details;
 
 			$client_details = ProviderHelper::getClientDetails('token', $key["token"]);
-			if ($client_details == null && $client_details == 'false') { // SessionNotFound
+			if ($client_details == null || $client_details == 'false') { // SessionNotFound
 				$items_array[] = [
 					"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
 					"errorCode" => 2, // transaction already refunded
@@ -1113,7 +1113,7 @@ class DigitainController extends Controller
 				}
 
 				$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
-		    	if ($client_details == null && $client_details == 'false'){ // SessionNotFound
+		    	if ($client_details == null || $client_details == 'false'){ // SessionNotFound
 					$items_array[] = [
 						 "info" => isset($key['info']) ? $key['info'] : '', 
 						 "errorCode" => 4,
@@ -1517,7 +1517,7 @@ class DigitainController extends Controller
 				}
 
 				$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
-		    	if ($client_details == null && $client_details == 'false'){ // SessionNotFound
+		    	if ($client_details == null || $client_details == 'false'){ // SessionNotFound
 					$items_array[] = [
 						 "info" => isset($key['info']) ? $key['info'] : '', 
 						 "errorCode" => 4,
@@ -2016,7 +2016,7 @@ class DigitainController extends Controller
 					$isset_allbets_amount = 1;
 				}
 				$client_details = ProviderHelper::getClientDetails('token', $key["token"]);	
-				if($client_details == null && $client_details == 'false'){
+				if($client_details == null || $client_details == 'false'){
 		 			$items_array[] = [
 						 "betInfo" => $key['betInfo'], // Betinfo
 					     "winInfo" => $key['winInfo'], // IWininfo
@@ -2381,7 +2381,7 @@ class DigitainController extends Controller
 					$isset_allbets_amount = 1;
 				}
 				$client_details = ProviderHelper::getClientDetails('token', $key["token"]);
-				if ($client_details == null && $client_details == 'false') { // SessionNotFound
+				if ($client_details == null || $client_details == 'false') { // SessionNotFound
 					$items_array[] = [
 						"betInfo" => isset($key['betInfo']) ? $key['betInfo'] : '', // Info from RSG, MW Should Return it back!
 						"winInfo" => isset($key['winInfo']) ? $key['winInfo'] : '', // Info from RSG, MW Should Return it back!
@@ -2840,7 +2840,7 @@ class DigitainController extends Controller
 				continue;
 			}
 			$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
- 		    if($client_details == null && $client_details == 'false'){
+ 		    if($client_details == null || $client_details == 'false'){
  		    	$items_array[] = [
 					 "info" => $key['info'],
 					 "errorCode" => 4, 
@@ -3233,7 +3233,7 @@ class DigitainController extends Controller
 					continue;
 				}
 				$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
-	 		    if($client_details == null && $client_details == 'false'){
+	 		    if($client_details == null || $client_details == 'false'){
 	 		    	$items_array[] = [
 						 "info" => $key['info'],
 						 "errorCode" => 4, 
@@ -3439,7 +3439,7 @@ class DigitainController extends Controller
 				}
 
 				// $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
-				// if ($client_details == null && $client_details == 'false') {
+				// if ($client_details == null || $client_details == 'false') {
 				// 	$items_array[] = [
 				// 		"info" => $key['info'],
 				// 		"errorCode" => 4,
@@ -3835,7 +3835,7 @@ class DigitainController extends Controller
 				continue;
 			}
 			$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
-			if($client_details == null && $client_details == 'false'){
+			if($client_details == null || $client_details == 'false'){
 				$items_array[] = [
 					 "info" => $key['info'], // Info from RSG, MW Should Return it back!
 					 "errorCode" => 4, //The playerId was not found
@@ -4672,7 +4672,7 @@ class DigitainController extends Controller
 			return $response;
 		}
 		$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
-		if($client_details == null && $client_details == 'false'){
+		if($client_details == null || $client_details == 'false'){
 			$response = [
 				//  "info" => $json_data['info'], // Info from RSG, MW Should Return it back!
 				"timestamp" => date('YmdHisms'),
@@ -4948,7 +4948,7 @@ class DigitainController extends Controller
 			return $response;
 		}
 		$client_details = ProviderHelper::getClientDetails('token', $json_data['token']);
-		if($client_details == null && $client_details == 'false'){
+		if($client_details == null || $client_details == 'false'){
 			$response = [
 				 "timestamp" => date('YmdHisms'),
 				 "signature" => $this->createSignature(date('YmdHisms')),
