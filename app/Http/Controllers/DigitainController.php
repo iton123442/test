@@ -1102,11 +1102,11 @@ class DigitainController extends Controller
 			return $response;
 		}
 
-		#ALL OR NONE AMEND
+		#ALL OR NONE WIN
 		if ($json_data['allOrNone'] == 'true') {
 			return $this->winallOrNone($request->all());
 		}
-		#ALL OR NONE AMEND
+		#ALL OR NONE WIN
 		
 		$items_array = array(); // ITEMS INFO
 		// $isset_before_balance = false;
@@ -1145,11 +1145,10 @@ class DigitainController extends Controller
 
 
  				if(isset($key['betTxId']) && $key['betTxId'] != ''){
-		 		 	// $datatrans = $this->findTransactionRefund($key['betTxId'], 'transaction_id');
 		 		 	$datatrans = GameTransactionMDB::findGameExt($key['betTxId'], 1,'transaction_id', $client_details);
 		 		 	$transaction_identifier = $key['betTxId'];
  					$transaction_identifier_type = 'provider_trans_id';
-		 		 	if(!$datatrans): // Transaction Not Found!
+		 		 	if($datatrans == 'false'): // Transaction Not Found!
 			 		 	$items_array[] = [
 							 "info" => isset($key['info']) ? $key['info'] : '', 
 							 "errorCode" => 7, 
@@ -1161,7 +1160,7 @@ class DigitainController extends Controller
 					$datatrans = GameTransactionMDB::findGameExt($key['roundId'], 1,'round_id', $client_details);
 		 			$transaction_identifier = $key['roundId'];
  					$transaction_identifier_type = 'round_id';
-		 			if(!$datatrans): // Transaction Not Found!
+		 			if($datatrans == 'false'): // Transaction Not Found!
 			 			$items_array[] = [
 							 "info" => isset($key['info']) ? $key['info'] : '', 
 							 "errorCode" => 7, 
@@ -1193,18 +1192,7 @@ class DigitainController extends Controller
 						continue;
 					}
 				}
-				// $client_player = DigitainHelper::playerDetailsCall($client_details);
-				// if($client_player == 'false'){ // client cannot be reached! http errors etc!
-				// 	$response = array(
-				// 		 "timestamp" => date('YmdHisms'),
-				// 	     "signature" => $this->createSignature(date('YmdHisms')),
-				// 		 "errorCode" => 999,
-				// 		 "items" => $items_array,
-		  		//  );	
-				// 	return $response;
-				// }
 
-		 		// $check_win_exist = $this->gameTransactionEXTLog('provider_trans_id',$key['txId'], 2); 
 		 		$check_win_exist = GameTransactionMDB::findGameExt($key['txId'], 2,'transaction_id', $client_details);
 	 			if($check_win_exist != false && $check_win_exist != "false"){
 	 				$items_array[] = [
@@ -1230,10 +1218,7 @@ class DigitainController extends Controller
 	 			}else{
 	 				$gameId = $key["gameId"];
 	 			}
-	 			// if(isset($key['betTxId']) && $key['betTxId'] != null){
-	 			// 	$gameId = $this->findObjDataItem($datatrans->provider_request, $key['betTxId'], 'gameId');
-	 			// }
-
+	 
 	 			$is_exist_gameid = $this->getGameId($gameId);
 				if($is_exist_gameid == false){
 					$items_array[] = [
@@ -1285,18 +1270,14 @@ class DigitainController extends Controller
 					}
 				}
 				
-				// if($isset_before_balance == false;){
-					// $general_details['client']['beforebalance'] = $this->formatBalance($client_player->playerdetailsresponse->balance);
-					$general_details['client']['beforebalance'] = $this->formatBalance($client_details->balance);
-					// $isset_before_balance = true;
-				// }
+				$general_details['client']['beforebalance'] = $this->formatBalance($client_details->balance);
+			
 				$general_details['provider']['operationType'] = $key['operationType'];
 				$general_details['provider']['currencyId'] = $key['currencyId'];
 				$general_details['provider']['amount'] = $key['winAmount'];
 				$general_details['provider']['txCreationDate'] = $json_data['timestamp'];
 				$general_details['provider']['txId'] = $key['txId'];
 
-				// $game_transextension = ProviderHelper::createGameTransExtV2($datatrans->game_trans_id, $key['txId'], $datatrans->round_id, abs($key['winAmount']), 2,$request->all());
 				$gameTransactionEXTData = array(
 					"game_trans_id" => $datatrans->game_trans_id,
 					"provider_trans_id" => $key['txId'],
@@ -1315,10 +1296,6 @@ class DigitainController extends Controller
 						 "errorCode" => 999, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : ''
 						);
-					// ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $json_data, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-
-					// $updateGameTransaction = ["win" => 2];
-					// GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);  
 					$updateTransactionEXt = array(
 						"mw_response" => json_encode($json_data),
 						'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
@@ -1349,7 +1326,6 @@ class DigitainController extends Controller
 		 	  				$entry_id = 2; //win
 		 	  				$income = $bet_transaction_status->bet_amount - $key['winAmount'];
 		 	  			}
-	 	  				// $updateTheBet = DigitainHelper::updateBetToWin($datatrans->game_trans_id, $key['winAmount'], $income, $win, $entry_id);
 	 	  				$updateGameTransaction = [
 	 	  					  'pay_amount' => $key['winAmount'], 
 			                  'income' => $income, 
@@ -1358,7 +1334,6 @@ class DigitainController extends Controller
 			            ];
 						GameTransactionMDB::updateGametransaction($updateGameTransaction, $datatrans->game_trans_id, $client_details); 
 		 	  		}else{
-		 	  			// $updateTheBet = DigitainHelper::updateBetToWin($datatrans->game_trans_id, $datatrans->pay_amount, $datatrans->income, 0, $datatrans->entry_id);
 		 	  			$updateGameTransaction = [
 	 	  					  'pay_amount' => $bet_transaction_status->pay_amount, 
 			                  'income' => $bet_transaction_status->income, 
@@ -1367,20 +1342,7 @@ class DigitainController extends Controller
 			            ];
 						GameTransactionMDB::updateGametransaction($updateGameTransaction, $datatrans->game_trans_id, $client_details);
 		 	  		}
-					
-					// Update this bet that it has won
-					// if($transaction_identifier_type == 'provider_trans_id'){
-					// 	$this->updateGameExtTransDetails('BETWON','provider_trans_id', $key['betTxId'],1);
-					// }else{
-					// 	$this->updateGameExtTransDetails('BETWON','round_id', $key['roundId'],1);
-					// }
-
-					// $updateTransactionEXt = array(
-					// 	'transaction_detail' => 'BETWON'
-					// );
-					// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
-		 	  		// ProviderHelper::updatecreateGameTransExt($game_transextension,  $json_data, $items_array, $client_response->requestoclient, $client_response, 'SUCCESS', $general_details);
+				
 					ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 
 					$updateTransactionEXt = array(
@@ -1475,8 +1437,6 @@ class DigitainController extends Controller
 		        	    ];
 		 	  		}
 					ProviderHelper::_insertOrUpdate($client_details->token_id, $client_details->balance+$key['winAmount']);
-					// Providerhelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_transextension, $client_response->requestoclient);
-		 	  		// ProviderHelper::updatecreateGameTransExt($game_transextension,  $json_data, $items_array, $client_response->requestoclient, $client_response, 'FAILED', $general_details);
 		 	  		$updateTransactionEXt = array(
 						"mw_response" => json_encode($items_array),
 						'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
