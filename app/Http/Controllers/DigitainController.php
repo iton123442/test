@@ -919,7 +919,7 @@ class DigitainController extends Controller
 				}
 
 				// $client_details = $key['client_details'];
-				$game_details = $key['game_details'];
+				// $game_details = $key['game_details'];
 
 				$bet_payout = 0; // Bet always 0 payout!
 				$income = $key['betAmount'] - $bet_payout;
@@ -1732,7 +1732,7 @@ class DigitainController extends Controller
 					$gameId = $key["gameId"];
 				}
 
-				$game_details = $key['game_details'];
+				// $game_details = $key['game_details'];
 				$bet_info = json_decode($datatrans->general_details);
 
 				// $general_details['client']['beforebalance'] = $this->formatBalance($client_player->playerdetailsresponse->balance);
@@ -2505,7 +2505,7 @@ class DigitainController extends Controller
 				$general_details = ["aggregator" => [], "provider" => [], "client" => []];
 				$general_details2 = ["aggregator" => [], "provider" => [], "client" => []];
 
-				$game_details = $key['game_details'];
+				// $game_details = $key['game_details'];
 		
 				if ($isset_allbets_amount == 0) { # Calculate all total bets
 					foreach ($json_data['items'] as $key) {
