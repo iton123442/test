@@ -918,8 +918,8 @@ class DigitainController extends Controller
 					$provider_trans_id = 'RSGNOTXID';
 				}
 
-				// $client_details = $key['client_details'];
-				// $game_details = $key['game_details'];
+				$client_details = $key['client_details'];
+				$game_details = $key['game_details'];
 
 				$bet_payout = 0; // Bet always 0 payout!
 				$income = $key['betAmount'] - $bet_payout;
@@ -3609,8 +3609,8 @@ class DigitainController extends Controller
 						}
 					}
 				}
-				// $client_details = $key['client_details'];
-				$client_player = $key['client_player'];
+				$client_details = $key['client_details'];
+				// $client_player = $key['client_player'];
 				
 
 				if ($datatrans != false) { // TRANSACTION IS FOUND
@@ -4449,7 +4449,7 @@ class DigitainController extends Controller
 					continue;
 				}
 
-				// $client_details = $key['client_details'];
+				$client_details = $key['client_details'];
 				$game_details = $key["game_details"];
 				
 				if ($isset_allbets_amount == 0) { # Calculate all total bets
