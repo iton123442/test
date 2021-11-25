@@ -1559,7 +1559,7 @@ class DigitainController extends Controller
 					$datatrans = GameTransactionMDB::findGameExt($value['betTxId'], 1,'transaction_id', $client_details);
 					$transaction_identifier = $value['betTxId'];
 					$transaction_identifier_type = 'provider_trans_id';
-					if (!$datatrans) :
+					if ($datatrans == 'false') :
 						$items_array[] = [
 							"info" => isset($value['info']) ? $value['info'] : '',
 							"errorCode" => 7,
