@@ -1643,30 +1643,32 @@ class DigitainController extends Controller
 				// $json_data['items'][$i - 1]['check_win_exist'] = $check_win_exist;
 
 				# if win operation type is not the bet win operation type filter
-				$bet_info = json_decode($datatrans->general_details);
-				if (isset($bet_info->provider->operationType)) {
-					if ($this->getBetWinOpType($bet_info->provider->operationType) == false) {
-						$items_array[] = array(
-							"info" => $value['info'],
-							"errorCode" => 19,
-							"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
-						);
-						$global_error = 19;
-						$error_encounter = 1;
-						$value['tg_error'] = 19;
-						array_push($json_data_ii, $value);
-						continue;
-					} elseif ($this->getBetWinOpType($bet_info->provider->operationType) != $value['operationType']) {
-						$items_array[] = array(
-							"info" => $value['info'],
-							"errorCode" => 19,
-							"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
-						);
-						$global_error = 19;
-						$error_encounter = 1;
-						$value['tg_error'] = 19;
-						array_push($json_data_ii, $value);
-						continue;
+				if (isset($datatrans->general_details)){
+					$bet_info = json_decode($datatrans->general_details);
+					if (isset($bet_info->provider->operationType)) {
+						if ($this->getBetWinOpType($bet_info->provider->operationType) == false) {
+							$items_array[] = array(
+								"info" => $value['info'],
+								"errorCode" => 19,
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
+							);
+							$global_error = 19;
+							$error_encounter = 1;
+							$value['tg_error'] = 19;
+							array_push($json_data_ii, $value);
+							continue;
+						} elseif ($this->getBetWinOpType($bet_info->provider->operationType) != $value['operationType']) {
+							$items_array[] = array(
+								"info" => $value['info'],
+								"errorCode" => 19,
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
+							);
+							$global_error = 19;
+							$error_encounter = 1;
+							$value['tg_error'] = 19;
+							array_push($json_data_ii, $value);
+							continue;
+						}
 					}
 				}
 
