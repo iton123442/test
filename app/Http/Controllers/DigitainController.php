@@ -694,179 +694,207 @@ class DigitainController extends Controller
 
 		$total_bets = array_sum($all_bets_amount);
 		$isset_allbets_amount = 0;
-
 		$i = 0;
-		foreach ($json_data['items'] as $key) { // FOREACH CHECK
-			$i++;
+
+		foreach ($json_data['items'] as $key => $value) { // FOREACH CHECK
 
 			# Missing Parameters
-			if (!isset($key['info']) || !isset($key['txId']) || !isset($key['betAmount']) || !isset($key['token']) || !isset($key['playerId']) || !isset($key['roundId']) || !isset($key['gameId'])) {
+			if (!isset($value['info']) || !isset($value['txId']) || !isset($value['betAmount']) || !isset($value['token']) || !isset($value['playerId']) || !isset($value['roundId']) || !isset($value['gameId'])) {
 				$items_array[] = [
-					"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+					"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 					"errorCode" => 17, // transaction already refunded
-					"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+					"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 				];
 				$global_error = 17;
 				$error_encounter = 1;
+				$value['tg_error'] = 17;
+				array_push($json_data_ii, $value);
 				continue;
 			}
 
 			# if bet operation type is not in the bet operation types
-			if ($this->getBetWinOpType($key['operationType']) == false) {
+			if ($this->getBetWinOpType($value['operationType']) == false) {
 				$items_array[] = array(
-					"info" => $key['info'],
+					"info" => $value['info'],
 					"errorCode" => 19, // error operation type for this bet not in the bet operation types
-					"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+					"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 				);
 				$global_error = 19;
 				$error_encounter = 1;
+				$value['tg_error'] = 19;
+				array_push($json_data_ii, $value);
 				continue;
 			}
 
 			# if bet is in the change balance 0 oepration type table make the amount zero
-			if ($this->betWithNoChangeBalanceOT($key['operationType'])) {
-				if ($key['changeBalance'] == true) {
+			if ($this->betWithNoChangeBalanceOT($value['operationType'])) {
+				if ($value['changeBalance'] == true) {
 					$items_array[] = array(
-						"info" => $key['info'],
+						"info" => $value['info'],
 						"errorCode" => 19, // error operation type
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 					);
 					$global_error = 19;
 					$error_encounter = 1;
+					$value['tg_error'] = 19;
+					array_push($json_data_ii, $value);
 					continue;
 				} else {
-					$key['betAmount'] = 0;  // make the bet amount zero (free bets/artificial bets)
+					$value['betAmount'] = 0;  // make the bet amount zero (free bets/artificial bets)
 				}
 			}
 
 			if ($isset_allbets_amount == 0) { # Calculate all total bets
-				foreach ($json_data['items'] as $key) {
-					array_push($all_bets_amount, $key['betAmount']);
-					array_push($duplicate_txid_request, $key['txId']);  // Checking for same txId in the call
+				foreach ($json_data['items'] as $key => $key_amount) {
+					array_push($all_bets_amount, $key_amount['betAmount']);
+					array_push($duplicate_txid_request, $key_amount['txId']);  // Checking for same txId in the call
 				}
 				$isset_allbets_amount = 1;
 			}
 
-			$is_exist_gameid = $this->getGameId($key["gameId"]);
-			if($is_exist_gameid == false){
-				$items_array[] = [
-					 "info" => $key['info'], 
-					 "errorCode" => 11, 
-					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-        	    ]; 
-        	    continue;
-			}
-			$key["gameId"] = $is_exist_gameid; // Overwrite GameId
-
-			$game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $key["gameId"]);
-			if ($game_details == null) { // Game not found
-				$items_array[] = [
-					"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
-					"errorCode" => 11, // transaction already refunded
-					"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
-				];
-				$global_error = 11;
-				$error_encounter = 1;
-				continue;
-			}
-			$json_data['items'][$i - 1]['game_details'] = $game_details;
-
-			$client_details = ProviderHelper::getClientDetails('token', $key["token"]);
+			$client_details = ProviderHelper::getClientDetails('token', $value["token"]);
 			if ($client_details == null || $client_details == 'false') { // SessionNotFound
 				$items_array[] = [
-					"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+					"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 					"errorCode" => 2, // transaction already refunded
-					"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+					"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 				];
 				$global_error = 2;
+				$value['tg_error'] = 2;
+        	    array_push($json_data_ii, $value);
 				$error_encounter = 1;
 				continue;
 			}
-			$json_data['items'][$i - 1]['client_details'] = $client_details;
+			$value['client_details'] =  $client_details;
 
+			$is_exist_gameid = $this->getGameId($value["gameId"]);
+			if($is_exist_gameid == false){
+				$items_array[] = [
+					 "info" => $value['info'], 
+					 "errorCode" => 11, 
+					 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
+        	    ]; 
+        	    $value['tg_error'] = 11;
+        	    $error_encounter = 1;
+        	    array_push($json_data_ii, $value);
+        	    continue;
+			}
+
+			$game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $value["gameId"]);
+			if ($game_details == null) { // Game not found
+				$items_array[] = [
+					"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
+					"errorCode" => 11, // transaction already refunded
+					"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
+				];
+				$global_error = 11;
+				$value['tg_error'] = 11;
+        	    array_push($json_data_ii, $value);
+				$error_encounter = 1;
+				continue;
+			}
+			$value['game_details'] =  $game_details;
 
 			if ($client_details != null && $client_details == 'false') { // Wrong Player ID
-				if ($client_details->player_id != $key["playerId"]) {
+				if ($client_details->player_id != $value["playerId"]) {
 					$items_array[] = [
-						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+						"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 						"errorCode" => 4, // transaction already refunded
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = 4;
 					$error_encounter = 1;
+					$value['tg_error'] = 4;
+					array_push($json_data_ii, $value);
 					continue;
 				}
-				if ($key['currencyId'] != $client_details->default_currency) {
+				if ($value['currencyId'] != $client_details->default_currency) {
 					$items_array[] = [
-						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+						"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 						"errorCode" => 16, // transaction already refunded
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = 16;
 					$error_encounter = 1;
+					$value['tg_error'] = 16;
+					array_push($json_data_ii, $value);
 					continue;
 				}
 			
 				$json_data['items'][$i - 1]['client_player'] = $client_details;
 				if (abs($client_details->balance) < $total_bets) {
 					$items_array[] = [
-						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+						"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 						"errorCode" => 6, // transaction already refunded
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = 6;
 					$error_encounter = 1;
+					$value['tg_error'] = 6;
+					array_push($json_data_ii, $value);
 					continue;
 				}
-				if ($key['ignoreExpiry'] != 'false') {
-					$token_check = DigitainHelper::tokenCheck($key["token"]);
+				if ($value['ignoreExpiry'] != 'false') {
+					$token_check = DigitainHelper::tokenCheck($value["token"]);
 					if ($token_check != true) { // Token is expired!
 						$items_array[] = [
-							"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+							"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 							"errorCode" => 3, // transaction already refunded
-							"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+							"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 						];
 						$global_error = 3;
 						$error_encounter = 1;
+						$value['tg_error'] = 3;
+						array_push($json_data_ii, $value);
 						continue;
 					}
 				}
 			}
 			// $check_bet_exist = DigitainHelper::findGameExt($key['txId'], 1, 'transaction_id');
-			$check_bet_exist = GameTransactionMDB::findGameExt($key['txId'], 1,'transaction_id', $client_details);
+			$check_bet_exist = GameTransactionMDB::findGameExt($value['txId'], 1,'transaction_id', $client_details);
 			if ($check_bet_exist != 'false') { // Bet Exist!
 				$items_array[] = [
-					"info" => $key['info'],
+					"info" => $value['info'],
 					"errorCode" => 8, // this transaction is not found
-					"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+					"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 				];
 				$global_error = 8;
 				$error_encounter = 1;
+				$value['tg_error'] = 8;
+				array_push($json_data_ii, $value);
 				continue;
 			}
-			$json_data['items'][$i - 1]['check_bet_exist'] = $check_bet_exist;
+			// $json_data['items'][$i - 1]['check_bet_exist'] = $check_bet_exist;
+			$value['check_bet_exist'] =  $check_bet_exist;
 
 
-			if(isset($key['roundId'])){
-				// $is_round_has_refunded = $this->checkTransactionExt('round_id', $key['roundId'], 3);
-				$is_round_has_refunded = GameTransactionMDB::findGameExt($key['roundId'], 3,'round_id', $client_details);
+			if(isset($value['roundId'])){
+				// $is_round_has_refunded = $this->checkTransactionExt('round_id', $value['roundId'], 3);
+				$is_round_has_refunded = GameTransactionMDB::findGameExt($value['roundId'], 3,'round_id', $client_details);
 				if($is_round_has_refunded != null && $is_round_has_refunded != false && $is_round_has_refunded != 'false'){
 					$items_array[] = [
-						 "info" => $key['info'],
+						 "info" => $value['info'],
 						 "errorCode" => 14, // this transaction is not found
-						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+						 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 					]; 
+					$value['tg_error'] = 14;
+					array_push($json_data_ii, $value);
 					continue;
 				}
-				$json_data['items'][$i - 1]['is_round_has_refunded'] = $is_round_has_refunded;
+				// $json_data['items'][$i - 1]['is_round_has_refunded'] = $is_round_has_refunded;
+				$value['is_round_has_refunded'] =  $is_round_has_refunded;
 			}
 
 			if ($this->array_has_dupes($duplicate_txid_request)) {
 				$global_error = 8; // Duplicate TxId in the call
 				$error_encounter = 1;
+				$value['tg_error'] = 8;
+				array_push($json_data_ii, $value);
 				continue;
 			}
+			array_push($json_data_ii, $value);
 		} // END FOREACH CHECK
+	
 
 		# If Anything Failed Return Error Message
 		if ($error_encounter != 0) { // ELSE PROCEED TO CLIENT TRANSFERING
@@ -878,9 +906,8 @@ class DigitainController extends Controller
 			);
 			return $response;
 		} else {
-
 			$items_array = array(); // ITEMS INFO
-			foreach ($json_data['items'] as $key) {
+			foreach ($json_data_ii as $key) {
 				$general_details = ["aggregator" => [], "provider" => [], "client" => []];
 				// Provider Details Logger
 				$general_details['provider']['operationType'] = $key['operationType'];
@@ -923,9 +950,6 @@ class DigitainController extends Controller
 
 				$bet_payout = 0; // Bet always 0 payout!
 				$income = $key['betAmount'] - $bet_payout;
-
-				// $game_trans = ProviderHelper::createGameTransaction($token_id, $game_details->game_id, $key['betAmount'],  $bet_payout, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
-				// $game_transextension = ProviderHelper::createGameTransExtV2($game_trans, $provider_trans_id, $round_id, abs($key['betAmount']), 1, $json_data);
 
 				$gameTransactionData = array(
 					"provider_trans_id" => $provider_trans_id,
@@ -1005,11 +1029,6 @@ class DigitainController extends Controller
 					isset($client_response->fundtransferresponse->status->code)
 					&& $client_response->fundtransferresponse->status->code == "402"
 				) {
-					// if (ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)) :
-					// 	ProviderHelper::updateGameTransactionStatus($game_trans, 2, 6);
-					// else :
-					// 	ProviderHelper::updateGameTransactionStatus($game_trans, 2, 99);
-					// endif;
 
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);  
