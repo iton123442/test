@@ -2948,7 +2948,7 @@ class DigitainController extends Controller
 				// }
 			}
 
-	    	if($datatrans != false){
+	    	if($datatrans != 'false'){
 				$entry_type = $datatrans->game_transaction_type == 1 ? 'debit' : 'credit';
 	    		if($key['refundRound'] == true){
 					// $all_rounds = $this->getAllRounds($datatrans->round_id);
@@ -3087,7 +3087,7 @@ class DigitainController extends Controller
 					    $amount = abs($is_bet_amount)-abs($is_win_amount);
 						$pay_amount = $bet_amount;
 						$income = $bet_amount - $pay_amount;
-						if($amount < 0){
+						if($is_win_amount > $is_bet_amount){
 		  					$transactiontype = 'debit'; // overwrite the transaction type
 		  					if(abs($client_details->balance) < abs($amount)){
 								$items_array[] = [
