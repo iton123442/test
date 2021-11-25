@@ -3249,7 +3249,7 @@ class DigitainController extends Controller
 	
 		$json_data_ii = array();
 
-		foreach ($json_data['items'] $key => $value) { // #1 FOREACH CHECK
+		foreach ($json_data['items'] as $key => $value) { // #1 FOREACH CHECK
 	
 
 				# 001 (FILTER MDB ONLY ACCEPT REQUET THAT HAS PLAYERID PARAM)
@@ -3374,11 +3374,6 @@ class DigitainController extends Controller
 					$datatrans = GameTransactionMDB::findGameExt($value['originalTxId'], 1,'transaction_id', $client_details);
 					$transaction_identifier = $value['originalTxId'];
 					$transaction_identifier_type = 'provider_trans_id';
-					// if ($datatrans != false) {
-					// 	$player_id = ProviderHelper::getClientDetails('token_id', $datatrans->token_id)->player_id; // IF EXIT
-					// } else {
-					// 	$player_id = $key['playerId']; // IF NOT DID NOT EXIST
-					// }
 				}
 
 				// $json_data['items'][$i - 1]['datatrans'] = $datatrans;
@@ -3493,8 +3488,6 @@ class DigitainController extends Controller
 					}
 				}
 
-				// $json_data['items'][$i - 1]['client_details'] = $client_details;
-				// $json_data['items'][$i - 1]['client_player'] = $client_details;
 				$value['client_details'] = $client_details;
 				$value['client_player'] = $client_details;
 
@@ -3518,10 +3511,8 @@ class DigitainController extends Controller
 			$is_win = array();
 			$is_bet_amount = array();
 			$is_win_amount = array();
-
 			foreach ($json_data_ii as $key) {
 				$general_details = ["aggregator" => [], "provider" => [], "client" => []];
-
 
 				if ($key['refundRound'] == true) {  // Use round id always
 					$datatrans = $key['datatrans'];
