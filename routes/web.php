@@ -134,7 +134,7 @@ $app->post('/public/api/marriott/balance', 'MarriottController@getBalance'); #/
 $app->post('/public/api/marriott/debit', 'MarriottController@debitProcess'); #/
 // RGS Gaming Endpoints
 $app->post('/public/rsg/authenticate', 'DigitainController@authenticate');
-$app->post('/public/rsg/creategamesession', 'DigitainController@createGameSession');
+// $app->post('/public/rsg/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
 $app->post('/public/rsg/getbalance', 'DigitainController@getbalance');
 $app->post('/public/rsg/refreshtoken', 'DigitainController@refreshtoken');
 $app->post('/public/rsg/bet', 'DigitainController@bet');
@@ -143,6 +143,7 @@ $app->post('/public/rsg/betwin', 'DigitainController@betwin');
 $app->post('/public/rsg/refund', 'DigitainController@refund');
 $app->post('/public/rsg/amend', 'DigitainController@amend');
 $app->post('/public/rsg/promowin', 'DigitainController@PromoWin');
+$app->post('/public/rsg/charge', 'DigitainController@makeCharge');
 $app->post('/public/rsg/checktxstatus', 'DigitainController@CheckTxStatus');
 // IA SPORTS
 $app->post('/public/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
@@ -570,19 +571,14 @@ $app->post('/public/api/slotmill/appendwagergoods.json','SlotMillController@appe
 $app->post('/public/api/slotmill/endwager.json','SlotMillController@endwager'); // win 
 $app->post('/public/api/slotmill/reverse.json','SlotMillController@reverse');
 
-$app->get('/public/api/pg/validate/{auth_key}/{game_session_token}','PGCompanyController@auth_player');
-$app->get('/public/api/pg/keepalive/{auth_key}/{game_session_token}','PGCompanyController@keepalive');
-$app->post('/public/api/pg/placebet/{auth_key}/{game_session_token}','PGCompanyController@placebet');
-$app->post('/public/api/pg/cancelbet/{auth_key}','PGCompanyController@cancelbet');
-$app->post('/public/api/pg/syncbet/{auth_key}','PGCompanyController@syncbet');
-$app->post('/public/api/pg/paybet/{auth_key}','PGCompanyController@paybet');
-// //PGVIRTUAL
-// $app->get('/public/api/pgvirtual/validate/{auth_key}/{game_session_token}','PGCompanyController@auth_player');
-// $app->get('/public/api/pgvirtual/keepalive/{auth_key}/{game_session_token}','PGCompanyController@keepalive');
-// $app->post('/public/api/pgvirtual/placebet/{auth_key}/{game_session_token}','PGCompanyController@placebet');
-// $app->post('/public/api/pgvirtual/cancelbet/{auth_key}','PGCompanyController@cancelbet');
-// $app->post('/public/api/pgvirtual/syncbet/{auth_key}','PGCompanyController@syncbet');
-// $app->post('/public/api/pgvirtual/paybet/{auth_key}','PGCompanyController@paybet');
+
+//PGVIRTUAL
+$app->get('/public/api/pgvirtual/validate/{auth_key}/{game_session_token}','PGCompanyController@auth_player');
+$app->get('/public/api/pgvirtual/keepalive/{auth_key}/{game_session_token}','PGCompanyController@keepalive');
+$app->post('/public/api/pgvirtual/placebet/{auth_key}/{game_session_token}','PGCompanyController@placebet');
+$app->post('/public/api/pgvirtual/cancelbet/{auth_key}','PGCompanyController@cancelbet');
+$app->post('/public/api/pgvirtual/syncbet/{auth_key}','PGCompanyController@syncbet');
+$app->post('/public/api/pgvirtual/paybet/{auth_key}','PGCompanyController@paybet');
 
 // CUT CALL FOR THE WIN CREDIT PROCESS
 $app->post('/public/tigergames/bg-fundtransferV2','FundtransferProcessorController@bgFundTransferV2');
@@ -706,16 +702,9 @@ $app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoun
 $app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
 
 // Crash Gaming (TigerGames)
-$app->post('api/crashgame/balance', 'CrashGameController@Balance');
-$app->post('api/crashgame/debit', 'CrashGameController@Debit');
-$app->post('api/crashgame/credit', 'CrashGameController@Credit');
-$app->post('api/crashgame/refund', 'CrashGameController@Refund');
-$app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
+$app->post('/public/api/crashgame/balance', 'CrashGameController@Balance');
+$app->post('/public/api/crashgame/debit', 'CrashGameController@Debit');
+$app->post('/public/api/crashgame/credit', 'CrashGameController@Credit');
+$app->post('/public/api/crashgame/refund', 'CrashGameController@Refund');
+$app->post('/public/api/crashgame/cancel', 'CrashGameController@Cancel');
 
-// QUickSpins Direct
-$app->post('/api/quickspin/verifyToken', 'QuickspinDirectController@Authenticate');
-
-// Player Operator Details
-$app->group(['prefix' => 'api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
-    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
-});
