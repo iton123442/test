@@ -2913,26 +2913,27 @@ class DigitainController extends Controller
 
 				$transaction_identifier = $key['roundId'];
 				$transaction_identifier_type = 'round_id';
-
-				$provider_request_payload = json_decode($datatrans->provider_request);
-				if(isset($provider_request_payload->promoWinAmount) || isset($provider_request_payload->chargeAmount)){
-					if(isset($provider_request_payload->playerId)  && $provider_request_payload->playerId != $key['playerId']){
-						$items_array[] = [
-							 "info" => $key['info'],
-							 "errorCode" => 7, // this transaction is not found
-							 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-						]; 
-						continue;
-					}
-				}else{
-					$db_provider_request_data = $this->findObjDataItem($datatrans->provider_request, $key['roundId'], 'playerId');
-					if(isset($key['playerId']) && $key['playerId'] != $db_provider_request_data){
-						$items_array[] = [
-							 "info" => $key['info'],
-							 "errorCode" => 7, // this transaction is not found
-							 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-						]; 
-						continue;
+				if (isset($datatrans->provider_request)){
+					$provider_request_payload = json_decode($datatrans->provider_request);
+					if(isset($provider_request_payload->promoWinAmount) || isset($provider_request_payload->chargeAmount)){
+						if(isset($provider_request_payload->playerId)  && $provider_request_payload->playerId != $key['playerId']){
+							$items_array[] = [
+								 "info" => $key['info'],
+								 "errorCode" => 7, // this transaction is not found
+								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+							]; 
+							continue;
+						}
+					}else{
+						$db_provider_request_data = $this->findObjDataItem($datatrans->provider_request, $key['roundId'], 'playerId');
+						if(isset($key['playerId']) && $key['playerId'] != $db_provider_request_data){
+							$items_array[] = [
+								 "info" => $key['info'],
+								 "errorCode" => 7, // this transaction is not found
+								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+							]; 
+							continue;
+						}
 					}
 				}
 				$player_id = $key['playerId'];
