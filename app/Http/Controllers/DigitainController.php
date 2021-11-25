@@ -3324,7 +3324,7 @@ class DigitainController extends Controller
 				if ($value['refundRound'] == true) {  // Use round id always
 					// $datatrans = $this->findTransactionRefund($value['roundId'], 'round_id');
 					$datatrans = GameTransactionMDB::findGameExt($value['roundId'], 1,'round_id', $client_details);
-					if ($datatrans == false) {
+					if ($datatrans == 'false') {
 						$items_array[] = [
 							"info" => $value['info'],
 							"errorCode" => 7, // this transaction is not found
@@ -3374,6 +3374,18 @@ class DigitainController extends Controller
 					$datatrans = GameTransactionMDB::findGameExt($value['originalTxId'], 1,'transaction_id', $client_details);
 					$transaction_identifier = $value['originalTxId'];
 					$transaction_identifier_type = 'provider_trans_id';
+					if ($datatrans == 'false') {
+						$items_array[] = [
+							"info" => $value['info'],
+							"errorCode" => 7, // this transaction is not found
+							"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
+						];
+						$global_error = $global_error == 1 ? 7 : $global_error;
+						$error_encounter = 1;
+						$value['tg_error'] = $global_error;
+						array_push($json_data_ii, $value);
+						continue;
+					}
 				}
 
 				// $json_data['items'][$i - 1]['datatrans'] = $datatrans;
