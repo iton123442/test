@@ -3047,7 +3047,7 @@ class DigitainController extends Controller
 				}
 			}
 
-			if($datatrans != false){ // TRANSACTION IS FOUND
+			if($datatrans != 'false'){ // TRANSACTION IS FOUND
 					$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 					$round_id = $transaction_identifier;
 					$bet_amount = $datatrans->amount;
@@ -3386,7 +3386,7 @@ class DigitainController extends Controller
 				$value['transaction_identifier_type'] = $transaction_identifier_type;
 				$value['player_id'] = $client_details->player_id;
 
-				if ($datatrans != false) {
+				if ($datatrans != 'false') {
 					$entry_type = $datatrans->game_transaction_type == 1 ? 'debit' : 'credit';
 					if ($key['refundRound'] == true) {
 						// $all_rounds = $this->getAllRounds($datatrans->round_id);
