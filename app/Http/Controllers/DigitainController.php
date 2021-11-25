@@ -3004,10 +3004,10 @@ class DigitainController extends Controller
 							$is_bet[] = $bet_item;
 							$transaction_to_refund[] = $bet_item;
 							$is_bet_amount[] = $datatrans->amount;
-
 							// $is_bet_has_won = $this->checkIfBetHasWon('provider_trans_id', $key['originalTxId'], 1);
-							// if($is_bet_has_won != null){
-							if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
+							$is_bet_has_won = GameTransactionMDB::findGameExt($key['originalTxId'], 2,'transaction_id', $client_details);
+							if($is_bet_has_won != null){
+							// if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
 								$items_array[] = [
 									"info" => $key['info'],
 									"errorCode" => 20,
@@ -3453,8 +3453,9 @@ class DigitainController extends Controller
 								$transaction_to_refund[] = $bet_item;
 								$is_bet_amount[] = $datatrans->amount;
 
-								// if($is_bet_has_won != null){
-								if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
+								$is_bet_has_won = GameTransactionMDB::findGameExt($key['originalTxId'], 2,'transaction_id', $client_details);
+								if($is_bet_has_won != 'false'){
+								// if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
 									$items_array[] = [
 										"info" => $value['info'],
 										"errorCode" => 20,
@@ -3462,6 +3463,8 @@ class DigitainController extends Controller
 									]; 
 									$global_error = $global_error == 1 ? 20 : $global_error;
 									$error_encounter = 1;
+									$value['tg_error'] = $global_error;
+									array_push($json_data_ii, $value);
 									continue;
 								}
 							}
@@ -3592,20 +3595,19 @@ class DigitainController extends Controller
 									$is_bet[] = $bet_item;
 									$transaction_to_refund[] = $bet_item;
 									$is_bet_amount[] = $datatrans->amount;
-
 									// $is_bet_has_won = $this->checkTransactionExt('round_id', $datatrans->round_id, 2);
 									// $is_bet_has_won = $this->checkIfBetHasWon('provider_trans_id', $key['originalTxId'], 1);
 									// if($is_bet_has_won != null){
-									if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
-										$items_array[] = [
-											"info" => $key['info'],
-											"errorCode" => 20,
-											"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-										]; 
-										$global_error = $global_error == 1 ? 20 : $global_error;
-										$error_encounter = 1;
-										continue;
-									}
+									// if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
+									// 	$items_array[] = [
+									// 		"info" => $key['info'],
+									// 		"errorCode" => 20,
+									// 		"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+									// 	]; 
+									// 	$global_error = $global_error == 1 ? 20 : $global_error;
+									// 	$error_encounter = 1;
+									// 	continue;
+									// }
 								}
 		    			}else{
 		    			// its a win round
