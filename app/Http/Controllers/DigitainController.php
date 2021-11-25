@@ -2419,7 +2419,7 @@ class DigitainController extends Controller
 				// $json_data['items'][$i - 1]['client_details'] = $client_details;
 				$value['client_details'] = $client_details;
 
-				if ($key['ignoreExpiry'] != 'false') {
+				if ($value['ignoreExpiry'] != 'false') {
 					$token_check = DigitainHelper::tokenCheck($value["token"]);
 					if ($token_check != true) {
 						$items_array[] = [
@@ -2436,7 +2436,7 @@ class DigitainController extends Controller
 					}
 				}
 				if ($client_details == null || $client_details == 'false') {
-					if ($client_details->player_id != $key["playerId"]) {
+					if ($client_details->player_id != $value["playerId"]) {
 						$items_array[] = [
 							"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '',
 							"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '',
@@ -2449,7 +2449,7 @@ class DigitainController extends Controller
 						array_push($json_data_ii, $value);
 						continue;
 					}
-					if ($key['currencyId'] != $client_details->default_currency) {
+					if ($value['currencyId'] != $client_details->default_currency) {
 						$items_array[] = [
 							"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '',
 							"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '',
