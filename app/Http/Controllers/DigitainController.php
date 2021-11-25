@@ -1608,7 +1608,7 @@ class DigitainController extends Controller
 				$value['transaction_identifier_type'] = $transaction_identifier_type;
 				$value['datatrans'] = $datatrans;
 
-				if ($client_details != null) { // Wrong Player ID
+				if ($client_details != null || $client_details == 'false') { 
 					if ($value['currencyId'] != $client_details->default_currency) {
 						$items_array[] = [
 							"info" => isset($value['info']) ? $value['info'] : '',
