@@ -2396,7 +2396,7 @@ class DigitainController extends Controller
 
 
 				if ($isset_allbets_amount == 0) { # Calculate all total bets
-					foreach ($json_data['items'] as  $key => $key_amount)) {
+					foreach ($json_data['items'] as  $key => $key_amount) {
 						array_push($all_bets_amount, $key_amount['betAmount']);
 						array_push($duplicate_txid_request, $key_amount['txId']);  // Checking for same txId in the call
 					}
