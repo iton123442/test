@@ -3388,7 +3388,7 @@ class DigitainController extends Controller
 
 				if ($datatrans != 'false') {
 					$entry_type = $datatrans->game_transaction_type == 1 ? 'debit' : 'credit';
-					if ($key['refundRound'] == true) {
+					if ($value['refundRound'] == true) {
 						// $all_rounds = $this->getAllRounds($datatrans->round_id);
 						$all_rounds = GameTransactionMDB::findGameExtAll($datatrans->round_id, 'round_id', $client_details);
 		    			foreach ($all_rounds as $al_round) {
@@ -3443,9 +3443,9 @@ class DigitainController extends Controller
 								// if($is_bet_has_won != null){
 								if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
 									$items_array[] = [
-										"info" => $key['info'],
+										"info" => $value['info'],
 										"errorCode" => 20,
-										"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+										"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 									]; 
 									$global_error = $global_error == 1 ? 20 : $global_error;
 									$error_encounter = 1;
@@ -3470,13 +3470,13 @@ class DigitainController extends Controller
 
 				# IF BET IS ALREADY WON WHEN REFUNDROUND IS FALSE
 				if (count($transaction_to_refund) > 0) {
-					if ($key['refundRound'] == false) {
+					if ($value['refundRound'] == false) {
 						if ($entry_type == 'debit') {
 							if (count($is_win) > 0) { // This Bet Has Already Wonned
 								$items_array[] = [
-									"info" => $key['info'],
+									"info" => $value['info'],
 									"errorCode" => 20,
-									"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+									"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 								];
 								$global_error = $global_error == 1 ? 20 : $global_error;
 								$error_encounter = 1;
