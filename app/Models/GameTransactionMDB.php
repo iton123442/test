@@ -424,7 +424,7 @@ class GameTransactionMDB
             $details = [];
             $connection = self::getAvailableConnection($client_details->connection_name);
             if ($connection != null) {
-                if($type == 'all'){
+                if($type == 'all' || $type == 'allround'){
                     $details = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                 }else{
                     $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');

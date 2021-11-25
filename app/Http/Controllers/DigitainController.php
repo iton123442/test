@@ -3101,7 +3101,7 @@ class DigitainController extends Controller
 		  					$transactiontype = 'credit'; // overwrite the transaction type
 		  				}
 					}
-					
+
 	  				// $game_transextension = ProviderHelper::createGameTransExtV2($datatrans->game_trans_id, $key['txId'], $round_id, abs($amount), 3,$request->all());
 
 	  				$gameTransactionEXTData = array(
