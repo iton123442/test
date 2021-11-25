@@ -1337,7 +1337,7 @@ class DigitainController extends Controller
 		 	  			$updateGameTransaction = [
 	 	  					  'pay_amount' => $bet_transaction_status->pay_amount, 
 			                  'income' => $bet_transaction_status->income, 
-			                  'win' => $win, 
+			                  'win' => 0, 
 			                  'entry_id' => $bet_transaction_status->entry_id,
 			            ];
 						GameTransactionMDB::updateGametransaction($updateGameTransaction, $datatrans->game_trans_id, $client_details);
