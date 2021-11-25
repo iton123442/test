@@ -338,7 +338,18 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        dd($player_details);
+        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        try{
+            $freeroundDetails = [
+                "txid" => $player_details->player_id,
+                "remoteusername" => $player_details->player_id,
+                "gameid" => $data["gameid"],
+                "amount" => $data["amount"],
+                "freespinvalue" => $data["freespinvalue"],
+            ];
+        } catch (\Exception $e) {
+            return 400;
+        }
     }
 }
 ?>
