@@ -2365,7 +2365,7 @@ class DigitainController extends Controller
 				$is_exist_gameid = $this->getGameId($value["gameId"]);
 				if($is_exist_gameid == false){
 					$items_array[] = [
-						 "info" => $value['info'], 
+						 "info" => isset($value['betInfo']) ? $value['betInfo'] : '', 
 						 "errorCode" => 11, 
 						 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 	        	    ]; 
