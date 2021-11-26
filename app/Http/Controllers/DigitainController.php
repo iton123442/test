@@ -4061,7 +4061,7 @@ class DigitainController extends Controller
 						if($checkLog->round_id != $key['roundId']){
 							$items_array[] = [
 								 "info" => $key['info'], 
-								 "errorCode" => 7, 
+								 "errorCode" => 72, 
 								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 			        	    ]; 
 			        	    // $global_error = $global_error == 1 ? 7 : $global_error;
@@ -4073,7 +4073,7 @@ class DigitainController extends Controller
 						if ($key['winOperationType'] == 2){ // bet
 							$items_array[] = [
 								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
-								 "errorCode" => 7, // Win Transaction not found
+								 "errorCode" => 73, // Win Transaction not found
 								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 			        	    ]; 
 							continue;
