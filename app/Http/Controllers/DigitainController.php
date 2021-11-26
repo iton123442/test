@@ -1349,10 +1349,13 @@ class DigitainController extends Controller
 						"mw_response" => json_encode($items_array),
 						'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
 						'client_response' => json_encode($client_response),
-						'transaction_detail' => 'BETWON',
+						'transaction_detail' => 'SUCCESS',
 						'general_details' => json_encode($general_details)
 					);
 					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+
+					$updateTransactionEXtDEBIT = array('transaction_detail' => 'BETWON');
+					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXtDEBIT,$datatrans->game_trans_ext_id,$client_details);
 		 	  		
 
 		 	  		if(isset($key['returnBetsAmount']) && $key['returnBetsAmount'] == true){
@@ -1828,10 +1831,13 @@ class DigitainController extends Controller
 						"mw_response" => json_encode($items_array),
 						'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
 						'client_response' => json_encode($client_response),
-						'transaction_detail' => 'BETWON',
+						'transaction_detail' => 'SUCCESS',
 						'general_details' => json_encode($general_details)
 					);
 					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+
+					$updateTransactionEXtDEBIT = array('transaction_detail' => 'BETWON');
+					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXtDEBIT,$datatrans->game_trans_ext_id,$client_details);
 
 					if (isset($key['returnBetsAmount']) && $key['returnBetsAmount'] == true) {
 						if(isset($key['betTxId'])){
