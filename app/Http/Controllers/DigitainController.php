@@ -4380,7 +4380,8 @@ class DigitainController extends Controller
 				// 	$error_encounter = 1;
 				// 	continue;
 				// }
-				$json_data['items'][$i - 1]['client_response'] = $client_details;
+				$json_data['client_response'] = $client_details;
+				// $json_data['items'][$i - 1]['client_response'] = $client_details;
 
 				$is_exist_gameid = $this->getGameId($value["gameId"]);
 				if($is_exist_gameid == false){
