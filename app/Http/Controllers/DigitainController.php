@@ -4070,8 +4070,7 @@ class DigitainController extends Controller
 						}
 					}else{
 						// Not found bet or win go away!
-
-						if ($key['winOperationType'] == 1){ // bet
+						if ($key['winOperationType'] == 2){ // bet
 							$checkLog = GameTransactionMDB::findGameExt($key['winTxId'], 1,'transaction_id', $client_details);
 							if($checkLog != 'false'){
 								$items_array[] = [
