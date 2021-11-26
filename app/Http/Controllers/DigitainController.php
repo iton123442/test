@@ -4519,11 +4519,11 @@ class DigitainController extends Controller
 						$value['checkLog'] = $checkLog;
 					} else {
 						// Not found bet or win go away!
-						if ($key['winOperationType'] == 2){ // bet
+						if ($value['winOperationType'] == 2){ // bet
 							$items_array[] = [
-								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
+								 "info" => $value['info'], // Info from RSG, MW Should Return it back!
 								 "errorCode" => 7, // Win Transaction not found
-								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+								 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 			        	    ]; 
 			        	    $global_error = $global_error == 1 ? 7 : $global_error;
 							$error_encounter = 1;
@@ -4532,9 +4532,9 @@ class DigitainController extends Controller
 							continue;
 						}else{
 							$items_array[] = [
-								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
+								 "info" => $value['info'], // Info from RSG, MW Should Return it back!
 								 "errorCode" => 18, // Win Transaction not found
-								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+								 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 			        	    ]; 
 			        	    $global_error = $global_error == 1 ? 18 : $global_error;
 							$error_encounter = 1;
