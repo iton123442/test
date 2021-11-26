@@ -4320,7 +4320,7 @@ class DigitainController extends Controller
 
 		$json_data_ii = array();
 
-		foreach ($json_data['items'] as $key as $value) { // FOREACH CHECK
+		foreach ($json_data['items'] as $key => $value) { // FOREACH CHECK
 				# Missing item param
 				if (!isset($value['playerId']) || !isset($value['gameId']) || !isset($value['roundId']) || !isset($value['txId']) || !isset($value['winTxId']) || !isset($value['winOperationType']) || !isset($value['currencyId']) || !isset($value['info']) || !isset($value['amendAmount'])) {
 					$items_array[] = [
