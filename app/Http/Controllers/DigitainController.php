@@ -3486,19 +3486,26 @@ class DigitainController extends Controller
 								$transaction_to_refund[] = $bet_item;
 								$is_bet_amount[] = $datatrans->amount;
 
-								$is_bet_has_won = GameTransactionMDB::findGameExt($key['originalTxId'], 2,'transaction_id', $client_details);
-								if($is_bet_has_won != 'false'){
-								// if(isset($datatrans->transaction_detail ) && $datatrans->transaction_detail == "BETWON"){
-									$items_array[] = [
-										"info" => $value['info'],
-										"errorCode" => 20,
-										"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
-									]; 
-									$global_error = $global_error == 1 ? 20 : $global_error;
-									$error_encounter = 1;
-									$value['tg_error'] = $global_error;
-									array_push($json_data_ii, $value);
-									continue;
+								if(isset($value['roundId']) && $value['roundId'] != null){
+									$is_bet_has_won = GameTransactionMDB::findGameExt($value['roundId'], 2,'round_id', $client_details);
+									if($is_bet_has_won != 'false'){
+										$items_array[] = [
+											"info" => $value['info'],
+											"errorCode" => 20,
+											"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
+										]; 
+										continue;
+									}	
+								}else{
+									$is_bet_has_won = GameTransactionMDB::findGameExt($value['originalTxId'], 2,'transaction_id', $client_details);
+									if($is_bet_has_won != 'false'){
+										$items_array[] = [
+											"info" => $value['info'],
+											"errorCode" => 20,
+											"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
+										]; 
+										continue;
+									}	
 								}
 							}
 		    			}else{
@@ -3512,19 +3519,27 @@ class DigitainController extends Controller
 							$is_win[] = $win_item;
 							$transaction_to_refund[] = $win_item;
 							$is_win_amount[] = $datatrans->amount;
-							$is_bet_has_won = GameTransactionMDB::findGameExt($key['originalTxId'], 2,'transaction_id', $client_details);
+							if(isset($value['roundId']) && $value['roundId'] != null){
+								$is_bet_has_won = GameTransactionMDB::findGameExt($value['roundId'], 2,'round_id', $client_details);
 								if($is_bet_has_won != 'false'){
 									$items_array[] = [
 										"info" => $value['info'],
 										"errorCode" => 20,
 										"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 									]; 
-									$global_error = $global_error == 1 ? 20 : $global_error;
-									$error_encounter = 1;
-									$value['tg_error'] = $global_error;
-									array_push($json_data_ii, $value);
 									continue;
-								}
+								}	
+							}else{
+								$is_bet_has_won = GameTransactionMDB::findGameExt($value['originalTxId'], 2,'transaction_id', $client_details);
+								if($is_bet_has_won != 'false'){
+									$items_array[] = [
+										"info" => $value['info'],
+										"errorCode" => 20,
+										"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
+									]; 
+									continue;
+								}	
+							}
 		    			}
 					}
 				}
