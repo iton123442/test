@@ -4354,7 +4354,7 @@ class DigitainController extends Controller
 					continue;
 				}
 				$client_details = ProviderHelper::getClientDetails('player_id', $value['playerId']);
-				if ($client_details == nul && $client_details == 'false') {
+				if ($client_details == null && $client_details == 'false') {
 					$items_array[] = [
 						"info" => $value['info'], // Info from RSG, MW Should Return it back!
 						"errorCode" => 4, //The playerId was not found
