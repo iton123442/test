@@ -3027,6 +3027,15 @@ class DigitainController extends Controller
 						$is_win[] = $win_item;
 						$transaction_to_refund[] = $win_item;
 						$is_win_amount[] = $datatrans->amount;
+						$is_bet_has_won = GameTransactionMDB::findGameExt($key['originalTxId'], 2,'transaction_id', $client_details);
+						if($is_bet_has_won != 'false'){
+							$items_array[] = [
+								"info" => $key['info'],
+								"errorCode" => 20,
+								"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+							]; 
+							continue;
+						}
 	    			}
 	    		}
 			}
@@ -3479,6 +3488,19 @@ class DigitainController extends Controller
 							$is_win[] = $win_item;
 							$transaction_to_refund[] = $win_item;
 							$is_win_amount[] = $datatrans->amount;
+							$is_bet_has_won = GameTransactionMDB::findGameExt($key['originalTxId'], 2,'transaction_id', $client_details);
+								if($is_bet_has_won != 'false'){
+									$items_array[] = [
+										"info" => $value['info'],
+										"errorCode" => 20,
+										"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
+									]; 
+									$global_error = $global_error == 1 ? 20 : $global_error;
+									$error_encounter = 1;
+									$value['tg_error'] = $global_error;
+									array_push($json_data_ii, $value);
+									continue;
+								}
 		    			}
 					}
 				}
