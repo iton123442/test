@@ -4072,7 +4072,7 @@ class DigitainController extends Controller
 						// Not found bet or win go away!
 						if ($key['winOperationType'] == 2){ // bet
 							$checkLog = GameTransactionMDB::findGameExt($key['winTxId'], 1,'transaction_id', $client_details);
-							dd($checkLogk);
+							dd($checkLog);
 							if($checkLog != 'false'){ // cannot amend bet
 								$items_array[] = [
 									 "info" => $key['info'], // Info from RSG, MW Should Return it back!
