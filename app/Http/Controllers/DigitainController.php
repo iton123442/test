@@ -1988,7 +1988,7 @@ class DigitainController extends Controller
 				$general_details2 = ["aggregator" => [],"provider" => [],"client" => []];
 
 				# Missing item param
-				if(!isset($key['txId']) || !isset($key['betAmount']) || !isset($key['winAmount']) || !isset($key['token']) || !isset($key['playerId']) || !isset($key['roundId']) || !isset($key['gameId']) || !isset($key['betInfo']) || !isset($key['winInfo'])){
+				if(!isset($key['txId']) || !isset($key['betAmount']) || !isset($key['winAmount']) || !isset($key['token']) || !isset($key['roundId']) || !isset($key['gameId']) || !isset($key['betInfo']) || !isset($key['winInfo'])){
 					 $items_array[] = [
 						 "betInfo" => isset($key['betInfo']) ? $key['betInfo'] : '', // Betinfo
 					     "winInfo" => isset($key['winInfo']) ? $key['winInfo'] : '', // IWininfo
@@ -2348,7 +2348,7 @@ class DigitainController extends Controller
 		foreach ($json_data['items'] as $key => $value) { // FOREACH CHECK
 			
 				# Missing item param
-				if (!isset($value['txId']) || !isset($value['betAmount']) || !isset($value['winAmount']) || !isset($value['token']) || !isset($value['playerId']) || !isset($value['roundId']) || !isset($value['gameId'])) {
+				if (!isset($value['txId']) || !isset($value['betAmount']) || !isset($value['winAmount']) || !isset($value['token']) || !isset($value['roundId']) || !isset($value['gameId'])) {
 					$items_array[] = [
 						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '', // Info from RSG, MW Should Return it back!
 						"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '', // Info from RSG, MW Should Return it back!
