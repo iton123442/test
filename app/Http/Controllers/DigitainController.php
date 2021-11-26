@@ -3990,7 +3990,7 @@ class DigitainController extends Controller
 								"errorCode" => 18,  
 								"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 						   ];
-						   $error_encounter= 1;
+						   // $error_encounter= 1;
 						   continue;
 						}
 
@@ -4001,7 +4001,7 @@ class DigitainController extends Controller
 								"errorCode" => 18,  
 								"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 						   ]; 
-						   $error_encounter= 1;
+						   // $error_encounter= 1;
 						   continue;
 						}
 
@@ -4014,7 +4014,7 @@ class DigitainController extends Controller
 								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 			        	    ]; 
 			        	    // $global_error = $global_error == 1 ? 19 : $global_error;
-							$error_encounter= 1;
+							// $error_encounter= 1;
 							continue;
 						}
 
@@ -4025,7 +4025,7 @@ class DigitainController extends Controller
 									"errorCode" => 18,  
 									"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 							   ]; 
-							   $error_encounter= 1;
+							   // $error_encounter= 1;
 							   continue;
 						}
 
@@ -4037,7 +4037,7 @@ class DigitainController extends Controller
 								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 			        	    ]; 
 			        	    // $global_error = $global_error == 1 ? 18 : $global_error;
-							$error_encounter= 1;
+							// $error_encounter= 1;
 							continue;
 						}
 						
@@ -4052,7 +4052,7 @@ class DigitainController extends Controller
 										"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 									]; 
 									// $global_error = $global_error == 1 ? 19 : $global_error;
-									$error_encounter= 1;
+									// $error_encounter= 1;
 									continue;
 								}
 							}
@@ -4065,33 +4065,24 @@ class DigitainController extends Controller
 								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 			        	    ]; 
 			        	    // $global_error = $global_error == 1 ? 7 : $global_error;
-							$error_encounter= 1;
+							// $error_encounter= 1;
 							continue;
 						}
 					}else{
 						// Not found bet or win go away!
 						if ($key['winOperationType'] == 2){ // bet
-							$checkLog = GameTransactionMDB::findGameExt($key['winTxId'], 1,'transaction_id', $client_details);
-							dd($checkLog);
-							if($checkLog != 'false'){ // cannot amend bet
-								$items_array[] = [
-									 "info" => $key['info'], // Info from RSG, MW Should Return it back!
-									 "errorCode" => 7, // Win Transaction not found
-									 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
-				        	    ]; 
-				        	    $global_error = $global_error == 1 ? 7 : $global_error;
-								$error_encounter= 1;
-								continue;
-							}
+							$items_array[] = [
+								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
+								 "errorCode" => 7, // Win Transaction not found
+								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+			        	    ]; 
+							continue;
 						}else{
-							// 2 winOperationType // win
 							$items_array[] = [
 								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
 								 "errorCode" => 18, // Win Transaction not found
 								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 			        	    ]; 
-			        	    $global_error = $global_error == 1 ? 18 : $global_error;
-							$error_encounter= 1;
 							continue;
 						}
 					}
