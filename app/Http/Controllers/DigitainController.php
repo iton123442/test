@@ -4072,7 +4072,7 @@ class DigitainController extends Controller
 						// Not found bet or win go away!
 						$items_array[] = [
 							 "info" => $key['info'], // Info from RSG, MW Should Return it back!
-							 "errorCode" => 7, // Win Transaction not found
+							 "errorCode" => 18, // Win Transaction not found
 							 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 		        	    ]; 
 		        	    // $global_error = $global_error == 1 ? 7 : $global_error;
