@@ -4072,13 +4072,14 @@ class DigitainController extends Controller
 						// Not found bet or win go away!
 						if ($key['winOperationType'] == 2){ // bet
 							$checkLog = GameTransactionMDB::findGameExt($key['winTxId'], 1,'transaction_id', $client_details);
-							if($checkLog != 'false'){
+							dd($checkLogk);
+							if($checkLog != 'false'){ // cannot amend bet
 								$items_array[] = [
 									 "info" => $key['info'], // Info from RSG, MW Should Return it back!
 									 "errorCode" => 7, // Win Transaction not found
 									 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 				        	    ]; 
-				        	    // $global_error = $global_error == 1 ? 7 : $global_error;
+				        	    $global_error = $global_error == 1 ? 7 : $global_error;
 								$error_encounter= 1;
 								continue;
 							}
@@ -4089,7 +4090,7 @@ class DigitainController extends Controller
 								 "errorCode" => 18, // Win Transaction not found
 								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 			        	    ]; 
-			        	    // $global_error = $global_error == 1 ? 7 : $global_error;
+			        	    $global_error = $global_error == 1 ? 18 : $global_error;
 							$error_encounter= 1;
 							continue;
 						}
