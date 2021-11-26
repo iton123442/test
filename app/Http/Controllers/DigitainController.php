@@ -4317,56 +4317,64 @@ class DigitainController extends Controller
 		$all_bets_amount = array();
 		$isset_allbets_amount = 0;
 		$global_error = 1;
-		$i=0;
-		foreach ($json_data['items'] as $key) { // FOREACH CHECK
-		$i++;
+
+		$json_data_ii = array();
+
+		foreach ($json_data['items'] as $key as $value) { // FOREACH CHECK
 				# Missing item param
-				if (!isset($key['playerId']) || !isset($key['gameId']) || !isset($key['roundId']) || !isset($key['txId']) || !isset($key['winTxId']) || !isset($key['winOperationType']) || !isset($key['currencyId']) || !isset($key['info']) || !isset($key['amendAmount'])) {
+				if (!isset($value['playerId']) || !isset($value['gameId']) || !isset($value['roundId']) || !isset($value['txId']) || !isset($value['winTxId']) || !isset($value['winOperationType']) || !isset($value['currencyId']) || !isset($value['info']) || !isset($value['amendAmount'])) {
 					$items_array[] = [
-						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+						"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 						"errorCode" => 17, //The playerId was not found
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = $global_error == 1 ? 17 : $global_error;
 					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 					continue;
 				}
 				if ($isset_allbets_amount == 0) { # Calculate all total bets
-					foreach ($json_data['items'] as $key) {
-						array_push($duplicate_txid_request, $key['txId']);
-						array_push($all_bets_amount, $key['amendAmount']);
+					foreach ($json_data['items'] as $key2 as $key_amount) {
+						array_push($duplicate_txid_request, $key_amount['txId']);
+						array_push($all_bets_amount, $key_amount['amendAmount']);
 					}
 					$isset_allbets_amount = 1;
 				}
 				if ($this->array_has_dupes($duplicate_txid_request)) {
 					$items_array[] = [
-						"info" => $key['info'],
+						"info" => $value['info'],
 						"errorCode" => 8,
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 					];
 					$global_error = $global_error == 1 ? 8 : $global_error;
 					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 					continue;
 				}
-				$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
+				$client_details = ProviderHelper::getClientDetails('player_id', $value['playerId']);
 				if ($client_details == nul && $client_details == 'false') {
 					$items_array[] = [
-						"info" => $key['info'], // Info from RSG, MW Should Return it back!
+						"info" => $value['info'], // Info from RSG, MW Should Return it back!
 						"errorCode" => 4, //The playerId was not found
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = $global_error == 1 ? 7 : $global_error;
 					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 					continue;
 				}
-				$json_data['items'][$i - 1]['client_details'] = $client_details;
+				$json_data['client_details'] = $client_details;
+				// $json_data['items'][$i - 1]['client_details'] = $client_details;
 
 				// $client_response = DigitainHelper::playerDetailsCall($client_details);
 				// if ($client_response == 'false') {
 				// 	$items_array[] = [
-				// 		"info" => $key['info'], // Info from RSG, MW Should Return it back!
+				// 		"info" => $value['info'], // Info from RSG, MW Should Return it back!
 				// 		"errorCode" => 4, //The playerId was not found
-				// 		"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+				// 		"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 				// 	];
 				// 	$global_error = $global_error == 1 ? 7 : $global_error;
 				// 	$error_encounter = 1;
@@ -4374,154 +4382,195 @@ class DigitainController extends Controller
 				// }
 				$json_data['items'][$i - 1]['client_response'] = $client_details;
 
-				$is_exist_gameid = $this->getGameId($key["gameId"]);
+				$is_exist_gameid = $this->getGameId($value["gameId"]);
 				if($is_exist_gameid == false){
 					$items_array[] = [
-						 "info" => $key['info'], 
+						 "info" => $value['info'], 
 						 "errorCode" => 11, 
-						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+						 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 	        	    ]; 
+	        	    $value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 	        	    continue;
 				}
-				$key["gameId"] = $is_exist_gameid; // Overwrite GameId
+				$value["gameId"] = $is_exist_gameid; // Overwrite GameId
 
-				$game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $key["gameId"]);
+				$game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $value["gameId"]);
 				if ($game_details == null) { // Game not found
 					$items_array[] = [
-						"info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+						"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 						"errorCode" => 11, // transaction already refunded
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = $global_error == 1 ? 11 : $global_error;
 					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 					continue;
 				}
-				$json_data['items'][$i - 1]['game_details'] = $game_details;
+				$value['game_details'] = $game_details;
+				// $json_data['items'][$i - 1]['game_details'] = $game_details;
 
 
-				if (isset($key['winTxId'])) {
-					// $checkLog = DigitainHelper::findGameExt($key['winTxId'], 123, 'transaction_id'); // Amend can amend Bet and Win Select All Possible?
+				if (isset($value['winTxId'])) {
+					// $checkLog = DigitainHelper::findGameExt($value['winTxId'], 123, 'transaction_id'); // Amend can amend Bet and Win Select All Possible?
 
-					$checkLog = GameTransactionMDB::findGameExt($key['winTxId'], 2,'transaction_id', $client_details);
+					$checkLog = GameTransactionMDB::findGameExt($value['winTxId'], 2,'transaction_id', $client_details);
 					if ($checkLog != 'false') {
 
 						# If Not Included in the Operation Types
-						if($this->getOperationType($key['winOperationType']) == 'false'){
+						if($this->getOperationType($value['winOperationType']) == 'false'){
 							$items_array[] = [
-								"info" => $key['info'], 
+								"info" => $value['info'], 
 								"errorCode" => 18,  
-								"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 						   ];
 						   $global_error = $global_error == 1 ? 18 : $global_error;
 						   $error_encounter = 1;
+						   $value['tg_error'] = $global_error;
+						   array_push($json_data_ii, $value);
 						   continue;
 						}
 
 						# If not in win operation type
-						if($this->getWinOpType($key['winOperationType']) == false){
+						if($this->getWinOpType($value['winOperationType']) == false){
 							$items_array[] = [
-								"info" => $key['info'], 
+								"info" => $value['info'], 
 								"errorCode" => 18,  
-								"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 						   ]; 
 						   $global_error = $global_error == 1 ? 18 : $global_error;
 						   $error_encounter = 1;
+						   $value['tg_error'] = $global_error;
+						   array_push($json_data_ii, $value);
 						   continue;
 						}
 
 						$db_operation_type = 1;
 						$debit_operation_type = 37; 
-						if ($key['operationType'] != 37 && $key['operationType'] != 38) {
+						if ($value['operationType'] != 37 && $value['operationType'] != 38) {
 							$items_array[] = [
-								"info" => $key['info'],
+								"info" => $value['info'],
 								"errorCode" => 19,
-								"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 							];
 							$global_error = $global_error == 1 ? 19 : $global_error;
 							$error_encounter = 1;
+							$value['tg_error'] = $global_error;
+							array_push($json_data_ii, $value);
 							continue;
 						}
 						if($checkLog->game_transaction_type == 1){
 							$items_array[] = [
-								"info" => $key['info'], 
+								"info" => $value['info'], 
 								"errorCode" => 18,  // Invalid Data
-								"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 							]; 
 							$global_error = $global_error == 1 ? 18 : $global_error;
 							$error_encounter= 1;
+							$value['tg_error'] = $global_error;
+							array_push($json_data_ii, $value);
+							continue;
 						}
-						if ($checkLog->amount < $key['amendAmount']) {
+						if ($checkLog->amount < $value['amendAmount']) {
 							$items_array[] = [
-								"info" => $key['info'],
+								"info" => $value['info'],
 								"errorCode" => 18,
-								"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 							];
 							$global_error = $global_error == 1 ? 18 : $global_error;
 							$error_encounter = 1;
+							$value['tg_error'] = $global_error;
+							array_push($json_data_ii, $value);
 							continue;
 						}
 						if (isset($checkLog->general_details)) {
 							$db_general_details = json_decode($checkLog->general_details);
 							if (isset($db_general_details->provider->operationType)) {
-								if ($key['winOperationType'] != $db_general_details->provider->operationType) {
+								if ($value['winOperationType'] != $db_general_details->provider->operationType) {
 									$items_array[] = [
-										"info" => $key['info'],
+										"info" => $value['info'],
 										"errorCode" => 19,
-										"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+										"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 									];
 									$global_error = $global_error == 1 ? 19 : $global_error;
 									$error_encounter = 1;
+									$value['tg_error'] = $global_error;
+									array_push($json_data_ii, $value);
 									continue;
 								}
 							}
 						}
-						if ($checkLog->round_id != $key['roundId']) {
+						if ($checkLog->round_id != $value['roundId']) {
 							$items_array[] = [
-								"info" => $key['info'],
+								"info" => $value['info'],
 								"errorCode" => 7,
-								"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 							];
 							$global_error = $global_error == 1 ? 7 : $global_error;
 							$error_encounter = 1;
+							$value['tg_error'] = $global_error;
+							array_push($json_data_ii, $value);
 							continue;
 						}
 
-						$json_data['items'][$i - 1]['checkLog'] = $checkLog;
+						// $json_data['items'][$i - 1]['checkLog'] = $checkLog;
+						$value['checkLog'] = $checkLog;
 					} else {
 						// Not found bet or win go away!
-						$items_array[] = [
-							"info" => $key['info'], // Info from RSG, MW Should Return it back!
-							"errorCode" => 7, // Win Transaction not found
-							"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
-						];
-						$global_error = $global_error == 1 ? 7 : $global_error;
-						$error_encounter = 1;
-						continue;
+						if ($key['winOperationType'] == 2){ // bet
+							$items_array[] = [
+								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
+								 "errorCode" => 7, // Win Transaction not found
+								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+			        	    ]; 
+			        	    $global_error = $global_error == 1 ? 7 : $global_error;
+							$error_encounter = 1;
+							$value['tg_error'] = $global_error;
+							array_push($json_data_ii, $value);
+							continue;
+						}else{
+							$items_array[] = [
+								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
+								 "errorCode" => 18, // Win Transaction not found
+								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+			        	    ]; 
+			        	    $global_error = $global_error == 1 ? 18 : $global_error;
+							$error_encounter = 1;
+							$value['tg_error'] = $global_error;
+							array_push($json_data_ii, $value);
+							continue;
+						}
 					}
 				}
 
-				// $is_refunded = DigitainHelper::findGameExt($key['txId'], 3, 'transaction_id');
-				$is_refunded = GameTransactionMDB::findGameExt($key['txId'], 3,'transaction_id', $client_details);
+				// $is_refunded = DigitainHelper::findGameExt($value['txId'], 3, 'transaction_id');
+				$is_refunded = GameTransactionMDB::findGameExt($value['txId'], 3,'transaction_id', $client_details);
 				if ($is_refunded != 'false') {
 					$items_array[] = [
-						"info" => $key['info'], // Info from RSG, MW Should Return it back!
+						"info" => $value['info'], // Info from RSG, MW Should Return it back!
 						"errorCode" => 8, // transaction already refunded
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = $global_error == 1 ? 8 : $global_error;
 					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 					continue;
 				}
-				$json_data['items'][$i - 1]['is_refunded'] = $is_refunded;
+				$value['is_refunded'] = $is_refunded;
+				// $json_data['items'][$i - 1]['is_refunded'] = $is_refunded;
 
-				if ($key['currencyId'] != $client_details->default_currency) {
+				if ($value['currencyId'] != $client_details->default_currency) {
 					$items_array[] = [
-						"info" => $key['info'], // Info from RSG, MW Should Return it back!
+						"info" => $value['info'], // Info from RSG, MW Should Return it back!
 						"errorCode" => 16, // Currency code dont match!
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = $global_error == 1 ? 16 : $global_error;
 					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 					continue;
 				}
 		} // END FOREACH CHECK
@@ -4542,7 +4591,7 @@ class DigitainController extends Controller
 			$isset_allbets_amount = 0;
 			// ALL GOOD PROCESS IT
 
-			foreach ($json_data['items'] as $key) {
+			foreach ($json_data_ii as $key) {
 				$general_details = ["aggregator" => [], "provider" => [], "client" => []];
 				if (!isset($key['playerId']) || !isset($key['gameId']) || !isset($key['roundId']) || !isset($key['txId']) || !isset($key['winTxId']) || !isset($key['winOperationType']) || !isset($key['currencyId']) || !isset($key['info']) || !isset($key['amendAmount'])) {
 					$items_array[] = [
