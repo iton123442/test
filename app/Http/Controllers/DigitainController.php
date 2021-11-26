@@ -4070,14 +4070,30 @@ class DigitainController extends Controller
 						}
 					}else{
 						// Not found bet or win go away!
-						$items_array[] = [
-							 "info" => $key['info'], // Info from RSG, MW Should Return it back!
-							 "errorCode" => 18, // Win Transaction not found
-							 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
-		        	    ]; 
-		        	    // $global_error = $global_error == 1 ? 7 : $global_error;
-						$error_encounter= 1;
-						continue;
+
+						if ($key['winOperationType'] == 1){ // bet
+							$checkLog = GameTransactionMDB::findGameExt($key['winTxId'], 1,'transaction_id', $client_details);
+							if($checkLog != 'false'){
+								$items_array[] = [
+									 "info" => $key['info'], // Info from RSG, MW Should Return it back!
+									 "errorCode" => 7, // Win Transaction not found
+									 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+				        	    ]; 
+				        	    // $global_error = $global_error == 1 ? 7 : $global_error;
+								$error_encounter= 1;
+								continue;
+							}
+						}else{
+							// 2 winOperationType // win
+							$items_array[] = [
+								 "info" => $key['info'], // Info from RSG, MW Should Return it back!
+								 "errorCode" => 18, // Win Transaction not found
+								 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+			        	    ]; 
+			        	    // $global_error = $global_error == 1 ? 7 : $global_error;
+							$error_encounter= 1;
+							continue;
+						}
 					}
 			}
 
@@ -5623,7 +5639,7 @@ class DigitainController extends Controller
 			'5' => 5,
 			'6' => 6,
 			'8' => 8,
-			'109' => 10,
+			'10' => 10,
 			'12' => 12,
 			'14' => 14,
 			'16' => 16,
