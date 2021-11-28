@@ -195,41 +195,87 @@ class QuickspinDirectController extends Controller
         }
         $formatBal = $balance = str_replace(".","", $client_details->balance);
         $formattedBal = (int) $formatBal;
+        $trans_type = $req['txtype'];//transaction type wether its free spin or normal
         try {
             ProviderHelper::idenpotencyTable($provider_trans_id);
         } catch (\Exception $e) {
-            $getTransaction = GameTransactionMDB::findGameTransactionDetails($provider_trans_id, 'transaction_id',false, $client_details);
-            $res = [
-                "balance" => (int)$formatBal,
-                "txid" => (int) $provider_trans_id,
-                "remotetxid" => $getTransaction->game_trans_id,
-            ];
+            if($trans_type == 'freespinspayout'){
+                $res = [
+                    "balance" => (int)$formatBal,
+                    "txid" => (int) $provider_trans_id,
+                    "remotetxid" => $round_id,
+                ];
+            }else{
+                $getTransaction = GameTransactionMDB::findGameTransactionDetails($provider_trans_id, 'transaction_id',false, $client_details);
+                $res = [
+                    "balance" => (int)$formatBal,
+                    "txid" => (int) $provider_trans_id,
+                    "remotetxid" => $getTransaction->game_trans_id,
+                ];
+            }
             return $res;
         }
+        
         $game_details = Game::find($game_code, config('providerlinks.quickspinDirect.provider_db_id'));
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
-        $client_details->connection_name = $bet_transaction->connection_name;
         $winBalance = $formattedBal + $pay_amount;
         $win_or_lost = $pay_amount > 0 ?  1 : 0;
         $entry_id = $pay_amount > 0 ?  2 : 1;
-        $income = $bet_transaction->bet_amount - $pay_amount;
 
-        $res = [
-            "balance" => (int) $winBalance,
-            "txid" => (int) $provider_trans_id,
-            "remotetxid" => (string)$bet_transaction->game_trans_id
-        ];
+        if(!$bet_transaction){
+            $client_details->connection_name = $bet_transaction->connection_name;
+            $income = $bet_transaction->bet_amount - $pay_amount;
+            $res = [
+                "balance" => (int) $winBalance,
+                "txid" => (int) $provider_trans_id,
+                "remotetxid" => (string)$bet_transaction->game_trans_id
+            ];
+        }else{
+            $client_details->connection_name = $client_details->connection_name;
+            $income = 0;
+            $res = [
+                "balance" => (int) $winBalance,
+                "txid" => (int) $provider_trans_id,
+                "remotetxid" => $round_id
+            ];
+        }
         
-        $updateGameTransaction = [
-              'win' => 5,
-              'pay_amount' => $pay_amount,
-              'income' => $income,
-              'entry_id' => $entry_id,
-              'trans_status' => 2
-        ];
-        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+        if($trans_type == 'freespinspayout'){
+            $gameTransactionData = array(
+                "provider_trans_id" => $provider_trans_id,
+                "token_id" => $client_details->token_id,
+                "game_id" => $game_details->game_id,
+                "round_id" => $round_id,
+                "bet_amount" => 0,
+                "win" => $win_or_lost,
+                "pay_amount" => $pay_amount,
+                "income" => 0,
+                "entry_id" => 1,
+            ); 
+            $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+            $gameTransactionEXTData = array(
+                "game_trans_id" => $game_transaction_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $round_id,
+                "amount" => 0,
+                "game_transaction_type"=> 1,
+                "provider_request" =>json_encode($req->all()),
+            );
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            $game_trans_id = $game_transaction_id;
+        }else{
+            $updateGameTransaction = [
+                  'win' => 5,
+                  'pay_amount' => $pay_amount,
+                  'income' => $income,
+                  'entry_id' => $entry_id,
+                  'trans_status' => 2
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+            $game_trans_id = $bet_transaction->game_trans_id;
+        }
         $gameTransactionEXTData = array(
-                  "game_trans_id" => json_encode($bet_transaction->game_trans_id),
+                  "game_trans_id" => json_encode($game_trans_id),
                   "provider_trans_id" => $provider_trans_id,
                   "round_id" => $round_id,
                   "amount" => $pay_amount,
@@ -257,7 +303,7 @@ class QuickspinDirectController extends Controller
                 "provider_round_id"=> $round_id, #R
             ],
             "mwapi" => [
-                "roundId"=>$bet_transaction->game_trans_id, #R
+                "roundId"=>$game_trans_id, #R
                 "type"=>2, #R
                 "game_id" => $game_details->game_id, #R
                 "player_id" => $client_details->player_id, #R
@@ -269,7 +315,7 @@ class QuickspinDirectController extends Controller
                 ]
             ]
         ];
-        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
         if($client_response != false){  
 
         $updateTransactionEXt = array(
@@ -389,7 +435,8 @@ class QuickspinDirectController extends Controller
         return response($res,200)
                 ->header('Content-Type', 'application/json');
     }
-    public function freeRound(Request $req){
-        dd($req->all());
+    public function freeRound($data){
+        dd($data);
+
     }
 }

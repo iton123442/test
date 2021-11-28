@@ -714,5 +714,8 @@ $app->post('/public/api/quickspin/getBalance', 'QuickspinDirectController@getBal
 $app->post('/public/api/quickspin/withdraw', 'QuickspinDirectController@betProcess');
 $app->post('/public/api/quickspin/deposit', 'QuickspinDirectController@winProcess');
 $app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollbackProcess');
+$app->post('/public/api/quickspin/fs_win', 'QuickspinDirectController@freeRound');
 
-$app->post('/public/api/spearhead','SpearHeadController@Test');
+// SpearHead
+$app->post('/public/api/spearhead/GetBalance', 'SpearHeadController@getBalance');
+$app->post('/public/api/spearhead','SpearHeadController@index');
