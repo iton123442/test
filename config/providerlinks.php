@@ -630,8 +630,10 @@ return [
         'partner_id' => 2076,
     ],
     'spearhead' => [
-        'provider_db_id'=> 68,
+        'provider_db_id'=> 67,
         'api_url' => 'https://gamelaunch.everymatrix.com/',
+        'operator' => '',
+        'operator_key' => '',
     ],
 
 ];
