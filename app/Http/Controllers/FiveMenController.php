@@ -713,6 +713,48 @@ public function gameBet($request, $client_details)
 		}
 	}
 
+	public static function getSignatureApi($system_id, $version, $args, $system_key,$type){
+		$md5 = array();
+		$md5[] = $system_id;
+		$md5[] = $version;
+		$md5[] = $args;
+	
+		if($type == 'check_signature'){
+			$signature = $args['signature']; // store the signature
+			unset($args['signature']); // remove signature from the array
+		}
+
+		// foreach ($args as $required_arg) {
+		// 	$arg = $required_arg;
+		// 	if(is_array($arg)){
+		// 		if(count($arg)) {
+		// 			$recursive_arg = '';
+		// 			array_walk_recursive($arg, function($item) use (& $recursive_arg) {
+		// 				if(!is_array($item)) { $recursive_arg .= ($item . ':');} 
+		// 			});
+		// 			$md5[] = substr($recursive_arg, 0, strlen($recursive_arg)-1); // get rid of last
+		// 		} else {
+		// 			$md5[] = '';
+		// 		}
+		// 	} else {
+		// 		$md5[] = $arg;
+		// 	}
+		// };
+
+		$md5[] = $system_key;
+		$md5_str = implode('*', $md5);
+		$md5 = md5($md5_str);
+		if($type == 'check_signature'){
+			if($md5 == $signature){  // Generate Hash And Check it also!
+				return 'true';
+			}else{
+				return 'false';
+			}
+		}elseif($type == 'get_signature') {
+			return $md5;
+		}
+	}
+
 	public function getGamelist(Request $request){
 		$data = [
 			'signature' => 'e5e1757feaf0301856ad9c309741f283',
@@ -803,11 +845,10 @@ public function gameBet($request, $client_details)
 	 return ($update ? true : false);
  	}
  	public function getRTP(Request $request){
- 		// dd($request->all());
  		// getSignature($system_id, $version, array $args, $system_key,$type);
- 		$signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'get_signature');
+ 		$signature_checker = $this->getSignatureApi($this->project_id, 2, $request['game'], $this->api_key,'get_signature');
  		$game_details = Game::find($request["game"], $this->provider_db_id);
- 		$url = $this->api_url.'/game/getavailablepayouts';
+ 		$url = $this->api_url.'/game/'.$request['methodName'];
         $requesttosend = [
             'project' =>  $this->project_id,
 			'version' => 2,
@@ -828,6 +869,7 @@ public function gameBet($request, $client_details)
 			'RTPs' => $client_response->data
 		];
 		return json_encode($resBody);
+		
  		// return $signature_checker;
  	}
 }
