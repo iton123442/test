@@ -9,6 +9,7 @@ use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
+use App\Helpers\Game;
 use Carbon\Carbon;
 use DB;
 
@@ -675,7 +676,6 @@ public function gameBet($request, $client_details)
 		$md5 = array();
 		$md5[] = $system_id;
 		$md5[] = $version;
-		
 	
 		if($type == 'check_signature'){
 			$signature = $args['signature']; // store the signature
@@ -803,10 +803,31 @@ public function gameBet($request, $client_details)
 	 return ($update ? true : false);
  	}
  	public function getRTP(Request $request){
- 		// dd($request->game);
+ 		// dd($request->all());
  		// getSignature($system_id, $version, array $args, $system_key,$type);
  		$signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'get_signature');
-
- 		return $signature_checker;
+ 		$game_details = Game::find($request["game"], $this->provider_db_id);
+ 		$url = $this->api_url.'/game/getavailablepayouts';
+        $requesttosend = [
+            'project' =>  $this->project_id,
+			'version' => 2,
+			'game' => $request['game'],
+			'signature' => $signature_checker
+		
+		];
+		$client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+		$guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]);
+		$client_response = json_decode($guzzle_response->getBody()->getContents());
+		$resBody = [
+			'GameName' => $game_details->game_name,
+			'GameCode' => $game_details->game_code,
+			'RTPs' => $client_response->data
+		];
+		return json_encode($resBody);
+ 		// return $signature_checker;
  	}
 }

@@ -599,6 +599,7 @@ $app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransactio
 
 // Five Men
 $app->post('/public/api/5men','FiveMenController@index');
+$app->post('/public/api/5men/rtp','FiveMenController@getRTP');
 
 // $app->post('/public/api/5men/gamelist', 'FiveMenController@getGamelist'); // launch game 
 // $app->post('/public/api/5men/geturl', 'FiveMenController@getURL');// launch game
