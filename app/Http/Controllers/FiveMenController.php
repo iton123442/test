@@ -861,15 +861,22 @@ public function gameBet($request, $client_details)
                 'Content-Type' => 'application/json'
             ]
         ]);
+        if($request['methodName'] == 'getgameinfo'){
+        	$data = 'data';
+        }elseif($request['methodName'] == 'getavailablepayouts'){
+        	$data = 'RTPs';
+        }else{
+        	$data = 'Lang';
+        }
 		$guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]);
 		$client_response = json_decode($guzzle_response->getBody()->getContents());
 		$resBody = [
 			'GameName' => $game_details->game_name,
 			'GameCode' => $game_details->game_code,
-			'RTPs' => $client_response->data
+			 $data => $client_response->data
 		];
 		return json_encode($resBody);
-		
+
  		// return $signature_checker;
  	}
 }
