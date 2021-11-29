@@ -829,8 +829,8 @@ public function gameBet($request, $client_details)
  	}
  	public function getRTP(Request $request){
  		// getSignature($system_id, $version, array $args, $system_key,$type);
- 		
- 		if($request['methodName'] == 'getavailablebets'){
+
+ 		if($request['methodName'] == 'getavailablebets' || $request['methodName'] == 'getavailablebetsinmoney'){
  			$datass = [
  				'game' => $request['game'],
  				'currency' => $request['currency']
