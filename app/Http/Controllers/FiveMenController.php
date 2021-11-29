@@ -724,23 +724,6 @@ public function gameBet($request, $client_details)
 			unset($args['signature']); // remove signature from the array
 		}
 
-		// foreach ($args as $required_arg) {
-		// 	$arg = $required_arg;
-		// 	if(is_array($arg)){
-		// 		if(count($arg)) {
-		// 			$recursive_arg = '';
-		// 			array_walk_recursive($arg, function($item) use (& $recursive_arg) {
-		// 				if(!is_array($item)) { $recursive_arg .= ($item . ':');} 
-		// 			});
-		// 			$md5[] = substr($recursive_arg, 0, strlen($recursive_arg)-1); // get rid of last
-		// 		} else {
-		// 			$md5[] = '';
-		// 		}
-		// 	} else {
-		// 		$md5[] = $arg;
-		// 	}
-		// };
-
 		$md5[] = $system_key;
 		$md5_str = implode('*', $md5);
 		$md5 = md5($md5_str);
@@ -846,27 +829,45 @@ public function gameBet($request, $client_details)
  	}
  	public function getRTP(Request $request){
  		// getSignature($system_id, $version, array $args, $system_key,$type);
- 		$signature_checker = $this->getSignatureApi($this->project_id, 2, $request['game'], $this->api_key,'get_signature');
+ 		
+ 		if($request['methodName'] == 'getavailablebets'){
+ 			$datass = [
+ 				'game' => $request['game'],
+ 				'currency' => $request['currency']
+ 			];
+ 			$signature_checker = $this->getSignature($this->project_id, 2, $datass, $this->api_key,'get_signature');
+ 			$requesttosend = [
+	            'project' =>  $this->project_id,
+				'version' => 2,
+				'game' => $request['game'],
+				'currency' => $request['currency'],
+				'signature' => $signature_checker
+			
+			];
+ 		}else{
+ 			$signature_checker = $this->getSignatureApi($this->project_id, 2, $request['game'], $this->api_key,'get_signature');
+ 			$requesttosend = [
+	            'project' =>  $this->project_id,
+				'version' => 2,
+				'game' => $request['game'],
+				'signature' => $signature_checker
+			
+			];
+ 		}
  		$game_details = Game::find($request["game"], $this->provider_db_id);
  		$url = $this->api_url.'/game/'.$request['methodName'];
-        $requesttosend = [
-            'project' =>  $this->project_id,
-			'version' => 2,
-			'game' => $request['game'],
-			'signature' => $signature_checker
-		
-		];
+
 		$client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/json'
             ]
         ]);
-        if($request['methodName'] == 'getgameinfo'){
-        	$data = 'data';
-        }elseif($request['methodName'] == 'getavailablepayouts'){
+        if($request['methodName'] == 'getavailablepayouts'){
         	$data = 'RTPs';
-        }else{
+        }elseif($request['methodName'] == 'getavailablelanguages'){
         	$data = 'Lang';
+        }else{
+        	$data = 'data';
         }
 		$guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]);
 		$client_response = json_decode($guzzle_response->getBody()->getContents());
