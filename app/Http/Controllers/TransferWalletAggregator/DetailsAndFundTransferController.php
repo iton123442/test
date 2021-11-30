@@ -134,7 +134,7 @@ class DetailsAndFundTransferController extends Controller
 
                     
                 } 
-                sleep(0.200);
+                // sleep(0.200);
                 $balance_details = TWHelpers::getPlayerBalance($details->player_id);
                 if($balance_details->update_at != $player_balance->update_at){
                     if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
