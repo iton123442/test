@@ -15,10 +15,11 @@ use DB;
 class FreeRoundController extends Controller
 {
     
-    public function __construct(){
-        $this->middleware('oauth', ['except' => ['index']]);
-    }
+    // public function __construct(){
+    //     $this->middleware('oauth', ['except' => ['index']]);
+    // }
     public function freeRoundController(Request $request){
+        // dd($request->all());
         if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code')|| !$request->has('details') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
             return response($mw_response,200)
@@ -148,7 +149,9 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRoundPNG($player_details, $data, $sub_provder_id);
         } elseif ($sub_provder_id == 38) {
             return FreeSpinHelper::createFreeRoundMannaplay($player_details, $data, $sub_provder_id);
-        }
+        }  elseif ($sub_provder_id == 126) {
+            return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id);
+        } 
     }
 
 

@@ -1834,6 +1834,11 @@ class GameLobby{
         $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$channel."&ticket=".$data['token'];
         return $gameUrl;
     }
+
+    public static function SpearHeadGameLaunch($data){
+        dd("GAMELAUNCH");
+        Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
+    }
 }
 
 ?>
