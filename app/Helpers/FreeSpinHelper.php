@@ -336,5 +336,66 @@ class FreeSpinHelper{
         $array = json_decode(json_encode((array)$body), TRUE);
         return $array;
     }
+    public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id){
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        try{
+            $freeroundtransac = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["amount"],
+                "spin_remaining" => $data["details"]["amount"],
+                "denominations" => $data["details"]["freespinvalue"],
+            ];
+        } catch (\Exception $e) {
+            return 400;
+        }
+        $id = FreeSpinHelper::createFreeRound($freeroundtransac);
+        $username = "tigergames";
+        $password = "stage-4j2UUY5MzGVzKAV";
+        $credentials = base64_encode($username.":".$password);
+        $httpClient = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $credentials,
+            ]
+        ]);
+        $baseUrl = "https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/add";
+        $response = $httpClient->post(
+            $baseUrl,[
+                'body' => json_encode([
+                    'txid' => FreeSpinHelper::unique_code(14),
+                    'remoteusername' => '10226',
+                    'gameid' => $data['game_code'],
+                    'amount' => $data["details"]["amount"],
+                    'freespinvalue' => $data['details']['freespinvalue'],
+                ]
+            )]
+        );
+        $dataresponse = json_decode($response->getBody()->getContents());
+        $data = [
+            "status" => 3,
+            "provider_trans_id" => $prefix.$id,
+            "details" => json_encode($dataresponse)
+        ];
+        FreeSpinHelper::updateFreeRound($data, $id);
+        if ( !isset($dataresponse->errorCode) ){
+            //update freeroundtransac
+            $data = [
+                "provider_trans_id" => $prefix.$id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 200;
+        } else {
+            $data = [
+                "status" => 3,
+                "provider_trans_id" => $prefix.$id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
+    }
 }
 ?>

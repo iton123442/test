@@ -1,6 +1,7 @@
 <?php
 
-$middleware_url_api = 'https://api-test.betrnk.games/public';   
+$middleware_url_api = 'https://api-test.betrnk.games/public'; 
+// $middleware_url_api = 'http://localhost:1010'; 
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play-test.betrnk.games';
 $iframe_url = 'https://play-test.betrnk.games/loadgame/transferwallet?param=';
@@ -82,7 +83,7 @@ return [
         'secretkey' => '67498C0AD6BD4D2DB8FDFE59BD9039EB',
     ],
     'bolegaming' => [
-    	"CNY" => [
+        "CNY" => [
             'AccessKeyId' => '9048dbaa-b489-4b32-9a29-149240a5cefe',
             'access_key_secret' => '4A55C539E93B189EAA5A76A8BD92B99B87B76B80',
             'app_key' => 'R14NDR4FT',
@@ -440,6 +441,7 @@ return [
     'vivo' => [
         'PROVIDER_ID' => 34,
         'OPERATOR_ID' => '3003616',
+        'OPERATOR_TOKEN' => 'ODHr6OYKEblDZbQd23vNTfdjNXrriazJ',
         'SERVER_ID' => '6401748',
         'PASS_KEY' => '7f1c5d',
         'VIVO_URL' => 'https://games.vivogaming.com/',
@@ -600,8 +602,8 @@ return [
         'api_report_url' => 'http://trial-gp-api-report.funkytest.com/',
    ],
    'crashgaming' => [
-        'provider_db_id'=> 101,
-        'authToken' => 'HtVTkjRFi87fIF7QgixJPYx1lNkBBpkD',
+        'pdbid'=> 68, // TG DB ID
+        'authToken' => 'HtVTkjRFi87fIF7QgixJPYx1lNkBBpkD', // We generated this one!
    ],
    'vcci' => [
         'PROVIDER_ID'=> 000,
@@ -622,7 +624,17 @@ return [
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',
         'api_url' => 'https://api4.slotomatic.net/api/',
     ],
-
+    'quickspinDirect' => [
+        'provider_db_id'=> 66,
+        'api_url' => 'https://d1oij17g4yikkz.cloudfront.net',
+        'partner_id' => 2076,
+    ],
+    'spearhead' => [
+        'provider_db_id'=> 67,
+        'api_url' => 'https://gamelaunch.everymatrix.com/',
+        'operator' => '',
+        'operator_key' => '',
+    ],
 
 ];
 

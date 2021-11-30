@@ -257,22 +257,34 @@ class PlayTechController extends Controller
 			// Helper::saveLog('PlayTech transaction BET', $this->provider_db_id, json_encode($response),  "response" );
 			return $response;
 		}
-        $gameTransactionData = array(
-            "provider_trans_id" => $request["transId"],
-            "token_id" => $client_details->token_id,
-            "game_id" => $game_details->game_id,
-            "round_id" => $request["roundId"],
-            "bet_amount" => $request["amount"],
-            "win" => 5,
-            "pay_amount" => 0,
-            "income" => 0,
-            "entry_id" =>1,
-            "trans_status" =>1,
-            "operator_id" => $client_details->operator_id,
-            "client_id" => $client_details->client_id,
-            "player_id" => $client_details->player_id,
-        );
-        $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+        $failed = 2;
+        if ($bet_transaction != 'false' ) {
+            $failed = 5;
+            $updateGameTransaction = [
+                "bet_amount" => $bet_transaction->bet_amount + $request["amount"]
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+            $game_trans_id = $bet_transaction->game_trans_id;
+		} else {
+            $gameTransactionData = array(
+                "provider_trans_id" => $request["transId"],
+                "token_id" => $client_details->token_id,
+                "game_id" => $game_details->game_id,
+                "round_id" => $request["roundId"],
+                "bet_amount" => $request["amount"],
+                "win" => 5,
+                "pay_amount" => 0,
+                "income" => 0,
+                "entry_id" =>1,
+                "trans_status" =>1,
+                "operator_id" => $client_details->operator_id,
+                "client_id" => $client_details->client_id,
+                "player_id" => $client_details->player_id,
+            );
+            $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+        }
+
+        
         $gameTransactionEXTData = array(
             "game_trans_id" => $game_trans_id,
             "provider_trans_id" => $request["transId"],
@@ -290,7 +302,7 @@ class PlayTechController extends Controller
                 "message" => "Invalid request. This error can be returned if required parameters are missing or they have incorrect format"
             ];
             $updateGameTransaction = [
-                "win" => 2,
+                "win" => $failed,
                 'trans_status' => 5
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
@@ -317,7 +329,7 @@ class PlayTechController extends Controller
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
             $updateGameTransaction = [
-                "win" => 2,
+                "win" => $failed,
                 'trans_status' => 5
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
@@ -360,7 +372,7 @@ class PlayTechController extends Controller
                     );
                     GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
                     $updateGameTransaction = [
-                        "win" => 2,
+                        "win" => $failed,
                         'trans_status' => 5
                     ];
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
@@ -381,7 +393,7 @@ class PlayTechController extends Controller
                     );
                     GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
                     $updateGameTransaction = [
-                        "win" => 2,
+                        "win" => $failed,
                         'trans_status' => 5
                     ];
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);

@@ -155,7 +155,7 @@ class NolimitController extends Controller
                 return $response;
             }
                $game_details = Game::find($game_code, $this->provider_db_id);
-       try{
+        try{
                 $gameTransactionData = array(
                             "provider_trans_id" => $provider_trans_id,
                             "token_id" => $client_details->token_id,
@@ -402,7 +402,7 @@ class NolimitController extends Controller
                     }
                 
                    $updateGameTransaction = [
-                        'win' => $win_or_lost,
+                        'win' => 5,
                         'pay_amount' => $amount,
                         'income' => $income,
                         'entry_id' => $entry_id,

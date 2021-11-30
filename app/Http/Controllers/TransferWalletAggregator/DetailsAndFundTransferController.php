@@ -5,6 +5,7 @@ namespace App\Http\Controllers\TransferWalletAggregator;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use Illuminate\Http\Request;
+use App\Helpers\Helper;
 use DB;
 
 class DetailsAndFundTransferController extends Controller
@@ -85,16 +86,11 @@ class DetailsAndFundTransferController extends Controller
 
         try {
             // $security = TWHelpers::Client_SecurityHash($decodedrequest["clientid"], $decodedrequest["access_token"]);
-            $details = TWHelpers::getClientDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
+            $details = TWHelpers::getPlayerSessionDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
             if($details){
-
-                $balance = $details->tw_balance;
-
-                
-
-
+                $player_balance = TWHelpers::getPlayerBalance($details->player_id);
+                $balance = $player_balance->balance;
                 if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
-
                     if ( !($balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
                         $response = array(
                             "fundtransferresponse" => array(
@@ -110,12 +106,10 @@ class DetailsAndFundTransferController extends Controller
                         return response($response,200)
                            ->header('Content-Type', 'application/json');
                     }
-
                     $current_balance = $balance - $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
                 }
                 else{
                     $current_balance = $balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
-
                     try{
                         TWHelpers::idenpotencyTable($decodedrequest["fundtransferrequest"]["fundinfo"]["transactionId"]);
                     }catch(\Exception $e){
@@ -126,7 +120,7 @@ class DetailsAndFundTransferController extends Controller
                                     "status" => "OK",
                                     "message" => "The request was successfully completed."
                                 ),
-                                'accountid' =>  $details->tw_player_bal_id,
+                                'accountid' =>  $player_balance->tw_player_bal_id,
                                 'accountname' =>  $details->client_player_id,
                                 'email' =>  $details->email,
                                 'balance' => $balance,
@@ -140,8 +134,18 @@ class DetailsAndFundTransferController extends Controller
 
                     
                 } 
-
-                TWHelpers::updateTWBalance($current_balance, $details->tw_player_bal_id);
+                // sleep(0.200);
+                $balance_details = TWHelpers::getPlayerBalance($details->player_id);
+                if($balance_details->update_at != $player_balance->update_at){
+                    if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
+                        $current_balance = $balance_details->balance - $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
+                    }
+                    else{
+                        $current_balance = $balance_details->balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
+                    } 
+                    Helper::saveLog("FUNDSTRANSFER(TW)" , 888 , json_encode($decodedrequest), "NOT BALANCE EQUAL");
+                }
+                TWHelpers::updateTWBalance($current_balance, $player_balance->tw_player_bal_id);
                 if($current_balance >= 0){
                     $response = array(
                         "fundtransferresponse" => array(
@@ -150,7 +154,7 @@ class DetailsAndFundTransferController extends Controller
                                 "status" => "OK",
                                 "message" => "The request was successfully completed."
                             ),
-                            'accountid' =>  $details->tw_player_bal_id,
+                            'accountid' =>  $player_balance->tw_player_bal_id,
                             'accountname' =>  $details->client_player_id,
                             'email' =>  $details->email,
                             'balance' => $current_balance,

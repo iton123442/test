@@ -262,6 +262,33 @@ class TWHelpers {
         return  "partition ($partition_date)";
 	}
 
+
+    public static function getPlayerSessionDetails($type = "", $value = "", $client_id=1, $providerfilter='all') {
+        // DB::enableQueryLog();
+        if ($type == 'token') {
+            $where = 'where pst.player_token = "'.$value.'"';
+        }
+        $filter = 'order by token_id desc LIMIT 1';
+        $query = DB::select('select 
+        `c`.`default_currency`,
+        `p`.`client_player_id`,
+        `p`.`email`,
+        `p`.`player_id`
+        from (select player_id from player_session_tokens pst '.$where.' '.$filter.') pst 
+        inner join players as p using(player_id) 
+        inner join clients as c using (client_id)');
+        $client_details = count($query);
+        // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
+        return $client_details > 0 ? $query[0] : null;
+    }
+
+    public static function getPlayerBalance($player_id) {
+        $query = DB::select('SELECT * FROM tw_player_balance where player_id = '. $player_id);
+        $client_details = count($query);
+        // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
+        return $client_details > 0 ? $query[0] : null;
+    }
+
 }
 
 ?>

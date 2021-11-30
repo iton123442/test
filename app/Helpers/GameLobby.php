@@ -130,7 +130,7 @@ class GameLobby{
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
-        $url = config("providerlinks.nolimit.api_url").'device='.$device.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
+        $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
          
         } catch (\Exception $e) {
@@ -540,6 +540,36 @@ class GameLobby{
        
     }
 
+    public static function CrashGaming($data){
+        try{
+            $url = 'https://dev.crashbetrnk.com/gamelaunch';// config('providerlinks.tidygaming.url_lunch');
+            $client_details = Providerhelper::getClientDetails('token', $token);
+            $requesttosend = [
+                'session_id' =>  $client_details->player_token,
+                'user_id' => $client_details->player_id,
+                'user_name' => $client_details->player_id,
+                'currencycode' => $client_details->default_currency,
+                'balance' => $client_details->balance,
+                'uuid' => $client_details->player_token,
+                'exit_url' => isset($data['exitUrl']) ? $data['exitUrl'] : ""
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'AuthToken' => config('providerlinks.crashgaming.authToken')
+                ]
+            ]);
+            $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
+            );
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $client_response);
+            return $client_response->link;
+        }catch(\Exception $e){
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage());
+            return false;
+        }
+    }
+
     public static function tidylaunchUrl( $game_code = null, $token = null){
         Helper::saveLog('Tidy Gameluanch', 23, "", "");
         try{
@@ -589,6 +619,7 @@ class GameLobby{
      public static function slotmill($request){
         try {
             $client_details = Providerhelper::getClientDetails('token', $request["token"]);
+            $exit_url = $request["exitUrl"] ? $request["exitUrl"] : "";
             $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.slotmill.provider_db_id'), $request['game_code']);
             // $url = config("providerlinks.slotmill")[$request["game_code"]]; 
             // if ($request["game_code"] == "19002") {
@@ -602,7 +633,7 @@ class GameLobby{
             // } elseif ($request["game_code"] == "19008") {
             //    $url =  config("providerlinks.slotmill.outlaws"); 
             // }
-            return $url = $getGameDetails->info."/?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token;
+            return $url = $getGameDetails->info."/?language=".$request["lang"]."&org=".config("providerlinks.slotmill.brand")."&currency=".$client_details->default_currency."&key=".$client_details->player_token."&homeurl=".$exit_url;
 
         } catch (\Exception $e){
             return $request["exitUrl"];
@@ -1416,9 +1447,26 @@ class GameLobby{
             case 'Leap':
                 // $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency=USD';
 
-            $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency='.$client_details->default_currency.'';
-                break;
-            
+                $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency='.$client_details->default_currency.'';
+            break;
+
+            case '7 Mojos':
+                $get_game_type = DragonGamingHelper::getGameType($game_code, config("providerlinks.vivo.PROVIDER_ID"));
+                
+                $game_type_arr = [
+                    '1' => 'slots',
+                    '5' => 'live'
+                ];
+
+                if($game_type_arr[$get_game_type] == 'slots') {
+                    $url = config("providerlinks.vivo.7MOJOS_URL").'?tableguid=J37809HJDJ348HNH232221&token='.$token.'&operatorID='.$operator_id.'&operatorToken='. config("providerlinks.vivo.OPERATOR_TOKEN") .'&homeURL='.$exitUrl.'&gameid='.$game_code.'&mode=real&language=EN&currency='.$client_details->default_currency.'&host=https://de-se.svmsrv.com&gametype=slots';
+                }
+                else
+                {
+                    $url = config("providerlinks.vivo.7MOJOS_URL").'?tableguid=J37809HJDJ348HNH232221&token='.$token.'&operatorID='.$operator_id.'&operatorToken='. config("providerlinks.vivo.OPERATOR_TOKEN") .'&homeURL='.$exitUrl.'&gameid='.$game_code.'&mode=real&language=EN&currency='.$client_details->default_currency.'&host=https://de-lce.svmsrv.com&gametype=live';
+                }
+            break;
+    
             default:
                 # code...
                 break;
@@ -1436,7 +1484,7 @@ class GameLobby{
         $client_details = Providerhelper::getClientDetails('token', $token);
 
         /* [START] LoginRequest */
-        $queryString = "method=LoginRequest&Key=".$secretKey."&Time=".$dateTime."&Username=".$client_details->username."&CurrencyType=".$client_details->default_currency."&GameCode=".$game_code."&Mobile=0";
+        $queryString = "method=LoginRequest&Key=".$secretKey."&Time=".$dateTime."&Username=".$client_details->player_id."&CurrencyType=".$client_details->default_currency."&GameCode=".$game_code."&Mobile=0";
         $hashedString = md5($queryString.$md5Key.$dateTime.$secretKey);
         $response = ProviderHelper::simplePlayAPICall($queryString, $hashedString);
         $url = (string) $response['data']->GameURL;
@@ -1679,8 +1727,6 @@ class GameLobby{
             // return response($error,200) 
             //       ->header('Content-Type', 'application/xml');
         }
-
-
     }
 
     public static function PlayTechLaunch($data){
@@ -1692,7 +1738,8 @@ class GameLobby{
             Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
             return $gameUrl;
         } else {
-            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
+            $is_support  = $getGameDetails->info ==  ''  ? 'web' : $getGameDetails->info;
+            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=".$is_support."&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
             Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
             return $gameUrl;
         }
@@ -1755,7 +1802,6 @@ class GameLobby{
                 
         }
     }
-
     public static function AmuseGamingGameLaunch($data,$device){
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
         $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
@@ -1776,7 +1822,23 @@ class GameLobby{
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
         return "false";
     }
+    
+    public static function QuickSpinDGameLaunch($data,$device){
+        Helper::saveLog('QuickSpin Direct LAUNCH', 66, json_encode($data),  "HIT" );
+        if($device == 'desktop'){
+            $channel = 'web';
+        }else{
+            $channel = 'mobile';
+        }
+        $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
+        $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$channel."&ticket=".$data['token'];
+        return $gameUrl;
+    }
 
+    public static function SpearHeadGameLaunch($data){
+        dd("GAMELAUNCH");
+        Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
+    }
 }
 
 ?>

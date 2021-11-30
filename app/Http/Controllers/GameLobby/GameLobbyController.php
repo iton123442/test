@@ -400,6 +400,24 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                elseif($provider_code==128){
+                    $url = GameLobby::CrashGaming($request->all());
+                    if($url != false && $url != 'false'){
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "url" => $url,
+                            "game_launch" => true
+                        );
+                    }else{
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "url" => $this->createFallbackLink($request->all()),
+                            "game_launch" => false
+                        );
+                    }
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
                 elseif($provider_code==37){ // request->token
                     // $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
                     $url = GameLobby::iaLaunchUrl($request->game_code,$request->token,$request->exitUrl);
@@ -909,6 +927,15 @@ class GameLobbyController extends Controller
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::PlayTechLaunch($request->all()), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code == 126){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::QuickSpinDGameLaunch($request->all(), $device), 
                         "game_launch" => true
                     );
                     return response($msg,200)

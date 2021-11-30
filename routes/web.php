@@ -134,7 +134,7 @@ $app->post('/public/api/marriott/balance', 'MarriottController@getBalance'); #/
 $app->post('/public/api/marriott/debit', 'MarriottController@debitProcess'); #/
 // RGS Gaming Endpoints
 $app->post('/public/rsg/authenticate', 'DigitainController@authenticate');
-$app->post('/public/rsg/creategamesession', 'DigitainController@createGameSession');
+// $app->post('/public/rsg/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
 $app->post('/public/rsg/getbalance', 'DigitainController@getbalance');
 $app->post('/public/rsg/refreshtoken', 'DigitainController@refreshtoken');
 $app->post('/public/rsg/bet', 'DigitainController@bet');
@@ -143,6 +143,7 @@ $app->post('/public/rsg/betwin', 'DigitainController@betwin');
 $app->post('/public/rsg/refund', 'DigitainController@refund');
 $app->post('/public/rsg/amend', 'DigitainController@amend');
 $app->post('/public/rsg/promowin', 'DigitainController@PromoWin');
+$app->post('/public/rsg/charge', 'DigitainController@makeCharge');
 $app->post('/public/rsg/checktxstatus', 'DigitainController@CheckTxStatus');
 // IA SPORTS
 $app->post('/public/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
@@ -598,6 +599,7 @@ $app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransactio
 
 // Five Men
 $app->post('/public/api/5men','FiveMenController@index');
+$app->post('/public/api/5men/rtp','FiveMenController@getRTP');
 
 // $app->post('/public/api/5men/gamelist', 'FiveMenController@getGamelist'); // launch game 
 // $app->post('/public/api/5men/geturl', 'FiveMenController@getURL');// launch game
@@ -701,8 +703,20 @@ $app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoun
 $app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
 
 // Crash Gaming (TigerGames)
-$app->post('api/crashgame/balance', 'CrashGameController@Balance');
-$app->post('api/crashgame/debit', 'CrashGameController@Debit');
-$app->post('api/crashgame/credit', 'CrashGameController@Credit');
-$app->post('api/crashgame/refund', 'CrashGameController@Refund');
-$app->post('api/crashgame/cancel', 'CrashGameController@Cancel');
+$app->post('/public/api/crashgame/balance', 'CrashGameController@Balance');
+$app->post('/public/api/crashgame/debit', 'CrashGameController@Debit');
+$app->post('/public/api/crashgame/credit', 'CrashGameController@Credit');
+$app->post('/public/api/crashgame/refund', 'CrashGameController@Refund');
+$app->post('/public/api/crashgame/cancel', 'CrashGameController@Cancel');
+
+// QUickSpins Direct
+$app->post('/public/api/quickspin/verifyToken', 'QuickspinDirectController@Authenticate');
+$app->post('/public/api/quickspin/getBalance', 'QuickspinDirectController@getBalance');
+$app->post('/public/api/quickspin/withdraw', 'QuickspinDirectController@betProcess');
+$app->post('/public/api/quickspin/deposit', 'QuickspinDirectController@winProcess');
+$app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollbackProcess');
+$app->post('/public/api/quickspin/fs_win', 'QuickspinDirectController@freeRound');
+
+// SpearHead
+$app->post('/public/api/spearhead/GetBalance', 'SpearHeadController@getBalance');
+$app->post('/public/api/spearhead','SpearHeadController@index');

@@ -152,8 +152,9 @@ class WalletDetailsController extends Controller
         }
 
         //update player account balance
-        $balance = $getPlayerDetails->tw_balance + $request->amount;
-        TWHelpers::updateTWBalance($balance, $getPlayerDetails->tw_player_bal_id);
+        $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
+        $balance = $balance_details->balance + $request->amount;
+        TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
 
         $mw_response = [
             "data" => [
@@ -253,8 +254,9 @@ class WalletDetailsController extends Controller
         }
 
         //update player account balance
-        $balance = $getPlayerDetails->tw_balance - $amountToWithdraw;
-        TWHelpers::updateTWBalance($balance, $getPlayerDetails->tw_player_bal_id);
+        $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
+        $balance = $balance_details->balance - $amountToWithdraw;
+        TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
 
         $mw_response = [
             "data" => [

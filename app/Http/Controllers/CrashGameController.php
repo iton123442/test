@@ -25,7 +25,7 @@ class CrashGameController extends Controller
 
     public function __construct()
     {
-        $this->provider_db_id = config('providerlinks.crashgaming.provider_db_id');
+        $this->provider_db_id = config('providerlinks.crashgaming.pdbid');
         $this->authToken = config('providerlinks.crashgaming.authToken');
     }
 
