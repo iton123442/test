@@ -88,7 +88,7 @@ class DetailsAndFundTransferController extends Controller
             $details = TWHelpers::getPlayerSessionDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
             if($details){
                 $player_balance = TWHelpers::getPlayerBalance($details->player_id);
-                $balance = $player_balance->tw_balance;
+                $balance = $player_balance->balance;
                 if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
                     if ( !($balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
                         $response = array(
@@ -119,7 +119,7 @@ class DetailsAndFundTransferController extends Controller
                                     "status" => "OK",
                                     "message" => "The request was successfully completed."
                                 ),
-                                'accountid' =>  $details->tw_player_bal_id,
+                                'accountid' =>  $player_balance->tw_player_bal_id,
                                 'accountname' =>  $details->client_player_id,
                                 'email' =>  $details->email,
                                 'balance' => $balance,
@@ -143,7 +143,7 @@ class DetailsAndFundTransferController extends Controller
                         $current_balance = $balance_details->balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
                     } 
                 }
-                TWHelpers::updateTWBalance($current_balance, $details->tw_player_bal_id);
+                TWHelpers::updateTWBalance($current_balance, $player_balance->tw_player_bal_id);
                 if($current_balance >= 0){
                     $response = array(
                         "fundtransferresponse" => array(
@@ -152,7 +152,7 @@ class DetailsAndFundTransferController extends Controller
                                 "status" => "OK",
                                 "message" => "The request was successfully completed."
                             ),
-                            'accountid' =>  $details->tw_player_bal_id,
+                            'accountid' =>  $player_balance->tw_player_bal_id,
                             'accountname' =>  $details->client_player_id,
                             'email' =>  $details->email,
                             'balance' => $current_balance,
