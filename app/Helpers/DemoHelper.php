@@ -208,7 +208,8 @@ class DemoHelper{
     public static function demoPragamticPlay($game_code,$lang,$client_details){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
         if($client_details == false){ $currency = 'USD'; $lang = 'en';}else{ $currency = $client_details->default_currency; }
-        return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
+        // return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
+        return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang='.$lang.'&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
     }
 
     // YGG DONT SUPPORT RETURN URL
