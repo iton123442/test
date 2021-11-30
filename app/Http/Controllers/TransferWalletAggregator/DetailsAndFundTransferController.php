@@ -85,16 +85,11 @@ class DetailsAndFundTransferController extends Controller
 
         try {
             // $security = TWHelpers::Client_SecurityHash($decodedrequest["clientid"], $decodedrequest["access_token"]);
-            $details = TWHelpers::getClientDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
+            $details = TWHelpers::getPlayerSessionDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
             if($details){
-
-                $balance = $details->tw_balance;
-
-                
-
-
+                $player_balance = TWHelpers::getPlayerBalance($details->player_id);
+                $balance = $player_balance->tw_balance;
                 if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
-
                     if ( !($balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
                         $response = array(
                             "fundtransferresponse" => array(
@@ -110,12 +105,10 @@ class DetailsAndFundTransferController extends Controller
                         return response($response,200)
                            ->header('Content-Type', 'application/json');
                     }
-
                     $current_balance = $balance - $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
                 }
                 else{
                     $current_balance = $balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
-
                     try{
                         TWHelpers::idenpotencyTable($decodedrequest["fundtransferrequest"]["fundinfo"]["transactionId"]);
                     }catch(\Exception $e){
@@ -140,7 +133,16 @@ class DetailsAndFundTransferController extends Controller
 
                     
                 } 
-
+                sleep(0.200);
+                $balance_details = TWHelpers::getPlayerBalance($details->player_id);
+                if($balance_details->update_at != $player_balance->update_at){
+                    if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
+                        $current_balance = $balance_details->balance - $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
+                    }
+                    else{
+                        $current_balance = $balance_details->balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
+                    } 
+                }
                 TWHelpers::updateTWBalance($current_balance, $details->tw_player_bal_id);
                 if($current_balance >= 0){
                     $response = array(
