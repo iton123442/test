@@ -5,6 +5,7 @@ namespace App\Http\Controllers\TransferWalletAggregator;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use Illuminate\Http\Request;
+use App\Helpers\Helper;
 use DB;
 
 class DetailsAndFundTransferController extends Controller
@@ -142,6 +143,7 @@ class DetailsAndFundTransferController extends Controller
                     else{
                         $current_balance = $balance_details->balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
                     } 
+                    Helper::saveLog("FUNDSTRANSFER(TW)" , 888 , json_encode($decodedrequest), "NOT BALANCE EQUAL");
                 }
                 TWHelpers::updateTWBalance($current_balance, $player_balance->tw_player_bal_id);
                 if($current_balance >= 0){
