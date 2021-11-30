@@ -283,7 +283,7 @@ class TWHelpers {
     }
 
     public static function getPlayerBalance($player_id) {
-        $query = DB::select('SELECT player_id,balance, update_at FROM tw_player_balance where player_id = '. $player_id);
+        $query = DB::select('SELECT * FROM tw_player_balance where player_id = '. $player_id);
         $client_details = count($query);
         // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
         return $client_details > 0 ? $query[0] : null;
