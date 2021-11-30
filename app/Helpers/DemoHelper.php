@@ -65,6 +65,18 @@ class DemoHelper{
                 "game_launch" => true
             );
         }
+        elseif($provider_code == 49){ // pragmatic play
+            if(isset($data->token)) {
+                $client_details = ProviderHelper::getClientDetails("token",$data->token);
+            }else{
+                $client_details = false;
+            }
+            $response = array(
+                "game_code" => $data->game_code,
+                "url" => DemoHelper::demoPragamticPlay($data->game_code,$lang,$client_details),
+                "game_launch" => true
+            );
+        }
         elseif($provider_code == 95){ // 5Men Gaming
             $game_provider = "5Men Gaming";
             $response = array(
@@ -174,6 +186,12 @@ class DemoHelper{
     public static function yggDrasil($game_code,$lang){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
         return 'https://static-pff-tw.248ka.com/init/launchClient.html?gameid='.$game_code.'&lang='.$lang.'&currency=USD&org='.config('providerlinks.ygg.Org').'&channel=pc';
+    }
+
+    public static function demoPragamticPlay($game_code,$lang,$client_details){
+        $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
+        if($client_details == false){ $currency = 'USD'; $lang = 'en';}else{ $currency = $client_details->default_currency; }
+        return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
     }
 
     // YGG DONT SUPPORT RETURN URL
