@@ -5,6 +5,7 @@ namespace App\Http\Controllers\TransferWalletAggregator;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use Illuminate\Http\Request;
+use App\Helpers\Helper;
 use DB;
 
 class DetailsAndFundTransferController extends Controller
@@ -26,7 +27,10 @@ class DetailsAndFundTransferController extends Controller
             $security = TWHelpers::Client_SecurityHash($decodedrequest["clientid"], $decodedrequest["access_token"]);
             if($security){
                 $details = TWHelpers::getClientDetails('token', $decodedrequest["playerdetailsrequest"]["token"]);
-
+                $token = "false";
+                if( $decodedrequest["playerdetailsrequest"]["refreshtoken"]){
+                    $token = $decodedrequest["playerdetailsrequest"]["token"];
+                }
                 if ($details) {
                     $response = array(
                         "playerdetailsresponse" => array(
@@ -46,7 +50,7 @@ class DetailsAndFundTransferController extends Controller
                             'firstname' =>'',
                             'lastname' => '',
                             'gender' => '',
-                            'refreshtoken' => 'false'
+                            'refreshtoken' => $token
                         )
                     );
                     return response($response,200)
@@ -68,7 +72,7 @@ class DetailsAndFundTransferController extends Controller
                 return response($response,400)
                    ->header('Content-Type', 'application/json');
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $response = array(
                 "error_code"=>"SERVER NOT READY",
                 "error_message"=> "request is unauthenticated/missing a required input"
@@ -79,23 +83,14 @@ class DetailsAndFundTransferController extends Controller
     }
 
     public function fundTransfer(Request $request){
-
         // $hashkey = md5( $this->api_key  . $this->access_token );
         $decodedrequest = json_decode($request->getContent(),TRUE);
-
         try {
-            // $security = TWHelpers::Client_SecurityHash($decodedrequest["clientid"], $decodedrequest["access_token"]);
-            $details = TWHelpers::getClientDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
+            $details = TWHelpers::getPlayerSessionDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
             if($details){
-
-                $balance = $details->tw_balance;
-
-                
-
-
+                $player_balance = TWHelpers::getPlayerBalanceUsingTwID($details->tw_player_bal_id);
                 if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
-
-                    if ( !($balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
+                    if ( !($player_balance->balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
                         $response = array(
                             "fundtransferresponse" => array(
                                 "status" => array(
@@ -103,19 +98,46 @@ class DetailsAndFundTransferController extends Controller
                                     "status" => "Failed",
                                     "message" => "Insufficient funds."
                                 ),
-                                'balance'=> $balance,
+                                'balance'=> $player_balance->balance,
                                 'currencycode' =>  $details->default_currency
                             )
                         );
-                        return response($response,200)
-                           ->header('Content-Type', 'application/json');
+                        return response($response,200)->header('Content-Type', 'application/json');
                     }
-
-                    $current_balance = $balance - $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
+                    if($decodedrequest["fundtransferrequest"]["fundinfo"]["amount"] < 0){
+                        $response = array(
+                            "fundtransferresponse" => array(
+                                "status" => array(
+                                    "code"=> 402,
+                                    "status" => "Failed",
+                                    "message" => "Invalid amount"
+                                ),
+                                'balance'=> $player_balance->balance,
+                                'currencycode' =>  $details->default_currency
+                            )
+                        );
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                    $player_balance = TWHelpers::getPlayerBalanceUsingTwID($details->tw_player_bal_id);
+                    TWHelpers::updateTWBalance( ($player_balance->balance - $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]), $player_balance->tw_player_bal_id);
+                    $current_balance = $player_balance->balance - $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
+                    $response = array(
+                        "fundtransferresponse" => array(
+                            "status" => array(
+                                "code"=>200,
+                                "status" => "OK",
+                                "message" => "The request was successfully completed."
+                            ),
+                            'accountid' =>  $player_balance->tw_player_bal_id,
+                            'accountname' =>  $details->client_player_id,
+                            'email' =>  $details->email,
+                            'balance' => $current_balance,
+                            'currencycode' =>  $details->default_currency,
+                        )
+                    );
+                    return response($response,200)->header('Content-Type', 'application/json');
                 }
                 else{
-                    $current_balance = $balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
-
                     try{
                         TWHelpers::idenpotencyTable($decodedrequest["fundtransferrequest"]["fundinfo"]["transactionId"]);
                     }catch(\Exception $e){
@@ -126,23 +148,18 @@ class DetailsAndFundTransferController extends Controller
                                     "status" => "OK",
                                     "message" => "The request was successfully completed."
                                 ),
-                                'accountid' =>  $details->tw_player_bal_id,
+                                'accountid' =>  $player_balance->tw_player_bal_id,
                                 'accountname' =>  $details->client_player_id,
                                 'email' =>  $details->email,
-                                'balance' => $balance,
+                                'balance' => $player_balance->balance,
                                 'currencycode' =>  $details->default_currency,
                             )
                         );
-    
-                        return response($response,200)
-                        ->header('Content-Type', 'application/json');
+                        return response($response,200)->header('Content-Type', 'application/json');
                     }
-
-                    
-                } 
-
-                TWHelpers::updateTWBalance($current_balance, $details->tw_player_bal_id);
-                if($current_balance >= 0){
+                    $balance_details = TWHelpers::getPlayerBalanceUsingTwID($details->tw_player_bal_id);
+                    TWHelpers::updateTWBalance( ($balance_details->balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]), $player_balance->tw_player_bal_id);
+                    $current_balance = $player_balance->balance + $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"];
                     $response = array(
                         "fundtransferresponse" => array(
                             "status" => array(
@@ -150,32 +167,15 @@ class DetailsAndFundTransferController extends Controller
                                 "status" => "OK",
                                 "message" => "The request was successfully completed."
                             ),
-                            'accountid' =>  $details->tw_player_bal_id,
+                            'accountid' =>  $player_balance->tw_player_bal_id,
                             'accountname' =>  $details->client_player_id,
                             'email' =>  $details->email,
                             'balance' => $current_balance,
                             'currencycode' =>  $details->default_currency,
                         )
                     );
-                
-                    return response($response,200)
-                       ->header('Content-Type', 'application/json');
-                } else { 
-                    $response = array(
-                        "fundtransferresponse" => array(
-                            "status" => array(
-                                "code"=>402,
-                                "status" => "Failed",
-                                "message" => "Insufficient funds."
-                            ),
-                            'balance'=> $balance,
-                            'currencycode' =>  $details->default_currency
-                        )
-                    );
-                    return response($response,200)
-                       ->header('Content-Type', 'application/json');
-                }
-
+                    return response($response,200)->header('Content-Type', 'application/json');
+                } 
             } else {
                 $response = array(
                     "fundtransferresponse" => array(
@@ -191,7 +191,7 @@ class DetailsAndFundTransferController extends Controller
                 return response($response,200)
                    ->header('Content-Type', 'application/json');
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
            $response = array(
                 "fundtransferresponse" => array(
                     "status" => array(

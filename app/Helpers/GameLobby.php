@@ -867,11 +867,7 @@ class GameLobby{
             "token" => $token,
             "hash" => $hash
         ];
-        $client = new Client([
-            'headers' => [ 
-                'Authorization' => config('providerlinks.majagames.auth')
-            ]
-        ]);
+        $client = new Client();
         $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
         $client_response = json_decode($guzzle_response->getBody()->getContents());
         Helper::saveLog('Game Launch Pragmatic Play', 26, json_encode($form_body), json_encode($client_response));
