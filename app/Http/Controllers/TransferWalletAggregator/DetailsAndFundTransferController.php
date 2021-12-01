@@ -27,7 +27,10 @@ class DetailsAndFundTransferController extends Controller
             $security = TWHelpers::Client_SecurityHash($decodedrequest["clientid"], $decodedrequest["access_token"]);
             if($security){
                 $details = TWHelpers::getClientDetails('token', $decodedrequest["playerdetailsrequest"]["token"]);
-
+                $token = "false";
+                if( $decodedrequest["playerdetailsrequest"]["refreshtoken"]){
+                    $token = $decodedrequest["playerdetailsrequest"]["token"];
+                }
                 if ($details) {
                     $response = array(
                         "playerdetailsresponse" => array(
@@ -47,7 +50,7 @@ class DetailsAndFundTransferController extends Controller
                             'firstname' =>'',
                             'lastname' => '',
                             'gender' => '',
-                            'refreshtoken' => $decodedrequest["playerdetailsrequest"]["refreshtoken"]
+                            'refreshtoken' => $token
                         )
                     );
                     return response($response,200)
