@@ -47,7 +47,7 @@ class DetailsAndFundTransferController extends Controller
                             'firstname' =>'',
                             'lastname' => '',
                             'gender' => '',
-                            'refreshtoken' => 'false'
+                            'refreshtoken' => $decodedrequest["playerdetailsrequest"]["refreshtoken"]
                         )
                     );
                     return response($response,200)
