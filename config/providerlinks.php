@@ -631,9 +631,10 @@ return [
     ],
     'spearhead' => [
         'provider_db_id'=> 67,
-        'api_url' => 'https://gamelaunch.everymatrix.com/',
-        'operator' => '',
-        'operator_key' => '',
+        'api_url' => 'https://gamelaunch.everymatrix.com/Loader/Start/',
+        'operator' => 'TigerGamesUser',
+        'operator_key' => 'nXxOCeSCh4ko4q6q',
+        'X-Tenant-ID'=> 2540
     ],
 
 ];
