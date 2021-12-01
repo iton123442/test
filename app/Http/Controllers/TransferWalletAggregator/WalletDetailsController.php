@@ -152,10 +152,12 @@ class WalletDetailsController extends Controller
         }
 
         //update player account balance
-        $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
-        $balance = $balance_details->balance + $request->amount;
-        TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
-
+        // $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
+        // $balance = $balance_details->balance + $request->amount;
+        // TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
+        $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
+        TWHelpers::updateTWBalance( ($player_balance->balance + $request->amount), $getPlayerDetails->tw_player_bal_id);
+        $balance = $player_balance->balance + $request->amount;
         $mw_response = [
             "data" => [
                 "client_player_id" => $getPlayerDetails->client_player_id,
@@ -254,10 +256,12 @@ class WalletDetailsController extends Controller
         }
 
         //update player account balance
-        $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
-        $balance = $balance_details->balance - $amountToWithdraw;
-        TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
-
+        // $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
+        // $balance = $balance_details->balance - $amountToWithdraw;
+        // TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
+        $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
+        TWHelpers::updateTWBalance( ($player_balance->balance - $amountToWithdraw), $getPlayerDetails->tw_player_bal_id);
+        $balance = $player_balance->balance - $amountToWithdraw;
         $mw_response = [
             "data" => [
                 "client_player_id" => $getPlayerDetails->client_player_id,
