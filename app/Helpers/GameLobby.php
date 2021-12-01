@@ -1834,6 +1834,7 @@ class GameLobby{
     public static function SpearHeadGameLaunch($data, $device){
         Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
         $gameUrl = config("providerlinks.speahead.spearhead.api_url").config("providerlinks.spearhead.X-Tenant-ID")."?language=en&funMode=False&_sid64=".$data['token']."&casinolobbyurl=".$data['exitUrl'];
+        Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  $gameUrl );
         return $gameUrl;
     }
 }
