@@ -1835,6 +1835,70 @@ class GameLobby{
         dd("GAMELAUNCH");
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
     }
+
+
+    public static function IDNPoker($request){
+        Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "HIT" );
+        try {
+            $client_details = ProviderHelper::getClientDetails('token',$request['token']);
+            $key = "LUGTPyr6u8sRjCfh";
+            $aes = new AES($key);
+            $player_id = "TGTW".$client_details->player_id;
+            TransferWalletHelper::savePLayerGameRound($request['game_code'], $request['token'], $request['game_provider']);
+            /***************************************************************
+            *
+            * CHECK PLAYER IF EXIST
+            *
+            ****************************************************************/
+            $data = IDNPokerHelper::playerDetails($player_id);
+            /***************************************************************
+            *
+            * IF PLAYER NOT EXIST THEN CREATE PLAYER
+            *
+            ****************************************************************/
+            if ($data != "false") {
+                if (isset($data["error"])) {
+                    $data = IDNPokerHelper::registerPlayer($player_id);
+                }
+                $data = IDNPokerHelper::playerDetails($player_id);
+                if(isset($data["userid"]) && isset($data["username"])) {
+                    /***************************************************************
+                    *
+                    * GET URL / OR LOGIN TO PROVIDER
+                    *
+                    ****************************************************************/
+                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id);
+                    
+                    switch($client_details->wallet_type){
+                        case 1: 
+                            // SEAMLESS TYPE CLIENT
+                            // BUT PROVDER TRANSFER WALLET
+                            $data_to_send_play = array(
+                                "url" => $data["lobby_url"],
+                                "token" => $client_details->player_token,
+                                "player_id" => $client_details->player_id,
+                                "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
+                            );
+                            $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
+                            // return urlencode($encoded_data);
+                            return config('providerlinks.play_betrnk') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
+                        case 2:
+                            //TRANSFER WALLET CLIENT
+                            //TRANSFER WALLET SA PROIVDER
+                            return $data["lobby_url"];
+                        default:
+                            return false;
+                    }
+                }
+                return "false";
+            } else {
+                return $data;
+            }
+        } catch (\Exception $e) {
+            Helper::saveLog('IDNPOKER GAMELUANCH ERROR', 110, json_encode($request),  $e->getMessage() );
+            return "false";
+        }
+    }
 }
 
 ?>

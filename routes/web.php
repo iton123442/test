@@ -720,3 +720,9 @@ $app->post('/public/api/quickspin/fs_win', 'QuickspinDirectController@freeRound'
 // SpearHead
 $app->post('/public/api/spearhead/GetBalance', 'SpearHeadController@getBalance');
 $app->post('/public/api/spearhead','SpearHeadController@index');
+
+//IDNPOKER
+$app->post('api/idnpoker/makeDeposit', 'IDNPokerController@makeDeposit');
+$app->post('api/idnpoker/makeWithdraw', 'IDNPokerController@makeWithdraw');
+$app->post('api/idnpoker/getPlayerBalance', 'IDNPokerController@getPlayerBalance');
+$app->post('api/idnpoker/getPlayerWalletBalance', 'IDNPokerController@getPlayerWalletBalance');
