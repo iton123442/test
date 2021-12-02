@@ -3139,7 +3139,7 @@ class DigitainController extends Controller
 				        	    ]; 
 			        	   	    continue;
 				        	}
-				        	$win = 1; //3 draw, 4 refund, 1 lost win is refunded
+				        	$win = 4; //3 draw, 4 refund, 1 lost win is refunded
 	  						$entry_id = 2;
 	  						$pay_amount = $amount;
 	  						$income = $bet_amount - $pay_amount;
@@ -3782,7 +3782,7 @@ class DigitainController extends Controller
 				        	    ]; 
 			        	   	    continue;
 				        	}
-				        	$win = 1; //3 draw, 4 refund, 1 lost win is refunded
+				        	$win = 4; //3 draw, 4 refund, 1 lost win is refunded
 	  						$entry_id = 2;
 	  						$pay_amount = $amount;
 	  						$income = $bet_amount - $pay_amount;
