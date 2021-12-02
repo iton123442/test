@@ -3131,7 +3131,7 @@ class DigitainController extends Controller
 							$is_win_amount = count($is_win) > 0 ? array_sum($is_win_amount) : 0;
 						    $amount = $is_win_amount;
 						    $transactiontype = 'debit';
-						    if(abs($client_player->playerdetailsresponse->balance) < abs($amount)){
+						    if(abs($client_details->balance) < abs($amount)){
 								$items_array[] = [
 							 	 	"info" => $key['info'],
 								 	"errorCode" => 6, // Player Low Balance!
