@@ -10,6 +10,14 @@ class IDNPokerHelper{
     public static function playerDetails($player_id){
         try {
             $url = config('providerlinks.idnpoker.URL');
+           
+            $request = '
+            <request>
+                <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                <id>10</id>
+                <userid>'.$player_id.'</userid>
+            </request>';
+            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK PLAYER DETAILS REQUEST" );
             $client = new Client();
             $guzzle_response = $client->post($url,[
                 'body' => '
@@ -35,6 +43,16 @@ class IDNPokerHelper{
     public static function registerPlayer($player_id){
         try {
             $url = config('providerlinks.idnpoker.URL');
+            $request = '
+            <request>
+            <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                <id>1</id>
+                <userid>'.$player_id.'</userid>
+                <password>'.$player_id.'</password>
+                <confirm_password>'.$player_id.'</confirm_password>
+                <username>'.$player_id.'</username>
+            </request>';
+            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK REGISTER REQUEST" );
             $client = new Client();
             $guzzle_response = $client->post($url,[
                 'body' => '
@@ -67,6 +85,19 @@ class IDNPokerHelper{
             $lang = $data["lang"] != '' ? $data["lang"] : 'en';
             
             $client = new Client();
+            $request = '
+            <request>
+            <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                <id>2</id>
+                <userid>'.$player_id.'</userid>
+                <password>'.$player_id.'</password>
+                <ip>'.$data["ip_address"].'</ip>
+                <secure>1</secure>
+                <mobile>1</mobile>
+                <game>'.$data['game_code'].'</game>
+                <lang>'.$lang.'</lang>
+            </request>';
+            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK LOGIN REQUEST" );
             $guzzle_response = $client->post($url,[
                 'body' => '
                         <request>
