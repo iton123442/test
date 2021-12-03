@@ -37,12 +37,6 @@ class DemoHelper{
                 "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
                 "game_launch" => true
             );
-        }elseif($provider_code == 49){ // Bole Gaming
-            $response = array(
-                "game_code" => $data->game_code,
-                "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
-                "game_launch" => true
-            );
         }
         elseif(in_array($provider_code, [39, 78, 79, 80, 81, 82, 83])){
             $response = array(
