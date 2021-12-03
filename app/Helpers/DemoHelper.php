@@ -205,7 +205,7 @@ class DemoHelper{
         if($client_details == false){ $currency = 'USD'; $lang = 'en';}else{ $currency = $client_details->default_currency; }
         // return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
         $url = 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang='.$lang.'&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
-        Helper::saveLog('Game Launch Pragmatic Play Demo Url', 26, $url, json_encode($client_details));
+        Helper::saveLog('Game Launch Pragmatic Play Demo Url', 26, 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang='.$lang.'&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin', json_encode($client_details));
         return $url;
     }
 
