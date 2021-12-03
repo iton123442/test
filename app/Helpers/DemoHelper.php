@@ -62,7 +62,7 @@ class DemoHelper{
         elseif($provider_code == 49){ // pragmatic play
             Helper::saveLog('Game Launch Pragmatic Play Demo Tirgger', 26, json_encode($data), "im here!");
             if(isset($data->token)) {
-                $client_details = ProviderHelper::getClientDetails("token",$data->token);
+                $client_details = ProviderHelper::getClientDetails("ptw",$data->client_player_id, 1, 'all', $data->client_id);
             }else{
                 $client_details = false;
             }
