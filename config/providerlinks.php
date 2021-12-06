@@ -672,6 +672,7 @@ return [
         ],
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',
         'api_url' => 'https://api4.slotomatic.net/api/',
+        'modetype' => 'TEST',
     ],
     'quickspinDirect' => [
         'provider_db_id'=> 66,

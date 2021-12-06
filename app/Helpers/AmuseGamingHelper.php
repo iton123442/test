@@ -13,11 +13,9 @@ use DB;
 
 class AmuseGamingHelper{
 
-    public $mode_type = 'TEST';
 
     public static  function createPlayerAndCheckPlayer($client_details){
-        Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($this->mode_type),  $client_details );
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
             $currency = $client_details->default_currency;
@@ -85,7 +83,7 @@ class AmuseGamingHelper{
     }
 
     public static  function requestTokenFromProvider($client_details,$type){
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
             $currency = $client_details->default_currency;
@@ -135,7 +133,7 @@ class AmuseGamingHelper{
 
 
     public static  function AmuseGamingGameList($brand,$channel,$currency){
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
             $currency = $currency;

@@ -19,7 +19,6 @@ class AmuseGamingController extends Controller
        $this->publicKey = config('providerlinks.amusegaming.public_key');
     //    $this->prefix = "UUID";
        $this->secretKey = config('providerlinks.amusegaming.secret_key');
-       $this->mode_type = 'TEST';
     }
     // AUTHENTICATION_FAILED – Can't reach the player's account at the moment.
     // SESSION_TIMEOUT – Session time limit exceeded.
@@ -32,10 +31,10 @@ class AmuseGamingController extends Controller
         $xmlparser = new SimpleXMLElement($data);
         // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($xmlparser), "");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
-            $currency = $client_details->default_currency;
+            $currency = $currency;
         }
         $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$currency.'.operator_id');
         if($providers_operator_ID != $xmlparser->OperatorId){
@@ -62,10 +61,10 @@ class AmuseGamingController extends Controller
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog("AmuseGaming WithdrawAndDeposit", $this->provider_db_id, json_encode($xmlparser), "");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
-            $currency = $client_details->default_currency;
+            $currency = $currency;
         }
         $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$currency.'.operator_id');
         if($providers_operator_ID != $xmlparser->OperatorId){
@@ -139,10 +138,10 @@ class AmuseGamingController extends Controller
     public function debit($request){
         Helper::saveLog("AmuseGaming Withdraw Transactions Recieved", $this->provider_db_id, json_encode($request), "Recieved");
         $client_details = ProviderHelper::getClientDetails('player_id', $request->UserId);
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
-            $currency = $client_details->default_currency;
+            $currency = $currency;
         }
         $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$currency.'.operator_id');
         if($providers_operator_ID != $request->OperatorId){
@@ -292,10 +291,10 @@ class AmuseGamingController extends Controller
 
     public function credit($request,$freespin=false){
         $client_details = ProviderHelper::getClientDetails('player_id', $request->UserId);
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
-            $currency = $client_details->default_currency;
+            $currency = $currency;
         }
         $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$currency.'.operator_id');
         if($providers_operator_ID != $request->OperatorId){
@@ -419,10 +418,10 @@ class AmuseGamingController extends Controller
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog("AmuseGaming Cancel", $this->provider_db_id, json_encode($xmlparser), "REQUEST");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
-        if($this->mode_type == 'TEST'){
+        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
-            $currency = $client_details->default_currency;
+            $currency = $currency;
         }
         $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$currency.'.operator_id');
         if($providers_operator_ID != $request->OperatorId){
