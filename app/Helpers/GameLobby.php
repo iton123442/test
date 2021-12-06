@@ -1821,8 +1821,7 @@ class GameLobby{
             return "false";
         } catch (\Exception $e) {
             Helper::saveLog('AMUSEGAMING LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
-                return $e->getMessage();
-                
+            return $e->getMessage();
         }
     }
     

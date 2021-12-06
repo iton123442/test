@@ -76,7 +76,8 @@ class AmuseGamingHelper{
                 }
             }
             return false;
-        } catch (\Throwable $th) {
+        } catch (\Exception $e) {
+            Helper::saveLog('AMUSEGAMING GM CREATE PLAYER', 65, json_encode($e->getMessage()),  $e->getMessage() );
             return false;
         }
         
@@ -125,7 +126,8 @@ class AmuseGamingHelper{
                 return $response_client->token;
             }
             return false;
-        } catch (\Throwable $th) {
+        } catch (\Exception $e) {
+            Helper::saveLog('AMUSEGAMING GM CREATE PLAYER', 65, json_encode($e->getMessage()),  $e->getMessage() );
             return false;
         }
     }
@@ -179,7 +181,8 @@ class AmuseGamingHelper{
             //     // return $response_client->token;
             // }
             return $response_client;
-        } catch (\Throwable $th) {
+        } catch (\Exception $e) {
+            Helper::saveLog('AMUSEGAMING GM CREATE PLAYER', 65, json_encode($e->getMessage()),  $e->getMessage() );
             return false;
         }
     }
