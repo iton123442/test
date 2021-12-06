@@ -15,7 +15,6 @@ class AmuseGamingHelper{
 
     public static  function createPlayerAndCheckPlayer($client_details){
         $public_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.public_key');
-        dd($public_key);
         $secret_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.secret_key');
         $header = new Client([
             'headers' => [ 
@@ -124,7 +123,6 @@ class AmuseGamingHelper{
         $amsuegaming = config('providerlinks.amusegaming');
         $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
         $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
-        dd($secret_key);
         $endpoint = "casino/list_games";
         $header = new Client([
             'headers' => [ 
