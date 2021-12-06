@@ -26,10 +26,22 @@ class AmuseGamingController extends Controller
     // PLAYER_LIMIT_EXCEEDED – Player's bet limit has been reached.
 
     public function GetPlayerBalance(Request $request){
+        
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
         // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($xmlparser), "");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
+        $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.operator_id');
+        if($providers_operator_ID != $xmlparser->OperatorId){
+            $array_data = array(
+                "status" => "Error: Invalid OperatorId.",
+                "balance" => $client_details->balance
+            );
+            $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
+            // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
+            return response($response,200)
+                    ->header('Content-Type', 'application/xml');    
+        }
         $array_data = array(
             "status" => "ok",
             "balance" => $client_details->balance
@@ -45,6 +57,17 @@ class AmuseGamingController extends Controller
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog("AmuseGaming WithdrawAndDeposit", $this->provider_db_id, json_encode($xmlparser), "");
         $client_details = ProviderHelper::getClientDetails('player_id', $xmlparser->UserId);
+        $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.operator_id');
+        if($providers_operator_ID != $xmlparser->OperatorId){
+            $array_data = array(
+                "status" => "Error: Invalid OperatorId.",
+                "balance" => $client_details->balance
+            );
+            $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
+            // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
+            return response($response,200)
+                    ->header('Content-Type', 'application/xml');    
+        }
         if($client_details == null){ 
             $array_data = array(
                 "status" => "INSUFFICIENT_BALANCE"
@@ -107,6 +130,17 @@ class AmuseGamingController extends Controller
     public function debit($request){
         Helper::saveLog("AmuseGaming Withdraw Transactions Recieved", $this->provider_db_id, json_encode($request), "Recieved");
         $client_details = ProviderHelper::getClientDetails('player_id', $request->UserId);
+        $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.operator_id');
+        if($providers_operator_ID != $request->OperatorId){
+            $array_data = array(
+                "status" => "Error: Invalid OperatorId.",
+                "balance" => $client_details->balance
+            );
+            $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
+            // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
+            return response($response,200)
+                    ->header('Content-Type', 'application/xml');    
+        }
         $game_details = Helper::findGameDetails('game_code', $this->provider_db_id,$request->GameId);
         $player_balance = $client_details->balance;
         $player_tokenID = $client_details->token_id;
@@ -245,6 +279,17 @@ class AmuseGamingController extends Controller
 
     public function credit($request,$freespin=false){
         $client_details = ProviderHelper::getClientDetails('player_id', $request->UserId);
+        $providers_operator_ID = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.operator_id');
+        if($providers_operator_ID != $request->OperatorId){
+            $array_data = array(
+                "status" => "Error: Invalid OperatorId.",
+                "balance" => $client_details->balance
+            );
+            $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
+            // Helper::saveLog("AmuseGaming GetPlayerBalance", 555, json_encode($response), "");
+            return response($response,200)
+                    ->header('Content-Type', 'application/xml');    
+        }
         $game_details = Helper::findGameDetails('game_code', $this->provider_db_id,$request->GameId);
         $player_balance = $client_details->balance;
         $player_tokenID = $client_details->token_id;

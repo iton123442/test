@@ -13,7 +13,10 @@ use DB;
 
 class AmuseGamingHelper{
 
-    public static  function createPlayerAndCheckPlayer($player_id){
+    public static  function createPlayerAndCheckPlayer($client_details){
+        $public_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.public_key');
+        dd($public_key);
+        $secret_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.secret_key');
         $header = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -27,13 +30,13 @@ class AmuseGamingHelper{
              * 
              ******************************************************************/
             $param = [
-                "pubkey" => config('providerlinks.amusegaming.public_key'),
+                "pubkey" => $public_key,
                 "time" => time(),
                 "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                 "requrl" => config('providerlinks.amusegaming.api_url').'casino/player_exists',
-                "playerid" => $player_id,
+                "playerid" => $client_details->player_id,
             ];
-            $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", config('providerlinks.amusegaming.secret_key'), true ) );
+            $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", $secret_key, true ) );
             $response = $header->post( config('providerlinks.amusegaming.api_url').'casino/player_exists', [
                 'form_params' => $param,
             ]);
@@ -48,13 +51,13 @@ class AmuseGamingHelper{
                  * 
                  ******************************************************************/
                 $param = [
-                    "pubkey" => config('providerlinks.amusegaming.public_key'),
+                    "pubkey" => $public_key,
                     "time" => time(),
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').'casino/create_player_if_not_exists',
-                    "playerid" => $player_id,
+                    "playerid" => $client_details->player_id,
                 ];
-                $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", config('providerlinks.amusegaming.secret_key'), true ) );
+                $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", $secret_key, true ) );
                 $response = $header->post( config('providerlinks.amusegaming.api_url').'casino/create_player_if_not_exists', [
                     'form_params' => $param,
                 ]);
@@ -73,7 +76,10 @@ class AmuseGamingHelper{
         
     }
 
-    public static  function requestTokenFromProvider($player_id,$type){
+    public static  function requestTokenFromProvider($client_details,$type){
+        $public_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.public_key');
+        $secret_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.secret_key');
+        $player_id = $client_details->player_id;
         if (isset($type) && $type == "demo") {
             $endpoint = "casino/request_demo_token";
         } else {
@@ -92,13 +98,13 @@ class AmuseGamingHelper{
              * 
              ******************************************************************/
             $param = [
-                "pubkey" => config('providerlinks.amusegaming.public_key'),
+                "pubkey" => $public_key,
                 "time" => time(),
                 "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                 "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                 "playerid" => $player_id,
             ];
-            $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", config('providerlinks.amusegaming.secret_key'), true ) );
+            $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", $secret_key, true ) );
             $response = $header->post( config('providerlinks.amusegaming.api_url').$endpoint, [
                 'form_params' => $param,
             ]);
@@ -115,6 +121,9 @@ class AmuseGamingHelper{
 
 
     public static  function AmuseGamingGameList($brand,$channel){
+        $amsuegaming = config('providerlinks.amusegaming');
+        $public_key = config('providerlinks.amusegaming.operator.USD.public_key');
+        $secret_key = config('providerlinks.amusegaming.operator.USD.secret_key');
         $endpoint = "casino/list_games";
         $header = new Client([
             'headers' => [ 
@@ -130,7 +139,7 @@ class AmuseGamingHelper{
              ******************************************************************/
             if($brand != ''){
                 $param = [
-                    "pubkey" => config('providerlinks.amusegaming.public_key'),
+                    "pubkey" => $public_key,
                     "time" => time(),
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
@@ -138,14 +147,14 @@ class AmuseGamingHelper{
                 ];
             }else{
                 $param = [
-                    "pubkey" => config('providerlinks.amusegaming.public_key'),
+                    "pubkey" => $public_key,
                     "time" => time(),
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                 ];
             }
-            $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", config('providerlinks.amusegaming.secret_key'), true ) );
-            Helper::saveLog('AMUSEGAMING GAMELIST', 65, json_encode($param),  $param );
+            $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", $secret_key, true ) );
+            Helper::saveLog('AMUSEGAMING GAMELIST', 65, json_encode($param),  $amsuegaming );
             $response = $header->post( config('providerlinks.amusegaming.api_url').$endpoint, [
                 'form_params' => $param,
             ]);

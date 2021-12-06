@@ -1804,7 +1804,8 @@ class GameLobby{
         $launch_url = config('providerlinks.amusegaming.launch_url');
         $api_url = config('providerlinks.amusegaming.api_url');
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-        $getDetails = AmuseGamingHelper::createPlayerAndCheckPlayer($client_details->player_id);
+        $getDetails = AmuseGamingHelper::createPlayerAndCheckPlayer($client_details);
+        dd($getDetails);
         if ($getDetails) {
             $token = AmuseGamingHelper::requestTokenFromProvider($client_details->player_id, "real");
             if($token != "false"){
