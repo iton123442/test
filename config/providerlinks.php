@@ -664,6 +664,11 @@ return [
                 'public_key' => 'vjIVE0LldA12Ta3EbOTW',
                 'secret_key' => 'AnrqxulvTbVrhGw15epy'
             ],
+            'TEST' => [
+                'operator_id' => 'betrnkUSDtest',
+                'public_key' => 'EI4gh2M62f7V9mmH9SNI',
+                'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S'
+            ],
         ],
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',
         'api_url' => 'https://api4.slotomatic.net/api/',

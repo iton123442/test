@@ -13,9 +13,16 @@ use DB;
 
 class AmuseGamingHelper{
 
+    public static $mode_type = 'TEST';
+
     public static  function createPlayerAndCheckPlayer($client_details){
-        $public_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.public_key');
-        $secret_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.secret_key');
+        if($this->mode_type == 'TEST'){
+            $currency = 'TEST';
+        }else{
+            $currency = $client_details->default_currency;
+        }
+        $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
+        $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
         $header = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/x-www-form-urlencoded',
@@ -76,8 +83,13 @@ class AmuseGamingHelper{
     }
 
     public static  function requestTokenFromProvider($client_details,$type){
-        $public_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.public_key');
-        $secret_key = config('providerlinks.amusegaming.operator.'.$client_details->default_currency.'.secret_key');
+        if($this->mode_type == 'TEST'){
+            $currency = 'TEST';
+        }else{
+            $currency = $client_details->default_currency;
+        }
+        $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
+        $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
         $player_id = $client_details->player_id;
         if (isset($type) && $type == "demo") {
             $endpoint = "casino/request_demo_token";
@@ -120,7 +132,11 @@ class AmuseGamingHelper{
 
 
     public static  function AmuseGamingGameList($brand,$channel,$currency){
-        $amsuegaming = config('providerlinks.amusegaming');
+        if($this->mode_type == 'TEST'){
+            $currency = 'TEST';
+        }else{
+            $currency = $currency;
+        }
         $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
         $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
         $endpoint = "casino/list_games";
@@ -153,7 +169,7 @@ class AmuseGamingHelper{
                 ];
             }
             $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", $secret_key, true ) );
-            Helper::saveLog('AMUSEGAMING GAMELIST Param', 65, json_encode($param),  $amsuegaming );
+            Helper::saveLog('AMUSEGAMING GAMELIST Param', 65, json_encode($param),  $param );
             $response = $header->post( config('providerlinks.amusegaming.api_url').$endpoint, [
                 'form_params' => $param,
             ]);
