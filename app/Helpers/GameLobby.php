@@ -1801,15 +1801,16 @@ class GameLobby{
     public static function AmuseGamingGameLaunch($data,$device){
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
 
-        try {
+        // try {
             $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
             $launch_url = config('providerlinks.amusegaming.launch_url');
             $api_url = config('providerlinks.amusegaming.api_url');
             $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-            Helper::saveLog('AMUSEGAMING LAUNCH 1', 65, json_encode($client_details->player_id),  $client_details );
+            // Helper::saveLog('AMUSEGAMING LAUNCH 1', 65, json_encode($client_details->player_id),  $client_details );
             $getDetails = AmuseGamingHelper::createPlayerAndCheckPlayer($client_details);
-            Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($getDetails),  $getDetails );
+            // Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($getDetails),  $getDetails );
             if ($getDetails) {
+                dd($client_details->player_id);
                 $token = AmuseGamingHelper::requestTokenFromProvider($client_details->player_id, "real");
                 if($token != "false"){
                     $getGameDetails = Helper::findGameDetails( "game_code", $proivder_db_id, $data['game_code']);
@@ -1821,10 +1822,10 @@ class GameLobby{
             }
             Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
             return "false";
-        } catch (\Exception $e) {
-            Helper::saveLog('AMUSEGAMING LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
-            return $e->getMessage();
-        }
+        // } catch (\Exception $e) {
+        //     Helper::saveLog('AMUSEGAMING LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
+        //     return $e->getMessage();
+        // }
     }
     
     public static function QuickSpinDGameLaunch($data,$device){
