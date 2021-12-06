@@ -34,6 +34,7 @@ class AmuseGamingHelper{
              * CHECK PLAYER REQUEST 
              * 
              ******************************************************************/
+            date_default_timezone_set("Asia/Hong_Kong");
             $param = [
                 "pubkey" => $public_key,
                 "time" => time(),
@@ -108,6 +109,7 @@ class AmuseGamingHelper{
              * CHECK PLAYER REQUEST 
              * 
              ******************************************************************/
+            date_default_timezone_set("Asia/Hong_Kong");
             $param = [
                 "pubkey" => $public_key,
                 "time" => time(),
@@ -153,6 +155,7 @@ class AmuseGamingHelper{
              * CHECK PLAYER REQUEST 
              * 
              ******************************************************************/
+            date_default_timezone_set("Asia/Hong_Kong");
             if($brand != ''){
                 $param = [
                     "pubkey" => $public_key,
