@@ -16,6 +16,7 @@ class AmuseGamingHelper{
     public static $mode_type = 'TEST';
 
     public static  function createPlayerAndCheckPlayer($client_details){
+        Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($this->mode_type),  $client_details );
         if($this->mode_type == 'TEST'){
             $currency = 'TEST';
         }else{
