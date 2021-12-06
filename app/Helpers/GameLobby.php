@@ -1811,7 +1811,7 @@ class GameLobby{
             // Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($getDetails),  $getDetails );
             if ($getDetails) {
                
-                $token = AmuseGamingHelper::requestTokenFromProvider($client_details->player_id, "real");
+                $token = AmuseGamingHelper::requestTokenFromProvider($client_details, "real");
                 if($token != "false"){
                     $getGameDetails = Helper::findGameDetails( "game_code", $proivder_db_id, $data['game_code']);
                     $brand = AmuseGamingHelper::getBrand($data['game_code'],$proivder_db_id);
