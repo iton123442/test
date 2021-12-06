@@ -2908,13 +2908,16 @@ class DigitainController extends Controller
 
 				// $datatrans = $this->findTransactionRefund($key['roundId'], 'round_id');
 				$datatrans = GameTransactionMDB::findGameExt($key['roundId'], 1,'round_id', $client_details);
-				if($datatrans == false){
-					$items_array[] = [
-						 "info" => $key['info'],
-						 "errorCode" => 7, // this transaction is not found
-						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-				    ]; 
-					continue;
+				if($datatrans == 'false'){
+					$datatrans = GameTransactionMDB::findGameExt($key['roundId'], 2,'round_id', $client_details);
+					if($datatrans == 'false'){
+						$items_array[] = [
+							 "info" => $key['info'],
+							 "errorCode" => 7, // this transaction is not found
+							 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+					    ]; 
+						continue;
+					}
 				}
 
 				$transaction_identifier = $key['roundId'];
@@ -2946,6 +2949,17 @@ class DigitainController extends Controller
 			}else{ // use both round id and orignaltxtid
 				// $datatrans = $this->findTransactionRefund($key['originalTxId'], 'transaction_id');
 				$datatrans = GameTransactionMDB::findGameExt($key['originalTxId'], 1,'transaction_id', $client_details);
+				if($datatrans == 'false'){
+					$datatrans = GameTransactionMDB::findGameExt($key['originalTxId'], 2,'transaction_id', $client_details);
+					if($datatrans == 'false'){
+						$items_array[] = [
+							 "info" => $key['info'],
+							 "errorCode" => 7, // this transaction is not found
+							 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+					    ]; 
+						continue;
+					}
+				}
 				$transaction_identifier = $key['originalTxId'];
 				$transaction_identifier_type = 'provider_trans_id';
 				// if($datatrans != false){
@@ -3117,7 +3131,7 @@ class DigitainController extends Controller
 							$is_win_amount = count($is_win) > 0 ? array_sum($is_win_amount) : 0;
 						    $amount = $is_win_amount;
 						    $transactiontype = 'debit';
-						    if(abs($client_player->playerdetailsresponse->balance) < abs($amount)){
+						    if(abs($client_details->balance) < abs($amount)){
 								$items_array[] = [
 							 	 	"info" => $key['info'],
 								 	"errorCode" => 6, // Player Low Balance!
@@ -3125,7 +3139,7 @@ class DigitainController extends Controller
 				        	    ]; 
 			        	   	    continue;
 				        	}
-				        	$win = 1; //3 draw, 4 refund, 1 lost win is refunded
+				        	$win = 4; //3 draw, 4 refund, 1 lost win is refunded
 	  						$entry_id = 2;
 	  						$pay_amount = $amount;
 	  						$income = $bet_amount - $pay_amount;
@@ -3381,16 +3395,19 @@ class DigitainController extends Controller
 					// $datatrans = $this->findTransactionRefund($value['roundId'], 'round_id');
 					$datatrans = GameTransactionMDB::findGameExt($value['roundId'], 1,'round_id', $client_details);
 					if ($datatrans == 'false') {
-						$items_array[] = [
-							"info" => $value['info'],
-							"errorCode" => 7, // this transaction is not found
-							"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
-						];
-						$global_error = $global_error == 1 ? 7 : $global_error;
-						$error_encounter = 1;
-						$value['tg_error'] = $global_error;
-						array_push($json_data_ii, $value);
-						continue;
+						$datatrans = GameTransactionMDB::findGameExt($key['roundId'], 2,'round_id', $client_details);
+						if($datatrans == 'false'){
+							$items_array[] = [
+								"info" => $value['info'],
+								"errorCode" => 7, // this transaction is not found
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
+							];
+							$global_error = $global_error == 1 ? 7 : $global_error;
+							$error_encounter = 1;
+							$value['tg_error'] = $global_error;
+							array_push($json_data_ii, $value);
+							continue;
+						}
 					}
 					$transaction_identifier = $value['roundId'];
 					$transaction_identifier_type = 'round_id';
@@ -3428,9 +3445,7 @@ class DigitainController extends Controller
 				} else { // use both round id and orignaltxtid
 					// $datatrans = $this->findTransactionRefund($key['originalTxId'], 'transaction_id');
 					$datatrans = GameTransactionMDB::findGameExt($value['originalTxId'], 1,'transaction_id', $client_details);
-					$transaction_identifier = $value['originalTxId'];
-					$transaction_identifier_type = 'provider_trans_id';
-					if ($datatrans == 'false') {
+					if($datatrans == 'false'){
 						$items_array[] = [
 							"info" => $value['info'],
 							"errorCode" => 7, // this transaction is not found
@@ -3442,6 +3457,8 @@ class DigitainController extends Controller
 						array_push($json_data_ii, $value);
 						continue;
 					}
+					$transaction_identifier = $value['originalTxId'];
+					$transaction_identifier_type = 'provider_trans_id';
 				}
 
 				// $json_data['items'][$i - 1]['datatrans'] = $datatrans;
@@ -3765,7 +3782,7 @@ class DigitainController extends Controller
 				        	    ]; 
 			        	   	    continue;
 				        	}
-				        	$win = 1; //3 draw, 4 refund, 1 lost win is refunded
+				        	$win = 4; //3 draw, 4 refund, 1 lost win is refunded
 	  						$entry_id = 2;
 	  						$pay_amount = $amount;
 	  						$income = $bet_amount - $pay_amount;

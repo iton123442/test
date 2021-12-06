@@ -37,12 +37,6 @@ class DemoHelper{
                 "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
                 "game_launch" => true
             );
-        }elseif($provider_code == 49){ // Bole Gaming
-            $response = array(
-                "game_code" => $data->game_code,
-                "url" => DemoHelper::getStaticUrl($data->game_code, $provider_code),
-                "game_launch" => true
-            );
         }
         elseif(in_array($provider_code, [39, 78, 79, 80, 81, 82, 83])){
             $response = array(
@@ -66,8 +60,9 @@ class DemoHelper{
             );
         }
         elseif($provider_code == 49){ // pragmatic play
+            Helper::saveLog('Game Launch Pragmatic Play Demo Tirgger', 26, json_encode($data), "im here!");
             if(isset($data->token)) {
-                $client_details = ProviderHelper::getClientDetails("token",$data->token);
+                $client_details = ProviderHelper::getClientDetails("ptw",$data->client_player_id, 1, 'all', $data->client_id);
             }else{
                 $client_details = false;
             }
@@ -207,9 +202,11 @@ class DemoHelper{
 
     public static function demoPragamticPlay($game_code,$lang,$client_details){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
-        if($client_details == false){ $currency = 'USD'; $lang = 'en';}else{ $currency = $client_details->default_currency; }
+        if($client_details == false){ $currency = 'USD'; $lang = 'en';}else{ $currency = $client_details->default_currency; $lang = $client_details->language; }
         // return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
-        return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang='.$lang.'&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
+        $url = 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang='.$lang.'&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
+        Helper::saveLog('Game Launch Pragmatic Play Demo Url', 26, $url, json_encode($client_details));
+        return $url;
     }
 
     // YGG DONT SUPPORT RETURN URL
