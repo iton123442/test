@@ -155,16 +155,12 @@ class AmuseGamingHelper{
              * CHECK PLAYER REQUEST 
              * 
              ******************************************************************/
-            $before = microtime();
-            $before_tz = date_default_timezone_get();
+           
             date_default_timezone_set("UTC");
-            $after = microtime();
-            $after_tz = date_default_timezone_get();
-            return $before." , ".$after." , ".$before_tz." , ". $after_tz;
             if($brand != ''){
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time(),
+                    "time" => time()+30,
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                     "filter_brands" => $brand,

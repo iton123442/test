@@ -543,7 +543,7 @@ class GameLobby{
     public static function CrashGaming($data){
         try{
             $url = 'https://dev.crashbetrnk.com/gamelaunch';// config('providerlinks.tidygaming.url_lunch');
-            $client_details = Providerhelper::getClientDetails('token', $token);
+            $client_details = Providerhelper::getClientDetails('token', $data['token']);
             $requesttosend = [
                 'session_id' =>  $client_details->player_token,
                 'user_id' => $client_details->player_id,
@@ -1801,7 +1801,7 @@ class GameLobby{
     public static function AmuseGamingGameLaunch($data,$device){
         Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  "HIT" );
 
-        // try {
+        try {
             $proivder_db_id = config('providerlinks.amusegaming.provider_db_id');
             $launch_url = config('providerlinks.amusegaming.launch_url');
             $api_url = config('providerlinks.amusegaming.api_url');
@@ -1823,10 +1823,10 @@ class GameLobby{
             dd($client_details->player_id);
             Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
             return "false";
-        // } catch (\Exception $e) {
-        //     Helper::saveLog('AMUSEGAMING LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
-        //     return $e->getMessage();
-        // }
+        } catch (\Exception $e) {
+            Helper::saveLog('AMUSEGAMING LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
+            return $e->getMessage();
+        }
     }
     
     public static function QuickSpinDGameLaunch($data,$device){
