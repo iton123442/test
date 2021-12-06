@@ -156,7 +156,6 @@ class AmuseGamingHelper{
              * 
              ******************************************************************/
             date_default_timezone_set("Asia/Hong_Kong");
-            dd(date_default_timezone_set("Asia/Hong_Kong"));
             if($brand != ''){
                 $param = [
                     "pubkey" => $public_key,
