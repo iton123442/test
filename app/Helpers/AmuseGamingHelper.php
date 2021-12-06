@@ -168,7 +168,7 @@ class AmuseGamingHelper{
             }else{
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time(),
+                    "time" => time()+30,
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                 ];
