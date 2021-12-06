@@ -160,7 +160,7 @@ class AmuseGamingHelper{
             if($brand != ''){
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time()+960,
+                    "time" => time()+9060,
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                     "filter_brands" => $brand,
@@ -168,13 +168,13 @@ class AmuseGamingHelper{
             }else{
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time()+960,
+                    "time" => time()+9060,
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                 ];
             }
             $param["hmac"] = base64_encode( hash_hmac( "sha1", http_build_query( $param )."ILN4kJYDx8", $secret_key, true ) );
-            Helper::saveLog('AMUSEGAMING GAMELIST Param', 65, json_encode($param),  $param );
+            Helper::saveLog('AMUSEGAMING GAMELIST Param', 65, json_encode($param),  time() );
             $response = $header->post( config('providerlinks.amusegaming.api_url').$endpoint, [
                 'form_params' => $param,
             ]);
