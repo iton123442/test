@@ -13,7 +13,7 @@ use DB;
 
 class AmuseGamingHelper{
 
-    public static $mode_type = 'TEST';
+    public $mode_type = 'TEST';
 
     public static  function createPlayerAndCheckPlayer($client_details){
         Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($this->mode_type),  $client_details );
