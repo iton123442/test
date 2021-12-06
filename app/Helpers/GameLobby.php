@@ -1806,7 +1806,7 @@ class GameLobby{
             $launch_url = config('providerlinks.amusegaming.launch_url');
             $api_url = config('providerlinks.amusegaming.api_url');
             $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-            Helper::saveLog('AMUSEGAMING LAUNCH 1', 65, json_encode($client_details),  $client_details );
+            Helper::saveLog('AMUSEGAMING LAUNCH 1', 65, json_encode($client_details->player_id),  $client_details );
             $getDetails = AmuseGamingHelper::createPlayerAndCheckPlayer($client_details);
             Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($getDetails),  $getDetails );
             if ($getDetails) {

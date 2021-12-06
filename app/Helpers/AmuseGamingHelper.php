@@ -76,7 +76,7 @@ class AmuseGamingHelper{
             }
             return false;
         } catch (\Exception $e) {
-            Helper::saveLog('AMUSEGAMING GM CREATE PLAYER', 65, json_encode($e->getMessage()),  $e->getMessage() );
+            Helper::saveLog('AMUSEGAMING GM CREATE PLAYER ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
             return false;
         }
         
