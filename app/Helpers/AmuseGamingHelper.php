@@ -155,7 +155,12 @@ class AmuseGamingHelper{
              * CHECK PLAYER REQUEST 
              * 
              ******************************************************************/
+            $before = microtime();
+            $before_tz = date_default_timezone_get();
             date_default_timezone_set("Asia/Hong_Kong");
+            $after = microtime();
+            $after_tz = date_default_timezone_get();
+            return $before." , ".$after." , ".$before_tz." , ". $after_tz;
             if($brand != ''){
                 $param = [
                     "pubkey" => $public_key,
