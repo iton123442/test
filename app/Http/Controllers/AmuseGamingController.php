@@ -479,7 +479,7 @@ class AmuseGamingController extends Controller
 
 
     public function getGamelist(Request $request){
-        $result = AmuseGamingHelper::AmuseGamingGameList($request->brand,$request->channel);
+        $result = AmuseGamingHelper::AmuseGamingGameList($request->brand,$request->channel,$request->currency);
         return response()->json($result);
     }
 }

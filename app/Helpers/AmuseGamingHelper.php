@@ -120,10 +120,10 @@ class AmuseGamingHelper{
     }
 
 
-    public static  function AmuseGamingGameList($brand,$channel){
+    public static  function AmuseGamingGameList($brand,$channel,$currency){
         $amsuegaming = config('providerlinks.amusegaming');
-        $public_key = config('providerlinks.amusegaming.operator.USD.public_key');
-        $secret_key = config('providerlinks.amusegaming.operator.USD.secret_key');
+        $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
+        $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
         $endpoint = "casino/list_games";
         $header = new Client([
             'headers' => [ 
