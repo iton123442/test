@@ -539,6 +539,11 @@ $app->post('/public/api/gf/sw/force-transfer-out', 'GoldenFController@swforceTra
 $app->post('/public/api/gf/sw/query-translog', 'GoldenFController@swQuerytranslog');
 
 
+// MancalaGaming Endpoints
+$app->post('/api/mancala/Balance', 'MancalaGamingController@getBalance');
+$app->post('/api/mancala/Credit', 'MancalaGamingController@debitProcess');
+$app->post('/api/mancala/Debit', 'MancalaGamingController@creditProcess');
+$app->post('/api/mancala/Refund', 'MancalaGamingController@rollbackTransaction');
 
 $app->post('/public/api/currency','AlController@currency');
 
