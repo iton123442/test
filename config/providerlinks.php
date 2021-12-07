@@ -666,7 +666,7 @@ return [
             ],
             'TEST' => [
                 'operator_id' => 'betrnkUSDtest',
-                'public_key' => 'EI4gh2M62f7V9mmH9SNI1',
+                'public_key' => 'EI4gh2M62f7V9mmH9SNI',
                 'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S'
             ],
         ],
