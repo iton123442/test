@@ -160,16 +160,16 @@ class AmuseGamingHelper{
             if($brand != ''){
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time()-1000,
-                    "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
+                    "time" => time(),
+                    "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime()-1000 ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                     "filter_brands" => $brand,
                 ];
             }else{
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time()-1000,
-                    "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
+                    "time" => time(),
+                    "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime()-1000 ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                 ];
             }
