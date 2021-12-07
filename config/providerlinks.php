@@ -667,11 +667,11 @@ return [
             'TEST' => [
                 'operator_id' => 'betrnkUSDtest',
                 'public_key' => 'EI4gh2M62f7V9mmH9SNI',
-                'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S'
+                'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S1'
             ],
         ],
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',
-        'api_url' => 'https://api4.slotomatic.net/api1/',
+        'api_url' => 'https://api4.slotomatic.net/api/',
         'modetype' => 'TEST',
     ],
     'quickspinDirect' => [
