@@ -18,6 +18,7 @@ class PNGController extends Controller
     public function authenticate(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
+        Helper::saveLog('PNG authenticate MDB', 50,json_encode($xmlparser), 'endpoint hit');
         $accessToken = "secrettoken";
         if($xmlparser->username){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->username);
