@@ -1351,6 +1351,47 @@ class GameLobby{
         return $request_data['exitUrl'];    
     }
 
+    public static function MancalaLaunchUrl($request_data) {
+        $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
+
+        $game_launch = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+        
+        $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
+
+        $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
+                ['body' => json_encode(
+                        [
+                            "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
+                            "GameId" => $request_data['game_code'],
+                            "UserId" => $client_details->player_id,
+                            "Currency" => $client_details->default_currency,
+                            "Lang" => "EN",
+                            "ClientType" => 1,
+                            "IsVirtual" => false,
+                            "Hash" => $hash,
+                            "DemoMode" => false,
+                            "ExtraData" => "data"
+                        ]
+                )]
+            );
+
+        $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
+
+        if($game_launch_url !== NULL) {
+            
+            Helper::playerGameRoundUuid($request_data["game_code"], $request_data["token"], $request_data["game_provider"], $game_launch_url->Token);
+            
+            return $game_launch_url->IframeUrl."&backurl=".$request_data['exitUrl'];  
+        }
+        
+        return $request_data['exitUrl'];     
+    }
+
+
     public static function aoyamaLaunchUrl($game_code,$token,$exitUrl){
         /*$client_details = GameLobby::getClientDetails('token', $token);*/
         $client_code = 'BETRNKMW'; /*$client_details->client_code ? $client_details->client_code : 'BETRNKMW';*/
