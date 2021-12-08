@@ -311,14 +311,14 @@ class PNGController extends Controller
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog('PNG balance MDB', 50,json_encode($xmlparser), 'endpoint hit');
-        $accessToken = "secrettoken";
-        if($accessToken != $xmlparser->accessToken){
-            $array_data = array(
-                "statusCode" => 4,
-            );
-            Helper::saveLog('PNG balance MDB', 50,json_encode($array_data), 'endpoint hit 2');
-            return PNGHelper::arrayToXml($array_data,"<balance/>");
-        }
+        // $accessToken = "secrettoken";
+        // if($accessToken != $xmlparser->accessToken){
+        //     $array_data = array(
+        //         "statusCode" => 4,
+        //     );
+        //     Helper::saveLog('PNG balance MDB', 50,json_encode($array_data), 'endpoint hit 2');
+        //     return PNGHelper::arrayToXml($array_data,"<balance/>");
+        // }
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
             if($client_details){
