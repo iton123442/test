@@ -308,6 +308,7 @@ class PNGController extends Controller
     public function balance(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
+        Helper::saveLog('PNG balance MDB', 50,json_encode($xmlparser), 'endpoint hit');
         $accessToken = "secrettoken";
         if($accessToken != $xmlparser->accessToken){
             $array_data = array(
@@ -360,6 +361,7 @@ class PNGController extends Controller
     public function cancelReserve(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
+        Helper::saveLog('PNG cancelReserve MDB', 50,json_encode($xmlparser), 'endpoint hit');
         $accessToken = "secrettoken";
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
