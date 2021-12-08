@@ -684,7 +684,7 @@ return [
         'api_url' => 'https://gamelaunch.everymatrix.com/Loader/Start/',
         'operator' => 'TigerGamesUser',
         'operator_key' => 'nXxOCeSCh4ko4q6q',
-        'X-Tenant-ID'=> 2540
+        'opid'=> 2540
     ],
 
 ];
