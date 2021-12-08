@@ -65,6 +65,7 @@ class PNGController extends Controller
                 $array_data = array(
                     "statusCode" => 4,
                 );
+                Helper::saveLog('PNG authenticate MDB', 50,json_encode($array_data), 'endpoint hit 2');
                 return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
         }
@@ -72,6 +73,7 @@ class PNGController extends Controller
             $array_data = array(
                 "statusCode" => 4,
             );
+            Helper::saveLog('PNG authenticate MDB', 50,json_encode($array_data), 'endpoint hit 3');
             return PNGHelper::arrayToXml($array_data,"<authenticate/>");
         }
         
@@ -314,6 +316,7 @@ class PNGController extends Controller
             $array_data = array(
                 "statusCode" => 4,
             );
+            Helper::saveLog('PNG balance MDB', 50,json_encode($array_data), 'endpoint hit 2');
             return PNGHelper::arrayToXml($array_data,"<balance/>");
         }
         if($xmlparser->externalGameSessionId){
@@ -354,6 +357,7 @@ class PNGController extends Controller
                 $array_data = array(
                     "statusCode" => 4,
                 );
+                Helper::saveLog('PNG balance MDB', 50,json_encode($array_data), 'endpoint hit 3');
                 return PNGHelper::arrayToXml($array_data,"<balance/>");
             }
         }
