@@ -1884,8 +1884,7 @@ class GameLobby{
 
     public static function SpearHeadGameLaunch($data, $device){
         Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
-        //$gameUrl = config("providerlinks.speahead.spearhead.api_url").config("providerlinks.spearhead.X-Tenant-ID")."?language=en&funMode=False&_sid64=".$data['token']."&casinolobbyurl=".$data['exitUrl'];
-        $gameUrl = "https://gamelaunch.everymatrix.com/Loader/Start/2540/zeus-1000?language=en&funMode=False&_sid64=".$data['token']."";
+        $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&funMode=False&_sid=".$data['token'];
         Helper::saveLog('SpearHeadGameLaunch2 ', 67, json_encode($data),$gameUrl);
         return $gameUrl;
     }
