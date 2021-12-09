@@ -548,7 +548,7 @@ class GameLobby{
                 'session_id' =>  $client_details->player_token,
                 'user_id' => $client_details->player_id,
                 'user_name' => $client_details->player_id,
-                'currencycode' => $client_details->default_currency,
+                'currency_code' => $client_details->default_currency,
                 'balance' => $client_details->balance,
                 'uuid' => $client_details->player_token,
                 'exit_url' => isset($data['exitUrl']) ? $data['exitUrl'] : ""
@@ -556,7 +556,7 @@ class GameLobby{
             $client = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'AuthToken' => config('providerlinks.crashgaming.authToken')
+                    'Authorization' => 'Bearer '.config('providerlinks.crashgaming.authToken')
                 ]
             ]);
             $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]

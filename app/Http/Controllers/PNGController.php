@@ -18,6 +18,7 @@ class PNGController extends Controller
     public function authenticate(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
+        Helper::saveLog('PNG authenticate MDB', 50,json_encode($xmlparser), 'endpoint hit');
         $accessToken = "secrettoken";
         if($xmlparser->username){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->username);
@@ -64,6 +65,7 @@ class PNGController extends Controller
                 $array_data = array(
                     "statusCode" => 4,
                 );
+                Helper::saveLog('PNG authenticate MDB', 50,json_encode($array_data), 'endpoint hit 2');
                 return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
         }
@@ -71,6 +73,7 @@ class PNGController extends Controller
             $array_data = array(
                 "statusCode" => 4,
             );
+            Helper::saveLog('PNG authenticate MDB', 50,json_encode($array_data), 'endpoint hit 3');
             return PNGHelper::arrayToXml($array_data,"<authenticate/>");
         }
         
@@ -307,13 +310,15 @@ class PNGController extends Controller
     public function balance(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
-        $accessToken = "secrettoken";
-        if($accessToken != $xmlparser->accessToken){
-            $array_data = array(
-                "statusCode" => 4,
-            );
-            return PNGHelper::arrayToXml($array_data,"<balance/>");
-        }
+        Helper::saveLog('PNG balance MDB', 50,json_encode($xmlparser), 'endpoint hit');
+        // $accessToken = "secrettoken";
+        // if($accessToken != $xmlparser->accessToken){
+        //     $array_data = array(
+        //         "statusCode" => 4,
+        //     );
+        //     Helper::saveLog('PNG balance MDB', 50,json_encode($array_data), 'endpoint hit 2');
+        //     return PNGHelper::arrayToXml($array_data,"<balance/>");
+        // }
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
             if($client_details){
@@ -352,6 +357,7 @@ class PNGController extends Controller
                 $array_data = array(
                     "statusCode" => 4,
                 );
+                Helper::saveLog('PNG balance MDB', 50,json_encode($array_data), 'endpoint hit 3');
                 return PNGHelper::arrayToXml($array_data,"<balance/>");
             }
         }
@@ -359,6 +365,7 @@ class PNGController extends Controller
     public function cancelReserve(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
+        Helper::saveLog('PNG cancelReserve MDB', 50,json_encode($xmlparser), 'endpoint hit');
         $accessToken = "secrettoken";
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);

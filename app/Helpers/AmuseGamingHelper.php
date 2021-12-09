@@ -160,7 +160,7 @@ class AmuseGamingHelper{
             if($brand != ''){
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time()+1000,
+                    "time" => time(),
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                     "filter_brands" => $brand,
@@ -168,7 +168,7 @@ class AmuseGamingHelper{
             }else{
                 $param = [
                     "pubkey" => $public_key,
-                    "time" => time()+1000,
+                    "time" => time(),
                     "nonce" => md5( substr( str_shuffle( "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ), 0, 10 ).microtime() ),
                     "requrl" => config('providerlinks.amusegaming.api_url').$endpoint,
                 ];
