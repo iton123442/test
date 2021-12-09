@@ -93,14 +93,12 @@ class VivoController extends Controller
 			
 		}
 
-		Helper::errorDebug('vivo_authentication', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
+		/*Helper::errorDebug('vivo_authentication', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);*/
 		echo $response;
 	}
 
 	public function gameTransaction(Request $request) 
 	{
-		Helper::errorDebug('vivo_transaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), '');
-
 		$json_data = $request->all();
 		$client_code = RouteParam::get($request, 'brand_code');
 		
@@ -483,7 +481,7 @@ class VivoController extends Controller
 
 		}
 
-		Helper::errorDebug('vivo_status', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
+		/*Helper::errorDebug('vivo_status', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);*/
 		echo $response;
 
 	}
@@ -543,7 +541,7 @@ class VivoController extends Controller
 			}
 		}
 
-		Helper::errorDebug('vivo_balance', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
+		/*Helper::errorDebug('vivo_balance', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);*/
 		echo $response;
 
 	}
