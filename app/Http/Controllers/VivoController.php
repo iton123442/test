@@ -99,6 +99,8 @@ class VivoController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{
+		Helper::errorDebug('vivo_transaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), '');
+
 		$json_data = $request->all();
 		$client_code = RouteParam::get($request, 'brand_code');
 		
