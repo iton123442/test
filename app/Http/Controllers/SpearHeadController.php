@@ -23,6 +23,8 @@ class SpearHeadController extends Controller
         $this->operator =config('providerlinks.spearhead.operator');
         $this->operator_key = config('providerlinks.spearhead.operator_key');
         $this->opid= config('providerlinks.spearhead.opid');
+        $this->loginName = config('providerlinks.spearhead.username');
+        $this->password = config('providerlinks.spearhead.password');
         // $this->$processtime = new DateTime('NOW');
       }
 
@@ -37,12 +39,18 @@ class SpearHeadController extends Controller
           $country_code = $client_details->country_code;
         }
         $res = [
+          "ApiVersion" => "1.0",
+          "Request" => "GetAccount",
+          "ReturnCode" => 0,
+          "Details" => null,
+          "AccountId" => (string) $client_details->player_id,
+          "SessionId" => $client_details->player_token,
           "ExternalUserId" => (string) $client_details->player_id,
           "Country" => $country_code,
           "Currency" => $client_details->default_currency,
-          "SessionId" => $client_details->player_token,
           "Username" => $client_details->username,
           "Birthdate" => "1999-07-10",
+          "Message" => "Success"
         ];
       }else{
         $res = [
@@ -76,7 +84,7 @@ class SpearHeadController extends Controller
     }else{
       $res = [
         "ApiVersion" => "1.0",
-        "Request" => "GetAccount",
+        "Request" => "GetBalance",
         "ReturnCode" => 103,
         "Message" => "User not found"
       ];
