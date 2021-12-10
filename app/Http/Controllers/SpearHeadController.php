@@ -53,6 +53,7 @@ class SpearHeadController extends Controller
               "Message" => "User not found"
           ];
       }
+      Helper::saveLog('SpearHeadGameGetBalance', 67, json_encode($data),  json_encode($res));
       return $res;
           
   }
