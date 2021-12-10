@@ -16,8 +16,8 @@ class SpearHeadController extends Controller
         $this->$processtime = new DateTime('NOW');
       }
    public function getBalance(Request $request){
-    $data = $request->all();
-    Helper::saveLog('SpearHeadGameGetBalance', 67, json_encode($data),  "HIT" );
+    $data = $request->all(); 
+    Helper::saveLog('Spearhead  GetBalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
     $playerId = $data['ExternalUserId'];
     $request_secretkey = $request->header('x-Api-Key');
     $request_opid = $request->header('X-Tenant-ID');
@@ -59,6 +59,7 @@ class SpearHeadController extends Controller
   }
 
   public function index(Request $req){
+    Helper::saveLog('Spearhead  index', $this->provider_db_id, json_encode($req->all()), 'ENDPOINT HIT');
     $TransactionType = req['TransactionType'];
     if($request_secretkey != $this->operator_key && $request_opid != $this->opid){
       $res = [
