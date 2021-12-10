@@ -16,8 +16,8 @@ class SpearHeadController extends Controller
         $this->$processtime = new DateTime('NOW');
       }
    public function getBalance(Request $request){
-
     $data = $request->all();
+    Helper::saveLog('SpearHeadGameGetBalance', 67, json_encode($data),  "HIT" );
     $playerId = $data['ExternalUserId'];
     $request_secretkey = $request->header('x-Api-Key');
     $request_opid = $request->header('X-Tenant-ID');
@@ -53,6 +53,7 @@ class SpearHeadController extends Controller
               "Message" => "User not found"
           ];
       }
+      Helper::saveLog('SpearHeadGameGetBalance', 67, json_encode($data),  json_encode($res));
       return $res;
           
   }
