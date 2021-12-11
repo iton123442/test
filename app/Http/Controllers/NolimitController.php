@@ -33,7 +33,6 @@ class NolimitController extends Controller
 
          // dd($request->all());
         $data = $request->all();
-        $operator_key = "Nu3baiChohKo";
         $method = $data['method'];
         if($method == 'wallet.validate-token'){//
             try {
@@ -57,7 +56,7 @@ class NolimitController extends Controller
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
-                if($operator_key != $data['params']['identification']['key']){
+                if($this->operator_key != $data['params']['identification']['key']){
                     $response = [
                         "jsonrpc" =>  '2.0',
                         "error" => [
