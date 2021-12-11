@@ -187,6 +187,19 @@ class NolimitController extends Controller
                     return $response;
 
             }
+            if($bet_amount > $client_details->balance){
+                $response = [
+                    'jsonrpc' => '2.0',
+                    'result' => [
+                        'error' => [
+                            'code' => "14001",
+                            'message' => "Balance too low.",
+                            ],
+                        ]
+                    ];
+                    return $response;
+
+            }
                $game_details = Game::find($game_code, $this->provider_db_id);
        try{
                 $gameTransactionData = array(
