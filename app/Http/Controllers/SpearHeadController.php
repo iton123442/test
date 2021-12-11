@@ -3,6 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Helpers\Helper;
+use App\Helpers\ProviderHelper;
+use GuzzleHttp\Client;
+use App\Helpers\ClientRequestHelper;
+use App\Models\GameTransaction;
+use App\Models\GameTransactionMDB;
+use App\Helpers\Game;
+use Carbon\Carbon;
+use DB;
+use DateTime;
 
 class SpearHeadController extends Controller
 {
@@ -13,48 +23,73 @@ class SpearHeadController extends Controller
         $this->operator =config('providerlinks.spearhead.operator');
         $this->operator_key = config('providerlinks.spearhead.operator_key');
         $this->opid= config('providerlinks.spearhead.opid');
-        $this->$processtime = new DateTime('NOW');
+        $this->loginName = config('providerlinks.spearhead.username');
+        $this->password = config('providerlinks.spearhead.password');
+        // $this->$processtime = new DateTime('NOW');
       }
+
+   public function getAccount(Request $req){
+      $data = $req->all();
+      Helper::saveLog('Spearhead Verification', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
+      $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+      if($client_details != null){
+        if($client_details->country_code == null){
+          $country_code = "PH";
+        }else{
+          $country_code = $client_details->country_code;
+        }
+        $res = [
+          "ApiVersion" => "1.0",
+          "Request" => "GetAccount",
+          "ReturnCode" => 0,
+          "Details" => null,
+          "AccountId" => (string) $client_details->player_id,
+          "SessionId" => $client_details->player_token,
+          "ExternalUserId" => (string) $client_details->player_id,
+          "Country" => $country_code,
+          "Currency" => $client_details->default_currency,
+          "Username" => $client_details->username,
+          "Birthdate" => "1999-07-10",
+          "Message" => "Success"
+        ];
+      }else{
+        $res = [
+          "ApiVersion" => "1.0",
+          "Request" => "GetAccount",
+          "ReturnCode" => 103,
+          "Message" => "User not found"
+        ];
+      }
+      Helper::saveLog('Spearhead Verification', $this->provider_db_id, json_encode($data), json_encode($res));
+      return $res;
+   }
+
    public function getBalance(Request $request){
     $data = $request->all(); 
     Helper::saveLog('Spearhead  GetBalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-    $playerId = $data['ExternalUserId'];
-    $request_secretkey = $request->header('x-Api-Key');
-    $request_opid = $request->header('X-Tenant-ID');
-    if($request_secretkey != $this->operator_key && $request_opid != $this->opid){
-          $res = [
-            "ApiVersion"=>"v1",
-            "serverTimestamp" => $this->$processtime->format('Y-m-d\TH:i:s.u'),
-            "Code" => 403,
-            "Message" => "Forbidden"
-        ];
-
-        return response($response,403)->header('Content-Type', 'application/json');
-      }
-    $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
+    $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
     if($client_details != null){
-          $res = [
-              "balance" => (float)$client_details->balance,
-              "BonusMoney" => 0.0,
-              "RealMoney" => (int)$client_details->balance,
-              "Currency" => $client_details->default_currency,
-              "SessionId" => $data['SessionId'],
-              "ApiVersion" => "1.0",
-              "Request" => "GetBalance",
-              "ReturnCode" => 0,
-              "Message" => "Success",
-              "Details" => null,
-          ];
-      }else{
-          $res = [
-              "ApiVersion"=>"1.0",
-              "Request" =>"GetBalance",
-              "ReturnCode" => 103,
-              "Message" => "User not found"
-          ];
-      }
-      return $res;
-          
+      $res = [
+        "Balance" => (float)$client_details->balance,
+        "BonusMoney" => 0.0,
+        "RealMoney" => $client_details->balance,
+        "Currency" => $client_details->default_currency,
+        "SessionId" => $client_details->player_token,
+        "ApiVersion" => "1.0",
+        "Request" => "GetBalance",
+        "ReturnCode" => 0,
+        "Message" => "Success",
+        "Details" => null
+      ];
+    }else{
+      $res = [
+        "ApiVersion" => "1.0",
+        "Request" => "GetBalance",
+        "ReturnCode" => 103,
+        "Message" => "User not found"
+      ];
+    }
+    return $res;
   }
 
   public function index(Request $req){

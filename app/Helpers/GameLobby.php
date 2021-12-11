@@ -1884,7 +1884,7 @@ class GameLobby{
 
     public static function SpearHeadGameLaunch($data, $device){
         Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
-        $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&casinolobbyurl=".$data['exitUrl']."&funMode=False&_sid=".$data['token'];
+        $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&casinolobbyurl=".$data['exitUrl']."&_sid=".$data['token'];
         Helper::saveLog('SpearHeadGameLaunch2 ', 67, json_encode($data),$gameUrl);
         return $gameUrl;
     }
