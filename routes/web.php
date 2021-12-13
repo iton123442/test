@@ -735,3 +735,12 @@ $app->post('/public/api/idnpoker/makeDeposit', 'IDNPokerController@makeDeposit')
 $app->post('/public/api/idnpoker/makeWithdraw', 'IDNPokerController@makeWithdraw');
 $app->post('/public/api/idnpoker/getPlayerBalance', 'IDNPokerController@getPlayerBalance');
 $app->post('/public/api/idnpoker/getPlayerWalletBalance', 'IDNPokerController@getPlayerWalletBalance');
+
+
+// Transfer Wallet New Update
+$app->post('/public/api/transferwallet/renewsession','TransferWalletController@renewSession');
+$app->post('/public/api/transferwallet/createsession','TransferWalletController@createWalletSession');
+$app->post('/public/api/transferwallet/getPlayerBalance','TransferWalletController@getPlayerBalance');
+$app->post('/public/api/transferwallet/getPlayerWalletBalance','TransferWalletController@getPlayerWalletBalance');
+$app->post('/public/api/transferwallet/makeWithdraw','TransferWalletController@makeWithdraw');
+$app->post('/public/api/transferwallet/makeDeposit','TransferWalletController@makeDeposit');
