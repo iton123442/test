@@ -24,6 +24,7 @@ class TransactionInfoController extends Controller
 
 
     public function getTransaction(Request $request){ 
+        ProviderHelper::saveLogWithExeption('getTransaction', 1223, json_encode($request->all()), 'ENDPOINT HIT');
 
     	# ALL PARAMETER ARE MANDATORY!
     	if(!$request->has('access_token') || !$request->has('hashkey') || !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('username') || !$request->has('game_provider') || !$request->has('transactionId') || !$request->has('roundId')){
