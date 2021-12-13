@@ -31,6 +31,6 @@ class Kernel extends ConsoleKernel
         // $schedule->command('al:cron')->everyMinute();
         // $schedule->call('App\Http\Controllers\IAESportsController@GG')->everyMinute();
         // $schedule->call('App\Http\Controllers\IAESportsController@SettleRounds')->everyThirtyMinutes();
-        $schedule->call('App\Http\Controllers\IAESportsController@SettleRounds');
+        // $schedule->call('App\Http\Controllers\IAESportsController@SettleRounds');
     }
 }

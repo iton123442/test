@@ -50,11 +50,11 @@ class TransactionInfoController extends Controller
 			return $mw_response;
     	}
 
-    	// $hashkey = md5($client_details->client_api_key.$client_details->client_access_token);
-    	// if($hashkey != $request->hashkey){
-	    //     $mw_response = ["data" => null,"status" => ["code" => 404,"message" => TransactionInfo::TransactionErrorCode(404)]];
-	    //     return $mw_response;
-    	// }
+    	$hashkey = md5($client_details->client_api_key.$client_details->client_access_token);
+    	if($hashkey != $request->hashkey){
+	        $mw_response = ["data" => null,"status" => ["code" => 404,"message" => TransactionInfo::TransactionErrorCode(404)]];
+	        return $mw_response;
+    	}
 
         $provider_details = GameLobby::checkAndGetProviderId($request->game_provider);
         if($provider_details){
