@@ -52,6 +52,9 @@ $app->post('/public/oauth/access_token', function() use ($app){
     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
 });
 
+// Client Round History Inquire
+$app->post('/public/api/transaction/info', 'TransactionInfoController@getTransaction');
+
 // Player Details Request
 $app->post('/public/api/playerdetailsrequest/', 'PlayerDetailsController@show');
 
