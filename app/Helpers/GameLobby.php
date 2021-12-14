@@ -208,10 +208,10 @@ class GameLobby{
         $lang = GameLobby::getLanguage("PlayNGo",$lang);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
-        // $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
-        //            config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
-        $key = "LUGTPyr6u8sRjCfh";
-        $aes = new AES($key);
+        $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
+                   config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+        // $key = "LUGTPyr6u8sRjCfh";
+        // $aes = new AES($key);
         // $data = array(
         //     'root_url' => config('providerlinks.png.root_url'),
         //     'exitUrl' => $exit_url,
