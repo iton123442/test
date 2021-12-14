@@ -313,7 +313,7 @@ class PNGController extends Controller
                 ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
-                && $client_response->fundtransferresponse->status->code == "200"){
+                && $client_response->fundtransferresponse->status->code == "402"){
                     if($game != 'false'){
                         if($win == 0){
                             $this->updateGameTransaction($game,$json_data,'debit',$client_details);
@@ -328,7 +328,7 @@ class PNGController extends Controller
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                     return PNGHelper::arrayToXml($array_data,"<release/>");
                 }elseif (isset($client_response->fundtransferresponse->status->code) 
-                && $client_response->fundtransferresponse->status->code == "402") {
+                && $client_response->fundtransferresponse->status->code == "200") {
                     $array_data = array(
                         "statusCode" => 7,
                     );
