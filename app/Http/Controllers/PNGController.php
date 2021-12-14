@@ -277,7 +277,7 @@ class PNGController extends Controller
                 );
                 $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                 // $transactionId = PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,2);
-                $balance = round($client_response->fundtransferresponse->balance,2);
+                $balance = round($client_details->balance,2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                 $array_data = array(
                     "real" => $balance,
