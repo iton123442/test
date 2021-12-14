@@ -575,17 +575,23 @@ class GameLobby{
         try{
             $url = config('providerlinks.tidygaming.url_lunch');
             $client_details = Providerhelper::getClientDetails('token', $token);
-
             // $invite_code = config('providerlinks.tidygaming.usd_invite');
             // if ($client_details->default_currency == "THB" ) {
             //     $invite_code = config('providerlinks.tidygaming.thb_invite');
             // } elseif ($client_details->default_currency == "TRY") {
             //     $invite_code = config('providerlinks.tidygaming.try_invite');
             // } 
-            $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
+            // $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
             
-            $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
-            $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+            // $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
+            $operator_currency_support_1_1_using_prefix_k = [168,245,247,248,249,250];//client_id
+            $currency = $client_details->default_currency;
+            if (in_array( $client_details->client_id, $operator_currency_support_1_1_using_prefix_k)) {
+               $currency = "k".$client_details->default_currency;
+            }
+            $invite_code = config('providerlinks.tidygaming.currency')[$currency];
+            $get_code_currency = TidyHelper::currencyCode($currency);
+            // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,
@@ -1053,7 +1059,7 @@ class GameLobby{
         endif;  
     }
 
-    private static function icgGameUrl($currency){
+    public static function icgGameUrl($currency){
         $http = new Client();
         $response = $http->get(config("providerlinks.icgaminggames"), [
             'headers' =>[
@@ -1063,7 +1069,7 @@ class GameLobby{
         ]);
         return json_decode((string) $response->getBody(), true);
     }
-    private static function icgConnect($currency){
+    public static function icgConnect($currency){
         $http = new Client();
         switch($currency){
             case "JPY":

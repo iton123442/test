@@ -129,7 +129,7 @@ class Helper
 					"request_data" => json_encode(json_decode($request_data)),
 					"response_data" => json_encode($response_data)
 				];
-				return DB::connection('savelog')->table('seamless_request_logs')->insert($data);
+				return DB::table('debug')->insert($data);
 			}else{
 				return 8888888;
 			}

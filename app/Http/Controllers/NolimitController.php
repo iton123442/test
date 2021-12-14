@@ -295,7 +295,7 @@ class NolimitController extends Controller
                                     ];
 
                                 $updateTransactionEXt = array(
-                                    "provider_request" =>json_encode($request->all()),
+                                    "provider_request" => json_encode($request->all()),
                                     "mw_response" => json_encode($response),
                                     'mw_request' => json_encode($client_response->requestoclient),
                                     'client_response' => json_encode($client_response->fundtransferresponse),
@@ -306,9 +306,6 @@ class NolimitController extends Controller
                               GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                     break;
                             }
-                               
-
-
                         }
                             
                         ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data), $response);

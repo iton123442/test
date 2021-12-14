@@ -52,6 +52,9 @@ $app->post('/public/oauth/access_token', function() use ($app){
     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
 });
 
+// Client Round History Inquire
+$app->post('/public/api/transaction/info', 'TransactionInfoController@getTransaction');
+
 // Player Details Request
 $app->post('/public/api/playerdetailsrequest/', 'PlayerDetailsController@show');
 
@@ -725,10 +728,18 @@ $app->post('/public/api/quickspin/fs_win', 'QuickspinDirectController@freeRound'
 // SpearHead
 $app->post('/public/api/spearhead/GetAccount', 'SpearHeadController@getAccount');
 $app->post('/public/api/spearhead/GetBalance', 'SpearHeadController@getBalance');
-$app->post('/public/api/spearhead','SpearHeadController@index');
+$app->post('/public/api/spearhead','SpearHeadController@walletApiReq');
 
 //IDNPOKER
 $app->post('/public/api/idnpoker/makeDeposit', 'IDNPokerController@makeDeposit');
 $app->post('/public/api/idnpoker/makeWithdraw', 'IDNPokerController@makeWithdraw');
 $app->post('/public/api/idnpoker/getPlayerBalance', 'IDNPokerController@getPlayerBalance');
 $app->post('/public/api/idnpoker/getPlayerWalletBalance', 'IDNPokerController@getPlayerWalletBalance');
+
+// Transfer Wallet New Update
+$app->post('/public/api/transferwallet/renewsession','TransferWalletController@renewSession');
+$app->post('/public/api/transferwallet/createsession','TransferWalletController@createWalletSession');
+$app->post('/public/api/transferwallet/getPlayerBalance','TransferWalletController@getPlayerBalance');
+$app->post('/public/api/transferwallet/getPlayerWalletBalance','TransferWalletController@getPlayerWalletBalance');
+$app->post('/public/api/transferwallet/makeWithdraw','TransferWalletController@makeWithdraw');
+$app->post('/public/api/transferwallet/makeDeposit','TransferWalletController@makeDeposit');
