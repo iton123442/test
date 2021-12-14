@@ -79,34 +79,55 @@ class SpearHeadController extends Controller
       return $res;
    }
 
-   public function getBalance($req){
-    $data = $req;
-    Helper::saveLog('Spearhead  GetBalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-    $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
-    if($client_details != null){
-      $res = [
-        "Balance" => (float)$client_details->balance,
-        "BonusMoney" => 0.0,
-        "RealMoney" => $client_details->balance,
-        "Currency" => $client_details->default_currency,
-        "SessionId" => $client_details->player_token,
-        "ApiVersion" => "1.0",
-        "Request" => "GetBalance",
-        "ReturnCode" => 0,
-        "Message" => "Success",
-        "Details" => null
-      ];
-    }else{
-      $res = [
-        "ApiVersion" => "1.0",
-        "Request" => "GetBalance",
-        "ReturnCode" => 103,
-        "Message" => "User not found"
-      ];
-    }
-    return $res;
+public function getBalance($req){
+  $data = $req;
+  Helper::saveLog('Spearhead  GetBalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
+  $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+  if($client_details != null){
+    $res = [
+      "Balance" => (float)$client_details->balance,
+      "BonusMoney" => 0.0,
+      "RealMoney" => $client_details->balance,
+      "Currency" => $client_details->default_currency,
+      "SessionId" => $client_details->player_token,
+      "ApiVersion" => "1.0",
+      "Request" => "GetBalance",
+      "ReturnCode" => 0,
+      "Message" => "Success",
+      "Details" => null
+    ];
+  }else{
+    $res = [
+      "ApiVersion" => "1.0",
+      "Request" => "GetBalance",
+      "ReturnCode" => 103,
+      "Message" => "User not found"
+    ];
   }
+  Helper::saveLog('Spearhead  GetBalance', $this->provider_db_id, json_encode($data), $res);
+  return $res;
+}
 
+public function DebitProcess($req){
+  $data = $req;
+  Helper::saveLog('Spearhead  DebitProcess', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
+  $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+  $res = [
+    "accountTransactionId" => "1_d9e108c6-2f21-4731-8ed9-4003ca415353",
+    "currency" => $client_details->default_currency,
+    "balance" => $client_details - $data['amount'],
+    "sessionId" => $client_details->player_token,
+    "bonusMoneyAffected" => 0.0,
+    "realMoneyAffected" => $data['amount'],
+    "apiVersion" => "1.0",
+    "request" => "WalletDebit",
+    "returnCode" => 0,
+    "message" => "success",
+    "details" => null
+  ];
+  Helper::saveLog('Spearhead  DebitProcess', $this->provider_db_id, json_encode($data), $res);
+  return $res;
+}
 
 public function walletApiReq(Request $req){
   $data = $req->all();
@@ -115,6 +136,11 @@ public function walletApiReq(Request $req){
   }
   if($data['Request'] == "GetBalance"){
     return $this->getBalance($req->all());
+  }
+  if($data['Request'] == "WalletDebit"){
+    if($data['TransactionType'] == "Wager"){
+      return $this->DebitProcess($req->all());
+    }
   }
 }
 
