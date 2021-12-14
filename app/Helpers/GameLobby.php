@@ -582,10 +582,18 @@ class GameLobby{
             // } elseif ($client_details->default_currency == "TRY") {
             //     $invite_code = config('providerlinks.tidygaming.try_invite');
             // } 
-            $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
+            // $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
             
-            $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
-            $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+            // $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
+
+            $operator_currency_support_1_1_using_prefix_k = [168,245,247,248,249,250];//client_id
+            $currency = $client_details->default_currency;
+            if (in_array( $client_details->client_id, $operator_currency_support_1_1_using_prefix_k)) {
+               $currency = "k".$client_details->default_currency;
+            }
+            $invite_code = config('providerlinks.tidygaming.currency')[$currency];
+            $get_code_currency = TidyHelper::currencyCode($currency);
+            // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,

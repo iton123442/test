@@ -197,6 +197,12 @@ return [
             'RUB' => '50679e6c',
             'KRW' => 'bdafae9a',
             'IRR' => 'da104cef',
+            'kIDR' => 'b5ebfb6f',
+            'MYR' => '531afbdd',
+            'kVND' => '34f7085a',
+            'KLAK' => '951a128d',
+            'kMMK' => '1d69f90a',
+            'kKHR' => '3d7edfac',
         ],
         'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
         'TransferWallet' => [
