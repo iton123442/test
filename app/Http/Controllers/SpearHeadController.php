@@ -17,26 +17,41 @@ use DateTime;
 class SpearHeadController extends Controller
 {
 
-      public function __construct(){
-        $this->provider_db_id = config('providerlinks.spearhead.provider_db_id');
-        $this->api_url = config('providerlinks.spearhead.api_url');
-        $this->operator =config('providerlinks.spearhead.operator');
-        $this->operator_key = config('providerlinks.spearhead.operator_key');
-        $this->opid= config('providerlinks.spearhead.opid');
-        $this->loginName = config('providerlinks.spearhead.username');
-        $this->password = config('providerlinks.spearhead.password');
-        // $this->$processtime = new DateTime('NOW');
-      }
-
+    public function __construct(){
+      $this->provider_db_id = config('providerlinks.spearhead.provider_db_id');
+      $this->api_url = config('providerlinks.spearhead.api_url');
+      $this->operator =config('providerlinks.spearhead.operator');
+      $this->operator_key = config('providerlinks.spearhead.operator_key');
+      $this->opid= config('providerlinks.spearhead.opid');
+      $this->loginName = config('providerlinks.spearhead.username');
+      $this->password = config('providerlinks.spearhead.password');
+      // $this->$processtime = new DateTime('NOW');
+    }
+    public  function getCountryCode3D($country_code){
+        $countryCode = [
+          'PH' => 'PHL',
+          'US' => 'USD',
+          'TH' => 'THA',
+          'JP' => 'JPN',
+          'KR' => 'KOR'
+        ];
+        if (array_key_exists($country_code, $countryCode)) {
+          return $countryCode[$country_code];
+        } else {
+          return false;
+        }
+    }
    public function getAccount($req){
       $data = $req;
       Helper::saveLog('Spearhead Verification', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
       $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
       if($client_details != null){
+
         if($client_details->country_code == null){
-          $country_code = "PH";
+          $client_details->country_code = "PH";
+          $country_code = $this->getCountryCode3D($client_details->country_code);
         }else{
-          $country_code = $client_details->country_code;
+          $country_code = $this->getCountryCode3D($client_details->country_code);
         }
         $res = [
           "ApiVersion" => "1.0",
