@@ -115,10 +115,10 @@ public function DebitProcess($req){
   $res = [
     "accountTransactionId" => "1_d9e108c6-2f21-4731-8ed9-4003ca415353",
     "currency" => $client_details->default_currency,
-    "balance" => $client_details - $data['amount'],
+    "balance" => $client_details->balance - $data['Amount'],
     "sessionId" => $client_details->player_token,
     "bonusMoneyAffected" => 0.0,
-    "realMoneyAffected" => $data['amount'],
+    "realMoneyAffected" => $data['Amount'],
     "apiVersion" => "1.0",
     "request" => "WalletDebit",
     "returnCode" => 0,
