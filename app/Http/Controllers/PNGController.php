@@ -303,7 +303,7 @@ class PNGController extends Controller
                             "type"=>2, #R
                             "game_id" => $game_details->game_id, #R
                             "player_id" => $client_details->player_id, #R
-                            "mw_response" => $response, #R
+                            "mw_response" => $array_data, #R
                         ],
                         'fundtransferrequest' => [
                             'fundinfo' => [
