@@ -212,19 +212,19 @@ class GameLobby{
         //            config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
         $key = "LUGTPyr6u8sRjCfh";
         $aes = new AES($key);
-        $data = array(
-            'root_url' => config('providerlinks.png.root_url'),
-            'exitUrl' => $exit_url,
-            'ticket' => $token,
-            'game_code' => $game_code,
-            'pid' => $pid,
-            'lang' => $lang,
-            'practice' => config('providerlinks.png.practice'),
-            'channel' => config('providerlinks.png.channel')
-        );
-        $encoded_data = $aes->AESencode(json_encode($data));
-        $urlencode = urlencode(urlencode($encoded_data));
-        $gameurl = 'https://play-test.betrnk.games/api/playngo/load/'.$urlencode;
+        // $data = array(
+        //     'root_url' => config('providerlinks.png.root_url'),
+        //     'exitUrl' => $exit_url,
+        //     'ticket' => $token,
+        //     'game_code' => $game_code,
+        //     'pid' => $pid,
+        //     'lang' => $lang,
+        //     'practice' => config('providerlinks.png.practice'),
+        //     'channel' => config('providerlinks.png.channel')
+        // );
+        // $encoded_data = $aes->AESencode(json_encode($data));
+        // $urlencode = urlencode(urlencode($encoded_data));
+        // $gameurl = 'https://play-test.betrnk.games/api/playngo/load/'.$urlencode;
         return $gameurl;
     }
     public static function edpLaunchUrl($game_code,$token,$provider,$exitUrl){
