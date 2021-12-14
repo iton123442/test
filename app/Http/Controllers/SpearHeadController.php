@@ -122,7 +122,7 @@ public function DebitProcess($req){
     "apiVersion" => "1.0",
     "request" => "WalletDebit",
     "returnCode" => 0,
-    "message" => "success",
+    "message" => "Success",
     "details" => null
   ];
   Helper::saveLog('Spearhead  DebitProcess', $this->provider_db_id, json_encode($data), $res);
