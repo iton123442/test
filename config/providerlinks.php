@@ -377,8 +377,8 @@ return [
     ],
     'manna'=>[
         'PROVIDER_ID' => 16,
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/betrnk/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/betrnk/gameLink/link',
+        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
+        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
         'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
         'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
         'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',

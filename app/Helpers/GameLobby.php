@@ -1213,7 +1213,7 @@ class GameLobby{
             ]);
 
             try {
-                $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL"),
+                $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL").$platform.'/authenticate/auth_token',
                     ['body' => json_encode(
                             [
                                 "id" => $platform,
@@ -1241,7 +1241,7 @@ class GameLobby{
                     ]
                 ]);
 
-            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
+            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL").$platform.'/gameLink/link',
                     ['body' => json_encode(
                             [
                                 "account" => $client_details->player_id,
