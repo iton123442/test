@@ -148,7 +148,7 @@ class PNGController extends Controller
                 $balance = round($client_response->fundtransferresponse->balance,2);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
-                    
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                     $array_data = array(
                         "real" => $balance,
                         "statusCode" => 0,
