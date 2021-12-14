@@ -1188,11 +1188,13 @@ class GameLobby{
         return $url;
     }
 
-    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = ''){
+    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = '', $clientID){
         $client_details = GameLobby::getClientDetails('token', $token);
         $lang = GameLobby::getLanguage("Manna Play", $lang);
         // Authenticate New Token
-
+        $idn_play_client_ids = [251, 252, 253, 254, 255, 257];
+        $platform = (in_array($clientID, $idn_play_client_ids) ? 'idnplay' : 'betrnk');
+        
         try {
              $auth_token = new Client([ // auth_token
                 'headers' => [ 
