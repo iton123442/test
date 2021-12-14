@@ -327,14 +327,24 @@ class PNGController extends Controller
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                     return PNGHelper::arrayToXml($array_data,"<release/>");
-                }
-                else{
+                }elseif (isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "402") {
+                    $array_data = array(
+                        "statusCode" => 7,
+                    );
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
                     $dataToUpdate = array(
                         "mw_response" => "failed",
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
-                    return "something error with the client";
                 }
+                // else{
+                //     $dataToUpdate = array(
+                //         "mw_response" => "failed",
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                //     return "something error with the client";
+                // }
             }
             else{
                 $array_data = array(
