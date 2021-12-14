@@ -334,7 +334,7 @@ class PNGController extends Controller
                     );
                     return PNGHelper::arrayToXml($array_data,"<release/>");
                     $dataToUpdate = array(
-                        "mw_response" => PNGHelper::arrayToXml($array_data,"<release/>"),
+                        "mw_response" => json_encode($array_data),
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }
