@@ -1192,7 +1192,7 @@ class GameLobby{
         $client_details = GameLobby::getClientDetails('token', $token);
         $lang = GameLobby::getLanguage("Manna Play", $lang);
         // Authenticate New Token
-        $idn_play_client_ids = [251, 252, 253, 254, 255, 257];
+        $idn_play_client_ids = [173];
 
         if(in_array($clientID, $idn_play_client_ids)) {
             $platform = 'idnplay';
