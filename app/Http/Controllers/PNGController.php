@@ -314,10 +314,12 @@ class PNGController extends Controller
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
-                    if($win == 0){
-                        $this->updateGameTransaction($game,$json_data,'debit',$client_details);
-                    }else{
-                        $this->updateGameTransaction($game,$json_data,'credit',$client_details);
+                    if($game != 'false'){
+                        if($win == 0){
+                            $this->updateGameTransaction($game,$json_data,'debit',$client_details);
+                        }else{
+                            $this->updateGameTransaction($game,$json_data,'credit',$client_details);
+                        }
                     }
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
@@ -325,10 +327,24 @@ class PNGController extends Controller
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                     return PNGHelper::arrayToXml($array_data,"<release/>");
+                }elseif (isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "402") {
+                    $array_data = array(
+                        "statusCode" => 7,
+                    );
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($array_data),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }
-                else{
-                    return "something error with the client";
-                }
+                // else{
+                //     $dataToUpdate = array(
+                //         "mw_response" => "failed",
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                //     return "something error with the client";
+                // }
             }
             else{
                 $array_data = array(
