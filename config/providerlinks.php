@@ -683,9 +683,8 @@ return [
         'provider_db_id'=> 67,
         'api_url' => 'http://gamelaunch-stage.everymatrix.com/Loader/Start/',
         'operator' => 'TigerGamesUser',
-        'opid'=> 2540,
-        'username' => 'TigerGamesUser',
-        'password' => 'nXxOCeSCh4ko4q6q',
+        'operator_key' => 'nXxOCeSCh4ko4q6q',
+        'opid'=> 2540
     ],
 
 ];
