@@ -60,7 +60,7 @@ class SpearHeadController extends Controller
           "Message" => "User not found"
         ];
       }
-      Helper::saveLog('Spearhead Verification', $this->provider_db_id, json_encode($data), json_encode($res));
+      Helper::saveLog('Spearhead Verification', $this->provider_db_id, json_encode($data), $res);
       return $res;
    }
 
