@@ -499,7 +499,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==38){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
+                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang, $request->client_id), 
                         "game_launch" => true
                     );
                     return response($msg,200)
