@@ -223,7 +223,7 @@ class GameLobby{
         );
         $encoded_data = $aes->AESencode(json_encode($data));
         $urlencode = urlencode(urlencode($encoded_data));
-        $gameurl = 'https://play-test.betrnk.game/api/playngo/load'.$urlencode;
+        $gameurl = 'https://play-test.betrnk.game/api/playngo/load/'.$urlencode;
         return $gameurl;
     }
     public static function edpLaunchUrl($game_code,$token,$provider,$exitUrl){
