@@ -167,6 +167,10 @@ class PNGController extends Controller
                     $array_data = array(
                         "statusCode" => 7,
                     );
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($array_data),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
                 
@@ -262,9 +266,7 @@ class PNGController extends Controller
                     $entry_id = 2;
                     $client_details->connection_name = $game->connection_name;
                     //$json_data["amount"] = round($data["args"]["win"],2)+ $game->pay_amount;
-                    if($win == 5){
-                        $this->updateGameTransaction($game,$json_data,'debit',$client_details);
-                    }
+                   
                     $gametransactionid = $game->game_trans_id;
                     $income = $game->bet_amount - (float)$xmlparser->real;
                 }
@@ -318,7 +320,9 @@ class PNGController extends Controller
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     if($game != 'false'){
-                        if($win != 5){
+                        if($win == 5){
+                            $this->updateGameTransaction($game,$json_data,'debit',$client_details);
+                        }else{
                             $this->updateGameTransaction($game,$json_data,'credit',$client_details);
                         }
                     }
@@ -333,11 +337,11 @@ class PNGController extends Controller
                     $array_data = array(
                         "statusCode" => 7,
                     );
-                    return PNGHelper::arrayToXml($array_data,"<release/>");
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
                 }
                 // else{
                 //     $dataToUpdate = array(
