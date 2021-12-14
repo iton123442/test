@@ -1053,7 +1053,7 @@ class GameLobby{
         endif;  
     }
 
-    private static function icgGameUrl($currency){
+    public static function icgGameUrl($currency){
         $http = new Client();
         $response = $http->get(config("providerlinks.icgaminggames"), [
             'headers' =>[
@@ -1063,7 +1063,7 @@ class GameLobby{
         ]);
         return json_decode((string) $response->getBody(), true);
     }
-    private static function icgConnect($currency){
+    public static function icgConnect($currency){
         $http = new Client();
         switch($currency){
             case "JPY":
