@@ -239,7 +239,7 @@ class NolimitController extends Controller
                                             'message' => 'Server error',
                                             'data' => [
 
-                                                'code' =>14001,
+                                                'code' => 14001,
                                                 'message'=> "Insuficient funds",
                                             ],
                                         ],
@@ -249,7 +249,7 @@ class NolimitController extends Controller
                                     ];
 
                                 $updateTransactionEXt = array(
-                                    "provider_request" =>json_encode($request->all()),
+                                    "provider_request" => json_encode($request->all()),
                                     "mw_response" => json_encode($response),
                                     'mw_request' => json_encode($client_response->requestoclient),
                                     'client_response' => json_encode($client_response->fundtransferresponse),
@@ -260,9 +260,6 @@ class NolimitController extends Controller
                             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                     break;
                             }
-                               
-
-
                         }
                             
                         Helper::saveLog('Nolimit Debit', $this->provider_db_id, json_encode($data), $response);
@@ -278,15 +275,15 @@ class NolimitController extends Controller
                                 ],
                     ]; 
              $updateTransactionEXt = array(
-                                    "provider_request" =>json_encode($request->all()),
-                                    "mw_response" => json_encode($response),
-                                    'mw_request' => json_encode($client_response->requestoclient),
-                                    'client_response' => json_encode($client_response->fundtransferresponse),
-                                    'transaction_detail' => 'failed',
-                                    'general_details' => 'failed',
-                                );
-                                 Helper::saveLog(' failed updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    "provider_request" =>json_encode($request->all()),
+                    "mw_response" => json_encode($response),
+                    'mw_request' => json_encode($client_response->requestoclient),
+                    'client_response' => json_encode($client_response->fundtransferresponse),
+                    'transaction_detail' => 'failed',
+                    'general_details' => 'failed',
+                );
+            Helper::saveLog(' failed updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
             Helper::saveLog('Nolimit bet error', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return json_encode($response, JSON_FORCE_OBJECT); 
         }// End Catch
@@ -542,6 +539,23 @@ class NolimitController extends Controller
              } // End catch error
 
                 $existing_bet = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
+                if($existing_bet->transaction_detail == 'failed'){
+                    $response = array(
+                            "jsonrpc" => '2.0',
+                            "error" => [
+                                'code' => -32000,
+                                "message" => "Server error",
+                                "data" => [
+
+                                    "code" => 14005,
+                                    "message" => "Responsible gaming, bet not allowed.",
+
+                                ],
+                            ],
+                            "id" => $data['id']
+                        );
+                    return $response; 
+                }
                 if($existing_bet != 'false'){
 
                         $client_details->connection_name = $existing_bet->connection_name;
