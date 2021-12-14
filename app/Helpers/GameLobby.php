@@ -1176,13 +1176,22 @@ class GameLobby{
         $lang = GameLobby::getLanguage("Manna Play", $lang);
         // Authenticate New Token
         $idn_play_client_ids = [251, 252, 253, 254, 255, 257];
-        $platform = (in_array($clientID, $idn_play_client_ids) ? 'idnplay' : 'betrnk');
-        
+
+        if(in_array($clientID, $idn_play_client_ids)) {
+            $platform = 'idnplay';
+            $api_key = config("providerlinks.manna.IDN_API_KEY");
+        }
+        else
+        {
+            $platform = 'betrnk';
+            $api_key = config("providerlinks.manna.AUTH_API_KEY");
+        }
+
         try {
              $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => config("providerlinks.manna.AUTH_API_KEY")
+                    'apiKey' => $api_key
                 ]
             ]);
 
@@ -1190,7 +1199,7 @@ class GameLobby{
                 $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL"),
                     ['body' => json_encode(
                             [
-                                "id" => "betrnk",
+                                "id" => $platform,
                                 "account" => $client_details->player_id,
                                 "currency" => $client_details->default_currency,
                                 "sessionId" => $token,
@@ -1210,7 +1219,7 @@ class GameLobby{
             $game_link = new Client([
                     'headers' => [ 
                         'Content-Type' => 'application/json',
-                        'apiKey' => config("providerlinks.manna.AUTH_API_KEY"),
+                        'apiKey' => $api_key,
                         'token' => $auth_result->token
                     ]
                 ]);
