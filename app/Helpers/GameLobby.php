@@ -1173,24 +1173,35 @@ class GameLobby{
         return $url;
     }
 
-    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = ''){
+    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = '', $clientID){
         $client_details = GameLobby::getClientDetails('token', $token);
         $lang = GameLobby::getLanguage("Manna Play", $lang);
         // Authenticate New Token
+        $idn_play_client_ids = [173];
+
+        if(in_array($clientID, $idn_play_client_ids)) {
+            $platform = 'idnplay';
+            $api_key = config("providerlinks.manna.IDN_API_KEY");
+        }
+        else
+        {
+            $platform = 'betrnk';
+            $api_key = config("providerlinks.manna.AUTH_API_KEY");
+        }
 
         try {
              $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => config("providerlinks.manna.AUTH_API_KEY")
+                    'apiKey' => $api_key
                 ]
             ]);
 
             try {
-                $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL"),
+                $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL").$platform.'/authenticate/auth_token',
                     ['body' => json_encode(
                             [
-                                "id" => "betrnk",
+                                "id" => $platform,
                                 "account" => $client_details->player_id,
                                 "currency" => $client_details->default_currency,
                                 "sessionId" => $token,
@@ -1210,12 +1221,12 @@ class GameLobby{
             $game_link = new Client([
                     'headers' => [ 
                         'Content-Type' => 'application/json',
-                        'apiKey' => config("providerlinks.manna.AUTH_API_KEY"),
+                        'apiKey' => $api_key,
                         'token' => $auth_result->token
                     ]
                 ]);
 
-            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
+            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL").$platform.'/gameLink/link',
                     ['body' => json_encode(
                             [
                                 "account" => $client_details->player_id,
