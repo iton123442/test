@@ -54,7 +54,6 @@ class TidyHelper{
 	}
 
 	 public static function currencyCode($currency){
-	 	$currency = strtoupper($currency);
 	 	$code = '';
 	 	switch ($currency) {
 	 		case 'CNY':
