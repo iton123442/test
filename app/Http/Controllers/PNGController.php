@@ -228,7 +228,7 @@ class PNGController extends Controller
 	                );
 	                $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
 
-
+                    $income = 0 - (float)$xmlparser->real;
                     
                     if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
                         $fund_extra_data = [
@@ -256,8 +256,6 @@ class PNGController extends Controller
                                 );
                                 FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                         }
-                        
-                    
                     }
                 }
                 else{
@@ -265,6 +263,7 @@ class PNGController extends Controller
                     $client_details->connection_name = $game->connection_name;
                     //$json_data["amount"] = round($data["args"]["win"],2)+ $game->pay_amount;
                     $gametransactionid = $game->game_trans_id;
+                    $income = $game->bet_amount - (float)$xmlparser->real;
                 }
                 $wingametransactionext = array(
                     "game_trans_id" => $gametransactionid,
