@@ -728,7 +728,7 @@ $app->post('/public/api/quickspin/fs_win', 'QuickspinDirectController@freeRound'
 // SpearHead
 $app->post('/public/api/spearhead/GetAccount', 'SpearHeadController@getAccount');
 $app->post('/public/api/spearhead/GetBalance', 'SpearHeadController@getBalance');
-$app->post('/public/api/spearhead','SpearHeadController@index');
+$app->post('/public/api/spearhead','SpearHeadController@walletApiReq');
 
 //IDNPOKER
 $app->post('/public/api/idnpoker/makeDeposit', 'IDNPokerController@makeDeposit');
