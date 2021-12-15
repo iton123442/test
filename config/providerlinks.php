@@ -690,7 +690,7 @@ return [
     ],
     'spearhead' => [
         'provider_db_id'=> 67,
-        'api_url' => 'http://gamelaunch-stage.everymatrix.com/Loader/Start/',
+        'api_url' => 'https://gamelaunch-stage.everymatrix.com/Loader/Start/',
         'operator' => 'TigerGamesUser',
         'opid'=> 2540,
         'username' => 'TigerGamesUser',
