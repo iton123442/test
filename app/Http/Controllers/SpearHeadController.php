@@ -43,22 +43,48 @@ class SpearHeadController extends Controller
     }
     public function walletApiReq(Request $req){
       $data = $req->all();
-      if($data['Request'] == "GetAccount"){
-        return $this->getAccount($req->all());
+      switch ($data['Request']){
+        case "GetAccount":
+          return $this->getAccount($req->all());
+        break;
+        case "GetBalance":
+          return $this->getBalance($req->all());
+        break;
+        case "WalletDebit":
+          if($data['TransactionType'] == "Wager"){
+            return $this->DebitProcess($req->all());
+          }
+        break;
+        case "WalletCredit":
+          if($data['Request'] == "WalletCredit"){
+            if($data['TransactionType'] == "Result"){
+              return $this->CreditProcess($req->all());
+            }
+            if($data['TransactionType'] == "Rollback"){
+              return $this->RollbackProcess($req->all());
+            }
+          }
+        break;
       }
-      if($data['Request'] == "GetBalance"){
-        return $this->getBalance($req->all());
-      }
-      if($data['Request'] == "WalletDebit"){
-        if($data['TransactionType'] == "Wager"){
-          return $this->DebitProcess($req->all());
-        }
-      }
-      if($data['Request'] == "WalletCredit"){
-        if($data['TransactionType'] == "Result"){
-          return $this->CreditProcess($req->all());
-        }
-      }
+      // if($data['Request'] == "GetAccount"){
+      //   return $this->getAccount($req->all());
+      // }
+      // if($data['Request'] == "GetBalance"){
+      //   return $this->getBalance($req->all());
+      // }
+      // if($data['Request'] == "WalletDebit"){
+      //   if($data['TransactionType'] == "Wager"){
+      //     return $this->DebitProcess($req->all());
+      //   }
+      // }
+      // if($data['Request'] == "WalletCredit"){
+      //   if($data['TransactionType'] == "Result"){
+      //     return $this->CreditProcess($req->all());
+      //   }
+      //   if($data['TransactionType'] == "Rollback"){
+      //     return $this->RollbackProcess($req->all());
+      //   }
+      // }
     }
    public function getAccount($req){
       $data = $req;
@@ -178,9 +204,8 @@ public function DebitProcess($req){
           ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
           switch ($client_response->fundtransferresponse->status->code) {
               case '200':
-              
                 $http_status = 200;
-                $response = [
+                $res = [
                         "AccountTransactionId" => $game_transaction_id,
                         "Currency" => $client_details->default_currency,
                         "Balance" => (float)$client_response->fundtransferresponse->balance,
@@ -193,10 +218,9 @@ public function DebitProcess($req){
                         "Message" => 'Success',
                         "Details" => null,
                 ];
-
                 $updateTransactionEXt = array(
                     "provider_request" =>json_encode($req),
-                    "mw_response" => json_encode($response),
+                    "mw_response" => json_encode($res),
                     'mw_request' => json_encode($client_response->requestoclient),
                     'client_response' => json_encode($client_response->fundtransferresponse),
                     'transaction_detail' => 'success',
@@ -216,7 +240,7 @@ public function DebitProcess($req){
 
               $updateTransactionEXt = array(
                   "provider_request" =>json_encode($req),
-                  "mw_response" => json_encode($response),
+                  "mw_response" => json_encode($res),
                   'mw_request' => json_encode($client_response->requestoclient),
                   'client_response' => json_encode($client_response->fundtransferresponse),
                   'transaction_detail' => 'failed',
@@ -228,8 +252,8 @@ public function DebitProcess($req){
           }
       }
           
-      Helper::saveLog('Spearhead Debit', $this->provider_db_id, json_encode($data), $response);
-      return response()->json($response, $http_status);
+      Helper::saveLog('Spearhead Debit', $this->provider_db_id, json_encode($data), $res);
+      return response()->json($res, $http_status);
 
     }else{
       $res = [
