@@ -261,7 +261,7 @@ if($client_details != null){
   // return $res;
 }//end debit func=======================================================================================
 
-public function DebitProcess($req){
+public function CreditProcess($req){
   $data = $req;
   Helper::saveLog('Spearhead Credit', $this->provider_db_id, json_encode($data), 'ENDPOINT Hit');
   $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
