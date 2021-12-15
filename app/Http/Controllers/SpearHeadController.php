@@ -273,7 +273,7 @@ public function DebitProcess($req){
     "SessionId" => $client_details->player_token,
     "ExternalUserId" => $client_details->player_id,
     "AccountTransactionId" => "321457741",
-    "Balance" => $client_details->balance + $data['Amount'];
+    "Balance" => $client_details->balance + $data['Amount'],
     "Currency" => $client_details->default_currency,
     "Message" => "Success",
     "details" => null
