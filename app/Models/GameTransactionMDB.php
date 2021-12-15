@@ -272,6 +272,8 @@ class GameTransactionMDB
             $where = 'where gt.game_trans_id = '.$identifier;
         } elseif ( $type == "round_id") {
             $where = 'where gt.round_id = "'.$identifier.'" '.$entry_type.'';
+        } elseif ( $type == "token_id") {
+            $where = 'where gt.token_id = "'.$identifier.'" '.$entry_type.'';
         }
         try {
             $connection_name = $client_details->connection_name;
