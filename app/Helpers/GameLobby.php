@@ -208,8 +208,23 @@ class GameLobby{
         $lang = GameLobby::getLanguage("PlayNGo",$lang);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
-        $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
-                   config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+        // $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
+        //            config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+        $key = "LUGTPyr6u8sRjCfh";
+        $aes = new AES($key);
+        $data = array(
+            'root_url' => config('providerlinks.png.root_url'),
+            'exitUrl' => $exit_url,
+            'ticket' => $token,
+            'game_code' => $game_code,
+            'pid' => $pid,
+            'lang' => $lang,
+            'practice' => config('providerlinks.png.practice'),
+            'channel' => config('providerlinks.png.channel')
+        );
+        $encoded_data = $aes->AESencode(json_encode($data));
+        $urlencode = urlencode(urlencode($encoded_data));
+        $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode;
         return $gameurl;
     }
     public static function edpLaunchUrl($game_code,$token,$provider,$exitUrl){
@@ -429,7 +444,8 @@ class GameLobby{
         $url = $exitUrl;
         $domain = parse_url($url, PHP_URL_HOST);
         Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
-        $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
+        // $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
+        $url = config('providerlinks.digitain.api_url').'/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId='.config('providerlinks.digitain.operator_id').'&mainDomain='.$domain.'';
         return $url;
     }
 
