@@ -51,7 +51,7 @@ class IDNPokerController extends Controller
             } 
 
             $msg = array(
-                "status" => "ok",
+                "status" => "error",
                 "message" => "Player Not found",
                 "balance" => "0.00"
             );
