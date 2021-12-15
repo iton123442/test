@@ -56,14 +56,12 @@ class SpearHeadController extends Controller
           }
         break;
         case "WalletCredit":
-          if($data['Request'] == "WalletCredit"){
             if($data['TransactionType'] == "Result"){
               return $this->CreditProcess($req->all());
             }
             if($data['TransactionType'] == "Rollback"){
               return $this->RollbackProcess($req->all());
             }
-          }
         break;
       }
       // if($data['Request'] == "GetAccount"){
@@ -391,24 +389,90 @@ public function CreditProcess($req){
 
     }
   }//end check client details
-
-  // $res = [
-  //     "apiVersion" => "1.0",
-  //     "Request" => "WalletDebit",
-  //     "ReturnCode" => 0,
-  //     "Details" => null,
-  //     "SessionId" => $client_details->player_token,
-  //     "ExternalUserId" => $client_details->player_id,
-  //     "AccountTransactionId" => "321457741",
-  //     "Balance" => $client_details->balance + $data['Amount'],
-  //     "Currency" => $client_details->default_currency,
-  //     "Message" => "Success",
-  //     "details" => null
-  // ];
-  // Helper::saveLog('Spearhead Credit', $this->provider_db_id, json_encode($data), $res);
-  // return $res;
 }//end credit func
 
+
+public function RollbackProcess($req){
+  $data = $req;
+  Helper::saveLog('Spearhead Credit', $this->provider_db_id, json_encode($data), 'ENDPOINT Hit');
+  $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+  $playerId = $data['ExternalUserId'];
+  $rollback_amount = $data['Amount'];
+  $provider_trans_id = $data['TransactionId'];
+  $rollbackTransactionId = $data['RollbackTransactionId'];
+  $game_code = $data['AdditionalData']['GameSlug'];
+  $round_id = $data['RoundId'];
+  if($client_details != null){
+    try{
+      ProviderHelper::idenpotencyTable($provider_trans_id);
+    }catch(\Exception $e){
+      $res = [
+        "ApiVersion"=>"1.0",
+        "Request" =>"WalletDebit",
+        "ReturnCode" => 107,
+        "Message" => "Transaction is processing"
+    ];
+        return $res;
+    }
+    $game_details = Game::find($game_code, $this->provider_db_id);
+    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollbackTransactionId,'transaction_id', false, $client_details);
+    $client_details->connection_name = $bet_transaction->connection_name;
+    $income = $bet_transaction->bet_amount - $rollback_amount;
+    $NewBalance = $client_details->balance + $rollback_amount;
+    $win_or_lost = 4;
+    $entry_id = 2;
+    $updateGameTransaction = [
+        'win' => $win_or_lost,
+        'pay_amount' => $rollback_amount,
+        'income' => $income,
+        'entry_id' => $entry_id,
+        'trans_status' => 3
+    ];
+    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+    $gameTransactionEXTData = array(
+        "game_trans_id" => $bet_transaction->game_trans_id,
+        "provider_trans_id" => $provider_trans_id,
+        "round_id" => $round_id,
+        "amount" => $rollback_amount,
+        "game_transaction_type"=> 3,
+        "provider_request" =>json_encode($req),
+        "mw_response" => null,
+    );
+    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+    $client_response = ClientRequestHelper::fundTransfer($client_details, $rollback_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $bet_transaction->game_trans_id, 'credit', "true");
+    if (isset($client_response->fundtransferresponse->status->code)) {
+                            
+            switch ($client_response->fundtransferresponse->status->code) {
+                case '200':
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                     $res = [
+                        "ApiVersion" => "1.0",
+                        "Request" => "WalletCredit",
+                        "ReturnCode" => 0,
+                        "Details" => null,
+                        "SessionId" => $client_details->player_token,
+                        "ExternalUserId" => $client_details->player_id,
+                        "AccountTransactionId" => $bet_transaction->game_trans_id,
+                        "Balance" => $client_response->fundtransferresponse->balance,
+                        "Currency" => $client_details->default_currency,
+                        "Message" => "Success"
+                    ];
+                return $res;
+            }
+
+            $updateTransactionEXt = array(
+                "provider_request" =>json_encode($req),
+                "mw_response" => json_encode($res),
+                'mw_request' => json_encode($client_response->requestoclient),
+                'client_response' => json_encode($client_response->fundtransferresponse),
+                'transaction_detail' => 'success',
+                'general_details' => 'success',
+            );
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+
+        }
+  }//end check player details
+}//end rollback func
 //   public function index(Request $req){
 //     Helper::saveLog('Spearhead  index', $this->provider_db_id, json_encode($req->all()), 'ENDPOINT HIT');
 //     $TransactionType = req['TransactionType'];
