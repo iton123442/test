@@ -444,7 +444,8 @@ class GameLobby{
         $url = $exitUrl;
         $domain = parse_url($url, PHP_URL_HOST);
         Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
-        $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
+        // $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
+        $url = config('providerlinks.digitain.api_url').'/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId='.config('providerlinks.digitain.operator_id').'&mainDomain='.$domain.'';
         return $url;
     }
 

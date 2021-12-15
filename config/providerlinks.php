@@ -221,6 +221,7 @@ return [
         'merchant_password' => 'LmJfpioowcD8gspb',
     ],
     'digitain' => [
+        'api_url' => 'https://launchdigi.stgdigitain.com', 
         'provider_db_id' => 14, // Database ID nothing todo with the provider!
         'provider_and_sub_name' => 'Digitain', // Nothing todo with the provider
         'digitain_key' => 'BetRNK3184223',
