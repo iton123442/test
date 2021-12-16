@@ -575,11 +575,11 @@ return [
         ],
         '15' => [// EveryMatrix
             'operator' =>'BETRNK ',
-            'operator_key' => 'TG_DEV'
+            'operator_key' => 'TG_DEV',
         ],
         '1' => [// TigerGames
             'operator' =>'BETRNK ',
-            'operator_key' => 'TG_DEV'
+            'operator_key' => 'TG_DEV',
         ],
     ],
     'bgaming' => [
