@@ -575,7 +575,7 @@ return [
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
         'operator' =>'TG_DEV',
-        'operator_key' => 'on2ha5xie7Hu'
+        'operator_key' => 'on2ha5xie7Hu',
         '20' => [// APLUS
             'operator' =>'ELDOAH_CUR ',
             'operator_key' => 'TG_DEV'
