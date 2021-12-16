@@ -123,16 +123,20 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $url = config('providerlinks.playstar.api_url').'/launch/?host_id='.config('providerlinks.playstar.host_id')[$client_details->default_currency].'&game_id='.$data['game_code'].'&lang=en-US&access_token='.$data['token'];
         return $url;
-
-    
-
     }
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
+        $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+        if($client_details->operator_id == '20'){
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }else if ($client_details->operator_id == '15'){
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }else{ // TigerGames
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }
         $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
-         
         } catch (\Exception $e) {
 
             Helper::saveLog('Nolimit Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
