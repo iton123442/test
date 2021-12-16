@@ -569,6 +569,18 @@ return [
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
         'operator' =>'TG_DEV',
         'operator_key' => 'on2ha5xie7Hu'
+        '20' => [// APLUS
+            'operator' =>'ELDOAH_CUR ',
+            'operator_key' => 'on2ha5xie7Hu'
+        ],
+        '15' => [// EveryMatrix
+            'operator' =>'BETRNK ',
+            'operator_key' => 'on2ha5xie7Hu'
+        ],
+        '1' => [// TigerGames
+            'operator' =>'BETRNK ',
+            'operator_key' => 'on2ha5xie7Hu'
+        ],
     ],
     'bgaming' => [
          'PROVIDER_ID'=> 49,

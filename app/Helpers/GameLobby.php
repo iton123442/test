@@ -130,9 +130,16 @@ class GameLobby{
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
+        $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+        if($client_details->operator_id == '20'){
+            $operator = config("providerlinks.nolimit.20.operator");
+        }else if ($client_details->operator_id == '15'){
+            $operator = config("providerlinks.nolimit.15.operator");
+        }else{ // TigerGames
+            $operator = config("providerlinks.nolimit.15.operator");
+        }
         $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
-         
         } catch (\Exception $e) {
 
             Helper::saveLog('Nolimit Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
