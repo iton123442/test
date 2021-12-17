@@ -713,3 +713,7 @@ $app->post('/public/api/crashgame/credit', 'CrashGameController@Credit');
 $app->post('/public/api/crashgame/refund', 'CrashGameController@Refund');
 $app->post('/public/api/crashgame/cancel', 'CrashGameController@Cancel');
 
+// PLAYER OPERATOR DETAILS
+$app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
+    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+});
