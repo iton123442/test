@@ -584,6 +584,10 @@ class GameLobby{
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $client_response);
             return $client_response->url;
+            // return $client_response->link;
+            // $url = 'https://dev.crashbetrnk.com/?session_id=y0ce41415db035cf889d6953ce18ef26';
+            $url = 'https://dev.crashbetrnk.com/?session_id='.$token;
+            return $url;
         }catch(\Exception $e){
             ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage().' '.$e->getLine());
             return false;
@@ -625,11 +629,7 @@ class GameLobby{
             );
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             ProviderHelper::saveLogGameLaunch('Tidy Gameluanch 102', 23, json_encode($requesttosend), $client_response);
-            // return $client_response->link;
-            // $url = 'https://dev.crashbetrnk.com/?session_id=y0ce41415db035cf889d6953ce18ef26';
-            $url = 'https://dev.crashbetrnk.com/?session_id='.$token;
-            return $url;
-
+            return $client_response->link;
         }catch(\Exception $e){
             $requesttosend = [
                 'error' => 1010
