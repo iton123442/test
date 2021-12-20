@@ -562,7 +562,7 @@ class GameLobby{
 
     public static function CrashGaming($data){
         try{
-            $url = 'https://dev.crashbetrnk.com/gamelaunch';// config('providerlinks.tidygaming.url_lunch');
+            $url = 'https://dev.crashbetrnk.com/gamelaunch?authtoken=HtVTkjRFi87fIF7QgixJPYx1lNkBBpkD';
             $client_details = Providerhelper::getClientDetails('token', $data['token']);
             $requesttosend = [
                 'session_id' =>  $client_details->player_token,
