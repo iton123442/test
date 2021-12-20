@@ -569,7 +569,7 @@ class GameLobby{
                 'user_id' => (string)$client_details->player_id,
                 'user_name' => (string)$client_details->player_id,
                 'currency_code' => $client_details->default_currency,
-                'balance' => $client_details->balance,
+                'balance' => (int)$client_details->balance,
                 'uuid' => $client_details->player_token,
                 'exit_url' => isset($data['exitUrl']) ? $data['exitUrl'] : ""
             ];
