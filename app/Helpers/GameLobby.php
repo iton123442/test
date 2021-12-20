@@ -585,7 +585,7 @@ class GameLobby{
             ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $client_response);
             return $client_response->url;
         }catch(\Exception $e){
-            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage() $e->getLine());
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage().' '.$e->getLine());
             return false;
         }
     }
