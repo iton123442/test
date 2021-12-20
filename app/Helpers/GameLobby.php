@@ -583,9 +583,9 @@ class GameLobby{
             );
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $client_response);
-            return $client_response->link;
+            return $client_response->url;
         }catch(\Exception $e){
-            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage() $e->getLine());
             return false;
         }
     }
