@@ -123,16 +123,20 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $url = config('providerlinks.playstar.api_url').'/launch/?host_id='.config('providerlinks.playstar.host_id')[$client_details->default_currency].'&game_id='.$data['game_code'].'&lang=en-US&access_token='.$data['token'];
         return $url;
-
-    
-
     }
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
+        $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+        if($client_details->operator_id == '20'){
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }else if ($client_details->operator_id == '15'){
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }else{ // TigerGames
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }
         $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
-         
         } catch (\Exception $e) {
 
             Helper::saveLog('Nolimit Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
@@ -208,8 +212,23 @@ class GameLobby{
         $lang = GameLobby::getLanguage("PlayNGo",$lang);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
-        $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
-                   config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+        // $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
+        //            config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+        $key = "LUGTPyr6u8sRjCfh";
+        $aes = new AES($key);
+        $data = array(
+            'root_url' => config('providerlinks.png.root_url'),
+            'exitUrl' => $exit_url,
+            'ticket' => $token,
+            'game_code' => $game_code,
+            'pid' => $pid,
+            'lang' => $lang,
+            'practice' => config('providerlinks.png.practice'),
+            'channel' => config('providerlinks.png.channel')
+        );
+        $encoded_data = $aes->AESencode(json_encode($data));
+        $urlencode = urlencode(urlencode($encoded_data));
+        $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode;
         return $gameurl;
     }
     public static function edpLaunchUrl($game_code,$token,$provider,$exitUrl){
@@ -429,7 +448,8 @@ class GameLobby{
         $url = $exitUrl;
         $domain = parse_url($url, PHP_URL_HOST);
         Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
-        $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
+        // $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
+        $url = config('providerlinks.digitain.api_url').'/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId='.config('providerlinks.digitain.operator_id').'&mainDomain='.$domain.'';
         return $url;
     }
 
@@ -542,30 +562,34 @@ class GameLobby{
 
     public static function CrashGaming($data){
         try{
-            $url = 'https://dev.crashbetrnk.com/gamelaunch';// config('providerlinks.tidygaming.url_lunch');
+            $url = 'https://dev.crashbetrnk.com/gamelaunch?authtoken='.config('providerlinks.crashgaming.authToken');
             $client_details = Providerhelper::getClientDetails('token', $data['token']);
             $requesttosend = [
                 'session_id' =>  $client_details->player_token,
-                'user_id' => $client_details->player_id,
-                'user_name' => $client_details->player_id,
-                'currencycode' => $client_details->default_currency,
-                'balance' => $client_details->balance,
+                'user_id' => (string)$client_details->player_id,
+                'user_name' => (string)$client_details->player_id,
+                'currency_code' => $client_details->default_currency,
+                'balance' => (int)$client_details->balance,
                 'uuid' => $client_details->player_token,
                 'exit_url' => isset($data['exitUrl']) ? $data['exitUrl'] : ""
             ];
             $client = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'AuthToken' => config('providerlinks.crashgaming.authToken')
+                    'Authorization' => 'Bearer '.config('providerlinks.crashgaming.authToken')
                 ]
             ]);
             $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
             );
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $client_response);
-            return $client_response->link;
+            return $client_response->url;
+            // return $client_response->link;
+            // $url = 'https://dev.crashbetrnk.com/?session_id=y0ce41415db035cf889d6953ce18ef26';
+            // $url = 'https://dev.crashbetrnk.com/?session_id='.$client_details->player_token;
+            return $url;
         }catch(\Exception $e){
-            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage().' '.$e->getLine());
             return false;
         }
     }
@@ -575,17 +599,23 @@ class GameLobby{
         try{
             $url = config('providerlinks.tidygaming.url_lunch');
             $client_details = Providerhelper::getClientDetails('token', $token);
-
             // $invite_code = config('providerlinks.tidygaming.usd_invite');
             // if ($client_details->default_currency == "THB" ) {
             //     $invite_code = config('providerlinks.tidygaming.thb_invite');
             // } elseif ($client_details->default_currency == "TRY") {
             //     $invite_code = config('providerlinks.tidygaming.try_invite');
             // } 
-            $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
+            // $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
             
-            $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
-            $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+            // $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
+            $operator_currency_support_1_1_using_prefix_k = [168,245,247,248,249,250];//THIS CLIENT_ID ARE USING THE ONT TO ONE BET AMOUNT 
+            $currency = $client_details->default_currency;
+            if (in_array( $client_details->client_id, $operator_currency_support_1_1_using_prefix_k)) {
+               $currency = "k".$client_details->default_currency;
+            }
+            $invite_code = config('providerlinks.tidygaming.currency')[$currency];
+            $get_code_currency = TidyHelper::currencyCode($currency);
+            // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,
@@ -1053,7 +1083,7 @@ class GameLobby{
         endif;  
     }
 
-    private static function icgGameUrl($currency){
+    public static function icgGameUrl($currency){
         $http = new Client();
         $response = $http->get(config("providerlinks.icgaminggames"), [
             'headers' =>[
@@ -1063,7 +1093,7 @@ class GameLobby{
         ]);
         return json_decode((string) $response->getBody(), true);
     }
-    private static function icgConnect($currency){
+    public static function icgConnect($currency){
         $http = new Client();
         switch($currency){
             case "JPY":
@@ -1167,24 +1197,35 @@ class GameLobby{
         return $url;
     }
 
-    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = ''){
+    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = '', $clientID){
         $client_details = GameLobby::getClientDetails('token', $token);
         $lang = GameLobby::getLanguage("Manna Play", $lang);
         // Authenticate New Token
+        $idn_play_client_ids = [173];
+
+        if(in_array($clientID, $idn_play_client_ids)) {
+            $platform = 'idnplay';
+            $api_key = config("providerlinks.manna.IDN_API_KEY");
+        }
+        else
+        {
+            $platform = 'betrnk';
+            $api_key = config("providerlinks.manna.AUTH_API_KEY");
+        }
 
         try {
              $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => config("providerlinks.manna.AUTH_API_KEY")
+                    'apiKey' => $api_key
                 ]
             ]);
 
             try {
-                $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL"),
+                $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL").$platform.'/authenticate/auth_token',
                     ['body' => json_encode(
                             [
-                                "id" => "betrnk",
+                                "id" => $platform,
                                 "account" => $client_details->player_id,
                                 "currency" => $client_details->default_currency,
                                 "sessionId" => $token,
@@ -1204,12 +1245,12 @@ class GameLobby{
             $game_link = new Client([
                     'headers' => [ 
                         'Content-Type' => 'application/json',
-                        'apiKey' => config("providerlinks.manna.AUTH_API_KEY"),
+                        'apiKey' => $api_key,
                         'token' => $auth_result->token
                     ]
                 ]);
 
-            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
+            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL").$platform.'/gameLink/link',
                     ['body' => json_encode(
                             [
                                 "account" => $client_details->player_id,
@@ -1350,6 +1391,47 @@ class GameLobby{
 
         return $request_data['exitUrl'];    
     }
+
+    public static function MancalaLaunchUrl($request_data) {
+        $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
+
+        $game_launch = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+        
+        $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
+
+        $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
+                ['body' => json_encode(
+                        [
+                            "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
+                            "GameId" => $request_data['game_code'],
+                            "UserId" => $client_details->player_id,
+                            "Currency" => $client_details->default_currency,
+                            "Lang" => "EN",
+                            "ClientType" => 1,
+                            "IsVirtual" => false,
+                            "Hash" => $hash,
+                            "DemoMode" => false,
+                            "ExtraData" => "data"
+                        ]
+                )]
+            );
+
+        $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
+
+        if($game_launch_url !== NULL) {
+            
+            Helper::playerGameRoundUuid($request_data["game_code"], $request_data["token"], $request_data["game_provider"], $game_launch_url->Token);
+            
+            return $game_launch_url->IframeUrl."&backurl=".$request_data['exitUrl'];  
+        }
+        
+        return $request_data['exitUrl'];     
+    }
+
 
     public static function aoyamaLaunchUrl($game_code,$token,$exitUrl){
         /*$client_details = GameLobby::getClientDetails('token', $token);*/
@@ -1843,8 +1925,7 @@ class GameLobby{
 
     public static function SpearHeadGameLaunch($data, $device){
         Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
-        //$gameUrl = config("providerlinks.speahead.spearhead.api_url").config("providerlinks.spearhead.X-Tenant-ID")."?language=en&funMode=False&_sid64=".$data['token']."&casinolobbyurl=".$data['exitUrl'];
-        $gameUrl = "https://gamelaunch.everymatrix.com/Loader/Start/2540/zeus-1000?language=en&funMode=False&_sid64=".$data['token']."";
+        $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&casinolobbyurl=".$data['exitUrl']."&_sid=".$data['token'];
         Helper::saveLog('SpearHeadGameLaunch2 ', 67, json_encode($data),$gameUrl);
         return $gameUrl;
     }

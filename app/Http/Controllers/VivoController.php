@@ -93,7 +93,7 @@ class VivoController extends Controller
 			
 		}
 
-		Helper::errorDebug('vivo_authentication', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
+		/*Helper::errorDebug('vivo_authentication', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);*/
 		echo $response;
 	}
 
@@ -481,7 +481,7 @@ class VivoController extends Controller
 
 		}
 
-		Helper::errorDebug('vivo_status', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
+		/*Helper::errorDebug('vivo_status', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);*/
 		echo $response;
 
 	}
@@ -541,7 +541,7 @@ class VivoController extends Controller
 			}
 		}
 
-		Helper::errorDebug('vivo_balance', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
+		/*Helper::errorDebug('vivo_balance', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);*/
 		echo $response;
 
 	}

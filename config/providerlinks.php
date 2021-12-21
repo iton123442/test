@@ -23,6 +23,7 @@ return [
         'password' => '_^+T3chSu4rt+^_',
         'grant_type' => 'password',
     ],
+    'icgamingapi' => 'https://admin-stage.iconic-gaming.com/service',
     'icgaminglogin' => 'https://admin-stage.iconic-gaming.com/service/login',
     'icgaminggames' => 'https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
     'icgagents'=>[
@@ -196,6 +197,12 @@ return [
             'RUB' => '50679e6c',
             'KRW' => 'bdafae9a',
             'IRR' => 'da104cef',
+            'kIDR' => 'b5ebfb6f',
+            'MYR' => '531afbdd',
+            'kVND' => '34f7085a',
+            'KLAK' => '951a128d',
+            'kMMK' => '1d69f90a',
+            'kKHR' => '3d7edfac',
         ],
         'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
         'TransferWallet' => [
@@ -220,6 +227,7 @@ return [
         'merchant_password' => 'LmJfpioowcD8gspb',
     ],
     'digitain' => [
+        'api_url' => 'https://launchdigi.stgdigitain.com', 
         'provider_db_id' => 14, // Database ID nothing todo with the provider!
         'provider_and_sub_name' => 'Digitain', // Nothing todo with the provider
         'digitain_key' => 'BetRNK3184223',
@@ -370,11 +378,12 @@ return [
     ],
     'manna'=>[
         'PROVIDER_ID' => 16,
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/betrnk/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/betrnk/gameLink/link',
+        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
+        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
         'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
         'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP'
+        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+        'IDN_API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
     ],
     'solid'=>[
         'PROVIDER_ID' => 1,
@@ -566,7 +575,19 @@ return [
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
         'operator' =>'TG_DEV',
-        'operator_key' => 'on2ha5xie7Hu'
+        'operator_key' => 'on2ha5xie7Hu',
+        '20' => [// APLUS
+            'operator' =>'ELDOAH_CUR ',
+            'operator_key' => 'TG_DEV'
+        ],
+        '15' => [// EveryMatrix
+            'operator' =>'BETRNK ',
+            'operator_key' => 'TG_DEV',
+        ],
+        '1' => [// TigerGames
+            'operator' =>'BETRNK ',
+            'operator_key' => 'TG_DEV',
+        ],
     ],
     'bgaming' => [
          'PROVIDER_ID'=> 49,
@@ -681,10 +702,11 @@ return [
     ],
     'spearhead' => [
         'provider_db_id'=> 67,
-        'api_url' => 'https://gamelaunch.everymatrix.com/Loader/Start/',
+        'api_url' => 'https://gamelaunch-stage.everymatrix.com/Loader/Start/',
         'operator' => 'TigerGamesUser',
-        'operator_key' => 'nXxOCeSCh4ko4q6q',
-        'X-Tenant-ID'=> 2540
+        'opid'=> 2540,
+        'username' => 'TigerGamesUser',
+        'password' => 'nXxOCeSCh4ko4q6q',
     ],
 
 ];

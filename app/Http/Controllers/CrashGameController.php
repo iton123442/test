@@ -30,6 +30,7 @@ class CrashGameController extends Controller
     }
 
 	public function Balance(Request $request){
+        ProviderHelper::saveLogWithExeption('CG Balance - EH', $this->provider_db_id, $request->getContent(), 'ENDPOINT HIT');
         $request_body = $request->getContent();
         $data = json_decode($request_body);
 
@@ -50,6 +51,7 @@ class CrashGameController extends Controller
 	}
 
 	public function Debit(Request $request){
+        ProviderHelper::saveLogWithExeption('CG Debit - EH', $this->provider_db_id, $request->getContent(), 'ENDPOINT HIT');
         $request_body = $request->getContent();
         $data = json_decode($request_body);
 
@@ -201,6 +203,7 @@ class CrashGameController extends Controller
 
 
     public function Credit(Request $request){
+        ProviderHelper::saveLogWithExeption('CG Credit - EH', $this->provider_db_id, $request->getContent(), 'ENDPOINT HIT');
         $request_body = $request->getContent();
         $data = json_decode($request_body);
 
@@ -313,6 +316,7 @@ class CrashGameController extends Controller
 
 
     public function Refund(Request $request){
+        ProviderHelper::saveLogWithExeption('CG Refund - EH', $this->provider_db_id, $request->getContent(), 'ENDPOINT HIT');
         $request_body = $request->getContent();
         $data = json_decode($request_body);
 
@@ -426,6 +430,7 @@ class CrashGameController extends Controller
     }
 
     public function Cancel(Request $request){
+        ProviderHelper::saveLogWithExeption('CG Cancel - EH', $this->provider_db_id, $request->getContent(), 'ENDPOINT HIT');
         $request_body = $request->getContent();
         $data = json_decode($request_body);
 

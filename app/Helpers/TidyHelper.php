@@ -54,7 +54,6 @@ class TidyHelper{
 	}
 
 	 public static function currencyCode($currency){
-	 	$currency = strtoupper($currency);
 	 	$code = '';
 	 	switch ($currency) {
 	 		case 'CNY':
@@ -165,6 +164,22 @@ class TidyHelper{
 	 		case 'IRR':
 	 			$code = '364';
 	 			break;
+			case 'kVND':
+	 			$code = '10002';
+	 			break;
+			case 'kIDR':
+	 			$code = '10003';
+	 			break;
+			case 'kMMK':
+				$code = '10011';
+				break;
+			case 'kKHR':
+				$code = '10012';
+				break;
+			case 'kLAK':
+				$code = '10013';
+				break;
+
 	 	}
 
 	 	return $code;

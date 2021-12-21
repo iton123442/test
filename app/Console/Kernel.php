@@ -16,7 +16,8 @@ class Kernel extends ConsoleKernel
         //
         'App\Console\Commands\AlCron',        
         'App\Console\Commands\riandraft',
-        'App\Console\Commands\UpdateCurrency',        
+        'App\Console\Commands\UpdateCurrency',    
+        'App\Console\Commands\TransferWallet',           
     ];
 
     /**
@@ -31,6 +32,6 @@ class Kernel extends ConsoleKernel
         // $schedule->command('al:cron')->everyMinute();
         // $schedule->call('App\Http\Controllers\IAESportsController@GG')->everyMinute();
         // $schedule->call('App\Http\Controllers\IAESportsController@SettleRounds')->everyThirtyMinutes();
-        $schedule->call('App\Http\Controllers\IAESportsController@SettleRounds');
+        // $schedule->call('App\Http\Controllers\IAESportsController@SettleRounds');
     }
 }

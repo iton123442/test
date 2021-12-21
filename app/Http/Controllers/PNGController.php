@@ -53,7 +53,7 @@ class PNGController extends Controller
                     "statusCode" => 0,
                     "statusMessage" => "ok",
                     "userCurrency" => $client_details->default_currency,
-                    "country" => "SE",
+                    "country" => isset($client_details->country_code) ? $client_details->country_code : 'TH',
                     "birthdate"=> "1990-04-29",
                     "externalGameSessionId" => $xmlparser->username,
                     "real"=> number_format($client_response->playerdetailsresponse->balance,2,'.', ''),
@@ -109,18 +109,18 @@ class PNGController extends Controller
                 $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
                 // $game = Helper::getGameTransaction($xmlparser->externalGameSessionId,$xmlparser->roundId);
                 if($game == 'false'){
-                	$gameTransactionData = array(
-	                    "provider_trans_id" => $xmlparser->transactionId,
-	                    "token_id" => $client_details->token_id,
-	                    "game_id" => $game_details->game_id,
-	                    "round_id" => $xmlparser->roundId,
-	                    "bet_amount" => (float)$xmlparser->real,
-	                    "pay_amount" =>0,
-	                    "income" => 0,
-	                    "win" => 5,
-	                    "entry_id" =>1,
-	                );
-	                $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                    $gameTransactionData = array(
+                        "provider_trans_id" => $xmlparser->transactionId,
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $game_details->game_id,
+                        "round_id" => $xmlparser->roundId,
+                        "bet_amount" => (float)$xmlparser->real,
+                        "pay_amount" =>0,
+                        "income" => 0,
+                        "win" => 5,
+                        "entry_id" =>1,
+                    );
+                    $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
 
                     // $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
                 }
@@ -131,30 +131,30 @@ class PNGController extends Controller
                     $gametransactionid = $game->game_trans_id;
                 }
                 $wingametransactionext = array(
-	                "game_trans_id" => $gametransactionid,
-	                "provider_trans_id" => $xmlparser->transactionId,
-	                "round_id" =>$xmlparser->roundId,
-	                "amount" =>(float)$xmlparser->real,
-	                "game_transaction_type"=>1,
-	                "provider_request" => json_encode($xmlparser),
-	                "mw_response" => 'null'
-	            );
-	            $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                    "game_trans_id" => $gametransactionid,
+                    "provider_trans_id" => $xmlparser->transactionId,
+                    "round_id" =>$xmlparser->roundId,
+                    "amount" =>(float)$xmlparser->real,
+                    "game_transaction_type"=>1,
+                    "provider_request" => json_encode($xmlparser),
+                    "mw_response" => 'null'
+                );
+                $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
-                $balance = round($client_response->fundtransferresponse->balance,2);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
-                    
+                    $balance = round($client_response->fundtransferresponse->balance,2);
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                     $array_data = array(
                         "real" => $balance,
                         "statusCode" => 0,
                     );
                     
                     $dataToUpdate = array(
-                    	"mw_response" => json_encode($array_data),
-	                );
-	                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                        "mw_response" => json_encode($array_data),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                     
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
@@ -164,6 +164,11 @@ class PNGController extends Controller
                     $array_data = array(
                         "statusCode" => 7,
                     );
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($array_data),
+                        "client_response" => json_encode($client_response)
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
                 
@@ -212,19 +217,20 @@ class PNGController extends Controller
                 $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
                 $fund_extra_data = [];
                 if($game == 'false'){
+                    $entry_id = 1;
                     $gameTransactionData = array(
-	                    "provider_trans_id" => $xmlparser->transactionId,
+                        "provider_trans_id" => $xmlparser->transactionId,
                         "token_id" => $client_details->token_id,
-	                    "game_id" => $game_details->game_id,
-	                    "round_id" => $xmlparser->roundId,
+                        "game_id" => $game_details->game_id,
+                        "round_id" => $xmlparser->roundId,
                         "bet_amount" => 0,
-	                    "pay_amount" => (float)$xmlparser->real,
-	                    "income" => 0,
-	                    "win" => $win,
-	                );
-	                $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                        "pay_amount" => (float)$xmlparser->real,
+                        "income" => 0,
+                        "win" => 5,
+                    );
+                    $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
 
-
+                    $income = 0 - (float)$xmlparser->real;
                     
                     if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
                         $fund_extra_data = [
@@ -252,19 +258,15 @@ class PNGController extends Controller
                                 );
                                 FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                         }
-                        
-                    
                     }
                 }
                 else{
+                    $entry_id = 2;
                     $client_details->connection_name = $game->connection_name;
                     //$json_data["amount"] = round($data["args"]["win"],2)+ $game->pay_amount;
-                    if($win == 5){
-                        $this->updateGameTransaction($game,$json_data,'debit',$client_details);
-                    }else{
-                        $this->updateGameTransaction($game,$json_data,'credit',$client_details);
-                    }
+                   
                     $gametransactionid = $game->game_trans_id;
+                    $income = $game->bet_amount - (float)$xmlparser->real;
                 }
                 $wingametransactionext = array(
                     "game_trans_id" => $gametransactionid,
@@ -277,24 +279,75 @@ class PNGController extends Controller
                 );
                 $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                 // $transactionId = PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,2);
-                $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit","false",$fund_extra_data); 
-                $balance = round($client_response->fundtransferresponse->balance,2);
+                $balance = round($client_details->balance,2) + (float)$xmlparser->real;
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+                $array_data = array(
+                    "real" => $balance,
+                    "statusCode" => 0,
+                );
+                $action_payload = [
+                        "type" => "custom", #genreral,custom :D # REQUIRED!
+                        "custom" => [
+                            "provider" => 'PlayNGo',
+                            "client_connection_name" => $client_details->connection_name,
+                            "win_or_lost" => $win,
+                            "entry_id" => $entry_id,
+                            "pay_amount" => (float)$xmlparser->real,
+                            "income" => $income,
+                            "game_trans_ext_id" => $transactionId
+                        ],
+                        "provider" => [
+                            "provider_request" => $xmlparser, #R
+                            "provider_trans_id"=> $xmlparser->transactionId, #R
+                            "provider_round_id"=> $xmlparser->roundId, #R
+                        ],
+                        "mwapi" => [
+                            "roundId"=>$gametransactionid, #R
+                            "type"=>2, #R
+                            "game_id" => $game_details->game_id, #R
+                            "player_id" => $client_details->player_id, #R
+                            "mw_response" => $array_data, #R
+                        ],
+                        'fundtransferrequest' => [
+                            'fundinfo' => [
+                                'freespin' => false,
+                            ]
+                        ]
+                ];
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
-                    $array_data = array(
-                        "real" => $balance,
-                        "statusCode" => 0,
-                    );
+                    if($game != 'false'){
+                        if($win == 5){
+                            $this->updateGameTransaction($game,$json_data,'debit',$client_details);
+                        }else{
+                            $this->updateGameTransaction($game,$json_data,'credit',$client_details);
+                        }
+                    }
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                     return PNGHelper::arrayToXml($array_data,"<release/>");
+                }elseif (isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "402") {
+                    $array_data = array(
+                        "statusCode" => 7,
+                    );
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($array_data),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
                 }
-                else{
-                    return "something error with the client";
-                }
+                // else{
+                //     $dataToUpdate = array(
+                //         "mw_response" => "failed",
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                //     return "something error with the client";
+                // }
             }
             else{
                 $array_data = array(
@@ -307,13 +360,14 @@ class PNGController extends Controller
     public function balance(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
-        $accessToken = "secrettoken";
-        if($accessToken != $xmlparser->accessToken){
-            $array_data = array(
-                "statusCode" => 4,
-            );
-            return PNGHelper::arrayToXml($array_data,"<balance/>");
-        }
+        Helper::saveLog('PNG balance MDB', 50,json_encode($xmlparser), 'endpoint hit');
+        // $accessToken = "secrettoken";
+        // if($accessToken != $xmlparser->accessToken){
+        //     $array_data = array(
+        //         "statusCode" => 4,
+        //     );
+        //     return PNGHelper::arrayToXml($array_data,"<balance/>");
+        // }
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
             if($client_details){
