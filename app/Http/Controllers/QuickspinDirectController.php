@@ -323,8 +323,8 @@ class QuickspinDirectController extends Controller
               "mw_response" => json_encode($res),
               'mw_request' => json_encode($client_response->requestoclient),
               'client_response' => json_encode($client_response->fundtransferresponse),
-              'transaction_detail' => 'Failed',
-              'general_details' => 'Failed',
+              'transaction_detail' => 'success',
+              'general_details' => 'success',
         );
         GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
       Helper::saveLog('QuickSpinD Win success', config('providerlinks.quickspinDirect.provider_db_id'), json_encode($req->all()), $res);
@@ -336,6 +336,15 @@ class QuickspinDirectController extends Controller
             "errorcode" => "UNHANDLED",
             "errormessage" => "internal server error"
         ];
+        $updateTransactionEXt = array(
+              "provider_request" =>json_encode($req->all()),
+              "mw_response" => json_encode($res),
+              'mw_request' => json_encode($client_response->requestoclient),
+              'client_response' => json_encode($client_response->fundtransferresponse),
+              'transaction_detail' => json_encode($res),
+              'general_details' => 'failed',
+        );
+        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
         return response($res,$http_status)
                 ->header('Content-Type', 'application/json');
 
