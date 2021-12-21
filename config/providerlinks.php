@@ -622,7 +622,7 @@ return [
             'USD' => [
                 'operator_id' => 'betrnkUSD',
                 'public_key' => 'h0UOev7mrcLvDUOCB6Sc',
-                'secret_key' => 'ioai4ETPCEbkGfVFcggmUOCB6Sc'
+                'secret_key' => 'ioai4ETPCEbkGfVFcggm'
             ],
             'EUR' => [
                 'operator_id' => 'betrnkEUR',
@@ -667,7 +667,7 @@ return [
             'TEST' => [
                 'operator_id' => 'betrnkUSDtest',
                 'public_key' => 'EI4gh2M62f7V9mmH9SNI',
-                'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S1'
+                'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S'
             ],
         ],
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',
