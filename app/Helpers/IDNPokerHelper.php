@@ -92,11 +92,9 @@ class IDNPokerHelper{
                 $player_lang = 'en';
             }
             if($data['lang'] != ''){
-                $lang = $data["lang"];
-                Helper::saveLog('IDNPOKER GAMELUANCH LANG 1', 110, $lang. "    =    =   ". $data['lang'],  $player_lang );
-            }else{
                 $lang = $player_lang;
-                Helper::saveLog('IDNPOKER GAMELUANCH LANG 2', 110, $lang. "    =    =   ". $data['lang'],  $player_lang );
+            }else{
+                $lang = $data["lang"];
             }
             // $lang = $data["lang"] != '' ? $data["lang"] : 'en';
      
