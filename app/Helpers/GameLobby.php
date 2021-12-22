@@ -337,7 +337,7 @@ class GameLobby{
         
     }
 
-    public static function evoplayLunchUrl($token,$game_code,$game_provider,$exit_url){
+    public static function evoplayLunchUrl($token,$game_code,$game_provider,$exit_url,$lang){
         $client_player_details = GameLobby::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.evoplay.project_id'),
@@ -346,7 +346,7 @@ class GameLobby{
           "game" => $game_code, //game_code, game_id
           "settings" =>  [
             'user_id'=> $client_player_details->player_id,
-            'language'=> $client_player_details->language ? $client_player_details->language : 'en',
+            'language'=> $lang,
             'https' => true,
           ],
           "denomination" => '1', // game to be launched with values like 1.0, 1, default
