@@ -81,7 +81,6 @@ class IDNPokerHelper{
 
     public static function gameLaunchURLLogin($data, $player_id, $client_details) {
         try {
-            Helper::saveLog('IDNPOKER GAMELUANCH CLIENT DETAILS', 110, json_encode($client_details),  json_encode($data));
             $url = config('providerlinks.idnpoker.URL');
             if($client_details->default_language != ''){
                 $player_lang = $client_details->default_language;
@@ -89,13 +88,10 @@ class IDNPokerHelper{
                     $player_lang = 'jp';
                 }
             }else{
-                $player_lang = 'en';
+                $player_lang = $data['lang'];
             }
-            if($data['lang'] != ''){
-                $lang = $player_lang;
-            }else{
-                $lang = $data["lang"];
-            }
+            $lang = $player_lang;
+          
             // $lang = $data["lang"] != '' ? $data["lang"] : 'en';
      
             $client = new Client();
