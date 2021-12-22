@@ -202,7 +202,7 @@ class AmuseGamingHelper{
         }elseif($game_details[0]->brand == 'AG Play\'n GO' || $game_details[0]->brand_code == '124'){
             $brand = 'playngo';
         }elseif($game_details[0]->brand == 'AG EGT Original'){
-            $brand = 'egt';
+            $brand = 'egtoriginal';
         }elseif($game_details[0]->brand == 'AG Wazdan'){
             $brand = 'wazdan';
         }elseif($game_details[0]->brand == 'AG NetEnt'){
