@@ -83,7 +83,7 @@ class IDNPokerHelper{
         try {
             $url = config('providerlinks.idnpoker.URL');
             $lang = $data["lang"] != '' ? $data["lang"] : 'en';
-            // $lang = 'ja';
+            $lang = 'jp';
             
             $client = new Client();
             $request = '
@@ -96,7 +96,7 @@ class IDNPokerHelper{
                 <secure>1</secure>
                 <mobile>1</mobile>
                 <game>'.$data['game_code'].'</game>
-                <lang>ja</lang>
+                <lang>'.$lang.'</lang>
             </request>';
             Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK LOGIN REQUEST" );
             $guzzle_response = $client->post($url,[
@@ -110,7 +110,7 @@ class IDNPokerHelper{
                             <secure>1</secure>
                             <mobile>1</mobile>
                             <game>'.$data['game_code'].'</game>
-                            <lang>ja</lang>
+                            <lang>'.$lang.'</lang>
                         </request>'
             ]
             );
