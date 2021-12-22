@@ -91,7 +91,7 @@ class IDNPokerHelper{
             }else{
                 $player_lang = 'en';
             }
-            if($data['lang'] == '' || $data['lang'] === null){
+            if(empty($data['lang'])){
                 $lang = $player_lang;
             }else{
                 $lang = $data['lang'];
