@@ -79,10 +79,10 @@ class IDNPokerHelper{
     }
 
 
-    public static function gameLaunchURLLogin($data, $player_id) {
+    public static function gameLaunchURLLogin($data, $player_id, $client_details) {
         try {
             $url = config('providerlinks.idnpoker.URL');
-            $lang = $data["lang"] != '' ? $data["lang"] : 'en';
+            $lang = $data["lang"] != '' ? $data["lang"] : $client_details->default_language;
             
             $client = new Client();
             $request = '

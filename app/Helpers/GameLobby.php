@@ -1939,7 +1939,6 @@ class GameLobby{
             $aes = new AES($key);
             $player_id = "TGTW".$client_details->player_id;
             TransferWalletHelper::savePLayerGameRound($request['game_code'], $request['token'], $request['game_provider']);
-            $request['lang'] = $client_details->default_langauge;
             /***************************************************************
             *
             * CHECK PLAYER IF EXIST
@@ -1962,7 +1961,7 @@ class GameLobby{
                     * GET URL / OR LOGIN TO PROVIDER
                     *
                     ****************************************************************/
-                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id);
+                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details);
                     
                     switch($client_details->wallet_type){
                         case 1: 
