@@ -81,6 +81,7 @@ class IDNPokerHelper{
 
     public static function gameLaunchURLLogin($data, $player_id, $client_details) {
         try {
+            Helper::saveLog('IDNPOKER GAMELUANCH CLIENT DETAILS', 110, json_encode($client_details),  "CLIENT DETAILS" );
             $url = config('providerlinks.idnpoker.URL');
             if($client_details->default_language != ''){
                 $player_lang = $client_details->default_language;
