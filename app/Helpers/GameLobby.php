@@ -1939,6 +1939,7 @@ class GameLobby{
             $aes = new AES($key);
             $player_id = "TGTW".$client_details->player_id;
             TransferWalletHelper::savePLayerGameRound($request['game_code'], $request['token'], $request['game_provider']);
+            $request['lang'] = $client_details->default_langauge;
             /***************************************************************
             *
             * CHECK PLAYER IF EXIST
@@ -1971,7 +1972,6 @@ class GameLobby{
                                 "url" => $data["lobby_url"],
                                 "token" => $client_details->player_token,
                                 "player_id" => $client_details->player_id,
-                                "lang" => $client_details->default_language,
                                 "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
                             );
                             $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
