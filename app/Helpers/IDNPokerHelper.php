@@ -91,10 +91,14 @@ class IDNPokerHelper{
             }else{
                 $player_lang = 'en';
             }
-            $lang = $player_lang;
-       
+            if($data['lang'] != ''){
+                $lang = $data["lang"];
+            }else{
+                $lang = $player_lang;
+            }
+            Helper::saveLog('IDNPOKER GAMELUANCH CLIENT DETAILS', 110, $lang. "    =    =   ". $data['lang'],  $player_lang );
             // $lang = $data["lang"] != '' ? $data["lang"] : 'en';
-            #new
+     
             $client = new Client();
             $request = '
             <request>
