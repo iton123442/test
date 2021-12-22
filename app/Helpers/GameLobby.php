@@ -1971,7 +1971,6 @@ class GameLobby{
                                 "url" => $data["lobby_url"],
                                 "token" => $client_details->player_token,
                                 "player_id" => $client_details->player_id,
-                                "lang" => $client_details->default_language,
                                 "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
                             );
                             $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
