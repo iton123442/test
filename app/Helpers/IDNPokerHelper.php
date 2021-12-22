@@ -96,7 +96,7 @@ class IDNPokerHelper{
                 <secure>1</secure>
                 <mobile>1</mobile>
                 <game>'.$data['game_code'].'</game>
-                <lang>'.$lang.'</lang>
+                <lang>ja</lang>
             </request>';
             Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK LOGIN REQUEST" );
             $guzzle_response = $client->post($url,[
@@ -110,7 +110,7 @@ class IDNPokerHelper{
                             <secure>1</secure>
                             <mobile>1</mobile>
                             <game>'.$data['game_code'].'</game>
-                            <lang>'.$lang.'</lang>
+                            <lang>ja</lang>
                         </request>'
             ]
             );
