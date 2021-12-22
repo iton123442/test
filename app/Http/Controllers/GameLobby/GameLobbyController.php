@@ -470,7 +470,7 @@ class GameLobbyController extends Controller
                 }
                 elseif($provider_code==40){
                     $lang = GameLobby::getLanguage("EVOPLAY 8Provider",$request->input("lang"));
-                    $url = GameLobby::evoplayLunchUrl($request->token,$request->game_code,$request->game_provider, $request->exitUrl,$lan);
+                    $url = GameLobby::evoplayLunchUrl($request->token,$request->game_code,$request->game_provider, $request->exitUrl,$lang);
                     if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
