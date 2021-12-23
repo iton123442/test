@@ -84,19 +84,21 @@ class TransactionInfo{
     public static function IconicGaming($clientDetails, $requestData, $transactionData){
         $http = new Client();
         try {
-            $response = $http->get(config("providerlinks.icgamingapi").'/api/v1/profile/info/link?id='.$transactionData->round_id, [
+            $response = $http->get(config("providerlinks.icgamingapi").'/api/v1/profile/info/link?id='.$transactionData->round_id.'&lang=en', [
                 'headers' =>[
                     'Authorization' => 'Bearer '.GameLobby::icgConnect($clientDetails->default_currency),
                     'Accept'     => 'application/json'
                 ],
             ]);
             $iconicResponse = json_decode((string) $response->getBody(), true);
+            ProviderHelper::saveLogWithExeption('IconicGaming', 1223, json_encode($clientDetails), $iconicResponse);
             if(isset($iconicResponse['data']) && $iconicResponse['data'] != null){
                 $mw_response = ["data" => $iconicResponse['data'],"status" => ["code" => 200, "message" => TransactionInfo::TransactionErrorCode(200)]];
             }else{
                 $mw_response = ["data" => null,"status" => ["code" => 404,"message" => TransactionInfo::TransactionErrorCode(404)]];
             }
         } catch (\Exception $e) {
+            ProviderHelper::saveLogWithExeption('IconicGaming', 1223, json_encode($request->all()), $e->getMessage());
             $mw_response = ["data" => null,"status" => ["code" => 402,"message" => TransactionInfo::TransactionErrorCode(402)]];
         }
         return $mw_response;
