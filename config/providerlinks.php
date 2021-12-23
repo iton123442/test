@@ -113,11 +113,15 @@ return [
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a44c3ca52ef01f55b0a8b3859610f554b05aa57ca36e4a508addd9ddae539a84d43f9407c72d555bc3093bf3516663d504e98b989f3ec3e3ff8407171f43ccdc',
         ],
+        '32THB' => [  // ASK ME USD
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a44c3ca52ef01f55b0a8b3859610f554b05aa57ca36e4a508addd9ddae539a84d43f9407c72d555bc3093bf3516663d504e98b989f3ec3e3ff8407171f43ccdc',
+        ],
         '5USD' => [ // XIGOLO USD
             'merchant_id' => 'XIGOLO',
             'merchant_key' => 'b7943fc2e48c3b74a2c31514aebdce25364bd2b1a97855f290c01831052b25478c35bdebdde8aa7a963e140a8c1e6401102321a2bd237049f9e675352c35c4cc',
         ],
-        '15EUR' => [ // XIGOLO USD
+        '15EUR' => [ // EVERYMATRIX
             'merchant_id' => 'TGEM',
             'merchant_key' => '0d403e21c44d857d2c1847cb35ea16b5c4a8acbb3b669bda2e45ced7c736d4d51f3b23486e64a0a4b9ff2b3359e53af6c4ab8caa59ba728479114a2cc51096be',
         ],
@@ -300,6 +304,7 @@ return [
             "7"=>"tgc",
             "8"=>"askmebet",
             "9"=>"tigergames",
+            "32"=>"askmebet",
         ]
     ],
     'evolution'=>[
