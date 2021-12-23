@@ -1892,7 +1892,6 @@ class GameLobby{
             $getDetails = AmuseGamingHelper::createPlayerAndCheckPlayer($client_details);
             // Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($getDetails),  $getDetails );
             if ($getDetails) {
-               
                 $token = AmuseGamingHelper::requestTokenFromProvider($client_details, "real");
                 if($token != "false"){
                     $getGameDetails = Helper::findGameDetails( "game_code", $proivder_db_id, $data['game_code']);
@@ -1902,7 +1901,6 @@ class GameLobby{
                     return $url;
                 }
             }
-            dd($client_details->player_id);
             Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
             return "false";
         } catch (\Exception $e) {

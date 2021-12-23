@@ -640,50 +640,10 @@ return [
    'amusegaming' => [
         'provider_db_id'=> 65,
         'operator' => [
-            'USD' => [
-                'operator_id' => 'betrnkUSD',
-                'public_key' => 'h0UOev7mrcLvDUOCB6Sc',
-                'secret_key' => 'ioai4ETPCEbkGfVFcggm'
-            ],
-            'EUR' => [
-                'operator_id' => 'betrnkEUR',
-                'public_key' => 'Lhs13QDwtgPEHv4QFCEo',
-                'secret_key' => '6yr6Kp1gBvQX7HmojcLK'
-            ],
             'JPY' => [
                 'operator_id' => 'betrnkJPY',
                 'public_key' => 'OLY4s6G0EMb69g5L9ZBp',
                 'secret_key' => 'dQBO3vdevew0Z0sc9b2E'
-            ],
-            'CNY' => [
-                'operator_id' => 'betrnkCNY',
-                'public_key' => 'gmaVKpWmvEM6MQ2t2mUG',
-                'secret_key' => 'yfz78WVnew5Urlszw2y0'
-            ],
-            'THB' => [
-                'operator_id' => 'betrnkTHB',
-                'public_key' => 'TInFeJyIc6DR2Qhyplem',
-                'secret_key' => 'cDjRAQydDlJ5x71ENKzp'
-            ],
-            'IRR' => [
-                'operator_id' => 'betrnkIRR',
-                'public_key' => '85DJPuk15Ilv1V5iQCrB',
-                'secret_key' => 'nFwzV0KzsALl1ciAba1u'
-            ],
-            'RUB' => [
-                'operator_id' => 'betrnkRUB',
-                'public_key' => 'Ny6ZgFm4C9blxSaD9Itk',
-                'secret_key' => '9y3dzLaCPsdBszomfrty'
-            ],
-            'TRY' => [
-                'operator_id' => 'betrnkTRY',
-                'public_key' => 'BZ6Ep4t6NjocQyjFTQbK',
-                'secret_key' => '8KVd0Hz9NX3odFxQFufb'
-            ],
-            'KRW' => [
-                'operator_id' => 'betrnkKRW',
-                'public_key' => 'vjIVE0LldA12Ta3EbOTW',
-                'secret_key' => 'AnrqxulvTbVrhGw15epy'
             ],
             'TEST' => [
                 'operator_id' => 'betrnkUSDtest',
