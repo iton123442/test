@@ -16,7 +16,7 @@ class AmuseGamingHelper{
 
     public static  function createPlayerAndCheckPlayer($client_details){
         // if(config('providerlinks.amusegaming.modetype') == 'TEST'){
-            $currency = 'JPY';
+            $currency = 'TEST';
         // }else{
         //     $currency = $client_details->default_currency;
         // }
@@ -85,7 +85,7 @@ class AmuseGamingHelper{
 
     public static  function requestTokenFromProvider($client_details,$type){
         // if(config('providerlinks.amusegaming.modetype') == 'TEST'){
-            $currency = 'JPY';
+            $currency = 'TEST';
         // }else{
         //     $currency = $client_details->default_currency;
         // }
@@ -136,7 +136,7 @@ class AmuseGamingHelper{
 
     public static  function AmuseGamingGameList($brand,$channel,$currency){
         // if(config('providerlinks.amusegaming.modetype') == 'TEST'){
-            $currency = 'JPY';
+            $currency = 'TEST';
         // }else{
         //     $currency = $currency;
         // }
