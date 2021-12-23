@@ -128,6 +128,10 @@ return [
         '7USD' => [  // ASK ME USD
             'merchant_id' => 'TGC',
             'merchant_key' => 'cb1bc0a2fc16bddfd549bdd8aae0954fba28c9b11c6a25e6ef886b56e846b033ae5fe29880be69fd8741ab400e6c4cb2f8c0f05e49dcc4568362370278ba044d',
+        ],
+        '8USD' => [  // ASK ME USD
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
         ]
     ],
     'cqgames' => [
