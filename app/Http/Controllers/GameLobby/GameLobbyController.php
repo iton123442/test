@@ -135,7 +135,7 @@ class GameLobbyController extends Controller
             
            $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
            if($request->input("client_id") == 92){
-                dd($subscription_checker);
+                return $subscription_checker;
             }
            if(!$subscription_checker){
                $log_id = Helper::saveLog('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
@@ -1045,9 +1045,7 @@ class GameLobbyController extends Controller
     public function checkGameAccess($client_id, $game_code, $sub_provider_id){
 
             $excludedlist = ClientGameSubscribe::with("selectedProvider")->with("gameExclude")->with("subProviderExcluded")->where("client_id",$client_id)->get();
-            if($client_id == 92){
-                return $excludedlist;
-            }
+           
             if(count($excludedlist)>0){  # No Excluded Provider
                 $gamesexcludeId=array();
                 foreach($excludedlist[0]->gameExclude as $excluded){
@@ -1071,6 +1069,14 @@ class GameLobbyController extends Controller
                         }
                     }
                     array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
+                }
+
+                 if($client_id == 92){
+                    $msg = [
+                        'sub_providers' => $sub_providers,
+                        'sub_provider_subscribed' => $sub_provider_subscribed
+                    };
+                    return $msg
                 }
                 if(in_array($sub_provider_id, $sub_provider_subscribed)){
                     if(in_array($game_code, $provider_gamecodes)){
