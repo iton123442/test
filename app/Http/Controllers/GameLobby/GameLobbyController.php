@@ -134,9 +134,9 @@ class GameLobbyController extends Controller
             // CLIENT SUBSCRIPTION FILTER
             
            $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
-           // if($request->input("client_id") == 92){
-           //      return $subscription_checker;
-           //  }
+           if($request->input("client_id") == 92){
+                return $subscription_checker;
+            }
            if(!$subscription_checker){
                $log_id = Helper::saveLog('GAME LAUNCH NO SUBSCRIPTION', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
                $msg = array(
@@ -1062,16 +1062,16 @@ class GameLobbyController extends Controller
 
                 $sub_provider_subscribed = array();
                 $provider_gamecodes = array();
-                // if($client_id == 92){
-                //     foreach($sub_providers as $sub_provider){
-                //         foreach($sub_provider->games as $game){
-                //             if($game->sub_provider_id == $sub_provider_id){
-                //                 array_push($provider_gamecodes,$game->game_code);
-                //             }
-                //         }
-                //         array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
-                //     }
-                // }else{
+                if($client_id == 92){
+                    foreach($sub_providers as $sub_provider){
+                        foreach($sub_provider->games as $game){
+                            if($game->sub_provider_id == $sub_provider_id){
+                                array_push($provider_gamecodes,$game->game_code);
+                            }
+                        }
+                        array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
+                    }
+                }else{
                     foreach($sub_providers as $sub_provider){
                         foreach($sub_provider->games as $game){
                             if($sub_provider->sub_provider_id == $sub_provider_id){
@@ -1080,16 +1080,16 @@ class GameLobbyController extends Controller
                         }
                         array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
                     }
-                // }
+                }
 
-                // if($client_id == 92){
-                //     $msg = [
-                //         // 'sub_providers' => $sub_providers,
-                //         // 'sub_provider_subscribed' => $sub_provider_subscribed,
-                //         'provider_gamecodes' => $provider_gamecodes,
-                //     ];
-                //     return $msg;
-                // }
+                if($client_id == 92){
+                    $msg = [
+                        // 'sub_providers' => $sub_providers,
+                        // 'sub_provider_subscribed' => $sub_provider_subscribed,
+                        'provider_gamecodes' => $provider_gamecodes,
+                    ];
+                    return $msg;
+                }
                 if(in_array($sub_provider_id, $sub_provider_subscribed)){
                     if(in_array($game_code, $provider_gamecodes)){
                         return true;
