@@ -398,7 +398,7 @@ class FreeSpinHelper{
         }
     }
     public static function createFreeRoundSpearHeadEm($player_details,$data, $sub_provder_id){
-        dd($data);sa
+        dd($data);
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
     }
