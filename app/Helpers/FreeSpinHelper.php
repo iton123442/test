@@ -365,7 +365,7 @@ class FreeSpinHelper{
             $baseUrl,[
                 'body' => json_encode([
                     'txid' => FreeSpinHelper::unique_code(14),
-                    'remoteusername' => '10226',
+                    'remoteusername' => $player_details->player_id,
                     'gameid' => $data['game_code'],
                     'amount' => $data["details"]["amount"],
                     'freespinvalue' => $data['details']['freespinvalue'],
@@ -396,6 +396,11 @@ class FreeSpinHelper{
             FreeSpinHelper::updateFreeRound($data, $id);
             return 400;
         }
+    }
+    public static function createFreeRoundSpearHeadEm($player_details,$data, $sub_provder_id){
+        dd($data);sa
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
     }
 }
 ?>
