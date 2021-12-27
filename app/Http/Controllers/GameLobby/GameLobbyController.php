@@ -1062,19 +1062,30 @@ class GameLobbyController extends Controller
 
                 $sub_provider_subscribed = array();
                 $provider_gamecodes = array();
-                foreach($sub_providers as $sub_provider){
-                    foreach($sub_provider->games as $game){
-                        if($sub_provider->sub_provider_id == $sub_provider_id){
-                            array_push($provider_gamecodes,$game->game_code);
+                if($client_id == 92){
+                    foreach($sub_providers as $sub_provider){
+                        foreach($sub_provider->games as $game){
+                            if($game->sub_provider_id == $sub_provider_id){
+                                array_push($provider_gamecodes,$game->game_code);
+                            }
                         }
+                        array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
                     }
-                    array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
+                }else{
+                    foreach($sub_providers as $sub_provider){
+                        foreach($sub_provider->games as $game){
+                            if($sub_provider->sub_provider_id == $sub_provider_id){
+                                array_push($provider_gamecodes,$game->game_code);
+                            }
+                        }
+                        array_push($sub_provider_subscribed,$sub_provider->sub_provider_id);
+                    }
                 }
 
-                 if($client_id == 92){
+                if($client_id == 92){
                     $msg = [
-                        'sub_providers' => $sub_providers,
-                        'sub_provider_subscribed' => $sub_provider_subscribed,
+                        // 'sub_providers' => $sub_providers,
+                        // 'sub_provider_subscribed' => $sub_provider_subscribed,
                         'provider_gamecodes' => $provider_gamecodes,
                     ];
                     return $msg;
