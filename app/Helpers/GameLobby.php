@@ -1911,21 +1911,31 @@ class GameLobby{
     
     public static function QuickSpinDGameLaunch($data,$device){
         Helper::saveLog('QuickSpin Direct LAUNCH', 66, json_encode($data),  "HIT" );
-        if($device == 'desktop'){
-            $channel = 'web';
-        }else{
-            $channel = 'mobile';
+        try {
+            if($device == 'desktop'){
+                $channel = 'web';
+            }else{
+                $channel = 'mobile';
+            }
+            $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
+            $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$channel."&ticket=".$data['token'];
+            return $gameUrl;
+        } catch (\Exception $e) {
+            Helper::saveLog('QuickSpinDirect LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
+            return $e->getMessage();
         }
-        $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
-        $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$channel."&ticket=".$data['token'];
-        return $gameUrl;
     }
 
     public static function SpearHeadGameLaunch($data, $device){
-        Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
-        $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&casinolobbyurl=".$data['exitUrl']."&_sid=".$data['token'];
-        Helper::saveLog('SpearHeadGameLaunch2 ', 67, json_encode($data),$gameUrl);
-        return $gameUrl;
+        try {
+            Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
+            $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&casinolobbyurl=".$data['exitUrl']."&_sid=".$data['token'];
+            Helper::saveLog('SpearHeadGameLaunch2 ', 67, json_encode($data),$gameUrl);
+            return $gameUrl;
+        } catch (\Exception $e) {
+            Helper::saveLog('SpearHeadLAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
+            return $e->getMessage();
+        }
     }
 
 
