@@ -469,7 +469,8 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==40){
-                    $url = GameLobby::evoplayLunchUrl($request->token,$request->game_code,$request->game_provider, $request->exitUrl);
+                    $lang = GameLobby::getLanguage("EVOPLAY 8Provider",$request->input("lang"));
+                    $url = GameLobby::evoplayLunchUrl($request->token,$request->game_code,$request->game_provider, $request->exitUrl,$lang);
                     if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
@@ -499,7 +500,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==38){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
+                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang, $request->client_id), 
                         "game_launch" => true
                     );
                     return response($msg,200)
