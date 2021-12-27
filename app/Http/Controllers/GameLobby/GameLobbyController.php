@@ -1074,7 +1074,8 @@ class GameLobbyController extends Controller
                  if($client_id == 92){
                     $msg = [
                         'sub_providers' => $sub_providers,
-                        'sub_provider_subscribed' => $sub_provider_subscribed
+                        'sub_provider_subscribed' => $sub_provider_subscribed,
+                        'provider_gamecodes' => $provider_gamecodes,
                     ];
                     return $msg;
                 }
