@@ -134,7 +134,7 @@ class GameLobbyController extends Controller
             // CLIENT SUBSCRIPTION FILTER
             
            $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
-           if($client_id == 92){
+           if($request->input("client_id") == 92){
                 dd($subscription_checker);
             }
            if(!$subscription_checker){
