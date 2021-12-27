@@ -1075,8 +1075,8 @@ class GameLobbyController extends Controller
                     $msg = [
                         'sub_providers' => $sub_providers,
                         'sub_provider_subscribed' => $sub_provider_subscribed
-                    };
-                    return $msg
+                    ];
+                    return $msg;
                 }
                 if(in_array($sub_provider_id, $sub_provider_subscribed)){
                     if(in_array($game_code, $provider_gamecodes)){
