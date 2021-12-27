@@ -16,6 +16,11 @@ class BNGController extends Controller
 {
     protected $startTime;
     private $prefix = 22;
+
+    private $playson_sub_id = 45;
+    private $booongo_sub_id = 44;
+
+
     public function __construct() {
         $this->startTime = microtime(true);
     }
@@ -293,7 +298,12 @@ class BNGController extends Controller
             //$client_details = ProviderHelper::getClientDetails('token', $data["token"]);
         if($client_details){
             //$game_details = Helper::getInfoPlayerGameRound($data["token"]);
-            $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
+
+            if (isset($data["provider_name"]) && $data["provider_name"] == 'playson'){
+                $game_details = $this->findGameDetails($this->playson_sub_id, $data["game_id"]);
+            }else{
+                $game_details = $this->findGameDetails($this->booongo_sub_id, $data["game_id"]);
+            }
             if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
                 return $this->betNotNullWinNotNull($data,$client_details,$game_details);
             }
@@ -770,6 +780,14 @@ class BNGController extends Controller
             }
         } 
     }
+
+    private  function findGameDetails($sub_provider_id, $game_code)
+    {
+        $query = DB::Select("SELECT game_id,game_code,game_name,sub_provider_name as provider_name FROM games inner join sub_providers sp using (sub_provider_id) WHERE game_code = '" . $game_code . "' AND sp.sub_provider_id = '" . $sub_provider_id . "' order by sp.sub_provider_id desc");
+        $result = count($query);
+        return $result > 0 ? $query[0] : null;
+    }
+
     private function _getClientDetails($type = "", $value = "") {
 
 		$query = DB::table("clients AS c")
