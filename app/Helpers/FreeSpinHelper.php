@@ -339,9 +339,10 @@ class FreeSpinHelper{
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        dd($player_details);
         try{
             $freeroundtransac = [
-                "player_id" => $player_details->player_id,
+                "player_id" => $data['details']['remoteusername'],
                 "game_id" => $game_details->game_id,
                 "total_spin" => $data["details"]["amount"],
                 "spin_remaining" => $data["details"]["amount"],
@@ -365,7 +366,7 @@ class FreeSpinHelper{
             $baseUrl,[
                 'body' => json_encode([
                     'txid' => FreeSpinHelper::unique_code(14),
-                    'remoteusername' => $player_details->player_id,
+                    'remoteusername' => $data['details']['remoteusername'],
                     'gameid' => $data['game_code'],
                     'amount' => $data["details"]["amount"],
                     'freespinvalue' => $data['details']['freespinvalue'],
