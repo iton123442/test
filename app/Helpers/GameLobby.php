@@ -123,16 +123,20 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $url = config('providerlinks.playstar.api_url').'/launch/?host_id='.config('providerlinks.playstar.host_id')[$client_details->default_currency].'&game_id='.$data['game_code'].'&lang=en-US&access_token='.$data['token'];
         return $url;
-
-    
-
     }
 
     public static function NoLimitLaunchUrl($data,$device){
         try {
+        $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+        if($client_details->operator_id == '20'){
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }else if ($client_details->operator_id == '15'){
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }else{ // TigerGames
+            $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
+        }
         $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
-         
         } catch (\Exception $e) {
 
             Helper::saveLog('Nolimit Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
@@ -333,7 +337,7 @@ class GameLobby{
         
     }
 
-    public static function evoplayLunchUrl($token,$game_code,$game_provider,$exit_url){
+    public static function evoplayLunchUrl($token,$game_code,$game_provider,$exit_url,$lang){
         $client_player_details = GameLobby::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.evoplay.project_id'),
@@ -342,7 +346,7 @@ class GameLobby{
           "game" => $game_code, //game_code, game_id
           "settings" =>  [
             'user_id'=> $client_player_details->player_id,
-            'language'=> $client_player_details->language ? $client_player_details->language : 'en',
+            'language'=> $lang,
             'https' => true,
           ],
           "denomination" => '1', // game to be launched with values like 1.0, 1, default
@@ -558,14 +562,14 @@ class GameLobby{
 
     public static function CrashGaming($data){
         try{
-            $url = 'https://dev.crashbetrnk.com/gamelaunch';// config('providerlinks.tidygaming.url_lunch');
+            $url = 'https://dev.crashbetrnk.com/gamelaunch?authtoken='.config('providerlinks.crashgaming.authToken');
             $client_details = Providerhelper::getClientDetails('token', $data['token']);
             $requesttosend = [
                 'session_id' =>  $client_details->player_token,
-                'user_id' => $client_details->player_id,
-                'user_name' => $client_details->player_id,
+                'user_id' => (string)$client_details->player_id,
+                'user_name' => (string)$client_details->player_id,
                 'currency_code' => $client_details->default_currency,
-                'balance' => $client_details->balance,
+                'balance' => (int)$client_details->balance,
                 'uuid' => $client_details->player_token,
                 'exit_url' => isset($data['exitUrl']) ? $data['exitUrl'] : ""
             ];
@@ -579,9 +583,13 @@ class GameLobby{
             );
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $client_response);
-            return $client_response->link;
+            return $client_response->url;
+            // return $client_response->link;
+            // $url = 'https://dev.crashbetrnk.com/?session_id=y0ce41415db035cf889d6953ce18ef26';
+            // $url = 'https://dev.crashbetrnk.com/?session_id='.$client_details->player_token;
+            return $url;
         }catch(\Exception $e){
-            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('CrashGaming', config('providerlinks.crashgaming.pdbid'), json_encode($requesttosend), $e->getMessage().' '.$e->getLine());
             return false;
         }
     }
