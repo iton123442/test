@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\CallParameters;
-use App\Helpers\ProviderHelper;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use Illuminate\Http\Request;
 use DB;

@@ -113,17 +113,25 @@ return [
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a44c3ca52ef01f55b0a8b3859610f554b05aa57ca36e4a508addd9ddae539a84d43f9407c72d555bc3093bf3516663d504e98b989f3ec3e3ff8407171f43ccdc',
         ],
+        '32THB' => [  // ASK ME USD
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a44c3ca52ef01f55b0a8b3859610f554b05aa57ca36e4a508addd9ddae539a84d43f9407c72d555bc3093bf3516663d504e98b989f3ec3e3ff8407171f43ccdc',
+        ],
         '5USD' => [ // XIGOLO USD
             'merchant_id' => 'XIGOLO',
             'merchant_key' => 'b7943fc2e48c3b74a2c31514aebdce25364bd2b1a97855f290c01831052b25478c35bdebdde8aa7a963e140a8c1e6401102321a2bd237049f9e675352c35c4cc',
         ],
-        '15EUR' => [ // XIGOLO USD
+        '15EUR' => [ // EVERYMATRIX
             'merchant_id' => 'TGEM',
             'merchant_key' => '0d403e21c44d857d2c1847cb35ea16b5c4a8acbb3b669bda2e45ced7c736d4d51f3b23486e64a0a4b9ff2b3359e53af6c4ab8caa59ba728479114a2cc51096be',
         ],
         '7USD' => [  // ASK ME USD
             'merchant_id' => 'TGC',
             'merchant_key' => 'cb1bc0a2fc16bddfd549bdd8aae0954fba28c9b11c6a25e6ef886b56e846b033ae5fe29880be69fd8741ab400e6c4cb2f8c0f05e49dcc4568362370278ba044d',
+        ],
+        '8USD' => [  // ASK ME USD
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
         ]
     ],
     'cqgames' => [
@@ -300,6 +308,7 @@ return [
             "7"=>"tgc",
             "8"=>"askmebet",
             "9"=>"tigergames",
+            "32"=>"askmebet",
         ]
     ],
     'evolution'=>[
@@ -376,14 +385,43 @@ return [
            'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
         ],
     ],
-    'manna'=>[
+    // 'manna'=>[
+    //     'PROVIDER_ID' => 16,
+    //     'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
+    //     'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
+    //     'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+    //     'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+    //     'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+    //     'IDN_API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
+    // ],
+    // 'ozashiki'=>[
+    //     'PROVIDER_ID' => 58,
+    //     'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
+    //     'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
+    //     'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+    //     'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+    //     'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
+    //     'PLATFORM_ID' => 'tigergame'
+    // ],
+    'mannaplay'=>[
         'PROVIDER_ID' => 16,
         'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
         'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
-        'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-        'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
-        'IDN_API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
+        'default' => [
+            'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+            'PLATFORM_ID' => 'betrnk'
+        ],
+        "15" => [ // Operator id 15 / Everymatrix
+            'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+            'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
+            'PLATFORM_ID' => 'tigergame'
+        ],
+        "30" => [  // Operator id 30 / IDNPLAY
+            'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+            'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+            'PLATFORM_ID' => 'idnplay'
+        ],
     ],
     'solid'=>[
         'PROVIDER_ID' => 1,
@@ -562,15 +600,6 @@ return [
         'provider_db_id' => 56,
         'api_url' => 'https://ams-api.stg.ttms.co:8443/cip/gametoken/',
     ],
-    'ozashiki'=>[
-        'PROVIDER_ID' => 58,
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
-        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
-        'PLATFORM_ID' => 'tigergame'
-    ],
     'nolimit'=>[
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
@@ -640,55 +669,15 @@ return [
    'amusegaming' => [
         'provider_db_id'=> 65,
         'operator' => [
-            'USD' => [
-                'operator_id' => 'betrnkUSD',
-                'public_key' => 'h0UOev7mrcLvDUOCB6Sc',
-                'secret_key' => 'ioai4ETPCEbkGfVFcggmUOCB6Sc'
-            ],
-            'EUR' => [
-                'operator_id' => 'betrnkEUR',
-                'public_key' => 'Lhs13QDwtgPEHv4QFCEo',
-                'secret_key' => '6yr6Kp1gBvQX7HmojcLK'
-            ],
             'JPY' => [
                 'operator_id' => 'betrnkJPY',
                 'public_key' => 'OLY4s6G0EMb69g5L9ZBp',
                 'secret_key' => 'dQBO3vdevew0Z0sc9b2E'
             ],
-            'CNY' => [
-                'operator_id' => 'betrnkCNY',
-                'public_key' => 'gmaVKpWmvEM6MQ2t2mUG',
-                'secret_key' => 'yfz78WVnew5Urlszw2y0'
-            ],
-            'THB' => [
-                'operator_id' => 'betrnkTHB',
-                'public_key' => 'TInFeJyIc6DR2Qhyplem',
-                'secret_key' => 'cDjRAQydDlJ5x71ENKzp'
-            ],
-            'IRR' => [
-                'operator_id' => 'betrnkIRR',
-                'public_key' => '85DJPuk15Ilv1V5iQCrB',
-                'secret_key' => 'nFwzV0KzsALl1ciAba1u'
-            ],
-            'RUB' => [
-                'operator_id' => 'betrnkRUB',
-                'public_key' => 'Ny6ZgFm4C9blxSaD9Itk',
-                'secret_key' => '9y3dzLaCPsdBszomfrty'
-            ],
-            'TRY' => [
-                'operator_id' => 'betrnkTRY',
-                'public_key' => 'BZ6Ep4t6NjocQyjFTQbK',
-                'secret_key' => '8KVd0Hz9NX3odFxQFufb'
-            ],
-            'KRW' => [
-                'operator_id' => 'betrnkKRW',
-                'public_key' => 'vjIVE0LldA12Ta3EbOTW',
-                'secret_key' => 'AnrqxulvTbVrhGw15epy'
-            ],
             'TEST' => [
                 'operator_id' => 'betrnkUSDtest',
                 'public_key' => 'EI4gh2M62f7V9mmH9SNI',
-                'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S1'
+                'secret_key' => 'dkzJ2WSYxDCxLYk0qT9S'
             ],
         ],
         'launch_url' => 'https://static.slotomatic.net/launch/index.html',

@@ -745,3 +745,8 @@ $app->post('/public/api/transferwallet/getPlayerBalance','TransferWalletControll
 $app->post('/public/api/transferwallet/getPlayerWalletBalance','TransferWalletController@getPlayerWalletBalance');
 $app->post('/public/api/transferwallet/makeWithdraw','TransferWalletController@makeWithdraw');
 $app->post('/public/api/transferwallet/makeDeposit','TransferWalletController@makeDeposit');
+
+// PLAYER OPERATOR DETAILS
+$app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
+    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+});

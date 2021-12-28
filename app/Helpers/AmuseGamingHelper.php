@@ -15,11 +15,11 @@ class AmuseGamingHelper{
 
 
     public static  function createPlayerAndCheckPlayer($client_details){
-        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
+        // if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
-        }else{
-            $currency = $client_details->default_currency;
-        }
+        // }else{
+        //     $currency = $client_details->default_currency;
+        // }
         $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
         $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
         $header = new Client([
@@ -84,11 +84,11 @@ class AmuseGamingHelper{
     }
 
     public static  function requestTokenFromProvider($client_details,$type){
-        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
+        // if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
-        }else{
-            $currency = $client_details->default_currency;
-        }
+        // }else{
+        //     $currency = $client_details->default_currency;
+        // }
         $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
         $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
         $player_id = $client_details->player_id;
@@ -135,11 +135,11 @@ class AmuseGamingHelper{
 
 
     public static  function AmuseGamingGameList($brand,$channel,$currency){
-        if(config('providerlinks.amusegaming.modetype') == 'TEST'){
+        // if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
-        }else{
-            $currency = $currency;
-        }
+        // }else{
+        //     $currency = $currency;
+        // }
         $public_key = config('providerlinks.amusegaming.operator.'.$currency.'.public_key');
         $secret_key = config('providerlinks.amusegaming.operator.'.$currency.'.secret_key');
         $endpoint = "casino/list_games";
@@ -202,7 +202,7 @@ class AmuseGamingHelper{
         }elseif($game_details[0]->brand == 'AG Play\'n GO' || $game_details[0]->brand_code == '124'){
             $brand = 'playngo';
         }elseif($game_details[0]->brand == 'AG EGT Original'){
-            $brand = 'egt';
+            $brand = 'egtoriginal';
         }elseif($game_details[0]->brand == 'AG Wazdan'){
             $brand = 'wazdan';
         }elseif($game_details[0]->brand == 'AG NetEnt'){
