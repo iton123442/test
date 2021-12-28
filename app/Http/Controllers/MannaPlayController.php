@@ -30,6 +30,23 @@ class MannaPlayController extends Controller
 	}
 
 
+	public function CheckAuth($client_details, $api_key){
+		if ($client_details->operator_id == 15){  // Operator id 15 / Everymatrix
+            $CLIENT_API_KEY = config("providerlinks.mannaplay.15.CLIENT_API_KEY");
+        }elseif($client_details->operator_id == 30){ // IDNPLAY
+            $CLIENT_API_KEY = config("providerlinks.mannaplay.30.CLIENT_API_KEY");
+        }else{
+            $CLIENT_API_KEY = config("providerlinks.mannaplay.default.CLIENT_API_KEY");
+        }
+
+        if ($CLIENT_API_KEY == $api_key){
+        	return true;
+        }else{
+        	return false;
+        }
+	}
+
+
 	public function getBalance(Request $request) {
 
 		$json_data = json_decode(file_get_contents("php://input"), true);
@@ -45,13 +62,13 @@ class MannaPlayController extends Controller
 		}
 		else
 		{
-			if ($this->client_api_key != $api_key) {
-				$http_status = 200;
-				$response = [
-					"errorCode" =>  10105,
-					"message" => "Authenticate fail!",
-				];
-			} else {
+			// if ($this->client_api_key != $api_key) {
+			// 	$http_status = 200;
+			// 	$response = [
+			// 		"errorCode" =>  10105,
+			// 		"message" => "Authenticate fail!",
+			// 	];
+			// } else {
 				$http_status = 200;
 				$response = [
 					"errorCode" =>  10204,
@@ -60,12 +77,22 @@ class MannaPlayController extends Controller
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				if ($client_details != null) {
+
+					if (!$this->CheckAuth($client_details, $api_key)){
+						$http_status = 200;
+						$response = [
+							"errorCode" =>  10105,
+							"message" => "Authenticate fail!",
+						];
+						return response()->json($response, $http_status);
+					}
+
 					$http_status = 200;
 					$response = [
 						"balance" => ProviderHelper::amountToFloat($client_details->balance)
 					];
 				}
-			}
+			// }
 
 		}
 		Helper::saveLog('manna_balance', $this->provider_db_id, file_get_contents("php://input"), $response);
@@ -87,13 +114,13 @@ class MannaPlayController extends Controller
 		}
 		else
 		{
-			if ($this->client_api_key != $api_key) {
-				$http_status = 200;
-				$response = [
-					"errorCode" =>  10105,
-					"message" => "Authenticate fail!",
-				];
-			} else {
+			// if ($this->client_api_key != $api_key) {
+			// 	$http_status = 200;
+			// 	$response = [
+			// 		"errorCode" =>  10105,
+			// 		"message" => "Authenticate fail!",
+			// 	];
+			// } else {
 
 				$http_status = 200;
 				$response = [
@@ -103,6 +130,15 @@ class MannaPlayController extends Controller
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				if ($client_details != null) {
+
+					if (!$this->CheckAuth($client_details, $api_key)){
+						$http_status = 200;
+						$response = [
+							"errorCode" =>  10105,
+							"message" => "Authenticate fail!",
+						];
+						return response()->json($response, $http_status);
+					}
 					
 					try{
 						ProviderHelper::idenpotencyTable($json_data['round_id']);
@@ -209,7 +245,7 @@ class MannaPlayController extends Controller
 	                return response()->json($response, $http_status);
 
 				}
-			}
+			// }
 
 		}
 		Helper::saveLog('MannaPlay debit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
@@ -232,12 +268,12 @@ class MannaPlayController extends Controller
 		}
 		else
 		{
-			if ($this->client_api_key != $api_key) {
-				$response = [
-					"errorCode" =>  10105,
-					"message" => "Authenticate fail!",
-				];
-			} else {
+			// if ($this->client_api_key != $api_key) {
+			// 	$response = [
+			// 		"errorCode" =>  10105,
+			// 		"message" => "Authenticate fail!",
+			// 	];
+			// } else {
 
 				$response = [
 					"errorCode" =>  10204,
@@ -247,6 +283,15 @@ class MannaPlayController extends Controller
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 
 				if ($client_details != null) {
+
+					if (!$this->CheckAuth($client_details, $api_key)){
+						$http_status = 200;
+						$response = [
+							"errorCode" =>  10105,
+							"message" => "Authenticate fail!",
+						];
+						return response()->json($response, $http_status);
+					}
 					
 					try{
 						ProviderHelper::idenpotencyTable($json_data['transaction_id']);
@@ -329,7 +374,7 @@ class MannaPlayController extends Controller
 
 					}
 				}
-			}
+			// }
 
 		}
 		Helper::saveLog('MannaPlay credit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
@@ -350,12 +395,12 @@ class MannaPlayController extends Controller
 		}
 		else
 		{
-			if ($this->client_api_key != $api_key) {
-				$response = [
-					"errorCode" =>  10105,
-					"message" => "Authenticate fail!",
-				];
-			} else {
+			// if ($this->client_api_key != $api_key) {
+			// 	$response = [
+			// 		"errorCode" =>  10105,
+			// 		"message" => "Authenticate fail!",
+			// 	];
+			// } else {
 
 				$response = [
 					"errorCode" =>  10204,
@@ -365,6 +410,15 @@ class MannaPlayController extends Controller
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 
 				if ($client_details != null) {
+
+					if (!$this->CheckAuth($client_details, $api_key)){
+						$http_status = 200;
+						$response = [
+							"errorCode" =>  10105,
+							"message" => "Authenticate fail!",
+						];
+						return response()->json($response, $http_status);
+					}
 					
 					try{
 						ProviderHelper::idenpotencyTable($json_data['transaction_id']);
@@ -440,7 +494,7 @@ class MannaPlayController extends Controller
 						}
 					}
 				}
-			}
+			// }
 
 		}
 		Helper::saveLog('MannaPlay rollback', $this->provider_db_id, file_get_contents("php://input"), $response);
