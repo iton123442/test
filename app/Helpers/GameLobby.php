@@ -1266,7 +1266,7 @@ class GameLobby{
             
             return $link_result->url;
         } catch (\Exception $e) {
-            ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($game_link_body), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($client_details), $e->getMessage());
             return $exitUrl;
         }
 
