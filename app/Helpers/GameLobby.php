@@ -1198,7 +1198,7 @@ class GameLobby{
     }
 
     public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = '', $clientID){
-        $client_details = GameLobby::getClientDetails('token', $token);
+        $client_details = Providerhelper::getClientDetails('token', $token);
         $lang = GameLobby::getLanguage("Manna Play", $lang);
 
         try {
