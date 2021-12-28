@@ -128,6 +128,10 @@ return [
         '7USD' => [  // ASK ME USD
             'merchant_id' => 'TGC',
             'merchant_key' => 'cb1bc0a2fc16bddfd549bdd8aae0954fba28c9b11c6a25e6ef886b56e846b033ae5fe29880be69fd8741ab400e6c4cb2f8c0f05e49dcc4568362370278ba044d',
+        ],
+        '8USD' => [  // ASK ME USD
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
         ]
     ],
     'cqgames' => [
@@ -381,14 +385,43 @@ return [
            'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
         ],
     ],
-    'manna'=>[
+    // 'manna'=>[
+    //     'PROVIDER_ID' => 16,
+    //     'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
+    //     'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
+    //     'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+    //     'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+    //     'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+    //     'IDN_API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
+    // ],
+    // 'ozashiki'=>[
+    //     'PROVIDER_ID' => 58,
+    //     'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
+    //     'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
+    //     'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+    //     'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+    //     'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
+    //     'PLATFORM_ID' => 'tigergame'
+    // ],
+    'mannaplay'=>[
         'PROVIDER_ID' => 16,
         'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
         'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
-        'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-        'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
-        'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
-        'IDN_API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
+        'default' => [
+            'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+            'PLATFORM_ID' => 'betrnk'
+        ],
+        "15" => [ // Operator id 15 / Everymatrix
+            'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+            'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
+            'PLATFORM_ID' => 'tigergame'
+        ],
+        "30" => [  // Operator id 30 / IDNPLAY
+            'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+            'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+            'PLATFORM_ID' => 'idnplay'
+        ],
     ],
     'solid'=>[
         'PROVIDER_ID' => 1,
@@ -567,15 +600,6 @@ return [
         'provider_db_id' => 56,
         'api_url' => 'https://ams-api.stg.ttms.co:8443/cip/gametoken/',
     ],
-    'ozashiki'=>[
-        'PROVIDER_ID' => 58,
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
-        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
-        'PLATFORM_ID' => 'tigergame'
-    ],
     'nolimit'=>[
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
@@ -664,9 +688,8 @@ return [
         'provider_db_id'=> 67,
         'api_url' => 'https://gamelaunch-stage.everymatrix.com/Loader/Start/',
         'operator' => 'TigerGamesUser',
-        'opid'=> 2540,
-        'username' => 'TigerGamesUser',
-        'password' => 'nXxOCeSCh4ko4q6q',
+        'operator_key' => 'nXxOCeSCh4ko4q6q',
+        'opid'=> 2540
     ],
 
 ];
