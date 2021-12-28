@@ -1233,13 +1233,13 @@ class GameLobby{
             ];
 
             try {
-                $auth_token->post(config("providerlinks.mannaplay.AUTH_URL").$platform_id.'/authenticate/auth_token',
+                $auth_token_response->post(config("providerlinks.mannaplay.AUTH_URL").$platform_id.'/authenticate/auth_token',
                     ['body' => json_encode($auth_token_body)]
                 );
                 $auth_result = json_decode($auth_token_response->getBody()->getContents());
                 ProviderHelper::saveLogGameLaunch('MannaPlay Auth Response', 15, json_encode($auth_token_body), $auth_result);
             } catch (\Exception $e) {
-                 ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($auth_token_body), $e->getMessage());
+                 ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($auth_token_body), $e->getMessage().' '.$e->getLine());
                 return $exitUrl;
             }
             // Generate Game Link
@@ -1266,7 +1266,7 @@ class GameLobby{
             
             return $link_result->url;
         } catch (\Exception $e) {
-            ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($client_details), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($client_details), $e->getMessage().' '.$e->getLine());
             return $exitUrl;
         }
 
