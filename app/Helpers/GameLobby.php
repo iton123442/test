@@ -1233,8 +1233,7 @@ class GameLobby{
             ];
 
             try {
-
-                $auth_token_response = $auth_token->post($auth_token_response = $auth_token->post(config("providerlinks.mannaplay.AUTH_URL").$platform_id.'/authenticate/auth_token',
+                $auth_token->post(config("providerlinks.mannaplay.AUTH_URL").$platform_id.'/authenticate/auth_token',
                     ['body' => json_encode($auth_token_body)]
                 );
                 $auth_result = json_decode($auth_token_response->getBody()->getContents());
