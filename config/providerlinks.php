@@ -387,6 +387,34 @@ return [
         'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
         'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP'
     ],
+    'ozashiki'=>[
+        'PROVIDER_ID' => 58,
+        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
+        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
+        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+        'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
+        'PLATFORM_ID' => 'tigergame'
+    ],
+    'mannaplay'=>[
+        'PROVIDER_ID' => 58,
+        'all' => [
+            'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/betrnk/authenticate/auth_token',
+            'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/betrnk/gameLink/link',
+            'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+            'PLATFORM_ID' => 'tigergame'
+        ],
+        '100' => [ // 100 Percent RTP
+            'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/betrnk/authenticate/auth_token',
+            'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/betrnk/gameLink/link',
+            'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
+            'PLATFORM_ID' => 'betrnk'
+        ],
+    ],
     'solid'=>[
         'PROVIDER_ID' => 1,
         'LAUNCH_URL'=> 'https://instage.solidgaming.net/api/launch/',
@@ -563,15 +591,6 @@ return [
     'toptrendgaming' => [
         'provider_db_id' => 56,
         'api_url' => 'https://ams-api.stg.ttms.co:8443/cip/gametoken/',
-    ],
-    'ozashiki'=>[
-        'PROVIDER_ID' => 58,
-        'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/tigergame/authenticate/auth_token',
-        'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/tigergame/gameLink/link',
-        'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
-        'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
-        'PLATFORM_ID' => 'tigergame'
     ],
     'nolimit'=>[
         'provider_db_id' => 59,

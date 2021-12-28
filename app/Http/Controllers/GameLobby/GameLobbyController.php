@@ -500,7 +500,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif(in_array($provider_code, [38,130])){
+                elseif(in_array($provider_code, [38,130,104])){  // Manna Play
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
@@ -509,6 +509,15 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                // elseif($provider_code==104){
+                //     $msg = array(
+                //         "game_code" => $request->input("game_code"),
+                //         "url" => GameLobby::ozashikiLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
+                //         "game_launch" => true
+                //     );
+                //     return response($msg,200)
+                //     ->header('Content-Type', 'application/json');
+                // }
                 elseif($request->input('game_provider')=="Aoyama Slots"){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
@@ -857,16 +866,6 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==104){
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::ozashikiLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang), 
-                        "game_launch" => true
-                    );
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
-                }
-
                 elseif($provider_code==105){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
