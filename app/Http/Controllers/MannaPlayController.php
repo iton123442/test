@@ -27,7 +27,7 @@ class MannaPlayController extends Controller
 	public function __construct(){
 		// $this->client_api_key = config("providerlinks.manna.CLIENT_API_KEY");
 		// $this->provider_db_id = config("providerlinks.manna.PROVIDER_ID");
-		$this->provider_db_id = config("providerlinks.PROVIDER_ID.PROVIDER_ID");
+		$this->provider_db_id = config("providerlinks.mannaplay.PROVIDER_ID");
 	}
 
 

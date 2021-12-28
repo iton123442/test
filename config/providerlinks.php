@@ -404,7 +404,7 @@ return [
     //     'PLATFORM_ID' => 'tigergame'
     // ],
     'mannaplay'=>[
-        'PROVIDER_ID' => 16,
+        'PROVIDER_ID' => 58,
         'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
         'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
         'default' => [
