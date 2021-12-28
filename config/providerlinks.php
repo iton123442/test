@@ -645,11 +645,6 @@ return [
    'amusegaming' => [
         'provider_db_id'=> 65,
         'operator' => [
-            'JPY' => [
-                'operator_id' => 'betrnkJPY',
-                'public_key' => 'OLY4s6G0EMb69g5L9ZBp',
-                'secret_key' => 'dQBO3vdevew0Z0sc9b2E'
-            ],
             'TEST' => [
                 'operator_id' => 'betrnkUSDtest',
                 'public_key' => 'EI4gh2M62f7V9mmH9SNI',

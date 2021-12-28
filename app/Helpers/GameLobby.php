@@ -1904,7 +1904,12 @@ class GameLobby{
             Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
             return "false";
         } catch (\Exception $e) {
-            Helper::saveLog('AMUSEGAMING LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            Helper::saveLog('AMUSEGAMING LAUNCH ERROR', 65, json_encode($msg),  $e->getMessage() );
             return $e->getMessage();
         }
     }
