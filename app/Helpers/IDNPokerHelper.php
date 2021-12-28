@@ -79,11 +79,24 @@ class IDNPokerHelper{
     }
 
 
-    public static function gameLaunchURLLogin($data, $player_id) {
+    public static function gameLaunchURLLogin($data, $player_id, $client_details) {
         try {
             $url = config('providerlinks.idnpoker.URL');
-            $lang = $data["lang"] != '' ? $data["lang"] : 'en';
-            
+            if($client_details->default_language != ''){
+                $player_lang = $client_details->default_language;
+                if($player_lang == 'ja'){
+                    $player_lang = 'jp';
+                }
+            }else{
+                $player_lang = $data['lang'];
+                if($data['lang'] == ''){
+                    $player_lang = 'en';
+                }
+            }
+            $lang = $player_lang;
+          
+            // $lang = $data["lang"] != '' ? $data["lang"] : 'en';
+     
             $client = new Client();
             $request = '
             <request>

@@ -542,6 +542,11 @@ $app->post('/public/api/gf/sw/force-transfer-out', 'GoldenFController@swforceTra
 $app->post('/public/api/gf/sw/query-translog', 'GoldenFController@swQuerytranslog');
 
 
+// MancalaGaming Endpoints
+$app->post('/public/api/mancala/Balance', 'MancalaGamingController@getBalance');
+$app->post('/public/api/mancala/Credit', 'MancalaGamingController@debitProcess');
+$app->post('/public/api/mancala/Debit', 'MancalaGamingController@creditProcess');
+$app->post('/public/api/mancala/Refund', 'MancalaGamingController@rollbackTransaction');
 
 $app->post('/public/api/currency','AlController@currency');
 
@@ -723,8 +728,9 @@ $app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollback
 $app->post('/public/api/quickspin/fs_win', 'QuickspinDirectController@freeRound');
 
 // SpearHead
+$app->post('/public/api/spearhead/GetAccount', 'SpearHeadController@getAccount');
 $app->post('/public/api/spearhead/GetBalance', 'SpearHeadController@getBalance');
-$app->post('/public/api/spearhead','SpearHeadController@index');
+$app->post('/public/api/spearhead','SpearHeadController@walletApiReq');
 
 //IDNPOKER
 $app->post('/public/api/idnpoker/makeDeposit', 'IDNPokerController@makeDeposit');
@@ -739,3 +745,8 @@ $app->post('/public/api/transferwallet/getPlayerBalance','TransferWalletControll
 $app->post('/public/api/transferwallet/getPlayerWalletBalance','TransferWalletController@getPlayerWalletBalance');
 $app->post('/public/api/transferwallet/makeWithdraw','TransferWalletController@makeWithdraw');
 $app->post('/public/api/transferwallet/makeDeposit','TransferWalletController@makeDeposit');
+
+// PLAYER OPERATOR DETAILS
+$app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
+    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+});

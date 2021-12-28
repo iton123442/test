@@ -65,7 +65,6 @@ class JustPlayController extends Controller
              $entry_id = $data["win"] == 0.0 ? 1 : 2;// 1/bet/debit , 2//win/credit
              $provider_trans_id = $data['id_stat']; // 
              $round_id = $data['id_stat'];// this is round
-             $payout_reason = ProviderHelper::updateReason(5);
              //Create GameTransaction, GameExtension
              Helper::saveLog("Justplay dapit sa game transaction", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
              $gameTransactionData = array(
