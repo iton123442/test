@@ -115,6 +115,7 @@ class GameLobby{
         $res = json_decode($response->getBody(),TRUE);
         Helper::saveLog('5men gamelaunch', 53, json_encode($response), $res);
         $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
+        Helper::saveLog('5men gamelaunchfinal', 53, json_encode($response), $gameurl);
         return $gameurl;   
       
         
