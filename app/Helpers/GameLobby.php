@@ -100,7 +100,7 @@ class GameLobby{
         ];
 
         $signature =  ProviderHelper::getSignature($requesttosend, config('providerlinks.5men.api_key'));
-
+        Helper::saveLog('5men create signature', 53, json_encode($signature), $requesttosend);
         $requesttosend['signature'] = $signature;
 
         $client = new Client([
@@ -113,7 +113,7 @@ class GameLobby{
             'form_params' => $requesttosend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
-        // Helper::saveLog('TGG GAMELAUNCH TOPGRADEGAMES', 29, json_encode($requesttosend), json_decode($response->getBody()));
+        Helper::saveLog('5men gamelaunch', 53, json_encode($response), $res);
         $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exiturl;
         return $gameurl;   
       
