@@ -501,9 +501,10 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif(in_array($provider_code, [38,130,104])){  // Manna Play
+                    $lang = isset($request->lang) ? $request->lang : 'en';
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->lang, $request->client_id), 
+                        "url" => GameLobby::mannaLaunchUrl($request->game_code,$request->token,$request->exitUrl, $lang, $request->client_id), 
                         "game_launch" => true
                     );
                     return response($msg,200)
