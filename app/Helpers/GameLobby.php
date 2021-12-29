@@ -1203,7 +1203,7 @@ class GameLobby{
         $lang = GameLobby::getLanguage("Manna Play", $lang);
 
         try {
-
+            ProviderHelper::saveLogGameLaunch('MannaPlay Auth Response', 15, json_encode($client_details), $clientID);
             // Authenticate New Token
             if ($client_details->operator_id == 15){ // EveryMatix Config
                 $auth_api_key = config("providerlinks.mannaplay.15.API_KEY");
