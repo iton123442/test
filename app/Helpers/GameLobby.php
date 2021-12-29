@@ -1223,7 +1223,7 @@ class GameLobby{
             $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => $api_key
+                    'apiKey' => $auth_api_key
 
                 ]
             ]);
