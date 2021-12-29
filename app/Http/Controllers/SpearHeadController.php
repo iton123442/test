@@ -307,6 +307,7 @@ public function CreditProcess($req){
       Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
       $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
       $game_trans_id = $game_transaction_id;
+      $income = 0;
     }else{
       $client_details->connection_name = $bet_transaction->connection_name;
       $income = $bet_transaction->bet_amount - $pay_amount;
