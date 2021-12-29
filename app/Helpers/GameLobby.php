@@ -1202,16 +1202,19 @@ class GameLobby{
         $lang = GameLobby::getLanguage("Manna Play", $lang);
 
         try {
-
+            ProviderHelper::saveLogGameLaunch('MannaPlay Auth Response', 15, json_encode($client_details), $clientID);
             // Authenticate New Token
             if ($client_details->operator_id == 15){ // EveryMatix Config
-                $auth_api_key = config("providerlinks.mannaplay.15.API_KEY");
+                $api_key = config("providerlinks.mannaplay.15.API_KEY");
+                $auth_api_key = config("providerlinks.mannaplay.15.AUTH_API_KEY");
                 $platform_id = config("providerlinks.mannaplay.15.PLATFORM_ID");
             }elseif($client_details->operator_id == 30){ // IDNPLAY
-                $auth_api_key = config("providerlinks.mannaplay.30.API_KEY");
+                $api_key = config("providerlinks.mannaplay.30.API_KEY");
+                $auth_api_key = config("providerlinks.mannaplay.30.AUTH_API_KEY");
                 $platform_id = config("providerlinks.mannaplay.30.PLATFORM_ID");
             }else{
-                $auth_api_key = config("providerlinks.mannaplay.default.API_KEY");
+                $api_key = config("providerlinks.mannaplay.default.API_KEY");
+                $auth_api_key = config("providerlinks.mannaplay.default.AUTH_API_KEY");
                 $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
             }
             
@@ -1219,7 +1222,7 @@ class GameLobby{
             $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => $auth_api_key
+                    'apiKey' => $api_key
 
                 ]
             ]);
