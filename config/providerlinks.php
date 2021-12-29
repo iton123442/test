@@ -409,16 +409,19 @@ return [
         'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
         'default' => [
             'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
             'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
             'PLATFORM_ID' => 'betrnk'
         ],
         "15" => [ // Operator id 15 - Everymatrix
             'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
+            'AUTH_API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
             'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
             'PLATFORM_ID' => 'tigergame'
         ],
         "30" => [  // Operator id 30 - IDNPLAY
             'API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
+            'AUTH_API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
             'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
             'PLATFORM_ID' => 'idnplay'
         ],
