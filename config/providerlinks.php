@@ -418,7 +418,7 @@ return [
             'PLATFORM_ID' => 'tigergame'
         ],
         "30" => [  // Operator id 30 - IDNPLAY
-            'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
+            'API_KEY'=> 'cxOhILwXLjhhxiUfBv86depT&4HaRjrb',
             'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
             'PLATFORM_ID' => 'idnplay'
         ],
