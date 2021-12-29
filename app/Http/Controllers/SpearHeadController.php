@@ -289,11 +289,30 @@ public function CreditProcess($req){
     }
     $game_details = Game::find($game_code, $this->provider_db_id);
     $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
-    $client_details->connection_name = $bet_transaction->connection_name;
-    $income = $bet_transaction->bet_amount - $pay_amount;
     $winBalance = $client_details->balance + $pay_amount;
     $win_or_lost = $pay_amount > 0 ?  1 : 0;
     $entry_id = $pay_amount > 0 ?  2 : 1;
+    if($bet_transaction == 'false'){
+      $gameTransactionData = array(
+          "provider_trans_id" => $provider_trans_id,
+          "token_id" => $client_details->token_id,
+          "game_id" => $game_details->game_id,
+          "round_id" => $round_id,
+          "bet_amount" => 0,
+          "win" => 5,
+          "pay_amount" => 0,
+          "income" => 0,
+          "entry_id" => 1,
+      ); 
+      Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
+      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+      $game_trans_id = $game_transaction_id;
+      $income = 0;
+    }else{
+      $client_details->connection_name = $bet_transaction->connection_name;
+      $income = $bet_transaction->bet_amount - $pay_amount;
+      $game_trans_id = $bet_transaction->game_trans_id;
+    }
     $res = [
       "ApiVersion" => "1.0",
       "Request" => "WalletCredit",
@@ -301,7 +320,7 @@ public function CreditProcess($req){
       "Details" => null,
       "SessionId" => $client_details->player_token,
       "ExternalUserId" => $client_details->player_id,
-      "AccountTransactionId" => $bet_transaction->game_trans_id,
+      "AccountTransactionId" => $game_trans_id,
       "Balance" => $winBalance,
       "Currency" => $client_details->default_currency,
       "Message" => "Success"
@@ -313,9 +332,9 @@ public function CreditProcess($req){
           'entry_id' => $entry_id,
           'trans_status' => 2
     ];
-    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
     $gameTransactionEXTData = array(
-              "game_trans_id" => json_encode($bet_transaction->game_trans_id),
+              "game_trans_id" => json_encode($game_trans_id),
               "provider_trans_id" => $provider_trans_id,
               "round_id" => $round_id,
               "amount" => $pay_amount,
@@ -343,7 +362,7 @@ public function CreditProcess($req){
               "provider_round_id"=> $round_id, #R
           ],
           "mwapi" => [
-              "roundId"=>$bet_transaction->game_trans_id, #R
+              "roundId"=>$game_trans_id, #R
               "type"=>2, #R
               "game_id" => $game_details->game_id, #R
               "player_id" => $client_details->player_id, #R
@@ -355,7 +374,7 @@ public function CreditProcess($req){
               ]
           ]
     ];
-    $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+    $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
     if(isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "200"){
         $updateTransactionEXt = array(
