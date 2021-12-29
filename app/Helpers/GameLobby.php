@@ -1197,141 +1197,152 @@ class GameLobby{
         return $url;
     }
 
-    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = ''){
-        $client_details = GameLobby::getClientDetails('token', $token);
+    public static function mannaLaunchUrl($game_code,$token,$exitUrl, $lang = '', $clientID){
+        $client_details = Providerhelper::getClientDetails('token', $token);
         $lang = GameLobby::getLanguage("Manna Play", $lang);
-        // Authenticate New Token
 
         try {
-             $auth_token = new Client([ // auth_token
+
+            // Authenticate New Token
+            if ($client_details->operator_id == 15){ // EveryMatix Config
+                $auth_api_key = config("providerlinks.mannaplay.15.API_KEY");
+                $platform_id = config("providerlinks.mannaplay.15.PLATFORM_ID");
+            }elseif($client_details->operator_id == 30){ // IDNPLAY
+                $auth_api_key = config("providerlinks.mannaplay.30.API_KEY");
+                $platform_id = config("providerlinks.mannaplay.30.PLATFORM_ID");
+            }else{
+                $auth_api_key = config("providerlinks.mannaplay.default.API_KEY");
+                $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
+            }
+            
+
+            $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
-                    'apiKey' => config("providerlinks.manna.AUTH_API_KEY")
+                    'apiKey' => $auth_api_key
+
                 ]
             ]);
 
-            try {
-                $auth_token_response = $auth_token->post(config("providerlinks.manna.AUTH_URL"),
-                    ['body' => json_encode(
-                            [
-                                "id" => "betrnk",
-                                "account" => $client_details->player_id,
-                                "currency" => $client_details->default_currency,
-                                "sessionId" => $token,
-                                "channel" => ($client_details->test_player ? "demo" : "")
-                            ]
-                    )]
-                );
+            $auth_token_body =  [
+                "id" => $platform_id,
+                "account" => $client_details->player_id,
+                "currency" => $client_details->default_currency,
+                "sessionId" => $token,
+                "channel" => ($client_details->test_player ? "demo" : "")
+            ];
 
+            try {
+               $auth_token_response = $auth_token->post(config("providerlinks.mannaplay.AUTH_URL").$platform_id.'/authenticate/auth_token',
+                    ['body' => json_encode($auth_token_body)]
+                );
                 $auth_result = json_decode($auth_token_response->getBody()->getContents());
-                ProviderHelper::saveLogGameLaunch('MannaPlay Auth Response', 15, json_encode($client_details), $auth_result);
+                ProviderHelper::saveLogGameLaunch('MannaPlay Auth Response', 15, json_encode($auth_token_body), $auth_result);
             } catch (\Exception $e) {
-                 ProviderHelper::saveLogGameLaunch('MannaPlay', 15, json_encode($client_details), $e->getMessage());
+                 ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($auth_token_body), $e->getMessage().' '.$e->getLine());
                 return $exitUrl;
             }
-            
             // Generate Game Link
             $game_link = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'apiKey' => config("providerlinks.manna.AUTH_API_KEY"),
-                        'token' => $auth_result->token
-                    ]
-                ]);
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'apiKey' => $auth_api_key,
+                    'token' => $auth_result->token
+                ]
+            ]);
 
-            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
-                    ['body' => json_encode(
-                            [
-                                "account" => $client_details->player_id,
-                                "sessionId" => $token,
-                                "language" => $lang,
-                                "gameId" => $game_code,
-                                "exitUrl" => $exitUrl
-                            ]
-                    )]
-                );
+            $game_link_body =  [
+             "account" => $client_details->player_id,
+             "sessionId" => $token,
+             "language" => $lang,
+             "gameId" => $game_code,
+             "exitUrl" => $exitUrl
+            ];
 
+            $game_link_response = $game_link->post(config("providerlinks.mannaplay.GAME_LINK_URL").$platform_id.'/gameLink/link',
+                    ['body' => json_encode($game_link_body)]
+            );
             $link_result = json_decode($game_link_response->getBody()->getContents());
             
             return $link_result->url;
         } catch (\Exception $e) {
-            ProviderHelper::saveLogGameLaunch('MannaPlay', 15, json_encode($client_details), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($client_details), $e->getMessage().' '.$e->getLine());
             return $exitUrl;
         }
 
        
     }
 
-    public static function ozashikiLaunchUrl($game_code,$token,$exitUrl, $lang = '') {
-        /*$client_details = GameLobby::getClientDetails('token', $token);*/
-        $client_details = ProviderHelper::getClientDetails('token', $token);
-        $lang = GameLobby::getLanguage("Ozashiki", $lang);
-        // Authenticate New Token
+    // public static function ozashikiLaunchUrl($game_code,$token,$exitUrl, $lang = '') {
+    //     /*$client_details = GameLobby::getClientDetails('token', $token);*/
+    //     $client_details = ProviderHelper::getClientDetails('token', $token);
+    //     $lang = GameLobby::getLanguage("Ozashiki", $lang);
+    //     // Authenticate New Token
 
-        try {
-            $auth_token = new Client([ // auth_token
-                'headers' => [ 
-                    'Content-Type' => 'application/json',
-                    'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY")
-                ]
-            ]);
-            $auth_token_response = $auth_token->post(config("providerlinks.ozashiki.AUTH_URL"),
-                    ['body' => json_encode(
-                            [
-                                "id" => config("providerlinks.ozashiki.PLATFORM_ID"),
-                                "account" => $client_details->player_id,
-                                "currency" => $client_details->default_currency,
-                                "sessionId" => $token,
-                                "channel" => ($client_details->test_player ? "demo" : "")
-                            ]
-                    )]
-                );
+    //     try {
+    //         $auth_token = new Client([ // auth_token
+    //             'headers' => [ 
+    //                 'Content-Type' => 'application/json',
+    //                 'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY")
+    //             ]
+    //         ]);
+    //         $auth_token_response = $auth_token->post(config("providerlinks.ozashiki.AUTH_URL"),
+    //                 ['body' => json_encode(
+    //                         [
+    //                             "id" => config("providerlinks.ozashiki.PLATFORM_ID"),
+    //                             "account" => $client_details->player_id,
+    //                             "currency" => $client_details->default_currency,
+    //                             "sessionId" => $token,
+    //                             "channel" => ($client_details->test_player ? "demo" : "")
+    //                         ]
+    //                 )]
+    //             );
 
-            $auth_result = json_decode($auth_token_response->getBody()->getContents());
+    //         $auth_result = json_decode($auth_token_response->getBody()->getContents());
 
-            ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Auth Response', 15, json_encode($client_details), $auth_result);
-        } catch (\Exception $e) {
-             ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki', 15, json_encode($client_details), $e->getMessage());
-            return $exitUrl;
-        }
+    //         ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Auth Response', 15, json_encode($client_details), $auth_result);
+    //     } catch (\Exception $e) {
+    //          ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki', 15, json_encode($client_details), $e->getMessage());
+    //         return $exitUrl;
+    //     }
 
-        // Generate Game Link
-        $game_link = new Client([
-            'headers' => [ 
-                'Content-Type' => 'application/json',
-                'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY"),
-                'token' => $auth_result->token
-            ]
-        ]);
+    //     // Generate Game Link
+    //     $game_link = new Client([
+    //         'headers' => [ 
+    //             'Content-Type' => 'application/json',
+    //             'apiKey' => config("providerlinks.ozashiki.AUTH_API_KEY"),
+    //             'token' => $auth_result->token
+    //         ]
+    //     ]);
 
-        $game_link_response = $game_link->post(config("providerlinks.ozashiki.GAME_LINK_URL"),
-                ['body' => json_encode(
-                        [
-                            "account" => $client_details->player_id,
-                            "sessionId" => $token,
-                            "language" => $lang,
-                            "gameId" => $game_code,
-                            "exitUrl" => $exitUrl
-                        ]
-                )]
-            );
+    //     $game_link_response = $game_link->post(config("providerlinks.ozashiki.GAME_LINK_URL"),
+    //             ['body' => json_encode(
+    //                     [
+    //                         "account" => $client_details->player_id,
+    //                         "sessionId" => $token,
+    //                         "language" => $lang,
+    //                         "gameId" => $game_code,
+    //                         "exitUrl" => $exitUrl
+    //                     ]
+    //             )]
+    //         );
 
-        $link_result = json_decode($game_link_response->getBody()->getContents());
-        ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Link', 15, json_encode($link_result), $auth_result);
-        return $link_result->url;
+    //     $link_result = json_decode($game_link_response->getBody()->getContents());
+    //     ProviderHelper::saveLogGameLaunch('MannaPlay Ozashiki Link', 15, json_encode($link_result), $auth_result);
+    //     return $link_result->url;
         
-        /*switch($client_details->wallet_type){
-            case 1:
-                return $link_result->url;
-            case 2:
-                return TWGameLaunchHelper::TwLaunchUrl($token, 'Ozashiki', $link_result->url, $client_details->player_id, $exitUrl);
-            case 3:
-                return PureTransferWalletHelper::PTwLaunchUrl($token, 'Ozashiki', $link_result->url, $client_details->player_id, $exitUrl);
-            default:
-                return false;
-        }*/
-        // return $link_result->url;
-    }
+    //     /*switch($client_details->wallet_type){
+    //         case 1:
+    //             return $link_result->url;
+    //         case 2:
+    //             return TWGameLaunchHelper::TwLaunchUrl($token, 'Ozashiki', $link_result->url, $client_details->player_id, $exitUrl);
+    //         case 3:
+    //             return PureTransferWalletHelper::PTwLaunchUrl($token, 'Ozashiki', $link_result->url, $client_details->player_id, $exitUrl);
+    //         default:
+    //             return false;
+    //     }*/
+    //     // return $link_result->url;
+    // }
 
     public static function dragonGamingLaunchUrl($request_data) {
         $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
@@ -1881,7 +1892,6 @@ class GameLobby{
             $getDetails = AmuseGamingHelper::createPlayerAndCheckPlayer($client_details);
             // Helper::saveLog('AMUSEGAMING LAUNCH createPlayerAndCheckPlayer', 65, json_encode($getDetails),  $getDetails );
             if ($getDetails) {
-               
                 $token = AmuseGamingHelper::requestTokenFromProvider($client_details, "real");
                 if($token != "false"){
                     $getGameDetails = Helper::findGameDetails( "game_code", $proivder_db_id, $data['game_code']);
@@ -1891,7 +1901,6 @@ class GameLobby{
                     return $url;
                 }
             }
-            dd($client_details->player_id);
             Helper::saveLog('AMUSEGAMING LAUNCH', 65, json_encode($data),  $getDetails );
             return "false";
         } catch (\Exception $e) {
@@ -1902,21 +1911,31 @@ class GameLobby{
     
     public static function QuickSpinDGameLaunch($data,$device){
         Helper::saveLog('QuickSpin Direct LAUNCH', 66, json_encode($data),  "HIT" );
-        if($device == 'desktop'){
-            $channel = 'web';
-        }else{
-            $channel = 'mobile';
+        try {
+            if($device == 'desktop'){
+                $channel = 'web';
+            }else{
+                $channel = 'mobile';
+            }
+            $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
+            $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$channel."&ticket=".$data['token'];
+            return $gameUrl;
+        } catch (\Exception $e) {
+            Helper::saveLog('QuickSpinDirect LAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
+            return $e->getMessage();
         }
-        $getGameDetails = Helper::findGameDetails( "game_code", config('providerlinks.quickspinDirect.provider_db_id'), $data['game_code']);
-        $gameUrl = config("providerlinks.quickspinDirect.api_url")."/casino/launcher.html?moneymode=real&lang=en_US&gameid=".$getGameDetails->game_code."&partner=tigergames&partnerid=2076&channel=".$channel."&ticket=".$data['token'];
-        return $gameUrl;
     }
 
     public static function SpearHeadGameLaunch($data, $device){
-        Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
-        $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&casinolobbyurl=".$data['exitUrl']."&_sid=".$data['token'];
-        Helper::saveLog('SpearHeadGameLaunch2 ', 67, json_encode($data),$gameUrl);
-        return $gameUrl;
+        try {
+            Helper::saveLog('SpearHeadGameLaunch ', 67, json_encode($data),  "HIT" );
+            $gameUrl = config('providerlinks.spearhead.api_url').config('providerlinks.spearhead.opid')."/".$data['game_code']."?language=en&casinolobbyurl=".$data['exitUrl']."&_sid=".$data['token'];
+            Helper::saveLog('SpearHeadGameLaunch2 ', 67, json_encode($data),$gameUrl);
+            return $gameUrl;
+        } catch (\Exception $e) {
+            Helper::saveLog('SpearHeadLAUNCH ERROR', 65, json_encode($e->getMessage()),  $e->getMessage() );
+            return $e->getMessage();
+        }
     }
 
 
@@ -1950,7 +1969,7 @@ class GameLobby{
                     * GET URL / OR LOGIN TO PROVIDER
                     *
                     ****************************************************************/
-                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id);
+                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details);
                     
                     switch($client_details->wallet_type){
                         case 1: 

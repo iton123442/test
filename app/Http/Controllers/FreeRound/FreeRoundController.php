@@ -42,7 +42,7 @@ class FreeRoundController extends Controller
         //     ->header('Content-Type', 'application/json');
         //  }
 
-         $checkProviderSupportFreeRound = $this->checkProviderSupportFreeRound($provider_code);
+        $checkProviderSupportFreeRound = $this->checkProviderSupportFreeRound($provider_code);
         if(!$checkProviderSupportFreeRound){
              $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service Provider"];
             return response($mw_response,200)
@@ -151,6 +151,8 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRoundMannaplay($player_details, $data, $sub_provder_id);
         }  elseif ($sub_provder_id == 126) {
             return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id);
+        } elseif ($sub_provder_id == 127) {
+            return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id);
         } 
     }
 

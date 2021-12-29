@@ -92,6 +92,14 @@ $app->post('/public/api/manna/{brand_code}/bet', 'MannaPlayController@debitProce
 $app->post('/public/api/manna/{brand_code}/win', 'MannaPlayController@creditProcess');
 $app->post('/public/api/manna/{brand_code}/betrollback', 'MannaPlayController@rollbackTransaction');
 $app->post('/public/api/manna/{brand_code}/fs_win', 'MannaPlayController@freeRound');
+
+// Ozashiki Single Controller Endpoints
+$app->post('/public/api/ozashiki/fetchbalance', 'MannaPlayController@getBalance');
+$app->post('/public/api/ozashiki/bet', 'MannaPlayController@debitProcess');
+$app->post('/public/api/ozashiki/win', 'MannaPlayController@creditProcess');
+$app->post('/public/api/ozashiki/betrollback', 'MannaPlayController@rollbackTransaction');
+
+
 // QTech Games Endpoints
 $app->get('/public/api/qtech/{brand_code}/accounts/{player_id}/session?gameId={game_id}', 'QTechController@authPlayer');
 $app->post('/public/api/qtech/{brand_code}/accounts/{player_id}/balance?gameId={game_id}', 'QTechController@getBalance');
@@ -634,11 +642,6 @@ $app->post('/public/api/login','TTGController@privateLogin');
 
 
 
-// Ozashiki Single Controller Endpoints
-$app->post('/public/api/ozashiki/fetchbalance', 'OzashikiController@getBalance');
-$app->post('/public/api/ozashiki/bet', 'OzashikiController@debitProcess');
-$app->post('/public/api/ozashiki/win', 'OzashikiController@creditProcess');
-$app->post('/public/api/ozashiki/betrollback', 'OzashikiController@rollbackTransaction');
 
 // Ozashiki Seamless and Semi Transfer Endpoints
 // $app->post('/public/api/ozashiki/fetchbalance', 'Ozashiki\MainController@getBalance');
@@ -745,3 +748,8 @@ $app->post('/public/api/transferwallet/getPlayerBalance','TransferWalletControll
 $app->post('/public/api/transferwallet/getPlayerWalletBalance','TransferWalletController@getPlayerWalletBalance');
 $app->post('/public/api/transferwallet/makeWithdraw','TransferWalletController@makeWithdraw');
 $app->post('/public/api/transferwallet/makeDeposit','TransferWalletController@makeDeposit');
+
+// PLAYER OPERATOR DETAILS
+$app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
+    $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
+});
