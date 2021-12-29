@@ -94,10 +94,10 @@ $app->post('/public/api/manna/{brand_code}/betrollback', 'MannaPlayController@ro
 $app->post('/public/api/manna/{brand_code}/fs_win', 'MannaPlayController@freeRound');
 
 // Ozashiki Single Controller Endpoints
-$app->post('/public/api/ozashiki/fetchbalance', 'OzashikiController@getBalance');
-$app->post('/public/api/ozashiki/bet', 'OzashikiController@debitProcess');
-$app->post('/public/api/ozashiki/win', 'OzashikiController@creditProcess');
-$app->post('/public/api/ozashiki/betrollback', 'OzashikiController@rollbackTransaction');
+$app->post('/public/api/ozashiki/fetchbalance', 'MannaPlayController@getBalance');
+$app->post('/public/api/ozashiki/bet', 'MannaPlayController@debitProcess');
+$app->post('/public/api/ozashiki/win', 'MannaPlayController@creditProcess');
+$app->post('/public/api/ozashiki/betrollback', 'MannaPlayController@rollbackTransaction');
 
 
 // QTech Games Endpoints

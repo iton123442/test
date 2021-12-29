@@ -86,6 +86,7 @@ class MannaPlayController extends Controller
 							"errorCode" =>  10105,
 							"message" => "Authenticate fail!",
 						];
+						Helper::saveLog('manna_balance FAILED AUTH', $this->provider_db_id, file_get_contents("php://input"), $api_key);
 						return response()->json($response, $http_status);
 					}
 
