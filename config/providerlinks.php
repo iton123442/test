@@ -412,12 +412,12 @@ return [
             'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
             'PLATFORM_ID' => 'betrnk'
         ],
-        "15" => [ // Operator id 15 / Everymatrix
+        "15" => [ // Operator id 15 - Everymatrix
             'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
             'CLIENT_API_KEY' => 'a5ebcf7ee7268c116b508136d50c1d40',
             'PLATFORM_ID' => 'tigergame'
         ],
-        "30" => [  // Operator id 30 / IDNPLAY
+        "30" => [  // Operator id 30 - IDNPLAY
             'API_KEY'=> 'Oj3TE7wztwWnKc#!SaQhaIRA8S8mUv1v#3cy5zOs',
             'CLIENT_API_KEY' => '4dtXHSekHaFkAqbGcsWV2es4BTRLADQP',
             'PLATFORM_ID' => 'idnplay'
