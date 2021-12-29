@@ -428,7 +428,7 @@ class FreeSpinHelper{
                 'body' => json_encode([
                     'BonusSource' => 2,
                     'OperatorUserId' => $data['details']['OperatorUserId'],
-                    'GameIds' => '['."WildReels".']',
+                    'GameIds' => $data['details']['GameIds'],
                     'NumberOfFreeRounds' => $data["details"]["NumberOfFreeRounds"],
                     'BonusId' => FreeSpinHelper::unique_code(14),
                     'FreeRoundsEndDate' => $data["details"]["FreeRoundsEndDate"],
