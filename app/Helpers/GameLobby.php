@@ -1214,7 +1214,7 @@ class GameLobby{
                 $platform_id = config("providerlinks.mannaplay.30.PLATFORM_ID");
             }else{
                 $api_key = config("providerlinks.mannaplay.default.API_KEY");
-                $auth_api_key = config("providerlinks.mannaplay.30.AUTH_API_KEY");
+                $auth_api_key = config("providerlinks.mannaplay.default.AUTH_API_KEY");
                 $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
             }
             
