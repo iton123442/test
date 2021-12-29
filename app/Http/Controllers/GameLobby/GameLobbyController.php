@@ -501,6 +501,7 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif(in_array($provider_code, [38,130,104])){  // Manna Play
+
                     $lang = isset($request->lang) ? $request->lang : 'en';
                     $msg = array(
                         "game_code" => $request->input("game_code"),
@@ -509,6 +510,7 @@ class GameLobbyController extends Controller
                     );
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
+                    
                 }
                 // elseif($provider_code==104){
                 //     $msg = array(
