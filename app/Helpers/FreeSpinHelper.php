@@ -428,7 +428,7 @@ class FreeSpinHelper{
                 'body' => json_encode([
                     'BonusSource' => 2,
                     'OperatorUserId' => $data['details']['OperatorUserId'],
-                    'GameIds' => '['.$data['game_code'].']',
+                    'GameIds' => '['."WildReels".']',
                     'NumberOfFreeRounds' => $data["details"]["NumberOfFreeRounds"],
                     'BonusId' => FreeSpinHelper::unique_code(14),
                     'FreeRoundsEndDate' => $data["details"]["FreeRoundsEndDate"],
@@ -448,6 +448,7 @@ class FreeSpinHelper{
                 ]
             )]
         );
+        Helper::saveLog('Spearhead freespin response', 67, json_encode($data), json_encode($response->getBody()->getContents()));
         $dataresponse = json_decode($response->getBody()->getContents());
         $data = [
             "status" => 3,
