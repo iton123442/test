@@ -34,7 +34,7 @@ class OzashikiController extends Controller
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$api_key = $request->header('apiKey');
 
-		Helper::saveLog('manna_balance HIT', $this->provider_db_id, file_get_contents("php://input"), $api_key);
+		Helper::saveLog('ozashiki HIT', $this->provider_db_id, file_get_contents("php://input"), $api_key);
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId'))
 		{
 			$http_status = 200;
