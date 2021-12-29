@@ -725,7 +725,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==60){ 
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::yggdrasillaunchUrl($request->all(), $request->input('game_provider')), //TEST
+                        "url" => GameLobby::yggdrasillaunchUrl($request->all(), $device), //TEST
                         "game_launch" => true
                     );
                     return response($msg,200)

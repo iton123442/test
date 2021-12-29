@@ -927,15 +927,16 @@ class GameLobby{
         // }
     }
 
-    public static function yggdrasillaunchUrl($data){
+    public static function yggdrasillaunchUrl($data,$device){
         $provider_id = config("providerlinks.ygg.provider_id");
+        if($device == 'desktop'){$channel = 'pc';}else{ $channel = 'mobile';}
         ProviderHelper::saveLogGameLaunch('YGG gamelaunch', $provider_id, json_encode($data), "Endpoing hit");
         $url = config("providerlinks.ygg.api_url");
         $org = config("providerlinks.ygg.Org");
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         try{
-            $url = $url."gameid=".$data['game_code']."&lang=".$client_details->language."&currency=".$client_details->default_currency."&org=".$org."&channel=pc&key=".$data['token'];
+            $url = $url."gameid=".$data['game_code']."&lang=".$client_details->language."&currency=".$client_details->default_currency."&org=".$org."&channel=".$channel."&home=".$data['exitUrl']."&key=".$data['token'];
             ProviderHelper::saveLogGameLaunch('YGG gamelaunch', $provider_id, json_encode($data), $url);
             return $url;
         }catch(\Exception $e){
