@@ -32,19 +32,18 @@ class MannaPlayController extends Controller
 
 
 	public function CheckAuth($client_details, $api_key){
-		if ($client_details->operator_id == 15){  // Operator id 15 / Everymatrix
-            $CLIENT_API_KEY = config("providerlinks.mannaplay.15.CLIENT_API_KEY");
-        }elseif($client_details->operator_id == 30){ // IDNPLAY
-            $CLIENT_API_KEY = config("providerlinks.mannaplay.30.CLIENT_API_KEY");
-        }else{
-            $CLIENT_API_KEY = config("providerlinks.mannaplay.default.CLIENT_API_KEY");
-        }
 
-        if ($CLIENT_API_KEY == $api_key){
-        	return true;
-        }else{
-        	return false;
-        }
+			if (config("providerlinks.mannaplay.".$client_details->operator_id.".CLIENT_API_KEY") != null){
+				$CLIENT_API_KEY = config("providerlinks.mannaplay.".$client_details->operator_id.".CLIENT_API_KEY");
+			}else{
+				$CLIENT_API_KEY = config("providerlinks.mannaplay.default.CLIENT_API_KEY");
+			}
+
+	        if ($CLIENT_API_KEY == $api_key){
+	        	return true;
+	        }else{
+	        	return false;
+	        }
 	}
 
 
@@ -53,7 +52,7 @@ class MannaPlayController extends Controller
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$api_key = $request->header('apiKey');
 
-		Helper::saveLog('manna_balance HIT', $this->provider_db_id, file_get_contents("php://input"), $api_key);
+		ProviderHelper::saveLogWithExeption('manna_balance HIT', $this->provider_db_id, file_get_contents("php://input"), $api_key);
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId'))
 		{
 			$http_status = 200;
@@ -86,7 +85,7 @@ class MannaPlayController extends Controller
 							"errorCode" =>  10105,
 							"message" => "Authenticate fail!",
 						];
-						Helper::saveLog('manna_balance FAILED AUTH', $this->provider_db_id, file_get_contents("php://input"), $api_key);
+						ProviderHelper::saveLogWithExeption('manna_balance FAILED AUTH', $this->provider_db_id, file_get_contents("php://input"), $api_key);
 						return response()->json($response, $http_status);
 					}
 
@@ -98,14 +97,14 @@ class MannaPlayController extends Controller
 			// }
 
 		}
-		Helper::saveLog('manna_balance', $this->provider_db_id, file_get_contents("php://input"), $response);
+		ProviderHelper::saveLogWithExeption('manna_balance', $this->provider_db_id, file_get_contents("php://input"), $response);
 		return response()->json($response, $http_status);
 	}
 
 	public function debitProcess(Request $request){
 
         $json_data = json_decode(file_get_contents("php://input"), true);
-		Helper::saveLog('manna_debit', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
+		ProviderHelper::saveLogWithExeption('manna_debit', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
 		$api_key = $request->header('apiKey');
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
 		{
@@ -134,6 +133,7 @@ class MannaPlayController extends Controller
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				if ($client_details != null) {
 
+
 					if (!$this->CheckAuth($client_details, $api_key)){
 						$http_status = 200;
 						$response = [
@@ -142,7 +142,7 @@ class MannaPlayController extends Controller
 						];
 						return response()->json($response, $http_status);
 					}
-					
+
 					try{
 						ProviderHelper::idenpotencyTable($json_data['round_id']);
 					}catch(\Exception $e){
@@ -235,7 +235,7 @@ class MannaPlayController extends Controller
 			                        );
 			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    }catch(\Exception $e){
-			                        /*Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
+			                        /*ProviderHelper::saveLogWithExeption('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
 			                    } 
 
 								break;
@@ -244,14 +244,14 @@ class MannaPlayController extends Controller
 
 					}
 						
-					Helper::saveLog('manna_debit', $this->provider_db_id, json_encode($json_data), $response);
+					ProviderHelper::saveLogWithExeption('manna_debit', $this->provider_db_id, json_encode($json_data), $response);
 	                return response()->json($response, $http_status);
 
 				}
 			// }
 
 		}
-		Helper::saveLog('MannaPlay debit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
+		ProviderHelper::saveLogWithExeption('MannaPlay debit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
 		return response()->json($response, $http_status);
 
     }
@@ -259,7 +259,7 @@ class MannaPlayController extends Controller
     public function creditProcess(Request $request){
    		
         $json_data = json_decode(file_get_contents("php://input"), true);
-		Helper::saveLog('manna_creditProcess', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
+		ProviderHelper::saveLogWithExeption('manna_creditProcess', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
 		$api_key = $request->header('apiKey');
 		$http_status = 200;
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
@@ -380,7 +380,7 @@ class MannaPlayController extends Controller
 			// }
 
 		}
-		Helper::saveLog('MannaPlay credit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
+		ProviderHelper::saveLogWithExeption('MannaPlay credit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
 		return response()->json($response, $http_status);
 
     }
@@ -500,14 +500,14 @@ class MannaPlayController extends Controller
 			// }
 
 		}
-		Helper::saveLog('MannaPlay rollback', $this->provider_db_id, file_get_contents("php://input"), $response);
+		ProviderHelper::saveLogWithExeption('MannaPlay rollback', $this->provider_db_id, file_get_contents("php://input"), $response);
 		return response()->json($response, $http_status);
 	}
 
 	public function freeRound(Request $request){
    		
 		$json_data = json_decode(file_get_contents("php://input"), true);
-		Helper::saveLog('manna_freeRound', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
+		ProviderHelper::saveLogWithExeption('manna_freeRound', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
 		$api_key = $request->header('apiKey');
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
 		{
@@ -678,7 +678,7 @@ class MannaPlayController extends Controller
 							];
 
 							$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount_win,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
-							Helper::saveLog('manna_freeround_response', $this->provider_db_id, json_encode($json_data), $response);
+							ProviderHelper::saveLogWithExeption('manna_freeround_response', $this->provider_db_id, json_encode($json_data), $response);
 							return response()->json($response, $http_status);
 							break;
 						case '402':
@@ -701,7 +701,7 @@ class MannaPlayController extends Controller
 								);
 								GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 							}catch(\Exception $e){
-								/*Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
+								/*ProviderHelper::saveLogWithExeption('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
 							} 
 
 							break;
@@ -710,13 +710,13 @@ class MannaPlayController extends Controller
 
 				}
 					
-				Helper::saveLog('manna_freeround', $this->provider_db_id, json_encode($json_data), $response);
+				ProviderHelper::saveLogWithExeption('manna_freeround', $this->provider_db_id, json_encode($json_data), $response);
 				return response()->json($response, $http_status);
 
 			}
 
 		}
-		Helper::saveLog('MannaPlay debit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
+		ProviderHelper::saveLogWithExeption('MannaPlay debit error_response', $this->provider_db_id, file_get_contents("php://input"), $response);
 		return response()->json($response, $http_status);
 
 
