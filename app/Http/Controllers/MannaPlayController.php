@@ -134,8 +134,6 @@ class MannaPlayController extends Controller
 				if ($client_details != null) {
 
 
-					dd($this->CheckAuth($client_details, $api_key));
-
 					if (!$this->CheckAuth($client_details, $api_key)){
 						$http_status = 200;
 						$response = [
@@ -145,9 +143,6 @@ class MannaPlayController extends Controller
 						return response()->json($response, $http_status);
 					}
 
-
-					dd(1);
-					
 					try{
 						ProviderHelper::idenpotencyTable($json_data['round_id']);
 					}catch(\Exception $e){
