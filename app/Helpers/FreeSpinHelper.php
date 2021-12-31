@@ -398,9 +398,83 @@ class FreeSpinHelper{
         }
     }
     public static function createFreeRoundSpearHeadEm($player_details,$data, $sub_provder_id){
-        dd($data);
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        try{
+            $freeroundtransac = [
+                "player_id" => $data['details']['OperatorUserId'],
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["NumberOfFreeRounds"],
+                "spin_remaining" => $data["details"]["NumberOfFreeRounds"],
+                "denominations" => $data["details"]["AdditionalParameters"]["BetValue"],
+                "date_expire" => $data["details"]["FreeRoundsEndDate"],
+            ];
+        } catch (\Exception $e) {
+            return 400;
+        }
+        $id = FreeSpinHelper::createFreeRound($freeroundtransac);
+        $username = "TigerGamesStageBonus";
+        $password = "YoqJcvRHFUcr2un4";
+        $credentials = base64_encode($username.":".$password);
+        $httpClient = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $credentials,
+            ]
+        ]);
+        $baseUrl = "https://vendorapi-stage.everymatrix.com/vendorbonus/RGS_Matrix/AwardBonus";
+        $response = $httpClient->post(
+            $baseUrl,[
+                'body' => json_encode([
+                    'BonusSource' => 2,
+                    'OperatorUserId' => $data['details']['OperatorUserId'],
+                    'GameIds' => [
+                        $game_details->info
+                    ],
+                    'NumberOfFreeRounds' => $data["details"]["NumberOfFreeRounds"],
+                    'BonusId' => $id,
+                    'FreeRoundsEndDate' => $data["details"]["FreeRoundsEndDate"],
+                    'DomainId' => config("providerlinks.spearhead.opid"),
+                    'UserDetails' => [
+                        "CountryAlpha3Code" => "PHL",
+                        "Gender" => "Male",
+                        "Alias" => $player_details->display_name,
+                        "Currency" => $player_details->default_currency,
+                        "Firstname" => $player_details->username,
+                        "Lastname" => $player_details->username,
+                        "OperatorUserId" => $data['details']['OperatorUserId'],
+                    ],
+                    "AdditionalParameters" => [
+                        "BetValue" => $data['details']['AdditionalParameters']['BetValue'],
+                    ],
+                ]
+            )]
+        );
+        Helper::saveLog('Spearhead freespin response', 67, json_encode($data), $response->getBody()->getContents());
+        $dataresponse = json_decode($response->getBody()->getContents());
+        $data = [
+            "status" => 3,
+            "provider_trans_id" => $prefix.$id,
+            "details" => json_encode($dataresponse)
+        ];
+        FreeSpinHelper::updateFreeRound($data, $id);
+        if (isset($dataresponse->errorCode) ){
+            //update freeroundtransac
+            $data = [
+                "status" => 3,
+                "provider_trans_id" => $prefix.$id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        } else {
+            $data = [
+                "provider_trans_id" => $prefix.$id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 200;
+        }
     }
 }
 ?>
