@@ -428,9 +428,9 @@ class FreeSpinHelper{
                 'body' => json_encode([
                     'BonusSource' => 2,
                     'OperatorUserId' => $data['details']['OperatorUserId'],
-                    'GameIds' => $data['details']['GameIds'],
+                    'GameIds' => [.'"'.$game_details->game_id.'"'.],
                     'NumberOfFreeRounds' => $data["details"]["NumberOfFreeRounds"],
-                    'BonusId' => FreeSpinHelper::unique_code(14),
+                    'BonusId' => $id,
                     'FreeRoundsEndDate' => $data["details"]["FreeRoundsEndDate"],
                     'DomainId' => config("providerlinks.spearhead.opid"),
                     'UserDetails' => [
@@ -456,23 +456,23 @@ class FreeSpinHelper{
             "details" => json_encode($dataresponse)
         ];
         FreeSpinHelper::updateFreeRound($data, $id);
-        if ( !isset($dataresponse->errorCode) ){
-            //update freeroundtransac
-            $data = [
-                "provider_trans_id" => $prefix.$id,
-                "details" => json_encode($dataresponse)
-            ];
-            FreeSpinHelper::updateFreeRound($data, $id);
-            return 200;
-        } else {
-            $data = [
-                "status" => 3,
-                "provider_trans_id" => $prefix.$id,
-                "details" => json_encode($dataresponse)
-            ];
-            FreeSpinHelper::updateFreeRound($data, $id);
-            return 400;
-        }
+        // if (isset($dataresponse['ErrorCode']) && $dataresponse['ErrorCode'] != 0 || $dataresponse['ErrorCode'] != "0"){
+        //     //update freeroundtransac
+        //     $data = [
+        //         "status" => 3,
+        //         "provider_trans_id" => $prefix.$id,
+        //         "details" => json_encode($dataresponse)
+        //     ];
+        //     FreeSpinHelper::updateFreeRound($data, $id);
+        //     return 400;
+        // } else {
+        //     $data = [
+        //         "provider_trans_id" => $prefix.$id,
+        //         "details" => json_encode($dataresponse)
+        //     ];
+        //     FreeSpinHelper::updateFreeRound($data, $id);
+        //     return 200;
+        // }
     }
 }
 ?>
