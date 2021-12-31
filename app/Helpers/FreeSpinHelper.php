@@ -452,7 +452,6 @@ class FreeSpinHelper{
         );
         Helper::saveLog('Spearhead freespin response', 67, json_encode($data), json_encode($response->getBody()->getContents()));
         $dataresponse = json_decode($response->getBody()->getContents());
-        dd($dataresponse);
         $data = [
             "status" => 3,
             "provider_trans_id" => $prefix.$id,
