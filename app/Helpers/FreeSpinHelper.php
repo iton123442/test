@@ -429,7 +429,7 @@ class FreeSpinHelper{
                     'BonusSource' => 2,
                     'OperatorUserId' => $data['details']['OperatorUserId'],
                     'GameIds' => [
-                        $game_details->game_id,
+                        $game_details->info
                     ],
                     'NumberOfFreeRounds' => $data["details"]["NumberOfFreeRounds"],
                     'BonusId' => $id,
@@ -450,7 +450,7 @@ class FreeSpinHelper{
                 ]
             )]
         );
-        Helper::saveLog('Spearhead freespin response', 67, json_encode($data), json_encode($response->getBody()->getContents()));
+        Helper::saveLog('Spearhead freespin response', 67, json_encode($data), $response->getBody()->getContents());
         $dataresponse = json_decode($response->getBody()->getContents());
         $data = [
             "status" => 3,
