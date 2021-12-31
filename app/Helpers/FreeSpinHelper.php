@@ -458,7 +458,7 @@ class FreeSpinHelper{
             "details" => json_encode($dataresponse)
         ];
         FreeSpinHelper::updateFreeRound($data, $id);
-        if ($dataresponse['ErrorCode'] != 0 || $dataresponse['ErrorCode'] != "0"){
+        if (isset($dataresponse->errorCode) ){
             //update freeroundtransac
             $data = [
                 "status" => 3,
