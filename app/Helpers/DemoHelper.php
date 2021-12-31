@@ -197,7 +197,8 @@ class DemoHelper{
 
     public static function yggDrasil($game_code,$lang){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
-        return 'https://static-pff-tw.248ka.com/init/launchClient.html?gameid='.$game_code.'&lang='.$lang.'&currency=USD&org='.config('providerlinks.ygg.Org').'&channel=pc';
+        // return 'https://static-pff-tw.248ka.com/init/launchClient.html?gameid='.$game_code.'&lang='.$lang.'&currency=USD&org='.config('providerlinks.ygg.Org').'&channel=pc';
+        return 'https://static-fra.pff-ygg.com/init/launchClient.html?gameid='.$game_code.'&lang='.$lang.'&currency=EUR&org=DEMO&channel=pc';
     }
 
     public static function demoPragamticPlay($game_code,$lang,$client_details){

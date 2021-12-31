@@ -335,7 +335,7 @@ class WalletDetailsController extends Controller
             $to = date("Y-m-d H:i:s", strtotime($request->date." ".$request->end_time));
         }
        
-        $partition = TWHelpers::multiplePartition($from,$to);
+        // $partition = TWHelpers::multiplePartition($from,$to);
         $and_player = "and player_id  = (SELECT player_id FROM players WHERE client_id = ".$request->client_id." AND client_player_id = '".$request->client_player_id."' LIMIT 1)  ";
         if ($request->client_player_id == "all") {
             $and_player = '';
@@ -385,7 +385,7 @@ class WalletDetailsController extends Controller
                 $total_data = DB::connection( $connection["connection_name"] )->select("
                     select 
                     count(game_trans_id) total
-                    from ".$connection["db_list"][1].".game_transactions $partition c 
+                    from ".$connection["db_list"][1].".game_transactions  c 
                     where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id."  ".$and_player.";
                     ")[0];
               
@@ -409,7 +409,7 @@ class WalletDetailsController extends Controller
                         when win = 4 then 'refunded'
                     end as status,
                     convert_tz(c.created_at,'+00:00', '+08:00') created_at
-                    from ".$connection["db_list"][1].".game_transactions ".$partition." c 
+                    from ".$connection["db_list"][1].".game_transactions c 
                     where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
                     order by game_trans_id desc
                     limit ".$request->page.", ".TWHelpers::getLimitAvailable($request->limit).";
