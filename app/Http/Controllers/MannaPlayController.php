@@ -32,19 +32,18 @@ class MannaPlayController extends Controller
 
 
 	public function CheckAuth($client_details, $api_key){
-		if ($client_details->operator_id == 15){  // Operator id 15 / Everymatrix
-            $CLIENT_API_KEY = config("providerlinks.mannaplay.15.CLIENT_API_KEY");
-        }elseif($client_details->operator_id == 30){ // IDNPLAY
-            $CLIENT_API_KEY = config("providerlinks.mannaplay.30.CLIENT_API_KEY");
-        }else{
-            $CLIENT_API_KEY = config("providerlinks.mannaplay.default.CLIENT_API_KEY");
-        }
 
-        if ($CLIENT_API_KEY == $api_key){
-        	return true;
-        }else{
-        	return false;
-        }
+			if (config("providerlinks.mannaplay.".$client_details->operator_id.".CLIENT_API_KEY") != null){
+				$CLIENT_API_KEY = config("providerlinks.mannaplay.".$client_details->operator_id.".CLIENT_API_KEY");
+			}else{
+				$CLIENT_API_KEY = config("providerlinks.mannaplay.default.CLIENT_API_KEY");
+			}
+
+	        if ($CLIENT_API_KEY == $api_key){
+	        	return true;
+	        }else{
+	        	return false;
+	        }
 	}
 
 
@@ -134,6 +133,7 @@ class MannaPlayController extends Controller
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				if ($client_details != null) {
 
+
 					if (!$this->CheckAuth($client_details, $api_key)){
 						$http_status = 200;
 						$response = [
@@ -142,7 +142,7 @@ class MannaPlayController extends Controller
 						];
 						return response()->json($response, $http_status);
 					}
-					
+
 					try{
 						ProviderHelper::idenpotencyTable($json_data['round_id']);
 					}catch(\Exception $e){
