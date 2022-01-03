@@ -216,6 +216,7 @@ class PNGController extends Controller
                 );
                 $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
                 $fund_extra_data = [];
+                $is_freespin = false;
                 if($game == 'false'){
                     $entry_id = 1;
                     $gameTransactionData = array(
@@ -233,6 +234,7 @@ class PNGController extends Controller
                     $income = 0 - (float)$xmlparser->real;
                     
                     if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                        $is_freespin = true;
                         $fund_extra_data = [
                             'fundtransferrequest' => [
                                 'fundinfo' => [
@@ -347,8 +349,12 @@ class PNGController extends Controller
                             "game_id" => $game_details->game_id, #R
                             "player_id" => $client_details->player_id, #R
                             "mw_response" => $array_data, #R
+                        ],
+                        'fundtransferrequest' => [
+                            'fundinfo' => [
+                                'freespin' => $is_freespin,
+                            ]
                         ]
-                    
                 ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
