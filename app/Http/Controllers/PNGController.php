@@ -259,6 +259,46 @@ class PNGController extends Controller
                                 FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                         }
                     }
+
+
+                    $wingametransactionext = array(
+                        "game_trans_id" => $gametransactionid,
+                        "provider_trans_id" => $xmlparser->transactionId,
+                        "round_id" =>$xmlparser->roundId,
+                        "amount" => 0,
+                        "game_transaction_type"=>1,
+                        "provider_request" => json_encode($xmlparser),
+                    );
+                    $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                    // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,0,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit",false,$fund_extra_data);
+                    if(isset($client_response->fundtransferresponse->status->code) 
+                    && $client_response->fundtransferresponse->status->code == "200"){
+                        $balance = round($client_response->fundtransferresponse->balance,2);
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+                        $array_data2 = array(
+                            "real" => $balance,
+                            "statusCode" => 0,
+                        );
+                        
+                        $dataToUpdate = array(
+                            "mw_response" => json_encode($array_data2),
+                        );
+                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                        // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
+                    }
+                    elseif(isset($client_response->fundtransferresponse->status->code) 
+                    && $client_response->fundtransferresponse->status->code == "402"){
+                        $array_data = array(
+                            "statusCode" => 7,
+                        );
+                        $dataToUpdate = array(
+                            "mw_response" => json_encode($array_data),
+                            "client_response" => json_encode($client_response)
+                        );
+                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                        return PNGHelper::arrayToXml($array_data,"<reserve/>");
+                    }
                 }
                 else{
                     $entry_id = 2;
