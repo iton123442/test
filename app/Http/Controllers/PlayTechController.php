@@ -46,6 +46,7 @@ class PlayTechController extends Controller
         if ($hashedata == "true") {
             if ($request->brandId == config('providerlinks.playtech.brand_id') ) {
                 $client_details = ProviderHelper::getClientDetails('token', $request->token);
+                $country_code = (isset($client_details->country_code) && $client_details->country_code != '' ) ? $client_details->country_code : "JP";
                 if ($client_details != null) {
                     $response = [
                         "requestId" => $request->requestId,
