@@ -1,12 +1,12 @@
 <?php
 
-$middleware_url_api = 'https://api-test.betrnk.games/public'; 
-// $middleware_url_api = 'http://localhost:1010'; 
+// $middleware_url_api = 'https://api-test.betrnk.games/public'; 
+$middleware_url_api = 'localhost:8010/public'; 
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play-test.betrnk.games';
 $iframe_url = 'https://play-test.betrnk.games/loadgame/transferwallet?param=';
 $puretransferwallet_iframe = 'https://play-test.betrnk.games/api/tw/loadgame?param=';
-$cut_call ='https://api-test.betrnk.games/public';
+$cut_call ='localhost:8010/public';
 return [
     'cut_call_server' => $cut_call,
     'play_betrnk' => $play_betrnk,

@@ -163,7 +163,7 @@ class FundtransferProcessorController extends Controller
         $is_succes = false; # Transaction Succeed First Try
         $re_attempt = false; # Re Attempt after Failed
         $api_error = false; # Check if API Logic Error
-        $restrict_id = Providerhelper::createRestrictGame($payload->action->mwapi->game_id,$payload->action->mwapi->player_id,$gteid, $requesttocient);
+        // $restrict_id = Providerhelper::createRestrictGame($payload->action->mwapi->game_id,$payload->action->mwapi->player_id,$gteid, $requesttocient);
 
         do {
             if($api_error === false){
@@ -178,7 +178,7 @@ class FundtransferProcessorController extends Controller
                                 'http_body' => $stats->getHandlerStats(),
                                 'request_body' => $requesttocient
                             ];
-                            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($data), $stats->getTransferTime() .' TG_SUCCESS');
+                            ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($data), $stats->getTransferTime() .' TG_SUCCESS');
                         },
                         'body' => json_encode($requesttocient)
                     ],
@@ -189,7 +189,7 @@ class FundtransferProcessorController extends Controller
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
                         $is_succes = true;
-                        Providerhelper::deleteGameRestricted('id', $restrict_id);
+                        // Providerhelper::deleteGameRestricted('id', $restrict_id);
                         if($re_attempt == true){
                             Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 12345, json_encode($requesttocient), "RE_ATTEMPT_SUCCESS");
                         }
@@ -528,7 +528,7 @@ class FundtransferProcessorController extends Controller
                             ];
                             ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                         }
-                        Providerhelper::criticalGameRestriction($restrict_id);
+                        // Providerhelper::criticalGameRestriction($restrict_id);
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
                     }else{
                         $api_error = false; // true if stop on API CODE not 402, false re rerun the 5 times resend
@@ -539,7 +539,7 @@ class FundtransferProcessorController extends Controller
                             ];
                             ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                         }
-                        Providerhelper::criticalGameRestriction($restrict_id);
+                        // Providerhelper::criticalGameRestriction($restrict_id);
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
                     }
                 }catch(\Exception $e){
@@ -557,7 +557,7 @@ class FundtransferProcessorController extends Controller
 
                 if($attempt_count++ == 5){ // if the last five attempt not success will be stop requesting
                     $is_succes = true;
-                    Providerhelper::criticalGameRestriction($restrict_id);
+                    // Providerhelper::criticalGameRestriction($restrict_id);
                     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 55555, json_encode($requesttocient), "ATTEMP ADD ++");
                 } 
 
