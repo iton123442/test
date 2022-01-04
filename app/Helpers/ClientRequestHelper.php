@@ -772,7 +772,7 @@ class ClientRequestHelper{
                                 'http_body' => $stats->getHandlerStats(),
                                 'request_body' => $requesttocient
                             ];
-                            Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
+                            ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
                         'body' => json_encode($requesttocient),
                         'timeout' => '1.00'
