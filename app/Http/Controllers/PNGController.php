@@ -383,13 +383,9 @@ class PNGController extends Controller
 
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
-                // if($game != 'false'){
-                //     if($win == 5){
-                //         $this->updateGameTransaction($game,$json_data,'debit',$client_details);
-                //     }else{
-                //         $this->updateGameTransaction($game,$json_data,'credit',$client_details);
-                //     }
-                // }
+                if($game != 'false'){
+                    $this->updateGameTransaction($game,$json_data,'credit',$client_details);
+                }
                 $dataToUpdate = array(
                     "mw_response" => json_encode($array_data),
                 );
