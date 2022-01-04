@@ -59,7 +59,7 @@ class ProviderHelper{
 	public static function saveLogLatency($method, $provider_id = 0, $request_data, $response_data)
 	{
 		try{
-			if(env('SAVELOG_LATENCY', null) == $provider_id){
+			if(env('SAVELOG_LATENCY')){
 				$data = [
 					"method_name" => $method,
 					"provider_id" => $provider_id,
