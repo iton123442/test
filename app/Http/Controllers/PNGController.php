@@ -76,6 +76,7 @@ class PNGController extends Controller
         
     }
     public function reserve(Request $request){
+        $startTime =  microtime(true);
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog('PNG resrerve MDB', 50,json_encode($xmlparser), 'endpoint hit');
@@ -141,9 +142,15 @@ class PNGController extends Controller
                 );
                 $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
+
+                $sendtoclient =  microtime(true);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
+                $client_response_time = microtime(true) - $sendtoclient;
+
+
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
+                    ProviderHelper::saveLogProcessTime('PNG', 1334, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                     $balance = round($client_response->fundtransferresponse->balance,2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                     $array_data = array(
@@ -156,6 +163,7 @@ class PNGController extends Controller
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
+                    ProviderHelper::saveLogProcessTime('PNG', 1334, json_encode(["type"=>"update_gme","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                     
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
@@ -183,6 +191,7 @@ class PNGController extends Controller
         } 
     }
     public function release(Request $request){
+        $startTime =  microtime(true);
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog('PNGReleasechecker(PNG)', 189, json_encode($xmlparser), "Checker");
@@ -314,7 +323,13 @@ class PNGController extends Controller
                             ]
                         ]
                 ];
+
+
+                $sendtoclient =  microtime(true);  
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
+                $client_response_time = microtime(true) - $sendtoclient;
+
+
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     if($game != 'false'){
@@ -328,6 +343,7 @@ class PNGController extends Controller
                         "mw_response" => json_encode($array_data),
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    ProviderHelper::saveLogProcessTime('PNG', 1334, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                     return PNGHelper::arrayToXml($array_data,"<release/>");
                 }elseif (isset($client_response->fundtransferresponse->status->code) 
@@ -411,6 +427,7 @@ class PNGController extends Controller
         }
     }
     public function cancelReserve(Request $request){
+        $startTime =  microtime(true);
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
         $accessToken = "secrettoken";
@@ -485,7 +502,11 @@ class PNGController extends Controller
                 $transactionId=GameTransactionMDB::createGameTransactionExt($refundgametransactionext,$client_details);
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,3);
 
+                $sendtoclient =  microtime(true);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true);
+                $client_response_time = microtime(true) - $sendtoclient;
+
+
                 $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                 
                 if(isset($client_response->fundtransferresponse->status->code) 
@@ -498,6 +519,7 @@ class PNGController extends Controller
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
+                    ProviderHelper::saveLogProcessTime('PNG', 1334, json_encode(["type"=>"cancelprocess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                     return PNGHelper::arrayToXml($array_data,"<cancelReserve/>");
                 }
             }
