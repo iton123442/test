@@ -14,7 +14,13 @@ use App\Models\GameTransactionMDB;
 use DB;
 class PNGController extends Controller
 {
-    //
+    public $provider_db_id, $middleware_api, $prefix;
+    
+    public function __construct()
+    {
+        $this->provider_db_id = config('providerlinks.png.provider_id');
+        $this->prefix = "PNG_"; // for idom name
+    }
     public function authenticate(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
@@ -77,10 +83,12 @@ class PNGController extends Controller
     }
     public function reserve(Request $request){
         $startTime =  microtime(true);
+        $array_data = array(
+            "statusCode" => 4,
+        );
         $data = $request->getContent();
-        
+        Helper::saveLog('PNG', 50,json_encode($array_data), $data);
         $xmlparser = new SimpleXMLElement($data);
-        Helper::saveLog('PNG', 50,json_encode($xmlparser), $data);
         Helper::saveLog('PNG reserve MDB', 50,json_encode($xmlparser), 'endpoint hit');
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
@@ -95,7 +103,7 @@ class PNGController extends Controller
                 // }
 
                 try{
-                    ProviderHelper::idenpotencyTable('PNG_'.$xmlparser->transactionId);
+                    ProviderHelper::idenpotencyTable($this->prefix.$xmlparser->transactionId);
                 }catch(\Exception $e){
                     $bet_transaction = GameTransactionMDB::findGameExt($xmlparser->transactionId, 1,'transaction_id', $client_details);
                     if ($bet_transaction != 'false' && $bet_transaction->general_details != 'failed') {

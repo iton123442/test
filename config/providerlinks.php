@@ -326,7 +326,8 @@ return [
         'pid' => 8888,
         'pid2'=>8956,
         'channel'=> 'desktop',
-        'practice'=>0
+        'practice'=>0,
+        'provider_id' => 32,
     ],
     'microgaming'=>[
         'grant_type'=> 'client_credentials',
