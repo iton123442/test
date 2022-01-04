@@ -295,8 +295,8 @@ class ClientRequestHelper{
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
             }
         }
-        Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 2");
-        Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), config('providerlinks.cut_call_server')."/tigergames/fundtransfer");
+        // Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 2");
+        // Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), config('providerlinks.cut_call_server')."/tigergames/fundtransfer");
 
         try{
             # This will call our server for async request! Cut The Connection within 10ms and leave it to the server!
@@ -307,7 +307,7 @@ class ClientRequestHelper{
                             'http_body' => $stats->getHandlerStats(),
                             'request_body' => $requesttocient
                         ];
-                        Helper::saveLog($requesttocient['request_body']['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() . ' TG_PROCESS');
+                        ProviderHelper::saveLogLatency($requesttocient['request_body']['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() . ' TG_PROCESS');
                     },
                     'timeout' => 0.050, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
