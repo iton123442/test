@@ -18,7 +18,7 @@ class PNGController extends Controller
     
     public function __construct()
     {
-        $this->provider_db_id = config('providerlinks.png.provider_id');
+        // $this->provider_db_id = config('providerlinks.png.provider_id');
         $this->prefix = "PNG_"; // for idom name
     }
     public function authenticate(Request $request){
@@ -587,7 +587,7 @@ class PNGController extends Controller
                     $trans_data["entry_id"] = 1;
                 break;
             case "credit":
-                    $trans_data["win"] = $request_data["win"];
+                    $trans_data["win"] = 5;
                     $trans_data["pay_amount"] = abs($request_data["amount"]);
                     $trans_data["income"]=$existingdata->bet_amount-$request_data["amount"];
                     $trans_data["entry_id"] = 2;
