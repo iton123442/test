@@ -919,7 +919,7 @@ class GameLobby{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
-            ProviderHelper::saveLogGameLaunch('pragmatic gamelaunch err', 26, json_encode($msg), $e->getMessage());
+            ProviderHelper::saveLog('pragmatic gamelaunch err', 26, json_encode($msg), $e->getMessage());
             return $msg;
         }
         // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
