@@ -244,7 +244,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code==56){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::pngLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl,$lang),
+                        "url" => GameLobby::pngLaunchUrl($request->game_code,$token,$request->input('game_provider'),$request->exitUrl,$lang,$device),
                         "game_launch" => true
                     );
                     return response($msg,200)

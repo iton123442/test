@@ -627,7 +627,7 @@ class YGGController extends Controller
                 "msg" => "Session expired. Please log in again."
             );
             return $response;
-            Helper::saveLog("YGG playerinfo response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            Helper::saveLog("YGG getbalance response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
         }
         $player_id = "TGaming_".$client_details->player_id;
         $balance = floatval(number_format($client_details->balance, 2, '.', ''));

@@ -206,7 +206,7 @@ class GameLobby{
         ProviderHelper::saveLogGameLaunch('Smartsoft Gameluanch ', 60, json_encode($data), 'Endpoint Hit');
         return $url;
     }
-    public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang){
+    public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang,$device){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;
@@ -215,6 +215,9 @@ class GameLobby{
         $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
         // $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
         //            config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+        if($device != 'desktop'){
+            $device = 'mobile';
+        }
         $key = "LUGTPyr6u8sRjCfh";
         $aes = new AES($key);
         $data = array(
@@ -225,7 +228,7 @@ class GameLobby{
             'pid' => $pid,
             'lang' => $lang,
             'practice' => config('providerlinks.png.practice'),
-            'channel' => config('providerlinks.png.channel')
+            'channel' => $device
         );
         $encoded_data = $aes->AESencode(json_encode($data));
         $urlencode = urlencode(urlencode($encoded_data));
@@ -1205,19 +1208,22 @@ class GameLobby{
 
         try {
             ProviderHelper::saveLogGameLaunch('MannaPlay Auth Response', 15, json_encode($client_details), $clientID);
-            
             // Authenticate New Token
-            if (config("providerlinks.mannaplay.".$client_details->operator_id.".CLIENT_API_KEY") != null){
-                $api_key = config("providerlinks.mannaplay.".$client_details->operator_id.".API_KEY");
-                $auth_api_key = config("providerlinks.mannaplay.".$client_details->operator_id.".AUTH_API_KEY");
-                $platform_id = config("providerlinks.mannaplay.".$client_details->operator_id.".PLATFORM_ID");
+            if ($client_details->operator_id == 15){ // EveryMatix Config
+                $api_key = config("providerlinks.mannaplay.15.API_KEY");
+                $auth_api_key = config("providerlinks.mannaplay.15.AUTH_API_KEY");
+                $platform_id = config("providerlinks.mannaplay.15.PLATFORM_ID");
+            }elseif($client_details->operator_id == 30){ // IDNPLAY
+                $api_key = config("providerlinks.mannaplay.30.API_KEY");
+                $auth_api_key = config("providerlinks.mannaplay.30.AUTH_API_KEY");
+                $platform_id = config("providerlinks.mannaplay.30.PLATFORM_ID");
             }else{
                 $api_key = config("providerlinks.mannaplay.default.API_KEY");
                 $auth_api_key = config("providerlinks.mannaplay.default.AUTH_API_KEY");
                 $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
             }
-
             
+
             $auth_token = new Client([ // auth_token
                 'headers' => [ 
                     'Content-Type' => 'application/json',
@@ -1813,14 +1819,13 @@ class GameLobby{
         Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($data),  "HIT" );
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.playtech.provider_db_id'), $data['game_code']);
-        $lang = isset($data["lang"]) ? $data["lang"] : 'en';
         if($getGameDetails->game_type_id == "15"){
-            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$getGameDetails->info."&token=".$data['token']."&platform=web&language=".$lang."&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'].'&tableAlias='.$data['game_code'];
+            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$getGameDetails->info."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'].'&tableAlias='.$data['game_code'];
             Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
             return $gameUrl;
         } else {
             $is_support  = $getGameDetails->info ==  ''  ? 'web' : $getGameDetails->info;
-            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=".$is_support."&language=".$lang."&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
+            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=".$is_support."&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
             Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
             return $gameUrl;
         }
