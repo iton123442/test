@@ -897,7 +897,7 @@ class GameLobby{
             "currency" => $currency,
             "language" => $data['lang'],
             "lobbyUrl" => $data['exitUrl'],
-            "platform" => "WEB",
+            "platform" => $device,
             "secureLogin" => $stylename,
             "stylename" => $stylename,
             "symbol" => $game_code,
