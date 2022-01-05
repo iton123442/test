@@ -869,7 +869,7 @@ class GameLobby{
         return $url;
     }
     
-    public static function pragmaticplaylauncher($game_code = null, $token = null, $data)
+    public static function pragmaticplaylauncher($game_code = null, $token = null, $data, $device)
     {
         $stylename = config('providerlinks.tpp.secureLogin');
         $key = config('providerlinks.tpp.secret_key');
@@ -883,7 +883,11 @@ class GameLobby{
         // $game_details = DB::select("SELECT * FROM games WHERE provider_id = '26' AND game_code = '".$game_code."' order by created  ");
         $game_details = DB::table('games')->where('provider_id','=',26)->where('game_code','=',$game_code)->orderBy('created_at','desc')->first();
         // $game_details = Helper::findGameDetails('game_code', 26, $game_code);
-
+        if($device == 'desktop'){ 
+            $device = 'WEB';
+        }else{ 
+            $device = 'MOBILE'; 
+        }
         $userid = "TGaming_".$client_details->player_id;
         $currency = $client_details->default_currency;
         $hash = md5("currency=".$currency."&language=".$data['lang']."&lobbyUrl=".$data['exitUrl']."&platform=WEB&secureLogin=".$stylename."&stylename=".$stylename."&symbol=".$game_code."&technology=H5&token=".$token."".$key);
@@ -939,7 +943,7 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         try{
-            $url = $url."gameid=".$data['game_code']."&lang=".$client_details->language."&currency=".$client_details->default_currency."&org=".$org."&channel=".$channel."&home=".$data['exitUrl']."&key=".$data['token'];
+            $url = $url."gameid=".$data['game_code']."&lang=".$data['lang']."&currency=".$client_details->default_currency."&org=".$org."&channel=".$channel."&home=".$data['exitUrl']."&key=".$data['token'];
             ProviderHelper::saveLogGameLaunch('YGG gamelaunch', $provider_id, json_encode($data), $url);
             return $url;
         }catch(\Exception $e){

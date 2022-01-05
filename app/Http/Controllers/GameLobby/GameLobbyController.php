@@ -549,7 +549,7 @@ class GameLobbyController extends Controller
 
                 elseif($provider_code==49){
 
-                    $url = GameLobby::pragmaticplaylauncher($request->game_code, $request->token, $request->all());
+                    $url = GameLobby::pragmaticplaylauncher($request->game_code, $request->token, $request->all(), $device);
                     if($url){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
