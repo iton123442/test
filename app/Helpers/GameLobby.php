@@ -892,25 +892,36 @@ class GameLobby{
         $currency = $client_details->default_currency;
         $hash = md5("currency=".$currency."&language=".$data['lang']."&lobbyUrl=".$data['exitUrl']."&platform=WEB&secureLogin=".$stylename."&stylename=".$stylename."&symbol=".$game_code."&technology=H5&token=".$token."".$key);
         // $hashCreatePlayer = md5('currency='.$currency.'&externalPlayerId='.$userid.'&secureLogin='.$stylename.$key);
+        try{
+            $form_body = [
+                "currency" => $currency,
+                "language" => $data['lang'],
+                "lobbyUrl" => $data['exitUrl'],
+                "platform" => $device,
+                "secureLogin" => $stylename,
+                "stylename" => $stylename,
+                "symbol" => $game_code,
+                "technology" => "H5",
+                "token" => $token,
+                "hash" => $hash
+            ];
+            $client = new Client();
+            $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            Helper::saveLog('Game Launch Pragmatic Play', 26, json_encode($form_body), json_encode($client_response));
+            $url = $client_response->gameURL;
+            return $url;
 
-        $form_body = [
-            "currency" => $currency,
-            "language" => $data['lang'],
-            "lobbyUrl" => $data['exitUrl'],
-            "platform" => $device,
-            "secureLogin" => $stylename,
-            "stylename" => $stylename,
-            "symbol" => $game_code,
-            "technology" => "H5",
-            "token" => $token,
-            "hash" => $hash
-        ];
-        $client = new Client();
-        $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
-        $client_response = json_decode($guzzle_response->getBody()->getContents());
-        Helper::saveLog('Game Launch Pragmatic Play', 26, json_encode($form_body), json_encode($client_response));
-        $url = $client_response->gameURL;
-        return $url;
+        
+        }catch(\Exception $e){
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            ProviderHelper::saveLogGameLaunch('pragmatic gamelaunch err', 26, json_encode($msg), $e->getMessage());
+            return $error;
+        }
         // $paramEncoded = urlencode("token=".$token."&symbol=".$game_code."&technology=H5&platform=WEB&language=en&lobbyUrl=daddy.betrnk.games");
         // $url = "$gameluanch_url?key=$paramEncoded&stylename=$stylename";
         // $result = json_encode($url);
