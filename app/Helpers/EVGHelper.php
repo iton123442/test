@@ -70,44 +70,49 @@ class EVGHelper
 		}
 		Helper::saveLog('gamedetails(EVG)', 74, json_encode($game_details), $env);
         if($client_details){
-            $data = array(
-                "uuid" => $token,
-                "player"=> array(
-                            "id"=> (string)$client_details->player_id,
-                            "update"=>false,
-                            "country"=>"US",
-                            "language"=>$lang,
-                            "currency"=> $client_details->default_currency,
-                            "session" => array(
-                                         "id"=>$token,
-                                         "ip"=>$players_ip,
-
-                            ),
-                        ),
-                "config"=> array(
-                            "game" => array(
-                                        "category"=>$game_details[1],
-                                        "table"=>array(
-                                                "id"=>$game_details[0]
-                                        )
-                            ),
-                            "channel"=> array(
-                                        "wrapped"=> false,
-                                        "mobile"=> false
+			try {
+				$data = array(
+					"uuid" => $token,
+					"player"=> array(
+								"id"=> (string)$client_details->player_id,
+								"update"=>false,
+								"country"=>"US",
+								"language"=>$lang,
+								"currency"=> $client_details->default_currency,
+								"session" => array(
+											 "id"=>$token,
+											 "ip"=>$players_ip,
+	
+								),
 							),
-							"urls" =>array(
-										"lobby"=>$exit_url
-							)
-                        ),
-            );
-            Helper::saveLog('requestLaunchUrl(EVG)', 74, json_encode($data), $gamecode);
-            $client = new Client();
-            $provider_response = $client->post(config('providerlinks.evolution.ua2AuthenticationUrl'),
-                ['body' => json_encode($data),
-                ]
-			);
-			Helper::saveLog('responseLaunchUrl(EVG)', 74, json_encode($data), json_decode($provider_response->getBody(),TRUE));
-            return config("providerlinks.evolution.host").json_decode($provider_response->getBody(),TRUE)["entry"];
+					"config"=> array(
+								"game" => array(
+											"category"=>$game_details[1],
+											"table"=>array(
+													"id"=>$game_details[0]
+											)
+								),
+								"channel"=> array(
+											"wrapped"=> false,
+											"mobile"=> false
+								),
+								"urls" =>array(
+											"lobby"=>$exit_url
+								)
+							),
+				);
+				Helper::saveLog('requestLaunchUrl(EVG)', 74, json_encode($data), $gamecode);
+				$client = new Client();
+				$provider_response = $client->post(config('providerlinks.evolution.ua2AuthenticationUrl'),
+					['body' => json_encode($data),
+					]
+				);
+				Helper::saveLog('responseLaunchUrl(EVG)', 74, json_encode($data), json_decode($provider_response->getBody(),TRUE));
+				return config("providerlinks.evolution.host").json_decode($provider_response->getBody(),TRUE)["entry"];
+			} catch (\Exception $e) {
+				Helper::saveLog('responseLaunchUrl(EVG)', 74, json_encode($data), $e->getMessage());
+			}
+           
         }
 	}
 	public static function getGameTransaction($game_round){
