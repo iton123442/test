@@ -890,14 +890,14 @@ class GameLobby{
         }
         $userid = "TGaming_".$client_details->player_id;
         $currency = $client_details->default_currency;
-        $hash = md5("currency=".$currency."&language=".$data['lang']."&lobbyUrl=".$data['exitUrl']."&platform=WEB&secureLogin=".$stylename."&stylename=".$stylename."&symbol=".$game_code."&technology=H5&token=".$token."".$key);
+        $hash = md5("currency=".$currency."&language=".$data['lang']."&lobbyUrl=".$data['exitUrl']."&platform=".$device."&secureLogin=".$stylename."&stylename=".$stylename."&symbol=".$game_code."&technology=H5&token=".$token."".$key);
         // $hashCreatePlayer = md5('currency='.$currency.'&externalPlayerId='.$userid.'&secureLogin='.$stylename.$key);
         try{
             $form_body = [
                 "currency" => $currency,
                 "language" => $data['lang'],
                 "lobbyUrl" => $data['exitUrl'],
-                "platform" => "WEB",
+                "platform" => $device,
                 "secureLogin" => $stylename,
                 "stylename" => $stylename,
                 "symbol" => $game_code,
