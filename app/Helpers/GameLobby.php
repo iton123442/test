@@ -234,7 +234,7 @@ class GameLobby{
         $urlencode = urlencode(urlencode($encoded_data));
 
         if ($client_details->operator_id == 1){
-            $gameurl = 'https://play-test.tigergames.io/api/playngo/tgload/'.$urlencode; 
+            $gameurl = config('providerlinks.play_tigergames').'/api/playngo/tgload/'.$urlencode; 
         }else{
            $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode; 
         }
