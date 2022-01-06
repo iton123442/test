@@ -215,6 +215,10 @@ class GameLobby{
         $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
         // $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
         //            config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+<<<<<<< HEAD
+=======
+        // return $gameurl;
+>>>>>>> 796ad28d8cfead66043070bacdc80e90025cc9dc
         if($device != 'desktop'){
             $device = 'mobile';
         }
@@ -232,7 +236,13 @@ class GameLobby{
         );
         $encoded_data = $aes->AESencode(json_encode($data));
         $urlencode = urlencode(urlencode($encoded_data));
-        $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode;
+
+        if ($client_details->operator_id == 1){
+            $gameurl = config('providerlinks.play_tigergames').'/api/playngo/tgload/'.$urlencode; 
+        }else{
+           $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode; 
+        }
+        // $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode;
         return $gameurl;
     }
     public static function edpLaunchUrl($game_code,$token,$provider,$exitUrl){
