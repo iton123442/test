@@ -233,12 +233,11 @@ class GameLobby{
         $encoded_data = $aes->AESencode(json_encode($data));
         $urlencode = urlencode(urlencode($encoded_data));
 
-        if ($client_details->operator_id == 1){
+        // if ($client_details->operator_id == 1){
             $gameurl = config('providerlinks.play_tigergames').'/api/playngo/tgload/'.$urlencode; 
-        }else{
-           $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode; 
-        }
-        // $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode;
+        // }else{
+        //    $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode; 
+        // }
         return $gameurl;
     }
     public static function edpLaunchUrl($game_code,$token,$provider,$exitUrl){
