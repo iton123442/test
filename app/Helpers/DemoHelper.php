@@ -323,7 +323,7 @@ class DemoHelper{
         try {
             // Generate Game Link
             $game_link = new Client();
-            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
+            $game_link_response = $game_link->post(config("providerlinks.mannaplay.GAME_LINK_URL").'tigergame/gameLink/link',
                     ['body' => json_encode(
                             [
                                 "mode" => "demo",
