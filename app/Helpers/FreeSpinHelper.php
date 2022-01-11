@@ -122,9 +122,8 @@ class FreeSpinHelper{
 		return substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, $limit);
 	}
 
-    public static function createFreeRoundSlotmill($player_details,$data, $sub_provder_id){
+    public static function createFreeRoundSlotmill($player_details,$data, $sub_provder_id, $freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
         $player_prefix = "TG_";
         try{
             $freeroundtransac = [
@@ -149,12 +148,12 @@ class FreeSpinHelper{
         $URL = "https://stageapi.slotmill.com/game.admin.web/services/game/createprepaid.json?";
 
         try {
-            $provider_response = $client->post( $URL. 'uid='.$uid.'&pwd='.$pwd.'&org='.$org.'&nativeId='.$player_prefix.$player_details->player_id.'&currency='.$player_details->default_currency.'&amount='.$data["details"]["denomination"].'&gameid='.$data["game_code"].'&consumebefore='.$endtime.'&ref='.$prefix.$id.'&lang=en&createType=Yes&Count='.$data["details"]["rounds"].'&walletid='.$walletid);
+            $provider_response = $client->post( $URL. 'uid='.$uid.'&pwd='.$pwd.'&org='.$org.'&nativeId='.$player_prefix.$player_details->player_id.'&currency='.$player_details->default_currency.'&amount='.$data["details"]["denomination"].'&gameid='.$data["game_code"].'&consumebefore='.$endtime.'&ref='.$freeround_id.'&lang=en&createType=Yes&Count='.$data["details"]["rounds"].'&walletid='.$walletid);
             $dataresponse = json_decode($provider_response->getBody()->getContents());
         } catch (\Exception $e) {
             $data = [
                 "status" => 3,
-                "provider_trans_id" => $prefix.$id,
+                "provider_trans_id" => $freeround_id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
@@ -163,7 +162,7 @@ class FreeSpinHelper{
         if ( isset($dataresponse->code) && $dataresponse->code == '0' ){
             //update freeroundtransac
             $data = [
-                "provider_trans_id" => $prefix.$id,
+                "provider_trans_id" => $freeround_id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
@@ -171,7 +170,7 @@ class FreeSpinHelper{
         } else {
             $data = [
                 "status" => 3,
-                "provider_trans_id" => $prefix.$id,
+                "provider_trans_id" => $freeround_id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
@@ -179,9 +178,9 @@ class FreeSpinHelper{
         }
     }
 
-    public static function createFreeRoundPNG($player_details,$data, $sub_provder_id){
+    public static function createFreeRoundPNG($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        // $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -199,7 +198,7 @@ class FreeSpinHelper{
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
         $client = new Client();
         $game_array = "<arr:int>".$game_details->info."</arr:int>";
-        $transaction_id = $prefix.$id;
+        $transaction_id = $freeround_id;
         try{
             $xmldatatopass = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v1="http://playngo.com/v1" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
                             <soapenv:Header/>
@@ -249,9 +248,9 @@ class FreeSpinHelper{
         
     }
     
-    public static function createFreeRoundMannaplay($player_details,$data, $sub_provder_id){
+    public static function createFreeRoundMannaplay($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        // $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -266,7 +265,7 @@ class FreeSpinHelper{
         }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
         $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
-        $transaction_id = $prefix.$id;
+        // $transaction_id = $prefix.$id;
         $platform = "betrnk";
         $api_key = "GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a";
         $URL = "https://api.mannagaming.com/agent/marketing_tool/Freeround/General/give";
@@ -289,7 +288,7 @@ class FreeSpinHelper{
                                 "numrounds" => $data["details"]["rounds"],
                                 "currency" => $player_details->default_currency,
                                 "bet" =>$data["details"]["denomination"],
-                                "opref" => $transaction_id,
+                                "opref" => $freeround_id,
                                 "expiretime" => $endtime
                             ]
                     )]
@@ -297,14 +296,14 @@ class FreeSpinHelper{
             $dataresponse = json_decode($game_link_response->getBody()->getContents());
             $data = [
                 "status" => 3,
-                "provider_trans_id" => $prefix.$id,
+                "provider_trans_id" => $freeround_id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
         } catch (\Exception $e) {
             $data = [
                 "status" => 3,
-                "provider_trans_id" => $prefix.$id,
+                "provider_trans_id" => $freeround_id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
@@ -313,7 +312,7 @@ class FreeSpinHelper{
         if ( !isset($dataresponse->errorCode) ){
             //update freeroundtransac
             $data = [
-                "provider_trans_id" => $prefix.$id,
+                "provider_trans_id" => $freeround_id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
@@ -321,7 +320,7 @@ class FreeSpinHelper{
         } else {
             $data = [
                 "status" => 3,
-                "provider_trans_id" => $prefix.$id,
+                "provider_trans_id" => $freeround_id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);

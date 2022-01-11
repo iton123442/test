@@ -4,6 +4,7 @@ namespace App\Http\Controllers\FreeRound;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Helpers\ProviderHelper;
 use App\Helpers\GameLobby;
 use App\Models\ClientGameSubscribe;
 use App\Models\GameSubProvider;
@@ -20,7 +21,7 @@ class FreeRoundController extends Controller
     // }
     public function freeRoundController(Request $request){
         // dd($request->all());
-        if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code')|| !$request->has('details') ){
+        if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code') || !$request->has('details') || !$request->has('freeround_id') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
             return response($mw_response,200)
             ->header('Content-Type', 'application/json');
@@ -33,7 +34,13 @@ class FreeRoundController extends Controller
             return response(["error_code"=>"405","error_description"=>"Provider Code Doesnt Exist or Not Found!"],200)
                 ->header('Content-Type', 'application/json');
         }
-
+        $freeround_id = $request->has('client_player_id').'_'.$request->has('freeround_id');
+        try{
+            ProviderHelper::idenpotencyTable($freeround_id);
+        }catch(\Exception $e){
+            return response(["error_code"=>"405","error_description"=>"Provider Code Doesnt Exist or Not Found!"],200)
+                ->header('Content-Type', 'application/json');
+        }
         //  CLIENT SUBSCRIPTION FILTER
         //  $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
         //  if(!$subscription_checker){
@@ -41,7 +48,7 @@ class FreeRoundController extends Controller
         //     return response($mw_response,200)
         //     ->header('Content-Type', 'application/json');
         //  }
-
+        
         $checkProviderSupportFreeRound = $this->checkProviderSupportFreeRound($provider_code);
         if(!$checkProviderSupportFreeRound){
              $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service Provider"];
@@ -63,7 +70,7 @@ class FreeRoundController extends Controller
             ->header('Content-Type', 'application/json');
         }
         $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
-        if($this->addFreeGameProviderController($checkPlayerExist, $request->all(), $provider_code ) == 200 ){
+        if($this->addFreeGameProviderController($checkPlayerExist, $request->all(), $provider_code, $freeround_id ) == 200 ){
             $mw_response = [
                 "data" => $request->all(),
                 "status" => [
@@ -142,18 +149,20 @@ class FreeRoundController extends Controller
     }
 
 
-    public function addFreeGameProviderController($player_details, $data, $sub_provder_id){
+    public function addFreeGameProviderController($player_details, $data, $sub_provder_id, $freeround_id){
         if ($sub_provder_id == 89) {
-            return FreeSpinHelper::createFreeRoundSlotmill($player_details, $data, $sub_provder_id);
+            return FreeSpinHelper::createFreeRoundSlotmill($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 56) {
-            return FreeSpinHelper::createFreeRoundPNG($player_details, $data, $sub_provder_id);
+            return FreeSpinHelper::createFreeRoundPNG($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 38) {
-            return FreeSpinHelper::createFreeRoundMannaplay($player_details, $data, $sub_provder_id);
+            return FreeSpinHelper::createFreeRoundMannaplay($player_details, $data, $sub_provder_id,$freeround_id);
         }  elseif ($sub_provder_id == 126) {
             return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id);
         } elseif ($sub_provder_id == 127) {
             return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id);
-        } 
+        } else {
+            return 400;
+        }
     }
 
 
