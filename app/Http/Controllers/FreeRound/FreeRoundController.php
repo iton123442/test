@@ -230,6 +230,7 @@ class FreeRoundController extends Controller
                     fs.coins,
                     case when fs.status = 0 then 'pending' when fs.status = 1 then 'running' when fs.status = 2 then 'completed'   else 'failed' end as status,
                     date_expire,
+                    fs.provider_trans_id,
                     fs.created_at
                     from freespin fs
                     inner join players p using (player_id)
@@ -249,6 +250,8 @@ class FreeRoundController extends Controller
            
             $data = array();//this is to add data and reformat the $table object to datatables standard array
             foreach($details as $datas){
+                $freeround = explode("_", $datas->provider_trans_id);
+                $datatopass['freeround_id']=$freeround[1];
                 $datatopass['client_player_id']=$datas->client_player_id;
                 $datatopass['game_code']=$datas->game_code;
                 $datatopass['rounds']=$datas->rounds;
