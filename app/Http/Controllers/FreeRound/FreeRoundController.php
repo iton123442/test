@@ -34,7 +34,7 @@ class FreeRoundController extends Controller
             return response(["error_code"=>"405","error_description"=>"Provider Code Doesnt Exist or Not Found!"],200)
                 ->header('Content-Type', 'application/json');
         }
-        $freeround_id = $request->has('client_player_id').'_'.$request->has('freeround_id');
+        $freeround_id = $request->client_id.'_'.$request->freeround_id;
         try{
             ProviderHelper::idenpotencyTable($freeround_id);
         }catch(\Exception $e){
