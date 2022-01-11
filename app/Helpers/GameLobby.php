@@ -207,17 +207,17 @@ class GameLobby{
         return $url;
     }
     public static function pngLaunchUrl($game_code,$token,$provider,$exitUrl,$lang,$device){
+        if($device != 'desktop'){
+            $device = 'mobile';
+        }
         $client_details = ProviderHelper::getClientDetails('token', $token);
         $timestamp = Carbon::now()->timestamp;
         $exit_url = $exitUrl;
         $lang = GameLobby::getLanguage("PlayNGo",$lang);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $pid = ($client_details->operator_id == 17) ? config('providerlinks.png.pid2') : config('providerlinks.png.pid');
-        // $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.
-        //            config('providerlinks.png.channel').'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
-        if($device != 'desktop'){
-            $device = 'mobile';
-        }
+        // $gameurl = config('providerlinks.png.root_url').'/casino/ContainerLauncher?pid='.$pid.'&gid='.$game_code.'&channel='.$device.'&lang='.$lang.'&practice='.config('providerlinks.png.practice').'&ticket='.$token.'&origin='.$exit_url;
+        // return $gameurl;
         $key = "LUGTPyr6u8sRjCfh";
         $aes = new AES($key);
         $data = array(
@@ -232,7 +232,12 @@ class GameLobby{
         );
         $encoded_data = $aes->AESencode(json_encode($data));
         $urlencode = urlencode(urlencode($encoded_data));
-        $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode;
+
+        // if ($client_details->operator_id == 1){
+            $gameurl = config('providerlinks.play_tigergames').'/api/playngo/tgload/'.$urlencode; 
+        // }else{
+        //    $gameurl = config('providerlinks.play_betrnk').'/api/playngo/load/'.$urlencode; 
+        // }
         return $gameurl;
     }
     public static function edpLaunchUrl($game_code,$token,$provider,$exitUrl){

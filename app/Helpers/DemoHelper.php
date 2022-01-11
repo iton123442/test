@@ -4,6 +4,7 @@ namespace App\Helpers;
 use App\Helpers\GameLobby;
 use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
+use App\Services\AES;
 use DB;
 
 class DemoHelper{
@@ -118,6 +119,15 @@ class DemoHelper{
             );
             
         }
+        elseif($provider_code==56){ //playngo
+
+            $response = array(
+                "game_code" =>$data->game_code,
+                "url" =>  DemoHelper::playngo($data),
+                "game_launch" => true
+            );
+            
+        }
         // elseif($provider_code == 34){ // EDP
         //     // / $client = new Client();
         //     // $guzzle_response = $client->get('https://edemo.endorphina.com/api/link/accountId/1002 /hash/' . md5("endorphina_4OfAKing@ENDORPHINA") . '/returnURL/' . $returnURL);
@@ -224,6 +234,26 @@ class DemoHelper{
         return $url;
     }
 
+    public static function playngo($request){ //56
+        $lang = isset($request->lang) ? $request->lang : 'en';
+        $lang = GameLobby::getLanguage("PlayNGo",$lang);
+        $key = "LUGTPyr6u8sRjCfh";
+        $aes = new AES($key);
+        $data = array(
+            'root_url' => config('providerlinks.png.root_url'),
+            'exitUrl' => isset($request->exitUrl) ? $request->exitUrl : 'www.google.com',
+            'game_code' => $request->game_code, //gid in png
+            'pid' => config('providerlinks.png.pid'),
+            'lang' => $lang,
+            'practice' => 1, //demo
+            'channel' => isset($request->device) ? $request->device : 'desktop'
+        );
+        $encoded_data = $aes->AESencode(json_encode($data));
+        $urlencode = urlencode(urlencode($encoded_data));
+        $gameurl = config('providerlinks.play_tigergames').'/api/playngo/tgload/'.$urlencode; 
+        return $gameurl;
+    }
+
     public static function evoplay($game_code, $lang){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
         $requesttosend = [
@@ -293,7 +323,7 @@ class DemoHelper{
         try {
             // Generate Game Link
             $game_link = new Client();
-            $game_link_response = $game_link->post(config("providerlinks.manna.GAME_LINK_URL"),
+            $game_link_response = $game_link->post(config("providerlinks.mannaplay.GAME_LINK_URL").'tigergame/gameLink/link',
                     ['body' => json_encode(
                             [
                                 "mode" => "demo",
