@@ -38,7 +38,7 @@ class FreeRoundController extends Controller
         try{
             ProviderHelper::idenpotencyTable($freeround_id);
         }catch(\Exception $e){
-            return response(["error_code"=>"405","error_description"=>"Provider Code Doesnt Exist or Not Found!"],200)
+            return response(["error_code"=>"403","error_description"=> "Transaction Already Exist!"],200)
                 ->header('Content-Type', 'application/json');
         }
         //  CLIENT SUBSCRIPTION FILTER
