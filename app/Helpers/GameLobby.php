@@ -497,7 +497,7 @@ class GameLobby{
         }
     }
 
-    public static function cq9LaunchUrl($game_code, $token, $provider_sub_name){
+    public static function cq9LaunchUrl($game_code, $token, $provider_sub_name,$lang){
         Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
         $client_details = ProviderHelper::getClientDetails('token', $token);
         // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
@@ -520,7 +520,7 @@ class GameLobby{
             'gamehall'=> 'cq9',
             'gamecode'=> $game_code,
             'gameplat'=> 'WEB',
-            'lang'=> 'en',
+            'lang'=> $lang,
         ];
         $response = $client->post(config('providerlinks.cqgames.api_url').'/gameboy/player/sw/gamelink', [
             'form_params' => $requesttosend,
