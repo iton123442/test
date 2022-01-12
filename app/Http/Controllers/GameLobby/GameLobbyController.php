@@ -346,8 +346,11 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==54){ // request->token
-                    // $url = GameLobby::cq9LaunchUrl($request->game_code,$token);
-                    $url = GameLobby::cq9LaunchUrl($request->game_code,$token,$request->input('game_provider'), $request->exitUrl);
+                    $lang = 'en';
+                    if($request->has('lang')){
+                        $lang = $request->lang;
+                    }
+                    $url = GameLobby::cq9LaunchUrl($request->game_code,$token,$request->input('game_provider'), $request->exitUrl,$lang);
                     if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),
