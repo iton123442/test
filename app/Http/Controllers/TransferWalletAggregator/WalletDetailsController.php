@@ -343,7 +343,10 @@ class WalletDetailsController extends Controller
         $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
 
         $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
-
+        $page = $request->page;
+        if($client_details->operator_id == 11){
+            $page = $request->page * $request->limit;
+        }
         $status = GameTransactionMDB::checkDBConnection($connection);
 
         if ( ($connection != null) && $status) {
@@ -412,7 +415,7 @@ class WalletDetailsController extends Controller
                     from ".$connection["db_list"][1].".game_transactions c 
                     where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
                     order by game_trans_id desc
-                    limit ".$request->page.", ".TWHelpers::getLimitAvailable($request->limit).";
+                    limit ".$page.", ".TWHelpers::getLimitAvailable($request->limit).";
                 ";
                 $details = DB::connection( $connection["connection_name"] )->select($query);
                 if (count($details) == 0) {
