@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\TransferWalletAggregator;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\PureTransferWallet\PureTransferWalletHelper;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use Illuminate\Http\Request;
-use App\Helpers\ProviderHelper;
-use App\Helpers\TransferWalletHelper;
+use App\Helpers\GameLobby;
+use App\Helpers\IDNPokerHelper;
 use App\Helpers\Helper;
 use App\Models\GameTransactionMDB;
 use DB;
@@ -78,6 +77,47 @@ class WalletDetailsController extends Controller
        
         if($getPlayerDetails == null){
             $mw_response = ["data" => null,"status" => ["code" => 303 ,"message" => TWHelpers::getPTW_Message(303)]];
+            try {
+                if($request->has('game_provider')){
+                    $playerDetails = TWHelpers::playerDetails('ptw' ,$request->client_player_id ,$request->client_id); // GET PLAYER DETAILS NO BLANACE CHECKER FROM THE PROVDIER BALANCE GET
+                    if($playerDetails != null){
+                        if($playerDetails->operator_id == 11){
+                            $provider_id = GameLobby::checkAndGetProviderId($request->game_provider);
+                            if($provider_id){
+                                $provider_code = $provider_id->sub_provider_id;
+                                if($provider_code == 110){
+                                    $player_id = "TGTW".$playerDetails->player_id;
+                                    $data = IDNPokerHelper::playerDetails($player_id);
+                                    if ($data != "false") {
+                                        $msg = array(
+                                            "status" => "success",
+                                            "balance" => $data["balance"],
+                                        );
+                                        $mw_response = [
+                                            "data" => [
+                                                "client_player_id" => $request->client_player_id,
+                                                "balance" => $data["balance"]
+                                            ],
+                                            "status" => [
+                                                "code" => 200,
+                                                "message" => TWHelpers::getPTW_Message(200)
+                                            ]
+                                        ]; 
+                                        return $mw_response;
+                                        Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
+                                        return response($msg, 200)->header('Content-Type', 'application/json');
+                            
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                   
+                }
+            } catch (\Exception $e) {
+                return $mw_response;
+            }
             return $mw_response;
         }
 
