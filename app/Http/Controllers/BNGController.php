@@ -462,7 +462,10 @@ class BNGController extends Controller
     private function betNullWinNotNull($data,$client_details,$game_details){
         $game = GameTransactionMDB::getGameTransactionByRoundId($data["args"]["round_id"],$client_details);
         if($game != null){
-            $win_or_lost = $data["args"]["win"] == 0 && $game->pay_amount == 0 ? 0 : 1;
+            $win_or_lost = 5;
+            if($data["args"]["round_finished"] == true){
+                $win_or_lost = $data["args"]["win"] == 0 && $game->pay_amount == 0 ? 0 : 1;
+            }
             $createGametransaction = array(
                 "win" => 5,
                 "pay_amount" =>$game->pay_amount+$data["args"]["win"],
