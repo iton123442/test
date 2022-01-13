@@ -81,7 +81,7 @@ class WalletDetailsController extends Controller
                 if($request->has('game_provider')){
                     $playerDetails = TWHelpers::playerDetails('ptw' ,$request->client_player_id ,$request->client_id); // GET PLAYER DETAILS NO BLANACE CHECKER FROM THE PROVDIER BALANCE GET
                     if($playerDetails != null){
-                        if($playerDetails->operator_id == 11){
+                        if($playerDetails->operator_id == 11 || $playerDetails->operator_id == 1){
                             $provider_id = GameLobby::checkAndGetProviderId($request->game_provider);
                             if($provider_id){
                                 $provider_code = $provider_id->sub_provider_id;
