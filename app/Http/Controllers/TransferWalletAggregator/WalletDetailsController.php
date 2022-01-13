@@ -109,7 +109,7 @@ class WalletDetailsController extends Controller
                             
                                     }
                                 }
-                                
+                                $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
                             }
                         }
                     }
