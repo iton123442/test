@@ -557,7 +557,7 @@ class PNGController extends Controller
                     "provider_trans_id" => $xmlparser->transactionId,
                     "round_id" =>$xmlparser->roundId,
                     "amount" =>abs((float)$xmlparser->real),
-                    "game_transaction_type"=>2,
+                    "game_transaction_type"=>3,
                     "provider_request" =>$xmlparser,
                     "mw_response" => 'null'
                 );
