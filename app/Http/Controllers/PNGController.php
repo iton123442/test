@@ -174,7 +174,23 @@ class PNGController extends Controller
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
-                        "client_response" => json_encode($client_response),
+                        "general_details" => "failed"
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
+                    return PNGHelper::arrayToXml($array_data,"<reserve/>");
+                } else {
+                    if($game == 'false'){
+                        $updateGameTransaction = [
+                            "win" => 2
+                        ];
+                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametransactionid, $client_details);
+                    }
+                    $array_data = array(
+                        "statusCode" => 7,
+                    );
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($array_data),
                         "general_details" => "failed"
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
@@ -541,7 +557,7 @@ class PNGController extends Controller
                     "provider_trans_id" => $xmlparser->transactionId,
                     "round_id" =>$xmlparser->roundId,
                     "amount" =>abs((float)$xmlparser->real),
-                    "game_transaction_type"=>2,
+                    "game_transaction_type"=>3,
                     "provider_request" =>$xmlparser,
                     "mw_response" => 'null'
                 );
