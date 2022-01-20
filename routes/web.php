@@ -144,18 +144,18 @@ $app->post('/public/api/marriott/authenticate', 'MarriottController@authPlayer')
 $app->post('/public/api/marriott/balance', 'MarriottController@getBalance'); #/
 $app->post('/public/api/marriott/debit', 'MarriottController@debitProcess'); #/
 // RGS Gaming Endpoints
-$app->post('/public/rsg/authenticate', 'DigitainController@authenticate');
-// $app->post('/public/rsg/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
-$app->post('/public/rsg/getbalance', 'DigitainController@getbalance');
-$app->post('/public/rsg/refreshtoken', 'DigitainController@refreshtoken');
-$app->post('/public/rsg/bet', 'DigitainController@bet');
-$app->post('/public/rsg/win', 'DigitainController@win');
-$app->post('/public/rsg/betwin', 'DigitainController@betwin');
-$app->post('/public/rsg/refund', 'DigitainController@refund');
-$app->post('/public/rsg/amend', 'DigitainController@amend');
-$app->post('/public/rsg/promowin', 'DigitainController@PromoWin');
-$app->post('/public/rsg/charge', 'DigitainController@makeCharge');
-$app->post('/public/rsg/checktxstatus', 'DigitainController@CheckTxStatus');
+$app->post('/public/rgs/authenticate', 'DigitainController@authenticate');
+// $app->post('/public/rgs/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
+$app->post('/public/rgs/getbalance', 'DigitainController@getbalance');
+$app->post('/public/rgs/refreshtoken', 'DigitainController@refreshtoken');
+$app->post('/public/rgs/bet', 'DigitainController@bet');
+$app->post('/public/rgs/win', 'DigitainController@win');
+$app->post('/public/rgs/betwin', 'DigitainController@betwin');
+$app->post('/public/rgs/refund', 'DigitainController@refund');
+$app->post('/public/rgs/amend', 'DigitainController@amend');
+$app->post('/public/rgs/promowin', 'DigitainController@PromoWin');
+$app->post('/public/rgs/charge', 'DigitainController@makeCharge');
+$app->post('/public/rgs/checktxstatus', 'DigitainController@CheckTxStatus');
 // IA SPORTS
 $app->post('/public/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
 $app->post('/public/api/ia/lunch', 'IAESportsController@userlunch');// DEPRECATED
