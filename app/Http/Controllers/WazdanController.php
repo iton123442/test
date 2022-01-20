@@ -19,6 +19,7 @@ class WazdanController extends Controller
         $this->startTime = microtime(true);
     }
     public function hashCode(Request $request){
+        Helper::saveLog('hashCode (Wazdan)', 50, $request->getContent(), "Hash Hit");
         $operator = "tigergames";
         $license = "curacao";
         $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
@@ -26,6 +27,7 @@ class WazdanController extends Controller
             "how" => 'hash_hmac("sha256","'.$request->getContent().'",'.$key.')',
             "hmac"=>hash_hmac("sha256",$request->getContent(),$key)
         );
+        Helper::saveLog('hashCode (Wazdan)2', 50, $request->getContent(), $data);
         return $data;
     }
     public function authenticate(Request $request){
