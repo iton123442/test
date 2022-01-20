@@ -1731,6 +1731,11 @@ class GameLobby{
             return false;
         }
     }
+    public static function getGameByGameId($game_id){
+        $game = DB::select("SELECT game_id, game_type_id,provider_id,sub_provider_id,game_name,game_code,on_maintenance FROM games WHERE game_id = '".$game_id."'");
+        $count = count($game);
+        return $count > 0 ? $game[0]:null;
+    }
     public static function checkAndGetProviderId($provider_name){
         $provider = DB::select("SELECT * FROM sub_provider_code WHERE sub_provider_name = '".$provider_name."'");
         $count = count($provider);
