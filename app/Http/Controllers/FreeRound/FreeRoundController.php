@@ -205,6 +205,7 @@ class FreeRoundController extends Controller
         }
        
         // $partition = TWHelpers::multiplePartition($from,$to);
+        $page = $request->page * $request->limit;
         $and_player = "and player_id  = (SELECT player_id FROM players WHERE client_id = ".$request->client_id." AND client_player_id = '".$request->client_player_id."' LIMIT 1)  ";
         if ($request->client_player_id == "all") {
             $and_player = '';
@@ -238,7 +239,7 @@ class FreeRoundController extends Controller
                     inner join games g using(game_id)
                 where convert_tz(fs.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
                 order by freespin_id desc
-                limit ".$request->page.", ".TWHelpers::getLimitAvailable($request->limit).";
+                limit ".$page.", ".TWHelpers::getLimitAvailable($request->limit).";
             ";
             $details = DB::select($query);
             if (count($details) == 0) {

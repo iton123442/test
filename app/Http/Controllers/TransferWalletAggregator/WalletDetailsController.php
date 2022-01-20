@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\TransferWalletAggregator;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\PureTransferWallet\PureTransferWalletHelper;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use Illuminate\Http\Request;
-use App\Helpers\ProviderHelper;
-use App\Helpers\TransferWalletHelper;
+use App\Helpers\GameLobby;
+use App\Helpers\IDNPokerHelper;
 use App\Helpers\Helper;
 use App\Models\GameTransactionMDB;
 use DB;
@@ -78,6 +77,47 @@ class WalletDetailsController extends Controller
        
         if($getPlayerDetails == null){
             $mw_response = ["data" => null,"status" => ["code" => 303 ,"message" => TWHelpers::getPTW_Message(303)]];
+            try {
+                if($request->has('game_provider')){
+                    $playerDetails = TWHelpers::playerDetails('ptw' ,$request->client_player_id ,$request->client_id); // GET PLAYER DETAILS NO BLANACE CHECKER FROM THE PROVDIER BALANCE GET
+                    if($playerDetails != null){
+                        if($playerDetails->operator_id == 11 || $playerDetails->operator_id == 1){
+                            $provider_id = GameLobby::checkAndGetProviderId($request->game_provider);
+                            if($provider_id){
+                                $provider_code = $provider_id->sub_provider_id;
+                                if($provider_code == 110){
+                                    $player_id = "TGTW".$playerDetails->player_id;
+                                    $data = IDNPokerHelper::playerDetails($player_id);
+                                    if ($data != "false") {
+                                        $msg = array(
+                                            "status" => "success",
+                                            "balance" => $data["balance"],
+                                        );
+                                        $mw_response = [
+                                            "data" => [
+                                                "client_player_id" => $request->client_player_id,
+                                                "balance" => $data["balance"]
+                                            ],
+                                            "status" => [
+                                                "code" => 200,
+                                                "message" => TWHelpers::getPTW_Message(200)
+                                            ]
+                                        ]; 
+                                        return $mw_response;
+                                        Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
+                                        return response($msg, 200)->header('Content-Type', 'application/json');
+                            
+                                    }
+                                }
+                                $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
+                            }
+                        }
+                    }
+                   
+                }
+            } catch (\Exception $e) {
+                return $mw_response;
+            }
             return $mw_response;
         }
 
@@ -343,7 +383,10 @@ class WalletDetailsController extends Controller
         $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
 
         $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
-
+        $page = $request->page;
+        if($client_details->operator_id == 11){
+            $page = $request->page * $request->limit;
+        }
         $status = GameTransactionMDB::checkDBConnection($connection);
 
         if ( ($connection != null) && $status) {
@@ -412,7 +455,7 @@ class WalletDetailsController extends Controller
                     from ".$connection["db_list"][1].".game_transactions c 
                     where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
                     order by game_trans_id desc
-                    limit ".$request->page.", ".TWHelpers::getLimitAvailable($request->limit).";
+                    limit ".$page.", ".TWHelpers::getLimitAvailable($request->limit).";
                 ";
                 $details = DB::connection( $connection["connection_name"] )->select($query);
                 if (count($details) == 0) {

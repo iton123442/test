@@ -299,6 +299,26 @@ class TWHelpers {
         return $client_details > 0 ? $query[0] : null;
     }
 
+
+    public static function playerDetails($type = "", $value = "", $client_id = false){
+
+        if ($type == 'ptw') {
+            $where = 'where p.client_player_id = "'.$value.'"  AND  p.client_id = '.$client_id.' ';
+        }
+
+        if ($type == 'player_id') {
+            $where = 'where p.player_id = '.$value.' ';
+        }
+        $query = DB::select(
+            'select 
+                `p`.`client_id`,`c`.`country_code`,`p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`p`.`created_at`, `c`.`connection_name`
+            from players p 
+            inner join clients as c using (client_id) 
+            inner join operator as op using (operator_id) '.$where.' ');
+         $client_details = count($query);
+         return $client_details > 0 ? $query[0] : null;
+    }
+
 }
 
 ?>
