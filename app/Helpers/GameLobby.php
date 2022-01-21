@@ -498,7 +498,7 @@ class GameLobby{
         }
     }
 
-    public static function cq9LaunchUrl($game_code, $token, $provider_sub_name){
+    public static function cq9LaunchUrl($game_code, $token, $provider_sub_name,$lang){
         Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
         $client_details = ProviderHelper::getClientDetails('token', $token);
         // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
@@ -521,7 +521,7 @@ class GameLobby{
             'gamehall'=> 'cq9',
             'gamecode'=> $game_code,
             'gameplat'=> 'WEB',
-            'lang'=> 'en',
+            'lang'=> $lang,
         ];
         $response = $client->post(config('providerlinks.cqgames.api_url').'/gameboy/player/sw/gamelink', [
             'form_params' => $requesttosend,
@@ -1730,6 +1730,11 @@ class GameLobby{
         } catch (\Exception $e){
             return false;
         }
+    }
+    public static function getGameByGameId($game_id){
+        $game = DB::select("SELECT game_id, game_type_id,provider_id,sub_provider_id,game_name,game_code,on_maintenance FROM games WHERE game_id = '".$game_id."'");
+        $count = count($game);
+        return $count > 0 ? $game[0]:null;
     }
     public static function checkAndGetProviderId($provider_name){
         $provider = DB::select("SELECT * FROM sub_provider_code WHERE sub_provider_name = '".$provider_name."'");

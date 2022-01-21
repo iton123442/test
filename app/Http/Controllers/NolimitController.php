@@ -343,7 +343,7 @@ class NolimitController extends Controller
             $round_id = $data['params']['information']['gameRoundId'];
             $game_code = $data['params']['information']['game'];
             $balance = $client_details->balance;
-            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', 1, $client_details);
+            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
             ProviderHelper::saveLogWithExeption('NOLIMIT after data request', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
             try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
