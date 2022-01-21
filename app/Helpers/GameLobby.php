@@ -136,7 +136,7 @@ class GameLobby{
         }else{ // TigerGames
             $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
         }
-        $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
+        $url = config("providerlinks.nolimit.api_url").'device=mobile&lobbyUrl='.$data['exitUrl'].'&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
         } catch (\Exception $e) {
 
@@ -1970,8 +1970,6 @@ class GameLobby{
             return $e->getMessage();
         }
     }
-
-
     public static function IDNPoker($request){
         Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "HIT" );
         try {
