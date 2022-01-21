@@ -384,7 +384,7 @@ class WalletDetailsController extends Controller
 
         $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
         $page = $request->page;
-        if($client_details->operator_id == 11){
+        if($client_details->operator_id == 11 || $client_details->operator_id == 33){
             $page = $request->page * $request->limit;
         }
         $status = GameTransactionMDB::checkDBConnection($connection);
