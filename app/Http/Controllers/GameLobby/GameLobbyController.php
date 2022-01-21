@@ -132,6 +132,25 @@ class GameLobbyController extends Controller
                  ->header('Content-Type', 'application/json');
             }
             // CLIENT SUBSCRIPTION FILTER
+
+           # Filter Added GameID for clients who used game_id as identifier
+           if ($request->has("game_id")){
+                $log_id = Helper::saveLog('GAME LAUNCH NO GAMEID NOT FOUND', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
+                $gameDetails = GameLobby::getGameByGameId($request->input("game_id"));
+                if ($gameDetails == null){
+                    $msg = array(
+                       "game_code" => $request->input("game_code"),
+                       "url" => config('providerlinks.play_betrnk').'/tigergames/api?msg='.ClientHelper::getClientErrorCode(3).'&id='.$log_id,
+                       "game_launch" => false
+                   );
+                   return $msg;
+                }
+
+                # Overwrite the game_code if the client use game_id
+                $request->merge([
+                  'game_code' =>  $gameDetails->game_code
+                ]);
+           }
             
            $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
            // if($request->input("client_id") == 92){
