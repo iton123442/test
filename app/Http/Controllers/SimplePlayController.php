@@ -24,7 +24,7 @@ use GuzzleHttp\Client;
 
 use DB;
 
-class SimplePlayMDBController extends Controller
+class SimplePlayController extends Controller
 {
     public function __construct(){
         /*$this->middleware('oauth', ['except' => ['index']]);*/
@@ -75,8 +75,10 @@ class SimplePlayMDBController extends Controller
     }
 
     public function debitProcess(Request $request) 
-    {
+    {   
+
         $string = file_get_contents("php://input");
+        Helper::saveLog('simpleplay_balance in', 35, $string, "ENDPOINTHIT");
         $decrypted_string = $this->decrypt(urldecode($string));
         $query = parse_url('http://test.url?'.$decrypted_string, PHP_URL_QUERY);
         parse_str($query, $request_params);
