@@ -24,7 +24,7 @@ use GuzzleHttp\Client;
 
 use DB;
 
-class SimplePlayMDBController extends Controller
+class SimplePlayController extends Controller
 {
     public function __construct(){
         /*$this->middleware('oauth', ['except' => ['index']]);*/
