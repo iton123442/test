@@ -77,7 +77,7 @@ class SimplePlayController extends Controller
     public function debitProcess(Request $request) 
     {   
         $string = file_get_contents("php://input");
-        Helper::saveLog('simpleplay_balance', 35, json_encode($string), $response);
+        Helper::saveLog('simpleplay_balanceIN', 35, json_encode($string), "ENDPOINTHIT");
         $decrypted_string = $this->decrypt(urldecode($string));
         $query = parse_url('http://test.url?'.$decrypted_string, PHP_URL_QUERY);
         parse_str($query, $request_params);
