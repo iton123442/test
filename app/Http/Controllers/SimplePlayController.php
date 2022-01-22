@@ -79,8 +79,8 @@ class SimplePlayController extends Controller
 
         $string = file_get_contents("php://input");
         $decrypted_string = $this->decrypt(urldecode($string));
-        Helper::saveLog('simpleplay_debit in', 35, $string, "ENDPOINTHIT");
         $query = parse_url('http://test.url?'.$decrypted_string, PHP_URL_QUERY);
+        Helper::saveLog('simpleplay_debit in', 35, $query, "ENDPOINTHIT");
         parse_str($query, $request_params);
 
         // $incoming_req = $this->encrypt($string);
