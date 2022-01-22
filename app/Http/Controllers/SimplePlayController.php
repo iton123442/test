@@ -76,18 +76,16 @@ class SimplePlayController extends Controller
 
     public function debitProcess(Request $request) 
     {   
-
         $string = file_get_contents("php://input");
+        Helper::saveLog('simpleplay_balance', 35, json_encode($string), $response);
         $decrypted_string = $this->decrypt(urldecode($string));
         $query = parse_url('http://test.url?'.$decrypted_string, PHP_URL_QUERY);
-        Helper::saveLog('simpleplay_debit in', 35, $query, "ENDPOINTHIT");
         parse_str($query, $request_params);
-
         // $incoming_req = $this->encrypt($string);
         // $decrypted_string = $this->decrypt($incoming_req);
         // $query = parse_url('http://test.url?'.$decrypted_string, PHP_URL_QUERY);
         // parse_str($query, $request_params);
-
+        // dd($string);
         $playerId = $request_params['username'];
         $amount = $request_params['amount'];
         $transaction_id = $request_params['txnid'];
