@@ -2896,15 +2896,24 @@ class DigitainController extends Controller
  		    # END 001
 
 			// $idempotik = $this->gameTransactionEXTLog('provider_trans_id',$key['txId'], 3); 
-			$idempotik = GameTransactionMDB::findGameExt($key['txId'], 3,'transaction_id', $client_details);
-			if($idempotik != false && $idempotik != "false"){
-				$items_array[] = [
-						"errorCode" => 14, // TransactionAlreadyRolledBack
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
-				];  
-				continue;
-			}
+			// $idempotik = GameTransactionMDB::findGameExt($key['txId'], 3,'transaction_id', $client_details);
+			// if($idempotik != false && $idempotik != "false"){
+			// 	$items_array[] = [
+			// 			"errorCode" => 14, // TransactionAlreadyRolledBack
+			// 			"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+			// 	];  
+			// 	continue;
+			// }
 			if($key['refundRound'] == true){  // Use round id always
+
+				$idempotik = GameTransactionMDB::findGameExt($key['roundId'], 3,'round_id', $client_details);
+				if($idempotik != false && $idempotik != "false"){
+					$items_array[] = [
+							"errorCode" => 14, // TransactionAlreadyRolledBack
+							"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+					];  
+					continue;
+				}
 
 				// $datatrans = $this->findTransactionRefund($key['roundId'], 'round_id');
 				$datatrans = GameTransactionMDB::findGameExt($key['roundId'], 1,'round_id', $client_details);
@@ -2947,6 +2956,16 @@ class DigitainController extends Controller
 				}
 				$player_id = $key['playerId'];
 			}else{ // use both round id and orignaltxtid
+
+				$idempotik = GameTransactionMDB::findGameExt($key['originalTxId'], 3,'transaction_id', $client_details);
+				if($idempotik != false && $idempotik != "false"){
+					$items_array[] = [
+							"errorCode" => 14, // TransactionAlreadyRolledBack
+							"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+					];  
+					continue;
+				}
+
 				// $datatrans = $this->findTransactionRefund($key['originalTxId'], 'transaction_id');
 				$datatrans = GameTransactionMDB::findGameExt($key['originalTxId'], 1,'transaction_id', $client_details);
 				if($datatrans == 'false'){
@@ -3363,18 +3382,18 @@ class DigitainController extends Controller
 	 		    }
 	 		    # END 001
 
-				$idempotik = GameTransactionMDB::findGameExt($value['txId'], 3,'transaction_id', $client_details);
-				if($idempotik != false && $idempotik != "false"){
-					$items_array[] = [
-							"errorCode" => 14, // TransactionAlreadyRolledBack
-							"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
-					];  
-					$global_error = $global_error == 1 ? 8 : $global_error;
-					$error_encounter = 1;
-					$value['tg_error'] = $global_error;
-					array_push($json_data_ii, $value);
-					continue;
-				}
+				// $idempotik = GameTransactionMDB::findGameExt($value['txId'], 3,'transaction_id', $client_details);
+				// if($idempotik != false && $idempotik != "false"){
+				// 	$items_array[] = [
+				// 			"errorCode" => 14, // TransactionAlreadyRolledBack
+				// 			"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
+				// 	];  
+				// 	$global_error = $global_error == 1 ? 8 : $global_error;
+				// 	$error_encounter = 1;
+				// 	$value['tg_error'] = $global_error;
+				// 	array_push($json_data_ii, $value);
+				// 	continue;
+				// }
 
 				// Duplicate Checker
 				array_push($refund_duplicate_txid_request, $value['txId']);
@@ -3393,6 +3412,20 @@ class DigitainController extends Controller
 
 				if ($value['refundRound'] == true) {  // Use round id always
 					// $datatrans = $this->findTransactionRefund($value['roundId'], 'round_id');
+
+					$idempotik = GameTransactionMDB::findGameExt($value['roundId'], 3,'roundId', $client_details);
+					if($idempotik != false && $idempotik != "false"){
+						$items_array[] = [
+								"errorCode" => 14, // TransactionAlreadyRolledBack
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
+						];  
+						$global_error = $global_error == 1 ? 8 : $global_error;
+						$error_encounter = 1;
+						$value['tg_error'] = $global_error;
+						array_push($json_data_ii, $value);
+						continue;
+					}
+
 					$datatrans = GameTransactionMDB::findGameExt($value['roundId'], 1,'round_id', $client_details);
 					if ($datatrans == 'false') {
 						$datatrans = GameTransactionMDB::findGameExt($key['roundId'], 2,'round_id', $client_details);
@@ -3444,6 +3477,20 @@ class DigitainController extends Controller
 					$player_id = $value['playerId'];
 				} else { // use both round id and orignaltxtid
 					// $datatrans = $this->findTransactionRefund($key['originalTxId'], 'transaction_id');
+
+					$idempotik = GameTransactionMDB::findGameExt($value['originalTxId'], 3,'transaction_id', $client_details);
+					if($idempotik != false && $idempotik != "false"){
+						$items_array[] = [
+								"errorCode" => 14, // TransactionAlreadyRolledBack
+								"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
+						];  
+						$global_error = $global_error == 1 ? 8 : $global_error;
+						$error_encounter = 1;
+						$value['tg_error'] = $global_error;
+						array_push($json_data_ii, $value);
+						continue;
+					}
+					
 					$datatrans = GameTransactionMDB::findGameExt($value['originalTxId'], 1,'transaction_id', $client_details);
 					if($datatrans == 'false'){
 						$items_array[] = [

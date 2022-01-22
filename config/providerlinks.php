@@ -243,7 +243,7 @@ return [
         'provider_db_id' => 14, // Database ID nothing todo with the provider!
         'provider_and_sub_name' => 'Digitain', // Nothing todo with the provider
         'digitain_key' => 'BetRNK3184223',
-        'operator_id' => 'B9EC7C0A',
+        'operator_id' => '6BC95607',  // old B9EC7C0A
     ],
     'payment'=>[
         'catpay'=>[
@@ -388,6 +388,8 @@ return [
            'TRY' => 'bb9be14cbf5460a82277797dc39c46d0',
            'IRR' => '79d9b5da1d79cfe588f2db352e617a34',
            'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
+           'KRW' => '13c11ee300417eeb892643b07b224e53',
+           'JPY' => '91e006399cad8230d2d97091d8300412'
         ],
     ],
     // 'manna'=>[

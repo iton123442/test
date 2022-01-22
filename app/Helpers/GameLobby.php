@@ -136,7 +136,7 @@ class GameLobby{
         }else{ // TigerGames
             $operator = config("providerlinks.nolimit.".$client_details->operator_id.".operator");
         }
-        $url = config("providerlinks.nolimit.api_url").'device=mobile&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
+        $url = config("providerlinks.nolimit.api_url").'device=mobile&lobbyUrl='.$data['exitUrl'].'&hideExitButton=false'.'&language='.$data['lang'].'&operator='.config("providerlinks.nolimit.operator").'&game='.$data['game_code'].'&token='.$data['token'];
         return $url;
         } catch (\Exception $e) {
 
@@ -1731,6 +1731,11 @@ class GameLobby{
             return false;
         }
     }
+    public static function getGameByGameId($game_id){
+        $game = DB::select("SELECT game_id, game_type_id,provider_id,sub_provider_id,game_name,game_code,on_maintenance FROM games WHERE game_id = '".$game_id."'");
+        $count = count($game);
+        return $count > 0 ? $game[0]:null;
+    }
     public static function checkAndGetProviderId($provider_name){
         $provider = DB::select("SELECT * FROM sub_provider_code WHERE sub_provider_name = '".$provider_name."'");
         $count = count($provider);
@@ -1970,8 +1975,6 @@ class GameLobby{
             return $e->getMessage();
         }
     }
-
-
     public static function IDNPoker($request){
         Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "HIT" );
         try {
