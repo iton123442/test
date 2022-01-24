@@ -658,7 +658,7 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code == 58){ 
-                    $url = GameLobby::boomingGamingUrl($request->all(), $request->input('game_provider') );
+                    $url = GameLobby::boomingGamingUrl($request->all(), $request->input('game_provider') , $device );
                     
                     $msg = array(
                         "game_code" => $request->input("game_code"),
