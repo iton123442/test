@@ -748,7 +748,7 @@ class GameLobby{
         return $url;
     }
 
-    public static function boomingGamingUrl($data, $provider_name){
+    public static function boomingGamingUrl($data, $provider_name, $device){
         ProviderHelper::saveLogGameLaunch('Booming session ', config('providerlinks.booming.provider_db_id'), json_encode($data), "ENDPOINT HIT");
         $url = config('providerlinks.booming.api_url').'/v2/session';
         $client_details = ProviderHelper::getClientDetails('token',$data["token"]);
@@ -761,7 +761,7 @@ class GameLobby{
                 'game_id' => $data["game_code"],
                 'balance' => $client_details->balance,
                 'locale' => 'en',
-                'variant' => 'mobile', // mobile, desktop
+                'variant' => $device, // mobile, desktop
                 'currency' => $client_details->default_currency,
                 'player_id' => 'TG_'.$client_details->player_id,
                 'callback' =>  config('providerlinks.booming.call_back'),
@@ -785,11 +785,8 @@ class GameLobby{
             return $client_response->play_url;
 
         }catch(\Exception $e){
-            $error = [
-                'error' => $e->getMessage()
-            ];
             ProviderHelper::saveLogGameLaunch('Booming session error', config('providerlinks.booming.provider_db_id'), json_encode($data), $e->getMessage());
-            return $error;
+            return false;
         }
 
     }
