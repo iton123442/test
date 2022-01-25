@@ -39,6 +39,7 @@ class TidyController extends Controller
     }
 
 	 public function autPlayer(Request $request){
+		Helper::saveLog('Tidy Auth', $this->provider_db_id,  json_encode($request->all()), 'ENDPOINT HIT');
 	 	$playersid = explode('_', $request->username);
 		$getClientDetails = ProviderHelper::getClientDetails('player_id',$playersid[1]);
 		if($getClientDetails != null){
