@@ -150,6 +150,7 @@ class FreeRoundController extends Controller
 
 
     public function addFreeGameProviderController($player_details, $data, $sub_provder_id, $freeround_id){
+        Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($data), 'CONTROLLER PORTAL');
         if ($sub_provder_id == 89) {
             return FreeSpinHelper::createFreeRoundSlotmill($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 56) {
