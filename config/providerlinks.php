@@ -414,6 +414,7 @@ return [
         'PROVIDER_ID' => 58,
         'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
         'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
+        'FREE_ROUND_ADD' => 'https://api.mannagaming.com/agent/marketing_tool/Freeround/General/give',
         'default' => [
             'API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
             'AUTH_API_KEY'=> 'GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a',
