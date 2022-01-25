@@ -507,7 +507,7 @@ class MannaPlayController extends Controller
 	public function freeRound(Request $request){
    		
 		$json_data = json_decode(file_get_contents("php://input"), true);
-		ProviderHelper::saveLogWithExeption('manna_freeRound', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
+		Helper::saveLog('manna_freeRound',  $this->provider_db_id,json_encode($json_data), 'endpoint hit');
 		$api_key = $request->header('apiKey');
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
 		{
