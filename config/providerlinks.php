@@ -412,6 +412,7 @@ return [
     // ],
     'mannaplay'=>[
         'PROVIDER_ID' => 58,
+        'PROVIDER_ID' => 16,
         'AUTH_URL'=> 'https://api.mannagaming.com/agent/specify/',
         'GAME_LINK_URL' => 'https://api.mannagaming.com/agent/specify/',
         'FREE_ROUND_ADD' => 'https://api.mannagaming.com/agent/marketing_tool/Freeround/General/give',

@@ -252,7 +252,7 @@ class FreeSpinHelper{
      
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         // $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
-      
+        Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($freeround_id), 'HIT');
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -304,10 +304,12 @@ class FreeSpinHelper{
                 "opref" => $freeround_id,
                 "expiretime" => $endtime
             ];
+            Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($requestBody), 'HIT');
             $game_link_response = $client->post( $URL,
                     ['body' => json_encode($requestBody)]
                 );
             $dataresponse = json_decode($game_link_response->getBody()->getContents());
+            Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
             // $data = [
             //     "status" => 3,
             //     "provider_trans_id" => $freeround_id,
