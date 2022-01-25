@@ -88,6 +88,9 @@ class ClientRequestHelper{
                     [
                         'on_stats' => function (TransferStats $stats) use ($requesttocient){
                             $data = [
+                                'Request' => $stats->getRequest(),
+                                'Response' => $stats->getResponse(),
+                                'TxTime' => $stats->getTransferTime(),
                                 'http_body' => $stats->getHandlerStats(),
                                 'request_body' => $requesttocient
                             ];
