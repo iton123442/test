@@ -249,8 +249,10 @@ class FreeSpinHelper{
     }
     
     public static function createFreeRoundMannaplay($player_details,$data, $sub_provder_id,$freeround_id){
+     
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         // $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+      
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -264,42 +266,54 @@ class FreeSpinHelper{
             return 400;
         }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
+       
         $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
+        
         // $transaction_id = $prefix.$id;
-        $platform = "betrnk";
-        $api_key = "GkyPIN1mD*yzjxzQumq@cZZC!Vw%b!kIVy&&hk!a";
-        $URL = "https://api.mannagaming.com/agent/marketing_tool/Freeround/General/give";
-
+        $details = ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);
+        if ($details->operator_id == 15){ // EveryMatix Config
+            $api_key = config("providerlinks.mannaplay.15.API_KEY");
+            $platform_id = config("providerlinks.mannaplay.15.PLATFORM_ID");
+        }elseif($details->operator_id == 30){ // IDNPLAY
+            $api_key = config("providerlinks.mannaplay.30.API_KEY");
+            $platform_id = config("providerlinks.mannaplay.30.PLATFORM_ID");
+        }else{
+            $api_key = config("providerlinks.mannaplay.default.API_KEY");
+            $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
+        }
+        $URL = config("providerlinks.mannaplay.FREE_ROUND_ADD");
+        
         $client = new Client([
             'headers' => [ 
+                'Content-Type' => 'application/json',
                 'apiKey' => $api_key
             ]
         ]);
+       
         try {
+            $requestBody =   [
+                "account" => "$player_details->player_id",
+                "id" => $platform_id,
+                "channel" =>"",
+                "game_ids" => [
+                    $data["game_code"]
+                ],
+                "numrounds" => $data["details"]["rounds"],
+                "currency" => $player_details->default_currency,
+                "bet" =>$data["details"]["denomination"],
+                "opref" => $freeround_id,
+                "expiretime" => $endtime
+            ];
             $game_link_response = $client->post( $URL,
-                    ['body' => json_encode(
-                            [
-                                "account" => $player_details->player_id,
-                                "id" => $platform,
-                                "channel" =>"",
-                                "game_ids" => [
-                                    $data["game_code"]
-                                ],
-                                "numrounds" => $data["details"]["rounds"],
-                                "currency" => $player_details->default_currency,
-                                "bet" =>$data["details"]["denomination"],
-                                "opref" => $freeround_id,
-                                "expiretime" => $endtime
-                            ]
-                    )]
+                    ['body' => json_encode($requestBody)]
                 );
             $dataresponse = json_decode($game_link_response->getBody()->getContents());
-            $data = [
-                "status" => 3,
-                "provider_trans_id" => $freeround_id,
-                "details" => json_encode($dataresponse)
-            ];
-            FreeSpinHelper::updateFreeRound($data, $id);
+            // $data = [
+            //     "status" => 3,
+            //     "provider_trans_id" => $freeround_id,
+            //     "details" => json_encode($dataresponse)
+            // ];
+            // FreeSpinHelper::updateFreeRound($data, $id);
         } catch (\Exception $e) {
             $data = [
                 "status" => 3,
