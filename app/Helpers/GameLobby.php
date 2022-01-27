@@ -427,6 +427,7 @@ class GameLobby{
             "language" => $lang,
         ];
         $requesttosend['sign'] = AWSHelper::hashen($requesttosend, $client_details->player_token);
+        $requesttosend['merchHomeUrl'] = isset($exit_url) ? $exit_url : "www.google.com";
         $guzzle_response = $client->post(config('providerlinks.aws.api_url').'/api/login',
             ['body' => json_encode($requesttosend)]
         );
