@@ -422,7 +422,7 @@ class GameLobby{
             "username" => $merchant_id.'_TG'.$client_details->player_id,
             "playmode" => 0, // Mode of gameplay, 0: official
             "device" => 1, // Identifying the device. Device, 0: mobile device 1: webpage
-            "merchHomeUrl" => isset($exit_url) ? $exiturl : "www.google.com",
+            "merchHomeUrl" => isset($exit_url) ? $exit_url : "www.google.com",
             "gameId" => $game_code,
             "language" => $lang,
         ];
