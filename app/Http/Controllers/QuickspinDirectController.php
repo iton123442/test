@@ -21,7 +21,7 @@ class QuickspinDirectController extends Controller
         if($client_details->country_code != null){
             $countryCode = $client_details->country_code;
         }else{
-            $countryCode = "JP";
+            $countryCode = "SG";
         }
         $formatBal = $balance = str_replace(".","", $client_details->balance);
         if($client_details != null){
