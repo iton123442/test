@@ -21,7 +21,7 @@ class QuickspinDirectController extends Controller
         if($client_details->country_code != null){
             $countryCode = $client_details->country_code;
         }else{
-            $countryCode = "PH";
+            $countryCode = "JP";
         }
         $formatBal = $balance = str_replace(".","", $client_details->balance);
         if($client_details != null){
@@ -154,6 +154,11 @@ class QuickspinDirectController extends Controller
                                 break;
                                 case '402':
                                         // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                    $updateGameTransaction = [
+                                        'win' => 2,
+                                        'trans_status' => 5
+                                    ];
+                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                                     $http_status = 200;
                                     $res = [
                                         
@@ -172,6 +177,29 @@ class QuickspinDirectController extends Controller
                                     );
                                     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                 break;
+                                default:
+                                    $http_status = 200;
+                                    $updateGameTransaction = [
+                                        'win' => 2,
+                                        'trans_status' => 5
+                                    ];
+                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                                    $res = [
+                                        
+                                         "errorcode" => "INSUFFICIENT_FUNDS",
+                                         "errormessage" => "not enough funds for withdrawal"
+                                      
+                                    ];
+
+                                    $updateTransactionEXt = array(
+                                        "provider_request" =>json_encode($req->all()),
+                                        "mw_response" => json_encode($res),
+                                        'mw_request' => json_encode($client_response->requestoclient),
+                                        'client_response' => json_encode($client_response->fundtransferresponse),
+                                        'transaction_detail' => 'failed',
+                                        'general_details' => 'failed',
+                                    );
+                                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                         }
                     }
                     Helper::saveLog('QuickSpin Debit success', config("providerlinks.quickspinDirect.provider_db_id"), json_encode($req->all()), $res);

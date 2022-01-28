@@ -275,7 +275,12 @@ class NolimitController extends Controller
 
                                     break;
                                 case '402':
-                                    ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                    // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                    $updateGameTransaction = [
+                                        'win' => 2,
+                                        'trans_status' => 5
+                                    ];
+                              GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                                     $http_status = 200;
                                     $response = [
                                         
@@ -305,6 +310,41 @@ class NolimitController extends Controller
                                  ProviderHelper::saveLogWithExeption('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
                               GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                     break;
+                                    default:
+                                    $updateGameTransaction = [
+                                        'win' => 2,
+                                        'trans_status' => 5
+                                    ];
+                              GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                                $http_status = 200;
+                                    $response = [
+                                        
+                                        'jsonrpc' => '2.0',
+                                        'error' => [
+                                            'code' => -3200,
+                                            'message' => 'Server error',
+                                            'data' => [
+
+                                                'code' =>14001,
+                                                'message'=> "Balance too low.",
+                                            ],
+                                        ],
+
+                                        'id' => $data['id']
+                                      
+                                    ];
+
+                                $updateTransactionEXt = array(
+                                    "provider_request" =>json_encode($request->all()),
+                                    "mw_response" => json_encode($response),
+                                    'mw_request' => json_encode($client_response->requestoclient),
+                                    'client_response' => json_encode($client_response->fundtransferresponse),
+                                    'transaction_detail' => 'failed',
+                                    'general_details' => 'failed',
+                                );
+                                 ProviderHelper::saveLogWithExeption('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                
                             }
                         }
                             

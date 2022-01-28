@@ -113,6 +113,16 @@ class OnlyPlayController extends Controller
                                                     'success' => true,
                                                     'balance' => $formatBalance
                                                 ];
+                                        $updateTransactionEXt = array(
+                                            "provider_request" =>json_encode($request->all()),
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'success',
+                                            'general_details' => 'success',
+                                        );
+                                        ProviderHelper::saveLogWithExeption('after 200 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
                                         break;
                                     case '402':
                                         $updateGameTransaction = [
@@ -125,19 +135,39 @@ class OnlyPlayController extends Controller
                                                 "code" => 7837,
                                                 "message" => "Internal Error",
                                                 ];
-                                        break;
+                                        $updateTransactionEXt = array(
+                                            "provider_request" =>json_encode($request->all()),
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'failed',
+                                            'general_details' => 'failed',
+                                        );
+                                        ProviderHelper::saveLogWithExeption('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
+                                    break;
+                                    default:
+                                        $updateGameTransaction = [
+                                                'win' => 2,
+                                                'trans_status' => 5,
+                                            ];
+                                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $get_client_details);
+                                        $response = [
+                                            "success" =>  false,
+                                            "code" => 7837,
+                                            "message" => "Internal Error",
+                                        ];
+                                        $updateTransactionEXt = array(
+                                            "provider_request" =>json_encode($request->all()),
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'failed',
+                                            'general_details' => 'failed',
+                                        );
+                                        ProviderHelper::saveLogWithExeption('after updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
                                 }
-
-                                $updateTransactionEXt = array(
-                                    "provider_request" =>json_encode($request->all()),
-                                    "mw_response" => json_encode($response),
-                                    'mw_request' => json_encode($client_response->requestoclient),
-                                    'client_response' => json_encode($client_response->fundtransferresponse),
-                                    'transaction_detail' => 'success',
-                                    'general_details' => 'success',
-                                );
-                                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
-
                             }
                 
                 Helper::saveLog('OnlyPlay debit', $this->provider_db_id, json_encode($request->all()), $response);
