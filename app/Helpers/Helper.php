@@ -646,4 +646,12 @@ class Helper
 		);
 		DB::table("pgvirtual_game_session_token")->insert($player_game_round);
 	}
+
+	public static function getSessionTokenBySessionId($sessionId){
+		$query = DB::select('SELECT  `player_token`
+		FROM `player_game_rounds` `pgr` 
+		WHERE `uuid_token` = "'.$sessionId.'" ORDER BY round_id desc LIMIT 1 ');
+		$session_token = count($query);
+		return $session_token > 0 ? $query[0] : false;
+	}
 }
