@@ -604,7 +604,7 @@ class GameLobby{
         }
     }
 
-    public static function tidylaunchUrl( $game_code = null, $token = null){
+    public static function tidylaunchUrl( $game_code = null, $token = null,  $game_provider = null ,$exit_url){
         Helper::saveLog('Tidy Gameluanch', 23, "", "");
         try{
             $url = config('providerlinks.tidygaming.url_lunch');
@@ -633,7 +633,8 @@ class GameLobby{
                 'token' => $token,
                 'uid' => 'TGW_'.$client_details->player_id,
                 'currency' => $get_code_currency,
-                'invite_code' => $invite_code
+                'invite_code' => $invite_code,
+                'back_url' => $exit_url
             ];
             $client = new Client([
                 'headers' => [ 
