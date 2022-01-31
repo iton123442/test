@@ -545,12 +545,13 @@ class FundtransferProcessorController extends Controller
                 }catch(\Exception $e){
 
                     ProviderHelper::saveCLientErrorLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
-                    
+
                     # Use Custom Logs Now
-                    // $ext_data = array(
-                    //     "client_response" => $e->getMessage().' '.$e->getLine().' '.$e->getFile(),
-                    // );
-                    // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                    $ext_data = array(
+                        "client_response" => $e->getMessage().' '.$e->getLine().' '.$e->getFile(),
+                    );
+                    ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+
 
                     # Only HTTP Error Should Be Resended
                     if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
