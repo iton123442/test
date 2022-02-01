@@ -239,21 +239,29 @@ class VivoController extends Controller
 							// 	//check if vivo active table
 							// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
 							// }
+							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
+							if($bet_transaction == null){
+								$gameTransactionData = array(
+						            "provider_trans_id" => $request->TransactionID,
+						            "token_id" => $client_details->token_id,
+						            "game_id" => $game_details->game_id,
+						            "round_id" => $request->roundId,
+						            "bet_amount" => $request->Amount,
+						            "win" => 5,
+						            "pay_amount" => 0,
+						            "income" => 0,
+						            "entry_id" => 1,
+						        );
 
-							$gameTransactionData = array(
-					            "provider_trans_id" => $request->TransactionID,
-					            "token_id" => $client_details->token_id,
-					            "game_id" => $game_details->game_id,
-					            "round_id" => $request->roundId,
-					            "bet_amount" => $request->Amount,
-					            "win" => 5,
-					            "pay_amount" => 0,
-					            "income" => 0,
-					            "entry_id" => 1,
-					        );
-
-					        /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
-					        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+						        /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
+						        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+						    }else{
+						    	$updateGameTransaction = [
+		                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
+		                        ];
+		                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTransaction->game_trans_id, $client_details);
+		                        $game_transaction_id = $bet_transaction->game_trans_id;
+						    }
 
 					        $bet_game_transaction_ext = array(
 								"game_trans_id" => $game_transaction_id,
