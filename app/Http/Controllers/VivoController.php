@@ -211,6 +211,7 @@ class VivoController extends Controller
 					else
 					{
 						if($request->TrnType == 'BET') {
+							Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), 'HIT Bet process');
 							try{
 								ProviderHelper::idenpotencyTable($request->TransactionID);
 							}catch(\Exception $e){
@@ -303,6 +304,7 @@ class VivoController extends Controller
 					                    } 
 
 										break;
+										Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), json_encode($response));
 								}
 
 							}
@@ -310,6 +312,7 @@ class VivoController extends Controller
 						}
 
 						elseif($request->TrnType == 'WIN') {
+							Helper::saveLog('Vivo Gaming WIN', 34,json_encode($request->all()), 'HIT Win process');
 							try{
 								ProviderHelper::idenpotencyTable($request->TransactionID);
 							}catch(\Exception $e){
@@ -397,6 +400,7 @@ class VivoController extends Controller
 					            ];
 
 					            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$request->Amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+					            Helper::saveLog('Vivo Gaming WIN', 34,json_encode($request->all()), json_encode($response));
 
 							}
 
