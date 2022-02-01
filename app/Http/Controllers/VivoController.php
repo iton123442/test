@@ -355,7 +355,7 @@ class VivoController extends Controller
 					           	ProviderHelper::updateGameTransactionV2Credit($bet_transaction->game_trans_id, $request->Amount, $income, $win_or_lost, $entry_id, "game_trans_id", 2);*/
 
 					           	$update_game_transaction = array(
-				                    "win" => $request->Amount == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1,
+				                    "win" => 5,
 				                    "pay_amount" => $bet_transaction->pay_amount + $request->Amount,
 				                    "income" => $bet_transaction->income - $request->Amount,
 				                    "entry_id" => $request->Amount == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
