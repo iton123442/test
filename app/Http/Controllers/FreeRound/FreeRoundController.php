@@ -79,9 +79,7 @@ class FreeRoundController extends Controller
                 ]
             ];
         }
-        
         return $mw_response;
-
     } 
 
     public function checkGameAccess($client_id, $game_code, $sub_provider_id){
@@ -160,11 +158,11 @@ class FreeRoundController extends Controller
         } elseif ($sub_provder_id == 105) {
             return FreeSpinHelper::createFreeRounNolimitCity($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 126) {
-            return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id);
+            return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 127) {
-            return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id);
+            return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 44) {
-            return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id);
+            return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id,$freeround_id);
         } 
         else {
             return 400;
