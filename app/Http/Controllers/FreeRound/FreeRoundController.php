@@ -163,7 +163,10 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id);
         } elseif ($sub_provder_id == 127) {
             return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id);
-        } else {
+        } elseif ($sub_provder_id == 44) {
+            return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id);
+        } 
+        else {
             return 400;
         }
     }

@@ -85,6 +85,9 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "SG") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
+            else if ($payload->action->custom->provider == "VivoGaming") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }
             else if ($payload->action->custom->provider == "FunkyGames") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
@@ -425,6 +428,20 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                 
                             }
+                            elseif ($payload->action->custom->provider == 'VivoGaming') {
+                                 $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                
+                            }
                             elseif ($payload->action->custom->provider == 'Quickspin') {
                                  $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
@@ -543,6 +560,16 @@ class FundtransferProcessorController extends Controller
                         Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 402, json_encode($client_response), "CLIENT_API_ERROR");
                     }
                 }catch(\Exception $e){
+
+                    ProviderHelper::saveCLientErrorLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
+
+                    # Use Custom Logs Now
+                    $ext_data = array(
+                        "client_response" => $e->getMessage().' '.$e->getLine().' '.$e->getFile(),
+                    );
+                    ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+
+
                     # Only HTTP Error Should Be Resended
                     if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
                         $updateGameTransaction = [
