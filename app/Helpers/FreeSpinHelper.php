@@ -358,8 +358,8 @@ class FreeSpinHelper{
             $freeroundtransac = [
                 "player_id" => $data['details']['remoteusername'],
                 "game_id" => $game_details->game_id,
-                "total_spin" => $data["details"]["amount"],
-                "spin_remaining" => $data["details"]["amount"],
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
                 "denominations" => $data["details"]["freespinvalue"],
             ];
         } catch (\Exception $e) {
@@ -419,8 +419,8 @@ class FreeSpinHelper{
             $freeroundtransac = [
                 "player_id" => $data['details']['OperatorUserId'],
                 "game_id" => $game_details->game_id,
-                "total_spin" => $data["details"]["NumberOfFreeRounds"],
-                "spin_remaining" => $data["details"]["NumberOfFreeRounds"],
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
                 "denominations" => $data["details"]["AdditionalParameters"]["BetValue"],
                 "date_expire" => $data["details"]["FreeRoundsEndDate"],
             ];
@@ -491,5 +491,67 @@ class FreeSpinHelper{
             return 200;
         }
     }
+    public static function BNGcreateFreeBet($player_details,$data, $sub_provder_id){
+        // dd($data);
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        try{
+            $freeroundtransac = [
+                "player_id" => $data['details']['OperatorUserId'],
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                // "denominations" => $data["details"]["AdditionalParameters"]["BetValue"],
+                // "date_expire" => $data["details"]["FreeRoundsEndDate"],
+            ];
+        } catch (\Exception $e) {
+            return 400;
+        }
+        $id = FreeSpinHelper::createFreeRound($freeroundtransac);
+        $baseUrl = config("providerlinks.boongo.PLATFORM_SERVER_URL").config("providerlinks.boongo.tigergames-stage")."/tigergames-stage/api/v1/bonus/create/";
+        $response = $httpClient->post(
+            $baseUrl,[
+                'body' => json_encode([
+                        "api_token" => config("providerlinks.boongo.API_TOKEN"),
+                        "mode" => "REAL",
+                        "campaign" => "tigergames",
+                        "game_id" => $game_details->game_code,
+                        "bonus_type" => $data["details"]["bonus_type"],
+                        "currency" => $player_details->default_currency,
+                        "total_rounds" => $data["details"]["rounds"],
+                        "round_bet" => $data["details"]["rounds"]*1,
+                        "bonuses" => [
+                            "player_id" => $player_details->player_id,
+                            "ext_bonus_id" => $id
+                        ],
+                    ]
+            )]
+        );//end client post
+        Helper::saveLog('BNG freespin response', 44, json_encode($data), $response->getBody()->getContents());
+        $dataresponse = json_decode($response->getBody()->getContents());
+        $data = [
+            "status" => 3,
+            "provider_trans_id" => $prefix.$id,
+            "details" => json_encode($dataresponse)
+        ];
+        FreeSpinHelper::updateFreeRound($data, $id);
+        if (isset($dataresponse->errorCode) ){
+            //update freeroundtransac
+            $data = [
+                "status" => 3,
+                "provider_trans_id" => $prefix.$id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        } else {
+            $data = [
+                "provider_trans_id" => $prefix.$id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 200;
+        }
+    }   
 }
 ?>
