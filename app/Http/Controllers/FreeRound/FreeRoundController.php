@@ -157,7 +157,9 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRoundPNG($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 38) {
             return FreeSpinHelper::createFreeRoundMannaplay($player_details, $data, $sub_provder_id,$freeround_id);
-        }  elseif ($sub_provder_id == 126) {
+        } elseif ($sub_provder_id == 105) {
+            return FreeSpinHelper::createFreeRounNolimitCity($player_details, $data, $sub_provder_id,$freeround_id);
+        } elseif ($sub_provder_id == 126) {
             return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id);
         } elseif ($sub_provder_id == 127) {
             return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id);
