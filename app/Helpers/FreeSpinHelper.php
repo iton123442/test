@@ -495,21 +495,22 @@ class FreeSpinHelper{
         // dd($data);
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        // dd($prefix);
         try{
             $freeroundtransac = [
-                "player_id" => $data['details']['OperatorUserId'],
+                "player_id" => $player_details->player_id,
                 "game_id" => $game_details->game_id,
                 "total_spin" => $data["details"]["rounds"],
                 "spin_remaining" => $data["details"]["rounds"],
-                // "denominations" => $data["details"]["AdditionalParameters"]["BetValue"],
-                // "date_expire" => $data["details"]["FreeRoundsEndDate"],
             ];
         } catch (\Exception $e) {
             return 400;
         }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
-        $baseUrl = config("providerlinks.boongo.PLATFORM_SERVER_URL").config("providerlinks.boongo.tigergames-stage")."/tigergames-stage/api/v1/bonus/create/";
-        $response = $httpClient->post(
+        $client = new Client();
+        // $baseUrl = config("providerlinks.boongo.PLATFORM_SERVER_URL").config("providerlinks.boongo.tigergames-stage")."/tigergames-stage/api/v1/bonus/create/";
+        $baseUrl = "https://gate-stage.betsrv.com/op/tigergames-stage/api/v1/bonus/create/";
+        $response = $client->post(
             $baseUrl,[
                 'body' => json_encode([
                         "api_token" => config("providerlinks.boongo.API_TOKEN"),
@@ -519,11 +520,11 @@ class FreeSpinHelper{
                         "bonus_type" => $data["details"]["bonus_type"],
                         "currency" => $player_details->default_currency,
                         "total_rounds" => $data["details"]["rounds"],
-                        "round_bet" => $data["details"]["rounds"]*1,
-                        "bonuses" => [
-                            "player_id" => $player_details->player_id,
-                            "ext_bonus_id" => $id
-                        ],
+                        "round_bet" => "0.20",
+                        "bonuses" => array([
+                            "player_id" => (string) $player_details->player_id,
+                            "ext_bonus_id" => (string) $id
+                        ]),
                     ]
             )]
         );//end client post
