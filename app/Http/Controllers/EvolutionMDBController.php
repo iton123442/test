@@ -241,7 +241,7 @@ class EvolutionMDBController extends Controller
                 } 
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game"]["details"]["table"]["id"]);
 		        $game = GameTransactionMDB::findGameTransactionDetails($data["transaction"]["refId"], 'round_id',false, $client_details);
-                if($game == null){
+                if($game == 'false'){
                     $msg = array(
                         "status"=>"BET_DOES_NOT_EXIST",
                         "uuid"=>$data["uuid"],
@@ -333,88 +333,94 @@ class EvolutionMDBController extends Controller
     }
     public function cancel(Request $request){
         Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT cancel MDB");
-        $startTime =  microtime(true);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
-            Helper::saveLog('EVG', 12, json_encode($data), "CANCEL");
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
             if($client_details){
-                // $game_transaction = Helper::checkGameTransaction($data["transaction"]["id"],$data["transaction"]["refId"],3);
-                // if($game_transaction){
-                //     $msg = array(
-                //         "status"=>"BET_ALREADY_SETTLED",
-                //         "uuid"=>$data["uuid"],
-                //     );
-                //     return response($msg,200)->header('Content-Type', 'application/json');
-                // }
-                // else{
-                    $check_bet_exist = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["transaction"]["id"],1,$client_details);
-                    if($check_bet_exist==null){
+                    try{
+                        ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_3');
+                    }catch(\Exception $e){
+                        $msg = array(
+                            "status"=>"BET_ALREADY_SETTLED",
+                            "uuid"=>$data["uuid"],
+                        );
+                        return response($msg,200)->header('Content-Type', 'application/json');
+                    }
+                    try{
+                        ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_2');
+                    }catch(\Exception $e){
+                        $msg = array(
+                            "status"=>"WIN_ALREADY_RECEIVE",
+                            "uuid"=>$data["uuid"],
+                        );
+                        return response($msg,200)->header('Content-Type', 'application/json');
+                    }
+                    // $check_bet_exist = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["transaction"]["id"],1,$client_details);
+                    $check_bet_exist = GameTransactionMDB::findGameTransactionDetails($data["transaction"]["refId"], 'round_id',false, $client_details);
+                    if($check_bet_exist == 'false'){
                         $msg = array(
                             "status"=>"BET_DOES_NOT_EXIST",
                             "uuid"=>$data["uuid"],
                         );
                         return response($msg,200)->header('Content-Type', 'application/json');
                     }
-                    else{
-                        try{
-                        ProviderHelper::idenpotencyTable($this->prefix.'_'.$data["transaction"]["id"].'_'.$data["transaction"]["refId"].'_3');
-                        }catch(\Exception $e){
-                            $msg = array(
-                                "status"=>"BET_ALREADY_SETTLED",
-                                "uuid"=>$data["uuid"],
-                            );
-                            return response($msg,200)->header('Content-Type', 'application/json');
-                        }
-                        $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game"]["details"]["table"]["id"]);
-                        // $json_data = array(
-                        //     "transid" => $data["transaction"]["id"],
-                        //     "amount" => round($data["transaction"]["amount"],2),
-                        //     "roundid" => $data["transaction"]["refId"],
-                        // );
-                        $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($client_details->player_token,$data["transaction"]["refId"],$client_details);
-                        if($game==null){
-                            $msg = array(
-                                "status"=>"BET_DOES_NOT_EXIST",
-                                "uuid"=>$data["uuid"],
-                            );
-                            return response($msg,200)->header('Content-Type', 'application/json'); 
-                        }
-                        $updateGametransaction = array(
-                            "win" =>4,
-                            "pay_amount" =>round($data["transaction"]["amount"],2),
-                            "income" =>$game->amount-round($data["transaction"]["amount"],2),
-                            "entry_id" =>2,
+                    $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game"]["details"]["table"]["id"]);
+                    $updateGametransaction = array(
+                        "win" => 5,
+                        "pay_amount" =>$data["transaction"]["amount"],
+                        "income" => $check_bet_exist->bet_amount-$data["transaction"]["amount"],
+                        "entry_id" =>2,
+                    );
+                    GameTransactionMDB::updateGametransaction($updateGametransaction,$check_bet_exist->game_trans_id,$client_details);
+                    $refundgametransactionext = array(
+                        "game_trans_id" => $check_bet_exist->game_trans_id,
+                        "provider_trans_id" =>  $data["transaction"]["id"],
+                        "round_id" =>$data["transaction"]["refId"],
+                        "amount" =>$data["transaction"]["amount"],
+                        "game_transaction_type"=>3,
+                        "provider_request" =>json_encode($data),
+                    );
+                    $fund_extra_data = [
+                        'provider_name' => $game_details->provider_name
+                    ];
+                    $refundgametransactionextID = GameTransactionMDB::createGameTransactionExt($refundgametransactionext,$client_details);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$data["transaction"]["amount"],$game_details->game_code,$game_details->game_name,$refundgametransactionextID,$check_bet_exist->game_trans_id,"credit",true,$fund_extra_data);
+                    $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                    if(isset($client_response->fundtransferresponse->status->code) 
+                    && $client_response->fundtransferresponse->status->code == "200"){
+                        $msg = array(
+                            "status"=>"OK",
+                            "balance"=>(float)$balance,
+                            "uuid"=>$data["uuid"],
                         );
-                        GameTransactionMDB::updateGametransaction($updateGametransaction,$gameExtension->game_trans_id,$client_details);
-                        $refundgametransactionext = array(
-                            "game_trans_id" => $game->game_trans_id,
-                            "provider_trans_id" =>  $datadecoded["transactionId"],
-                            "round_id" =>$datadecoded["roundId"],
-                            "amount" =>round($datadecoded["amount"],2),
-                            "game_transaction_type"=>3,
-                            "provider_request" =>json_encode($datadecoded),
+                        $dataToUpdate = array(
+                            "mw_response" => json_encode($msg)
                         );
-                        $refundgametransactionextID = GameTransactionMDB::createGameTransactionExt($refundgametransactionext,$client_details);
-                        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["transaction"]["amount"],2),$game_details->game_code,$game_details->game_name,$refundgametransactionextID,$game->game_trans_id,"credit",true);
-                        $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-                        if(isset($client_response->fundtransferresponse->status->code) 
-                        && $client_response->fundtransferresponse->status->code == "200"){
-                            $msg = array(
-                                "status"=>"OK",
-                                "balance"=>(float)$balance,
-                                "uuid"=>$data["uuid"],
-                            );
-                            $dataToUpdate = array(
-                                "mw_response" => json_encode($msg)
-                            );
-                            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransactionext,$client_details);
-                            //Helper::saveLog('responseTime(EVG)', 12, json_encode(["type"=>"creditproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
-                            return response($msg,200)
-                                ->header('Content-Type', 'application/json');
-                        }
+                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransactionext,$client_details);
+                        $datatoupdate = array(
+                            "win"=>4
+                        );
+                        // GameTransaction::updateGametransaction($datatoupdate,$game_transactionid);
+                        GameTransactionMDB::updateGametransaction($datatoupdate, $check_bet_exist->game_trans_id, $client_details);
+                      
+                        return response($msg,200)
+                            ->header('Content-Type', 'application/json');
                     }
-                // }
+                    $msg = array(
+                        "status"=>"OK",
+                        "balance"=>(float)$balance,
+                        "uuid"=>$data["uuid"],
+                    );
+                    $dataToUpdate = array(
+                        "mw_response" =>json_encode($msg),
+                        "mw_request"=>json_encode($client_response->requestoclient),
+                        "client_response" =>json_encode($client_response->fundtransferresponse),
+                        "transaction_detail" => "PENDING",
+                        "general_details" => "PENDING",
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransactionext,$client_details);
+                    return response($msg,200)
+                        ->header('Content-Type', 'application/json');
             }
             else{
                 $msg = array(
