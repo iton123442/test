@@ -66,7 +66,7 @@ class FreeRoundController extends Controller
         if(!$checkPlayerExist){
             $mw_response = ["error_code"=>"409","error_description"=>"Player does not exist!"];
             return response($mw_response,200)
-            ->header('Content-Type', 'application/json');
+            ->header('Content-Type', 'application/json');;
         }
         $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
         if($this->addFreeGameProviderController($checkPlayerExist, $request->all(), $provider_code, $freeround_id ) == 200 ){
@@ -161,10 +161,8 @@ class FreeRoundController extends Controller
         } elseif ($sub_provder_id == 127) {
             return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 44) {
-            return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id, $freeround_id);
-        } elseif ($sub_provder_id == 57) {
-            return FreeSpinHelper::createFreeRoundWazdan($player_details, $data, $sub_provder_id,$freeround_id);
-        }
+            return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id,$freeround_id);
+        } 
         else {
             return 400;
         }
