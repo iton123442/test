@@ -15,6 +15,7 @@ class EvolutionController extends Controller
     // # Rollback 01/06/20
     private $prefix = 'evolution';
     public function authentication(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT authentication");
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
@@ -45,6 +46,7 @@ class EvolutionController extends Controller
         }
     }
     public function sid(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT sid");
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
@@ -75,6 +77,7 @@ class EvolutionController extends Controller
         }
     }
     public function balance(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT balance");
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
@@ -108,6 +111,7 @@ class EvolutionController extends Controller
 
     public function debit(Request $request){
         $startTime =  microtime(true);
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT debit");
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
@@ -203,6 +207,7 @@ class EvolutionController extends Controller
         }
     }
     public function credit(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT credit");
         $startTime =  microtime(true);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
@@ -327,6 +332,7 @@ class EvolutionController extends Controller
         }
     }
     public function cancel(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT cancel");
         $startTime =  microtime(true);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
@@ -424,6 +430,7 @@ class EvolutionController extends Controller
         return EVGHelper::gameLaunch($request->token,"139.180.159.34",$request->game_code);
     }
     public function internalrefund(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT internalrefund");
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
             //Helper::saveLog('cancelrequest(EVG)', 50, json_encode($data), "cancel");
