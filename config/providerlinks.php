@@ -305,6 +305,7 @@ return [
         'hmac_scret_key' => 'uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1',
         'partnercode'=> 'gd1wiurg',
         'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
+        'api_freeRound' => 'https://service-stage.wazdanep.com/add/',
         'operator_data' =>[
             "1"=>"tigergames",
             "5"=>"xigolo",
