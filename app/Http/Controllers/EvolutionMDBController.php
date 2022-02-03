@@ -16,6 +16,7 @@ class EvolutionMDBController extends Controller
     // # Rollback 01/06/20
     private $prefix = '42';
     public function authentication(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT authentication MDB");
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
@@ -48,6 +49,7 @@ class EvolutionMDBController extends Controller
         }
     }
     public function sid(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT sid MDB");
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
             $client_details = ProviderHelper::getClientDetails("player_id",$data["userId"]);
@@ -78,6 +80,7 @@ class EvolutionMDBController extends Controller
         }
     }
     public function balance(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT balance MDB");
        // Helper::saveLog('BALANCEREQUEST(EVG)', 12, $request->getContent(), ["BALANCEREQUEST"]);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
@@ -111,6 +114,7 @@ class EvolutionMDBController extends Controller
     }
 
     public function debit(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT debit MDB");
         $startTime =  microtime(true);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
@@ -211,6 +215,7 @@ class EvolutionMDBController extends Controller
         }
     }
     public function credit(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT credit MDB");
         $startTime =  microtime(true);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
@@ -322,6 +327,7 @@ class EvolutionMDBController extends Controller
         }
     }
     public function cancel(Request $request){
+        Helper::saveLog('evolution', 42, json_encode($request->all()), "ENDPOINT HIT cancel MDB");
         $startTime =  microtime(true);
         if($request->has("authToken")&& $request->authToken == config("providerlinks.evolution.owAuthToken")){
             $data = json_decode($request->getContent(),TRUE);
