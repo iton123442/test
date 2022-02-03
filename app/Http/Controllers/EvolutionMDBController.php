@@ -394,9 +394,11 @@ class EvolutionMDBController extends Controller
                             "uuid"=>$data["uuid"],
                         );
                         $dataToUpdate = array(
-                            "mw_response" => json_encode($msg)
+                            "mw_response" => json_encode($msg),
+                            "transaction_detail" =>"success",
+							"general_details" => "success",
                         );
-                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransactionext,$client_details);
+                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransactionextID,$client_details);
                         $datatoupdate = array(
                             "win"=>4
                         );
