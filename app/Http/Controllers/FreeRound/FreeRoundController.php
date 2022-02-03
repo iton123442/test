@@ -20,7 +20,6 @@ class FreeRoundController extends Controller
     //     $this->middleware('oauth', ['except' => ['index']]);
     // }
     public function freeRoundController(Request $request){
-        // dd($request->all());
         if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code') || !$request->has('details') || !$request->has('freeround_id') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
             return response($mw_response,200)
