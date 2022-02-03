@@ -168,7 +168,6 @@ class EvolutionMDBController extends Controller
                     $client_response = ClientRequestHelper::fundTransfer($client_details,$data["transaction"]["amount"],$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
-                        sleep(20);
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                         $msg = array(
