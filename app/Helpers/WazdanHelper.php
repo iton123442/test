@@ -91,4 +91,14 @@ class WazdanHelper
 		//Helper::saveLog('responseTime(WAZDAN)', 12, json_encode(["method"=>"createWazdanGameTransactionExt"]), microtime(true) - $starttime);
 		return $gamestransaction_ext_ID;
     }
+	public static function generateSignature($requestdata){
+        $operator = "tigergames";
+        $license = "curacao";
+        $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
+        $data = array(
+            "how" => 'hash_hmac("sha256","'.json_encode($requestdata).'",'.$key.')',
+            "hmac"=>hash_hmac("sha256",json_encode($requestdata),$key)
+        );
+        return $data;
+	}
 }
