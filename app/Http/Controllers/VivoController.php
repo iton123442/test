@@ -240,6 +240,7 @@ class VivoController extends Controller
 							// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
 							// }
 							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
+							Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
 						            "provider_trans_id" => $request->TransactionID,
