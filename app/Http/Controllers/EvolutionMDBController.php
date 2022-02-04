@@ -285,6 +285,7 @@ class EvolutionMDBController extends Controller
                         "provider_request" => $data, #R
                         "provider_trans_id"=>$data["transaction"]["id"], #R
                         "provider_round_id"=>$data["transaction"]["refId"], #R
+                        "provider_name" => $game_details->provider_name
                     ],
                     "mwapi" => [
                         "roundId"=>$game->game_trans_id, #R
