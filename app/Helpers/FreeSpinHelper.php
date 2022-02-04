@@ -371,6 +371,7 @@ class FreeSpinHelper{
                     "spin_remaining" => $data["details"]["rounds"],
                     "denominations" => $data["details"]["denomination"],
                     "date_expire" => $data["details"]["expiration_date"],
+                    "provider_trans_id" =>$freeround_id,
                 ];
             } catch (\Exception $e) {
                 return 400;
@@ -407,7 +408,7 @@ class FreeSpinHelper{
             } catch (\Exception $e) {
                 $createFreeround = [
                     "status" => 3,
-                    "provider_trans_id" => $freeround_id
+                    // "provider_trans_id" => $freeround_id
                 ];
                 FreeSpinHelper::updateFreeRound($createFreeround, $id);
                 $freespinExtenstion = [
@@ -424,7 +425,7 @@ class FreeSpinHelper{
                 //update freeroundtransac
                 $createFreeround = [
                     "status" => 3,
-                    "provider_trans_id" => $freeround_id
+                    // "provider_trans_id" => $freeround_id
                 ];
                 FreeSpinHelper::updateFreeRound($createFreeround, $id);
                 $freespinExtenstion = [
@@ -437,10 +438,10 @@ class FreeSpinHelper{
                 FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
                 return 400;
             } else {
-                $createFreeround = [
-                    "provider_trans_id" => $freeround_id
-                ];
-                FreeSpinHelper::updateFreeRound($createFreeround, $id);
+                // $createFreeround = [
+                //     "provider_trans_id" => $freeround_id
+                // ];
+                // FreeSpinHelper::updateFreeRound($createFreeround, $id);
                 $freespinExtenstion = [
                     "freespin_id" => $id,
                     "mw_request" => json_encode($requestBody),
@@ -720,7 +721,7 @@ class FreeSpinHelper{
                     "denominations" => $data["details"]["denomination"],
                     "date_expire" => $data["details"]["expiration_date"],
                     "provider_trans_id" => $freeround_id,
-                    "start_time" => $data["details"]["start_time"]
+                    "date_start" => $data["details"]["start_time"]
                 ];
             }catch(\Exception $e){
                 return 400;
@@ -760,7 +761,7 @@ class FreeSpinHelper{
             }catch(\Exception $e){
                 $createFreeround = [
                     "status" => 3,
-                    "provider_trans_id" => $freeround_id
+                    // "provider_trans_id" => $freeround_id
                 ];
                 FreeSpinHelper::updateFreeRound($createFreeround, $id);
                 $freespinExtenstion = [
@@ -777,7 +778,7 @@ class FreeSpinHelper{
                 //update freeroundtransac
                 $createFreeround = [
                     "status" => 3,
-                    "provider_trans_id" => $freeround_id
+                    // "provider_trans_id" => $freeround_id
                 ];
                 FreeSpinHelper::updateFreeRound($createFreeround, $id);
                 $freespinExtenstion = [
@@ -790,10 +791,10 @@ class FreeSpinHelper{
                 FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
                 return 400;
             } else {
-                $createFreeround = [
-                    "provider_trans_id" => $freeround_id
-                ];
-                FreeSpinHelper::updateFreeRound($createFreeround, $id);
+                // $createFreeround = [
+                //     "provider_trans_id" => $freeround_id
+                // ];
+                // FreeSpinHelper::updateFreeRound($createFreeround, $id);
                 $freespinExtenstion = [
                     "freespin_id" => $id,
                     "mw_request" => json_encode($requestBody),
