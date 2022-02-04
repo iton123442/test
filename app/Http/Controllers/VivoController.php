@@ -240,7 +240,7 @@ class VivoController extends Controller
 							// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
 							// }
 							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
-							Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), json_encode($bet_transaction));
+							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
 						            "provider_trans_id" => $request->TransactionID,
@@ -260,7 +260,7 @@ class VivoController extends Controller
 						    	$updateGameTransaction = [
 		                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
 		                        ];
-		                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTransaction->game_trans_id, $client_details);
+		                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
 		                        $game_transaction_id = $bet_transaction->game_trans_id;
 						    }
 
