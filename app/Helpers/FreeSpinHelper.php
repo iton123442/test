@@ -669,8 +669,9 @@ class FreeSpinHelper{
         }
     }   
     public static function createFreeRoundWazdan($player_details,$data, $sub_provder_id,$freeround_id){
-        Helper::saveLog('freeSpin(Wazdan) '.  $sub_provder_id, $sub_provder_id,json_encode($freeround_id), 'HIT');//savelog
+        Helper::saveLog('freeSpin(Wazdan)'. $sub_provder_id, $sub_provder_id,json_encode($freeround_id), 'HIT');//savelog
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
+        //  dd($game_details);
         if($game_details){
             try{
                 $insertFreespin = [
@@ -680,11 +681,14 @@ class FreeSpinHelper{
                     "spin_remaining" => $data["details"]["rounds"],
                     "denominations" => $data["details"]["denomination"],
                     "date_expire" => $data["details"]["expiration_date"],
+                    "provider_trans_id" => $freeround_id,
+                    "start_time" => $data["details"]["start_time"]
                 ];
             }catch(\Exception $e){
                 return 400;
             }
             $id = FreeSpinHelper::createFreeRound($insertFreespin);//insert Freespin
+            // dd($id);
             $startDate = date("Y-m-d H:i:s", strtotime($data["details"]["start_time"]));
             $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
             $details= ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);//getoperatorDetails
@@ -702,6 +706,7 @@ class FreeSpinHelper{
                 "startDate"=> $startDate,
                 "endDate" => $endtime
             ];
+            
             $api_key = WazdanHelper::generateSignature($requestBody);
             $client = new Client(['headers' => [ 
                 'Content-Type' => 'application/json',
@@ -709,10 +714,11 @@ class FreeSpinHelper{
                 ]
             ]);
             try{
-                $game_link_response = $client->post( config("providerlinks.wazdan.api_freeRound"),
+                $game_link_response = $client->post(config("providerlinks.wazdan.api_freeRound"),
                 ['body' => json_encode($requestBody)]);
                 $dataresponse = json_decode($game_link_response->getBody()->getContents()); // get response
-                Helper::saveLog('freeSpin(Wazdan) '.  $sub_provder_id, $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
+                // dd($dataresponse);
+                Helper::saveLog('freeSpin(Wazdan)'. $sub_provder_id, $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
             }catch(\Exception $e){
                 $createFreeround = [
                     "status" => 3,
