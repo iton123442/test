@@ -115,11 +115,11 @@ class WazdanController extends Controller
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('getStake(Wazdan)', 50, $data, "Initialize");
-        if($datadecoded["user"]["token"]){
-            // $client_details = ProviderHelper::getClientDetails('token', $request->token);
+        if($datadecoded["user"]["token"]){    
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
             }catch(\Exception $e){
+                $client_details = ProviderHelper::getClientDetails('token', $request->token);
                 $msg = array(
                     "status" => 0,
                     "funds" => array(
