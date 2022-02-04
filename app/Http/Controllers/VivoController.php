@@ -365,7 +365,7 @@ class VivoController extends Controller
 					           	if($bet_transaction->pay_amount > 0){
 	                           		$win_or_lost = 1;
 		                        }else{
-		                            $win_or_lost = $pay_amount > 0 ?  1 : 0;
+		                            $win_or_lost = $request->Amount > 0 ?  1 : 0;
 		                        }
 					           	$update_game_transaction = array(
 				                    "win" => 5,
