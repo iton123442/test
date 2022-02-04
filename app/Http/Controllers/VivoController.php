@@ -362,7 +362,11 @@ class VivoController extends Controller
 					           	$income = $bet_transaction->bet_amount -  $request->Amount ;
 
 					           	ProviderHelper::updateGameTransactionV2Credit($bet_transaction->game_trans_id, $request->Amount, $income, $win_or_lost, $entry_id, "game_trans_id", 2);*/
-
+					           	if($bet_transaction->pay_amount > 0){
+	                           		$win_or_lost = 1;
+		                        }else{
+		                            $win_or_lost = $pay_amount > 0 ?  1 : 0;
+		                        }
 					           	$update_game_transaction = array(
 				                    "win" => 5,
 				                    "pay_amount" => $bet_transaction->pay_amount + $request->Amount,
@@ -389,6 +393,7 @@ class VivoController extends Controller
 								$action_payload = [
 					                "type" => "custom", #genreral,custom :D # REQUIRED!
 					                "custom" => [
+					                	"win_or_lost" => $win_or_lost,
 					                    "provider" => 'VivoGaming',
 					                    "game_trans_ext_id" => $game_trans_ext_id,
 			                    		"client_connection_name" => $client_details->connection_name
