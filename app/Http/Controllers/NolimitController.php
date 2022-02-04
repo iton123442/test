@@ -201,7 +201,8 @@ class NolimitController extends Controller
                     return $response;
 
             }
-               $game_details = Game::find($game_code, $this->provider_db_id);
+            //    $game_details = Game::find($game_code, $this->provider_db_id);
+               $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
        try{
                 $gameTransactionData = array(
                             "provider_trans_id" => $provider_trans_id,
@@ -456,7 +457,8 @@ class NolimitController extends Controller
             }
           try{
                 ProviderHelper::saveLogWithExeption('NOLIMIT start to process', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
-                $game_details = Game::find($game_code, $this->provider_db_id);
+                // $game_details = Game::find($game_code, $this->provider_db_id);
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
                  ProviderHelper::saveLogWithExeption('NOLIMIT find game_detailss', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
