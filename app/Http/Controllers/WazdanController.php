@@ -7,6 +7,7 @@ use App\Helpers\Helper;
 use App\Helpers\WazdanHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ProviderHelper;
+use App\Helpers\FreeSpinHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransaction as GMT;
 use App\Models\GameTransactionMDB;
@@ -114,10 +115,11 @@ class WazdanController extends Controller
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('getStake(Wazdan)', 50, $data, "Initialize");
-        if($datadecoded["user"]["token"]){
+        if($datadecoded["user"]["token"]){    
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
             }catch(\Exception $e){
+                $client_details = ProviderHelper::getClientDetails('token', $request->token);
                 $msg = array(
                     "status" => 0,
                     "funds" => array(
@@ -168,6 +170,27 @@ class WazdanController extends Controller
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];  
+                //insert freespin here
+                // if(isset($datadecoded["transaction_id"])){
+                //     $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
+                //     $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded["transaction_id"], "provider_trans_id" );
+
+                //     if($getFreespin){
+                //       //update transaction
+                //          $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                //          $updateFreespinData = [
+                //              "status" => $status,
+                //              "spin_remaining" => $getFreespin->spin_remaining - 1
+                //          ];
+                //          $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                //          //create transction 
+                //          $createFreeRoundTransaction = array(
+                //              "game_trans_id" => $game_transactionid,
+                //              'freespin_id' => $getFreespin->freespin_id
+                //          );
+                //          FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                //     }
+                // }
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){

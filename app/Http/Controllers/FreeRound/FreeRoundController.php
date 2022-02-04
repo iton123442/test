@@ -162,7 +162,9 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 44) {
             return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id,$freeround_id);
-        } 
+        }  elseif ($sub_provder_id == 57) {
+            return FreeSpinHelper::createFreeRoundWazdan($player_details, $data, $sub_provder_id,$freeround_id);
+        }
         else {
             return 400;
         }
