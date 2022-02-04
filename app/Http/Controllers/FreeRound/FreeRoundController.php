@@ -17,7 +17,7 @@ class FreeRoundController extends Controller
 {
     
     public function __construct(){
-        $this->middleware('oauth', ['except' => ['index']]);
+        $this->middleware('oauth', ['except' => []]);
     }
     public function freeRoundController(Request $request){
         if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code') || !$request->has('details') || !$request->has('freeround_id') ){
