@@ -8,6 +8,7 @@ use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransaction;
+use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
 use Carbon\Carbon;
@@ -228,7 +229,10 @@ class NolimitController extends Controller
 
                  ProviderHelper::saveLogWithExeption('after  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
-                $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit',false,$fund_extra_data);
                 if($client_response == false){
 
                     $response = [
@@ -504,36 +508,52 @@ class NolimitController extends Controller
 
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
-
-                            $action_payload = [
-                                "type" => "custom", #genreral,custom :D # REQUIRED!
-                                "custom" => [
-                                    "provider" => 'Nolimit City',
-                                    "client_connection_name" => $client_details->connection_name,
-                                    "win_or_lost" => $win_or_lost,
-                                    "entry_id" => $entry_id,
-                                    "pay_amount" => $pay_amount,
-                                    "income" => $income,
-                                    "game_trans_ext_id" => $game_trans_ext_id
-                                ],
-                                "provider" => [
-                                    "provider_request" => $data, #R
-                                    "provider_trans_id"=> $provider_trans_id, #R
-                                    "provider_round_id"=> $round_id, #R
-                                ],
-                                "mwapi" => [
-                                    "roundId"=>$bet_transaction->game_trans_id, #R
-                                    "type"=>2, #R
-                                    "game_id" => $game_details->game_id, #R
-                                    "player_id" => $client_details->player_id, #R
-                                    "mw_response" => $response, #R
-                                ],
-                                'fundtransferrequest' => [
-                                    'fundinfo' => [
-                                        'freespin' => false,
-                                    ]
-                                ]
-                            ];
+               
+                $action_payload = [
+                    "type" => "custom", #genreral,custom :D # REQUIRED!
+                    "custom" => [
+                        "provider" => 'Nolimit City',
+                        "client_connection_name" => $client_details->connection_name,
+                        "win_or_lost" => $win_or_lost,
+                        "entry_id" => $entry_id,
+                        "pay_amount" => $pay_amount,
+                        "income" => $income,
+                        "game_trans_ext_id" => $game_trans_ext_id
+                    ],
+                    "provider" => [
+                        "provider_request" => $data, #R
+                        "provider_trans_id"=> $provider_trans_id, #R
+                        "provider_round_id"=> $round_id, #R
+                        "provider_name" => $game_details->provider_name
+                    ],
+                    "mwapi" => [
+                        "roundId"=>$bet_transaction->game_trans_id, #R
+                        "type"=>2, #R
+                        "game_id" => $game_details->game_id, #R
+                        "player_id" => $client_details->player_id, #R
+                        "mw_response" => $response, #R
+                    ]
+                ];
+                if(isset( $data['params']['promoName'] )) {
+                    $getOrignalfreeroundID = explode("_",$data['params']['promoName']);
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
+                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['params']['promoName'], "provider_trans_id" );
+                    if($getFreespin){
+                        //update transaction
+                        $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                        $updateFreespinData = [
+                            "status" => $status,
+                            "spin_remaining" => $getFreespin->spin_remaining - 1
+                        ];
+                        $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                        //create transction 
+                        $createFreeRoundTransaction = array(
+                            "game_trans_id" => $bet_transaction->game_trans_id,
+                            'freespin_id' => $getFreespin->freespin_id
+                        );
+                        FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                    }
+                }
                 $updateTransactionEXt = array(
                     "provider_request" =>json_encode($request->all()),
                     "mw_response" => json_encode($response),
