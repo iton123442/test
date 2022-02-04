@@ -556,6 +556,7 @@ class NolimitController extends Controller
                         FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                     }
                 }
+                Helper::saveLog('FREESPIN', 42, json_encode($action_payload), "FREESPIN");
                 $updateTransactionEXt = array(
                     "provider_request" =>json_encode($request->all()),
                     "mw_response" => json_encode($response),
