@@ -170,27 +170,27 @@ class WazdanController extends Controller
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];  
-                //insert freespin here
-                // if(isset($datadecoded["transaction_id"])){
-                //     $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
-                //     $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded["transaction_id"], "provider_trans_id" );
+                //Ryyynz FreeSPIN!!
+                if(isset($datadecoded["transaction_id"])){
+                    $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
+                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded["transaction_id"], "provider_trans_id" );
 
-                //     if($getFreespin){
-                //       //update transaction
-                //          $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-                //          $updateFreespinData = [
-                //              "status" => $status,
-                //              "spin_remaining" => $getFreespin->spin_remaining - 1
-                //          ];
-                //          $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                //          //create transction 
-                //          $createFreeRoundTransaction = array(
-                //              "game_trans_id" => $game_transactionid,
-                //              'freespin_id' => $getFreespin->freespin_id
-                //          );
-                //          FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-                //     }
-                // }
+                    if($getFreespin){
+                      //update transaction
+                         $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                         $updateFreespinData = [
+                             "status" => $status,
+                             "spin_remaining" => $getFreespin->spin_remaining - 1
+                         ];
+                         $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                         //create transction 
+                         $createFreeRoundTransaction = array(
+                             "game_trans_id" => $game_transactionid,
+                             'freespin_id' => $getFreespin->freespin_id
+                         );
+                         FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                    }
+                }
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
@@ -356,8 +356,10 @@ class WazdanController extends Controller
         } 
     }
     public function returnWin(Request $request){
+
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
+        Helper::saveLog('returnWin(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
@@ -469,7 +471,7 @@ class WazdanController extends Controller
                         )
                     );
                     //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                    //Helper::saveLog('responseTime(WAZDANWIN)', 12, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                    Helper::saveLog('responseTime(WAZDANWIN)', 12, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
