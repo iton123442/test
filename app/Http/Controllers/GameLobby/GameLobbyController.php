@@ -326,9 +326,13 @@ class GameLobbyController extends Controller
                     return $msg;
                 }
                 elseif($provider_code==36){ // request->token
-                    Helper::saveLog('DEMO CALL', 14, json_encode($request->all()), 'DEMO');
+                    $device = 'device';
+                    if($request->has('device')){
+                        $device = $request->device;
+                    }
+
                     $lang = GameLobby::getLanguage($request->game_provider,$request->lang);
-                    $url = GameLobby::rsgLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang,$request->input('game_provider'));
+                    $url = GameLobby::rsgLaunchUrl($request->game_code,$request->token,$request->exitUrl,$lang,$request->input('game_provider'),$device);
                     if($url != false && $url != 'false'){
                         $msg = array(
                             "game_code" => $request->input("game_code"),

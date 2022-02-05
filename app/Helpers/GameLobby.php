@@ -14,6 +14,7 @@ use App\Helpers\TransferWalletHelper;
 use App\Helpers\DragonGamingHelper;
 use App\Helpers\FCHelper;
 use App\Helpers\ProviderHelper;
+use App\Helpers\DigitainHelper;
 use App\Helpers\MGHelper;
 use App\Helpers\EVGHelper;
 use DOMDocument;
@@ -453,12 +454,23 @@ class GameLobby{
         return $game_url.'&player_token='.$token;
     }
 
-    public static function rsgLaunchUrl($game_code,$token,$exitUrl,$lang='en', $provider_sub_name){
+    public static function rsgLaunchUrl($game_code,$token,$exitUrl,$lang='en', $provider_sub_name, $device){
+
+        // $gameinfo = DigitainHelper::findGameDetails(config;('providerlinks.digitain.provider_db_id'), $game_code);
+        $gameId = $game_code;
+        if ($device == 'mobile'){
+            $gameinfo = DigitainHelper::HasMobileGameCode($game_code);
+            if ($gameinfo != false){
+                $gameId = $gameinfo;
+            }else{
+                $gameId = $game_code;
+            }
+        }  
+
         $url = $exitUrl;
         $domain = parse_url($url, PHP_URL_HOST);
         Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
-        // $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
-        $url = config('providerlinks.digitain.api_url').'/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId='.config('providerlinks.digitain.operator_id').'&mainDomain='.$domain.'';
+        $url = config('providerlinks.digitain.api_url').'/GamesLaunch/Launch?gameid='.$gameId.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId='.config('providerlinks.digitain.operator_id').'&mainDomain='.$domain.'';
         return $url;
     }
 
