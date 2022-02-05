@@ -91,7 +91,7 @@ class SpearHeadController extends Controller
       if($client_details != null){
 
         if($client_details->country_code == null){
-          $client_details->country_code = "PH";
+          $client_details->country_code = "JP";
           $country_code = $this->getCountryCode3D($client_details->country_code);
         }else{
           $country_code = $this->getCountryCode3D($client_details->country_code);
@@ -203,50 +203,55 @@ public function DebitProcess($req){
           switch ($client_response->fundtransferresponse->status->code) {
               case '200':
                 $http_status = 200;
-                $res = [
-                        "AccountTransactionId" => $game_transaction_id,
-                        "Currency" => $client_details->default_currency,
-                        "Balance" => (float)$client_response->fundtransferresponse->balance,
-                        "SessionId" => $data['SessionId'],
-                        "BonusMoneyAffected" => 0.0,
-                        "RealMoneyAffected" => $bet_amount,
-                        "ApiVersion" => "1.0",
-                        "Request" => 'WalletDebit',
-                        "ReturnCode" => 0,
-                        "Message" => 'Success',
-                        "Details" => null,
-                ];
-                $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($req),
-                    "mw_response" => json_encode($res),
-                    'mw_request' => json_encode($client_response->requestoclient),
-                    'client_response' => json_encode($client_response->fundtransferresponse),
-                    'transaction_detail' => 'success',
-                    'general_details' => 'success',
-                );
-               Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-               GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                  break;
+                    $res = [
+                            "AccountTransactionId" => $game_transaction_id,
+                            "Currency" => $client_details->default_currency,
+                            "Balance" => (float)$client_response->fundtransferresponse->balance,
+                            "SessionId" => $data['SessionId'],
+                            "BonusMoneyAffected" => 0.0,
+                            "RealMoneyAffected" => $bet_amount,
+                            "ApiVersion" => "1.0",
+                            "Request" => 'WalletDebit',
+                            "ReturnCode" => 0,
+                            "Message" => 'Success',
+                            "Details" => null,
+                    ];
+                    $updateTransactionEXt = array(
+                        "provider_request" =>json_encode($req),
+                        "mw_response" => json_encode($res),
+                        'mw_request' => json_encode($client_response->requestoclient),
+                        'client_response' => json_encode($client_response->fundtransferresponse),
+                        'transaction_detail' => 'success',
+                        'general_details' => 'success',
+                    );
+                   Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                   GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                break;
                 case '402':
-                  $http_status = 400;
-                  $res = [
-                    "ApiVersion"=>"1.0",
-                    "Request" =>"WalletDebit",
-                    "ReturnCode" => 104,
-                    "Message" => "Insufficient funds"
-                  ];
+                    $http_status = 400;
+                    $updateGameTransaction = [
+                          'win' => 2,
+                          'trans_status' => 5
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+                    $res = [
+                      "ApiVersion"=>"1.0",
+                      "Request" =>"WalletDebit",
+                      "ReturnCode" => 104,
+                      "Message" => "Insufficient funds"
+                    ];
 
-              $updateTransactionEXt = array(
-                  "provider_request" =>json_encode($req),
-                  "mw_response" => json_encode($res),
-                  'mw_request' => json_encode($client_response->requestoclient),
-                  'client_response' => json_encode($client_response->fundtransferresponse),
-                  'transaction_detail' => 'failed',
-                  'general_details' => 'failed',
-              );
-               Helper::saveLog('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-          GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                  break;
+                    $updateTransactionEXt = array(
+                        "provider_request" =>json_encode($req),
+                        "mw_response" => json_encode($res),
+                        'mw_request' => json_encode($client_response->requestoclient),
+                        'client_response' => json_encode($client_response->fundtransferresponse),
+                        'transaction_detail' => 'failed',
+                        'general_details' => 'failed',
+                    );
+                    Helper::saveLog('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                break;
           }
       }
           

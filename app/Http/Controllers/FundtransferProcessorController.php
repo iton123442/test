@@ -85,6 +85,9 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "SG") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
+            else if ($payload->action->custom->provider == "VivoGaming") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }
             else if ($payload->action->custom->provider == "FunkyGames") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
@@ -146,8 +149,12 @@ class FundtransferProcessorController extends Controller
         if(isset($payload->action->provider->provider_name)){
             $requesttocient["gamedetails"]['provider_name'] = $payload->action->provider->provider_name;
         }
+        
         if(isset($payload->request_body->fundtransferrequest->fundinfo->freespin)){
             $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $payload->request_body->fundtransferrequest->fundinfo->freespin;
+        }
+        if(isset($payload->request_body->fundtransferrequest->fundinfo->freeroundId)){
+            $requesttocient["fundtransferrequest"]['fundinfo']['freeroundId'] = $payload->request_body->fundtransferrequest->fundinfo->freeroundId;
         }
         if(isset($payload->action->custom->client_connection_name) && isset($gteid)) {
             try{
@@ -287,6 +294,10 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'evolution'){
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'bng'){
@@ -412,6 +423,20 @@ class FundtransferProcessorController extends Controller
                             ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                            
                             }elseif ($payload->action->custom->provider == 'Smartsoft Gaming') {
+                                 $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                
+                            }
+                            elseif ($payload->action->custom->provider == 'VivoGaming') {
                                  $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
                                     "client_response" =>json_encode($client_response),

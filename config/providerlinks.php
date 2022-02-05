@@ -305,6 +305,7 @@ return [
         'hmac_scret_key' => 'uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1',
         'partnercode'=> 'gd1wiurg',
         'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
+        'api_freeRound' => 'https://service-stage.wazdanep.com/add/',
         'operator_data' =>[
             "1"=>"tigergames",
             "5"=>"xigolo",
@@ -615,6 +616,7 @@ return [
     'nolimit'=>[
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
+        'api_freebet' => 'https://partner.nolimitcity.com/api/v1/json',
         'operator' =>'TG_DEV',
         'operator_key' => 'on2ha5xie7Hu',
         '20' => [// APLUS
