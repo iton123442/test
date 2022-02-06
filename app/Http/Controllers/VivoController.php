@@ -370,7 +370,7 @@ class VivoController extends Controller
 					           	$update_game_transaction = array(
 				                    "win" => 5,
 				                    "pay_amount" => $bet_transaction->pay_amount + $request->Amount,
-				                    "income" => $bet_transaction->income - $request->Amount,
+				                    "income" => $bet_transaction->bet_amount - $request->Amount,
 				                    "entry_id" => $request->Amount == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
 				                );
 
