@@ -398,34 +398,83 @@ class WazdanController extends Controller
                 }
                 //ryy
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($datadecoded["roundId"], 'round_id',false, $client_details);
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
                 // $client_details->connection_name = $bet_transaction->connection_name;
                 $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
                 if($game==null){
-                    // $msg = array(
-                    //     "status" => 0,
-                    //     "funds" => array(
-                    //         "balance" => round($client_details->balance,2)
-                    //     )
-                    // );
-                    // Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
-                    // return response($msg,200)
-                    // ->header('Content-Type', 'application/json');
+                    if(isset( $datadecoded['freeRoundInfo']['txId'] )) {
+                        $getOrignalfreeroundID = explode("_",$datadecoded['freeRoundInfo']['txId']);
+                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+                        $gameTransactionData = array(
+                            "provider_trans_id" => $datadecoded["transactionId"],
+                            "token_id" => $client_details->token_id,
+                            "game_id" => $game_details->game_id,
+                            "round_id" => $datadecoded["roundId"],
+                            "bet_amount" => 0,
+                            "pay_amount" =>0,
+                            "win" => 5,
+                            "income" =>0,
+                            "entry_id" =>1,
+                        );
+                        $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                        $betgametransactionext = array(
+                            "game_trans_id" => $game_transactionid,
+                            "provider_trans_id" => $datadecoded["transactionId"],
+                            "round_id" => $datadecoded["roundId"],
+                            "amount" => 0,
+                            "game_transaction_type"=>1,
+                            "provider_request" =>json_encode($datadecoded),
+                        );
+                        $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);  
+                        $fund_extra_data = [
+                            'provider_name' => $game_details->provider_name
+                        ];  
+                        $client_response = ClientRequestHelper::fundTransfer($client_details, 0,$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+                        if(isset($client_response->fundtransferresponse->status->code) 
+                        && $client_response->fundtransferresponse->status->code == "200"){
+                            $balance = round($client_response->fundtransferresponse->balance,2);
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                            $msg = array(
+                                "status" => 0,
+                                "funds" => array(
+                                    "balance" => $balance
+                                ),
+                            );
+                            $dataToUpdate = array(
+                                "mw_response" => json_encode($msg)
+                            );
+                            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                            }
+                            $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded['freeRoundInfo']['txId'], "provider_trans_id" );
+                            if($getFreespin){
+                                //update transaction
+                                $updateFreespinData = [
+                                    "status" => 2,
+                                    "spin_remaining" => 0
+                                ];
+                            FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                                //create transction 
+                                $createFreeRoundTransaction = array(
+                                    "game_trans_id" => $bet_transaction->game_trans_id,
+                                    'freespin_id' => $getFreespin->freespin_id
+                                );
+                                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+
+
+                            }
+                            $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
+                    } else {
                     $msg = array(
-                        "status" =>1,
-                        "message" => array(
-                            "text"=>"session not found",
-                            "choices"=>array(
-                                array(
-                                    "label" => "Go Back to Game List",
-                                    "action" => "close_game",
-                                    "response" => "quit"
-                                )
-                            )
+                        "status" => 0,
+                        "funds" => array(
+                            "balance" => round($client_details->balance,2)
                         )
                     );
-                    return response($msg,200)->header('Content-Type', 'application/json');
+                    Helper::saveLog('refundAlreadyexist(Wazdan)', 50, $data, $msg);
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                    }
                 }
-                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
 
                 $win_or_lost = round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 0 : 1;
                 $createGametransaction = array(
@@ -510,26 +559,6 @@ class WazdanController extends Controller
                         "mw_response" => $response, #R
                     ]
                 ];
-                if(isset( $datadecoded['freeRoundInfo']['txId'] )) {
-                    $getOrignalfreeroundID = explode("_",$datadecoded['freeRoundInfo']['txId']);
-                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
-                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded['freeRoundInfo']['txId'], "provider_trans_id" );
-                    if($getFreespin){
-                        //update transaction
-                        $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-                        $updateFreespinData = [
-                            "status" => $status,
-                            "spin_remaining" => $getFreespin->spin_remaining - 1
-                        ];
-                       FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                        //create transction 
-                        $createFreeRoundTransaction = array(
-                            "game_trans_id" => $bet_transaction->game_trans_id,
-                            'freespin_id' => $getFreespin->freespin_id
-                        );
-                        FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-                    }
-                }
                 //$client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
