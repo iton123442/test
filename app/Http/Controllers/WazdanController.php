@@ -397,7 +397,6 @@ class WazdanController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 //ryy
-                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($datadecoded["roundId"], 'round_id',false, $client_details);
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
                 // $client_details->connection_name = $bet_transaction->connection_name;
                 $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
@@ -446,6 +445,7 @@ class WazdanController extends Controller
                             GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
                             }
                             $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded['freeRoundInfo']['txId'], "provider_trans_id" );
+                            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($datadecoded["roundId"], 'round_id',false, $client_details);
                             if($getFreespin){
                                 //update transaction
                                 $updateFreespinData = [
