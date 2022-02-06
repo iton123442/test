@@ -171,9 +171,9 @@ class WazdanController extends Controller
                     'provider_name' => $game_details->provider_name
                 ];  
                 //Ryyynz FreeSPIN!!
-                if(isset($datadecoded["transaction_id"])){
+                if(isset($datadecoded["transactionId"])){
                     $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
-                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded["transaction_id"], "provider_trans_id" );
+                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($datadecoded["transactionId"], "provider_trans_id" );
 
                     if($getFreespin){
                       //update transaction
