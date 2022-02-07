@@ -41,16 +41,23 @@ class FreeRoundController extends Controller
                 ->header('Content-Type', 'application/json');
         }
         //  CLIENT SUBSCRIPTION FILTER
-        //  $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
-        //  if(!$subscription_checker){
-        //      $mw_response = ["error_code"=>"406","error_description"=>"Game Not Found"];
-        //     return response($mw_response,200)
-        //     ->header('Content-Type', 'application/json');
-        //  }
-        
+         $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
+         if(!$subscription_checker){
+             $mw_response = ["error_code"=>"406","error_description"=>"Game Not Found"];
+            return response($mw_response,200)
+            ->header('Content-Type', 'application/json');
+         }
+
         $checkProviderSupportFreeRound = $this->checkProviderSupportFreeRound($provider_code);
         if(!$checkProviderSupportFreeRound){
              $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service Provider"];
+            return response($mw_response,200)
+            ->header('Content-Type', 'application/json');
+         }
+        
+        $checkGameSupportFreeRound = $this->checkGameSupportFreeRound($provider_code, $request->input("game_code"));
+        if(!$checkGameSupportFreeRound){
+             $mw_response = ["error_code"=>"407","error_description"=>"Game Not Supported!"];
             return response($mw_response,200)
             ->header('Content-Type', 'application/json');
          }
@@ -123,7 +130,16 @@ class FreeRoundController extends Controller
     }   
 
     public function checkProviderSupportFreeRound($sub_provider_id){
+        // 0 => SUPPORTED
+        // 1 => NOT SUPPORTED
         $provider = DB::select("SELECT * FROM sub_providers WHERE sub_provider_id = ".$sub_provider_id." and is_freespin = 0");
+        $count = count($provider);
+        return $count > 0 ? $provider[0]:null;
+    }
+    public function checkGameSupportFreeRound($sub_provider_id, $game_code){
+         // 0 => SUPPORTED
+        // 1 => NOT SUPPORTED
+        $provider = DB::select("SELECT game_id FROM games WHERE sub_provider_id = ".$sub_provider_id." AND game_code = '".$game_code."' and is_freespin = 0");
         $count = count($provider);
         return $count > 0 ? $provider[0]:null;
     }
