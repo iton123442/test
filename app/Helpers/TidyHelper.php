@@ -185,4 +185,19 @@ class TidyHelper{
 	 	return $code;
 	 }
 
+	 public static function getcurrencyCode($currency, $client_id){
+		try {
+			$supportClientPrefix_k = config('providerlinks.tidygaming.support_1to1_denomination_prefixK');
+			$getCurrency = $currency;
+			if (in_array( $client_id, $supportClientPrefix_k)) {
+				$getCurrency = "k".$getCurrency;
+			}
+			$get_code_currency = TidyHelper::currencyCode($getCurrency);
+			return $get_code_currency;
+		} catch (\Exception $e) {
+			return false;
+		}
+		
+	 }
+
 }
