@@ -724,16 +724,28 @@ class FreeSpinHelper{
         //  dd($game_details);
         if($game_details){
             try{
-                $insertFreespin = [
-                    "player_id" => $player_details->player_id,
-                    "game_id" => $game_details->game_id,
-                    "total_spin" => $data["details"]["rounds"],
-                    "spin_remaining" => $data["details"]["rounds"],
-                    "denominations" => $data["details"]["denomination"],
-                    "date_expire" => $data["details"]["expiration_date"],
-                    "provider_trans_id" => $freeround_id,
-                    "date_start" => $data["details"]["start_time"]
-                ];
+                // if($data["details"]["type"] != "regular") {
+                //     $insertFreespin = [
+                //         "player_id" => $player_details->player_id,
+                //         "game_id" => $game_details->game_id,
+                //         // "total_spin" => $data["details"]["rounds"],
+                //         "denominations" => $data["details"]["denomination"],
+                //         "date_expire" => $data["details"]["expiration_date"],
+                //         "provider_trans_id" => $freeround_id,
+                //         "date_start" => $data["details"]["start_time"]
+                //     ];
+                // } else {
+                    $insertFreespin = [
+                        "player_id" => $player_details->player_id,
+                        "game_id" => $game_details->game_id,
+                        "total_spin" => $data["details"]["rounds"],
+                        "spin_remaining" => $data["details"]["rounds"],
+                        "denominations" => $data["details"]["denomination"],
+                        "date_expire" => $data["details"]["expiration_date"],
+                        "provider_trans_id" => $freeround_id,
+                        "date_start" => $data["details"]["start_time"]
+                    ];
+                // }
             }catch(\Exception $e){
                 return 400;
             }
@@ -743,20 +755,36 @@ class FreeSpinHelper{
             $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
             $details= ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);//getoperatorDetails
             // dd($details);
-            $requestBody = [
-                "playerId"=> $player_details->player_id,
-                "type"=> "regular",
-                "currency"=> $player_details->default_currency,
-                "count"=> $data["details"]["rounds"],
-                "txId"=> $freeround_id,
-                "gameId"=> $game_details->game_code,
-                "operator"=> "tigergames",
-                "license"=> "curacao",
-                "stake"=> $data["details"]["denomination"],
-                "startDate"=> $startDate,
-                "endDate" => $endtime
-            ];
-            
+            // if($data["details"]["type"] != "regular") {
+            //     $requestBody = [
+            //         "playerId"=> $player_details->player_id,
+            //         "type"=> $data["details"]["type"],
+            //         "currency"=> $player_details->default_currency,
+            //         "txId"=> $freeround_id,
+            //         "gameId"=> $game_details->game_code,
+            //         "operator"=> config("providerlinks.wazdan.operator"),
+            //         "license"=> config("providerlinks.wazdan.license"),
+            //         "stake"=> $data["details"]["bet_value"],
+            //         "value"=> $data["details"]["denomination"], //total amount
+            //         // "count"=> $data["details"]["rounds"],
+            //         "startDate"=> $startDate,
+            //         "endDate" => $endtime
+            //     ];
+            // } else {
+                $requestBody = [
+                    "playerId"=> $player_details->player_id,
+                    "type"=> "regular",
+                    "currency"=> $player_details->default_currency,
+                    "count"=> $data["details"]["rounds"],
+                    "txId"=> $freeround_id,
+                    "gameId"=> $game_details->game_code,
+                    "operator"=> config("providerlinks.wazdan.operator"),
+                    "license"=> config("providerlinks.wazdan.license"),
+                    "stake"=> $data["details"]["denomination"],
+                    "startDate"=> $startDate,
+                    "endDate" => $endtime
+                ];
+            // }
             $api_key = WazdanHelper::generateSignature($requestBody);
             $client = new Client(['headers' => [ 
                 'Content-Type' => 'application/json',
