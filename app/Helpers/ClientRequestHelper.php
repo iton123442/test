@@ -297,6 +297,9 @@ class ClientRequestHelper{
             if(isset($action['fundtransferrequest']['fundinfo']['freeroundId'])){
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freeroundId'] = $action['fundtransferrequest']['fundinfo']['freeroundId'];
             }
+            if(isset($action['fundtransferrequest']['fundinfo']['freeroundend'])){
+                $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freeroundend'] = $action['fundtransferrequest']['fundinfo']['freeroundend'];
+            }
         }
         // Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 2");
         // Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), config('providerlinks.cut_call_server')."/tigergames/fundtransfer");
