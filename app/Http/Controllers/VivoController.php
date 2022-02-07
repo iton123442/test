@@ -222,24 +222,47 @@ class VivoController extends Controller
 								return $response;
 							}
 
+
 							$response = [
 								"errorCode" =>  10100,
 								"message" => "Server is not ready!",
 							];
 
-
 							$json_data['income'] = $request->Amount;
 							$json_data['roundid'] = $request->roundId;
 							$json_data['transid'] = $request->TransactionID;
-							
-							// initial check
-							// $game_details = Game::find($request->gameId, $this->provider_db_id);
 
-							// if (!$game_details) {
-							// 	//check if vivo active table
-							// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
-							// }
-							$bet_transaction = GameTransaction::getGameTransactionByRoundId($request->roundId, $client_details);
+
+							$existing_unique_round = false;
+							$query_round_found = false;
+							$query_round_search_count = 1;
+							try{
+								ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
+								$existing_unique_round = false;
+							}catch(\Exception $e){
+								// Error means naa nah!,
+								$existing_unique_round = true;
+							}
+							
+							
+							if ($existing_unique_round == true){
+								do {
+									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+									if($bet_transaction != null){
+										$query_round_found = true;
+									}else{
+										$query_round_found = false;
+										$query_round_search_count++;
+									}
+
+									if ($query_round_search_count==3){
+										return $response;
+									}
+									Helper::saveLog('Vivo existing_unique_round BET', 34,json_encode($request->all()), 'HIT Bet loop');
+								} while (!$query_round_found);
+							}else{
+								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+							}	
 							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
