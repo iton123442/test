@@ -93,7 +93,7 @@ class WazdanHelper
     }
 	public static function generateSignature($requestdata){
         $operator = config("providerlinks.wazdan.operator");
-        $license =  config("providerlinks.wazdan.license");;
+        $license =  config("providerlinks.wazdan.license");
         $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
         $data = array(
             "how" => 'hash_hmac("sha256","'.json_encode($requestdata).'",'.$key.')',
