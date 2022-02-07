@@ -430,12 +430,16 @@ class WazdanController extends Controller
                             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($datadecoded["roundId"], 'round_id',false, $client_details);
                             if($getFreespin){
                                 //update transaction
+                                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
                                 $updateFreespinData = [
                                     "status" => 2,
                                     "spin_remaining" => 0
                                 ];
                             FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
                                 //create transction 
+                            if($status == 2) {
+                                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+                            }
                                 $createFreeRoundTransaction = array(
                                     "game_trans_id" => $bet_transaction->game_trans_id,
                                     'freespin_id' => $getFreespin->freespin_id
