@@ -242,7 +242,7 @@ class VivoController extends Controller
 								$existing_unique_round = false;
 							}catch(\Exception $e){
 								// Error means naa nah!,
-								elper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
+								Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
 								$existing_unique_round = true;
 							}
 							
@@ -265,7 +265,7 @@ class VivoController extends Controller
 							}else{
 								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
 							}	
-							Helper::saveLog('Vivo Gaming FOUND BET', $microtime,json_encode($request->all()), json_encode($bet_transaction));
+							Helper::saveLog('Vivo Gaming FOUND BET', $micTime,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
 						            "provider_trans_id" => $request->TransactionID,
