@@ -537,10 +537,10 @@ class NolimitController extends Controller
                     ]
                 ];
                 if(isset( $data['params']['promoName'] )) {
-                    $getOrignalfreeroundID = explode("_",$data['params']['promoName']);
-                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
                     $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['params']['promoName'], "provider_trans_id" );
                     if($getFreespin){
+                        $getOrignalfreeroundID = explode("_",$data['params']['promoName']);
+                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
                         //update transaction
                         $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
                         $updateFreespinData = [
@@ -548,6 +548,9 @@ class NolimitController extends Controller
                             "spin_remaining" => $getFreespin->spin_remaining - 1
                         ];
                        FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                       if($status == 2 ){
+                            $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                        }
                         //create transction 
                         $createFreeRoundTransaction = array(
                             "game_trans_id" => $bet_transaction->game_trans_id,
