@@ -338,6 +338,7 @@ class WazdanController extends Controller
 
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
+        dd($datadecoded);
         Helper::saveLog('returnWin(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
@@ -380,6 +381,10 @@ class WazdanController extends Controller
                 $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
                 if($game==null){
                     if(isset( $datadecoded['freeRoundInfo']['txId'] )) {
+                        if($datadecoded['freeRoundInfo']['type'] == "variable") {
+                            //code here
+                        }
+
                         $getOrignalfreeroundID = explode("_",$datadecoded['freeRoundInfo']['txId']);
                         $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
                         $gameTransactionData = array(
