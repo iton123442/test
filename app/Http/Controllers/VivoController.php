@@ -211,6 +211,7 @@ class VivoController extends Controller
 					else
 					{
 						if($request->TrnType == 'BET') {
+							$micTime = microtime(true);
 							Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), 'HIT Bet process');
 							try{
 								ProviderHelper::idenpotencyTable($request->TransactionID);
@@ -241,6 +242,7 @@ class VivoController extends Controller
 								$existing_unique_round = false;
 							}catch(\Exception $e){
 								// Error means naa nah!,
+								Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
 								$existing_unique_round = true;
 							}
 							
@@ -251,6 +253,7 @@ class VivoController extends Controller
 									if($bet_transaction != null){
 										$query_round_found = true;
 									}else{
+										Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet loop');
 										$query_round_found = false;
 										$query_round_search_count++;
 									}
@@ -258,12 +261,11 @@ class VivoController extends Controller
 									if ($query_round_search_count==3){
 										return $response;
 									}
-									Helper::saveLog('Vivo existing_unique_round BET', 34,json_encode($request->all()), 'HIT Bet loop');
 								} while (!$query_round_found);
 							}else{
 								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
 							}	
-							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
+							Helper::saveLog('Vivo Gaming FOUND BET', $micTime,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
 						            "provider_trans_id" => $request->TransactionID,
