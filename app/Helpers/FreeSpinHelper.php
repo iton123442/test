@@ -275,6 +275,7 @@ class FreeSpinHelper{
                 "spin_remaining" => $data["details"]["rounds"],
                 "denominations" => $data["details"]["denomination"],
                 "date_expire" => $data["details"]["expiration_date"],
+                "provider_trans_id" =>$freeround_id,
             ];
         } catch (\Exception $e) {
             return 400;
@@ -324,36 +325,46 @@ class FreeSpinHelper{
                 );
             $dataresponse = json_decode($game_link_response->getBody()->getContents());
             Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
-            // $data = [
-            //     "status" => 3,
-            //     "provider_trans_id" => $freeround_id,
-            //     "details" => json_encode($dataresponse)
-            // ];
-            // FreeSpinHelper::updateFreeRound($data, $id);
+      
         } catch (\Exception $e) {
-            $data = [
+            $createFreeround = [
                 "status" => 3,
-                "provider_trans_id" => $freeround_id,
-                "details" => json_encode($dataresponse)
             ];
-            FreeSpinHelper::updateFreeRound($data, $id);
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requestBody),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         }
         if ( !isset($dataresponse->errorCode) ){
             //update freeroundtransac
-            $data = [
-                "provider_trans_id" => $freeround_id,
-                "details" => json_encode($dataresponse)
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requestBody),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
             ];
-            FreeSpinHelper::updateFreeRound($data, $id);
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 200;
         } else {
-            $data = [
+            $createFreeround = [
                 "status" => 3,
-                "provider_trans_id" => $freeround_id,
-                "details" => json_encode($dataresponse)
             ];
-            FreeSpinHelper::updateFreeRound($data, $id);
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requestBody),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         }
     }

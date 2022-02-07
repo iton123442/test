@@ -156,6 +156,9 @@ class FundtransferProcessorController extends Controller
         if(isset($payload->request_body->fundtransferrequest->fundinfo->freeroundId)){
             $requesttocient["fundtransferrequest"]['fundinfo']['freeroundId'] = $payload->request_body->fundtransferrequest->fundinfo->freeroundId;
         }
+        if(isset($payload->request_body->fundtransferrequest->fundinfo->freeroundend)){
+            $requesttocient["fundtransferrequest"]['fundinfo']['freeroundend'] = $payload->request_body->fundtransferrequest->fundinfo->freeroundend;
+        }
         if(isset($payload->action->custom->client_connection_name) && isset($gteid)) {
             try{
                 $ext_Data = ['mw_request' => json_encode($requesttocient)];
