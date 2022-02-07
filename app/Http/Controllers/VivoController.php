@@ -241,6 +241,7 @@ class VivoController extends Controller
 								$existing_unique_round = false;
 							}catch(\Exception $e){
 								// Error means naa nah!,
+								elper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
 								$existing_unique_round = true;
 							}
 							
