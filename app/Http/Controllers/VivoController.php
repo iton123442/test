@@ -113,7 +113,7 @@ class VivoController extends Controller
 		$client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
 
 		$hash = md5($request->userId.$request->Amount.$request->TrnType.$request->TrnDescription.$request->roundId.$request->gameId.$request->History.config("providerlinks.vivo.PASS_KEY"));
-
+		// dd($hash);
 		if($hash != $request->hash) {
 			
 			$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>500</CODE></RESPONSE></VGSSYSTEM>';
@@ -239,7 +239,7 @@ class VivoController extends Controller
 							// 	//check if vivo active table
 							// 	$game_details = Game::find($request->TrnDescription, $this->provider_db_id);
 							// }
-							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
+							$bet_transaction = GameTransaction::getGameTransactionByRoundId($request->roundId, $client_details);
 							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
@@ -370,7 +370,7 @@ class VivoController extends Controller
 					           	$update_game_transaction = array(
 				                    "win" => 5,
 				                    "pay_amount" => $bet_transaction->pay_amount + $request->Amount,
-				                    "income" => $bet_transaction->income - $request->Amount,
+				                    "income" => $bet_transaction->bet_amount - $request->Amount,
 				                    "entry_id" => $request->Amount == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
 				                );
 
