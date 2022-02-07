@@ -780,8 +780,8 @@ class FreeSpinHelper{
                         "count"=> $data["details"]["rounds"],
                         "txId"=> $freeround_id,
                         "gameId"=> $game_details->game_code,
-                        "operator"=> config("providerlinks.wazdan.operator"),
-                        "license"=> config("providerlinks.wazdan.license"),
+                        "operator"=> "tigergames",
+                        "license"=> "curacao",
                         "stake"=> $data["details"]["denomination"],
                         "startDate"=> $startDate,
                         "endDate" => $endtime
