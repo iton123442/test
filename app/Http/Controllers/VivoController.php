@@ -102,10 +102,7 @@ class VivoController extends Controller
 		$json_data = $request->all();
 		$client_code = RouteParam::get($request, 'brand_code');
 		
-		if($this->_isIdempotent($request->TransactionID)) {
-			header("Content-type: text/xml; charset=utf-8");
-			return '<?xml version="1.0" encoding="utf-8"?>'. $this->_isIdempotent($request->TransactionID)->mw_response;
-		}
+		
 		
 		$response = '';
 		$response .= '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
@@ -122,15 +119,11 @@ class VivoController extends Controller
 		{
 			if ($client_details) {
 				$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
-			/*GameRound::create($request->roundId, $client_details->token_id);*/
-
-			/*if(!GameRound::check($request->roundId)) {
-				$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
-			}
-			else
-			{*/
 				if($request->TrnType == 'CANCELED_BET') {
-					
+					if($this->_isIdempotent($request->TransactionID)) {
+						header("Content-type: text/xml; charset=utf-8");
+						return '<?xml version="1.0" encoding="utf-8"?>'. $this->_isIdempotent($request->TransactionID)->mw_response;
+					}
 					// Check if the transaction exist
 					$game_transaction =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($request->TransactionID, 1, $client_details);
 					/*$game_transaction = ProviderHelper::findGameTransaction($request->TransactionID, 'transaction_id', 1);*/
@@ -211,7 +204,6 @@ class VivoController extends Controller
 					else
 					{
 						if($request->TrnType == 'BET') {
-							$micTime = microtime(true);
 							Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), 'HIT Bet process');
 							try{
 								ProviderHelper::idenpotencyTable($request->TransactionID);
@@ -234,38 +226,39 @@ class VivoController extends Controller
 							$json_data['transid'] = $request->TransactionID;
 
 
-							$existing_unique_round = false;
-							$query_round_found = false;
-							$query_round_search_count = 1;
-							try{
-								ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
-								$existing_unique_round = false;
-							}catch(\Exception $e){
-								// Error means naa nah!,
-								Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
-								$existing_unique_round = true;
-							}
+							// $existing_unique_round = false;
+							// $query_round_found = false;
+							// $query_round_search_count = 1;
+							// try{
+							// 	ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
+							// 	$existing_unique_round = false;
+							// }catch(\Exception $e){
+							// 	// Error means naa nah!,
+							// 	elper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
+							// 	$existing_unique_round = true;
+							// }
 							
 							
-							if ($existing_unique_round == true){
-								do {
-									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-									if($bet_transaction != null){
-										$query_round_found = true;
-									}else{
-										Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet loop');
-										$query_round_found = false;
-										$query_round_search_count++;
-									}
+							// if ($existing_unique_round == true){
+							// 	do {
+							// 		$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+							// 		if($bet_transaction != null){
+							// 			$query_round_found = true;
+							// 		}else{
+							// 			Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet loop');
+							// 			$query_round_found = false;
+							// 			$query_round_search_count++;
+							// 		}
 
-									if ($query_round_search_count==3){
-										return $response;
-									}
-								} while (!$query_round_found);
-							}else{
-								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-							}	
-							Helper::saveLog('Vivo Gaming FOUND BET', $micTime,json_encode($request->all()), json_encode($bet_transaction));
+							// 		if ($query_round_search_count==3){
+							// 			return $response;
+							// 		}
+							// 	} while (!$query_round_found);
+							// }else{
+							// 	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+							// }
+							$bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->roundId, "round_id", false, $client_details)
+							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
 						            "provider_trans_id" => $request->TransactionID,
@@ -314,7 +307,8 @@ class VivoController extends Controller
 										$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$game_transaction_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
 										
 										$data_to_update = array(
-					                        "mw_response" => json_encode($response)
+					                        "mw_response" => json_encode($response),
+					                        "transaction_detail" => "success"
 					                    );
 					                    GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 
@@ -331,6 +325,7 @@ class VivoController extends Controller
 					                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
 					                        $data_to_update = array(
 					                            "mw_response" => json_encode($response)
+					                            "transaction_detail" => "failed"
 					                        );
 					                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 					                    } catch(\Exception $e) {
