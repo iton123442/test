@@ -725,17 +725,17 @@ class FreeSpinHelper{
         if($game_details){
             try{
                 //freeSpin type
-                if($data["details"]["type"] != "regular") {
-                    $insertFreespin = [
-                        "player_id" => $player_details->player_id,
-                        "game_id" => $game_details->game_id,
-                        // "total_spin" => $data["details"]["rounds"],
-                        "denominations" => $data["details"]["denomination"],
-                        "date_expire" => $data["details"]["expiration_date"],
-                        "provider_trans_id" => $freeround_id,
-                        "date_start" => $data["details"]["start_time"]
-                    ];
-                } else {
+                // if($data["details"]["type"] != "regular") {
+                //     $insertFreespin = [
+                //         "player_id" => $player_details->player_id,
+                //         "game_id" => $game_details->game_id,
+                //         // "total_spin" => $data["details"]["rounds"],
+                //         "denominations" => $data["details"]["denomination"],
+                //         "date_expire" => $data["details"]["expiration_date"],
+                //         "provider_trans_id" => $freeround_id,
+                //         "date_start" => $data["details"]["start_time"]
+                //     ];
+                // } else {
                     $insertFreespin = [
                         "player_id" => $player_details->player_id,
                         "game_id" => $game_details->game_id,
@@ -746,7 +746,7 @@ class FreeSpinHelper{
                         "provider_trans_id" => $freeround_id,
                         "date_start" => $data["details"]["start_time"]
                     ];
-                }
+                // }
                 }catch(\Exception $e){
                     return 400;
                 }
@@ -757,22 +757,22 @@ class FreeSpinHelper{
                 $details= ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);//getoperatorDetails
                 // dd($details);
                 //freeSpin type
-                if($data["details"]["type"] != "regular") {
-                    $requestBody = [
-                        "playerId"=> $player_details->player_id,
-                        "type"=> $data["details"]["type"],
-                        "currency"=> $player_details->default_currency,
-                        "txId"=> $freeround_id,
-                        "gameId"=> $game_details->game_code,
-                        "operator"=> config("providerlinks.wazdan.operator"),
-                        "license"=> config("providerlinks.wazdan.license"),
-                        "stake"=> $data["details"]["bet_value"],
-                        "value"=> $data["details"]["denomination"], //total amount
-                        // "count"=> $data["details"]["rounds"],
-                        "startDate"=> $startDate,
-                        "endDate" => $endtime
-                    ];
-                } else {
+                // if($data["details"]["type"] != "regular") {
+                //     $requestBody = [
+                //         "playerId"=> $player_details->player_id,
+                //         "type"=> $data["details"]["type"],
+                //         "currency"=> $player_details->default_currency,
+                //         "txId"=> $freeround_id,
+                //         "gameId"=> $game_details->game_code,
+                //         "operator"=> config("providerlinks.wazdan.operator"),
+                //         "license"=> config("providerlinks.wazdan.license"),
+                //         "stake"=> $data["details"]["bet_value"],
+                //         "value"=> $data["details"]["denomination"], //total amount
+                //         // "count"=> $data["details"]["rounds"],
+                //         "startDate"=> $startDate,
+                //         "endDate" => $endtime
+                //     ];
+                // } else {
                     $requestBody = [
                         "playerId"=> $player_details->player_id,
                         "type"=> "regular",
@@ -786,7 +786,7 @@ class FreeSpinHelper{
                         "startDate"=> $startDate,
                         "endDate" => $endtime
                     ];
-                }
+                // }
                 $api_key = WazdanHelper::generateSignature($requestBody);
                 $client = new Client(['headers' => [ 
                     'Content-Type' => 'application/json',
