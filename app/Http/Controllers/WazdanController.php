@@ -338,7 +338,6 @@ class WazdanController extends Controller
 
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
-        dd($datadecoded);
         Helper::saveLog('returnWin(Wazdan)', 50, $data, "Initialize");
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
