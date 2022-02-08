@@ -380,10 +380,6 @@ class WazdanController extends Controller
                 $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
                 if($game==null){
                     if(isset( $datadecoded['freeRoundInfo']['txId'] )) {
-                        // if($datadecoded['freeRoundInfo']['type'] == "variable") {
-                        //     //code here
-                        // }
-
                         $getOrignalfreeroundID = explode("_",$datadecoded['freeRoundInfo']['txId']);
                         $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
                         $gameTransactionData = array(

@@ -103,11 +103,7 @@ class VivoController extends Controller
 		Helper::saveLog('Vivo Gaming Requests', 34,json_encode($request->all()), 'ENDPOINT HIT');
 		$client_code = RouteParam::get($request, 'brand_code');
 		
-		if($this->_isIdempotent($request->TransactionID)) {
-			header("Content-type: text/xml; charset=utf-8");
-			return '<?xml version="1.0" encoding="utf-8"?>'. $this->_isIdempotent($request->TransactionID)->mw_response;
-		}
-		
+
 		$response = '';
 		$response .= '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 
@@ -282,6 +278,7 @@ class VivoController extends Controller
 
 						        /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
 						        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+						        sleep(0.3);
 						    }else{
 						    	$updateGameTransaction = [
 		                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
