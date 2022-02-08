@@ -1793,9 +1793,9 @@ class GameLobby{
     public static function TopTrendGamingLaunchUrl($data){
         try {
             $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-
             if($client_details->country_code == null){
-                $country_code = $data['country_code'];
+                $country_code = "PH";
+                // $country_code = $data['country_code'];
             }else{
                 $country_code = $client_details->country_code;
             }
@@ -1821,7 +1821,7 @@ class GameLobby{
             $json = json_encode(simplexml_load_string($game_luanch_response));
             $array = json_decode($json,true);
             $val = $array["@attributes"]["token"];
-            $game_name = DB::select('SELECT game_name FROM games WHERE provider_id = 57 and game_code = '.$data['game_code'].'');
+            $game_name = DB::select('SELECT game_name FROM games WHERE provider_id = '.config("providerlinks.toptrendgaming.provider_db_id").' and game_code = '.$data['game_code'].'');
             $remove[] = "'";
             $remove[] = ' ';
             $game_details = $game_name[0];
