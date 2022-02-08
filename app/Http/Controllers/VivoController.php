@@ -261,8 +261,9 @@ class VivoController extends Controller
 							// }else{
 							// 	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
 							// }
-							sleep(0.3);
+							sleep(0.5);
 							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							switch ($bet_transaction){
 						        case null:
 							          $gameTransactionData = array(
