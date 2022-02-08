@@ -209,6 +209,7 @@ return [
             'RUB' => '50679e6c',
             'KRW' => 'bdafae9a',
             'IRR' => 'da104cef',
+            'IDR' => 'ac5cb093',
             'kIDR' => 'b5ebfb6f',
             'MYR' => '531afbdd',
             'kVND' => '34f7085a',
