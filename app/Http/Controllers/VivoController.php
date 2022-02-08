@@ -98,7 +98,8 @@ class VivoController extends Controller
 	}
 
 	public function gameTransaction(Request $request) 
-	{
+	{	
+		sleep(1);
 		$json_data = $request->all();
 		$micTime = microtime(true);
 		Helper::saveLog('Vivo Gaming Requests', 34,json_encode($request->all()), $micTime);
@@ -262,7 +263,7 @@ class VivoController extends Controller
 							// }else{
 							// 	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
 							// }
-							sleep(0.5);
+							
 							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
 							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							switch ($bet_transaction){
@@ -434,7 +435,8 @@ class VivoController extends Controller
 				                    "amount" => $request->Amount,
 				                    "game_transaction_type"=> 2,
 				                    "provider_request" =>json_encode($json_data),
-				                    "mw_response" => json_encode($response)
+				                    "mw_response" => json_encode($response),
+				                    "general_details" => $request->History,
 				                );		                
 
 								$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
