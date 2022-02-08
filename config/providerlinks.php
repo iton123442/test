@@ -613,6 +613,7 @@ return [
     'toptrendgaming' => [
         'provider_db_id' => 56,
         'api_url' => 'https://ams-api.stg.ttms.co:8443/cip/gametoken/',
+        'game_api_url' => 'https://ams-games.stg.ttms.co',
     ],
     'nolimit'=>[
         'provider_db_id' => 59,
