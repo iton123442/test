@@ -216,7 +216,7 @@ return [
             'kMMK' => '1d69f90a',
             'kKHR' => '3d7edfac',
         ],
-        'support_1to1_denomination_prefixK' => [168,245,247,248,249,250,185], //THIS IS THE CLIENT ID THAT SUPPOR PREFIX K OR 1:1 EXAMPLE currency LAK concant for kLAK
+        'support_1to1_denomination_prefixK' => [245,247,248,249,250,185], //THIS IS THE CLIENT ID THAT SUPPOR PREFIX K OR 1:1 EXAMPLE currency LAK concant for kLAK
         'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
         'TransferWallet' => [
             "client_id" => '2efa763b',
