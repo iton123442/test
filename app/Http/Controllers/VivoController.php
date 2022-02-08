@@ -261,33 +261,20 @@ class VivoController extends Controller
 							// }else{
 							// 	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
 							// }
-							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-							// sleep(0.3);
-							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
-							switch ($bet_transaction){
-						        case null:
-							          $gameTransactionData = array(
-							            "provider_trans_id" => $request->TransactionID,
-							            "token_id" => $client_details->token_id,
-							            "game_id" => $game_details->game_id,
-							            "round_id" => $request->roundId,
-							            "bet_amount" => $request->Amount,
-							            "win" => 5,
-							            "pay_amount" => 0,
-							            "income" => 0,
-							            "entry_id" => 1,
-							          );
-
-								      /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
-								      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-						        break;
-						        default:
-						        	$updateGameTransaction = [
-		                            	"bet_amount" => $bet_transaction->bet_amount + $request->Amount,
-			                        ];
-			                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-			                        $game_transaction_id = $bet_transaction->game_trans_id;
-						    }
+							
+					          $gameTransactionData = array(
+					            "provider_trans_id" => $request->TransactionID,
+					            "token_id" => $client_details->token_id,
+					            "game_id" => $game_details->game_id,
+					            "round_id" => $request->roundId,
+					            "bet_amount" => $request->Amount,
+					            "win" => 5,
+					            "pay_amount" => 0,
+					            "income" => 0,
+					            "entry_id" => 1,
+					          );
+						      /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
+						      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 							// if($bet_transaction == null){
 							// 	$gameTransactionData = array(
 						 //            "provider_trans_id" => $request->TransactionID,
