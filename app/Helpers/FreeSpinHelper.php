@@ -729,7 +729,6 @@ class FreeSpinHelper{
                     $insertFreespin = [
                         "player_id" => $player_details->player_id,
                         "game_id" => $game_details->game_id,
-                        // "total_spin" => $data["details"]["rounds"],
                         "denominations" => $data["details"]["denomination"],
                         "date_expire" => $data["details"]["expiration_date"],
                         "provider_trans_id" => $freeround_id,
@@ -768,7 +767,6 @@ class FreeSpinHelper{
                         "license"=> config("providerlinks.wazdan.license"),
                         "stake"=> $data["details"]["denomination"],
                         "value"=> $data["details"]["denomination"], //total amount
-                        // "count"=> $data["details"]["rounds"],
                         "startDate"=> $startDate,
                         "endDate" => $endtime
                     ];
