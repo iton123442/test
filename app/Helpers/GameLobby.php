@@ -1826,8 +1826,8 @@ class GameLobby{
             $remove[] = ' ';
             $game_details = $game_name[0];
             $get_name = str_replace($remove,'', $game_details->game_name);
- 
-            $game_url = 'https://ams5-games.ttms.co/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
+
+            $game_url = 'https://ams-games.stg.ttms.co/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
 
             return $game_url;
 
