@@ -100,6 +100,7 @@ class VivoController extends Controller
 	public function gameTransaction(Request $request) 
 	{
 		$json_data = $request->all();
+		Helper::saveLog('Vivo Gaming Requests', 34,json_encode($request->all()), 'ENDPOINT HIT');
 		$client_code = RouteParam::get($request, 'brand_code');
 		
 		if($this->_isIdempotent($request->TransactionID)) {
@@ -233,37 +234,38 @@ class VivoController extends Controller
 							$json_data['transid'] = $request->TransactionID;
 
 
-							$existing_unique_round = false;
-							$query_round_found = false;
-							$query_round_search_count = 1;
-							try{
-								ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
-								$existing_unique_round = false;
-							}catch(\Exception $e){
-								// Error means naa nah!,
-								Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
-								$existing_unique_round = true;
-							}
+							// $existing_unique_round = false;
+							// $query_round_found = false;
+							// $query_round_search_count = 1;
+							// try{
+							// 	ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
+							// 	$existing_unique_round = false;
+							// }catch(\Exception $e){
+							// 	// Error means naa nah!,
+							// 	Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
+							// 	$existing_unique_round = true;
+							// }
 							
 							
-							if ($existing_unique_round == true){
-								do {
-									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-									if($bet_transaction != null){
-										$query_round_found = true;
-									}else{
-										Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet loop');
-										$query_round_found = false;
-										$query_round_search_count++;
-									}
+							// if ($existing_unique_round == true){
+							// 	do {
+							// 		$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+							// 		if($bet_transaction != null){
+							// 			$query_round_found = true;
+							// 		}else{
+							// 			Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet loop');
+							// 			$query_round_found = false;
+							// 			$query_round_search_count++;
+							// 		}
 
-									if ($query_round_search_count==3){
-										return $response;
-									}
-								} while (!$query_round_found);
-							}else{
-								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-							}	
+							// 		if ($query_round_search_count==3){
+							// 			return $response;
+							// 		}
+							// 	} while (!$query_round_found);
+							// }else{
+							// 	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+							// }
+							$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);	
 							Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 							if($bet_transaction == null){
 								$gameTransactionData = array(
