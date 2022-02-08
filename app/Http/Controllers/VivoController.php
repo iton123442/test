@@ -100,7 +100,8 @@ class VivoController extends Controller
 	public function gameTransaction(Request $request) 
 	{
 		$json_data = $request->all();
-		Helper::saveLog('Vivo Gaming Requests', 34,json_encode($request->all()), 'ENDPOINT HIT');
+		$micTime = microtime(true);
+		Helper::saveLog('Vivo Gaming Requests', 34,json_encode($request->all()), $micTime);
 		$client_code = RouteParam::get($request, 'brand_code');
 		
 
@@ -318,6 +319,7 @@ class VivoController extends Controller
 								"amount" => $request->Amount,
 								"game_transaction_type" => 1,
 								"provider_request" => json_encode($json_data),
+								"general_details" => $request->History,
 							);
 
 					        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details); 
