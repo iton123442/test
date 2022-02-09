@@ -281,8 +281,8 @@ class VivoController extends Controller
 							      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 							      sleep(0.5);
 							}catch(\Exception $e){
-									Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
+									Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
 									$updateGameTransaction = [
 		                            	"bet_amount" => $bet_transaction->bet_amount + $request->Amount,
 			                        ];
