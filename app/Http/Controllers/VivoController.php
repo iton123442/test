@@ -110,7 +110,6 @@ class VivoController extends Controller
 		$response .= '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300ssss</CODE></RESPONSE></VGSSYSTEM>';
 
 		$client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
-
 		$hash = md5($request->userId.$request->Amount.$request->TrnType.$request->TrnDescription.$request->roundId.$request->gameId.$request->History.config("providerlinks.vivo.PASS_KEY"));
 		// dd($hash);
 		if($hash != $request->hash) {
@@ -158,7 +157,6 @@ class VivoController extends Controller
 			           	$income = $game_transaction->bet_amount -  $game_transaction->bet_amount ;*/
 
 			           	$update_game_transaction = array(
-		                    "win" => 4,
 		                    // "bet_amount" => $game_transaction->amount - $request->Amount,
 		                    "entry_id" => 2
 		                );
@@ -206,6 +204,7 @@ class VivoController extends Controller
 					}
 					else
 					{
+
 						if($request->TrnType == 'BET') {
 							Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), 'HIT Bet process');
 							try{
@@ -217,127 +216,57 @@ class VivoController extends Controller
 								];
 								return $response;
 							}
+							$getSideBet = strpos($request->History, 'sideBet');
+							if($getSideBet != false){
+								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId('side_bet_'.$request->roundId, $client_details);
+								if($bet_transaction == null){
+										$gameTransactionData = array(
+								            "provider_trans_id" => $request->TransactionID,
+								            "token_id" => $client_details->token_id,
+								            "game_id" => $game_details->game_id,
+								            "round_id" => 'side_bet_'.$request->roundId,
+								            "bet_amount" => $request->Amount,
+								            "win" => 5,
+								            "pay_amount" => 0,
+								            "income" => 0,
+								            "entry_id" => 1,
+								        );
 
+								        //$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
+								        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+								} else {
+										$updateGameTransaction = [
+				                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
+				                        ];
+				                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+				                        $game_transaction_id = $bet_transaction->game_trans_id;
+								}
+							} else {// end sidebet get
+								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
+								if($bet_transaction == null){
+										$gameTransactionData = array(
+								            "provider_trans_id" => $request->TransactionID,
+								            "token_id" => $client_details->token_id,
+								            "game_id" => $game_details->game_id,
+								            "round_id" => $request->roundId,
+								            "bet_amount" => $request->Amount,
+								            "win" => 5,
+								            "pay_amount" => 0,
+								            "income" => 0,
+								            "entry_id" => 1,
+								        );
 
-							$response = [
-								"errorCode" =>  10100,
-								"message" => "Server is not ready!",
-							];
-
-							$json_data['income'] = $request->Amount;
-							$json_data['roundid'] = $request->roundId;
-							$json_data['transid'] = $request->TransactionID;
-
-
-							// $existing_unique_round = false;
-							// $query_round_found = false;
-							// $query_round_search_count = 1;
-							// try{
-							// 	ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
-							// 	$existing_unique_round = false;
-							// }catch(\Exception $e){
-							// 	// Error means naa nah!,
-							// 	Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet Round ID idempo');
-							// 	$existing_unique_round = true;
-							// }
-							
-							
-							// if ($existing_unique_round == true){
-							// 	do {
-							// 		$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-							// 		if($bet_transaction != null){
-							// 			$query_round_found = true;
-							// 		}else{
-							// 			Helper::saveLog($request->roundId, 34,json_encode($request->all()), 'HIT Bet loop');
-							// 			$query_round_found = false;
-							// 			$query_round_search_count++;
-							// 		}
-
-							// 		if ($query_round_search_count==3){
-							// 			return $response;
-							// 		}
-							// 	} while (!$query_round_found);
-							// }else{
-							// 	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-							// }
-							try{
-								Helper::saveLog('Vivo Gaming INSERT BET', 34,json_encode($request->all()), "INIT BET");
-								ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
-								$gameTransactionData = array(
-						            "provider_trans_id" => $request->TransactionID,
-						            "token_id" => $client_details->token_id,
-						            "game_id" => $game_details->game_id,
-						            "round_id" => $request->roundId,
-						            "bet_amount" => $request->Amount,
-						            "win" => 5,
-						            "pay_amount" => 0,
-						            "income" => 0,
-						            "entry_id" => 1,
-						          );
-							      /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
-							      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-							}catch(\Exception $e){
-							      	sleep(1);
-									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-									Helper::saveLog('Vivo Gaming FOUND BET', 34,json_encode($request->all()), json_encode($bet_transaction));
-									$updateGameTransaction = [
-		                            	"bet_amount" => $bet_transaction->bet_amount + $request->Amount,
-			                        ];
-			                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-			                        $game_transaction_id = $bet_transaction->game_trans_id;
+								        //$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
+								        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+								} else {
+										$updateGameTransaction = [
+				                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
+				                        ];
+				                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+				                        $game_transaction_id = $bet_transaction->game_trans_id;
+								}
 							}
-							//======================================================================================================================
-							// $bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
-							// 
-							// switch ($bet_transaction){
-						 //        case null:
-							//           $gameTransactionData = array(
-							//             "provider_trans_id" => $request->TransactionID,
-							//             "token_id" => $client_details->token_id,
-							//             "game_id" => $game_details->game_id,
-							//             "round_id" => $request->roundId,
-							//             "bet_amount" => $request->Amount,
-							//             "win" => 5,
-							//             "pay_amount" => 0,
-							//             "income" => 0,
-							//             "entry_id" => 1,
-							//           );
-
-							// 	      /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
-							// 	      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-						 //        break;
-						 //        default:
-						 //        	$updateGameTransaction = [
-		     //                        	"bet_amount" => $bet_transaction->bet_amount + $request->Amount,
-			    //                     ];
-			    //                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-			    //                     $game_transaction_id = $bet_transaction->game_trans_id;
-						 //    }
-							//========================================================================================================================
-							// if($bet_transaction == null){
-							// 	$gameTransactionData = array(
-						 //            "provider_trans_id" => $request->TransactionID,
-						 //            "token_id" => $client_details->token_id,
-						 //            "game_id" => $game_details->game_id,
-						 //            "round_id" => $request->roundId,
-						 //            "bet_amount" => $request->Amount,
-						 //            "win" => 5,
-						 //            "pay_amount" => 0,
-						 //            "income" => 0,
-						 //            "entry_id" => 1,
-						 //        );
-
-						 //        //$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
-						 //        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-						 //    }else{
-						 //    	$updateGameTransaction = [
-		     //                        "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
-		     //                    ];
-		     //                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-		     //                    $game_transaction_id = $bet_transaction->game_trans_id;
-						 //    }
-
-					        $bet_game_transaction_ext = array(
+					       	$bet_game_transaction_ext = array(
 								"game_trans_id" => $game_transaction_id,
 								"provider_trans_id" => $request->TransactionID,
 								"round_id" => $request->roundId,
@@ -393,6 +322,100 @@ class VivoController extends Controller
 							}
 
 						}
+
+						// if($request->TrnType == 'BET') {
+						// 	Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), 'HIT Bet process');
+						// 	try{
+						// 		ProviderHelper::idenpotencyTable($request->TransactionID);
+						// 	}catch(\Exception $e){
+						// 		$response = [
+						// 			"errorCode" =>  10209,
+						// 			"message" => "Transaction id exists!",
+						// 		];
+						// 		return $response;
+						// 	}
+
+
+						// 	$response = [
+						// 		"errorCode" =>  10100,
+						// 		"message" => "Server is not ready!",
+						// 	];
+
+						// 	$json_data['income'] = $request->Amount;
+						// 	$json_data['roundid'] = $request->roundId;
+						// 	$json_data['transid'] = $request->TransactionID;
+
+
+						// 	$gameTransactionData = array(
+					 //            "provider_trans_id" => $request->TransactionID,
+					 //            "token_id" => $client_details->token_id,
+					 //            "game_id" => $game_details->game_id,
+					 //            "round_id" => $request->roundId,
+					 //            "bet_amount" => $request->Amount,
+					 //            "win" => 5,
+					 //            "pay_amount" => 0,
+					 //            "income" => 0,
+					 //            "entry_id" => 1,
+				  //         	);
+					 //        /*$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);*/
+					 //        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+
+					 //        $bet_game_transaction_ext = array(
+						// 		"game_trans_id" => $game_transaction_id,
+						// 		"provider_trans_id" => $request->TransactionID,
+						// 		"round_id" => $request->roundId,
+						// 		"amount" => $request->Amount,
+						// 		"game_transaction_type" => 1,
+						// 		"provider_request" => json_encode($json_data),
+						// 		"general_details" => $request->History,
+						// 	);
+
+					 //        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details); 
+						// 	/*$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $request->TransactionID, $request->roundId, $request->Amount, 1, $json_data);*/
+							
+						// 	$fund_extra_data = [
+			   //                  'provider_name' => $game_details->provider_name
+			   //              ];
+
+					 //        $client_response = ClientRequestHelper::fundTransfer($client_details, $request->Amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
+							
+						// 	if (isset($client_response->fundtransferresponse->status->code)) {
+						// 		switch ($client_response->fundtransferresponse->status->code) {
+						// 			case '200':
+						// 				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+						// 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$game_transaction_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
+										
+						// 				$data_to_update = array(
+					 //                        "mw_response" => json_encode($response)
+					 //                    );
+					 //                    GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+
+						// 				break;
+						// 			case '402':
+										
+						// 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
+						// 				try {
+					 //                        $data = array(
+					 //                            "win"=> 2,
+					 //                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+					 //                        );
+
+					 //                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
+					 //                        $data_to_update = array(
+					 //                            "mw_response" => json_encode($response)
+					 //                        );
+					 //                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+					 //                    } catch(\Exception $e) {
+					 //                        /*Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
+					 //                    } 
+
+						// 				break;
+						// 				Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), json_encode($response));
+						// 		}
+
+						// 	}
+
+						// }
 
 						elseif($request->TrnType == 'WIN') {
 							Helper::saveLog('Vivo Gaming WIN', 34,json_encode($request->all()), 'HIT Win process');
