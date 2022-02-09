@@ -95,7 +95,7 @@ class FreeSpinHelper{
             }
 
         }
-        $getFreeRound = DB::select('select freespin_id,game_id,spin_remaining, status, provider_trans_id from freespin ' . $where);
+        $getFreeRound = DB::select('select freespin_id,game_id,spin_remaining, status, win, provider_trans_id from freespin ' . $where);
         $data_rows = count($getFreeRound);
 		return $data_rows > 0? $getFreeRound[0] : false;
 
