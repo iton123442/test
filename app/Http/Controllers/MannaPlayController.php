@@ -629,6 +629,7 @@ class MannaPlayController extends Controller
 						}
 						$updateFreespinData = [
 							"status" => $status,
+							"win" => $getFreespin->win + $amount_win,
 							"spin_remaining" => $getFreespin->spin_remaining - 1
 						];
 						$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
