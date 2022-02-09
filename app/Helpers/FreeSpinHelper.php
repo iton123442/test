@@ -95,7 +95,7 @@ class FreeSpinHelper{
             }
 
         }
-        $getFreeRound = DB::select('select freespin_id,game_id,spin_remaining, status, provider_trans_id from freespin ' . $where);
+        $getFreeRound = DB::select('select freespin_id,game_id,spin_remaining, status, win, provider_trans_id from freespin ' . $where);
         $data_rows = count($getFreeRound);
 		return $data_rows > 0? $getFreeRound[0] : false;
 
@@ -279,10 +279,7 @@ class FreeSpinHelper{
             return 400;
         }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
-       
-        $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
-        
-        // $transaction_id = $prefix.$id;
+        // $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
         $details = ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);
         if ($details->operator_id == 15){ // EveryMatix Config
             $api_key = config("providerlinks.mannaplay.15.API_KEY");
@@ -315,7 +312,7 @@ class FreeSpinHelper{
                 "currency" => $player_details->default_currency,
                 "bet" =>$data["details"]["denomination"],
                 "opref" => $freeround_id,
-                "expiretime" => $endtime
+                "expiretime" => $data["details"]["expiration_date"]
             ];
             Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($requestBody), 'HIT');
             $game_link_response = $client->post( $URL,
