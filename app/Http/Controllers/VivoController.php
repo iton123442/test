@@ -99,7 +99,6 @@ class VivoController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{	
-		sleep(1);
 		$json_data = $request->all();
 		$micTime = microtime(true);
 		Helper::saveLog('Vivo Gaming Requests', 34,json_encode($request->all()), $micTime);
