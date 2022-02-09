@@ -264,7 +264,7 @@ class VivoController extends Controller
 							// 	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundIdVivo($request->roundId, $client_details);
 							// }
 							try{
-								Helper::saveLog('Vivo Gaming INSERT BET', 34,json_encode($request->all()), json_encode($bet_transaction));
+								Helper::saveLog('Vivo Gaming INSERT BET', 34,json_encode($request->all()), "INIT BET");
 								ProviderHelper::idenpotencyTable('VIVO_ROUND_ID_'.$request->roundId);
 								$gameTransactionData = array(
 						            "provider_trans_id" => $request->TransactionID,
