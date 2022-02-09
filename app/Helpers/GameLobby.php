@@ -1804,8 +1804,8 @@ class GameLobby{
                     'Content-Type' => 'application/xml'
                 ]
             ]);
-            $url = 'https://ams5-api.ttms.co:8443/cip/gametoken/TGR_'.$client_details->player_id;
-            // $url = config('providerlinks.toptrendgaming.api_url').'TGR_'.$client_details->player_id;
+            // $url = 'https://ams5-api.ttms.co:8443/cip/gametoken/TGR_'.$client_details->player_id;
+            $url = config('providerlinks.toptrendgaming.api_url').'TGR_'.$client_details->player_id;
             $guzzle_response = $client->post($url,[
                 'body' => '<logindetail>
                                 <player account="'.$client_details->default_currency.'" country="'.$country_code.'" firstName="" lastName="" userName="'.$client_details->username.'" 
