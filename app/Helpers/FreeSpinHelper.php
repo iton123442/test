@@ -263,9 +263,7 @@ class FreeSpinHelper{
     }
     
     public static function createFreeRoundMannaplay($player_details,$data, $sub_provder_id,$freeround_id){
-     
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        // $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
         Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($freeround_id), 'HIT');
         try{
             $freeroundtransac = [
