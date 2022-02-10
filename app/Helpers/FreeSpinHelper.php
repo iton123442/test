@@ -619,14 +619,17 @@ class FreeSpinHelper{
         }
         Helper::saveLog('Spearhead freespin response', 67, json_encode($data), $response->getBody()->getContents());
     }
-    public static function BNGcreateFreeBet($player_details,$data, $sub_provder_id,$round_id){
+    public static function BNGcreateFreeBet($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
         try{
-            if($data["details"]["bonus_type"] != "FIXED_FREEBET"){
+            if($data["details"]["type"] != "FIXED_FREEBET"){
                 $freeroundtransac = [
                     "player_id" => $player_details->player_id,
                     "game_id" => $game_details->game_id,
+                    "date_expire" => $data["details"]["expiration_date"],
+                    "provider_trans_id" => $freeround_id,
+                    "date_start" => $data["details"]["start_time"]
                 ];
             }else{
                 $freeroundtransac = [
@@ -634,6 +637,9 @@ class FreeSpinHelper{
                     "game_id" => $game_details->game_id,
                     "total_spin" => $data["details"]["rounds"],
                     "spin_remaining" => $data["details"]["rounds"],
+                    "date_expire" => $data["details"]["expiration_date"],
+                    "provider_trans_id" => $freeround_id,
+                    "date_start" => $data["details"]["start_time"]
                 ];
             }
         } catch (\Exception $e) {
@@ -644,7 +650,7 @@ class FreeSpinHelper{
         // $baseUrl = config("providerlinks.boongo.PLATFORM_SERVER_URL").config("providerlinks.boongo.tigergames-stage")."/tigergames-stage/api/v1/bonus/create/";
         $baseUrl = "https://gate-stage.betsrv.com/op/tigergames-stage/api/v1/bonus/create/";
         try {
-            if($data["details"]["bonus_type"] != "FIXED_FREEBET"){
+            if($data["details"]["type"] != "FIXED_FREEBET"){
                 $response = $client->post(
                     $baseUrl,[
                         'body' => json_encode([
@@ -652,9 +658,9 @@ class FreeSpinHelper{
                                 "mode" => "REAL",
                                 "campaign" => "tigergames",
                                 "game_id" => $game_details->game_code,
-                                "bonus_type" => $data["details"]["bonus_type"],
+                                "bonus_type" => $data["details"]["type"],
                                 "currency" => $player_details->default_currency,
-                                "total_bet" => $data["details"]["bet_value"],
+                                "total_bet" => $data["details"]["denomination"],
                                 "bonuses" => array([
                                     "player_id" => (string) $player_details->player_id,
                                     "ext_bonus_id" => (string) $id
@@ -670,10 +676,10 @@ class FreeSpinHelper{
                                 "mode" => "REAL",
                                 "campaign" => "tigergames",
                                 "game_id" => $game_details->game_code,
-                                "bonus_type" => $data["details"]["bonus_type"],
+                                "bonus_type" => $data["details"]["type"],
                                 "currency" => $player_details->default_currency,
                                 "total_rounds" => (int)$data["details"]["rounds"],
-                                "round_bet" => $data["details"]["bet_value"],
+                                "round_bet" => $data["details"]["denomination"],
                                 "bonuses" => array([
                                     "player_id" => (string) $player_details->player_id,
                                     "ext_bonus_id" => (string) $id
