@@ -649,45 +649,73 @@ class FreeSpinHelper{
         $client = new Client();
         // $baseUrl = config("providerlinks.boongo.PLATFORM_SERVER_URL").config("providerlinks.boongo.tigergames-stage")."/tigergames-stage/api/v1/bonus/create/";
         $baseUrl = "https://gate-stage.betsrv.com/op/tigergames-stage/api/v1/bonus/create/";
-        try {
             if($data["details"]["type"] != "FIXED_FREEBET"){
-                $response = $client->post(
-                    $baseUrl,[
-                        'body' => json_encode([
-                                "api_token" => config("providerlinks.boongo.API_TOKEN"),
-                                "mode" => "REAL",
-                                "campaign" => "tigergames",
-                                "game_id" => $game_details->game_code,
-                                "bonus_type" => $data["details"]["type"],
-                                "currency" => $player_details->default_currency,
-                                "total_bet" => $data["details"]["denomination"],
-                                "bonuses" => array([
-                                    "player_id" => (string) $player_details->player_id,
-                                    "ext_bonus_id" => (string) $id
-                                ]),
-                            ]
-                    )]
-                );//end client post
+                $requesttosend = [
+                    "api_token" => config("providerlinks.boongo.API_TOKEN"),
+                    "mode" => "REAL",
+                    "campaign" => "tigergames",
+                    "game_id" => $game_details->game_code,
+                    "bonus_type" => $data["details"]["type"],
+                    "currency" => $player_details->default_currency,
+                    "total_bet" => $data["details"]["denomination"],
+                    "bonuses" => array([
+                        "player_id" => (string) $player_details->player_id,
+                        "ext_bonus_id" => (string) $id
+                    ])
+                ];
+                // $response = $client->post(
+                //     $baseUrl,[
+                //         'body' => json_encode([
+                //                 "api_token" => config("providerlinks.boongo.API_TOKEN"),
+                //                 "mode" => "REAL",
+                //                 "campaign" => "tigergames",
+                //                 "game_id" => $game_details->game_code,
+                //                 "bonus_type" => $data["details"]["type"],
+                //                 "currency" => $player_details->default_currency,
+                //                 "total_bet" => $data["details"]["denomination"],
+                //                 "bonuses" => array([
+                //                     "player_id" => (string) $player_details->player_id,
+                //                     "ext_bonus_id" => (string) $id
+                //                 ]),
+                //             ]
+                //     )]
+                // );//end client post
             }else{
-                $response = $client->post(
-                    $baseUrl,[
-                        'body' => json_encode([
-                                "api_token" => config("providerlinks.boongo.API_TOKEN"),
-                                "mode" => "REAL",
-                                "campaign" => "tigergames",
-                                "game_id" => $game_details->game_code,
-                                "bonus_type" => $data["details"]["type"],
-                                "currency" => $player_details->default_currency,
-                                "total_rounds" => (int)$data["details"]["rounds"],
-                                "round_bet" => $data["details"]["denomination"],
-                                "bonuses" => array([
-                                    "player_id" => (string) $player_details->player_id,
-                                    "ext_bonus_id" => (string) $id
-                                ]),
-                            ]
-                    )]
-                );//end client post
+                $requesttosend = [
+                    "api_token" => config("providerlinks.boongo.API_TOKEN"),
+                    "mode" => "REAL",
+                    "campaign" => "tigergames",
+                    "game_id" => $game_details->game_code,
+                    "bonus_type" => $data["details"]["type"],
+                    "currency" => $player_details->default_currency,
+                    "total_rounds" => (int)$data["details"]["rounds"],
+                    "round_bet" => $data["details"]["denomination"],
+                    "bonuses" => array([
+                        "player_id" => (string) $player_details->player_id,
+                        "ext_bonus_id" => (string) $id
+                    ]),
+                ];
+                // $response = $client->post(
+                //     $baseUrl,[
+                //         'body' => json_encode([
+                //                 "api_token" => config("providerlinks.boongo.API_TOKEN"),
+                //                 "mode" => "REAL",
+                //                 "campaign" => "tigergames",
+                //                 "game_id" => $game_details->game_code,
+                //                 "bonus_type" => $data["details"]["type"],
+                //                 "currency" => $player_details->default_currency,
+                //                 "total_rounds" => (int)$data["details"]["rounds"],
+                //                 "round_bet" => $data["details"]["denomination"],
+                //                 "bonuses" => array([
+                //                     "player_id" => (string) $player_details->player_id,
+                //                     "ext_bonus_id" => (string) $id
+                //                 ]),
+                //             ]
+                //     )]
+                // );//end client post
             }
+        try {
+            $response = $client->post($baseUrl,['body' => json_encode($requesttosend)]);
             $dataresponse = json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
             $dataresponse = [
@@ -708,6 +736,14 @@ class FreeSpinHelper{
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         } else {
             $data = [
