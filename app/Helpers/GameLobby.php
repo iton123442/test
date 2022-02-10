@@ -632,9 +632,9 @@ class GameLobby{
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,
-                'username' => 'TGW_' . $client_details->player_id,
+                'username' => 'TGOP_' . $client_details->player_id,
                 'token' => $token,
-                'uid' => 'TGW_'.$client_details->player_id,
+                'uid' => 'TGOP_'.$client_details->player_id,
                 'currency' => $get_code_currency,
                 'invite_code' => $invite_code,
                 'back_url' => $exit_url
@@ -1793,9 +1793,9 @@ class GameLobby{
     public static function TopTrendGamingLaunchUrl($data){
         try {
             $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-
             if($client_details->country_code == null){
-                $country_code = $data['country_code'];
+                $country_code = "PH";
+                // $country_code = $data['country_code'];
             }else{
                 $country_code = $client_details->country_code;
             }
@@ -1821,13 +1821,14 @@ class GameLobby{
             $json = json_encode(simplexml_load_string($game_luanch_response));
             $array = json_decode($json,true);
             $val = $array["@attributes"]["token"];
-            $game_name = DB::select('SELECT game_name FROM games WHERE provider_id = 57 and game_code = '.$data['game_code'].'');
+            // dd($val);
+            $game_name = DB::select('SELECT game_name FROM games WHERE provider_id = '.config("providerlinks.toptrendgaming.provider_db_id").' and game_code = '.$data['game_code'].'');
             $remove[] = "'";
             $remove[] = ' ';
             $game_details = $game_name[0];
             $get_name = str_replace($remove,'', $game_details->game_name);
- 
-            $game_url = 'https://ams5-games.ttms.co/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
+
+            $game_url = config("providerlinks.toptrendgaming.game_api_url").'/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
 
             return $game_url;
 

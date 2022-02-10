@@ -35,7 +35,7 @@ class TidyController extends Controller
     	$this->client_id = config('providerlinks.tidygaming.client_id');
     	$this->API_URL = config('providerlinks.tidygaming.API_URL');
     	$this->startTime = microtime(true);
-    	$this->prefix = "TIDY";
+    	$this->prefix = "TGOP_";
     }
 
 	 public function autPlayer(Request $request){
@@ -48,7 +48,7 @@ class TidyController extends Controller
 			$data_info = array(
 				'check' => '1',
 				'info' => [
-					'username' => $getClientDetails->username,
+					'username' => $this->prefix.$getClientDetails->username,
 					'nickname' => $getClientDetails->display_name,
 					'currency' => $get_code_currency,	
 					'enable'   => 1,
