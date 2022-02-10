@@ -632,9 +632,9 @@ class GameLobby{
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,
-                'username' => 'TGW_' . $client_details->player_id,
+                'username' => 'TGOP_' . $client_details->player_id,
                 'token' => $token,
-                'uid' => 'TGW_'.$client_details->player_id,
+                'uid' => 'TGOP_'.$client_details->player_id,
                 'currency' => $get_code_currency,
                 'invite_code' => $invite_code,
                 'back_url' => $exit_url
