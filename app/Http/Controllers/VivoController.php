@@ -280,12 +280,8 @@ class VivoController extends Controller
 							}
 							else
 							{
-								$getSideBet = strpos($request->History, 'SIDE_BET');
-								if($getSideBet != false){
-									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId('side_bet_'.$request->roundId, $client_details);
-								}else{
-									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
-								}
+								
+								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
 								// initial check
 								// $game_details = Game::find($request->gameId, $this->provider_db_id);
 
