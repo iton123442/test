@@ -200,6 +200,7 @@ class VivoController extends Controller
 						        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 						     	$amount = 0;
 							}catch(\Exception $e){
+								sleep(0.05);
 								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
 								if($bet_transaction == null){
 									$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
@@ -208,7 +209,7 @@ class VivoController extends Controller
 								$game_transaction_id = $bet_transaction->game_trans_id;
 								$amount = $bet_transaction->bet_amount;
 							}
-							
+
 					       	$bet_game_transaction_ext = array(
 								"game_trans_id" => $game_transaction_id,
 								"provider_trans_id" => $request->TransactionID,
@@ -238,7 +239,10 @@ class VivoController extends Controller
 									case '200':
 										ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 										$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$game_transaction_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
-										
+										$updateGameTransaction = [
+				                            "transaction_detail" => $amount + $request->Amount,
+				                        ];
+				                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
 										$data_to_update = array(
 					                        "mw_response" => json_encode($response)
 					                    );
@@ -283,7 +287,6 @@ class VivoController extends Controller
 							}
 							else
 							{
-								
 								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
 								// initial check
 								// $game_details = Game::find($request->gameId, $this->provider_db_id);
