@@ -366,7 +366,7 @@ class PNGController extends Controller
             if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
                 $getFreespin = FreeSpinHelper::getFreeSpinDetails($xmlparser->freegameExternalId, "provider_trans_id" );
                 if($getFreespin){
-                    $getOrignalfreeroundID = explode("_",$json_data["freeroundref"]);
+                    $getOrignalfreeroundID = explode("_",$xmlparser->freegameExternalId);
                     $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
                     $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
                     $updateFreespinData = [
