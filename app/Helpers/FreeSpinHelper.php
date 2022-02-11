@@ -621,7 +621,6 @@ class FreeSpinHelper{
     }
     public static function BNGcreateFreeBet($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
         try{
             if($data["details"]["type"] != "FIXED_FREEBET"){
                 $freeroundtransac = [
@@ -723,17 +722,15 @@ class FreeSpinHelper{
             ];
             $data = [
                 "status" => 3,
-                "provider_trans_id" => $prefix.$id,
-                "details" => json_encode($dataresponse)
+                // "details" => json_encode($dataresponse)
             ];
+            Helper::saveLog('BNG freespin error', 44, json_encode($data), json_encode($dataresponse));
             FreeSpinHelper::updateFreeRound($data, $id);
         }
         if (isset($dataresponse->error)){
             //update freeroundtransac
             $data = [
                 "status" => 3,
-                "provider_trans_id" => $prefix.$id,
-                "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
@@ -746,14 +743,22 @@ class FreeSpinHelper{
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         } else {
-            $data = [
-                "provider_trans_id" => $prefix.$id,
-                "details" => json_encode($dataresponse)
+            // $data = [
+            //     "provider_trans_id" => $prefix.$id,
+            //     "details" => json_encode($dataresponse)
+            // ];
+            // FreeSpinHelper::updateFreeRound($data, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
             ];
-            FreeSpinHelper::updateFreeRound($data, $id);
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 200;
         }
-        Helper::saveLog('BNG freespin response', 44, json_encode($data), $response->getBody()->getContents());
+        Helper::saveLog('BNG freespin response', 44, json_encode($data), json_encode($dataresponse));
     }   
     public static function createFreeRoundWazdan($player_details,$data, $sub_provder_id,$freeround_id){
         Helper::saveLog('freeSpin(Wazdan)'. $sub_provder_id, $sub_provder_id,json_encode($freeround_id), 'HIT');//savelog

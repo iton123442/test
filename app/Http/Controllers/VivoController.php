@@ -218,52 +218,54 @@ class VivoController extends Controller
 							}
 							$getSideBet = strpos($request->History, 'sideBet');
 							if($getSideBet != false){
-								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId('side_bet_'.$request->roundId, $client_details);
-								if($bet_transaction == null){
-										$gameTransactionData = array(
-								            "provider_trans_id" => $request->TransactionID,
-								            "token_id" => $client_details->token_id,
-								            "game_id" => $game_details->game_id,
-								            "round_id" => 'side_bet_'.$request->roundId,
-								            "bet_amount" => $request->Amount,
-								            "win" => 5,
-								            "pay_amount" => 0,
-								            "income" => 0,
-								            "entry_id" => 1,
-								        );
+								try{
+									ProviderHelper::idenpotencyTable('side_bet_'.$request->roundId);
+									$gameTransactionData = array(
+							            "provider_trans_id" => $request->TransactionID,
+							            "token_id" => $client_details->token_id,
+							            "game_id" => $game_details->game_id,
+							            "round_id" => 'side_bet_'.$request->roundId,
+							            "bet_amount" => $request->Amount,
+							            "win" => 5,
+							            "pay_amount" => 0,
+							            "income" => 0,
+							            "entry_id" => 1,
+							        );
 
-								        //$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
-								        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-								} else {
-										$updateGameTransaction = [
-				                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
-				                        ];
-				                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-				                        $game_transaction_id = $bet_transaction->game_trans_id;
+							        //$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
+							        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+								}catch(\Exception $e){
+									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId('side_bet_'.$request->roundId, $client_details);
+									$updateGameTransaction = [
+			                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
+			                        ];
+			                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+			                        $game_transaction_id = $bet_transaction->game_trans_id;
 								}
 							} else {// end sidebet get
-								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
-								if($bet_transaction == null){
-										$gameTransactionData = array(
-								            "provider_trans_id" => $request->TransactionID,
-								            "token_id" => $client_details->token_id,
-								            "game_id" => $game_details->game_id,
-								            "round_id" => $request->roundId,
-								            "bet_amount" => $request->Amount,
-								            "win" => 5,
-								            "pay_amount" => 0,
-								            "income" => 0,
-								            "entry_id" => 1,
-								        );
+								try{
+									ProviderHelper::idenpotencyTable($request->roundId);
+									$gameTransactionData = array(
+							            "provider_trans_id" => $request->TransactionID,
+							            "token_id" => $client_details->token_id,
+							            "game_id" => $game_details->game_id,
+							            "round_id" => $request->roundId,
+							            "bet_amount" => $request->Amount,
+							            "win" => 5,
+							            "pay_amount" => 0,
+							            "income" => 0,
+							            "entry_id" => 1,
+							        );
 
-								        //$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
-								        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-								} else {
-										$updateGameTransaction = [
-				                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
-				                        ];
-				                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-				                        $game_transaction_id = $bet_transaction->game_trans_id;
+							        //$game_transaction_id = GameTransaction::createGametransaction($gameTransactionData);
+							        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+								}catch(\Exception $e){
+									$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
+									$updateGameTransaction = [
+			                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
+			                        ];
+			                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+			                        $game_transaction_id = $bet_transaction->game_trans_id;
 								}
 							}
 					       	$bet_game_transaction_ext = array(
