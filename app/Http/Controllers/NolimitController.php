@@ -550,6 +550,8 @@ class NolimitController extends Controller
                        FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
                        if($status == 2 ){
                             $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                        } else {
+                            $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
                         }
                         //create transction 
                         $createFreeRoundTransaction = array(

@@ -431,14 +431,17 @@ class WazdanController extends Controller
                                     "status" => 2,
                                     "spin_remaining" => 0
                                 ];
-                            FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                                //create transction 
-                            if($status == 2) {
-                                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
-                            }
-                                $createFreeRoundTransaction = array(
-                                    "game_trans_id" => $bet_transaction->game_trans_id,
-                                    'freespin_id' => $getFreespin->freespin_id
+                                FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                                    //create transction 
+                                if($status == 2) {
+                                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+                                }  else {
+                                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                                }
+                                
+                                    $createFreeRoundTransaction = array(
+                                        "game_trans_id" => $bet_transaction->game_trans_id,
+                                        'freespin_id' => $getFreespin->freespin_id
                                 );
                                 FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
 
