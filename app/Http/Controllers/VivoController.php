@@ -221,17 +221,17 @@ class VivoController extends Controller
 
 					        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
 					        $bet = DB::select("SELECT sum(amount) FROM api_test.game_transaction_ext where game_trans_id = '".$game_transaction_id."' and game_transaction_type = 1")
-					        $updateGameTransaction = [
+					        $updateGameTransaction => [
 	                            "bet_amount" => $bet,
 	                        ];
 	                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
-	                        
+
 							/*$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $request->TransactionID, $request->roundId, $request->Amount, 1, $json_data);*/
 							
 							$fund_extra_data = [
 			                    'provider_name' => $game_details->provider_name
 			                ];
-			                
+
 					        $client_response = ClientRequestHelper::fundTransfer($client_details, $request->Amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 							
 							if (isset($client_response->fundtransferresponse->status->code)) {
