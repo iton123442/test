@@ -281,7 +281,6 @@ class FreeSpinHelper{
             $freespinExtenstion = [
                 "freespin_id" => $id,
                 "mw_request" => json_encode($xmldatatopass),
-                "provider_response" => json_encode(FreeSpinHelper::soapXMLparser($client_reponse)),
                 "client_request" => json_encode($data),
                 "mw_response" => $e->getMessage(),
             ];
