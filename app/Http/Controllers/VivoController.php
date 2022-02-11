@@ -239,10 +239,10 @@ class VivoController extends Controller
 									case '200':
 										ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 										$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID>'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$game_transaction_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
-										$updateGameTransaction = [
-				                            "transaction_detail" => $amount + $request->Amount,
+										$updateGameTransactionExt = [
+				                            "transaction_detail" => "success",
 				                        ];
-				                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+				                        GameTransactionMDB::updateGametransactionEXT($updateGameTransactionExt, $game_trans_ext_id, $client_details);
 										$data_to_update = array(
 					                        "mw_response" => json_encode($response)
 					                    );
