@@ -191,26 +191,24 @@ class VivoController extends Controller
 						            "token_id" => $client_details->token_id,
 						            "game_id" => $game_details->game_id,
 						            "round_id" => $request->roundId,
-						            "bet_amount" => $request->Amount,
+						            "bet_amount" => 0,
 						            "win" => 5,
 						            "pay_amount" => 0,
 						            "income" => 0,
 						            "entry_id" => 1,
 						        );
 						        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+						     	$amount = 0;
 							}catch(\Exception $e){
 								$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($request->roundId, $client_details);
 								if($bet_transaction == null){
 									$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 									return $response;
 								}
-								$updateGameTransaction = [
-		                            "bet_amount" => $bet_transaction->bet_amount + $request->Amount,
-		                        ];
-		                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-		                        $game_transaction_id = $bet_transaction->game_trans_id;
+								$game_transaction_id = $bet_transaction->game_trans_id;
+								$amount = $bet_transaction->bet_amount;
 							}
-
+							
 					       	$bet_game_transaction_ext = array(
 								"game_trans_id" => $game_transaction_id,
 								"provider_trans_id" => $request->TransactionID,
@@ -220,8 +218,13 @@ class VivoController extends Controller
 								"provider_request" => json_encode($json_data),
 								"general_details" => $request->History,
 							);
-
 					        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details); 
+
+					        $updateGameTransaction = [
+	                            "bet_amount" => $amount + $request->Amount,
+	                        ];
+	                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+	                        
 							/*$game_trans_ext_id = ProviderHelper::createGameTransExtV2($game_transaction_id, $request->TransactionID, $request->roundId, $request->Amount, 1, $json_data);*/
 							
 							$fund_extra_data = [
