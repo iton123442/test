@@ -70,6 +70,23 @@ class GameTransactionMDB
             return null;
         }
     }
+    public static function findGameExtVivo($game_trans_id,$entry_type,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            $select = "SELECT sum(amount) as amount FROM ";
+            $db = "{$connection['db_list'][0]}.game_transaction_ext gte ";
+            $where = "where gte.game_trans_id ='{$game_trans_id}' AND gte.game_transaction_type={$entry_type}";
+            $gameTxExt = DB::connection($connection["connection_name"])->select($select.$db.$where);
+            $cnt = count($gameTxExt);
+            if ($cnt > 0){
+                return $gameTxExt[0];
+            }else{
+                return self::checkAndGetFromOtherServer($select,$where,$connection["connection_name"],'gte');
+            }
+        }else{
+            return null;
+        }
+    }
     public static function getGameTransactionByTokenAndRoundId($player_token,$game_round,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
@@ -232,8 +249,7 @@ class GameTransactionMDB
         }else{
             return null;
         }
-    }  
-
+    }    
     /**
      * getAvailableConnection
      *
@@ -506,24 +522,7 @@ class GameTransactionMDB
         
 
     }
-    public static function findGameExtVivo($identifier, $client_details){
-        $connection = self::getAvailableConnection($client_details->connection_name);
-        if($connection != null){
-            $select = "SELECT sum(amount) as amount FROM ";
-            $db = "{$connection['db_list'][1]}.game_transaction_ext gt ";
-            $where = "WHERE  game_trans_id = '{$identifier}' and game_transaction_type = 1";
-            $gameTxext = DB::connection($connection["connection_name"])->select($select.$db.$where);
-            $cnt = count($gameTxext);
-            if ($cnt > 0){
-                return $gameTxext[0];
-            }else{
-                return self::checkAndGetFromOtherServer($select,$where,$connection["connection_name"],'gte');;
-            }
-        }else{
-            return null;
-        }
-        
-    }
+
     public  static function GoldenFfindGameExt($provider_identifier, $game_transaction_type=false, $type,$client_details)
     {
         $game_trans_type = '';
