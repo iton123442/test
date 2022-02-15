@@ -90,7 +90,7 @@ class DigitainHelper{
       *  Check if game if the gamecode is mobile type then convert it to desktop value
       *
       */
-    public  static function findGameDetails($provider_id, $game_code){
+    public  static function findGameDetails($type,$provider_id, $game_code){
         
             # If game code is mobile convert to desktop game code
             $is_exist_gameid = DigitainHelper::IsMobileGameCode($game_code);
