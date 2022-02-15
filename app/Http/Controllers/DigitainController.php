@@ -5972,6 +5972,16 @@ class DigitainController extends Controller
 			'6257' => '6257', // ib 21
 			'6273' => '6273', // skillgames_mobile
 			'6274' => '6274', // skillgames_desktop
+
+
+			'8106' => '8106', // Backgammon Asian New	mobile
+			'8105' => '8105', // Backgammon Asian New	desktop
+			'8104' => '8104', // Backgammon Long New	mobile
+			'8103' => '8103', // Backgammon Long New	desktop
+			'8102' => '8102', // Backgammon Short New	mobile
+			'8101' => '8101', // Backgammon Short New	desktop
+
+
 		];	
 		if (array_key_exists($game_id, $game_ids)) {
 			return $game_ids[$game_id];
