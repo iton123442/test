@@ -100,7 +100,7 @@ class DigitainHelper{
                 $gameId = $game_code;
             }
 
-            $query = DB::Select("SELECT game_id,game_code,game_name,sub_provider_name as provider_name FROM games inner join sub_providers sp using (sub_provider_id) WHERE game_code = '" . $$gameId . "' AND sp.provider_id = '" . $provider_id . "' order by sp.sub_provider_id desc");
+            $query = DB::Select("SELECT game_id,game_code,game_name,sub_provider_name as provider_name FROM games inner join sub_providers sp using (sub_provider_id) WHERE game_code = '" . $gameId . "' AND sp.provider_id = '" . $provider_id . "' order by sp.sub_provider_id desc");
             $result = count($query);
             return $result > 0 ? $query[0] : null;
     }
