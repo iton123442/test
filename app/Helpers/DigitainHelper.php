@@ -90,7 +90,7 @@ class DigitainHelper{
       *  Check if game if the gamecode is mobile type then convert it to desktop value
       *
       */
-    public  static function findGameDetails($provider_id, $game_code){
+    public  static function findGameDetails($type,$provider_id, $game_code){
         
             # If game code is mobile convert to desktop game code
             $is_exist_gameid = DigitainHelper::IsMobileGameCode($game_code);
@@ -100,7 +100,7 @@ class DigitainHelper{
                 $gameId = $game_code;
             }
 
-            $query = DB::Select("SELECT game_id,game_code,game_name,sub_provider_name as provider_name FROM games inner join sub_providers sp using (sub_provider_id) WHERE game_code = '" . $$gameId . "' AND sp.provider_id = '" . $provider_id . "' order by sp.sub_provider_id desc");
+            $query = DB::Select("SELECT game_id,game_code,game_name,sub_provider_name as provider_name FROM games inner join sub_providers sp using (sub_provider_id) WHERE game_code = '" . $gameId . "' AND sp.provider_id = '" . $provider_id . "' order by sp.sub_provider_id desc");
             $result = count($query);
             return $result > 0 ? $query[0] : null;
     }
@@ -136,10 +136,19 @@ class DigitainHelper{
         $game_ids = [
             'mobile' => 'desktop', 
 
-            '8106' => '8105',  // Backgammon Asian New
-            '8104' => '8103',  // Backgammon Long
-            '8102' => '8101',  // Backgammon Short
-            '6273' => '6274',  // Skill Games Lobby
+            '6247'=>'6243', //Dominoes
+            '6248'=>'6244', //DominoesFives
+            '6249'=>'6245', //DominoesThrees
+            '6250'=>'6246', //DominoesBlock
+            '6228'=>'6230', //BeloteClassic
+            '6227'=>'6229', //BeloteOpen
+            '6222'=>'6223', //Pasoor
+            '6213'=>'6214', //Hokm
+            '8102'=>'8101', //BackgammonShort
+            '8104'=>'8103', //BackgammonLong
+            '8106'=>'8105', //BackgammonAsian
+            '6273'=>'6274', //Skill Games Lobby
+            '6217'=>'6218', //Skill Games Tournament
 
         ];  
         if (array_key_exists($gameCode, $game_ids)) {

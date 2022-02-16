@@ -339,6 +339,10 @@ return [
         'channel'=> 'desktop',
         'practice'=>0,
         'provider_id' => 32,
+        "username" => "qdxapi",
+        "secret_key" => "TwZbbsgmvdKhOalSyBoKpSIwK",
+        "freeRoundAPI_URL" => "https://agastage.playngonetwork.com:33001/CasinoGameTPService",
+        "SOAP_URL" => "http://playngo.com/v1/CasinoGameTPService/AddFreegameOffers",
     ],
     'microgaming'=>[
         'grant_type'=> 'client_credentials',
