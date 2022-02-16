@@ -5919,68 +5919,96 @@ class DigitainController extends Controller
 			'11506' => '11506', // BlackJack
 			'9895' => '9895', // Keno Express
 			'5730' => '5730', // Penalty
+			'6492' => '6492', // Penalty
 			'5510' => '5510', // Rocketon
 			'5337' => '5337', // Sicbo
 
-			// SkillGames
-			'6210' => '6210', // Joker Classic
-			'6211' => '6211', // p2pmineSweeper desktop
-			'6212' => '6212', // p2pmineSweeper mobile
-			'6213' => '6213', // Hokm Mobile
-			'6214' => '6214', // Hokm
-			'6215' => '6215', // Chingachung
-			'6216' => '6216', // Chingachung
-			'6217' => '6217', // Tournament Mobile
-			'6218' => '6218', // Tournament Desktop
-			'6219' => '6219', // Joker Short
-			'6220' => '6220', // Joker Short
-			'6221' => '6221', // Joker Classic
-			'6222' => '6222', // Pasoor
-			'6223' => '6223', // Pasoor
-			'6224' => '6224', // CB21
-			'6225' => '6225', // Asian
-			'6226' => '6226', // Asian
-			'6227' => '6227', // p2pbeloteopen_mobile
-			'6228' => '6228', // p2pbeloteclassic_mobile
-			'6229' => '6229', // p2pbeloteopen_desktop
-			'6230' => '6230', // p2p belote classic desktop
-			'6231' => '6231', // pioner
-			'6232' => '6232', // pioner
-			'6233' => '6233', // inout
-			'6234' => '6234', // inout
-			'6235' => '6235', // Backgammon mobile
-			'6237' => '6237', // Hyper mobile
-			'6238' => '6238', // Hyper
-			'6239' => '6239', // Nackgammon
-			'6240' => '6240', // Nackgammon mobile
-			'6241' => '6241', // Long mobile
-			'6242' => '6242', // Long desktop
-			'6243' => '6243', // Dominoes
-			'6244' => '6244', // Dominoes Fives
-			'6245' => '6245', // Dominoes Threes
-			'6246' => '6246', // Dominoes Block
-			'6247' => '6247', // Dominoes
-			'6248' => '6248', // Dominoes Fives
-			'6249' => '6249', // Dominoes Threes
-			'6250' => '6250', // DominoesBlock
-			'6251' => '6251', // game21
-			'6252' => '6252', // toto 21
-			'6253' => '6253', // game21
-			'6254' => '6254', // cb 21
-			'6255' => '6255', // cw 21
-			'6256' => '6256', // cw 21
-			'6257' => '6257', // ib 21
-			'6273' => '6273', // skillgames_mobile
-			'6274' => '6274', // skillgames_desktop
 
 
-			'8106' => '8106', // Backgammon Asian New	mobile
-			'8105' => '8105', // Backgammon Asian New	desktop
-			'8104' => '8104', // Backgammon Long New	mobile
-			'8103' => '8103', // Backgammon Long New	desktop
-			'8102' => '8102', // Backgammon Short New	mobile
-			'8101' => '8101', // Backgammon Short New	desktop
+			// COMMENTED IS UNUSED OR NO LONGER AVAILABLE
+			// OLD SkillGames 
+			// '6210' => '6210', // Joker Classic
+			// '6211' => '6211', // p2pmineSweeper desktop
+			// '6212' => '6212', // p2pmineSweeper mobile
+			// '6213' => '6213', // Hokm Mobile
+			// '6214' => '6214', // Hokm
+			// '6215' => '6215', // Chingachung
+			// '6216' => '6216', // Chingachung
+			// '6217' => '6217', // Tournament Mobile
+			// '6218' => '6218', // Tournament Desktop
+			// '6219' => '6219', // Joker Short
+			// '6220' => '6220', // Joker Short
+			// '6221' => '6221', // Joker Classic
+			// '6222' => '6222', // Pasoor
+			// '6223' => '6223', // Pasoor
+			// '6224' => '6224', // CB21
+			// '6225' => '6225', // Asian
+			// '6226' => '6226', // Asian
+			// '6227' => '6227', // p2pbeloteopen_mobile
+			// '6228' => '6228', // p2pbeloteclassic_mobile
+			// '6229' => '6229', // p2pbeloteopen_desktop
+			// '6230' => '6230', // p2p belote classic desktop
+			// '6231' => '6231', // pioner
+			// '6232' => '6232', // pioner
+			// '6233' => '6233', // inout
+			// '6234' => '6234', // inout
+			// '6235' => '6235', // Backgammon mobile
+			// '6237' => '6237', // Hyper mobile
+			// '6238' => '6238', // Hyper
+			// '6239' => '6239', // Nackgammon
+			// '6240' => '6240', // Nackgammon mobile
+			// '6241' => '6241', // Long mobile
+			// '6242' => '6242', // Long desktop
+			// '6243' => '6243', // Dominoes
+			// '6244' => '6244', // Dominoes Fives
+			// '6245' => '6245', // Dominoes Threes
+			// '6246' => '6246', // Dominoes Block
+			// '6247' => '6247', // Dominoes
+			// '6248' => '6248', // Dominoes Fives
+			// '6249' => '6249', // Dominoes Threes
+			// '6250' => '6250', // DominoesBlock
+			// '6251' => '6251', // game21
+			// '6252' => '6252', // toto 21
+			// '6253' => '6253', // game21
+			// '6254' => '6254', // cb 21
+			// '6255' => '6255', // cw 21
+			// '6256' => '6256', // cw 21
+			// '6257' => '6257', // ib 21
+			// '6273' => '6273', // skillgames_mobile
+			// '6274' => '6274', // skillgames_desktop
 
+
+			// New SkillGames  [STAGING]
+
+			// Desktop
+			'6243'=>'6243', // Dominoes
+			'6244'=>'6244', // DominoesFives
+			'6245'=>'6245', // DominoesThrees
+			'6246'=>'6246', // DominoesBlock
+			'6230'=>'6230', // BeloteClassic
+			'6229'=>'6229', // BeloteOpen
+			'6223'=>'6223', // Pasoor
+			'6214'=>'6214', // Hokm
+			'8101'=>'8101', // BackgammonShort
+			'8103'=>'8103', // BackgammonLong
+			'8105'=>'8105', // BackgammonAsian
+			'6274'=>'6274', // Skill Games Lobby
+			'6218'=>'6218', // Skill Games Tournament
+
+			// Mobile
+			'6247'=>'6247', // Dominoes Mobile
+			'6248'=>'6248', // DominoesFives Mobile
+			'6249'=>'6249', // DominoesThrees Mobile
+			'6250'=>'6250', // DominoesBlock Mobile
+			'6228'=>'6228', // BeloteClassic Mobile
+			'6227'=>'6227', // BeloteOpen Mobile
+			'6222'=>'6222', // Pasoor Mobile
+			'6213'=>'6213', // Hokm Mobile
+			'8102'=>'8102', // BackgammonShort Mobile
+			'8104'=>'8104', // BackgammonLong Mobile
+			'8106'=>'8106', // BackgammonAsian Mobile
+			'6273'=>'6273', // Skill Games Lobby Mobile
+			'6217'=>'6217' // Skill Games Tournament Mobile
 
 		];	
 		if (array_key_exists($game_id, $game_ids)) {

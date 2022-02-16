@@ -136,10 +136,19 @@ class DigitainHelper{
         $game_ids = [
             'mobile' => 'desktop', 
 
-            '8106' => '8105',  // Backgammon Asian New
-            '8104' => '8103',  // Backgammon Long
-            '8102' => '8101',  // Backgammon Short
-            '6273' => '6274',  // Skill Games Lobby
+            '6247'=>'6243', //Dominoes
+            '6248'=>'6244', //DominoesFives
+            '6249'=>'6245', //DominoesThrees
+            '6250'=>'6246', //DominoesBlock
+            '6228'=>'6230', //BeloteClassic
+            '6227'=>'6229', //BeloteOpen
+            '6222'=>'6223', //Pasoor
+            '6213'=>'6214', //Hokm
+            '8102'=>'8101', //BackgammonShort
+            '8104'=>'8103', //BackgammonLong
+            '8106'=>'8105', //BackgammonAsian
+            '6273'=>'6274', //Skill Games Lobby
+            '6217'=>'6218', //Skill Games Tournament
 
         ];  
         if (array_key_exists($gameCode, $game_ids)) {
