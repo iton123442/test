@@ -226,36 +226,36 @@ class OnlyPlayController extends Controller
                         'success' => true,
                         'balance' => $formatWinBalance
                     ];
-                        $entry_id = $pay_amount > 0 ?  2 : 1;
-    
-                        $amount = $pay_amount + $bet_transaction->pay_amount;
-                        $income = $bet_transaction->bet_amount -  $amount; 
-    
-                        if($bet_transaction->pay_amount > 0){
-                            $win_or_lost = 1;
-                        }else{
-                            $win_or_lost = $pay_amount > 0 ?  1 : 0;
-                        }
-                        
-                        $updateGameTransaction = [
-                            'win' => 5,
-                            'pay_amount' => $amount,
-                            'income' => $income,
-                            'entry_id' => $entry_id,
-                            'trans_status' => 2
-                        ];
+                    $entry_id = $pay_amount > 0 ?  2 : 1;
+
+                    $amount = $pay_amount + $bet_transaction->pay_amount;
+                    $income = $bet_transaction->bet_amount -  $amount; 
+
+                    if($bet_transaction->pay_amount > 0){
+                        $win_or_lost = 1;
+                    }else{
+                        $win_or_lost = $pay_amount > 0 ?  1 : 0;
+                    }
+                    
+                    $updateGameTransaction = [
+                        'win' => 5,
+                        'pay_amount' => $amount,
+                        'income' => $income,
+                        'entry_id' => $entry_id,
+                        'trans_status' => 2
+                    ];
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $get_client_details);
     
     
-                        $gameTransactionEXTData = array(
-                            "game_trans_id" => $bet_transaction->game_trans_id,
-                            "provider_trans_id" => $request->tx_id,
-                            "round_id" => $request->round_id,
-                            "amount" => $pay_amount,
-                            "game_transaction_type"=> 2,
-                            "provider_request" =>json_encode($request->all()),
-                            "mw_response" => json_encode($response),
-                        );
+                    $gameTransactionEXTData = array(
+                        "game_trans_id" => $bet_transaction->game_trans_id,
+                        "provider_trans_id" => $request->tx_id,
+                        "round_id" => $request->round_id,
+                        "amount" => $pay_amount,
+                        "game_transaction_type"=> 2,
+                        "provider_request" =>json_encode($request->all()),
+                        "mw_response" => json_encode($response),
+                    );
                     $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$get_client_details);
     
                                 $action_payload = [
