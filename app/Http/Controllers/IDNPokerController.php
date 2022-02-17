@@ -89,8 +89,9 @@ class IDNPokerController extends Controller
         }
 
         // $player_id = "TGTW_". $client_details->player_id;
-        $player_id = "TGTW".$client_details->player_id;
-        $data = IDNPokerHelper::playerDetails($player_id);
+        $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
+        $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+        $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
         if ($data != "false") {
             $msg = array(
                 "status" => "success",
@@ -230,6 +231,8 @@ class IDNPokerController extends Controller
                     $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false);
                     Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($clientFunds_response), "FUNDSTRANSFER RESPONSE");
                     if (isset($clientFunds_response->fundtransferresponse->status->code)) {
+                        $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
+                        $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
                         switch ($clientFunds_response->fundtransferresponse->status->code) {
                             case "200":
                                 $msg = array(
@@ -248,9 +251,9 @@ class IDNPokerController extends Controller
                                 $data_deposit = [
                                     "amount" => $request->amount,
                                     "transaction_id" => $client_transaction_id_provider,
-                                    "player_id" => "TGTW".$client_details->player_id
+                                    "player_id" => $player_id
                                 ];
-                                $provider_response = IDNPokerHelper::deposit($data_deposit);
+                                $provider_response = IDNPokerHelper::deposit($data_deposit,$auth_token);
                                 
                                 // $update_gametransactionext = array(
                                 //     "transaction_detail" =>json_encode($data_deposit),
@@ -445,34 +448,11 @@ class IDNPokerController extends Controller
                      *  GET provder BALANCE
                      * -----------------------------------------------
                      */   
-                    $player_id = "TGTW".$client_details->player_id;
-                    $data = IDNPokerHelper::playerDetails($player_id); // check balance
+                    $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
+                    $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                    $data = IDNPokerHelper::playerDetails($player_id,$auth_token); // check balance
                     if ($data != "false") {
                         $amount_to_withdraw = $data["balance"];
-                         /**
-                         * -----------------------------------------------
-                         *  CREATE TRANSACTION WALLET
-                         * -----------------------------------------------
-                         */   
-                        try {
-                            $data_accounts = [
-                                "player_id" => $client_details->player_id,
-                                "type" => 2,
-                                "amount" => $amount_to_withdraw,
-                                "client_id" => $client_details->client_id,
-                                "operator_id" => $client_details->operator_id,
-                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
-                                "status" => 1,
-                            ];
-                            $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
-                        } catch (\Exception $e) {
-                            $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
-                            $data["mw_response"] = json_encode($mw_response);
-                            $data["status_code"] = "406";
-                            TWHelpers::createTWPlayerAccountsRequestLogs($data);
-                            return $mw_response;
-                        }
-                    
                         /**
                          * -----------------------------------------------
                          *  PROVIDER WITHDRAW
@@ -488,8 +468,39 @@ class IDNPokerController extends Controller
                                 "balance" => 0,
                                 "status" => "success"
                             ];
+
+                            $msg = array(
+                                "status" => "ok",
+                                "message" => "Transaction success",
+                                "balance" => $client_response->playerdetailsresponse->balance
+                            );
+                            return $msg;
                         } else {
-                            $provider_response = IDNPokerHelper::withdraw($data_deposit);
+                             /**
+                             * -----------------------------------------------
+                             *  CREATE TRANSACTION WALLET
+                             * -----------------------------------------------
+                             */   
+                            
+                            try {
+                                $data_accounts = [
+                                    "player_id" => $client_details->player_id,
+                                    "type" => 2,
+                                    "amount" => $amount_to_withdraw,
+                                    "client_id" => $client_details->client_id,
+                                    "operator_id" => $client_details->operator_id,
+                                    "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
+                                    "status" => 1,
+                                ];
+                                $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
+                            } catch (\Exception $e) {
+                                $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
+                                $data["mw_response"] = json_encode($mw_response);
+                                $data["status_code"] = "406";
+                                TWHelpers::createTWPlayerAccountsRequestLogs($data);
+                                return $mw_response;
+                            }
+                            $provider_response = IDNPokerHelper::withdraw($data_deposit, $auth_token);
                         }
                         $log_data = [
                             "client_request" => json_encode($data_deposit),
