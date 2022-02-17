@@ -669,7 +669,7 @@ return [
         'PROVIDER_ID'=> 110,
         'URL' => 'https://scr.idngame.com:2800/',
         'prefix' => "TGTW",
-        'type' => "production",// [production, staging]
+        'type' => "staging",// [production, staging]
         "agent" => [
             "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production
             "9" => [
