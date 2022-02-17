@@ -35,7 +35,7 @@ class TidyController extends Controller
     	$this->client_id = config('providerlinks.tidygaming.client_id');
     	$this->API_URL = config('providerlinks.tidygaming.API_URL');
     	$this->startTime = microtime(true);
-    	$this->prefix = "TIDY";
+    	$this->prefix = "TGOP_";
     }
 
 	 public function autPlayer(Request $request){
@@ -43,19 +43,21 @@ class TidyController extends Controller
 	 	$playersid = explode('_', $request->username);
 		$getClientDetails = ProviderHelper::getClientDetails('player_id',$playersid[1]);
 		if($getClientDetails != null){
-			$getPlayer = ProviderHelper::playerDetailsCall($getClientDetails->player_token);
-			$get_code_currency = TidyHelper::currencyCode($getClientDetails->default_currency);
+			// $getPlayer = ProviderHelper::playerDetailsCall($getClientDetails->player_token);
+			$get_code_currency = TidyHelper::getcurrencyCode($getClientDetails->default_currency, $getClientDetails->client_id);
 			$data_info = array(
 				'check' => '1',
 				'info' => [
-					'username' => $getClientDetails->username,
+					'username' => $this->prefix.$getClientDetails->username,
 					'nickname' => $getClientDetails->display_name,
 					'currency' => $get_code_currency,	
 					'enable'   => 1,
 					'created_at' => $getClientDetails->created_at
 				]
 			);
+			Helper::saveLog('Tidy autPlayer', $this->provider_db_id,  json_encode($request->all()),json_encode( $data_info));
 			return response($data_info,200)->header('Content-Type', 'application/json');
+
 		}else {
 			$errormessage = array(
 				'error_code' 	=> '08-025',
@@ -132,7 +134,7 @@ class TidyController extends Controller
 		}
 		if($client_details != null){
 				$currency = $client_details->default_currency;
-				$get_code_currency = TidyHelper::currencyCode($currency);
+				$get_code_currency = TidyHelper::getcurrencyCode($currency, $client_details->client_id);
 				$num = $client_details->balance;
 				$reponse =  array(	
 		 			 "uid"			=> $this->prefix_id.'_'.$client_details->player_id,
@@ -290,7 +292,7 @@ class TidyController extends Controller
 						$response = [
 							"uid" => $uid,
 							"request_uuid" => $request_uuid,
-							"currency" => TidyHelper::currencyCode($client_details->default_currency),
+							"currency" => TidyHelper::getcurrencyCode($client_details->default_currency,$client_details->client_id),
 							"balance" =>  ProviderHelper::amountToFloat($num)
 						];
 
@@ -452,7 +454,7 @@ class TidyController extends Controller
 			$response = [
 				"uid" => $uid,
 				"request_uuid" => $request_uuid,
-				"currency" => TidyHelper::currencyCode($client_details->default_currency),
+				"currency" => TidyHelper::getcurrencyCode($client_details->default_currency,$client_details->client_id),
 				"balance" =>  ProviderHelper::amountToFloat($num)
 			];
 			$create_gametransactionext = array(
@@ -581,7 +583,7 @@ class TidyController extends Controller
 			$response = [
 				"uid" => $uid,
 				"request_uuid" => $request_uuid,
-				"currency" => TidyHelper::currencyCode($client_details->default_currency),
+				"currency" => TidyHelper::getcurrencyCode($client_details->default_currency,$client_details->client_id),
 				"balance" =>  ProviderHelper::amountToFloat($num)
 			];
 			$create_gametransactionext = array(

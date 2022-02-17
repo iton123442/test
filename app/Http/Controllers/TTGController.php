@@ -164,8 +164,16 @@ class TTGController extends Controller
                                 switch ($client_response->fundtransferresponse->status->code) {
                                     case '200':
                                         $response .= '<cw type="fundTransferResp" cur="'.$get_client_details->default_currency.'" amt="'.$fundT_bal.'" err="0" />';
-                                      
-                                        break;
+                                        $updateTransactionEXt = array(
+                                            "provider_request" =>json_encode($data),
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'success',
+                                            'general_details' => 'success',
+                                        );
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
+                                    break;
                                     case '402':
                                         $updateGameTransaction = [
                                                     'win' => 2,
@@ -173,21 +181,40 @@ class TTGController extends Controller
                                                 ];
                                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $get_client_details);
                                         $response .= '<cw type="fundTransferResp" err="9999" />';
-                                        break;
-                                }
+                                        $updateTransactionEXt = array(
+                                            "provider_request" =>json_encode($data),
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'failed',
+                                            'general_details' => 'failed',
+                                        );
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
+                                    break;
+                                    default:
+                                        $updateGameTransaction = [
+                                                    'win' => 2,
+                                                    'trans_status' => 5,
+                                                ];
+                                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $get_client_details);
+                                        $response .= '<cw type="fundTransferResp" err="9999" />';
+                                        $updateTransactionEXt = array(
+                                            "provider_request" =>json_encode($data),
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'failed',
+                                            'general_details' => 'failed',
+                                        );
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
+                                        $updateGameTransaction = [
+                                                    'win' => 2,
+                                                    'trans_status' => 5,
+                                                ];
+                                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $get_client_details);
+                                }// end switch
                             
                                 // ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, $data, $response, $client_response->requestoclient, $client_response, $data);
-
-                                $updateTransactionEXt = array(
-                                    "provider_request" =>json_encode($data),
-                                    "mw_response" => json_encode($response),
-                                    'mw_request' => json_encode($client_response->requestoclient),
-                                    'client_response' => json_encode($client_response->fundtransferresponse),
-                                    'transaction_detail' => 'success',
-                                    'general_details' => 'success',
-                                );
-                                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
-
                             }
 
                   Helper::saveLog('TTGaming bet', $this->provider_db_id, $array, $response);

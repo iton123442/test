@@ -28,31 +28,31 @@ class PNGController extends Controller
         if($xmlparser->username){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->username);
             if($client_details){
-                $client = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$client_details->client_access_token
-                    ]
-                ]);
-                $guzzle_response = $client->post($client_details->player_details_url,
-                    ['body' => json_encode(
-                            [
-                                "access_token" => $client_details->client_access_token,
-                                "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                                "type" => "playerdetailsrequest",
-                                "datesent" => "",
-                                "gameid" => "",
-                                "clientid" => $client_details->client_id,
-                                "playerdetailsrequest" => [
-                                    "player_username"=>$client_details->username,
-                                    "client_player_id"=>$client_details->client_player_id,
-                                    "token" => $client_details->player_token,
-                                    "gamelaunch" => true
-                                ]]
-                    )]
-                );
-                $client_response = json_decode($guzzle_response->getBody()->getContents());
-                Helper::saveLog('AuthPlayer(PNG)', 12, json_encode($xmlparser),$client_response);
+                // $client = new Client([
+                //     'headers' => [ 
+                //         'Content-Type' => 'application/json',
+                //         'Authorization' => 'Bearer '.$client_details->client_access_token
+                //     ]
+                // ]);
+                // $guzzle_response = $client->post($client_details->player_details_url,
+                //     ['body' => json_encode(
+                //             [
+                //                 "access_token" => $client_details->client_access_token,
+                //                 "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+                //                 "type" => "playerdetailsrequest",
+                //                 "datesent" => "",
+                //                 "gameid" => "",
+                //                 "clientid" => $client_details->client_id,
+                //                 "playerdetailsrequest" => [
+                //                     "player_username"=>$client_details->username,
+                //                     "client_player_id"=>$client_details->client_player_id,
+                //                     "token" => $client_details->player_token,
+                //                     "gamelaunch" => true
+                //                 ]]
+                //     )]
+                // );
+                // $client_response = json_decode($guzzle_response->getBody()->getContents());
+                // Helper::saveLog('AuthPlayer(PNG)', 12, json_encode($xmlparser),$client_response);
 
                 $array_data = array(
                     "externalId" => $client_details->player_id,
@@ -62,7 +62,7 @@ class PNGController extends Controller
                     "country" => isset($client_details->country_code) ? $client_details->country_code : 'TH',
                     "birthdate"=> "1990-04-29",
                     "externalGameSessionId" => $xmlparser->username,
-                    "real"=> number_format($client_response->playerdetailsresponse->balance,2,'.', ''),
+                    "real"=> number_format($client_details->balance,2,'.', ''),
                 );
                 return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
@@ -187,7 +187,7 @@ class PNGController extends Controller
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametransactionid, $client_details);
                     }
                     $array_data = array(
-                        "statusCode" => 7,
+                        "statusCode" => 10,
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
@@ -268,35 +268,7 @@ class PNGController extends Controller
 
                 $income = 0 - (float)$xmlparser->real;
                 
-                if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-                    $is_freespin = true;
-                    $fund_extra_data = [
-                        'fundtransferrequest' => [
-                            'fundinfo' => [
-                                'freespin' => true
-                            ]
-                        ]
-                    ];
-                    //getTransaction
-                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($xmlparser->freegameExternalId, "provider_trans_id" );
-
-                    if($getFreespin){
-                        //update transaction
-                            $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-                            $updateFreespinData = [
-                                "status" => $status,
-                                "spin_remaining" => $getFreespin->spin_remaining - 1
-                            ];
-                            $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                            //create transction 
-                            $createFreeRoundTransaction = array(
-                                "game_trans_id" => $gametransactionid,
-                                'freespin_id' => $getFreespin->freespin_id
-                            );
-                            FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-                    }
-                }
-
+                
 
                 $wingametransactionext = array(
                     "game_trans_id" => $gametransactionid,
@@ -391,10 +363,35 @@ class PNGController extends Controller
                     ]
             ];
 
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                $getFreespin = FreeSpinHelper::getFreeSpinDetails($xmlparser->freegameExternalId, "provider_trans_id" );
+                if($getFreespin){
+                    $getOrignalfreeroundID = explode("_",$xmlparser->freegameExternalId);
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+                    $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                    $updateFreespinData = [
+                        "status" => $status,
+                        "win" => $getFreespin->win + $xmlparser->real,
+                        "spin_remaining" => $getFreespin->spin_remaining - 1
+                    ];
+                    $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                    if($status == 2 ){
+                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                    } else {
+                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                    }
+                    //create transction 
+                    $createFreeRoundTransaction = array(
+                        "game_trans_id" => $gametransactionid,
+                        'freespin_id' => $getFreespin->freespin_id
+                    );
+                    FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                }
+            }
 
             $sendtoclient =  microtime(true);  
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
-            $client_response_time = microtime(true) - $sendtoclient;
+            // $client_response_time = microtime(true) - $sendtoclient;
 
 
             if(isset($client_response->fundtransferresponse->status->code) 

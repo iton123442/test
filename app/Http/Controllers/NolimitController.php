@@ -8,6 +8,7 @@ use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransaction;
+use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
 use Carbon\Carbon;
@@ -200,7 +201,8 @@ class NolimitController extends Controller
                     return $response;
 
             }
-               $game_details = Game::find($game_code, $this->provider_db_id);
+            //    $game_details = Game::find($game_code, $this->provider_db_id);
+               $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
        try{
                 $gameTransactionData = array(
                             "provider_trans_id" => $provider_trans_id,
@@ -228,7 +230,10 @@ class NolimitController extends Controller
 
                  ProviderHelper::saveLogWithExeption('after  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
-                $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit',false,$fund_extra_data);
                 if($client_response == false){
 
                     $response = [
@@ -275,7 +280,12 @@ class NolimitController extends Controller
 
                                     break;
                                 case '402':
-                                    ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                    // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                    $updateGameTransaction = [
+                                        'win' => 2,
+                                        'trans_status' => 5
+                                    ];
+                              GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                                     $http_status = 200;
                                     $response = [
                                         
@@ -305,6 +315,41 @@ class NolimitController extends Controller
                                  ProviderHelper::saveLogWithExeption('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
                               GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                     break;
+                                    default:
+                                    $updateGameTransaction = [
+                                        'win' => 2,
+                                        'trans_status' => 5
+                                    ];
+                              GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                                $http_status = 200;
+                                    $response = [
+                                        
+                                        'jsonrpc' => '2.0',
+                                        'error' => [
+                                            'code' => -3200,
+                                            'message' => 'Server error',
+                                            'data' => [
+
+                                                'code' =>14001,
+                                                'message'=> "Balance too low.",
+                                            ],
+                                        ],
+
+                                        'id' => $data['id']
+                                      
+                                    ];
+
+                                $updateTransactionEXt = array(
+                                    "provider_request" =>json_encode($request->all()),
+                                    "mw_response" => json_encode($response),
+                                    'mw_request' => json_encode($client_response->requestoclient),
+                                    'client_response' => json_encode($client_response->fundtransferresponse),
+                                    'transaction_detail' => 'failed',
+                                    'general_details' => 'failed',
+                                );
+                                 ProviderHelper::saveLogWithExeption('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                
                             }
                         }
                             
@@ -412,7 +457,8 @@ class NolimitController extends Controller
             }
           try{
                 ProviderHelper::saveLogWithExeption('NOLIMIT start to process', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
-                $game_details = Game::find($game_code, $this->provider_db_id);
+                // $game_details = Game::find($game_code, $this->provider_db_id);
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
                  ProviderHelper::saveLogWithExeption('NOLIMIT find game_detailss', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
@@ -464,36 +510,57 @@ class NolimitController extends Controller
 
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
-
-                            $action_payload = [
-                                "type" => "custom", #genreral,custom :D # REQUIRED!
-                                "custom" => [
-                                    "provider" => 'Nolimit City',
-                                    "client_connection_name" => $client_details->connection_name,
-                                    "win_or_lost" => $win_or_lost,
-                                    "entry_id" => $entry_id,
-                                    "pay_amount" => $pay_amount,
-                                    "income" => $income,
-                                    "game_trans_ext_id" => $game_trans_ext_id
-                                ],
-                                "provider" => [
-                                    "provider_request" => $data, #R
-                                    "provider_trans_id"=> $provider_trans_id, #R
-                                    "provider_round_id"=> $round_id, #R
-                                ],
-                                "mwapi" => [
-                                    "roundId"=>$bet_transaction->game_trans_id, #R
-                                    "type"=>2, #R
-                                    "game_id" => $game_details->game_id, #R
-                                    "player_id" => $client_details->player_id, #R
-                                    "mw_response" => $response, #R
-                                ],
-                                'fundtransferrequest' => [
-                                    'fundinfo' => [
-                                        'freespin' => false,
-                                    ]
-                                ]
-                            ];
+               
+                $action_payload = [
+                    "type" => "custom", #genreral,custom :D # REQUIRED!
+                    "custom" => [
+                        "provider" => 'Nolimit City',
+                        "client_connection_name" => $client_details->connection_name,
+                        "win_or_lost" => $win_or_lost,
+                        "entry_id" => $entry_id,
+                        "pay_amount" => $pay_amount,
+                        "income" => $income,
+                        "game_trans_ext_id" => $game_trans_ext_id
+                    ],
+                    "provider" => [
+                        "provider_request" => $data, #R
+                        "provider_trans_id"=> $provider_trans_id, #R
+                        "provider_round_id"=> $round_id, #R
+                        "provider_name" => $game_details->provider_name
+                    ],
+                    "mwapi" => [
+                        "roundId"=>$bet_transaction->game_trans_id, #R
+                        "type"=>2, #R
+                        "game_id" => $game_details->game_id, #R
+                        "player_id" => $client_details->player_id, #R
+                        "mw_response" => $response, #R
+                    ]
+                ];
+                if(isset( $data['params']['promoName'] )) {
+                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['params']['promoName'], "provider_trans_id" );
+                    if($getFreespin){
+                        $getOrignalfreeroundID = explode("_",$data['params']['promoName']);
+                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+                        //update transaction
+                        $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                        $updateFreespinData = [
+                            "status" => $status,
+                            "spin_remaining" => $getFreespin->spin_remaining - 1
+                        ];
+                       FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                       if($status == 2 ){
+                            $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                        } else {
+                            $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                        }
+                        //create transction 
+                        $createFreeRoundTransaction = array(
+                            "game_trans_id" => $bet_transaction->game_trans_id,
+                            'freespin_id' => $getFreespin->freespin_id
+                        );
+                        FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                    }
+                }
                 $updateTransactionEXt = array(
                     "provider_request" =>json_encode($request->all()),
                     "mw_response" => json_encode($response),

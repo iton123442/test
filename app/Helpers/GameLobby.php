@@ -14,6 +14,7 @@ use App\Helpers\TransferWalletHelper;
 use App\Helpers\DragonGamingHelper;
 use App\Helpers\FCHelper;
 use App\Helpers\ProviderHelper;
+use App\Helpers\DigitainHelper;
 use App\Helpers\MGHelper;
 use App\Helpers\EVGHelper;
 use DOMDocument;
@@ -244,7 +245,6 @@ class GameLobby{
         $profile = "nofullscreen_money.xml";
         $sha1key = sha1($exitUrl.''.config("providerlinks.endorphina.nodeId").''.$profile.''.$token.''.config("providerlinks.endorphina.secretkey"));
         $sign = $sha1key; 
-        Helper::savePLayerGameRound($game_code,$token,$provider);
         ProviderHelper::saveLogGameLaunch('GAMELAUNCH EDP', 11, json_encode(config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign), json_encode($sign));
         return config("providerlinks.endorphina.url").'?exit='.$exitUrl.'&nodeId='.config("providerlinks.endorphina.nodeId").'&profile='.$profile.'&token='.$token.'&sign='.$sign;
     }
@@ -454,12 +454,23 @@ class GameLobby{
         return $game_url.'&player_token='.$token;
     }
 
-    public static function rsgLaunchUrl($game_code,$token,$exitUrl,$lang='en', $provider_sub_name){
+    public static function rsgLaunchUrl($game_code,$token,$exitUrl,$lang='en', $provider_sub_name, $device){
+
+        // $gameinfo = DigitainHelper::findGameDetails(config;('providerlinks.digitain.provider_db_id'), $game_code);
+        $gameId = $game_code;
+        if ($device == 'mobile'){
+            $gameinfo = DigitainHelper::HasMobileGameCode($game_code);
+            if ($gameinfo != false){
+                $gameId = $gameinfo;
+            }else{
+                $gameId = $game_code;
+            }
+        }  
+
         $url = $exitUrl;
         $domain = parse_url($url, PHP_URL_HOST);
         Helper::savePLayerGameRound($game_code,$token,$provider_sub_name);
-        // $url = 'https://partnerapirgs.betadigitain.com/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId=B9EC7C0A&mainDomain='.$domain.'';
-        $url = config('providerlinks.digitain.api_url').'/GamesLaunch/Launch?gameid='.$game_code.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId='.config('providerlinks.digitain.operator_id').'&mainDomain='.$domain.'';
+        $url = config('providerlinks.digitain.api_url').'/GamesLaunch/Launch?gameid='.$gameId.'&playMode=real&token='.$token.'&deviceType=1&lang='.$lang.'&operatorId='.config('providerlinks.digitain.operator_id').'&mainDomain='.$domain.'';
         return $url;
     }
 
@@ -609,18 +620,10 @@ class GameLobby{
         try{
             $url = config('providerlinks.tidygaming.url_lunch');
             $client_details = Providerhelper::getClientDetails('token', $token);
-            // $invite_code = config('providerlinks.tidygaming.usd_invite');
-            // if ($client_details->default_currency == "THB" ) {
-            //     $invite_code = config('providerlinks.tidygaming.thb_invite');
-            // } elseif ($client_details->default_currency == "TRY") {
-            //     $invite_code = config('providerlinks.tidygaming.try_invite');
-            // } 
-            // $invite_code = config('providerlinks.tidygaming.currency')[$client_details->default_currency];
-            
-            // $get_code_currency = TidyHelper::currencyCode($client_details->default_currency);
-            $operator_currency_support_1_1_using_prefix_k = [168,245,247,248,249,250];//THIS CLIENT_ID ARE USING THE ONT TO ONE BET AMOUNT 
+
+            $supportClientPrefix_k = config('providerlinks.tidygaming.support_1to1_denomination_prefixK');
             $currency = $client_details->default_currency;
-            if (in_array( $client_details->client_id, $operator_currency_support_1_1_using_prefix_k)) {
+            if (in_array( $client_details->client_id, $supportClientPrefix_k)) {
                $currency = "k".$client_details->default_currency;
             }
             $invite_code = config('providerlinks.tidygaming.currency')[$currency];
@@ -629,9 +632,9 @@ class GameLobby{
             $requesttosend = [
                 'client_id' =>  config('providerlinks.tidygaming.client_id'),
                 'game_id' => $game_code,
-                'username' => 'TGW_' . $client_details->player_id,
+                'username' => 'TGOP_' . $client_details->player_id,
                 'token' => $token,
-                'uid' => 'TGW_'.$client_details->player_id,
+                'uid' => 'TGOP_'.$client_details->player_id,
                 'currency' => $get_code_currency,
                 'invite_code' => $invite_code,
                 'back_url' => $exit_url
@@ -1790,9 +1793,9 @@ class GameLobby{
     public static function TopTrendGamingLaunchUrl($data){
         try {
             $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-
             if($client_details->country_code == null){
-                $country_code = $data['country_code'];
+                $country_code = "PH";
+                // $country_code = $data['country_code'];
             }else{
                 $country_code = $client_details->country_code;
             }
@@ -1818,13 +1821,14 @@ class GameLobby{
             $json = json_encode(simplexml_load_string($game_luanch_response));
             $array = json_decode($json,true);
             $val = $array["@attributes"]["token"];
-            $game_name = DB::select('SELECT game_name FROM games WHERE provider_id = 57 and game_code = '.$data['game_code'].'');
+            // dd($val);
+            $game_name = DB::select('SELECT game_name FROM games WHERE provider_id = '.config("providerlinks.toptrendgaming.provider_db_id").' and game_code = '.$data['game_code'].'');
             $remove[] = "'";
             $remove[] = ' ';
             $game_details = $game_name[0];
             $get_name = str_replace($remove,'', $game_details->game_name);
- 
-            $game_url = 'https://ams5-games.ttms.co/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
+
+            $game_url = config("providerlinks.toptrendgaming.game_api_url").'/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
 
             return $game_url;
 

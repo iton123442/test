@@ -86,22 +86,76 @@ class DigitainHelper{
 
 
      /**
-     * [ABANDONED REFER TO PROVIDER HELPER findGameDetails]
-     * [isolated helper class helper for digitain]
-     *
-     */
-    public static function findGameDetails($type, $provider_id, $identification) {
-            $game_details = DB::table("games as g")
-                ->leftJoin("providers as p","g.provider_id","=","p.provider_id");
-                
-            if ($type == 'game_code') {
-                $game_details->where([
-                    ["g.provider_id", "=", $provider_id],
-                    ["g.game_code",'=', $identification],
-                ]);
+      * 
+      *  Check if game if the gamecode is mobile type then convert it to desktop value
+      *
+      */
+    public  static function findGameDetails($type,$provider_id, $game_code){
+        
+            # If game code is mobile convert to desktop game code
+            $is_exist_gameid = DigitainHelper::IsMobileGameCode($game_code);
+            if($is_exist_gameid != false){
+                $gameId = $is_exist_gameid;
+            }else{
+                $gameId = $game_code;
             }
-            $result= $game_details->first();
-            return $result;
+
+            $query = DB::Select("SELECT game_id,game_code,game_name,sub_provider_name as provider_name FROM games inner join sub_providers sp using (sub_provider_id) WHERE game_code = '" . $gameId . "' AND sp.provider_id = '" . $provider_id . "' order by sp.sub_provider_id desc");
+            $result = count($query);
+            return $result > 0 ? $query[0] : null;
+    }
+
+     /**
+      *  Check if game has mobile
+      *  Key is either desktop and mobile
+      *  Value is always desktop gamecode
+      *  if provider send mobile game code, send desktop gamecode back to client
+      */
+    public static function HasMobileGameCode($gameCode){
+        $game_ids = [
+            'desktop' => 'mobile', 
+
+            '8105' => '8106',  // Backgammon Asian New
+            '8103' => '8104',  // Backgammon Long
+            '8101' => '8102',  // Backgammon Short
+            '6274' => '6273',  // Skill Games Lobby
+
+        ];  
+        if (array_key_exists($gameCode, $game_ids)) {
+            return $game_ids[$gameCode];
+        } else {
+            return false;
+        }
+    }
+
+
+     /**
+      *  Mobile Game Code to Desktop
+      */
+    public static function IsMobileGameCode($gameCode){
+        $game_ids = [
+            'mobile' => 'desktop', 
+
+            '6247'=>'6243', //Dominoes
+            '6248'=>'6244', //DominoesFives
+            '6249'=>'6245', //DominoesThrees
+            '6250'=>'6246', //DominoesBlock
+            '6228'=>'6230', //BeloteClassic
+            '6227'=>'6229', //BeloteOpen
+            '6222'=>'6223', //Pasoor
+            '6213'=>'6214', //Hokm
+            '8102'=>'8101', //BackgammonShort
+            '8104'=>'8103', //BackgammonLong
+            '8106'=>'8105', //BackgammonAsian
+            '6273'=>'6274', //Skill Games Lobby
+            '6217'=>'6218', //Skill Games Tournament
+
+        ];  
+        if (array_key_exists($gameCode, $game_ids)) {
+            return $game_ids[$gameCode];
+        } else {
+            return false;
+        }
     }
 
     public static function saveLog($method, $provider_id = 0, $request_data, $response_data) {

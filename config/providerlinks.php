@@ -209,13 +209,19 @@ return [
             'RUB' => '50679e6c',
             'KRW' => 'bdafae9a',
             'IRR' => 'da104cef',
+            'IDR' => 'ac5cb093',
             'kIDR' => 'b5ebfb6f',
             'MYR' => '531afbdd',
             'kVND' => '34f7085a',
-            'KLAK' => '951a128d',
+            'kLAK' => '951a128d',
             'kMMK' => '1d69f90a',
             'kKHR' => '3d7edfac',
+            'VND'  => 'b807860d',
+            'LAK'  => '223f24ab',
+            'MMK'  => '89853cff',
+            'KHR'  => 'd264b6ad',
         ],
+        'support_1to1_denomination_prefixK' => [], //THIS IS THE CLIENT ID THAT SUPPOR PREFIX K OR 1:1 EXAMPLE currency LAK concant for kLAK
         'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
         'TransferWallet' => [
             "client_id" => '2efa763b',
@@ -305,6 +311,7 @@ return [
         'hmac_scret_key' => 'uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1',
         'partnercode'=> 'gd1wiurg',
         'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
+        'api_freeRound' => 'https://service-stage.wazdanep.com/add/',
         'operator_data' =>[
             "1"=>"tigergames",
             "5"=>"xigolo",
@@ -332,6 +339,10 @@ return [
         'channel'=> 'desktop',
         'practice'=>0,
         'provider_id' => 32,
+        "username" => "qdxapi",
+        "secret_key" => "TwZbbsgmvdKhOalSyBoKpSIwK",
+        "freeRoundAPI_URL" => "https://agastage.playngonetwork.com:33001/CasinoGameTPService",
+        "SOAP_URL" => "http://playngo.com/v1/CasinoGameTPService/AddFreegameOffers",
     ],
     'microgaming'=>[
         'grant_type'=> 'client_credentials',
@@ -611,10 +622,12 @@ return [
     'toptrendgaming' => [
         'provider_db_id' => 56,
         'api_url' => 'https://ams-api.stg.ttms.co:8443/cip/gametoken/',
+        'game_api_url' => 'https://ams-games.stg.ttms.co',
     ],
     'nolimit'=>[
         'provider_db_id' => 59,
         'api_url' => 'https://partner.nolimitcdn.com/loader/game-loader.html?',
+        'api_freebet' => 'https://partner.nolimitcity.com/api/v1/json',
         'operator' =>'TG_DEV',
         'operator_key' => 'on2ha5xie7Hu',
         '20' => [// APLUS

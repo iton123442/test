@@ -16,11 +16,10 @@ use DB;
 class FreeRoundController extends Controller
 {
     
-    // public function __construct(){
-    //     $this->middleware('oauth', ['except' => ['index']]);
-    // }
+    public function __construct(){
+        $this->middleware('oauth', ['except' => []]);
+    }
     public function freeRoundController(Request $request){
-        // dd($request->all());
         if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code') || !$request->has('details') || !$request->has('freeround_id') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
             return response($mw_response,200)
@@ -42,16 +41,23 @@ class FreeRoundController extends Controller
                 ->header('Content-Type', 'application/json');
         }
         //  CLIENT SUBSCRIPTION FILTER
-        //  $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
-        //  if(!$subscription_checker){
-        //      $mw_response = ["error_code"=>"406","error_description"=>"Game Not Found"];
-        //     return response($mw_response,200)
-        //     ->header('Content-Type', 'application/json');
-        //  }
-        
+         $subscription_checker = $this->checkGameAccess($request->input("client_id"), $request->input("game_code"), $provider_code);
+         if(!$subscription_checker){
+             $mw_response = ["error_code"=>"406","error_description"=>"Game Not Found"];
+            return response($mw_response,200)
+            ->header('Content-Type', 'application/json');
+         }
+
         $checkProviderSupportFreeRound = $this->checkProviderSupportFreeRound($provider_code);
         if(!$checkProviderSupportFreeRound){
              $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service Provider"];
+            return response($mw_response,200)
+            ->header('Content-Type', 'application/json');
+         }
+        
+        $checkGameSupportFreeRound = $this->checkGameSupportFreeRound($provider_code, $request->input("game_code"));
+        if(!$checkGameSupportFreeRound){
+             $mw_response = ["error_code"=>"407","error_description"=>"Game Not Supported!"];
             return response($mw_response,200)
             ->header('Content-Type', 'application/json');
          }
@@ -67,7 +73,7 @@ class FreeRoundController extends Controller
         if(!$checkPlayerExist){
             $mw_response = ["error_code"=>"409","error_description"=>"Player does not exist!"];
             return response($mw_response,200)
-            ->header('Content-Type', 'application/json');
+            ->header('Content-Type', 'application/json');;
         }
         $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
         if($this->addFreeGameProviderController($checkPlayerExist, $request->all(), $provider_code, $freeround_id ) == 200 ){
@@ -79,9 +85,7 @@ class FreeRoundController extends Controller
                 ]
             ];
         }
-        
         return $mw_response;
-
     } 
 
     public function checkGameAccess($client_id, $game_code, $sub_provider_id){
@@ -126,7 +130,16 @@ class FreeRoundController extends Controller
     }   
 
     public function checkProviderSupportFreeRound($sub_provider_id){
+        // 0 => SUPPORTED
+        // 1 => NOT SUPPORTED
         $provider = DB::select("SELECT * FROM sub_providers WHERE sub_provider_id = ".$sub_provider_id." and is_freespin = 0");
+        $count = count($provider);
+        return $count > 0 ? $provider[0]:null;
+    }
+    public function checkGameSupportFreeRound($sub_provider_id, $game_code){
+         // 0 => SUPPORTED
+        // 1 => NOT SUPPORTED
+        $provider = DB::select("SELECT game_id FROM games WHERE sub_provider_id = ".$sub_provider_id." AND game_code = '".$game_code."' and is_freespin = 0");
         $count = count($provider);
         return $count > 0 ? $provider[0]:null;
     }
@@ -157,11 +170,18 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRoundPNG($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 38) {
             return FreeSpinHelper::createFreeRoundMannaplay($player_details, $data, $sub_provder_id,$freeround_id);
-        }  elseif ($sub_provder_id == 126) {
-            return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id);
+        } elseif ($sub_provder_id == 105) {
+            return FreeSpinHelper::createFreeRounNolimitCity($player_details, $data, $sub_provder_id,$freeround_id);
+        } elseif ($sub_provder_id == 126) {
+            return FreeSpinHelper::createFreeRoundQuickSpinD($player_details, $data, $sub_provder_id,$freeround_id);
         } elseif ($sub_provder_id == 127) {
-            return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id);
-        } else {
+            return FreeSpinHelper::createFreeRoundSpearHeadEm($player_details, $data, $sub_provder_id,$freeround_id);
+        } elseif ($sub_provder_id == 44) {
+            return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id,$freeround_id);
+        }  elseif ($sub_provder_id == 57) {
+            return FreeSpinHelper::createFreeRoundWazdan($player_details, $data, $sub_provder_id,$freeround_id);
+        }
+        else {
             return 400;
         }
     }
