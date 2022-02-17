@@ -379,6 +379,9 @@ class BNGController extends Controller
             );
             $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
+            if($data["args"]["bonus"] != null){
+                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+            }
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [

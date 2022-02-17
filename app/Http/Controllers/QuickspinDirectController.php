@@ -132,10 +132,10 @@ class QuickspinDirectController extends Controller
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         switch ($client_response->fundtransferresponse->status->code) {
                                 case '200':
-                                     $http_status = 200;
-                                     $playerBal = sprintf('%.2f', $client_response->fundtransferresponse->balance);
-                                     $formatBal = $balance = str_replace(".","", $playerBal);
-                                     $res = [
+                                    $http_status = 200;
+                                    $playerBal = sprintf('%.2f', $client_response->fundtransferresponse->balance);
+                                    $formatBal = $balance = str_replace(".","", $playerBal);
+                                    $res = [
                                         "balance" => (int)$formatBal,
                                         "txid" => (int)$provider_trans_id,
                                         "remotetxid" => (string)$game_transaction_id,
