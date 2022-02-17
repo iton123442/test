@@ -400,7 +400,10 @@ return [
            'IRR' => '79d9b5da1d79cfe588f2db352e617a34',
            'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
            'KRW' => '13c11ee300417eeb892643b07b224e53',
-           'JPY' => '91e006399cad8230d2d97091d8300412'
+           'JPY' => '91e006399cad8230d2d97091d8300412',
+           'KZT' => '5826d08f7295fbd7754080c5aa81ad08',
+           'TND' => '7ed09f9194573e2d0bc6788ddab84237',
+           'RUB' => '122482672d17fc9085e9b4ecab391bc8'
         ],
     ],
     // 'manna'=>[
