@@ -147,6 +147,21 @@ class IDNPokerController extends Controller
             Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
+
+        /**
+         * -----------------------------------------------
+         *  IF DEPOSIT EQUAL TO 0
+         * -----------------------------------------------
+         */    
+        if ($request->amount == 0) {
+            $msg = array(
+                "status" => "ok",
+                "message" => "Transaction success",
+                "balance" => "0.00"
+            );
+            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+            return response($msg, 200)->header('Content-Type', 'application/json');
+        }
          /**
          * -----------------------------------------------
          *  GET GAME DETAILS
