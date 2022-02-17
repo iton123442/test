@@ -296,6 +296,10 @@ class IDNPokerController extends Controller
                                         Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
                                         return response($msg, 200)->header('Content-Type', 'application/json');
                                     }
+                                    $message = "Deposit Failed";
+                                    if (isset($provider_response["message"])) {
+                                        $message = $provider_response["message"];
+                                    }
                                 }
                                 $data = [
                                     "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
@@ -323,7 +327,7 @@ class IDNPokerController extends Controller
                                 if (isset($clientFundsRollback_response->fundtransferresponse->status->code)) {
                                     switch ($clientFundsRollback_response->fundtransferresponse->status->code) {
                                         case "200":
-                                            $msg = array("status" => "error", "message" => "Deposit Failed");
+                                            $msg = array("status" => "error", "message" => $message);
                                             $account_data = [
                                                 "status" => 2
                                             ];
