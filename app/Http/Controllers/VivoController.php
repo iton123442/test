@@ -183,6 +183,10 @@ class VivoController extends Controller
 
 						if($request->TrnType == 'BET') {
 							Helper::saveLog('Vivo Gaming BET', 34,json_encode($request->all()), 'HIT Bet process');
+							$getSideBet = strpos($request->History, 'sideBet');
+							if($getSideBet != false){
+								sleep(0.05);
+							}
 							try{
 								ProviderHelper::idenpotencyTable('VIVO_'.$request->roundId);
 								$gameTransactionData = array(
@@ -208,7 +212,6 @@ class VivoController extends Controller
 								$game_transaction_id = $bet_transaction->game_trans_id;
 								$amount = $bet_transaction->bet_amount;
 							}
-
 					       	$bet_game_transaction_ext = array(
 								"game_trans_id" => $game_transaction_id,
 								"provider_trans_id" => $request->TransactionID,
