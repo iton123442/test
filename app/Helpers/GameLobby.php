@@ -1984,14 +1984,14 @@ class GameLobby{
             $client_details = ProviderHelper::getClientDetails('token',$request['token']);
             $key = "LUGTPyr6u8sRjCfh";
             $aes = new AES($key);
-            $player_id = "TGTW".$client_details->player_id;
-            TransferWalletHelper::savePLayerGameRound($request['game_code'], $request['token'], $request['game_provider']);
+            $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+            $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
             /***************************************************************
             *
             * CHECK PLAYER IF EXIST
             *
             ****************************************************************/
-            $data = IDNPokerHelper::playerDetails($player_id);
+            $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
             /***************************************************************
             *
             * IF PLAYER NOT EXIST THEN CREATE PLAYER
@@ -1999,17 +1999,16 @@ class GameLobby{
             ****************************************************************/
             if ($data != "false") {
                 if (isset($data["error"])) {
-                    $data = IDNPokerHelper::registerPlayer($player_id);
+                    $data = IDNPokerHelper::registerPlayer($player_id,$auth_token);
                 }
-                $data = IDNPokerHelper::playerDetails($player_id);
+                $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
                 if(isset($data["userid"]) && isset($data["username"])) {
                     /***************************************************************
                     *
                     * GET URL / OR LOGIN TO PROVIDER
                     *
                     ****************************************************************/
-                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details);
-                    
+                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token);
                     switch($client_details->wallet_type){
                         case 1: 
                             // SEAMLESS TYPE CLIENT

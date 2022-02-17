@@ -7,13 +7,13 @@ use GuzzleHttp\Client;
 class IDNPokerHelper{
 
     //REGISTER PLAYER 
-    public static function playerDetails($player_id){
+    public static function playerDetails($player_id,$auth){
         try {
             $url = config('providerlinks.idnpoker.URL');
            
             $request = '
             <request>
-                <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                <secret_key>'.$auth.'</secret_key>
                 <id>10</id>
                 <userid>'.$player_id.'</userid>
             </request>';
@@ -40,12 +40,12 @@ class IDNPokerHelper{
         
     }
 
-    public static function registerPlayer($player_id){
+    public static function registerPlayer($player_id,$auth){
         try {
             $url = config('providerlinks.idnpoker.URL');
             $request = '
             <request>
-            <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+            <secret_key>'.$auth.'</secret_key>
                 <id>1</id>
                 <userid>'.$player_id.'</userid>
                 <password>'.$player_id.'</password>
@@ -57,7 +57,7 @@ class IDNPokerHelper{
             $guzzle_response = $client->post($url,[
                 'body' => '
                         <request>
-                        <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                        <secret_key>'.$auth.'</secret_key>
                             <id>1</id>
                             <userid>'.$player_id.'</userid>
                             <password>'.$player_id.'</password>
@@ -79,7 +79,7 @@ class IDNPokerHelper{
     }
 
 
-    public static function gameLaunchURLLogin($data, $player_id, $client_details) {
+    public static function gameLaunchURLLogin($data, $player_id, $client_details, $auth) {
         try {
             $url = config('providerlinks.idnpoker.URL');
             if($client_details->default_language != ''){
@@ -100,7 +100,7 @@ class IDNPokerHelper{
             $client = new Client();
             $request = '
             <request>
-            <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+            <secret_key>'.$auth.'</secret_key>
                 <id>2</id>
                 <userid>'.$player_id.'</userid>
                 <password>'.$player_id.'</password>
@@ -114,7 +114,7 @@ class IDNPokerHelper{
             $guzzle_response = $client->post($url,[
                 'body' => '
                         <request>
-                        <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                        <secret_key>'.$auth.'</secret_key>
                             <id>2</id>
                             <userid>'.$player_id.'</userid>
                             <password>'.$player_id.'</password>
@@ -137,14 +137,14 @@ class IDNPokerHelper{
         }
     }
 
-    public static function deposit($data){
+    public static function deposit($data,$auth){
         try {
             $url = config('providerlinks.idnpoker.URL');
             $client = new Client();
             $guzzle_response = $client->post($url,[
                 'body' => '
                         <request>
-                            <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                            <secret_key>'.$auth.'</secret_key>
                             <id>3</id>
                             <userid>'.$data["player_id"].'</userid>
                             <id_transaction>'.$data["transaction_id"].'</id_transaction>
@@ -164,14 +164,14 @@ class IDNPokerHelper{
         
     }
 
-    public static function withdraw($data){
+    public static function withdraw($data,$auth){
         try {
             $url = config('providerlinks.idnpoker.URL');
             $client = new Client();
             $guzzle_response = $client->post($url,[
                 'body' => '
                         <request>
-                            <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                            <secret_key>'.$auth.'</secret_key>
                             <id>4</id>
                             <userid>'.$data["player_id"].'</userid>
                             <id_transaction>'.$data["transaction_id"].'</id_transaction>
@@ -189,6 +189,21 @@ class IDNPokerHelper{
             return "false";
         }
         
+    }
+
+    public static function getAuthPerOperator($client_details, $type = false){
+        $auth = "";
+        if($type == "staging") {
+            $auth = config('providerlinks.idnpoker.agent.JFPAA');
+        }
+        if($type == "production"){
+            if($client_details->operator_id == 1 ){
+                $auth = config('providerlinks.idnpoker.agent')["JFPAA"]; //TESTING
+            } else {
+                $auth = config('providerlinks.idnpoker.agent')[$client_details->operator_id][$client_details->client_id];
+            }
+        }
+        return $auth;
     }
 
 }
