@@ -102,10 +102,10 @@ class VivoController extends Controller
 		$micTime = microtime(true);
 		Helper::saveLog('Vivo Gaming Requests'.$request->TrnType, 34,json_encode($request->all()), $micTime);
 		$client_code = RouteParam::get($request, 'brand_code');
-		// $getSideBet = strpos($request->History, 'sideBet');
-		// if($getSideBet != false){
-		// 	sleep(0.05);
-		// }
+		$getSideBet = strpos($request->History, 'sideBet');
+		if($getSideBet != false){
+			sleep(0.5);
+		}
 		try{
 			ProviderHelper::idenpotencyTable($request->TrnType.$request->TransactionID);
 		}catch(\Exception $e){
