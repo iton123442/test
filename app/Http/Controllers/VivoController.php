@@ -100,7 +100,7 @@ class VivoController extends Controller
 	{	
 		$json_data = $request->all();
 		$micTime = microtime(true);
-		Helper::saveLog('Vivo Gaming Requests'.$request->History, 34,json_encode($request->all()), $micTime);
+		Helper::saveLog('Vivo Gaming Requests'.$request->TrnType, 34,json_encode($request->all()), $micTime);
 		$client_code = RouteParam::get($request, 'brand_code');
 		// $getSideBet = strpos($request->History, 'sideBet');
 		// if($getSideBet != false){
