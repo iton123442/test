@@ -194,7 +194,7 @@ class FreeSpinHelper{
 
     public static function createFreeRoundPNG($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        // $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+       
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -205,14 +205,14 @@ class FreeSpinHelper{
                 "date_expire" => $data["details"]["expiration_date"],
                 "lines" => $data["details"]["lines"],
                 "coins" => $data["details"]["coins"],
+                "date_start" => $data["details"]["start_time"],
+                "provider_trans_id" => $freeround_id,
             ];
         } catch (\Exception $e) {
             return 400;
         }
         $id = FreeSpinHelper::createFreeRound($freeroundtransac);
-        $client = new Client();
         $game_array = "<arr:int>".$game_details->info."</arr:int>";
-        $transaction_id = $freeround_id;
         try{
             $xmldatatopass = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:v1="http://playngo.com/v1" xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
                             <soapenv:Header/>
@@ -225,7 +225,7 @@ class FreeSpinHelper{
                                 <v1:Rounds>'.$data["details"]["rounds"].'</v1:Rounds>
                                 <v1:ExpireTime>'.$data["details"]["expiration_date"] .'z</v1:ExpireTime>
                                 <v1:Turnover>0</v1:Turnover>
-                                <v1:FreegameExternalId>'.$transaction_id.'</v1:FreegameExternalId>
+                                <v1:FreegameExternalId>'.$freeround_id.'</v1:FreegameExternalId>
                                 <v1:GameIdList>
                                     '.$game_array.'
                                 </v1:GameIdList>
@@ -235,28 +235,56 @@ class FreeSpinHelper{
             $client = new Client([
                 'headers' => [
                     'Content-Type'=> 'text/xml',
-                    'SOAPAction'=>'http://playngo.com/v1/CasinoGameTPService/AddFreegameOffers',
+                    'SOAPAction'=>config("providerlinks.png.SOAP_URL"),
                 ],
-                'auth' => ['qdxapi','TwZbbsgmvdKhOalSyBoKpSIwK'],
+                'auth' => [ config("providerlinks.png.username"),config("providerlinks.png.secret_key")],
             ]);
-            $guzzle_response = $client->post('https://agastage.playngonetwork.com:33001/CasinoGameTPService',
-                ['body' => $xmldatatopass]
-            );
-            $client_reponse = $guzzle_response->getBody()->getContents();
-            $data = [
-                "provider_trans_id" => $transaction_id,
-                "details" => json_encode(FreeSpinHelper::soapXMLparser($client_reponse))
+            try {
+                $guzzle_response = $client->post(config("providerlinks.png.freeRoundAPI_URL") ,
+                    ['body' => $xmldatatopass]
+                );
+                $client_reponse = $guzzle_response->getBody()->getContents();
+                $response = FreeSpinHelper::soapXMLparser($client_reponse);
+            } catch (\Exception $e) {
+                $getMessage =  $e->getMessage();
+            }
+            if(isset($response["AddFreegameOffersResponse"]["AddFreegameOffersResult"])){
+                $freespinExtenstion = [
+                    "freespin_id" => $id,
+                    "mw_request" => json_encode($xmldatatopass),
+                    "provider_response" => json_encode(FreeSpinHelper::soapXMLparser($client_reponse)),
+                    "client_request" => json_encode($data),
+                    "mw_response" => "200"
+                ];
+                FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+                return 200;
+            }
+            $toFailed = [
+                "status" => 3,
             ];
-            FreeSpinHelper::updateFreeRound($data, $id);
-            return 200;
+            FreeSpinHelper::updateFreeRound($toFailed, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($xmldatatopass),
+                "provider_response" => json_encode(FreeSpinHelper::soapXMLparser($client_reponse)),
+                "client_request" => json_encode($data),
+                "mw_response" => $getMessage
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
         }
         catch(\Exception $e){
-            $data = [
+            $toFailed = [
                 "status" => 3,
-                "provider_trans_id" => $transaction_id,
-                "details" =>json_encode( $e->getMessage())
             ];
-            FreeSpinHelper::updateFreeRound($data, $id);
+            FreeSpinHelper::updateFreeRound($toFailed, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($xmldatatopass),
+                "client_request" => json_encode($data),
+                "mw_response" => $e->getMessage(),
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         }
         

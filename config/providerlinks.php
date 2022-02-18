@@ -339,6 +339,10 @@ return [
         'channel'=> 'desktop',
         'practice'=>0,
         'provider_id' => 32,
+        "username" => "qdxapi",
+        "secret_key" => "TwZbbsgmvdKhOalSyBoKpSIwK",
+        "freeRoundAPI_URL" => "https://agastage.playngonetwork.com:33001/CasinoGameTPService",
+        "SOAP_URL" => "http://playngo.com/v1/CasinoGameTPService/AddFreegameOffers",
     ],
     'microgaming'=>[
         'grant_type'=> 'client_credentials',
@@ -396,7 +400,10 @@ return [
            'IRR' => '79d9b5da1d79cfe588f2db352e617a34',
            'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
            'KRW' => '13c11ee300417eeb892643b07b224e53',
-           'JPY' => '91e006399cad8230d2d97091d8300412'
+           'JPY' => '91e006399cad8230d2d97091d8300412',
+           'KZT' => '5826d08f7295fbd7754080c5aa81ad08',
+           'TND' => '7ed09f9194573e2d0bc6788ddab84237',
+           'RUB' => '122482672d17fc9085e9b4ecab391bc8'
         ],
     ],
     // 'manna'=>[
@@ -661,8 +668,14 @@ return [
     'idnpoker' => [
         'PROVIDER_ID'=> 110,
         'URL' => 'https://scr.idngame.com:2800/',
+        'prefix' => "TGTW",
+        'type' => "staging",// [production, staging]
         "agent" => [
-            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e",
+            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production
+            "9" => [
+                "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA
+                "122" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB
+            ]
         ]
    ],  
    'funkygames' => [
