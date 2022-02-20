@@ -239,7 +239,7 @@ class VivoController extends Controller
             'provider_name' => $game_details->provider_name
         ];
         Helper::saveLog('Vivo Gaming BET prio fundTransfer', 34,json_encode($data), $client_details->balance - $data["Amount"]);
-        $getSideBet = strpos($request->History, 'sideBet');
+        $getSideBet = strpos($data["History"], 'sideBet');
 		if($getSideBet != false){
 			sleep(0.5);
 		}
