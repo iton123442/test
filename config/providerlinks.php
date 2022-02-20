@@ -278,6 +278,7 @@ return [
         'api_url' => 'http://api.flexcontentprovider.com',
         'project_id' => '1421',
         'api_key' => '29abd3790d0a5acd532194c5104171c8',
+        'api_freeRound' => 'http://api.flexcontentprovider.com/game/registerBonus',
         'provider_id' => 29,
     ],
     '5men' => [

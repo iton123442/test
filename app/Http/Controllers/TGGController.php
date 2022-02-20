@@ -729,7 +729,6 @@ class TGGController extends Controller
 			'signature' => 'e5e1757feaf0301856ad9c309741f283',
 		];
 		$signature =  $this->getSignature($this->project_id, 1,$data,$this->api_key,'get_signature');
-		
 		$url = $this->api_url.'/game/getlist';
         $requesttosend = [
             'project' =>  $this->project_id,
@@ -752,7 +751,7 @@ class TGGController extends Controller
 
 	public function getURL(){
 		$token = 'n58ec5e159f769ae0b7b3a0774fdbf80';
-		$client_player_details = $this->getClientDetails('token', $token);
+		$client_player_details = ProviderHelper::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.tgg.project_id'),
           "version" => 1,
