@@ -126,7 +126,6 @@ class VivoController extends Controller
 		}
 		switch ($request->TrnType){
 			case "BET":
-				sleep(0.5);
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
