@@ -102,10 +102,7 @@ class VivoController extends Controller
 		$micTime = microtime(true);
 		Helper::saveLog('Vivo Gaming Requests'.$request->TrnType, 34,json_encode($request->all()), $micTime);
 		$client_code = RouteParam::get($request, 'brand_code');
-		$getSideBet = strpos($request->History, 'sideBet');
-		if($getSideBet != false){
-			sleep(0.5);
-		}
+		
 		try{
 			ProviderHelper::idenpotencyTable($request->TrnType.$request->TransactionID);
 		}catch(\Exception $e){
@@ -126,7 +123,6 @@ class VivoController extends Controller
 		}
 		switch ($request->TrnType){
 			case "BET":
-				sleep(0.5);
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
@@ -243,6 +239,10 @@ class VivoController extends Controller
             'provider_name' => $game_details->provider_name
         ];
         Helper::saveLog('Vivo Gaming BET prio fundTransfer', 34,json_encode($data), $client_details->balance - $data["Amount"]);
+        $getSideBet = strpos($data["History"], 'sideBet');
+		if($getSideBet != false){
+			sleep(0.5);
+		}
         $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 		if (isset($client_response->fundtransferresponse->status->code)) {
 			switch ($client_response->fundtransferresponse->status->code) {
