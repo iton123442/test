@@ -1023,6 +1023,13 @@ class FundtransferProcessorController extends Controller
             $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
         }
 
+        if(isset($details["fundtransferrequest"]["fundinfo"]["freeroundId"] )) {
+            $fund_extra_data["fundtransferrequest"]['fundinfo']['freeroundId'] = $details["fundtransferrequest"]['fundinfo']['freeroundId'];
+        }
+        if(isset($details["fundtransferrequest"]["fundinfo"]["freeroundend"] )) {
+            $fund_extra_data["fundtransferrequest"]['fundinfo']['freeroundend'] = $details["fundtransferrequest"]['fundinfo']['freeroundend'];
+        }
+
         do {
             
             try {
