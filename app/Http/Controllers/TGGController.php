@@ -309,7 +309,7 @@ class TGGController extends Controller
 	}
 
 	public  function gameWin($request, $client_details){
-
+		Helper::saveLog('TGG gameWin', $this->provider_db_id, json_encode($request), 'WIN HIT!');
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
 
