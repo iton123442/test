@@ -126,6 +126,7 @@ class VivoController extends Controller
 		switch ($request->TrnType){
 			case "BET":
 				if($getSideBet != false){
+					sleep(0.3);
 					return $this->betProcess($request->all(),$client_details);
 				}elseif($getSideBetPair != false){
 					sleep(0.5);
