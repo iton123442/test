@@ -121,8 +121,16 @@ class VivoController extends Controller
 		if($hash != $request->hash) {
 			$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>500</CODE></RESPONSE></VGSSYSTEM>';
 		}
+		$getSideBet = strpos($request->History, 'sideBet');
+		$getSideBetPair = strpos($request->History, 'sideBetPpair');
 		switch ($request->TrnType){
 			case "BET":
+				if($getSideBet != false){
+					return $this->betProcess($request->all(),$client_details);
+				}elseif($getSideBetPair != false){
+					sleep(0.5);
+					return $this->betProcess($request->all(),$client_details);
+				}
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
@@ -239,10 +247,7 @@ class VivoController extends Controller
             'provider_name' => $game_details->provider_name
         ];
         Helper::saveLog('Vivo Gaming BET prio fundTransfer', 34,json_encode($data), $client_details->balance - $data["Amount"]);
-        $getSideBet = strpos($data["History"], 'sideBet');
-		if($getSideBet != false){
-			sleep(0.5);
-		}
+       
         $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 		if (isset($client_response->fundtransferresponse->status->code)) {
 			switch ($client_response->fundtransferresponse->status->code) {
