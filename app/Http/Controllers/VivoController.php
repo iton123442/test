@@ -128,6 +128,7 @@ class VivoController extends Controller
 				if($getSideBet != false){
 					return $this->betProcess($request->all(),$client_details);
 				}elseif($getSideBetPair != false){
+					sleep(0.5);
 					return $this->betProcess($request->all(),$client_details);
 				}
 				return $this->betProcess($request->all(),$client_details);
