@@ -121,8 +121,8 @@ class VivoController extends Controller
 		if($hash != $request->hash) {
 			$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>500</CODE></RESPONSE></VGSSYSTEM>';
 		}
-		$getSideBet = strpos($data["History"], 'sideBet');
-		$getSideBetPair = strpos($data["History"], 'sideBetPpair');
+		$getSideBet = strpos($request->History, 'sideBet');
+		$getSideBetPair = strpos($request->History, 'sideBetPpair');
 		switch ($request->TrnType){
 			case "BET":
 				if($getSideBet != false){
