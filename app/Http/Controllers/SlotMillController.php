@@ -141,36 +141,7 @@ class SlotMillController extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ]; 
-        if(isset($request["prepaidref"])) {
-            $fund_extra_data["fundtransferrequest"]["fundinfo"]["freespin"] = true;
-            // $fund_extra_data = [
-	        //     'fundtransferrequest' => [
-			// 		'fundinfo' => [
-			// 			'freespin' => true
-			// 		]
-			// 	]
-	        // ];
-           //getTransaction
-           $getFreespin = FreeSpinHelper::getFreeSpinDetails($request["prepaidref"], "provider_trans_id" );
-
-           if($getFreespin){
-             //update transaction
-                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-                $updateFreespinData = [
-                    "status" => $status,
-                    "spin_remaining" => $getFreespin->spin_remaining - 1
-                ];
-                $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                //create transction 
-                $createFreeRoundTransaction = array(
-                    "game_trans_id" => $game_trans_id,
-                    'freespin_id' => $getFreespin->freespin_id
-                );
-                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-           }
-          
-          
-        }
+       
 
         try {
            
@@ -544,9 +515,30 @@ class SlotMillController extends Controller
         ];
 
         if(isset($request["prepaidref"])) {
-            $body_details["fundtransferrequest"]["fundinfo"]["freespin"] = true;
+            $getFreespin = FreeSpinHelper::getFreeSpinDetails($request["prepaidref"], "provider_trans_id" );
+            if($getFreespin){
+                $getOrignalfreeroundID = explode("_",$request["prepaidref"]);
+                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                $updateFreespinData = [
+                    "status" => $status,
+                    "win" => $getFreespin->win + $amount,
+                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                ];
+                $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                if($status == 2 ){
+                    $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                } else {
+                    $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                }
+                //create transction 
+                $createFreeRoundTransaction = array(
+                    "game_trans_id" => $bet_transaction->game_trans_id,
+                    'freespin_id' => $getFreespin->freespin_id
+                );
+                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+            }
         }
-
         try {
             $client = new Client();
             $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',

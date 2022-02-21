@@ -588,6 +588,7 @@ return [
     'slotmill'=>[
         'provider_db_id'=> 46,
         'brand' => "TigerGames",
+        'prefix' => "TG_",
         '19002' => "https://templar-treasures.stage.slotmill.com/",
         '19003' => "https://starspell.stage.slotmill.com/",
         '19005' => "https://wildfire.stage.slotmill.com/",

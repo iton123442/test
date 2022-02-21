@@ -121,14 +121,18 @@ class VivoController extends Controller
 		if($hash != $request->hash) {
 			$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>500</CODE></RESPONSE></VGSSYSTEM>';
 		}
-		$getSideBet = strpos($request->History, 'sideBet');
+		$getSideBet = strpos($request->History, 'sideBet21');
 		$getSideBetPair = strpos($request->History, 'sideBetPpair');
 		switch ($request->TrnType){
 			case "BET":
 				if($getSideBet != false){
-					return $this->betProcess($request->all(),$client_details);
-				}elseif($getSideBetPair != false){
 					sleep(0.5);
+					Helper::saveLog('Vivo Gaming BET SideBet', 34,json_encode($request->all()), 'HIT sideBet process');
+					return $this->betProcess($request->all(),$client_details);
+				}
+				if($getSideBetPair != false){
+					sleep(1);
+					Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
 					return $this->betProcess($request->all(),$client_details);
 				}
 				return $this->betProcess($request->all(),$client_details);
@@ -299,8 +303,6 @@ class VivoController extends Controller
 				"message" => "Warning value must not be less 0.",
 			];
 		}
-		else
-		{
 			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 			if($bet_transaction == null){
 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID >'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300ss</CODE></RESPONSE></VGSSYSTEM>';
@@ -328,9 +330,6 @@ class VivoController extends Controller
 	            "general_details" => $data["History"],
 	        );		                
 			$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
-
-			sleep(0.5);
-
 			$update_game_transaction = array(
 	            "win" => 5,
 	            "pay_amount" => $bet_transaction->pay_amount + $data["Amount"],
@@ -361,15 +360,18 @@ class VivoController extends Controller
 	                "mw_response" => $response, #R
 	            ]
 	        ];
+	        try {
+        	 	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+	        	Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), json_encode($response));
+	        } catch (\Exception $e) {
+	        	Helper::saveLog('Vivo Gaming WIN ERROR CATCHED', 34,json_encode($data), json_encode($response));
+	        }
+	       
 
-	        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-	        Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), json_encode($response));
-
-		}
-		header("Content-type: text/xml; charset=utf-8");
-		$final_response =  '<?xml version="1.0" encoding="utf-8"?>';
-		$final_response .= $response;
-		return $final_response;
+			header("Content-type: text/xml; charset=utf-8");
+			$final_response =  '<?xml version="1.0" encoding="utf-8"?>';
+			$final_response .= $response;
+			return $final_response;
 	}
 
 	public function transactionStatus(Request $request) 
