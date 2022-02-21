@@ -121,7 +121,7 @@ class VivoController extends Controller
 		if($hash != $request->hash) {
 			$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>500</CODE></RESPONSE></VGSSYSTEM>';
 		}
-		$getSideBet = strpos($request->History, 'sideBet');
+		$getSideBet = strpos($request->History, 'sideBet21');
 		$getSideBetPair = strpos($request->History, 'sideBetPpair');
 		switch ($request->TrnType){
 			case "BET":
@@ -129,9 +129,9 @@ class VivoController extends Controller
 					Helper::saveLog('Vivo Gaming BET SideBet', 34,json_encode($request->all()), 'HIT sideBet process');
 					sleep(0.5);
 					return $this->betProcess($request->all(),$client_details);
-				}elseif($getSideBetPair != false){
+				}
+				if($getSideBetPair != false){
 					Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
-					sleep(1);
 					return $this->betProcess($request->all(),$client_details);
 				}
 				return $this->betProcess($request->all(),$client_details);
