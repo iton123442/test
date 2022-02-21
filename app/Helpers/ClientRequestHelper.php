@@ -81,6 +81,13 @@ class ClientRequestHelper{
                 if(isset( $action["fundtransferrequest"]['fundinfo']['freespin'] )){
                     $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
                 }
+
+                if(isset($details["fundtransferrequest"]["fundinfo"]["freeroundId"] )) {
+                    $fund_extra_data["fundtransferrequest"]['fundinfo']['freeroundId'] = $action["fundtransferrequest"]['fundinfo']['freeroundId'];
+                }
+                if(isset($details["fundtransferrequest"]["fundinfo"]["freeroundend"] )) {
+                    $fund_extra_data["fundtransferrequest"]['fundinfo']['freeroundend'] = $action["fundtransferrequest"]['fundinfo']['freeroundend'];
+                }
             }
 
             try{
