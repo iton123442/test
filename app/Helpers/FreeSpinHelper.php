@@ -988,19 +988,19 @@ class FreeSpinHelper{
                         "registration_id"=> $freeround_id,
                         "expire"=> $endtime,
                     ]
-            ];
-               
+                ];
+               dump($requestBody);
                 $client = new Client(['headers' => [ 
                     'Content-Type' => 'application/json',
                     'Authorization' =>'Bearer '.$signature
-                    ]
+                ]
                 ]);
                 try{
-                    $game_link_response = $client->post(config("providerlinks.tgg.api_url").'/game/registerBonus',
+                    $game_link_response = $client->post(config("providerlinks.tgg.api_freeRound"),
                     ['body' => json_encode($requestBody)]);
                     $dataresponse = json_decode($game_link_response->getBody()->getContents()); // get response
-                    Helper::saveLog('TGG Freespin 1', $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
                     dd($dataresponse);
+                    Helper::saveLog('TGG Freespin response', $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
                 }catch(\Exception $e){
                     $createFreeround = [
                         "status" => 3,
