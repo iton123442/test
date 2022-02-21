@@ -73,7 +73,7 @@ class FreeRoundController extends Controller
         if(!$checkPlayerExist){
             $mw_response = ["error_code"=>"409","error_description"=>"Player does not exist!"];
             return response($mw_response,200)
-            ->header('Content-Type', 'application/json');;
+            ->header('Content-Type', 'application/json');
         }
         $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
         if($this->addFreeGameProviderController($checkPlayerExist, $request->all(), $provider_code, $freeround_id ) == 200 ){
