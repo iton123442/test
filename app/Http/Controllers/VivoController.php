@@ -299,8 +299,6 @@ class VivoController extends Controller
 				"message" => "Warning value must not be less 0.",
 			];
 		}
-		else
-		{
 			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 			if($bet_transaction == null){
 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID >'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300ss</CODE></RESPONSE></VGSSYSTEM>';
@@ -328,9 +326,6 @@ class VivoController extends Controller
 	            "general_details" => $data["History"],
 	        );		                
 			$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
-
-			sleep(0.5);
-
 			$update_game_transaction = array(
 	            "win" => 5,
 	            "pay_amount" => $bet_transaction->pay_amount + $data["Amount"],
@@ -361,15 +356,18 @@ class VivoController extends Controller
 	                "mw_response" => $response, #R
 	            ]
 	        ];
+	        try {
+        	 	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+	        	Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), json_encode($response));
+	        } catch (\Exception $e) {
+	        	Helper::saveLog('Vivo Gaming WIN ERROR CATCHED', 34,json_encode($data), json_encode($response));
+	        }
+	       
 
-	        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-	        Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), json_encode($response));
-
-		}
-		header("Content-type: text/xml; charset=utf-8");
-		$final_response =  '<?xml version="1.0" encoding="utf-8"?>';
-		$final_response .= $response;
-		return $final_response;
+			header("Content-type: text/xml; charset=utf-8");
+			$final_response =  '<?xml version="1.0" encoding="utf-8"?>';
+			$final_response .= $response;
+			return $final_response;
 	}
 
 	public function transactionStatus(Request $request) 
