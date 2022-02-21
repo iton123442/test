@@ -126,10 +126,12 @@ class VivoController extends Controller
 		switch ($request->TrnType){
 			case "BET":
 				if($getSideBet != false){
-					sleep(0.3);
+					Helper::saveLog('Vivo Gaming BET SideBet', 34,json_encode($request->all()), 'HIT sideBet process');
+					sleep(0.5);
 					return $this->betProcess($request->all(),$client_details);
 				}elseif($getSideBetPair != false){
-					sleep(0.5);
+					Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
+					sleep(1);
 					return $this->betProcess($request->all(),$client_details);
 				}
 				return $this->betProcess($request->all(),$client_details);
