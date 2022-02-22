@@ -573,16 +573,16 @@ class NolimitController extends Controller
                     return response($response,200)
                             ->header('Content-Type', 'application/json');
 
-            }catch(\Exception $e){
-                     $response = [
-                            'jsonrpc' => '2.0',
-                            'result' => [
-                                'error' => [
-                                    'code' => "15002",
-                                    'message' => "Invalid Request",
+                }catch(\Exception $e){
+                        $response = [
+                                'jsonrpc' => '2.0',
+                                'result' => [
+                                    'error' => [
+                                        'code' => "15002",
+                                        'message' => "Invalid Request",
+                                        ],
                                     ],
-                                ],
-                            ];    
+                                ];    
            ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($request->all()),  $e->getMessage() . ' ' . $e->getLine());
            return response($response,200)->header('Content-Type', 'application/json');
 
