@@ -2009,26 +2009,57 @@ class GameLobby{
                     *
                     ****************************************************************/
                     $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token);
-                    switch($client_details->wallet_type){
-                        case 1: 
-                            // SEAMLESS TYPE CLIENT
-                            // BUT PROVDER TRANSFER WALLET
-                            $data_to_send_play = array(
-                                "url" => $data["lobby_url"],
-                                "token" => $client_details->player_token,
-                                "player_id" => $client_details->player_id,
-                                "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
-                            );
-                            $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
-                            // return urlencode($encoded_data);
-                            return config('providerlinks.play_betrnk') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
-                        case 2:
-                            //TRANSFER WALLET CLIENT
-                            //TRANSFER WALLET SA PROIVDER
-                            return $data["lobby_url"];
-                        default:
-                            return false;
+                    if(isset($data["lobby_url"])){
+                        // do deposit
+                        $player_details = ProviderHelper::playerDetailsCall($request['token']);
+                        if(isset($player_details->playerdetailsresponse->status->code) && $player_details->playerdetailsresponse->status->code == 200){
+                            // ProviderHelper::_insertOrUpdate($client_details->token_id,$player_details->playerdetailsresponse->balance);
+
+                            try {
+                                $http = new Client();
+                                $response = $http->post(config('providerlinks.oauth_mw_api.mwurl').'/api/idnpoker/makeDeposit', [
+                                    'form_params' => [
+                                        'token' => $request['token'],
+                                        'player_id'=> $client_details->player_id,
+                                        'amount' => $player_details->playerdetailsresponse->balance,
+                                    ],
+                                    'headers' =>[
+                                        'Accept'     => 'application/json'
+                                    ]
+                                ]);
+
+                                $iframe_data = json_decode((string) $response->getBody(), true);
+                                Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
+                            } catch (\Exception $e) {
+                                Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, json_encode($player_details),  $e->getMessage() );
+                            }
+                            
+                            switch($client_details->wallet_type){
+                                case 1: 
+                                    // SEAMLESS TYPE CLIENT
+                                    // BUT PROVDER TRANSFER WALLET
+                                    $data_to_send_play = array(
+                                        "url" => $data["lobby_url"],
+                                        "token" => $client_details->player_token,
+                                        "player_id" => $client_details->player_id,
+                                        "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
+                                    );
+                                    $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
+                                    // return urlencode($encoded_data);
+                                    return config('providerlinks.play_betrnk') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
+                                case 2:
+                                    //TRANSFER WALLET CLIENT
+                                    //TRANSFER WALLET SA PROIVDER
+                                    return $data["lobby_url"];
+                                default:
+                                    return "false";
+                            }
+                        }else{
+                            return "false";
+                        }
+                        
                     }
+                    
                 }
                 return "false";
             } else {
