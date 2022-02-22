@@ -488,6 +488,11 @@ class TGGController extends Controller
 					];
 					 FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
 						 //create transction 
+				 	if($status == 2 ){
+						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+					} else {
+						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+					}
 					 $body_details = [
 			            "type" => "credit",
 			            "win" => $win_or_lost,
@@ -504,11 +509,6 @@ class TGGController extends Controller
 			            "game_transaction_id" => $existing_bet->game_trans_id
 
 			        ];
-					if($status == 2 ){
-						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
-					} else {
-						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-					}
 					
 					$createFreeRoundTransaction = array(
 						"game_trans_id" => $existing_bet->game_trans_id,
