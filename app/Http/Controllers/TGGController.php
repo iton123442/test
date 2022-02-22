@@ -443,7 +443,8 @@ class TGGController extends Controller
 				if ($existing_bet == 'false') {
 					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
 				}
-                // $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $reference_transaction_uuid;
+				$getOrignalfreeroundID = explode("_",$request['extrabonus_bypass']);
+                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
 				$client_details->connection_name = $existing_bet->connection_name;
 				$reference_transaction_uuid = $request['data']['action_id'];
 				$amount = $request['data']['amount'];
@@ -451,7 +452,7 @@ class TGGController extends Controller
 				$win_or_lost = $amount > 0 ?  1 : 0;
 				$income = $existing_bet->bet_amount -  $amount;
 				$balance = $client_details->balance + $amount;
-				$getFreespin = FreeSpinHelper::getFreeSpinDetails($reference_transaction_uuid, "provider_trans_id");
+				$getFreespin = FreeSpinHelper::getFreeSpinDetails($request['details']['extrabonus_bypass'], "provider_trans_id");
 				// $bet_transaction = GameTransactionMDB::findGameTransactionDetails($transaction_uuid, 'round_id',false, $client_details);
 				$response = array(
 					'status' => 'ok',
@@ -489,9 +490,9 @@ class TGGController extends Controller
 					 FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
 						 //create transction 
 				 	if($status == 2 ){
-						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+						$action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
 					} else {
-						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+						$action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
 					}
 					 $body_details = [
 			            "type" => "credit",
