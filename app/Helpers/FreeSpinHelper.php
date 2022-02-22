@@ -987,6 +987,7 @@ class FreeSpinHelper{
                         "settings"=>[
                             "user_id"=> $player_details->client_player_id,
                             "registration_id"=> $freeround_id,
+                            "bypass" => $freeround_id,
                             "expire"=> $endtime
                         ]
                 ];
@@ -1007,6 +1008,7 @@ class FreeSpinHelper{
                     "settings" => [
                         "user_id" => $player_details->client_player_id,
                         "registration_id"=> $freeround_id,
+                        "bypass" => $freeround_id,
                         "expire"=> $endtime
                     ]
                 ];
