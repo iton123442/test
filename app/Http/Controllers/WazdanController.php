@@ -14,7 +14,6 @@ use App\Models\GameTransactionMDB;
 use DB;
 class WazdanController extends Controller
 {
-    //
     private $prefix = 33;
     public function __construct() {
         $this->startTime = microtime(true);

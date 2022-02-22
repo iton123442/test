@@ -313,6 +313,36 @@ class TGGHelper{
 		);
 		DB::table('game_transaction_ext')->where("game_trans_ext_id",$gametransextid)->update($gametransactionext);
 	}
+	public static function getSignaturess(array $args,$system_key){
+		$md5=array();
+		foreach($args as $required_arg)
+		{
+			$arg=$required_arg;
+			if(is_array($arg))
+			{
+				if(count($arg)){
+						$recursive_arg='';
+					array_walk_recursive($arg,function($item)use(&$recursive_arg)
+					{
+						if(!is_array($item))
+						{
+						$recursive_arg.=($item.':');
+						}
+					});
+						$md5[]=substr($recursive_arg,0,strlen($recursive_arg)-1); 
+				}else{
+					$md5[]='';
+				}
+			}else{
+				$md5[]=$arg;
+
+			};
+		};
+			$md5[]=$system_key;
+			$md5_str=implode('*',$md5);
+			$md5=md5($md5_str);
+			return$md5;
+	}
 
 }
 

@@ -997,12 +997,11 @@ class FundtransferProcessorController extends Controller
 
     public function bgFundTransferV2MultiDB(Request $request){
         $details = json_decode(file_get_contents("php://input"), true);
+        
         // Helper::saveLog('backgroundProcesstFund', 88, json_encode($details), "ENDPOINT HIT");
         $client_details = ProviderHelper::getClientDetails('token', $details["token"]);
         $game_details = Game::findbyid($details["game_details"]["game_id"]);
-
         $amount = $details["game_transaction"]["amount"]; // amount should be fixed after sending data
-
         $game_trans_ext_id = $details["game_trans_ext_id"];
         $game_transaction_id = $details["game_transaction_id"];
         $connection_name = $details["connection_name"];
