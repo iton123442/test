@@ -439,6 +439,7 @@ class TGGController extends Controller
 				}
 			} elseif ($string_to_obj->game->action == 'extrabonusspin') {
 				$reference_transaction_uuid = $request['data']['round_id'];
+				dd($string_to_obj->extrabonus_bypass);
 				Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "HIT!");
 				if ($existing_bet == 'false') {
 					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
