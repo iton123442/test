@@ -316,41 +316,41 @@ class TGGController extends Controller
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 
-		// try{
-		// 	ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
-		// }catch(\Exception $e){
+		try{
+			ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
+		}catch(\Exception $e){
 
-		// 	$bet_transaction = GameTransactionMDB::findGameExt($request["callback_id"], 2,'round_id', $client_details);
-  //           if ($bet_transaction != 'false') {
-  //               if ($bet_transaction->mw_response == 'null') {
-  //                  	$response = array(
-		// 				"status" => 'error',
-		// 				"error" => [
-		// 					'scope' => 'user',
-		// 					'no_refund'=> 0,
-		// 					"message" => "Internal error. Please reopen the game",
-		// 				]
-		// 			);
-  //               }else {
-  //                   $response = $bet_transaction->mw_response;
-  //               }
+			$bet_transaction = GameTransactionMDB::findGameExt($request["callback_id"], 2,'round_id', $client_details);
+            if ($bet_transaction != 'false') {
+                if ($bet_transaction->mw_response == 'null') {
+                   	$response = array(
+						"status" => 'error',
+						"error" => [
+							'scope' => 'user',
+							'no_refund'=> 0,
+							"message" => "Internal error. Please reopen the game",
+						]
+					);
+                }else {
+                    $response = $bet_transaction->mw_response;
+                }
 				
 
-  //           } else {
-  //               $response = array(
-		// 			"status" => 'error',
-		// 			"error" => [
-		// 				'scope' => 'user',
-		// 				'no_refund'=> 0,
-		// 				"message" => "Internal error. Please reopen the game",
-		// 			]
-		// 		);
-  //           } 
+            } else {
+                $response = array(
+					"status" => 'error',
+					"error" => [
+						'scope' => 'user',
+						'no_refund'=> 0,
+						"message" => "Internal error. Please reopen the game",
+					]
+				);
+            } 
 
 
-  //           Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
-  //           return $response;
-		// }
+            Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
+            return $response;
+		}
 		
 
 		$reference_transaction_uuid = $request['data']['action_id'];
@@ -439,7 +439,6 @@ class TGGController extends Controller
 				}
 			} elseif ($string_to_obj->game->action == 'extrabonusspin') {
 				$reference_transaction_uuid = $request['data']['round_id'];
-				dd($string_to_obj->extrabonus_bypass);
 				Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "HIT!");
 				if ($existing_bet == 'false') {
 					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
