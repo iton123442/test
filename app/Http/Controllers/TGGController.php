@@ -316,41 +316,41 @@ class TGGController extends Controller
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 
-		try{
-			ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
-		}catch(\Exception $e){
+		// try{
+		// 	ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
+		// }catch(\Exception $e){
 
-			$bet_transaction = GameTransactionMDB::findGameExt($request["callback_id"], 2,'round_id', $client_details);
-            if ($bet_transaction != 'false') {
-                if ($bet_transaction->mw_response == 'null') {
-                   	$response = array(
-						"status" => 'error',
-						"error" => [
-							'scope' => 'user',
-							'no_refund'=> 0,
-							"message" => "Internal error. Please reopen the game",
-						]
-					);
-                }else {
-                    $response = $bet_transaction->mw_response;
-                }
+		// 	$bet_transaction = GameTransactionMDB::findGameExt($request["callback_id"], 2,'round_id', $client_details);
+  //           if ($bet_transaction != 'false') {
+  //               if ($bet_transaction->mw_response == 'null') {
+  //                  	$response = array(
+		// 				"status" => 'error',
+		// 				"error" => [
+		// 					'scope' => 'user',
+		// 					'no_refund'=> 0,
+		// 					"message" => "Internal error. Please reopen the game",
+		// 				]
+		// 			);
+  //               }else {
+  //                   $response = $bet_transaction->mw_response;
+  //               }
 				
 
-            } else {
-                $response = array(
-					"status" => 'error',
-					"error" => [
-						'scope' => 'user',
-						'no_refund'=> 0,
-						"message" => "Internal error. Please reopen the game",
-					]
-				);
-            } 
+  //           } else {
+  //               $response = array(
+		// 			"status" => 'error',
+		// 			"error" => [
+		// 				'scope' => 'user',
+		// 				'no_refund'=> 0,
+		// 				"message" => "Internal error. Please reopen the game",
+		// 			]
+		// 		);
+  //           } 
 
 
-            Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
-            return $response;
-		}
+  //           Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
+  //           return $response;
+		// }
 		
 
 		$reference_transaction_uuid = $request['data']['action_id'];
@@ -443,7 +443,7 @@ class TGGController extends Controller
 				if ($existing_bet == 'false') {
 					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
 				}
-                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $reference_transaction_uuid;
+                // $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $reference_transaction_uuid;
 				$client_details->connection_name = $existing_bet->connection_name;
 				$reference_transaction_uuid = $request['data']['action_id'];
 				$amount = $request['data']['amount'];
@@ -488,6 +488,11 @@ class TGGController extends Controller
 					];
 					 FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
 						 //create transction 
+				 	if($status == 2 ){
+						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+					} else {
+						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+					}
 					 $body_details = [
 			            "type" => "credit",
 			            "win" => $win_or_lost,
@@ -504,11 +509,6 @@ class TGGController extends Controller
 			            "game_transaction_id" => $existing_bet->game_trans_id
 
 			        ];
-					if($status == 2 ){
-						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
-					} else {
-						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-					}
 					
 					$createFreeRoundTransaction = array(
 						"game_trans_id" => $existing_bet->game_trans_id,
