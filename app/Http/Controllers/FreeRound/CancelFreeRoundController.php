@@ -14,7 +14,7 @@ class CancelFreeRoundController extends Controller
     public function __construct(){
         $this->middleware('oauth', ['except' => ['index']]);
     }
-    public function freeRoundController(Request $request){
+    public function cancelfreeRoundController(Request $request){
         if( !$request->has('client_id') || !$request->has('freeround_id') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
             return response($mw_response,200)
