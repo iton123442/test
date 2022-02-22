@@ -441,16 +441,14 @@ class TGGController extends Controller
 			} elseif ($string_to_obj->game->action == 'extrabonusspin') {
 				$reference_transaction_uuid = $request['data']['round_id'];
 				Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "HIT!");
-				if ($existing_bet == 'false') {
-					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
-				}
-				$getOrignalfreeroundID = explode("_",$request["settings"]["registration_id"]);
-                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
+				// if ($existing_bet == 'false') {
+				// 	$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
+				// }
+                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $reference_transaction_uuid;
 				$client_details->connection_name = $existing_bet->connection_name;
 				$reference_transaction_uuid = $request['data']['action_id'];
 				$amount = $request['data']['amount'];
 				$transaction_uuid = $request['callback_id'];
-
 				$balance = $client_details->balance + $amount;
 				$getFreespin = FreeSpinHelper::getFreeSpinDetails($reference_transaction_uuid, "provider_trans_id");
 				$bet_transaction = GameTransactionMDB::findGameTransactionDetails($transaction_uuid, 'round_id',false, $client_details);
