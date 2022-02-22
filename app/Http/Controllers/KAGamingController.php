@@ -343,6 +343,7 @@ class KAGamingController extends Controller
         $entry_id = 1;
         $win_or_lost = 5; // 0 lost,  5 processing
         $payout_reason = 'settled';
+        $rounds_remaining = isset($data->roundsRemaining) ? $data->roundsRemaining : 0;
         
         // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
         // if($session_check == 'false'){
@@ -513,10 +514,14 @@ class KAGamingController extends Controller
                         $bet_amount = $existing_bet_details->bet_amount + $bet_amount;
                         $income = $bet_amount - $pay_amount; //$existing_bet_details->income;
                         if($pay_amount > 0){
-                            $win_or_lost = 1;
+                            if($rounds_remaining == 0){
+                                $win_or_lost = 1;
+                            }
                             $entry_id = 2;
                         }else{
-                            $win_or_lost = 0;
+                            if($rounds_remaining == 0){
+                                $win_or_lost = 0;
+                            }
                             $entry_id = 1;
                         }
                         $is_multiple = true;
@@ -537,11 +542,15 @@ class KAGamingController extends Controller
                         $pay_amount = $win_amount;
                         $income = $bet_amount - $pay_amount;
                         if($pay_amount > 0){
-                        $win_or_lost = 1;
-                        $entry_id = 2;
+                            if($rounds_remaining == 0){
+                                $win_or_lost = 1;
+                            }
+                            $entry_id = 2;
                         }else{
-                        $win_or_lost = 0;
-                        $entry_id = 1;
+                            if($rounds_remaining == 0){
+                                $win_or_lost = 0;
+                            }
+                            $entry_id = 1;
                         }          
                         $is_multiple = false;
                         $update_betamount = 0;
