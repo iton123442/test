@@ -87,7 +87,8 @@ class WalletDetailsController extends Controller
                                 $provider_code = $provider_id->sub_provider_id;
                                 if($provider_code == 110){
                                     $player_id = "TGTW".$playerDetails->player_id;
-                                    $data = IDNPokerHelper::playerDetails($player_id);
+                                    $auth_token = IDNPokerHelper::getAuthPerOperator($playerDetails, config('providerlinks.idnpoker.type')); 
+                                    $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
                                     if ($data != "false") {
                                         $msg = array(
                                             "status" => "success",
