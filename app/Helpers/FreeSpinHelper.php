@@ -940,7 +940,6 @@ class FreeSpinHelper{
     public static function createFreeRoundTGG($player_details,$data, $sub_provder_id,$freeround_id){
         Helper::saveLog('TGG Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
-        dump($game_details);
         if($game_details){
             try{
                 //freeSpin type
@@ -1015,7 +1014,6 @@ class FreeSpinHelper{
                     'form_params' => $requestBody,
                 ]);
                 $dataresponse = json_decode($response->getBody(),TRUE);
-                dump($dataresponse);
                 if(isset($dataresponse->error)){
                     $createFreeround = [
                         "status" => 3,
