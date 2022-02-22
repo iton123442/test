@@ -16,15 +16,10 @@ use DB;
 class FreeRoundController extends Controller
 {
     
-<<<<<<< HEAD
     public function __construct(){
         $this->middleware('oauth', ['except' => ['index']]);
     }
-=======
-    // public function __construct(){
-    //     $this->middleware('oauth', ['except' => ['index']]);
-    // }
->>>>>>> ff8cffadfff24363257aace40a79c6b0c89ffaeb
+
     public function freeRoundController(Request $request){
         if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code') || !$request->has('details') || !$request->has('freeround_id') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
