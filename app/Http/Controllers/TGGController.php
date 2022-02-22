@@ -9,6 +9,7 @@ use App\Helpers\ProviderHelper;
 use App\Models\GameTransactionMDB;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
+use App\Helpers\FreeSpinHelper;
 use Carbon\Carbon;
 use DB;
 
@@ -309,10 +310,9 @@ class TGGController extends Controller
 	}
 
 	public  function gameWin($request, $client_details){
-		Helper::saveLog('TGG gameWin', $this->provider_db_id, json_encode($request), 'WIN HIT!');
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-
+		Helper::saveLog('TGG gameWin', $this->provider_db_id, json_encode($request), 'WIN HIT!');
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
@@ -420,10 +420,10 @@ class TGGController extends Controller
 				 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 				 		);
 				 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-			            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog('TGG Win 1', $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					} catch (\Exception $e) {
-			            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog('TGG Error 1', $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					}
 				} else {
@@ -438,7 +438,62 @@ class TGGController extends Controller
 				  	Helper::saveLog("TGG not found transaction Spin", $this->provider_db_id, json_encode($request), $response);
 			        return $response;
 				}
-			} elseif ($string_to_obj->game->action == 'freespin') {
+			} elseif ($string_to_obj->game->action == 'extrabonusspin') {
+				$reference_transaction_uuid = $request['data']['round_id'];
+				Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "HIT!");
+				if ($existing_bet == 'false') {
+					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
+				}
+				$getOrignalfreeroundID = explode("_",$request["settings"]["registration_id"]);
+                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
+				$client_details->connection_name = $existing_bet->connection_name;
+				$reference_transaction_uuid = $request['data']['action_id'];
+				$amount = $request['data']['amount'];
+				$transaction_uuid = $request['callback_id'];
+
+				$balance = $client_details->balance + $amount;
+				$getFreespin = FreeSpinHelper::getFreeSpinDetails($request["settings"]["registration_id"], "provider_trans_id");
+				$bet_transaction = GameTransactionMDB::findGameTransactionDetails($transaction_uuid, 'round_id',false, $client_details);
+				if($getFreespin){
+					 //update transaction
+					 $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+					 $updateFreespinData = [
+						"status" => $status,
+						"win" => $getFreespin->win + $amount,
+						"spin_remaining" => $getFreespin->spin_remaining - 1
+					];
+					 FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+						 //create transction 
+					if($status == 2 ){
+						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+					} else {
+						$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+					}
+					
+					$createFreeRoundTransaction = array(
+						"game_trans_id" => $bet_transaction->game_trans_id,
+						'freespin_id' => $getFreespin->freespin_id
+					);
+					FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+
+				}
+				try {
+					$client = new Client();
+					$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+						[ 'body' => json_encode($body_details), 'timeout' => '2.00']
+					);
+					//THIS RESPONSE IF THE TIMEOUT NOT FAILED
+					Helper::saveLog('TGG FreeRound STimeOUT', $this->provider_db_id, json_encode($request->all()), $response);
+					return response($response,200)
+							->header('Content-Type', 'application/json');
+				} catch (\Exception $e) {
+					Helper::saveLog('TGG FreeRound FTimeOUT', $this->provider_db_id, json_encode($request->all()), $response);
+					return response($response,200)
+							->header('Content-Type', 'application/json');
+				}
+		
+			}
+			 elseif ($string_to_obj->game->action == 'freespin') {
 				$reference_transaction_uuid = $request['data']['round_id'];
 				Helper::saveLog("TGG freespin", $this->provider_db_id, json_encode($request), "HIT");
 				if ($existing_bet == 'false') {
