@@ -452,7 +452,7 @@ class TGGController extends Controller
 				$transaction_uuid = $request['callback_id'];
 
 				$balance = $client_details->balance + $amount;
-				$getFreespin = FreeSpinHelper::getFreeSpinDetails($request["settings"]["registration_id"], "provider_trans_id");
+				$getFreespin = FreeSpinHelper::getFreeSpinDetails($reference_transaction_uuid, "provider_trans_id");
 				$bet_transaction = GameTransactionMDB::findGameTransactionDetails($transaction_uuid, 'round_id',false, $client_details);
 				if($getFreespin){
 					 //update transaction
