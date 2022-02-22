@@ -585,6 +585,7 @@ class FreeSpinHelper{
                 "game_id" => $game_details->game_id,
                 "total_spin" => $data["details"]["rounds"],
                 "spin_remaining" => $data["details"]["rounds"],
+                "provider_trans_id" => $freeround_id,
                 "denominations" => $data["details"]["AdditionalParameters"]["BetValue"],
                 "date_expire" => $data["details"]["FreeRoundsEndDate"],
             ];
@@ -671,6 +672,7 @@ class FreeSpinHelper{
                     "game_id" => $game_details->game_id,
                     "date_expire" => $data["details"]["expiration_date"],
                     "provider_trans_id" => $freeround_id,
+                    "denominations" => $data["details"]["denomination"],
                     "date_start" => $data["details"]["start_time"]
                 ];
             }else{
@@ -681,6 +683,7 @@ class FreeSpinHelper{
                     "spin_remaining" => $data["details"]["rounds"],
                     "date_expire" => $data["details"]["expiration_date"],
                     "provider_trans_id" => $freeround_id,
+                    "denominations" => $data["details"]["denomination"],
                     "date_start" => $data["details"]["start_time"]
                 ];
             }
