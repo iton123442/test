@@ -2013,31 +2013,32 @@ class GameLobby{
                         // do deposit
                         $player_details = ProviderHelper::playerDetailsCall($request['token']);
                         if(isset($player_details->playerdetailsresponse->status->code) && $player_details->playerdetailsresponse->status->code == 200){
-                            // ProviderHelper::_insertOrUpdate($client_details->token_id,$player_details->playerdetailsresponse->balance);
-
-                            try {
-                                $http = new Client();
-                                $response = $http->post(config('providerlinks.oauth_mw_api.mwurl').'/api/idnpoker/makeDeposit', [
-                                    'form_params' => [
-                                        'token' => $request['token'],
-                                        'player_id'=> $client_details->player_id,
-                                        'amount' => $player_details->playerdetailsresponse->balance,
-                                    ],
-                                    'headers' =>[
-                                        'Accept'     => 'application/json'
-                                    ]
-                                ]);
-
-                                $iframe_data = json_decode((string) $response->getBody(), true);
-                                Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
-                            } catch (\Exception $e) {
-                                Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, json_encode($player_details),  $e->getMessage() );
-                            }
-                            
+                            // ProviderHelper::_insertOrUpdate($client_details->token_id,$player_details->playerdetailsresponse->balance);                            
                             switch($client_details->wallet_type){
                                 case 1: 
                                     // SEAMLESS TYPE CLIENT
                                     // BUT PROVDER TRANSFER WALLET
+                                    try {
+                                        $http = new Client();
+                                        $response = $http->post(config('providerlinks.oauth_mw_api.mwurl').'/api/idnpoker/makeDeposit', [
+                                            'form_params' => [
+                                                'token' => $request['token'],
+                                                'player_id'=> $client_details->player_id,
+                                                'amount' => $player_details->playerdetailsresponse->balance,
+                                            ],
+                                            'headers' =>[
+                                                'Accept'     => 'application/json'
+                                            ]
+                                        ]);
+                                        $iframe_data = json_decode((string) $response->getBody(), true);
+                                        Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
+                                        if (isset($iframe_data['status']) && $iframe_data != 'ok' ) {
+                                            return "false";
+                                        }
+                                    } catch (\Exception $e) {
+                                        Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, json_encode($player_details),  $e->getMessage() );
+                                        return "false";
+                                    }
                                     $data_to_send_play = array(
                                         "url" => $data["lobby_url"],
                                         "token" => $client_details->player_token,
