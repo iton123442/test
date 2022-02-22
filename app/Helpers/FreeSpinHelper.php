@@ -944,6 +944,7 @@ class FreeSpinHelper{
     public static function createFreeRoundTGG($player_details,$data, $sub_provder_id,$freeround_id){
         Helper::saveLog('TGG Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
+        dump($data);
         if($game_details){
             try{
                 //freeSpin type
@@ -986,8 +987,9 @@ class FreeSpinHelper{
                         ],
                         "settings"=>[
                             "user_id"=> $player_details->client_player_id,
-                            "registration_id"=> $freeround_id,
-                            "bypass" => $freeround_id,
+                            "bypass" => [
+                                "promoCode" =>$freeround_id,
+                                ],
                             "expire"=> $endtime
                         ]
                 ];
@@ -1007,11 +1009,15 @@ class FreeSpinHelper{
                     ],
                     "settings" => [
                         "user_id" => $player_details->client_player_id,
-                        "registration_id"=> $freeround_id,
-                        "bypass" => $freeround_id,
+                        "bypass" => [
+                            "promoCode" =>$freeround_id,
+                            ],
                         "expire"=> $endtime
                     ]
                 ];
+                dump($requestBody);
+                
+
                 $client = new Client(['headers' => [ 
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ]
@@ -1020,6 +1026,7 @@ class FreeSpinHelper{
                     'form_params' => $requestBody,
                 ]);
                 $dataresponse = json_decode($response->getBody(),TRUE);
+                dump($dataresponse);
                 if(isset($dataresponse->error)){
                     $createFreeround = [
                         "status" => 3,
