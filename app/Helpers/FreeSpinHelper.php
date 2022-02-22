@@ -1011,6 +1011,7 @@ class FreeSpinHelper{
                     'form_params' => $requestBody,
                 ]);
                 $dataresponse = json_decode($response->getBody(),TRUE);
+                dump($dataresponse);
                 if(isset($dataresponse->error)){
                     $createFreeround = [
                         "status" => 3,
