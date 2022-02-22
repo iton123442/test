@@ -443,7 +443,7 @@ class TGGController extends Controller
 				if ($existing_bet == 'false') {
 					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
 				}
-                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $reference_transaction_uuid;
+                // $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $reference_transaction_uuid;
 				$client_details->connection_name = $existing_bet->connection_name;
 				$reference_transaction_uuid = $request['data']['action_id'];
 				$amount = $request['data']['amount'];
