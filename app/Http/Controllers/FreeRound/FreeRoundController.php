@@ -17,7 +17,7 @@ class FreeRoundController extends Controller
 {
     
     public function __construct(){
-        $this->middleware('oauth', ['except' => []]);
+        $this->middleware('oauth', ['except' => ['index']]);
     }
     public function freeRoundController(Request $request){
         if( !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('game_provider') || !$request->has('game_code') || !$request->has('details') || !$request->has('freeround_id') ){
@@ -73,7 +73,7 @@ class FreeRoundController extends Controller
         if(!$checkPlayerExist){
             $mw_response = ["error_code"=>"409","error_description"=>"Player does not exist!"];
             return response($mw_response,200)
-            ->header('Content-Type', 'application/json');;
+            ->header('Content-Type', 'application/json');
         }
         $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
         if($this->addFreeGameProviderController($checkPlayerExist, $request->all(), $provider_code, $freeround_id ) == 200 ){
@@ -180,6 +180,8 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::BNGcreateFreeBet($player_details, $data, $sub_provder_id,$freeround_id);
         }  elseif ($sub_provder_id == 57) {
             return FreeSpinHelper::createFreeRoundWazdan($player_details, $data, $sub_provder_id,$freeround_id);
+        }  elseif ($sub_provder_id == 53) {
+            return FreeSpinHelper::createFreeRoundTGG($player_details, $data, $sub_provder_id,$freeround_id);
         }
         else {
             return 400;

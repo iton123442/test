@@ -9,6 +9,7 @@ use App\Helpers\ProviderHelper;
 use App\Models\GameTransactionMDB;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
+use App\Helpers\FreeSpinHelper;
 use Carbon\Carbon;
 use DB;
 
@@ -42,7 +43,6 @@ class TGGController extends Controller
 
 
 		$client_details = ProviderHelper::getClientDetails('token',$request["token"]);
-
 		if($client_details == null){
 			$response = [
 				'status' => 'error',
@@ -309,49 +309,48 @@ class TGGController extends Controller
 	}
 
 	public  function gameWin($request, $client_details){
-
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-
+		Helper::saveLog('TGG gameWin', $this->provider_db_id, json_encode($request), 'WIN HIT!');
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 
-		try{
-			ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
-		}catch(\Exception $e){
+		// try{
+		// 	ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
+		// }catch(\Exception $e){
 
-			$bet_transaction = GameTransactionMDB::findGameExt($request["callback_id"], 2,'round_id', $client_details);
-            if ($bet_transaction != 'false') {
-                if ($bet_transaction->mw_response == 'null') {
-                   	$response = array(
-						"status" => 'error',
-						"error" => [
-							'scope' => 'user',
-							'no_refund'=> 0,
-							"message" => "Internal error. Please reopen the game",
-						]
-					);
-                }else {
-                    $response = $bet_transaction->mw_response;
-                }
+		// 	$bet_transaction = GameTransactionMDB::findGameExt($request["callback_id"], 2,'round_id', $client_details);
+  //           if ($bet_transaction != 'false') {
+  //               if ($bet_transaction->mw_response == 'null') {
+  //                  	$response = array(
+		// 				"status" => 'error',
+		// 				"error" => [
+		// 					'scope' => 'user',
+		// 					'no_refund'=> 0,
+		// 					"message" => "Internal error. Please reopen the game",
+		// 				]
+		// 			);
+  //               }else {
+  //                   $response = $bet_transaction->mw_response;
+  //               }
 				
 
-            } else {
-                $response = array(
-					"status" => 'error',
-					"error" => [
-						'scope' => 'user',
-						'no_refund'=> 0,
-						"message" => "Internal error. Please reopen the game",
-					]
-				);
-            } 
+  //           } else {
+  //               $response = array(
+		// 			"status" => 'error',
+		// 			"error" => [
+		// 				'scope' => 'user',
+		// 				'no_refund'=> 0,
+		// 				"message" => "Internal error. Please reopen the game",
+		// 			]
+		// 		);
+  //           } 
 
 
-            Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
-            return $response;
-		}
+  //           Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
+  //           return $response;
+		// }
 		
 
 		$reference_transaction_uuid = $request['data']['action_id'];
@@ -420,10 +419,10 @@ class TGGController extends Controller
 				 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 				 		);
 				 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-			            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog('TGG Win 1', $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					} catch (\Exception $e) {
-			            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog('TGG Error 1', $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					}
 				} else {
@@ -438,7 +437,104 @@ class TGGController extends Controller
 				  	Helper::saveLog("TGG not found transaction Spin", $this->provider_db_id, json_encode($request), $response);
 			        return $response;
 				}
-			} elseif ($string_to_obj->game->action == 'freespin') {
+			} 
+			// elseif ($string_to_obj->game->action == 'extrabonusspin') {
+			// 	$reference_transaction_uuid = $request['data']['round_id'];
+			// 	Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "HIT!");
+			// 	if ($existing_bet == 'false') {
+			// 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
+			// 	}
+   //              // $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $reference_transaction_uuid;
+			// 	$client_details->connection_name = $existing_bet->connection_name;
+			// 	$reference_transaction_uuid = $request['data']['action_id'];
+			// 	$amount = $request['data']['amount'];
+			// 	$transaction_uuid = $request['callback_id'];
+			// 	$win_or_lost = $amount > 0 ?  1 : 0;
+			// 	$income = $existing_bet->bet_amount -  $amount;
+			// 	$balance = $client_details->balance + $amount;
+			// 	$getFreespin = FreeSpinHelper::getFreeSpinDetails($reference_transaction_uuid, "provider_trans_id");
+			// 	// $bet_transaction = GameTransactionMDB::findGameTransactionDetails($transaction_uuid, 'round_id',false, $client_details);
+			// 	$response = array(
+			// 		'status' => 'ok',
+			// 		'data' => [
+			// 			'balance' => (string)$balance,
+			// 			'currency' => $client_details->default_currency,
+			// 		],
+			//   	);
+			// 	$updateGameTransaction = [
+		 //            'win' => $win_or_lost,
+		 //            "pay_amount" => $amount,
+		 //            'income' => $income,
+		 //            'entry_id' => 2,
+		 //            'trans_status' => 2
+		 //        ];
+	  //       	GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
+	  //       	$gameTransactionEXTData = array(
+		 //            "game_trans_id" => $existing_bet->game_trans_id,
+		 //            "provider_trans_id" => $reference_transaction_uuid,
+		 //            "round_id" => $transaction_uuid,
+		 //            "amount" => $amount,
+		 //            "game_transaction_type"=> 2,
+		 //            "provider_request" =>json_encode($request),
+		 //            "mw_response" =>json_encode($response),
+		 //        );
+		 //        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			// 	if($getFreespin){
+			// 		 //update transaction
+			// 		 $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+			// 		 $updateFreespinData = [
+			// 			"status" => $status,
+			// 			"win" => $getFreespin->win + $amount,
+			// 			"spin_remaining" => $getFreespin->spin_remaining - 1
+			// 		];
+			// 		 FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+			// 			 //create transction 
+			// 	 	if($status == 2 ){
+			// 			$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+			// 		} else {
+			// 			$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+			// 		}
+			// 		$body_details = [
+			//             "type" => "credit",
+			//             "win" => $win_or_lost,
+			//             "token" => $client_details->player_token,
+			//             "rollback" => false,
+			//             "game_details" => [
+			//                 "game_id" => $game_details->game_id
+			//             ],
+			//             "game_transaction" => [
+			//                 "amount" => $amount
+			//             ],
+			//             "connection_name" => $existing_bet->connection_name,
+			//             "game_trans_ext_id" => $game_trans_ext_id,
+			//             "game_transaction_id" => $existing_bet->game_trans_id
+
+			//         ];
+					
+			// 		$createFreeRoundTransaction = array(
+			// 			"game_trans_id" => $existing_bet->game_trans_id,
+			// 			'freespin_id' => $getFreespin->freespin_id
+			// 		);
+			// 		FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+
+			// 	}
+			// 	try {
+			// 		$client = new Client();
+			// 		$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+			// 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
+			// 		);
+			// 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
+			// 		Helper::saveLog('TGG FreeRound STimeOUT', $this->provider_db_id, json_encode($request), $response);
+			// 		return response($response,200)
+			// 				->header('Content-Type', 'application/json');
+			// 	} catch (\Exception $e) {
+			// 		Helper::saveLog('TGG FreeRound FTimeOUT', $this->provider_db_id, json_encode($request), $response);
+			// 		return response($response,200)
+			// 				->header('Content-Type', 'application/json');
+			// 	}
+		
+			// }
+			 elseif ($string_to_obj->game->action == 'freespin') {
 				$reference_transaction_uuid = $request['data']['round_id'];
 				Helper::saveLog("TGG freespin", $this->provider_db_id, json_encode($request), "HIT");
 				if ($existing_bet == 'false') {
@@ -729,7 +825,6 @@ class TGGController extends Controller
 			'signature' => 'e5e1757feaf0301856ad9c309741f283',
 		];
 		$signature =  $this->getSignature($this->project_id, 1,$data,$this->api_key,'get_signature');
-		
 		$url = $this->api_url.'/game/getlist';
         $requesttosend = [
             'project' =>  $this->project_id,
@@ -752,7 +847,7 @@ class TGGController extends Controller
 
 	public function getURL(){
 		$token = 'n58ec5e159f769ae0b7b3a0774fdbf80';
-		$client_player_details = $this->getClientDetails('token', $token);
+		$client_player_details = ProviderHelper::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.tgg.project_id'),
           "version" => 1,

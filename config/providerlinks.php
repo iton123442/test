@@ -278,6 +278,7 @@ return [
         'api_url' => 'http://api.flexcontentprovider.com',
         'project_id' => '1421',
         'api_key' => '29abd3790d0a5acd532194c5104171c8',
+        'api_freeRound' => 'http://api.flexcontentprovider.com/game/registerBonus',
         'provider_id' => 29,
     ],
     '5men' => [
@@ -400,7 +401,10 @@ return [
            'IRR' => '79d9b5da1d79cfe588f2db352e617a34',
            'EUR' => 'a119af190f7c8f8e8c236ced2e80b673',
            'KRW' => '13c11ee300417eeb892643b07b224e53',
-           'JPY' => '91e006399cad8230d2d97091d8300412'
+           'JPY' => '91e006399cad8230d2d97091d8300412',
+           'KZT' => '5826d08f7295fbd7754080c5aa81ad08',
+           'TND' => '7ed09f9194573e2d0bc6788ddab84237',
+           'RUB' => '122482672d17fc9085e9b4ecab391bc8'
         ],
     ],
     // 'manna'=>[
@@ -584,6 +588,7 @@ return [
     'slotmill'=>[
         'provider_db_id'=> 46,
         'brand' => "TigerGames",
+        'prefix' => "TG_",
         '19002' => "https://templar-treasures.stage.slotmill.com/",
         '19003' => "https://starspell.stage.slotmill.com/",
         '19005' => "https://wildfire.stage.slotmill.com/",
@@ -665,8 +670,14 @@ return [
     'idnpoker' => [
         'PROVIDER_ID'=> 110,
         'URL' => 'https://scr.idngame.com:2800/',
+        'prefix' => "TGTW",
+        'type' => "staging",// [production, staging]
         "agent" => [
-            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e",
+            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production
+            "9" => [
+                "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA
+                "122" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB
+            ]
         ]
    ],  
    'funkygames' => [
