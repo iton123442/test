@@ -439,12 +439,11 @@ class TGGController extends Controller
 				}
 			} elseif ($string_to_obj->game->action == 'extrabonusspin') {
 				$reference_transaction_uuid = $request['data']['round_id'];
-				dd($string_to_obj->extrabonus_bypass);
 				Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "HIT!");
 				if ($existing_bet == 'false') {
 					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
 				}
-				$getOrignalfreeroundID = explode("_",$request['extrabonus_bypass']);
+				$getOrignalfreeroundID = explode("_",$string_to_obj->extrabonus_bypass);
                 $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
 				$client_details->connection_name = $existing_bet->connection_name;
 				$reference_transaction_uuid = $request['data']['action_id'];
@@ -453,7 +452,7 @@ class TGGController extends Controller
 				$win_or_lost = $amount > 0 ?  1 : 0;
 				$income = $existing_bet->bet_amount -  $amount;
 				$balance = $client_details->balance + $amount;
-				$getFreespin = FreeSpinHelper::getFreeSpinDetails($request['details']['extrabonus_bypass'], "provider_trans_id");
+				$getFreespin = FreeSpinHelper::getFreeSpinDetails($string_to_obj->extrabonus_bypass, "provider_trans_id");
 				// $bet_transaction = GameTransactionMDB::findGameTransactionDetails($transaction_uuid, 'round_id',false, $client_details);
 				$response = array(
 					'status' => 'ok',
