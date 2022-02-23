@@ -313,15 +313,6 @@ class TGGController extends Controller
 	    $game_id = $string_to_obj->game->game_id;
 		Helper::saveLog('TGG gameWin', $this->provider_db_id, json_encode($request), 'WIN HIT!');
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
-		$response = array(
-			'status' => 'ok',
-			'data' => [
-				'balance' => (string)$client_details->balance,
-				'currency' => $client_details->default_currency,
-			],
-		  );
-		  return $response;
-
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 
 		try{
