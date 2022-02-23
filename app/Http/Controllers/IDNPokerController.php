@@ -637,7 +637,7 @@ class IDNPokerController extends Controller
                         if($value["status"] != "Withdraw" && $value["status"] != "Deposit") {
                             $gameDetails = self::getSubGameDetails(config('providerlinks.idnpoker.PROVIDER_ID'), $value["game"]);
                             $playerID = substr($value["userid"],4);
-                            $getClientDetails = ProviderHelper::getPlayerOperatorDetails("player_id", $playerID);
+                            $getClientDetails = ProviderHelper::getClientDetails("player_id", $playerID);
                             if($getClientDetails != null){
                                 $pay_amount = 0;
                                 $bet_amount = 0;
