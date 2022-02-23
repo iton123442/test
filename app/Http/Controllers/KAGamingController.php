@@ -543,12 +543,12 @@ class KAGamingController extends Controller
                         $pay_amount = $win_amount;
                         $income = $bet_amount - $pay_amount;
                         if($pay_amount > 0){
-                            if($rounds_remaining == 0){
+                            if($rounds_remaining == 0 && $complete == true){
                                 $win_or_lost = 1;
                             }
                             $entry_id = 2;
                         }else{
-                            if($rounds_remaining == 0){
+                            if($rounds_remaining == 0 && $complete == true){
                                 $win_or_lost = 0;
                             }
                             $entry_id = 1;
