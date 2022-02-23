@@ -62,7 +62,7 @@ class FreeRoundController extends Controller
             ->header('Content-Type', 'application/json');
          }
 
-         $Client_SecurityHash = $this->Client_SecurityHash($request->client_id);
+        $Client_SecurityHash = $this->Client_SecurityHash($request->client_id);
         if($Client_SecurityHash !== true){
              $mw_response = ["error_code"=>"408","error_description"=>"Client Disabled"];
             return response($mw_response,200)
