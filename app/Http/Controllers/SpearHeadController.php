@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransaction;
 use App\Models\GameTransactionMDB;
+use App\Helpers\FreeSpinHelper;
 use App\Helpers\Game;
 use Carbon\Carbon;
 use DB;
@@ -304,7 +305,7 @@ public function CreditProcess($req){
           "game_id" => $game_details->game_id,
           "round_id" => $round_id,
           "bet_amount" => 0,
-          "win" => 5,
+          "win" => $win_or_lost,
           "pay_amount" => 0,
           "income" => 0,
           "entry_id" => 1,
@@ -317,12 +318,51 @@ public function CreditProcess($req){
           "game_trans_id" => json_encode($game_trans_id),
           "provider_trans_id" => $provider_trans_id,
           "round_id" => $round_id,
-          "amount" => $pay_amount,
-          "game_transaction_type"=> 2,
+          "amount" => 0,
+          "game_transaction_type"=> 1,
           "provider_request" => json_encode($req),
-          "mw_response" => json_encode($res),
       );
       $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+      $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+      if (isset($client_response->fundtransferresponse->status->code)) {
+          ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+          switch ($client_response->fundtransferresponse->status->code) {
+              case '200':
+                $http_status = 200;
+                    $updateTransactionEXt = array(
+                        'mw_request' => json_encode($client_response->requestoclient),
+                        'client_response' => json_encode($client_response->fundtransferresponse),
+                        'transaction_detail' => 'success',
+                        'general_details' => 'success',
+                    );
+                   Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                   GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                break;
+          }
+      }
+      $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
+      $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
+      if($getFreespin){
+          //update transaction
+          $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+          $updateFreespinData = [
+              "status" => 2,
+              "spin_remaining" => 0
+          ];
+          FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+              //create transction 
+          if($status == 2) {
+              $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+          }  else {
+              $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+          }
+          
+              $createFreeRoundTransaction = array(
+                  "game_trans_id" => $bet_transaction->game_trans_id,
+                  'freespin_id' => $getFreespin->freespin_id
+          );
+          FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+      }
     }else{
       $client_details->connection_name = $bet_transaction->connection_name;
       $income = $bet_transaction->bet_amount - $pay_amount;
