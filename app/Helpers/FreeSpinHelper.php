@@ -944,7 +944,6 @@ class FreeSpinHelper{
     public static function createFreeRoundTGG($player_details,$data, $sub_provder_id,$freeround_id){
         Helper::saveLog('TGG Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
-        dump($data);
         if($game_details){
             try{
                 //freeSpin type
@@ -972,6 +971,8 @@ class FreeSpinHelper{
                 }
                 $id = FreeSpinHelper::createFreeRound($insertFreespin);
                 $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
+                $client_player_details = ProviderHelper::getClientDetails('player_id',  $player_details->player_id);
+                dump($client_player_details);
                 $details= ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);
                 $preRequestBody = [
                         "project"=> config("providerlinks.tgg.project_id"),
@@ -1015,7 +1016,6 @@ class FreeSpinHelper{
                         "expire"=> $endtime
                     ]
                 ];
-                dump($requestBody);
                 
 
                 $client = new Client(['headers' => [ 
@@ -1026,7 +1026,6 @@ class FreeSpinHelper{
                     'form_params' => $requestBody,
                 ]);
                 $dataresponse = json_decode($response->getBody(),TRUE);
-                dump($dataresponse);
                 if(isset($dataresponse->error)){
                     $createFreeround = [
                         "status" => 3,

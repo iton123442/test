@@ -26,18 +26,47 @@ class TGGController extends Controller
 	
 	// public $provider_db_id = 29; // 29 on test ,, 27 prod
 	public $provider_db_id = 29; 
-	
-	public function index(Request $request){
-		Helper::saveLog('TGG index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+	public static function getSignaturess(array $args,$system_key){
+		$md5=array();
+		foreach($args as $required_arg)
+		{
+			$arg=$required_arg;
+			if(is_array($arg))
+			{
+				if(count($arg)){
+						$recursive_arg='';
+					array_walk_recursive($arg,function($item)use(&$recursive_arg)
+					{
+						if(!is_array($item))
+						{
+						$recursive_arg.=($item.':');
+						}
+					});
+						$md5[]=substr($recursive_arg,0,strlen($recursive_arg)-1); 
+				}else{
+					$md5[]='';
+				}
+			}else{
+				$md5[]=$arg;
 
-		$signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'check_signature');
-		
+			};
+		};
+			$md5[]=$system_key;
+			$md5_str=implode('*',$md5);
+			$md5=md5($md5_str);
+			return$md5;
+	}
+
+	public function index(Request $request){
+		// Helper::saveLog('TGG index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+		$signature_checker = $this->getSignaturess( $request->all(), $this->api_key);
+		dump($signature_checker);
 		if($signature_checker == 'false'):
 			$msg = array(
 						"status" => 'error',
 						"error" => ["scope" => "user","no_refund" => 1,"message" => "Signature is invalid!"]
 					);
-			Helper::saveLog('TGG Signature Failed '.$request->name, $this->provider_db_id, json_encode($request->all()), $msg);
+			// Helper::saveLog('TGG Signature Failed '.$request->name, $this->provider_db_id, json_encode($request->all()), $msg);
 			return $msg;
 		endif;
 
@@ -438,14 +467,19 @@ class TGGController extends Controller
 			        return $response;
 				}
 			} elseif ($string_to_obj->game->action == 'extrabonusspin') {
+				$connection_name = $client_details->connection_name;
 				$reference_transaction_uuid = $request['data']['round_id'];
-				Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "HIT!");
+				$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
+				Helper::saveLog("TGG freeround", $this->provider_db_id, json_encode($request), "FREEROUND HIT!");
 				if ($existing_bet == 'false') {
-					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
+					$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 				}
+				dump($reference_transaction_uuid);
+				dump($client_details);
+				dump($existing_bet);
 				$getOrignalfreeroundID = explode("_",$string_to_obj->extrabonus_bypass);
-                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
-				$client_details->connection_name = $existing_bet->connection_name;
+                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[0];
+				// $client_details->connection_name = $existing_bet->connection_name;
 				$reference_transaction_uuid = $request['data']['action_id'];
 				$amount = $request['data']['amount'];
 				$transaction_uuid = $request['callback_id'];
@@ -505,7 +539,7 @@ class TGGController extends Controller
 			            "game_transaction" => [
 			                "amount" => $amount
 			            ],
-			            "connection_name" => $existing_bet->connection_name,
+			            "connection_name" => $connection_name,
 			            "game_trans_ext_id" => $game_trans_ext_id,
 			            "game_transaction_id" => $existing_bet->game_trans_id
 
