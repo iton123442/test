@@ -977,7 +977,7 @@ class FreeSpinHelper{
                 $preRequestBody = [
                         "project"=> config("providerlinks.tgg.project_id"),
                         "version"=> 1,
-                        "token"=>  $data["token"],
+                        "token"=>  $client_player_details->player_token,
                         "game"=> $game_details->game_code,
                         "currency"=> $player_details->default_currency,
                         "extra_bonuses"=> [
@@ -999,7 +999,7 @@ class FreeSpinHelper{
                     "project"=> config("providerlinks.tgg.project_id"),
                     "signature"=> $signature,
                     "version"=> 1,
-                    "token"=> $data["token"],
+                    "token"=> $client_player_details->player_token,
                     "game"=> $game_details->game_code,
                     "currency"=> $player_details->default_currency,
                     "extra_bonuses"=> [
