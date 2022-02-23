@@ -2032,7 +2032,7 @@ class GameLobby{
                                         ]);
                                         $iframe_data = json_decode((string) $response->getBody(), true);
                                         Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
-                                        if (isset($iframe_data['status']) && $iframe_data != 'ok' ) {
+                                        if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
                                             return "false";
                                         }
                                     } catch (\Exception $e) {
