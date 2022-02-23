@@ -344,6 +344,7 @@ class KAGamingController extends Controller
         $win_or_lost = 5; // 0 lost,  5 processing
         $payout_reason = 'settled';
         $rounds_remaining = isset($data->roundsRemaining) ? $data->roundsRemaining : 0;
+        $complete = isset($data->complete) ? $data->complete : false;
         
         // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
         // if($session_check == 'false'){
@@ -514,12 +515,12 @@ class KAGamingController extends Controller
                         $bet_amount = $existing_bet_details->bet_amount + $bet_amount;
                         $income = $bet_amount - $pay_amount; //$existing_bet_details->income;
                         if($pay_amount > 0){
-                            if($rounds_remaining == 0){
+                            if($rounds_remaining == 0 && $complete == true){
                                 $win_or_lost = 1;
                             }
                             $entry_id = 2;
                         }else{
-                            if($rounds_remaining == 0){
+                            if($rounds_remaining == 0 && $complete == true){
                                 $win_or_lost = 0;
                             }
                             $entry_id = 1;
@@ -675,6 +676,7 @@ class KAGamingController extends Controller
         $payout_reason = 'Credited Side Bets';
         $provider_trans_id = $data->transactionId;
         $game_code = $data->gameId;
+        $complete = isset($data->complete) ? $data->complete : false;
         // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
@@ -736,10 +738,16 @@ class KAGamingController extends Controller
 
         if($pay_amount > 0){
             $entry_id = 2; // Credit
-            $win_or_lost = 1; // 0 lost,  5 processing
+            $win_or_lost = 5; // 1 win,  5 processing
+            if($complete == true){
+                $win_or_lost = 1;
+            }
         }else{
             $entry_id = 1; // Debit
-            $win_or_lost = 0; // 0 lost,  5 processing
+            $win_or_lost = 5; // 0 lost,  5 processing
+            if($complete == true){
+                $win_or_lost = 0;
+            }
         }
 
         $game_transaction_type = 2; // 1 Bet, 2 Win
