@@ -206,4 +206,60 @@ class IDNPokerHelper{
         return $auth;
     }
 
+    public static function getRate($auth){
+        try {
+            $url = config('providerlinks.idnpoker.URL');
+            $client = new Client();
+            $guzzle_response = $client->post($url,[
+                'body' => '
+                        <request>
+                            <secret_key>'.$auth.'</secret_key>
+                            <id>9</id>
+                            <currency>JPY</currency>
+                        </request>'
+            ]
+            );
+            $details = $guzzle_response->getBody();
+            $json = json_encode(simplexml_load_string($details));
+            $currency_rate = json_decode($json,true);
+            if(isset($currency_rate["rate"])){
+                $rate = $currency_rate["rate"]; 
+                return $rate;
+            }
+            Helper::saveLog('IDNPOKER getRate', 110, json_encode($currency_rate),  "CHECK RESPONSE getRate" );
+            return "false";
+        } catch (\Exception $e) {
+            Helper::saveLog('IDNPOKER getRate', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getRate ERROR" );
+            return "false";
+        }
+    }
+
+    public static function getTransactionHistory($data,$auth){
+        try {
+            $url = config('providerlinks.idnpoker.URL');
+            $client = new Client();
+            $guzzle_response = $client->post($url,[
+                'body' => '
+                <request>
+                    <secret_key>'.$auth.'</secret_key>
+                    <id>15</id>
+                    <date>'.$data["date"].'</date>
+                    <start_time>'.$data["start_time"].'</start_time>
+                    <end_time>23:59</end_time>
+                </request>'
+            ]
+            );
+            $details = $guzzle_response->getBody();
+            $json = json_encode(simplexml_load_string($details));
+            $response = json_decode($json,true);
+            if(isset($response["numrow"]) && $response["numrow"] > 0 ){
+                return $response;
+            }
+            Helper::saveLog('IDNPOKER getTransactionHistory', 110, json_encode($response),  "CHECK RESPONSE getTransactionHistory" );
+            return "false";
+        } catch (\Exception $e) {
+            Helper::saveLog('IDNPOKER getTransactionHistory', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getTransactionHistory ERROR" );
+            return "false";
+        }
+    }
 }
