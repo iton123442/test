@@ -432,7 +432,7 @@ class TGGController extends Controller
 							}
 							//create transction 
 							$createFreeRoundTransaction = array(
-								"game_trans_id" => $bet_transaction->game_trans_id,
+								"game_trans_id" => $existing_bet->game_trans_id,
 								'freespin_id' => $getFreespin->freespin_id
 							);
 							FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
