@@ -97,7 +97,7 @@ class GameLobbyController extends Controller
     public function gameLaunchUrl(Request $request){
 
         // Save Every Gamelaunch from the client
-        ProviderHelper::saveLogWithExeption('GAMELAUNCH LOG', 12, json_encode($request->all()), 'GAME REQUEST BODY');
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH LOG', 12, json_encode($request->all()), 'GAME REQUEST BODY');
 
         // Demo Handler
         // Required Parameter game_code, game_provider
