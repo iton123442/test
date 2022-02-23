@@ -11,6 +11,7 @@ use App\Helpers\TransferWalletHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
 use Carbon\Carbon;
+use DB;
 use App\Models\GameTransactionMDB;
 
 class IDNPokerController extends Controller
@@ -615,4 +616,109 @@ class IDNPokerController extends Controller
         //     return response($msg, 200)->header('Content-Type', 'application/json');
         // }
     }
+
+    public static function getTransactionHistory(Request $request) {
+        Helper::saveLog('IDN TW getTransactionHistory', 110, json_encode($request->all()), 'getTransactionHistory');
+        $getTime = DB::select('SELECT DATE_FORMAT(SUBTIME(now(), "- 06:55:00"),"%m/%d/%Y")    as date ,DATE_FORMAT(SUBTIME(now(), "- 06:55:00"),"%H:%i") time');
+        $time = "00:00";  //$getTime[0]->getTime 
+        $date = $getTime[0]->date; //$getTime[0]->date
+        $data = [
+            "start_time" => $time,
+            "date" => $date,
+        ];
+        $key = config('providerlinks.idnpoker');
+        foreach ($key["keys"] as  $keyVal) {
+            $rate = IDNPokerHelper::getRate($keyVal); //TESTINGn); // check balance
+            $transactionList = IDNPokerHelper::getTransactionHistory($data,$keyVal);
+            if($transactionList != "false"){
+                foreach ($transactionList["row"] as  $value) {
+                    try {
+                        ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"]);
+                        if($value["status"] != "Withdraw" && $value["status"] != "Deposit") {
+                            $gameDetails = self::getSubGameDetails(config('providerlinks.idnpoker.PROVIDER_ID'), $value["game"]);
+                            $playerID = substr($value["userid"],4);
+                            $getClientDetails = ProviderHelper::getClientDetails("player_id", $playerID);
+                            if($getClientDetails != null){
+                                $pay_amount = 0;
+                                $bet_amount = 0;
+                                $win = 5;
+                                // $pay_amount =  ($value["status"] == "Lose"  || $value["status"] == "Fold") ? 0 :  $value["curr_amount"];
+                                if($value["status"] == "Lose" || $value["status"] == "Fold"){
+                                    $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
+                                    $pay_amount = 0;
+                                    $win = 0;
+                                } elseif ($value["status"] == "Win" || $value["status"] == "Draw" || $value["status"] == "Refund" ) {
+                                    // $bet_amount = ($value["r_bet"] / $rate);
+                                    $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
+                                    $pay_amount = $value["curr_amount"];
+                                    $win =  ($value["status"] == "Refund") ? 4 : 1;
+                                } elseif ($value["status"] == "Buy Jackpot" ) {
+                                    $bet_amount = $value["curr_amount"]; // already calculated from IDN system
+                                    $pay_amount = 0;
+                                    $win = 0;
+                                } elseif ($value["status"] == "Win Global Jackpot" ) {
+                                    $bet_amount = 0; // already calculated from IDN system
+                                    $pay_amount = $value["curr_amount"];
+                                    $win = 1;
+                                }
+                                $income = $bet_amount - $pay_amount;
+                                $entry = $pay_amount > 0 ? 2 : 1;
+                                // $date = $month."/".$date[1]."/".$date[2];
+                                $gameTransactionData = [
+                                    "token_id" => $getClientDetails->token_id,
+                                    "game_id" => $gameDetails->game_id,
+                                    "round_id" => $value["transaction_no"],
+                                    "bet_amount" => $bet_amount,
+                                    "provider_trans_id" => $value["transaction_no"],
+                                    "pay_amount" => $pay_amount,
+                                    "income" => $income,
+                                    "entry_id" => $entry,
+                                    "win" => $win,
+                                    "operator_id" => $getClientDetails->operator_id,
+                                    "client_id" => $getClientDetails->client_id,
+                                    "player_id" => $getClientDetails->player_id,
+                                ];
+                                $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $getClientDetails);
+                                $bet_game_transaction_ext = [
+                                    "game_trans_id" => $game_trans_id,
+                                    "provider_trans_id" => $value["transaction_no"],
+                                    "round_id" => $value["transaction_no"],
+                                    "amount" => $bet_amount,
+                                    "game_transaction_type" => 1,
+                                    "provider_request" => json_encode($value)
+                                ];
+                                GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $getClientDetails); 
+                                $win_game_transaction_ext = [
+                                    "game_trans_id" => $game_trans_id,
+                                    "provider_trans_id" => $value["transaction_no"],
+                                    "round_id" => $value["transaction_no"],
+                                    "amount" => $pay_amount,
+                                    "game_transaction_type" => 2,
+                                    "provider_request" => json_encode($value)
+                                ];
+                                GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $getClientDetails); 
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        echo "ALREADY INSERTED THE DATA". $e->getMessage();
+                        // return $e->getMessage();
+                    }
+                    sleep(2);
+                }
+            }
+
+            return 1;
+        }
+    }
+
+     /**
+	 * GLOBAL
+	 * @param $[sub_provider_id], $[game_code], 
+	 * 
+	 */
+	public static function getSubGameDetails($sub_provider_id, $game_code){
+		$query = DB::select('select * from games where sub_provider_id = "'.$sub_provider_id.'" and game_code = "'.$game_code.'"');
+		$game_details = count($query);
+		return $game_details > 0 ? $query[0] : false;
+	}
 }
