@@ -415,6 +415,7 @@ class TGGController extends Controller
 					if(isset($string_to_obj->extrabonus_bypass->promoCode)) {
 						$freeroundID = $string_to_obj->extrabonus_bypass->promoCode;
 						$getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+						Helper::saveLog('TGG FreeRound', $this->provider_db_id, json_encode($request),'FREEROUND HIT!');
 						if($getFreespin){
 							$getOrignalfreeroundID = explode("_",$freeroundID);
 							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original

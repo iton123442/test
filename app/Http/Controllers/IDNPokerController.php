@@ -514,11 +514,12 @@ class IDNPokerController extends Controller
                                 ];
                                 $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
                             } catch (\Exception $e) {
-                                $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
-                                $data["mw_response"] = json_encode($mw_response);
+                                // $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
+                                $msg = array("status" => "error", "message" => "Failed Request");
+                                $data["mw_response"] = json_encode($msg);
                                 $data["status_code"] = "406";
                                 TWHelpers::createTWPlayerAccountsRequestLogs($data);
-                                return $mw_response;
+                                return $msg;
                             }
                             $provider_response = IDNPokerHelper::withdraw($data_deposit, $auth_token);
                         }
