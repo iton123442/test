@@ -987,8 +987,8 @@ class FreeSpinHelper{
                         ],
                         "settings"=>[
                             "user_id"=> $player_details->client_player_id,
-                            "bypass" => [
-                                "promoCode" =>$freeround_id,
+                            "bypass"=> [
+                                "promoCode"=>$freeround_id,
                                 ],
                             "expire"=> $endtime
                         ]
@@ -1008,9 +1008,9 @@ class FreeSpinHelper{
                         ]
                     ],
                     "settings" => [
-                        "user_id" => $player_details->client_player_id,
-                        "bypass" => [
-                            "promoCode" =>$freeround_id,
+                        "user_id"=> $player_details->client_player_id,
+                        "bypass"=> [
+                            "promoCode"=>$freeround_id,
                             ],
                         "expire"=> $endtime
                     ]
@@ -1050,7 +1050,6 @@ class FreeSpinHelper{
                     ];
                     FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
                     return 200;
-                    Helper::saveLog('TGG Freespin Success', $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
                 }
         }
     }
