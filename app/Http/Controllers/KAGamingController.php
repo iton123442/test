@@ -775,10 +775,16 @@ class KAGamingController extends Controller
 
             if($pay_amount > 0){
                 $entry_id = 2; // Credit
-                $win_or_lost = 1; // 0 lost,  5 processing
+                $win_or_lost = 5; // 1 win,  5 processing
+                if($complete == true){
+                    $win_or_lost = 1;
+                }
             }else{
                 $entry_id = 1; // Debit
-                $win_or_lost = 0; // 0 lost,  5 processing
+                $win_or_lost = 5; // 0 lost,  5 processing
+                if($complete == true){
+                    $win_or_lost = 0;
+                }
             }
 
             $gameTransactionEXTData = array(
