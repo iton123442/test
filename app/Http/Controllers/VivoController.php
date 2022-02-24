@@ -138,7 +138,36 @@ class VivoController extends Controller
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
+				$getSideBetW = strpos($request->History, 'SIDE_BET');
+				if($getSideBetW != false){
+					sleep(0.5);
+					Helper::saveLog('Vivo Gaming BET getSideBetW', 34,json_encode($request->all()), 'HIT sideBetPpair process');
+					return $this->winProcess($request->all(),$client_details);
+				}
+				if(str_contains($request->History,'BLACKJACK:WIN;1')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;2')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;3')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;4')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;5')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;6')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;7')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}
 				return $this->winProcess($request->all(),$client_details);
+				
 			break;
 			case "CANCEL_BET":
 				return $this->cancelBet($request->all(),$client_details);
@@ -213,14 +242,13 @@ class VivoController extends Controller
 	            "token_id" => $client_details->token_id,
 	            "game_id" => $game_details->game_id,
 	            "round_id" => $data["roundId"],
-	            "bet_amount" => 0,
+	            "bet_amount" => $data["Amount"],
 	            "win" => 5,
 	            "pay_amount" => 0,
 	            "income" => 0,
 	            "entry_id" => 1,
 	        );
 	        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-	     	$amount = 0;
 		}catch(\Exception $e){
 			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 			if($bet_transaction == null){
@@ -228,7 +256,11 @@ class VivoController extends Controller
 				return $response;
 			}
 			$game_transaction_id = $bet_transaction->game_trans_id;
-			$amount = $bet_transaction->bet_amount;
+			$amount = $bet_transaction->bet_amount + $data["Amount"];
+			$updateGameTransaction = [
+            	"bet_amount" => $amount,
+	        ];
+	        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
 		}
 		$bet_game_transaction_ext = array(
 			"game_trans_id" => $game_transaction_id,
@@ -239,13 +271,12 @@ class VivoController extends Controller
 			"provider_request" => json_encode($data),
 			"general_details" => $data["History"],
 		);
-
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
-        $bet = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
-        $updateGameTransaction = [
-            "bet_amount" => $bet->amount,
-        ];
-        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+        // $bet = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
+        // $updateGameTransaction = [
+        //     "bet_amount" => $bet->amount,
+        // ];
+        // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
 
 		$fund_extra_data = [
             'provider_name' => $game_details->provider_name
@@ -333,7 +364,7 @@ class VivoController extends Controller
 			$update_game_transaction = array(
 	            "win" => 5,
 	            "pay_amount" => $bet_transaction->pay_amount + $data["Amount"],
-	            "income" => $bet_transaction->bet_amount - $data["Amount"],
+	            "income" => $bet_transaction->bet_amount - $bet_transaction->pay_amount,
 	            "entry_id" => $data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
 	        );
 	        GameTransactionMDB::updateGametransaction($update_game_transaction, $bet_transaction->game_trans_id, $client_details);
