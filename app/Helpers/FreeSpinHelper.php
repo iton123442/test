@@ -702,7 +702,7 @@ class FreeSpinHelper{
                 $requesttosend = [
                     "api_token" => config("providerlinks.boongo.API_TOKEN"),
                     "mode" => "REAL",
-                    "campaign" => "tigergames",
+                    "campaign" => $freeround_id,
                     "game_id" => $game_details->game_code,
                     "bonus_type" => $data["details"]["type"],
                     "currency" => $player_details->default_currency,
@@ -733,7 +733,7 @@ class FreeSpinHelper{
                 $requesttosend = [
                     "api_token" => config("providerlinks.boongo.API_TOKEN"),
                     "mode" => "REAL",
-                    "campaign" => "tigergames",
+                    "campaign" => $freeround_id,
                     "game_id" => $game_details->game_code,
                     "bonus_type" => $data["details"]["type"],
                     "currency" => $player_details->default_currency,
@@ -793,11 +793,7 @@ class FreeSpinHelper{
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         } else {
-            // $data = [
-            //     "provider_trans_id" => $prefix.$id,
-            //     "details" => json_encode($dataresponse)
-            // ];
-            // FreeSpinHelper::updateFreeRound($data, $id);
+            
             $freespinExtenstion = [
                 "freespin_id" => $id,
                 "mw_request" => json_encode($requesttosend),

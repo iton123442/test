@@ -244,7 +244,10 @@ class IDNPokerController extends Controller
                     ];
                     $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($data);
                     Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "FUNDSTRANSFER HIT");
-                    $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false);
+                    $fund_extra_data = [
+	                    'provider_name' => $game_details->provider_name
+	                ]; 
+                    $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false,$fund_extra_data);
                     Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($clientFunds_response), "FUNDSTRANSFER RESPONSE");
                     if (isset($clientFunds_response->fundtransferresponse->status->code)) {
                         $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
@@ -324,7 +327,10 @@ class IDNPokerController extends Controller
                                  * -----------------------------------------------
                                  */   
                                 Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "ROLLBACK HIT");
-                                $clientFundsRollback_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", true);
+                                $fund_extra_data = [
+                                    'provider_name' => $game_details->provider_name
+                                ]; 
+                                $clientFundsRollback_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", true,$fund_extra_data);
                                 if (isset($clientFundsRollback_response->fundtransferresponse->status->code)) {
                                     switch ($clientFundsRollback_response->fundtransferresponse->status->code) {
                                         case "200":
@@ -514,11 +520,12 @@ class IDNPokerController extends Controller
                                 ];
                                 $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
                             } catch (\Exception $e) {
-                                $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
-                                $data["mw_response"] = json_encode($mw_response);
+                                // $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
+                                $msg = array("status" => "error", "message" => "Failed Request");
+                                $data["mw_response"] = json_encode($msg);
                                 $data["status_code"] = "406";
                                 TWHelpers::createTWPlayerAccountsRequestLogs($data);
-                                return $mw_response;
+                                return $msg;
                             }
                             $provider_response = IDNPokerHelper::withdraw($data_deposit, $auth_token);
                         }
@@ -548,7 +555,10 @@ class IDNPokerController extends Controller
                                     "tw_account_id" => $game_trans_id,
                                 ];
                                 $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($log_data);
-                                $clientFundsCredit_response = ClientRequestHelper::fundTransfer($client_details, $amount_to_withdraw, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", false);
+                                $fund_extra_data = [
+                                    'provider_name' => $game_details->provider_name
+                                ]; 
+                                $clientFundsCredit_response = ClientRequestHelper::fundTransfer($client_details, $amount_to_withdraw, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", false,$fund_extra_data);
                                 Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($clientFundsCredit_response), "clientFundsCredit_response");
                                 if (isset($clientFundsCredit_response->fundtransferresponse->status->code)) {
                                     switch ($clientFundsCredit_response->fundtransferresponse->status->code) {
