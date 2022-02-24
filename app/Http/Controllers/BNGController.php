@@ -348,11 +348,11 @@ class BNGController extends Controller
             if($getFreespin){
                 $getOrignalfreeroundID = explode("_",$campaignId);
                 $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
-                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                $status = 2;
                 $updateFreespinData = [
                     "status" => $status,
                     "win" => $getFreespin->win + $data["args"]["win"],
-                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                    "spin_remaining" => $getFreespin->spin_remaining - $getFreespin->spin_remaining
                 ];
                 $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
                 if($status == 2 ){
