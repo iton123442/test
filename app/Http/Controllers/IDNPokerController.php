@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\TransferStats;
 use Illuminate\Http\Request;
 use App\Helpers\ProviderHelper;
-use App\Helpers\KAHelper;
 use App\Helpers\IDNPokerHelper;
 use App\Helpers\Helper;
-use App\Helpers\TransferWalletHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Http\Controllers\TransferWalletAggregator\TWHelpers;
-use Carbon\Carbon;
 use DB;
 use App\Models\GameTransactionMDB;
 use Webpatser\Uuid\Uuid;
@@ -42,7 +37,7 @@ class IDNPokerController extends Controller
         }
 
         try {
-            $client_response = KAHelper::playerDetailsCall($client_details);
+            $client_response = Providerhelper::playerDetailsCall($client_details->player_token);
             if ($client_response != "false") {
                 $balance = round($client_response->playerdetailsresponse->balance, 2);
                 $msg = array(
@@ -85,7 +80,7 @@ class IDNPokerController extends Controller
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
-        $game_details = TransferWalletHelper::getInfoPlayerGameRound($request->token);
+        $game_details = Helper::getInfoPlayerGameRound($request->token);
         if ($game_details == false) {
             $msg = array("status" => "error", "message" => "Game Not Found");
             Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
@@ -171,7 +166,7 @@ class IDNPokerController extends Controller
          *  GET GAME DETAILS
          * -----------------------------------------------
          */    
-        $game_details = TransferWalletHelper::getInfoPlayerGameRound($request->token);
+        $game_details = Helper::getInfoPlayerGameRound($request->token);
        
         if($game_details != "false") {
             /**
@@ -500,10 +495,10 @@ class IDNPokerController extends Controller
          * -----------------------------------------------
          */  
           
-        $game_details = TransferWalletHelper::getInfoPlayerGameRound($request->token);
+        $game_details = Helper::getInfoPlayerGameRound($request->token);
         if ($game_details != "false") {
             // ======================
-            $client_response = KAHelper::playerDetailsCall($client_details);
+            $client_response = Providerhelper::playerDetailsCall($client_details->player_token);
             Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $client_response);
             if($client_response != "false"){
                 if(isset($client_response->playerdetailsresponse->status->code) && $client_response->playerdetailsresponse->status->code == 200){
