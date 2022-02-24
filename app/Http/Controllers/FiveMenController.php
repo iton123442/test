@@ -26,12 +26,43 @@ class FiveMenController extends Controller
 	
 	// public $provider_db_id = 29; // 29 on test ,, 27 prod
 	public $provider_db_id = 53; 
+	public static function getSignaturess(array $args,$system_key){
+		$md5=array();
+		foreach($args as $required_arg)
+		{
+			$arg=$required_arg;
+			if(is_array($arg))
+			{
+				if(count($arg)){
+						$recursive_arg='';
+					array_walk_recursive($arg,function($item)use(&$recursive_arg)
+					{
+						if(!is_array($item))
+						{
+						$recursive_arg.=($item.':');
+						}
+					});
+						$md5[]=substr($recursive_arg,0,strlen($recursive_arg)-1); 
+				}else{
+					$md5[]='';
+				}
+			}else{
+				$md5[]=$arg;
+
+			};
+		};
+			$md5[]=$system_key;
+			$md5_str=implode('*',$md5);
+			$md5=md5($md5_str);
+			return$md5;
+	}
+
 
 	public function index(Request $request){
-		Helper::saveLog('5Men index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+		// Helper::saveLog('5Men index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
 
-		$signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'check_signature');
-		
+		$signature_checker = $this->getSignaturess($request->all(), $this->api_key);
+		dd($signature_checker);
 		if($signature_checker == 'false'):
 			$msg = array(
 						"status" => 'error',
@@ -348,7 +379,7 @@ public function gameBet($request, $client_details)
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		if (isset($string_to_obj->game->action)) {
 
-			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double') {
+			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double' || $string_to_obj->game->action == 'extrabonusspin') {
 				if ($existing_bet != 'false') {
 					$client_details->connection_name = $existing_bet->connection_name;
 					$amount = $request['data']['amount'];
@@ -403,6 +434,34 @@ public function gameBet($request, $client_details)
 			            "game_transaction_id" => $existing_bet->game_trans_id
 
 			        ];
+
+					if(isset($string_to_obj->extrabonus_bypass->promoCode)) {
+						$freeroundID = $string_to_obj->extrabonus_bypass->promoCode;
+						$getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+						Helper::saveLog('5Men FreeRound', $this->provider_db_id, json_encode($request),'FREEROUND HIT!');
+						if($getFreespin){
+							$getOrignalfreeroundID = explode("_",$freeroundID);
+							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+							$updateFreespinData = [
+								"status" => $status,
+								"win" => $getFreespin->win + $amount,
+								"spin_remaining" => $getFreespin->spin_remaining - 1
+							];
+							$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+							if($status == 2 ){
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+							} else {
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+							}
+							//create transction 
+							$createFreeRoundTransaction = array(
+								"game_trans_id" => $existing_bet->game_trans_id,
+								'freespin_id' => $getFreespin->freespin_id
+							);
+							FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+						}
+					}
 
 			        try {
 						$client = new Client();
