@@ -138,6 +138,12 @@ class VivoController extends Controller
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
+				$getSideBetW = strpos($request->History, 'SIDE_BET');
+				if($getSideBetW){
+					sleep(0.5);
+					Helper::saveLog('Vivo Gaming BET getSideBetW', 34,json_encode($request->all()), 'HIT sideBetPpair process');
+					return $this->winProcess($request->all(),$client_details);
+				}
 				return $this->winProcess($request->all(),$client_details);
 			break;
 			case "CANCEL_BET":
