@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
+use App\Helpers\FreeSpinHelper;
 use Carbon\Carbon;
 use DB;
 
