@@ -346,7 +346,7 @@ class BNGController extends Controller
             $campaignId = $data['args']['bonus']['campaign'];
             $getFreespin = FreeSpinHelper::getFreeSpinDetails($campaignId, "provider_trans_id" );
             if($getFreespin){
-                $getOrignalfreeroundID = explode("_",$freeroundID);
+                $getOrignalfreeroundID = explode("_",$campaignId);
                 $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
                 $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
                 $updateFreespinData = [
