@@ -351,8 +351,8 @@ class BNGController extends Controller
                 $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
                 $updateFreespinData = [
                     "status" => $status,
-                    "win" => $getFreespin->win + $amount,
-                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                    "win" => $getFreespin->win + $data["args"]["win"],
+                    "spin_remaining" => $getFreespin->spin_remaining - $getFreespin->spin_remaining
                 ];
                 $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
                 if($status == 2 ){
