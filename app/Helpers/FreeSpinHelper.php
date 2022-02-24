@@ -1053,5 +1053,119 @@ class FreeSpinHelper{
                 }
         }
     }
+
+    public static function createFreeRound5Men($player_details,$data, $sub_provder_id,$freeround_id){
+        Helper::saveLog('5Men Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
+        if($game_details){
+            try{
+                //freeSpin type
+                if($data["details"]["type"] == "bonus_spins") {
+                    $insertFreespin = [
+                        "player_id" => $player_details->player_id,
+                        "game_id" => $game_details->game_id,
+                        "total_spin" => $data["details"]["rounds"],
+                        "spin_remaining" => $data["details"]["rounds"],
+                        "denominations" => $data["details"]["denomination"],
+                        "date_expire" => $data["details"]["expiration_date"],
+                        "provider_trans_id" => $freeround_id,
+                    ];
+                } else {
+                    $insertFreespin = [
+                        "player_id" => $player_details->player_id,
+                        "game_id" => $game_details->game_id,
+                        "denominations" => $data["details"]["denomination"],
+                        "date_expire" => $data["details"]["expiration_date"],
+                        "provider_trans_id" => $freeround_id,
+                    ];
+                }
+                }catch(\Exception $e){
+                    return 400;
+                }
+                $id = FreeSpinHelper::createFreeRound($insertFreespin);
+                $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
+                $client_player_details = ProviderHelper::getClientDetails('player_id',  $player_details->player_id);
+                $details= ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);
+                $preRequestBody = [
+                        "project"=> config("providerlinks.5men.project_id"),
+                        "version"=> 1,
+                        "token"=>  $client_player_details->player_token,
+                        "game"=> $game_details->game_code,
+                        "currency"=> $player_details->default_currency,
+                        "extra_bonuses"=> [
+                            "bonus_spins"=> [  
+                                "spins_count"=> $data["details"]["rounds"],
+                                "bet_in_money"=> $data["details"]["denomination"],
+                            ],
+                        ],
+                        "settings"=>[
+                            "user_id"=> $player_details->client_player_id,
+                            "bypass"=> [
+                                "promoCode"=>$freeround_id,
+                                ],
+                            "expire"=> $endtime
+                        ]
+                ];
+                $signature = TGGHelper::getSignaturess($preRequestBody,config("providerlinks.5men.api_key"));
+                $requestBody = [
+                    "project"=> config("providerlinks.5men.project_id"),
+                    "signature"=> $signature,
+                    "version"=> 1,
+                    "token"=> $client_player_details->player_token,
+                    "game"=> $game_details->game_code,
+                    "currency"=> $player_details->default_currency,
+                    "extra_bonuses"=> [
+                        "bonus_spins"=> [  
+                            "spins_count"=> $data["details"]["rounds"],
+                            "bet_in_money"=> $data["details"]["denomination"],
+                        ]
+                    ],
+                    "settings" => [
+                        "user_id"=> $player_details->client_player_id,
+                        "bypass"=> [
+                            "promoCode"=>$freeround_id,
+                            ],
+                        "expire"=> $endtime
+                    ]
+                ];
+                
+
+                $client = new Client(['headers' => [ 
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ]
+                ]);
+                $response = $client->post(config("providerlinks.5men.api_freeRound"),[
+                    'form_params' => $requestBody,
+                ]);
+                $dataresponse = json_decode($response->getBody(),TRUE);
+                if(isset($dataresponse->error)){
+                    $createFreeround = [
+                        "status" => 3,
+                    ];
+                    FreeSpinHelper::updateFreeRound($createFreeround, $id);
+                    $freespinExtenstion = [
+                        "freespin_id" => $id,
+                        "mw_request" => json_encode($requestBody),
+                        "provider_response" => json_encode($dataresponse),
+                        "client_request" => json_encode($data),
+                        "mw_response" => "400"
+                    ];
+                    FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+                    return 400;
+                }
+                else {
+                    $freespinExtenstion = [
+                        "freespin_id" => $id,
+                        "mw_request" => json_encode($requestBody),
+                        "provider_response" => json_encode($dataresponse),
+                        "client_request" => json_encode($data),
+                        "mw_response" => "200"
+                    ];
+                    FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+                    return 200;
+                }
+        }
+    }
+    
 }
 ?>

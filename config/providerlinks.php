@@ -285,6 +285,7 @@ return [
         'api_url' => 'http://api.flexcontentprovider.com',
         'project_id' => '1471',
         'api_key' => '4516cf2200fec6953f8bce3547c3a6cc',
+        'api_freeRound' => 'http://api.flexcontentprovider.com/game/registerBonus',
         'provider_id' => 53,
     ],
     'bgaming' => [
