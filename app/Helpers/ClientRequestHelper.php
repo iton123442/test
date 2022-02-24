@@ -886,5 +886,50 @@ class ClientRequestHelper{
             }
     
     }
+
+    /**
+    *   @author 
+    */
+    public static function CheckerTransactionRequest($client_details,$transactionDetails){
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer '.$client_details->client_access_token
+            ]
+        ]);
+        $datatosend = [
+            "access_token" => $client_details->client_access_token,
+            "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+            "player_username"=>$client_details->username,
+            "client_player_id" => $client_details->client_player_id,
+            "transactionId" => $transactionDetails["game_trans_ext_id"],
+            "roundId" => $transactionDetails["game_trans_id"]
+        ];
+        $is_success = 1;
+        $is_true = false;
+        do {
+            try{  
+                $guzzle_response = $client->post($client_details->transaction_checker_url,
+                    [
+                        'body' => json_encode($datatosend),
+                        'timeout' => '2.00'
+                    ]
+                );
+                $client_checker_response = json_decode($guzzle_response->getBody()->getContents());
+                if (isset($client_checker_response->code)) {
+                    $is_success = 2;
+                    if ($client_checker_response->code == '200' || $client_checker_response->code == '403') {
+                        $is_true = true;
+                    } 
+                    Helper::saveLog('checker_success',$is_success ,json_encode($datatosend), $client_checker_response);
+                }
+                $is_success++;
+            }catch (\Exception $e){
+                $is_success++;
+                Helper::saveLog('checker_success', $is_success  ,json_encode($datatosend), 'ENDPOINT HIT');
+            } 
+        } while ($is_success < 3);
+        return $is_true;
+    }
     
 }
