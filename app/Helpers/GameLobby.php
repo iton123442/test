@@ -1980,6 +1980,7 @@ class GameLobby{
     }
     public static function IDNPoker($request){
         Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "HIT" );
+        Helper::savePLayerGameRound($request["game_code"],$request['token'], $request["game_provider"]);
         try {
             $client_details = ProviderHelper::getClientDetails('token',$request['token']);
             $key = "LUGTPyr6u8sRjCfh";
