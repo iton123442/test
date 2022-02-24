@@ -26,43 +26,12 @@ class FiveMenController extends Controller
 	
 	// public $provider_db_id = 29; // 29 on test ,, 27 prod
 	public $provider_db_id = 53; 
-	public static function getSignaturess(array $args,$system_key){
-		$md5=array();
-		foreach($args as $required_arg)
-		{
-			$arg=$required_arg;
-			if(is_array($arg))
-			{
-				if(count($arg)){
-						$recursive_arg='';
-					array_walk_recursive($arg,function($item)use(&$recursive_arg)
-					{
-						if(!is_array($item))
-						{
-						$recursive_arg.=($item.':');
-						}
-					});
-						$md5[]=substr($recursive_arg,0,strlen($recursive_arg)-1); 
-				}else{
-					$md5[]='';
-				}
-			}else{
-				$md5[]=$arg;
-
-			};
-		};
-			$md5[]=$system_key;
-			$md5_str=implode('*',$md5);
-			$md5=md5($md5_str);
-			return$md5;
-	}
 
 
 	public function index(Request $request){
-		// Helper::saveLog('5Men index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+		Helper::saveLog('5Men index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
 
 		$signature_checker = $this->getSignaturess($request->all(), $this->api_key);
-		dd($signature_checker);
 		if($signature_checker == 'false'):
 			$msg = array(
 						"status" => 'error',
