@@ -219,7 +219,7 @@ class VivoController extends Controller
 	            "token_id" => $client_details->token_id,
 	            "game_id" => $game_details->game_id,
 	            "round_id" => $data["roundId"],
-	            "bet_amount" => $request->Amount,
+	            "bet_amount" => $data["Amount"],
 	            "win" => 5,
 	            "pay_amount" => 0,
 	            "income" => 0,
@@ -233,7 +233,7 @@ class VivoController extends Controller
 				return $response;
 			}
 			$game_transaction_id = $bet_transaction->game_trans_id;
-			$amount = $bet_transaction->bet_amount + $request->Amount;
+			$amount = $bet_transaction->bet_amount + $data["Amount"];
 			$updateGameTransaction = [
             	"bet_amount" => $amount,
 	        ];
