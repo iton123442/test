@@ -31,7 +31,7 @@ class FiveMenController extends Controller
 	public function index(Request $request){
 		Helper::saveLog('5Men index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
 
-		$signature_checker = $this->getSignaturess($request->all(), $this->api_key);
+		$signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->api_key,'check_signature');
 		if($signature_checker == 'false'):
 			$msg = array(
 						"status" => 'error',
