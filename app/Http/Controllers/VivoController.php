@@ -139,12 +139,36 @@ class VivoController extends Controller
 			break;
 			case "WIN":
 				$getSideBetW = strpos($request->History, 'SIDE_BET');
+				$getSideBetW = strpos($request->History, 'BLACKJACK:WIN;');
 				if($getSideBetW){
 					sleep(0.5);
 					Helper::saveLog('Vivo Gaming BET getSideBetW', 34,json_encode($request->all()), 'HIT sideBetPpair process');
 					return $this->winProcess($request->all(),$client_details);
 				}
+				if(str_contains($request->History,'BLACKJACK:WIN;1')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;2')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;3')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;4')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;5')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;6')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}elseif(str_contains($request->History,'BLACKJACK:WIN;7')){
+					sleep(0.5);
+					return $this->winProcess($request->all(),$client_details);
+				}
 				return $this->winProcess($request->all(),$client_details);
+				
 			break;
 			case "CANCEL_BET":
 				return $this->cancelBet($request->all(),$client_details);
