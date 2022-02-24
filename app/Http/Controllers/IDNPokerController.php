@@ -17,14 +17,14 @@ class IDNPokerController extends Controller
 
     public function __construct(){
         // $this->middleware('oauth', ['except' => []]);
-        $this->provider_db_id = 110;
+        $this->provider_db_id = config('providerlinks.idnpoker.PROVIDER_ID');
     }
 
     public static function getPlayerBalance(Request $request) {
-        Helper::saveLog('IDN TW GetPlayerBalance', 110, json_encode($request->all()), 'HIT');
+        Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), 'HIT');
         if (!$request->has("token")) {
             $msg = array("status" => "error", "message" => "Token Invalid");
-            Helper::saveLog('IDN TW GetPlayerBalance', 110, json_encode($request->all()), $msg);
+            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
@@ -32,7 +32,7 @@ class IDNPokerController extends Controller
         
         if ($client_details == null || $client_details == 'false') {
             $msg = array("status" => "error", "message" => "Token Invalid");
-            Helper::saveLog('IDN TW GetPlayerBalance', 110, json_encode($request->all()), $msg);
+            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
@@ -46,7 +46,7 @@ class IDNPokerController extends Controller
                     "balance" => $balance
                 );
 
-                Helper::saveLog('IDN TW GetPlayerBalance', 110, json_encode($request->all()), $msg);
+                Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
                 return response($msg, 200)->header('Content-Type', 'application/json');
             } 
 
@@ -55,7 +55,7 @@ class IDNPokerController extends Controller
                 "message" => "Player Not found",
                 "balance" => "0.00"
             );
-            Helper::saveLog('IDN TW GetPlayerBalance', 110, json_encode($request->all()), $msg);
+            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
             
         } catch (\Exception $e) {
@@ -64,7 +64,7 @@ class IDNPokerController extends Controller
                 "message" => $e->getMessage(),
                 "balance" => 0.00
             );
-            Helper::saveLog('IDN TW GetPlayerBalance', 110, json_encode($request->all()), $msg);
+            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
     }
@@ -710,7 +710,7 @@ class IDNPokerController extends Controller
     }
 
     public static function getTransactionHistory(Request $request) {
-        Helper::saveLog('IDN TW getTransactionHistory', 110, json_encode($request->all()), 'getTransactionHistory');
+        Helper::saveLog('IDN TW getTransactionHistory', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), 'getTransactionHistory');
         $getTime = DB::select('SELECT DATE_FORMAT(SUBTIME(now(), "- 06:55:00"),"%m/%d/%Y")    as date ,DATE_FORMAT(SUBTIME(now(), "- 06:55:00"),"%H:%i") time');
         $time = "00:00";  //$getTime[0]->getTime 
         $date = $getTime[0]->date; //$getTime[0]->date
