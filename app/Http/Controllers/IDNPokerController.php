@@ -766,9 +766,6 @@ class IDNPokerController extends Controller
                                     "income" => $income,
                                     "entry_id" => $entry,
                                     "win" => $win,
-                                    "operator_id" => $getClientDetails->operator_id,
-                                    "client_id" => $getClientDetails->client_id,
-                                    "player_id" => $getClientDetails->player_id,
                                 ];
                                 $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $getClientDetails);
                                 $bet_game_transaction_ext = [
