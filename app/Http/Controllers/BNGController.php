@@ -380,7 +380,29 @@ class BNGController extends Controller
             $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
             if($data["args"]["bonus"] != null){
-                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+                $campaignId = $data['args']['bonus']['campaign'];
+                $getFreespin = FreeSpinHelper::getFreeSpinDetails($campaignId, "provider_trans_id" );
+                if($getFreespin){
+                    $getOrignalfreeroundID = explode("_",$freeroundID);
+                    $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
+                    $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                    $updateFreespinData = [
+                        "status" => $status,
+                        "win" => $getFreespin->win + $amount,
+                        "spin_remaining" => $getFreespin->spin_remaining - 1
+                    ];
+                    $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                    if($status == 2 ){
+                        $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                    } else {
+                        $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                    }
+                    $createFreeRoundTransaction = array(
+                        "game_trans_id" => $game_transactionid,
+                        'freespin_id' => $getFreespin->freespin_id
+                    );
+                    FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                }
             }
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
