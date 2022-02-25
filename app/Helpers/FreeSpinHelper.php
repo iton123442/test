@@ -973,7 +973,6 @@ class FreeSpinHelper{
                 FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
 
                  return 200;
-                 dump($game_link_response);
             }catch (\Exception $e) {
                 $dataresponse = [
                     "error" => json_encode($e)
