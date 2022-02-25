@@ -456,8 +456,8 @@ class PGSoftController extends Controller
         try {
 
            
-            $player_id =  ProviderHelper::explodeUsername('_', $data["player_name"]);
-            $client_details = ProviderHelper::getClientDetails('player_id',$player_id);
+            // $player_id =  ProviderHelper::explodeUsername('_', $data["player_name"]);
+            // $client_details = ProviderHelper::getClientDetails('player_id',$player_id);
             $game_details = $this->findGameCode('game_code', $this->provider_db_id, $data['game_id']);
 
             // $bet_transaction = $this->findGameTransaction($data['parent_bet_id'], 'round_id');
@@ -636,7 +636,7 @@ class PGSoftController extends Controller
                                         "round_id" => $reference_transaction_uuid,
                                         "amount" => $amount
                                     ],
-                                    "connection_name" => $bet_transaction->connection_name,
+                                    "connection_name" => $client_details->connection_name,
                                     "provider_request" => $provider_request,
                                     "provider_response" => $response,
                                     "game_trans_ext_id" => $game_trans_ext_id,
@@ -760,7 +760,7 @@ class PGSoftController extends Controller
                         "round_id" => $reference_transaction_uuid,
                         "amount" => $amount
                     ],
-                    "connection_name" => $bet_transaction->connection_name,
+                    "connection_name" => $client_details->connection_name,
                     "provider_request" => $provider_request,
                     "provider_response" => $response,
                     "game_trans_ext_id" => $game_trans_ext_id,
