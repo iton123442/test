@@ -21,13 +21,13 @@ class QuickspinDirectController extends Controller
         if($client_details->country_code != null){
             $countryCode = $client_details->country_code;
         }else{
-            $countryCode = "PH";
+            $countryCode = "JP";
         }
         $formatBal = $balance = str_replace(".","", $client_details->balance);
         if($client_details != null){
             $res = [
                 "customerid" => $client_details->player_id,
-                "countrycode" => "PH",
+                "countrycode" => $countryCode,
                 "cashiertoken" => $client_details->player_token,
                 "customercurrency" => $client_details->default_currency,
                 "balance" => (int)$formatBal,
