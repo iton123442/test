@@ -123,6 +123,7 @@ class VivoController extends Controller
 		}
 		$getSideBet = strpos($request->History, 'sideBet21');
 		$getSideBetPair = strpos($request->History, 'sideBetPpair');
+		$getSideBetW = strpos($request->History, 'SIDE_BET');
 		switch ($request->TrnType){
 			case "BET":
 				if($getSideBet != false){
@@ -138,34 +139,33 @@ class VivoController extends Controller
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
-				$getSideBetW = strpos($request->History, 'SIDE_BET');
 				if($getSideBetW != false){
 					sleep(0.5);
 					Helper::saveLog('Vivo Gaming BET getSideBetW', 34,json_encode($request->all()), 'HIT sideBetPpair process');
 					return $this->winProcess($request->all(),$client_details);
 				}
-				if(str_contains($request->History,'BLACKJACK:WIN;1')){
-					sleep(0.5);
-					return $this->winProcess($request->all(),$client_details);
-				}elseif(str_contains($request->History,'BLACKJACK:WIN;2')){
-					sleep(0.5);
-					return $this->winProcess($request->all(),$client_details);
-				}elseif(str_contains($request->History,'BLACKJACK:WIN;3')){
-					sleep(0.5);
-					return $this->winProcess($request->all(),$client_details);
-				}elseif(str_contains($request->History,'BLACKJACK:WIN;4')){
-					sleep(0.5);
-					return $this->winProcess($request->all(),$client_details);
-				}elseif(str_contains($request->History,'BLACKJACK:WIN;5')){
-					sleep(0.5);
-					return $this->winProcess($request->all(),$client_details);
-				}elseif(str_contains($request->History,'BLACKJACK:WIN;6')){
-					sleep(0.5);
-					return $this->winProcess($request->all(),$client_details);
-				}elseif(str_contains($request->History,'BLACKJACK:WIN;7')){
-					sleep(0.5);
-					return $this->winProcess($request->all(),$client_details);
-				}
+				// if(str_contains($request->History,'BLACKJACK:WIN;1')){
+				// 	sleep(0.5);
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }elseif(str_contains($request->History,'BLACKJACK:WIN;2')){
+				// 	sleep(0.7);
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }elseif(str_contains($request->History,'BLACKJACK:WIN;3')){
+				// 	sleep(0.8);
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }elseif(str_contains($request->History,'BLACKJACK:WIN;4')){
+				// 	sleep(1);
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }elseif(str_contains($request->History,'BLACKJACK:WIN;5')){
+				// 	sleep(0.2);
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }elseif(str_contains($request->History,'BLACKJACK:WIN;6')){
+				// 	sleep(0.4);
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }elseif(str_contains($request->History,'BLACKJACK:WIN;7')){
+				// 	sleep(0.1);
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }
 				return $this->winProcess($request->all(),$client_details);
 				
 			break;
