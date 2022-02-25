@@ -96,7 +96,7 @@ class FreeSpinHelper{
             }
 
         }
-        $getFreeRound = DB::select('select freespin_id,game_id,spin_remaining, status, win, provider_trans_id from freespin ' . $where);
+        $getFreeRound = DB::select('select freespin_id,player_id,game_id,spin_remaining, status, win, provider_trans_id from freespin ' . $where);
         $data_rows = count($getFreeRound);
 		return $data_rows > 0? $getFreeRound[0] : false;
 
@@ -937,7 +937,56 @@ class FreeSpinHelper{
             return 400;
         }
     }
+
+    public static function cancelFreeRoundWazdan($freeround_id){
+        Helper::saveLog('Wazdan CancelFreeRound',57, json_encode($freeround_id), 'Cancel FreeRound HIT!');
+        
+         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+         if(isset($getFreespin)) {
+            $baseUrl = "https://service-stage.wazdanep.com/forfeit/";
+            $datatosend = [
+                "playerId"=> $getFreespin->player_id,
+                "txId"=> $freeround_id,
+                "operator"=> config("providerlinks.wazdan.operator"),
+                "license"=>config("providerlinks.wazdan.license")
+            ];
+            $api_key = WazdanHelper::generateSignature($datatosend);
+            $client = new Client(['headers' => [ 
+                'Content-Type' => 'application/json',
+                'Signature' => $api_key["hmac"]
+                ]
+            ]);
+            try{
+                $game_link_response = $client->post($baseUrl,['body' => json_encode($datatosend)]);
+                $dataresponse = json_decode($game_link_response->getBody()->getContents());
+                $data = [
+                    "status" => 4,
+                ];
+                Helper::saveLog('Wazdan freespin Success', 57, json_encode($data), json_encode($dataresponse));
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+
+                 return 200;
+                 dump($game_link_response);
+            }catch (\Exception $e) {
+                $dataresponse = [
+                    "error" => json_encode($e)
+                ];
+                $data = [
+                    "status" => 0,
+                    // "details" => json_encode($dataresponse)
+                ];
+
+                Helper::saveLog('Wazdan freespin error', 57, json_encode($data), json_encode($dataresponse));
+
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            
+                return 400;
+            }
     
+         }
+        
+    }
+
     public static function createFreeRoundTGG($player_details,$data, $sub_provder_id,$freeround_id){
         Helper::saveLog('TGG Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
