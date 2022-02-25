@@ -9,6 +9,7 @@ use App\Helpers\WazdanHelper;
 use App\Helpers\TGGHelper;
 use SimpleXMLElement;
 use Webpatser\Uuid\Uuid;
+use App\Helpers\ClientRequestHelper;
 use DB;
 class FreeSpinHelper{
 
@@ -96,7 +97,7 @@ class FreeSpinHelper{
             }
 
         }
-        $getFreeRound = DB::select('select freespin_id,player_id,game_id,spin_remaining, status, win, provider_trans_id from freespin ' . $where);
+        $getFreeRound = DB::select('select freespin_id,player_id,game_id,spin_remaining, status, win,details,provider_trans_id from freespin ' . $where);
         $data_rows = count($getFreeRound);
 		return $data_rows > 0? $getFreeRound[0] : false;
 
@@ -810,8 +811,26 @@ class FreeSpinHelper{
         Helper::saveLog('BNG freespin response', 44, json_encode($data), json_encode($dataresponse));
     }  
     public static function cancelFreeRoundBNG($freeround_id){
-        dd($freeround_id);
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+        // dd($client_details);
+        $requesttosend = [
+            "api_token" => config("providerlinks.boongo.API_TOKEN"),
+            "bonus_id" => json_decode($getFreespin->details)
+        ];
+        $api_url = config("providerlinks.boongo.PLATFORM_SERVER_URL")."tigergames-stage/api/v1/bonus/delete";
+        $client = new Client();
+        try {
+            $response = $client->post($api_url,['body' => json_encode($requesttosend)]);
+            $dataresponse = json_decode($response->getBody()->getContents());
+            $data = [
+                    "status" => 4,
+            ];
+            FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            dd($dataresponse);
+            return 200;
+        } catch (\Exception $e) {
+            return 400;
+        }
     } 
     public static function createFreeRoundWazdan($player_details,$data, $sub_provder_id,$freeround_id){
         Helper::saveLog('freeSpin(Wazdan)'. $sub_provder_id, 33,json_encode($freeround_id), 'HIT');//savelog
