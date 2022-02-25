@@ -275,11 +275,13 @@ class TWHelpers {
         `p`.`email`,
         `p`.`player_id`,
         `tw`.`balance`,
-        `tw`.`tw_player_bal_id`
+        `tw`.`tw_player_bal_id`,
+        `op`.`status_id`
         from (select player_id from player_session_tokens pst '.$where.' '.$filter.') pst 
         inner join players as p using(player_id) 
         inner join tw_player_balance as tw using(player_id)
-        inner join clients as c using (client_id)');
+        inner join clients as c using (client_id)
+        inner join operator as op using (operator_id)');
         $client_details = count($query);
         // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
         return $client_details > 0 ? $query[0] : null;

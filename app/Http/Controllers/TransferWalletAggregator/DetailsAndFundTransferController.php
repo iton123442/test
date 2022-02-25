@@ -89,7 +89,7 @@ class DetailsAndFundTransferController extends Controller
             $details = TWHelpers::getPlayerSessionDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
             if($details){
                 $player_balance = TWHelpers::getPlayerBalanceUsingTwID($details->tw_player_bal_id);
-                if ( $player_balance->status_id == 0) {
+                if ( $details->status_id == 0) {
                     $response = array(
                         "fundtransferresponse" => array(
                             "status" => array(
