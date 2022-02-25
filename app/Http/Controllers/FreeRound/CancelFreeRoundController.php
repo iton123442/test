@@ -63,7 +63,9 @@ class CancelFreeRoundController extends Controller
                         // return FreeSpinHelper::createFreeRoundSlotmill($player_details, $data, $sub_provder_id,$freeround_id);// 200
                         return 200;
                     } elseif($game_details->sub_provider_id == 57) {
-                   return FreeSpinHelper::cancelFreeRoundWazdan($freeround_id);
+                        return FreeSpinHelper::cancelFreeRoundWazdan($freeround_id);
+                    } elseif($game_details->sub_provider_id == 44) {
+                        return FreeSpinHelper::cancelFreeRoundBNG($freeround_id);
                     }
                 }
             }
