@@ -275,11 +275,13 @@ class TWHelpers {
         `p`.`email`,
         `p`.`player_id`,
         `tw`.`balance`,
-        `tw`.`tw_player_bal_id`
+        `tw`.`tw_player_bal_id`,
+        `op`.`status_id`
         from (select player_id from player_session_tokens pst '.$where.' '.$filter.') pst 
         inner join players as p using(player_id) 
         inner join tw_player_balance as tw using(player_id)
-        inner join clients as c using (client_id)');
+        inner join clients as c using (client_id)
+        inner join operator as op using (operator_id)');
         $client_details = count($query);
         // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
         return $client_details > 0 ? $query[0] : null;
@@ -311,7 +313,7 @@ class TWHelpers {
         }
         $query = DB::select(
             'select 
-                `p`.`client_id`,`c`.`country_code`,`p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`p`.`created_at`, `c`.`connection_name`
+                `p`.`client_id`,`c`.`country_code`,`p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`p`.`created_at`, `c`.`connection_name`, `op`.`status_id`
             from players p 
             inner join clients as c using (client_id) 
             inner join operator as op using (operator_id) '.$where.' ');

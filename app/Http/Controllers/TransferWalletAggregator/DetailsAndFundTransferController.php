@@ -89,6 +89,20 @@ class DetailsAndFundTransferController extends Controller
             $details = TWHelpers::getPlayerSessionDetails('token', $decodedrequest["fundtransferrequest"]["playerinfo"]["token"]);
             if($details){
                 $player_balance = TWHelpers::getPlayerBalanceUsingTwID($details->tw_player_bal_id);
+                if ( $details->status_id == 0) {
+                    $response = array(
+                        "fundtransferresponse" => array(
+                            "status" => array(
+                                "code"=> 402,
+                                "status" => "Failed",
+                                "message" => "Server are not ready."
+                            ),
+                            'balance'=> $player_balance->balance,
+                            'currencycode' =>  $details->default_currency
+                        )
+                    );
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }
                 if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
                     if ( !($player_balance->balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
                         $response = array(
