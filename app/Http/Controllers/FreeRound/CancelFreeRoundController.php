@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ProviderHelper;
 use App\Helpers\Helper;
+use App\Helpers\WazdanHelper;
 use App\Helpers\FreeSpinHelper;
 use DB;
 class CancelFreeRoundController extends Controller
@@ -26,9 +27,9 @@ class CancelFreeRoundController extends Controller
             return response($mw_response,200)
             ->header('Content-Type', 'application/json');
         }
-        $freeround_id = $request->client_id.'_'.$request->freeround_id;
+        $freeround_id = $request->client_id."_".$request->freeround_id;
         $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
-        if($this->cancelFreeGameProviderController($request->client_id, $freeround_id ) == 200 ){
+        if($this->cancelFreeGameProviderController($freeround_id) == 200 ){
             $mw_response = [
                 "data" => $request->all(),
                 "status" => [
@@ -57,13 +58,15 @@ class CancelFreeRoundController extends Controller
         if(isset($getFreespin->status)){
             if ($getFreespin->status == 0) {
                 $game_details = ProviderHelper::findGameID($getFreespin->game_id);
-                if($game_details != 'false'){
+                if($game_details){
                     if ($game_details->sub_provider_id == 56) {
                         // return FreeSpinHelper::createFreeRoundSlotmill($player_details, $data, $sub_provder_id,$freeround_id);// 200
                         return 200;
-                    } 
-                } elseif($game_details->sub_provider_id == 57) {
-                        return 200;
+                    } elseif($game_details->sub_provider_id == 57) {
+                        return FreeSpinHelper::cancelFreeRoundWazdan($freeround_id);
+                    } elseif($game_details->sub_provider_id == 44) {
+                        return FreeSpinHelper::cancelFreeRoundBNG($freeround_id);
+                    }
                 }
             }
         }

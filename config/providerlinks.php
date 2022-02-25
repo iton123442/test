@@ -314,6 +314,7 @@ return [
         'partnercode'=> 'gd1wiurg',
         'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
         'api_freeRound' => 'https://service-stage.wazdanep.com/add/',
+        'freeround_api_link' => 'https://service-stage.wazdanep.com',
         'operator_data' =>[
             "1"=>"tigergames",
             "5"=>"xigolo",
