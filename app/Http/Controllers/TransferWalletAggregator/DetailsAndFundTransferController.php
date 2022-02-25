@@ -95,7 +95,7 @@ class DetailsAndFundTransferController extends Controller
                             "status" => array(
                                 "code"=> 402,
                                 "status" => "Failed",
-                                "message" => "Server not ready."
+                                "message" => "Server are not ready."
                             ),
                             'balance'=> $player_balance->balance,
                             'currencycode' =>  $details->default_currency
