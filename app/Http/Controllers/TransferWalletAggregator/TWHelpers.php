@@ -311,7 +311,7 @@ class TWHelpers {
         }
         $query = DB::select(
             'select 
-                `p`.`client_id`,`c`.`country_code`,`p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`p`.`created_at`, `c`.`connection_name`
+                `p`.`client_id`,`c`.`country_code`,`p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`p`.`created_at`, `c`.`connection_name`, `op`.`status_id`
             from players p 
             inner join clients as c using (client_id) 
             inner join operator as op using (operator_id) '.$where.' ');
