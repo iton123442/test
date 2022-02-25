@@ -794,7 +794,7 @@ class FreeSpinHelper{
             return 400;
         } else {
             $data = [
-                "details" => json_encode($dataresponse)
+                "details" => json_encode($dataresponse->items["bonus_id"])
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
