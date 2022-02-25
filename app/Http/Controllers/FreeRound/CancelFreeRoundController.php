@@ -29,7 +29,7 @@ class CancelFreeRoundController extends Controller
         }
         $freeround_id = $request->client_id."_".$request->freeround_id;
         $mw_response = ["error_code"=>"407","error_description"=>"Contact the Service"];
-        if($this->cancelFreeGameProviderController($freeround_id ) == 200 ){
+        if($this->cancelFreeGameProviderController($freeround_id) == 200 ){
             $mw_response = [
                 "data" => $request->all(),
                 "status" => [
