@@ -90,6 +90,22 @@ class DetailsAndFundTransferController extends Controller
             if($details){
                 $player_balance = TWHelpers::getPlayerBalanceUsingTwID($details->tw_player_bal_id);
                 if($decodedrequest["fundtransferrequest"]["fundinfo"]["transactiontype"]=="debit"){
+
+                    if ( $player_balance->status_id == 0) {
+                        $response = array(
+                            "fundtransferresponse" => array(
+                                "status" => array(
+                                    "code"=> 402,
+                                    "status" => "Failed",
+                                    "message" => "Server not ready."
+                                ),
+                                'balance'=> $player_balance->balance,
+                                'currencycode' =>  $details->default_currency
+                            )
+                        );
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+
                     if ( !($player_balance->balance >= $decodedrequest["fundtransferrequest"]["fundinfo"]["amount"]) ) {
                         $response = array(
                             "fundtransferresponse" => array(
