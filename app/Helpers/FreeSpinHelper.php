@@ -547,6 +547,7 @@ class FreeSpinHelper{
             'gameid' => $data['game_code'],
             'amount' => (int)$data["details"]["rounds"],
             'freespinvalue' => (int)$data['details']['denomination'],
+            'promoCode' => "TG".$freeround_id
         ];
         $baseUrl = "https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/add";
         $response = $httpClient->post($baseUrl,['body' => json_encode($requesttosend)]);
