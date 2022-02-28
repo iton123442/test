@@ -293,7 +293,8 @@ class QuickspinDirectController extends Controller
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
             $game_trans_id = $game_transaction_id;
             $promocode = explode("TG",$req["promocode"]);
-            $getFreespin = FreeSpinHelper::getFreeSpinDetails($promocode[0], "provider_trans_id" );
+            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
+            $getFreespin = FreeSpinHelper::getFreeSpinDetails($promocode[1], "provider_trans_id" );
               if($getFreespin){
                   //update transaction
                   $status = 2;
