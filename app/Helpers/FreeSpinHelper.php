@@ -907,7 +907,7 @@ class FreeSpinHelper{
                     ]
                 ]);
                 try{
-                    $game_link_response = $client->post(config("providerlinks.wazdan.api_freeRound"),
+                    $game_link_response = $client->post(config("providerlinks.wazdan.freeround_api_link")."/add/",
                     ['body' => json_encode($requestBody)]);
                     $dataresponse = json_decode($game_link_response->getBody()->getContents()); // get response
                     // dd($dataresponse);
@@ -970,7 +970,7 @@ class FreeSpinHelper{
         
          $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
          if(isset($getFreespin)) {
-            $baseUrl = "https://service-stage.wazdanep.com/forfeit/";
+            $baseUrl = config("providerlinks.wazdan.freeround_api_link")."/forfeit/";
             $datatosend = [
                 "playerId"=> $getFreespin->player_id,
                 "txId"=> $freeround_id,
@@ -989,7 +989,7 @@ class FreeSpinHelper{
                 $data = [
                     "status" => 4,
                 ];
-                Helper::saveLog('Wazdan freespin Success', 57, json_encode($data), json_encode($dataresponse));
+                Helper::saveLog('Wazdan Cancelfreespin Success', 57, json_encode($data), json_encode($dataresponse));
                 FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
 
                  return 200;
@@ -999,10 +999,9 @@ class FreeSpinHelper{
                 ];
                 $data = [
                     "status" => 0,
-                    // "details" => json_encode($dataresponse)
                 ];
 
-                Helper::saveLog('Wazdan freespin error', 57, json_encode($data), json_encode($dataresponse));
+                Helper::saveLog('Wazdan Cancelfreespin error', 57, json_encode($data), json_encode($dataresponse));
 
                 FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
             
@@ -1093,7 +1092,7 @@ class FreeSpinHelper{
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ]
                 ]);
-                $response = $client->post(config("providerlinks.tgg.api_freeRound"),[
+                $response = $client->post(config("providerlinks.tgg.api_url")."/game/registerBonus",[
                     'form_params' => $requestBody,
                 ]);
                 $dataresponse = json_decode($response->getBody(),TRUE);
@@ -1206,7 +1205,7 @@ class FreeSpinHelper{
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ]
                 ]);
-                $response = $client->post(config("providerlinks.5men.api_freeRound"),[
+                $response = $client->post(config("providerlinks.5men.api_url")."/game/registerBonus",[
                     'form_params' => $requestBody,
                 ]);
                 $dataresponse = json_decode($response->getBody(),TRUE);
