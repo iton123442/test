@@ -291,6 +291,28 @@ class QuickspinDirectController extends Controller
             );
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
             $game_trans_id = $game_transaction_id;
+            // $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
+              // if($getFreespin){
+              //     //update transaction
+              //     $status = 2;
+              //     $updateFreespinData = [
+              //         "status" => $status,
+              //         "spin_remaining" => 0
+              //     ];
+              //     FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+              //         //create transction 
+              //     if($status == 2) {
+              //         $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+              //     }  else {
+              //         $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+              //     }
+                  
+              //         $createFreeRoundTransaction = array(
+              //             "game_trans_id" => $bet_transaction->game_trans_id,
+              //             'freespin_id' => $getFreespin->freespin_id
+              //     );
+              //     FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+              // }
         }else{
             $updateGameTransaction = [
                   'win' => 5,
