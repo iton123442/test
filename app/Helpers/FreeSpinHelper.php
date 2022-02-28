@@ -518,6 +518,7 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id, $freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        $quickSpinDenom = $data["details"]["denomination"] * 100;
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -525,7 +526,7 @@ class FreeSpinHelper{
                 "total_spin" => $data["details"]["rounds"],
                 "spin_remaining" => $data["details"]["rounds"],
                 "provider_trans_id" => $freeround_id,
-                "denominations" => $data["details"]["denomination"],
+                "denominations" => $quickSpinDenom,
                 "date_expire" => $data["details"]["expiration_date"],
             ];
         } catch (\Exception $e) {
@@ -546,7 +547,7 @@ class FreeSpinHelper{
             'remoteusername' => $player_details->player_id,
             'gameid' => $data['game_code'],
             'amount' => (int)$data["details"]["rounds"],
-            'freespinvalue' => (int)$data['details']['denomination'],
+            'freespinvalue' => (int)$quickSpinDenom,
             'promocode' => "TG".$freeround_id
         ];
         $baseUrl = "https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/add";
@@ -554,7 +555,7 @@ class FreeSpinHelper{
         $dataresponse = json_decode($response->getBody()->getContents());
         if ($dataresponse->status == 'ok'){
             $data = [
-                "details" => json_encode($dataresponse->freespinids[0][1])
+                "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
