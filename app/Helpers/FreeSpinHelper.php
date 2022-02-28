@@ -553,8 +553,7 @@ class FreeSpinHelper{
         $dataresponse = json_decode($response->getBody()->getContents());
         if ($dataresponse->status == 'ok'){
             $data = [
-                "provider_trans_id" => $id,
-                "details" => json_encode($dataresponse)
+                "details" => json_encode($dataresponse->freespinids[0][1])
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
@@ -827,7 +826,6 @@ class FreeSpinHelper{
                     "status" => 4,
             ];
             FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
-            dd($dataresponse);
             return 200;
         } catch (\Exception $e) {
             return 400;
