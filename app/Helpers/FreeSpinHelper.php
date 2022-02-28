@@ -518,14 +518,16 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id, $freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        $prefix = "TG_".FreeSpinHelper::unique_code(14)."-";//transaction
+        $quickSpinDenom = $data["details"]["denomination"] * 100;
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
                 "game_id" => $game_details->game_id,
                 "total_spin" => $data["details"]["rounds"],
                 "spin_remaining" => $data["details"]["rounds"],
-                "denominations" => $data["details"]["freespinvalue"],
+                "provider_trans_id" => $freeround_id,
+                "denominations" => $quickSpinDenom,
+                "date_expire" => $data["details"]["expiration_date"],
             ];
         } catch (\Exception $e) {
             return 400;
@@ -540,40 +542,40 @@ class FreeSpinHelper{
                 'Authorization' => 'Basic ' . $credentials,
             ]
         ]);
-        $baseUrl = "https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/add";
-        $response = $httpClient->post(
-            $baseUrl,[
-                'body' => json_encode([
-                    'txid' => FreeSpinHelper::unique_code(14),
-                    'remoteusername' => $player_details->player_id,
-                    'gameid' => $data['game_code'],
-                    'amount' => $data["details"]["rounds"],
-                    'freespinvalue' => $data['details']['freespinvalue'],
-                ]
-            )]
-        );
-        $dataresponse = json_decode($response->getBody()->getContents());
-        $data = [
-            "status" => 3,
-            "provider_trans_id" => $prefix.$id,
-            "details" => json_encode($dataresponse)
+        $requesttosend = [
+            'txid' => $freeround_id,
+            'remoteusername' => $player_details->player_id,
+            'gameid' => $data['game_code'],
+            'amount' => (int)$data["details"]["rounds"],
+            'freespinvalue' => (int)$quickSpinDenom,
+            'promocode' => "TG".$freeround_id
         ];
-        FreeSpinHelper::updateFreeRound($data, $id);
-        if ( !isset($dataresponse->errorCode) ){
-            //update freeroundtransac
+        $baseUrl = "https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/add";
+        $response = $httpClient->post($baseUrl,['body' => json_encode($requesttosend)]);
+        $dataresponse = json_decode($response->getBody()->getContents());
+        if ($dataresponse->status == 'ok'){
             $data = [
-                "provider_trans_id" => $prefix.$id,
                 "details" => json_encode($dataresponse)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 200;
         } else {
-            $data = [
-                "status" => 3,
-                "provider_trans_id" => $prefix.$id,
-                "details" => json_encode($dataresponse)
+           $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
             ];
-            FreeSpinHelper::updateFreeRound($data, $id);
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         }
     }
@@ -826,7 +828,6 @@ class FreeSpinHelper{
                     "status" => 4,
             ];
             FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
-            dd($dataresponse);
             return 200;
         } catch (\Exception $e) {
             return 400;
