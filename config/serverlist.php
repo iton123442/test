@@ -42,8 +42,8 @@ return [
         "server_TW" => [
             'connection_name'=>'mysql',
             'db_list'=> [
-                'api_test',//game_trasnaction_ext
-                'api_test' // game_transaction
+                'wt_mw_db_staging',//game_trasnaction_ext
+                'wt_mw_db_staging' // game_transaction
             ]
         ],
     ]
