@@ -555,7 +555,7 @@ class FreeSpinHelper{
         $dataresponse = json_decode($response->getBody()->getContents());
         if ($dataresponse->status == 'ok'){
             $data = [
-                "details" => json_encode($dataresponse)
+                "details" => json_encode($dataresponse->freespinids[0][1])
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
