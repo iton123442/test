@@ -723,6 +723,7 @@ return [
         'provider_db_id'=> 66,
         'api_url' => 'https://d1oij17g4yikkz.cloudfront.net',
         'partner_id' => 2076,
+        'partner_api_url' => 'https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino',
     ],
     'spearhead' => [
         'provider_db_id'=> 67,
