@@ -551,8 +551,25 @@ class FreeSpinHelper{
             'promocode' => "TG".$freeround_id
         ];
         $baseUrl = config("providerlinks.quickspinDirect.partner_api_url")."/freespins/add";
-        $response = $httpClient->post($baseUrl,['body' => json_encode($requesttosend)]);
-        $dataresponse = json_decode($response->getBody()->getContents());
+        try {
+            $response = $httpClient->post($baseUrl,['body' => json_encode($requesttosend)]);
+            $dataresponse = json_decode($response->getBody()->getContents());
+        } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($msg),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }
         if ($dataresponse->status == 'ok'){
             $data = [
                 "details" => json_encode($dataresponse->freespinids[0][1])
