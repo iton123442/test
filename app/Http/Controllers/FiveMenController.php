@@ -740,7 +740,7 @@ public function gameBet($request, $client_details)
 
 	public function getGamelist(Request $request){
 		$data = [
-			'signature' => 'e5e1757feaf0301856ad9c309741f283',
+			'signature' => 'c36ed829bafac814e7812f1c6bde1713',
 		];
 		$signature =  $this->getSignature($this->project_id, 1,$data,$this->api_key,'get_signature');
 		
