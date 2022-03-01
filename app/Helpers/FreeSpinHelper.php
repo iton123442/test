@@ -587,7 +587,15 @@ class FreeSpinHelper{
         ];
         // https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/cancel
         $api_url = config("providerlinks.quickspinDirect.partner_api_url")."/freespins/cancel";
-        $client = new Client();
+        $username = "tigergames";
+        $password = "stage-4j2UUY5MzGVzKAV";
+        $credentials = base64_encode($username.":".$password);
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $credentials,
+            ]
+        ]);
         try {
             $response = $client->post($api_url,['body' => json_encode($requesttosend)]);
             $dataresponse = json_decode($response->getBody()->getContents());
