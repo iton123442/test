@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\TransferWalletAggregator;
 
 use App\Helpers\Helper;
-use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use App\Models\GameTransactionMDB;
 
 use DB;
 
@@ -319,6 +319,48 @@ class TWHelpers {
             inner join operator as op using (operator_id) '.$where.' ');
          $client_details = count($query);
          return $client_details > 0 ? $query[0] : null;
+    }
+
+    public static function createTWPlayerAccountsMDB($data, $client_details){
+        $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            Helper::saveLog('createTWPlayerAccountsMDB', 789, json_encode($connection), "createTWPlayerAccountsMDB");
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".tw_player_accounts")->insertGetId($data);
+        }else{
+            return null;
+        }
+        // return DB::table('tw_player_accounts')->insertGetId($data);
+    }
+ 
+    public static function updatePlayerAccountMDB($data, $tw_account_id, $client_details){
+        $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".tw_player_accounts")->where('tw_account_id',$tw_account_id)->update($data);
+        }else{
+            return null;
+        }
+        // return DB::table('tw_player_accounts')->where('tw_account_id',$tw_account_id)->update($data);
+    }
+
+    public static function createTWPlayerAccountsRequestLogsMDB($data, $client_details){
+        $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            Helper::saveLog('createTWPlayerAccountsRequestLogsMDB', 789, json_encode($connection), "createTWPlayerAccountsRequestLogsMDB");
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".tw_player_account_request_logs")->insertGetId($data);
+        }else{
+            return null;
+        }
+        // return DB::table('tw_player_account_request_logs')->insertGetId($data);
+    }
+ 
+    public static function updateTWPlayerAccountsRequestLogsMDB($data, $tw_log_id, $client_details){
+        $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".tw_player_account_request_logs")->where('tw_log_id',$tw_log_id)->update($data);
+        }else{
+            return null;
+        }
+        // return DB::table('tw_player_account_request_logs')->where('tw_log_id',$tw_log_id)->update($data);
     }
 
 }
