@@ -138,42 +138,30 @@ class WalletDetailsController extends Controller
     
 
     public function makeTransferWallerDeposit(Request $request){
-
         if(!$request->has('access_token') || !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('amount') || !$request->has('transaction_id') ){
             $mw_response = ["data" => null,"status" => ["code" => "404","message" => TWHelpers::getPTW_Message(404)]];
+            TWHelpers::walletLogsRequest("DEPOSIT FAILED", 1, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
-        Helper::saveLog( $request->client_player_id." TW Logs" , 5 , json_encode($request->all()), "DEPOSIT HIT");
-        $data = [
-            "client_transaction_id" => $request->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
-            "client_request" => json_encode($request->all()),
-            "wallet_type" => 1
-        ];
+        TWHelpers::walletLogsRequest( $request->client_player_id ,$request->client_id , json_encode($request->all()), "DEPOSIT HIT");
         $security = TWHelpers::Client_SecurityHash($request->client_id ,$request->access_token);
         if($security !== true){
             $mw_response = ["data" => null,"status" => ["code" => $security ,"message" => TWHelpers::getPTW_Message($security)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"]= $security;
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
         $getPlayerDetails = TWHelpers::getPlayerDetails('ptw' ,$request->client_player_id ,$request->client_id);
 
         if($getPlayerDetails == null){
             $mw_response = ["data" => null,"status" => ["code" => 303 ,"message" => TWHelpers::getPTW_Message(303)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"] = "303";
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
         if(!is_numeric($request->amount) || $request->amount < 0){
             $mw_response = ["data" => null,"status" => ["code" => 309 ,"message" => TWHelpers::getPTW_Message(309)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"] = "309";
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
-       
         //create depost accounts
         try {
             $data_accounts = [
@@ -182,21 +170,15 @@ class WalletDetailsController extends Controller
                 "amount" => $request->amount,
                 "client_id" => $getPlayerDetails->client_id,
                 "operator_id" => $getPlayerDetails->operator_id,
-                "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id //UNIQUE TRANSACTION
+                "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
+                'status' => 1
             ];
-            $account_id = TWHelpers::createTWPlayerAccounts($data_accounts);
+            $account_id = TWHelpers::createTWPlayerAccountsMDB($data_accounts, $getPlayerDetails);
         } catch (\Exception $e) {
             $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"] = "406";
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
-
-        //update player account balance
-        // $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
-        // $balance = $balance_details->balance + $request->amount;
-        // TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
         $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
         TWHelpers::updateTWBalance( ($player_balance->balance + $request->amount), $getPlayerDetails->tw_player_bal_id);
         $balance = $player_balance->balance + $request->amount;
@@ -227,10 +209,11 @@ class WalletDetailsController extends Controller
             "mw_response" => json_encode($mw_response),
             "wallet_type" => 1,
             "status_code" => "200",
-            "general_details" => json_encode($general_details)
+            "general_details" => json_encode($general_details),
+            "tw_account_id" => $account_id
         ];
-        TWHelpers::createTWPlayerAccountsRequestLogs($data);
-        
+        TWHelpers::createTWPlayerAccountsRequestLogsMDB($data, $getPlayerDetails);
+        TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
         return $mw_response;
     }
 
@@ -238,9 +221,10 @@ class WalletDetailsController extends Controller
 
         if(!$request->has('access_token') || !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('amount') || !$request->has('transaction_id') ){
             $mw_response = ["data" => null,"status" => ["code" => "404","message" => TWHelpers::getPTW_Message(404)]];
+            TWHelpers::walletLogsRequest("WITHDRAW FAILED", 2, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
-        Helper::saveLog( $request->client_player_id." TW Logs" , 5 , json_encode($request->all()), "WITHDRAW HIT");
+        TWHelpers::walletLogsRequest( $request->client_player_id ,$request->client_id , json_encode($request->all()), "WITHDRAW HIT");
         $data = [
             "client_transaction_id" => $request->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
             "client_request" => json_encode($request->all()),
@@ -249,33 +233,25 @@ class WalletDetailsController extends Controller
         $security = TWHelpers::Client_SecurityHash($request->client_id ,$request->access_token);
         if($security !== true){
             $mw_response = ["data" => null,"status" => ["code" => $security ,"message" => TWHelpers::getPTW_Message($security)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"]= $security;
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
         $getPlayerDetails = TWHelpers::getPlayerDetails('ptw' ,$request->client_player_id ,$request->client_id);
         if($getPlayerDetails == null){
             $mw_response = ["data" => null,"status" => ["code" => 303 ,"message" => TWHelpers::getPTW_Message(303)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"] = "303";
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
         if(!is_numeric($request->amount) || $request->amount < 0){
             $mw_response = ["data" => null,"status" => ["code" => 309 ,"message" => TWHelpers::getPTW_Message(309)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"] = "309";
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
         //if 0 amount then withraw all
         $amountToWithdraw = $request->amount == 0 ? $getPlayerDetails->tw_balance : $request->amount;
         if ($amountToWithdraw > $getPlayerDetails->tw_balance ) {
             $mw_response = ["data" => null,"status" => ["code" => 305 ,"message" => TWHelpers::getPTW_Message(305)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"] = "309";
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
          //create withdraw accounts
@@ -286,21 +262,17 @@ class WalletDetailsController extends Controller
                 "amount" => $amountToWithdraw,
                 "client_id" => $getPlayerDetails->client_id,
                 "operator_id" => $getPlayerDetails->operator_id,
-                "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id //UNIQUE TRANSACTION
+                "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
+                'status' => 1
             ];
-            $account_id = TWHelpers::createTWPlayerAccounts($data_accounts);
+            $account_id = TWHelpers::createTWPlayerAccountsMDB($data_accounts, $getPlayerDetails);
         } catch (\Exception $e) {
             $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
-            $data["mw_response"] = json_encode($mw_response);
-            $data["status_code"] = "406";
-            TWHelpers::createTWPlayerAccountsRequestLogs($data);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
 
         //update player account balance
-        // $balance_details = TWHelpers::getPlayerBalance($getPlayerDetails->player_id);
-        // $balance = $balance_details->balance - $amountToWithdraw;
-        // TWHelpers::updateTWBalance($balance, $balance_details->tw_player_bal_id);
         $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
         TWHelpers::updateTWBalance( ($player_balance->balance - $amountToWithdraw), $getPlayerDetails->tw_player_bal_id);
         $balance = $player_balance->balance - $amountToWithdraw;
@@ -331,9 +303,11 @@ class WalletDetailsController extends Controller
             "mw_response" => json_encode($mw_response),
             "wallet_type" => 2,
             "status_code" => "200",
-            "general_details" => json_encode($general_details)
+            "general_details" => json_encode($general_details),
+            "tw_account_id" => $account_id
         ];
-        TWHelpers::createTWPlayerAccountsRequestLogs($data);
+        TWHelpers::createTWPlayerAccountsRequestLogsMDB($data, $getPlayerDetails);
+        TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
         return $mw_response;
     }
 

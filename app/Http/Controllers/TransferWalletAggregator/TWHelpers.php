@@ -363,6 +363,27 @@ class TWHelpers {
         // return DB::table('tw_player_account_request_logs')->where('tw_log_id',$tw_log_id)->update($data);
     }
 
+    public static function walletLogsRequest($method, $provider_id = 0, $request_data, $response_data) {
+
+		try{
+			/*if(env('SAVELOG')){*/
+			if(1 == 1){
+				$data = [
+					"method_name" => $method,
+					"provider_id" => $provider_id,
+					"request_data" => json_encode(json_decode($request_data)),
+					"response_data" => json_encode($response_data)
+				];
+				return DB::table('debug')->insert($data);
+			}else{
+				return 8888888;
+			}
+		}catch(\Exception $e){
+			return 99999999;
+		}
+		
+	}
+
 }
 
 ?>
