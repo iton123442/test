@@ -550,7 +550,7 @@ class FreeSpinHelper{
             'freespinvalue' => (int)$quickSpinDenom,
             'promocode' => "TG".$freeround_id
         ];
-        $baseUrl = "https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/add";
+        $baseUrl = config("providerlinks.quickspinDirect.partner_api_url")."/freespins/add";
         $response = $httpClient->post($baseUrl,['body' => json_encode($requesttosend)]);
         $dataresponse = json_decode($response->getBody()->getContents());
         if ($dataresponse->status == 'ok'){
@@ -576,6 +576,27 @@ class FreeSpinHelper{
                 "mw_response" => "400"
             ];
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }
+    }
+    public static function cancelFreeRoundQuickSpin($freeround_id){
+        $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+        // dd($client_details);
+        $requesttosend = [
+            "freespinsid" => json_decode($getFreespin->details)
+        ];
+        // https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino/freespins/cancel
+        $api_url = config("providerlinks.quickspinDirect.partner_api_url")."/freespins/cancel";
+        $client = new Client();
+        try {
+            $response = $client->post($api_url,['body' => json_encode($requesttosend)]);
+            $dataresponse = json_decode($response->getBody()->getContents());
+            $data = [
+                    "status" => 4,
+            ];
+            FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            return 200;
+        } catch (\Exception $e) {
             return 400;
         }
     }
