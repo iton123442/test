@@ -278,14 +278,12 @@ return [
         'api_url' => 'http://api.flexcontentprovider.com',
         'project_id' => '1421',
         'api_key' => '29abd3790d0a5acd532194c5104171c8',
-        'api_freeRound' => 'http://api.flexcontentprovider.com/game/registerBonus',
         'provider_id' => 29,
     ],
     '5men' => [
         'api_url' => 'http://api.flexcontentprovider.com',
         'project_id' => '1471',
         'api_key' => '4516cf2200fec6953f8bce3547c3a6cc',
-        'api_freeRound' => 'http://api.flexcontentprovider.com/game/registerBonus',
         'provider_id' => 53,
     ],
     'bgaming' => [
@@ -313,7 +311,6 @@ return [
         'hmac_scret_key' => 'uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1',
         'partnercode'=> 'gd1wiurg',
         'gamelaunchurl' => 'https://gl-staging.wazdanep.com/',
-        'api_freeRound' => 'https://service-stage.wazdanep.com/add/',
         'freeround_api_link' => 'https://service-stage.wazdanep.com',
         'operator_data' =>[
             "1"=>"tigergames",
@@ -726,6 +723,7 @@ return [
         'provider_db_id'=> 66,
         'api_url' => 'https://d1oij17g4yikkz.cloudfront.net',
         'partner_id' => 2076,
+        'partner_api_url' => 'https://casino-partner-api.extstage.qs-gaming.com:7000/papi/1.0/casino',
     ],
     'spearhead' => [
         'provider_db_id'=> 67,
