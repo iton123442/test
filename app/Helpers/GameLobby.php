@@ -1833,11 +1833,16 @@ class GameLobby{
             return $game_url;
 
         } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            Helper::saveLog('TopTrendGaming Error', 56, json_encode($msg), json_encode($msg) );
             return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
             // $error = '<gametoken uid="usd001">
             //             <error code="1002" message="unable to login" />
             //           </gametoken>';
-            // Helper::saveLog('TopTrendGaming 1002', $provider, json_encode($requesttosend), $e->getMessage() );
             // return response($error,200) 
             //       ->header('Content-Type', 'application/xml');
         }
