@@ -1791,7 +1791,6 @@ class GameLobby{
 
     }
     public static function TopTrendGamingLaunchUrl($data){
-        try {
             $client_details = ProviderHelper::getClientDetails('token',$data['token']);
             if($client_details->country_code == null){
                 $country_code = "PH";
@@ -1827,7 +1826,7 @@ class GameLobby{
             $remove[] = ' ';
             $game_details = $game_name[0];
             $get_name = str_replace($remove,'', $game_details->game_name);
-
+        try {
             $game_url = config("providerlinks.toptrendgaming.game_api_url").'/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
             Helper::saveLog('TopTrendGaming Error', 56, json_encode($requesttosend), json_decode($json) );
             return $game_url;
