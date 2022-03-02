@@ -399,7 +399,7 @@ class TWHelpers {
                     when type = 1 then 'deposit'
                     when type = 2 then 'withdraw'
                 end as type
-            FROM tw_player_accounts
+            FROM `".$connection['db_list'][1]."`.`tw_player_accounts`
             where client_transaction_id = '".$identifier."' limit 1; ");
             }
             $count = count($details);
