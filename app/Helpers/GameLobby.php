@@ -1824,7 +1824,7 @@ class GameLobby{
                     'err_line' => $e->getLine(),
                     'err_file' => $e->getFile()
                 );
-                Helper::saveLog('TopTrendGaming Error Login', 56, json_encode($requesttosend), json_encode($msg) );
+                Helper::saveLog('TopTrendGaming Error Login', 56, json_encode($accountToSend), json_encode($msg) );
             }
             
             $game_luanch_response = $guzzle_response->getBody();
