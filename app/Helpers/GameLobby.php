@@ -1829,7 +1829,7 @@ class GameLobby{
             $get_name = str_replace($remove,'', $game_details->game_name);
 
             $game_url = config("providerlinks.toptrendgaming.game_api_url").'/casino/default/game/game.html?playerHandle='.$val.'&account='.$client_details->default_currency.'&gameName='.$get_name.'&gameType=0&gameId='.$data['game_code'].'&lang=en&deviceType=web&lsdId=TIGERGAMES';
-            Helper::saveLog('TopTrendGaming Error', $provider, json_encode($requesttosend), json_decode($json) );
+            Helper::saveLog('TopTrendGaming Error', 56, json_encode($requesttosend), json_decode($json) );
             return $game_url;
         } catch (\Exception $e) {
             $msg = array(
@@ -1837,7 +1837,7 @@ class GameLobby{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
-            Helper::saveLog('TopTrendGaming Error', $provider, json_encode($requesttosend), json_encode($msg) );
+            Helper::saveLog('TopTrendGaming Error', 56, json_encode($requesttosend), json_encode($msg) );
             return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
             // $error = '<gametoken uid="usd001">
             //             <error code="1002" message="unable to login" />
