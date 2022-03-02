@@ -162,6 +162,11 @@ class WalletDetailsController extends Controller
             TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
+        if (str_contains($request->transaction_id, '_')) {
+            $mw_response = ["data" => null,"status" => ["code" => "401","message" => TWHelpers::getPTW_Message(401)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+            return $mw_response;
+        } 
         //create depost accounts
         try {
             $data_accounts = [
@@ -247,6 +252,11 @@ class WalletDetailsController extends Controller
             TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
+        if (str_contains($request->transaction_id, '_')) {
+            $mw_response = ["data" => null,"status" => ["code" => "401","message" => TWHelpers::getPTW_Message(401)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+            return $mw_response;
+        } 
         //if 0 amount then withraw all
         $amountToWithdraw = $request->amount == 0 ? $getPlayerDetails->tw_balance : $request->amount;
         if ($amountToWithdraw > $getPlayerDetails->tw_balance ) {
@@ -512,8 +522,12 @@ class WalletDetailsController extends Controller
             return $mw_response;
         }
 
+        if (str_contains($reference_id, '_')) {
+            $mw_response = ["data" => null,"status" => ["code" => "401","message" => TWHelpers::getPTW_Message(401)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+            return $mw_response;
+        } 
         
-       
         // $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
         // $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
         // $status = GameTransactionMDB::checkDBConnection($connection);
@@ -534,17 +548,9 @@ class WalletDetailsController extends Controller
                 //     $connection["TG_ClientInfo"] = "TG_ClientInfo";
                 // }
               
-                $details = DB::select("
-                    SELECT 
-                        tw_account_id as id,
-                        amount,
-                        case 
-                            when type = 1 then 'deposit'
-                            when type = 2 then 'withdraw'
-                        end as type
-                    FROM tw_player_accounts
-                    where client_transaction_id = '".$client_transaction_id."' limit 1; ");
-                if (count($details) == 0) {
+                $details = TWHelpers::findTransactionWallet( $client_transaction_id, $getPlayerDetails);
+                
+                if ($details == 'false') {
                     $mw_response = [
                         "data" => null,
                         "status" => [
@@ -560,9 +566,9 @@ class WalletDetailsController extends Controller
                     "data" => [
                         "client_player_id" => $request->client_player_id,
                         "username" => $getPlayerDetails->username,
-                        "amount" => (double)$details[0]->amount,
+                        "amount" => (double)$details->amount,
                         "transaction_id" => $request->reference_id,
-                        "type" => $details[0]->type,
+                        "type" => $details->type,
                         "balance" => $getPlayerDetails->tw_balance
                     ],
                     "status" => [

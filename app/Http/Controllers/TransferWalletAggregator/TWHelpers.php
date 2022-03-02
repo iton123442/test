@@ -154,6 +154,7 @@ class TWHelpers {
          "406" => 'Transaction Id Already Exist',
          "407" => 'Transaction ID Not Found',
          "400" => 'Services Not Available',
+         "401" => 'Character not allowed!',
         ];
         if(array_key_exists($code, $message)){
             return $message[$code];
@@ -383,6 +384,45 @@ class TWHelpers {
 		}
 		
 	}
+
+    public static  function findTransactionWallet($identifier, $client_details) {
+        try {
+            $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
+            $status = self::checkDBConnection($connection);
+            $details = [];
+            if ( ($connection != null) && $status) {
+                $connection = config("serverlist.server_list.".$client_details->connection_name);
+                $details = DB::connection( $connection["connection_name"])->select("SELECT 
+                tw_account_id as id,
+                amount,
+                case 
+                    when type = 1 then 'deposit'
+                    when type = 2 then 'withdraw'
+                end as type
+            FROM tw_player_accounts
+            where client_transaction_id = '".$identifier."' limit 1; ");
+            }
+            $count = count($details);
+            return $count > 0 ? $details[0] : 'false';
+        } catch (\Exception $e) {
+            return 'false';
+        }
+    }
+
+     /**
+     * checkDBConnection
+     *
+     * @param  string $connection_name default connection 'mysql'
+     * @return bool
+     */
+    public static function checkDBConnection($connection_name='default'){
+        try {
+            DB::connection($connection_name)->getPdo();
+            return true;
+        } catch (\Exception $e){
+            return false;
+        }
+    }
 
 }
 
