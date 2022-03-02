@@ -348,6 +348,19 @@ public function CreditProcess($req){
               FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
           }
       }
+      $msg = [
+              "AccountTransactionId" => $game_transaction_id,
+              "Currency" => $client_details->default_currency,
+              "Balance" => (float)$client_details->balance,
+              "SessionId" => $data['SessionId'],
+              "BonusMoneyAffected" => 0.0,
+              "RealMoneyAffected" => 0.0,
+              "ApiVersion" => "1.0",
+              "Request" => 'WalletDebit',
+              "ReturnCode" => 0,
+              "Message" => 'Success',
+              "Details" => null,
+      ];
       $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
       if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -355,6 +368,7 @@ public function CreditProcess($req){
               case '200':
                 $http_status = 200;
                     $updateTransactionEXt = array(
+                        'mw_response' => json_encode($msg),
                         'mw_request' => json_encode($client_response->requestoclient),
                         'client_response' => json_encode($client_response->fundtransferresponse),
                         'transaction_detail' => 'success',
