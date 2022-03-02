@@ -1798,24 +1798,35 @@ class GameLobby{
             }else{
                 $country_code = $client_details->country_code;
             }
+            $accountToSend = '<logindetail>
+                                    <player account="'.$client_details->default_currency.'" country="'.$country_code.'" firstName="" lastName="" userName="'.$client_details->username.'" 
+                                    nickName="" tester="0" partnerId="TIGERGAMES" commonWallet="1" />
+                                    <partners>
+                                        <partner partnerId="zero" partnerType="0" />
+                                        <partner partnerId="TIGERGAMES" partnerType="1" />
+                                    </partners>
+                                </logindetail>';
             $client = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/xml'
                 ]
             ]);
-            // $url = 'https://ams5-api.ttms.co:8443/cip/gametoken/TGR_'.$client_details->player_id;
-            $url = config('providerlinks.toptrendgaming.api_url').'TGR_'.$client_details->player_id;
-            $guzzle_response = $client->post($url,[
-                'body' => '<logindetail>
-                                <player account="'.$client_details->default_currency.'" country="'.$country_code.'" firstName="" lastName="" userName="'.$client_details->username.'" 
-                                nickName="" tester="0" partnerId="TIGERGAMES" commonWallet="1" />
-                                <partners>
-                                    <partner partnerId="zero" partnerType="0" />
-                                    <partner partnerId="TIGERGAMES" partnerType="1" />
-                                </partners>
-                            </logindetail>'
-            ]
-            );
+            try {
+                // $url = 'https://ams5-api.ttms.co:8443/cip/gametoken/TGR_'.$client_details->player_id;
+                $url = config('providerlinks.toptrendgaming.api_url').'TGR_'.$client_details->player_id;
+                $guzzle_response = $client->post($url,[
+                    'body' => $accountToSend
+                ]
+                );
+            } catch (\Exception $e) {
+                $msg = array(
+                    'err_message' => $e->getMessage(),
+                    'err_line' => $e->getLine(),
+                    'err_file' => $e->getFile()
+                );
+                Helper::saveLog('TopTrendGaming Error Login', 56, json_encode($requesttosend), json_encode($msg) );
+            }
+            
             $game_luanch_response = $guzzle_response->getBody();
             $json = json_encode(simplexml_load_string($game_luanch_response));
             $array = json_decode($json,true);
