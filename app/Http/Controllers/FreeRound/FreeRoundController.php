@@ -33,6 +33,11 @@ class FreeRoundController extends Controller
             return response(["error_code"=>"405","error_description"=>"Provider Code Doesnt Exist or Not Found!"],200)
                 ->header('Content-Type', 'application/json');
         }
+        if (str_contains($request->freeround_id, '_')) {
+            return response(["error_code"=>"401","error_description"=>"Character not allowed!"],200)
+                ->header('Content-Type', 'application/json');
+        } 
+
         $freeround_id = $request->client_id.'_'.$request->freeround_id;
         try{
             ProviderHelper::idenpotencyTable($freeround_id);
