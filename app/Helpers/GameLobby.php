@@ -158,6 +158,7 @@ class GameLobby{
                     'Content-Type' => 'application/json'
                 ]
             ]);
+        list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
         $requesttosend = [
             "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
             "game" => $request_data['game_code'],
@@ -184,8 +185,6 @@ class GameLobby{
             ]
         ];
         Helper::saveLog('Bgaming create session', 49, json_encode($requesttosend), $game_launch);
-
-        list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode($requesttosend)]
             );
