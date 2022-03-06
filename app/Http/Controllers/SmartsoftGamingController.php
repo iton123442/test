@@ -662,6 +662,14 @@ class SmartsoftGamingController extends Controller
                 }
     }
 
-
+    public function getHashValue(Request $request){
+        $data = $request->all();
+        $stng = config('providerlinks.smartsoft.SecretHashKey').":".$request->ClientExternalKey.":".$request->PortalName.":".$request->GameType.":".$request->Username.":";
+        // eb6082ab-d6a0-45f2-a394-9ff681591f2b:11223344:parimatch:JetX:JetXFreeSpin20EUR::1:27/08/2020 00:00:28/08/2021 00:00::0:fc63e123-20fc-4adf-b3b1-734c95d58f01
+        $strngCreateGift = config('providerlinks.smartsoft.SecretHashKey').":".$request->ClientExternalKey.":".$request->PortalName.":".$request->GameType.":JetXFreeSpin20USD::2:06/03/2022 00:00:09/03/2022 00:00::0:1234587967";
+        // $hashValue = md5(config('providerlinks.smartsoft.SecretHashKey').":".$request->ClientExternalKey.":".$request->PortalName.":".$request->GameType.":".$request->Username.":");
+        $hashValue = md5($strngCreateGift);
+        dd($hashValue);
+    }
 
 }

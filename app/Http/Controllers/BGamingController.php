@@ -801,5 +801,28 @@ public function gameBet($request, $client_details){
 	{
 		return (float) str_replace(' ', '', number_format(($value / 100), 2, '.', ' '));
 	}
-	
+	public  function signatureChecker(Request $request){
+        $payload = $request->all();
+        $request_sign = $request->header('x-request-sign');
+        $secret = config('providerlinks.bgaming.AUTH_TOKEN');
+        $signature = hash_hmac('sha256',json_encode($payload),$secret);
+        // dd($signature);
+        Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
+        if($signature != $request_sign){
+                $response = [
+                            "code" =>  403,
+                            "message" => "Forbidden",
+                            "balance" => '0'
+                        ];
+
+         return response($response,400)->header('Content-Type', 'application/json');
+        }else{
+            $response = [
+                            "code" =>  200,
+                            "message" => "Correct signature",
+                            "balance" => '0'
+                        ];
+            return $response;
+        }
+    }
 }

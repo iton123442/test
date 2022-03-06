@@ -612,6 +612,7 @@ $app->get('/public/api/justplay/callback', 'JustPlayController@callback');
 // BGaming Single Controller Endpoints
 $app->post('/public/api/bgaming/play', 'BGamingController@gameTransaction');
 $app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
+$app->post('/public/api/bgaming/checkSign', 'BGamingController@signatureChecker');
 
 // Five Men
 $app->post('/public/api/5men','FiveMenController@index');
@@ -660,6 +661,7 @@ $app->get('/public/api/smartsoft_gaming/GetBalance', 'SmartsoftGamingController@
 $app->post('/public/api/smartsoft_gaming/Deposit', 'SmartsoftGamingController@Deposit');
 $app->post('/public/api/smartsoft_gaming/Withdraw', 'SmartsoftGamingController@Withdraw');
 $app->post('/public/api/smartsoft_gaming/RollbackTransaction', 'SmartsoftGamingController@Rollback');
+$app->post('/public/api/smartsoft_gaming/HashValue','SmartSoftGamingController@getHashValue');
 
 
 //TIGER GAMES TRANSFER WALLET
