@@ -158,40 +158,38 @@ class GameLobby{
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        Helper::saveLog('Bgaming create session', 49, json_encode($request_data), $game_launch);
-
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
+        $requesttosend = [
+            "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
+            "game" => $request_data['game_code'],
+            "currency" => $client_player_details->default_currency,
+            "locale" => "en",
+            "ip" => $request_data['ip_address'],
+            "balance" => $balance,
+            "client_type" => $device,
+            "urls" => [
+                "deposit_url" => "https://example.com/deposit",
+                "return_url" => $request_data['exitUrl']
+            ],
+            "user" => [
+                "id" => $client_player_details->player_id,
+                "email" => $client_player_details->email,
+                "firstname" => $client_player_details->username,
+                "lastname" => $client_player_details->username,
+                "nickname" => $client_player_details->display_name,
+                "city" => $request_data['country_code'],
+                "country" => $request_data['country_code'],
+                "date_of_birth" => "2021-01-29",
+                "gender" => "m",
+                "registered_at" => $registration_date
+            ]
+        ];
+        Helper::saveLog('Bgaming create session', 49, json_encode($requesttosend), $game_launch);
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
-                ['body' => json_encode(
-                        [
-                            "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
-                            "game" => $request_data['game_code'],
-                            "currency" => $client_player_details->default_currency,
-                            "locale" => "en",
-                            "ip" => $request_data['ip_address'],
-                            "balance" => $balance,
-                            "client_type" => $device,
-                            "urls" => [
-                                "deposit_url" => "https://example.com/deposit",
-                                "return_url" => $request_data['exitUrl']
-                            ],
-                            "user" => [
-                                "id" => $client_player_details->player_id,
-                                "email" => $client_player_details->email,
-                                "firstname" => $client_player_details->username,
-                                "lastname" => $client_player_details->username,
-                                "nickname" => $client_player_details->display_name,
-                                "city" => $request_data['country_code'],
-                                "country" => $request_data['country_code'],
-                                "date_of_birth" => "2021-01-29",
-                                "gender" => "m",
-                                "registered_at" => $registration_date
-                            ]
-                        ]
-                )]
+                ['body' => json_encode($requesttosend)]
             );
         
-        Helper::saveLog('Bgaming Launhing', 49, json_encode($request_data), $game_launch_response);
+        Helper::saveLog('Bgaming Launhing', 49, json_encode($request_data), json_encode($game_launch_response));
         $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
         
         return $game_launch_url->launch_options->game_url;        
