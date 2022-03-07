@@ -1,6 +1,6 @@
 <?php
 
-$middleware_url_api = 'https://api-test.betrnk.games/public'; 
+$middleware_url_api = 'localhost:8080/public'; 
 // $middleware_url_api = 'http://localhost:1010'; 
 $gamelobby_site = 'https://daddy.betrnk.games';
 $play_betrnk = 'https://play-test.betrnk.games';

@@ -2072,7 +2072,28 @@ class GameLobby{
                             }
                             
                         }
+                    } else {
+                        try {
+                            $http = new Client();
+                            $response = $http->post(config('providerlinks.oauth_mw_api.mwurl').'/api/idnpoker/retryWithdrawalWallet', [
+                                'form_params' => [
+                                    'player_id'=> $client_details->player_id,
+                                ],
+                                'headers' =>[
+                                    'Accept'     => 'application/json'
+                                ]
+                            ]);
+                            $iframe_data = json_decode((string) $response->getBody(), true);
+                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode($iframe_data),  json_encode($iframe_data) );
+                            if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
+                                return "false";
+                            }
+                        } catch (\Exception $e) {
+                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
+                            return "false";
+                        }
                     }
+                    
                 }
                 return "false";
             } else {
