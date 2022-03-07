@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 use App\Helpers\Helper;
 use GuzzleHttp\Client;
+use DB;
 
 class IDNPokerHelper{
 
@@ -90,6 +91,10 @@ class IDNPokerHelper{
             } else {
                 $lang = 'en';
             }
+            $IP = '127.1.1.1';
+            if (isset($data["ip_address"])) {
+               $IP = $data["ip_address"];
+            }
      
             $client = new Client();
             $request = '
@@ -98,7 +103,7 @@ class IDNPokerHelper{
                 <id>2</id>
                 <userid>'.$player_id.'</userid>
                 <password>'.$player_id.'</password>
-                <ip>'.$data["ip_address"].'</ip>
+                <ip>'.$IP.'</ip>
                 <secure>1</secure>
                 <mobile>1</mobile>
                 <game>'.$data['game_code'].'</game>
@@ -112,7 +117,7 @@ class IDNPokerHelper{
                             <id>2</id>
                             <userid>'.$player_id.'</userid>
                             <password>'.$player_id.'</password>
-                            <ip>'.$data["ip_address"].'</ip>
+                            <ip>'.$IP.'</ip>
                             <secure>1</secure>
                             <mobile>1</mobile>
                             <game>'.$data['game_code'].'</game>
@@ -256,4 +261,20 @@ class IDNPokerHelper{
             return "false";
         }
     }
+
+    public static function checkPlayerRestricted($player_id){
+		$query = DB::select('select * from tw_player_restriction where player_id = '.$player_id);
+		$data = count($query);
+		return $data > 0 ? $query[0] : "false";
+	}
+
+    public static function createPlayerRestricted($data) {
+		$data_saved = DB::table('tw_player_restriction')->insertGetId($data);
+		return $data_saved;
+	}
+
+    public static function deletePlayerRestricted($identifier){
+		$where = 'where idtw_player_restriction = '.$identifier;
+		DB::select('delete from tw_player_restriction '.$where);
+	}
 }
