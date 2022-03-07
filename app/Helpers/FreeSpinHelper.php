@@ -1290,17 +1290,18 @@ class FreeSpinHelper{
             try{
                 //freeSpin type
                 if($data["details"]["type"] == "PROMOTION-02") {
+                    $promoCode = "B-FS02";
                     $insertFreespin = [
                         "player_id" => $player_details->player_id,
                         "game_id" => $game_details->game_id,
                         "total_spin" => $data["details"]["rounds"],
                         "spin_remaining" => $data["details"]["rounds"],
                         "denominations" => $data["details"]["denomination"],
-                        "start_time" => $data["details"]["start_time"],
                         "date_expire" => $data["details"]["expiration_date"],
                         "provider_trans_id" => $freeround_id,
                     ];
                 } else {
+                    $promoCode = "B-FS01";
                     $insertFreespin = [
                         "player_id" => $player_details->player_id,
                         "game_id" => $game_details->game_id,
@@ -1312,63 +1313,53 @@ class FreeSpinHelper{
                 }catch(\Exception $e){
                     return 400;
                 }
+                $explode_freeroundid = explode('_', $freeround_id);
                 $id = FreeSpinHelper::createFreeRound($insertFreespin);
-                $endtime = date("Y-m-d H:i:s", strtotime($data["details"]["expiration_date"]));
                 $client_player_details = ProviderHelper::getClientDetails('player_id',  $player_details->player_id);
                 $details= ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);
-                $preRequestBody = [
-                        "project"=> config("providerlinks.5men.project_id"),
-                        "version"=> 1,
-                        "token"=>  $client_player_details->player_token,
-                        "game"=> $game_details->game_code,
-                        "currency"=> $player_details->default_currency,
-                        "extra_bonuses"=> [
-                            "bonus_spins"=> [  
-                                "spins_count"=> $data["details"]["rounds"],
-                                "bet_in_money"=> $data["details"]["denomination"],
-                            ],
-                        ],
-                        "settings"=>[
-                            "user_id"=> $player_details->client_player_id,
-                            "bypass"=> [
-                                "promoCode"=>$freeround_id,
-                                ],
-                            "expire"=> $endtime
-                        ]
-                ];
-                $signature = TGGHelper::getSignaturess($preRequestBody,config("providerlinks.5men.api_key"));
                 $requestBody = [
-                    "project"=> config("providerlinks.5men.project_id"),
-                    "signature"=> $signature,
-                    "version"=> 1,
-                    "token"=> $client_player_details->player_token,
-                    "game"=> $game_details->game_code,
-                    "currency"=> $player_details->default_currency,
-                    "extra_bonuses"=> [
-                        "bonus_spins"=> [  
-                            "spins_count"=> $data["details"]["rounds"],
-                            "bet_in_money"=> $data["details"]["denomination"],
-                        ]
-                    ],
-                    "settings" => [
-                        "user_id"=> $player_details->client_player_id,
-                        "bypass"=> [
-                            "promoCode"=>$freeround_id,
-                            ],
-                        "expire"=> $endtime
-                    ]
+                        "beginDate"=> $data["details"]["start_time"],
+                        "endDate"=> $data["details"]["expiration_date"],
+                        "merchantCode"=> config("providerlinks.spade.merchantCode"),
+                        "currency"=> $player_details->default_currency,
+                        "promotionCode"=> $promoCode,
+                        "freeSpinName"=> $data["details"]["type"],
+                        "gameList" => array([
+                            "gameCode"=> $game_details->game_code,
+                            "gameCount"=>  $data["details"]["rounds"],
+                            "betCost"=> $data["details"]["denomination"]
+                        ]),
+                        "acctId" => config("providerlinks.spade.prefix") ."_". $player_details->player_id,
+                        "bufferTime" => $data['details']['buffer_time'],
+                        "serialNo" => $explode_freeroundid[1],
                 ];
-                
-
                 $client = new Client(['headers' => [ 
-                    'Content-Type' => 'application/x-www-form-urlencoded',
+                    'API' => 'createLoyalFreeSpin',
+                    'DataType' => 'JSON'
                 ]
                 ]);
-                $response = $client->post(config("providerlinks.5men.api_url")."/game/registerBonus",[
-                    'form_params' => $requestBody,
-                ]);
-                $dataresponse = json_decode($response->getBody(),TRUE);
-                if(isset($dataresponse->error)){
+                try{
+                    $game_link_response = $client->post(config("providerlinks.spade.api_url"),
+                    ['body' => json_encode($requestBody)]);
+                    $dataresponse = json_decode($game_link_response->getBody()->getContents()); // get response
+                }catch(\Exception $e){
+                    $createFreeround = [
+                        "status" => 3,
+                    ];
+                    
+                    Helper::saveLog('SpadeGamingFS', 37,json_encode($requestBody),  json_encode($dataresponse));
+                    FreeSpinHelper::updateFreeRound($createFreeround, $id);
+                    $freespinExtenstion = [
+                        "freespin_id" => $id,
+                        "mw_request" => json_encode($requestBody),
+                        "provider_response" => json_encode($dataresponse),
+                        "client_request" => json_encode($data),
+                        "mw_response" => "400"
+                    ];
+                    FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+                    return 400;
+                }
+                if($dataresponse->code != 0){
                     $createFreeround = [
                         "status" => 3,
                     ];
