@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Http\Controllers\IDNPokerController;
 
 class playerRestrictionWallet extends Command
 {
@@ -37,8 +38,7 @@ class playerRestrictionWallet extends Command
      */
     public function handle()
     {
-        DD("awwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww STOPPPPPPPPPPPPP");
-    //    $arguments = $this->argument('resend-id');
-    //    EveryMatrix::resendRound($arguments);
+        
+        IDNPokerController::callRetryPlayerRestricted();
     }
 }
