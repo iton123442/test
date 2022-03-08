@@ -1399,7 +1399,7 @@ class FreeSpinHelper{
          if(isset($getFreespin)) {
             $promoCode = "B-FS02";
             $datatosend = [
-                "merchantCode"=> $getFreespin->player_id,
+                "merchantCode"=> config("providerlinks.spade.merchantCode"),
                 "tranId"=>  json_decode($getFreespin->details),
                 "promotionCode" => $promoCode,
                 "serialNo"=>$originalfreeround_id[1]
