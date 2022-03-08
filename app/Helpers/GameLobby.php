@@ -798,7 +798,8 @@ class GameLobby{
     public static function spadeLaunch($game_code,$token,$exitUrl,$lang='en_US'){
         $client_details = ProviderHelper::getClientDetails('token', $token);
         $domain =  $exitUrl;
-        $url = 'https://lobby.silverkirinplay.com/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
+        // $url = 'https://lobby.silverkirinplay.com/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
+        $url = 'https://lobby-egame-staging.sgplay.net/TIGERG/auth/?acctId=TIGERG_'.$client_details->player_id.'&language='.$lang.'&token='.$token.'&game='.$game_code.'';
         return $url;
     }
     
@@ -2009,60 +2010,88 @@ class GameLobby{
                 if(isset($data["userid"]) && isset($data["username"])) {
                     /***************************************************************
                     *
-                    * GET URL / OR LOGIN TO PROVIDER
+                    * CHECK IF PLAYER RESTRICTION
                     *
                     ****************************************************************/
-                    $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token);
-                    if(isset($data["lobby_url"])){
-                        // do deposit
-                        $player_details = ProviderHelper::playerDetailsCall($request['token']);
-                        if(isset($player_details->playerdetailsresponse->status->code) && $player_details->playerdetailsresponse->status->code == 200){
-                            // ProviderHelper::_insertOrUpdate($client_details->token_id,$player_details->playerdetailsresponse->balance);                            
-                            switch($client_details->wallet_type){
-                                case 1: 
-                                    // SEAMLESS TYPE CLIENT
-                                    // BUT PROVDER TRANSFER WALLET
-                                    try {
-                                        $http = new Client();
-                                        $response = $http->post(config('providerlinks.oauth_mw_api.mwurl').'/api/idnpoker/makeDeposit', [
-                                            'form_params' => [
-                                                'token' => $request['token'],
-                                                'player_id'=> $client_details->player_id,
-                                                'amount' => $player_details->playerdetailsresponse->balance,
-                                            ],
-                                            'headers' =>[
-                                                'Accept'     => 'application/json'
-                                            ]
-                                        ]);
-                                        $iframe_data = json_decode((string) $response->getBody(), true);
-                                        Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
-                                        if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
+                    $data = IDNPokerHelper::checkPlayerRestricted($client_details->player_id);
+                    if($data == "false"){
+                        /***************************************************************
+                        *
+                        * GET URL / OR LOGIN TO PROVIDER
+                        *
+                        ****************************************************************/
+                        $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token);
+                        if(isset($data["lobby_url"])){
+                            // do deposit
+                            $player_details = ProviderHelper::playerDetailsCall($request['token']);
+                            if(isset($player_details->playerdetailsresponse->status->code) && $player_details->playerdetailsresponse->status->code == 200){
+                                // ProviderHelper::_insertOrUpdate($client_details->token_id,$player_details->playerdetailsresponse->balance);                            
+                                switch($client_details->wallet_type){
+                                    case 1: 
+                                        // SEAMLESS TYPE CLIENT
+                                        // BUT PROVDER TRANSFER WALLET
+                                        try {
+                                            $http = new Client();
+                                            $response = $http->post(config('providerlinks.oauth_mw_api.mwurl').'/api/idnpoker/makeDeposit', [
+                                                'form_params' => [
+                                                    'token' => $request['token'],
+                                                    'player_id'=> $client_details->player_id,
+                                                    'amount' => $player_details->playerdetailsresponse->balance,
+                                                ],
+                                                'headers' =>[
+                                                    'Accept'     => 'application/json'
+                                                ]
+                                            ]);
+                                            $iframe_data = json_decode((string) $response->getBody(), true);
+                                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
+                                            if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
+                                                return "false";
+                                            }
+                                        } catch (\Exception $e) {
+                                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, json_encode($player_details),  $e->getMessage() );
                                             return "false";
                                         }
-                                    } catch (\Exception $e) {
-                                        Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, json_encode($player_details),  $e->getMessage() );
+                                        $data_to_send_play = array(
+                                            "url" => $data["lobby_url"],
+                                            "token" => $client_details->player_token,
+                                            "player_id" => $client_details->player_id,
+                                            "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
+                                        );
+                                        $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
+                                        // return urlencode($encoded_data);
+                                        return config('providerlinks.play_betrnk') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
+                                    case 2:
+                                        //TRANSFER WALLET CLIENT
+                                        //TRANSFER WALLET SA PROIVDER
+                                        return $data["lobby_url"];
+                                    default:
                                         return "false";
-                                    }
-                                    $data_to_send_play = array(
-                                        "url" => $data["lobby_url"],
-                                        "token" => $client_details->player_token,
-                                        "player_id" => $client_details->player_id,
-                                        "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
-                                    );
-                                    $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
-                                    // return urlencode($encoded_data);
-                                    return config('providerlinks.play_betrnk') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
-                                case 2:
-                                    //TRANSFER WALLET CLIENT
-                                    //TRANSFER WALLET SA PROIVDER
-                                    return $data["lobby_url"];
-                                default:
-                                    return "false";
+                                }
+                            }else{
+                                return "false";
                             }
-                        }else{
+                            
+                        }
+                    } else {
+                        try {
+                            $http = new Client();
+                            $response = $http->post(config('providerlinks.oauth_mw_api.mwurl').'/api/idnpoker/retryWithdrawalWallet', [
+                                'form_params' => [
+                                    'player_id'=> $client_details->player_id,
+                                ],
+                                'headers' =>[
+                                    'Accept'     => 'application/json'
+                                ]
+                            ]);
+                            $iframe_data = json_decode((string) $response->getBody(), true);
+                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode($iframe_data),  json_encode($iframe_data) );
+                            if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
+                                return "false";
+                            }
+                        } catch (\Exception $e) {
+                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
                             return "false";
                         }
-                        
                     }
                     
                 }

@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\AlCron',        
         'App\Console\Commands\riandraft',
         'App\Console\Commands\UpdateCurrency',    
-        'App\Console\Commands\TransferWallet',           
+        'App\Console\Commands\TransferWallet',    
+        'App\Console\Commands\playerRestrictionWallet',        
     ];
 
     /**
