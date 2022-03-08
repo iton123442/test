@@ -1376,7 +1376,7 @@ class FreeSpinHelper{
                 }
                 else {          
                     $data = [
-                        "details" => json_encode($dataresponse->transId)
+                        "details" => json_encode($dataresponse->tranId)
                     ];
                     FreeSpinHelper::updateFreeRound($data, $id);
                     $freespinExtenstion = [
@@ -1394,7 +1394,7 @@ class FreeSpinHelper{
     
     public static function cancelFreeRoundSpadeGaming($freeround_id){
         Helper::saveLog('Spade CancelFreeRound',59, json_encode($freeround_id), 'Cancel FreeRound HIT!');
-        
+        $originalfreeround_id = explode("_", $freeround_id);
          $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
          if(isset($getFreespin)) {
             $promoCode = "B-FS02";
@@ -1402,7 +1402,7 @@ class FreeSpinHelper{
                 "merchantCode"=> $getFreespin->player_id,
                 "tranId"=>  json_decode($getFreespin->details),
                 "promotionCode" => $promoCode,
-                "serialNo"=>$freeround_id
+                "serialNo"=>$originalfreeround_id[1]
             ];
             $client = new Client(['headers' => [ 
                 'API' => 'cancelFreeSpin',
