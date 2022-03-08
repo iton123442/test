@@ -1347,7 +1347,7 @@ class FreeSpinHelper{
                         "status" => 3,
                     ];
                     
-                    Helper::saveLog('SpadeGamingFS', 37,json_encode($requestBody),  json_encode($dataresponse));
+                    Helper::saveLog('SpadeGamingFS', 59,json_encode($requestBody),  json_encode($dataresponse));
                     FreeSpinHelper::updateFreeRound($createFreeround, $id);
                     $freespinExtenstion = [
                         "freespin_id" => $id,
@@ -1392,7 +1392,7 @@ class FreeSpinHelper{
         }
     }
     
-    public static function cancelFreeSpadeGaming($freeround_id){
+    public static function cancelFreeRoundSpadeGaming($freeround_id){
         Helper::saveLog('Spade CancelFreeRound',59, json_encode($freeround_id), 'Cancel FreeRound HIT!');
         
          $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
