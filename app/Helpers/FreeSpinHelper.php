@@ -1342,7 +1342,6 @@ class FreeSpinHelper{
                     $game_link_response = $client->post(config("providerlinks.spade.api_url"),
                     ['body' => json_encode($requestBody)]);
                     $dataresponse = json_decode($game_link_response->getBody()->getContents()); // get response
-                    dd($dataresponse);
                 }catch(\Exception $e){
                     $createFreeround = [
                         "status" => 3,
@@ -1411,7 +1410,7 @@ class FreeSpinHelper{
                 ]
             ]);
             try{
-                $game_link_response = $client->post($baseUrl,['body' => json_encode($datatosend)]);
+                $game_link_response = $client->post(config("providerlinks.spade.api_url"),['body' => json_encode($datatosend)]);
                 $dataresponse = json_decode($game_link_response->getBody()->getContents());
                 $data = [
                     "status" => 4,
