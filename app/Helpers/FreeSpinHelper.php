@@ -1347,7 +1347,7 @@ class FreeSpinHelper{
                         "status" => 3,
                     ];
                     
-                    Helper::saveLog('SpadeGamingFS', 37,json_encode($requestBody),  json_encode($dataresponse));
+                    Helper::saveLog('SpadeGamingFS', 59,json_encode($requestBody),  json_encode($dataresponse));
                     FreeSpinHelper::updateFreeRound($createFreeround, $id);
                     $freespinExtenstion = [
                         "freespin_id" => $id,
@@ -1374,7 +1374,11 @@ class FreeSpinHelper{
                     FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
                     return 400;
                 }
-                else {
+                else {          
+                    $data = [
+                        "details" => json_encode($dataresponse->tranId)
+                    ];
+                    FreeSpinHelper::updateFreeRound($data, $id);
                     $freespinExtenstion = [
                         "freespin_id" => $id,
                         "mw_request" => json_encode($requestBody),
@@ -1388,5 +1392,49 @@ class FreeSpinHelper{
         }
     }
     
+    public static function cancelFreeRoundSpadeGaming($freeround_id){
+        Helper::saveLog('Spade CancelFreeRound',59, json_encode($freeround_id), 'Cancel FreeRound HIT!');
+        $originalfreeround_id = explode("_", $freeround_id);
+         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+         if(isset($getFreespin)) {
+            $promoCode = "B-FS02";
+            $datatosend = [
+                "merchantCode"=> $getFreespin->player_id,
+                "tranId"=>  json_decode($getFreespin->details),
+                "promotionCode" => $promoCode,
+                "serialNo"=>$originalfreeround_id[1]
+            ];
+            $client = new Client(['headers' => [ 
+                'API' => 'cancelFreeSpin',
+                'DataType' => 'JSON'
+                ]
+            ]);
+            try{
+                $game_link_response = $client->post(config("providerlinks.spade.api_url"),['body' => json_encode($datatosend)]);
+                $dataresponse = json_decode($game_link_response->getBody()->getContents());
+                $data = [
+                    "status" => 4,
+                ];
+                Helper::saveLog('Spade Cancelfreespin Success', 59, json_encode($data), json_encode($dataresponse));
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+                 return 200;
+            }catch (\Exception $e) {
+                $dataresponse = [
+                    "error" => json_encode($e)
+                ];
+                $data = [
+                    "status" => 0,
+                ];
+
+                Helper::saveLog('Spade Cancelfreespin error', 59, json_encode($data), json_encode($dataresponse));
+
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            
+                return 400;
+            }
+    
+         }
+        
+    }
 }
 ?>
