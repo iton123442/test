@@ -8,6 +8,7 @@ use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
 use App\Models\GameTransactionMDB;
 use App\Helpers\ClientRequestHelper;
+use App\Helpers\FreeSpinHelper;
 use DB;
 
 class SpadeController extends Controller
@@ -647,6 +648,34 @@ class SpadeController extends Controller
 						"game_transaction_id" => $game_trans_id
 		
 					];
+					if($details->gameCode == "B-FS02") {
+						$freeroundID = $details->serialNo;
+						$getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+						Helper::saveLog('Spade FreeRound', $this->provider_db_id, json_encode($details),'FREEROUND HIT!');
+						if($getFreespin){
+							$getOrignalfreeroundID = explode("_",$freeroundID);
+							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+							$updateFreespinData = [
+								"status" => $status,
+								"win" => $getFreespin->win + $amount,
+								"spin_remaining" => $getFreespin->spin_remaining - 1
+							];
+							$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+							if($status == 2 ){
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+							} else {
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+							}
+							//create transction 
+							$createFreeRoundTransaction = array(
+								"game_trans_id" => $$bet_transaction->game_trans_id,
+								'freespin_id' => $getFreespin->freespin_id
+							);
+							FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+						}
+					}
+
 					try {
 						$client = new Client();
 						$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
