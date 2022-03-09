@@ -806,7 +806,7 @@ public function gameBet($request, $client_details){
         $request_sign = $request->header('x-request-sign');
         $secret = config('providerlinks.bgaming.AUTH_TOKEN');
         $signature = hash_hmac('sha256',json_encode($payload),$secret);
-        // dd($signature);
+        dd($signature);
         Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
         if($signature != $request_sign){
                 $response = [
