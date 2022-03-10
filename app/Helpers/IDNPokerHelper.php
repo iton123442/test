@@ -41,7 +41,7 @@ class IDNPokerHelper{
         
     }
 
-    public static function registerPlayer($player_id,$auth){
+    public static function registerPlayer($player_id,$auth,$password){
         try {
             $url = config('providerlinks.idnpoker.URL');
             $request = '
@@ -49,8 +49,8 @@ class IDNPokerHelper{
             <secret_key>'.$auth.'</secret_key>
                 <id>1</id>
                 <userid>'.$player_id.'</userid>
-                <password>'.$player_id.'</password>
-                <confirm_password>'.$player_id.'</confirm_password>
+                <password>'.$password.'</password>
+                <confirm_password>'.$password.'</confirm_password>
                 <username>'.$player_id.'</username>
             </request>';
             Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK REGISTER REQUEST" );
@@ -61,8 +61,8 @@ class IDNPokerHelper{
                         <secret_key>'.$auth.'</secret_key>
                             <id>1</id>
                             <userid>'.$player_id.'</userid>
-                            <password>'.$player_id.'</password>
-                            <confirm_password>'.$player_id.'</confirm_password>
+                            <password>'.$password.'</password>
+                            <confirm_password>'.$password.'</confirm_password>
                             <username>'.$player_id.'</username>
                         </request>'
             ]
@@ -80,7 +80,7 @@ class IDNPokerHelper{
     }
 
 
-    public static function gameLaunchURLLogin($data, $player_id, $client_details, $auth) {
+    public static function gameLaunchURLLogin($data, $player_id, $client_details, $auth,$password) {
         try {
             $url = config('providerlinks.idnpoker.URL');
             $supportlang = [
@@ -102,7 +102,7 @@ class IDNPokerHelper{
             <secret_key>'.$auth.'</secret_key>
                 <id>2</id>
                 <userid>'.$player_id.'</userid>
-                <password>'.$player_id.'</password>
+                <password>'.$password.'</password>
                 <ip>'.$IP.'</ip>
                 <secure>1</secure>
                 <mobile>1</mobile>
@@ -116,7 +116,7 @@ class IDNPokerHelper{
                         <secret_key>'.$auth.'</secret_key>
                             <id>2</id>
                             <userid>'.$player_id.'</userid>
-                            <password>'.$player_id.'</password>
+                            <password>'.$password.'</password>
                             <ip>'.$IP.'</ip>
                             <secure>1</secure>
                             <mobile>1</mobile>

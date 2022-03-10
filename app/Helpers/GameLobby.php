@@ -1991,6 +1991,7 @@ class GameLobby{
             $aes = new AES($key);
             // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
             $player_id = $client_details->client_player_id;
+            $password = $client_details->player_id.$client_details->client_player_id;
             $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
             /***************************************************************
             *
@@ -2005,7 +2006,7 @@ class GameLobby{
             ****************************************************************/
             if ($data != "false") {
                 if (isset($data["error"])) {
-                    $data = IDNPokerHelper::registerPlayer($player_id,$auth_token);
+                    $data = IDNPokerHelper::registerPlayer($player_id,$auth_token,$password);
                 }
                 $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
                 if(isset($data["userid"]) && isset($data["username"])) {
@@ -2021,7 +2022,7 @@ class GameLobby{
                         * GET URL / OR LOGIN TO PROVIDER
                         *
                         ****************************************************************/
-                        $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token);
+                        $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token,$password);
                         if(isset($data["lobby_url"])){
                             // do deposit
                             $player_details = ProviderHelper::playerDetailsCall($request['token']);
