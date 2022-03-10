@@ -90,7 +90,8 @@ class IDNPokerController extends Controller
 
         // $player_id = "TGTW_". $client_details->player_id;
         $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
-        $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+        // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+        $player_id =$client_details->client_player_id;
         $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
         if ($data != "false") {
             $msg = array(
@@ -240,7 +241,8 @@ class IDNPokerController extends Controller
                     Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($clientFunds_response), "FUNDSTRANSFER RESPONSE");
                     if (isset($clientFunds_response->fundtransferresponse->status->code)) {
                         $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
-                        $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                        // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                        $player_id =$client_details->client_player_id;
                         $msg = array(
                             "status" => "ok",
                             "message" => "Transaction success",
@@ -439,7 +441,8 @@ class IDNPokerController extends Controller
                      * -----------------------------------------------
                      */   
                     $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
-                    $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                    // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                    $player_id =$client_details->client_player_id;
                     $data = IDNPokerHelper::playerDetails($player_id,$auth_token); // check balance
                     if(isset($data["userid"]) && isset($data["username"]) &&  isset($data["balance"]) ) {
                         if($data["balance"] == 0 || $data["balance"] == "0") {
