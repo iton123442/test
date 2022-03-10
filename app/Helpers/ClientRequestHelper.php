@@ -322,7 +322,7 @@ class ClientRequestHelper{
                         ];
                         ProviderHelper::saveLogLatency($requesttocient['request_body']['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() . ' TG_PROCESS');
                     },
-                    'timeout' => 0.005, # enough tobe received by the server!
+                    'timeout' => 0.5, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
                 ],
                 ['defaults' => ['exceptions' => false]]
