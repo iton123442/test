@@ -1991,7 +1991,7 @@ class GameLobby{
             $aes = new AES($key);
             // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
             $player_id = $client_details->client_player_id;
-            $password = $client_details->player_id.$client_details->client_player_id;
+            $password = config('providerlinks.idnpoker.prefix').$client_details->player_id;
             $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
             /***************************************************************
             *
