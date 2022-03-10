@@ -1989,7 +1989,8 @@ class GameLobby{
             $client_details = ProviderHelper::getClientDetails('token',$request['token']);
             $key = "LUGTPyr6u8sRjCfh";
             $aes = new AES($key);
-            $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+            // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+            $player_id = $client_details->username;
             $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
             /***************************************************************
             *
