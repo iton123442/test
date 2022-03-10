@@ -277,4 +277,10 @@ class IDNPokerHelper{
 		$where = 'where idtw_player_restriction = '.$identifier;
 		DB::select('delete from tw_player_restriction '.$where);
 	}
+
+    public static function getPlayerID($player_id){
+		$query = DB::select('select * from players where username = "'.$player_id.'"');
+		$data = count($query);
+		return $data > 0 ? $query[0] : "false";
+	}
 }
