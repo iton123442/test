@@ -756,6 +756,7 @@ class IDNPokerController extends Controller
                         Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
                         return response($msg, 200)->header('Content-Type', 'application/json');
                     } 
+                    $client_transaction_id = $client_details->client_id.'_'.$checkPlayerRestricted->client_transaction_id;
                     /**
                      * -----------------------------------------------
                      *  PROVIDER WITHDRAW
@@ -783,7 +784,7 @@ class IDNPokerController extends Controller
                                 "amount" => $amount_to_withdraw,
                                 "client_id" => $client_details->client_id,
                                 "operator_id" => $client_details->operator_id,
-                                "client_transaction_id" => $checkPlayerRestricted->client_transaction_id, //UNIQUE TRANSACTION
+                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                                 "status" => 5,
                             ];
                             $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
@@ -791,7 +792,7 @@ class IDNPokerController extends Controller
                                 "client_request" => json_encode($data_deposit),
                                 "mw_response" =>  json_encode($provider_response),
                                 "wallet_type" => $wallet_type,
-                                "client_transaction_id" => $checkPlayerRestricted->client_transaction_id, //UNIQUE TRANSACTION
+                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                                 "tw_account_id" => $game_trans_id,
                                 "status_code" => "200",
                                 "general_details" => json_encode("Provider Success Response")
@@ -810,7 +811,7 @@ class IDNPokerController extends Controller
                              */   
                             $log_data = [
                                 "wallet_type" => $wallet_type,
-                                "client_transaction_id" => $checkPlayerRestricted->client_transaction_id, //UNIQUE TRANSACTION
+                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                                 "tw_account_id" => $game_trans_id,
                             ];
                             $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($log_data);
