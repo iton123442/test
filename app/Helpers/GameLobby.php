@@ -725,7 +725,8 @@ class GameLobby{
             'user_id'=> $client_player_details->player_id,
             'language'=> $client_player_details->language ? $client_player_details->language : 'en',
             'https' => 1,
-            'platform' => 'mobile'
+            'platform' => 'mobile',
+            'exit_url' => $request->exitUrl
           ],
           "denomination" => 'default', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
