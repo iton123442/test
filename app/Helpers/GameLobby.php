@@ -714,7 +714,7 @@ class GameLobby{
         
     }
 
-    public static function tgglaunchUrl( $game_code = null, $token = null){
+    public static function tgglaunchUrl( $game_code = null, $token = null,$exitUrl = null){
         $client_player_details = Providerhelper::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.tgg.project_id'),
@@ -726,7 +726,7 @@ class GameLobby{
             'language'=> $client_player_details->language ? $client_player_details->language : 'en',
             'https' => 1,
             'platform' => 'mobile',
-            'exit_url' => $request->exitUrl
+            'exit_url' => $exitUrl
           ],
           "denomination" => 'default', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
