@@ -562,7 +562,7 @@ class FreeSpinHelper{
             );
             $data = [
                 "status" => 3,
-                "details" => json_encode($dataresponse->freespinids[0][1])
+                "details" => $e->getMessage()." ".$e->getLine()." ".$e->getFile()
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
