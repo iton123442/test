@@ -518,7 +518,7 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id, $freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        $quickSpinDenom = $data["details"]["denomination"];
+        $quickSpinDenom = $data["details"]["denomination"] * 100;
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
