@@ -518,7 +518,7 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id, $freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-        $quickSpinDenom = $data["details"]["denomination"];
+        $quickSpinValue = $data["details"]["denomination"] * 100;
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -526,7 +526,7 @@ class FreeSpinHelper{
                 "total_spin" => $data["details"]["rounds"],
                 "spin_remaining" => $data["details"]["rounds"],
                 "provider_trans_id" => $freeround_id,
-                "denominations" => $quickSpinDenom,
+                "denominations" => $data["details"]["denomination"],
                 "date_expire" => $data["details"]["expiration_date"],
             ];
         } catch (\Exception $e) {
@@ -547,7 +547,7 @@ class FreeSpinHelper{
             'remoteusername' => $player_details->player_id,
             'gameid' => $data['game_code'],
             'amount' => (int)$data["details"]["rounds"],
-            'freespinvalue' => (int)$quickSpinDenom,
+            'freespinvalue' => (int)$quickSpinValue,
             'promocode' => "TG".$freeround_id
         ];
         $baseUrl = config("providerlinks.quickspinDirect.partner_api_url")."/freespins/add";
@@ -560,6 +560,11 @@ class FreeSpinHelper{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
+            $data = [
+                "status" => 3,
+                "details" => json_encode("FAILED")
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
                 "freespin_id" => $id,
                 "mw_request" => json_encode($requesttosend),
