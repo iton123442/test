@@ -562,7 +562,7 @@ class FreeSpinHelper{
             );
             $data = [
                 "status" => 3,
-                "details" => $e->getMessage()." ".$e->getLine()." ".$e->getFile()
+                "details" => "FAILED"
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
