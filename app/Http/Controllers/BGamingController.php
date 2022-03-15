@@ -41,6 +41,7 @@ class BGamingController extends Controller
                             "balance" => '0'
                         ];
 
+
          return response($response,400)->header('Content-Type', 'application/json');
 		}
 		if($client_details == 'false'){
@@ -85,6 +86,10 @@ class BGamingController extends Controller
                         ];
                         return response($response,412)->header('Content-Type', 'application/json');
                     }else{
+                        if($payload['actions'][0]['action'] == 'win' && $payload['actions'][1]['action'] == 'win'){
+                             $response = $this->gameWin($request->all(), $client_details);
+                             return response($response,200)->header('Content-Type', 'application/json');
+                        }
                         $this->gameBet($request->all(), $client_details);
                     }
                     $response = $this->gameWin($request->all(), $client_details);
@@ -403,10 +408,15 @@ public function gameBet($request, $client_details){
             ProviderHelper::_insertOrUpdate($client_details->token_id,$client_details->balance);
             $processtime = new DateTime('NOW');
             if(isset($payload['actions'][1]['action'])){
-            	if($payload['actions'][1]['action'] == 'win'){
-            	$win_load = $payload['actions'][1]['action_id'];
-            	$pay_amount = $payload['actions'][1]['amount']/100;
-            	}
+                if($payload['actions'][0]['action'] == 'win' && $payload['actions'][1]['action'] == 'win'){
+                    $win_load = $payload['actions'][0]['amount'] + $payload['actions'][1]['action_id'];
+                    $pay_amount = ($payload['actions'][0]['amount'] + $payload['actions'][1]['amount'])/100;
+                }else{
+                	if($payload['actions'][1]['action'] == 'win'){
+                    	$win_load = $payload['actions'][1]['action_id'];
+                    	$pay_amount = $payload['actions'][1]['amount']/100;
+                	}
+                }
             }else{
             	if($action_status == true){
             		$pay_amount = 0;
@@ -553,8 +563,8 @@ public function gameBet($request, $client_details){
                     "mw_response" => json_encode($response),
                     'mw_request' => json_encode($client_response->requestoclient),
                     'client_response' => json_encode($client_response->fundtransferresponse),
-                    'transaction_detail' => 'progressing',
-                    'general_details' => 'progressing',
+                    'transaction_detail' => 'success',
+                    'general_details' => 'success',
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                   Helper::saveLog('2', $this->provider_db_id, json_encode($request),$response);
@@ -805,8 +815,10 @@ public function gameBet($request, $client_details){
         $payload = $request->all();
         $request_sign = $request->header('x-request-sign');
         $secret = config('providerlinks.bgaming.AUTH_TOKEN');
-        $signature = hash_hmac('sha256',json_encode($payload),$secret);
-        dd($signature);
+        // $signature = hash_hmac('sha256',json_encode($payload),$secret);
+        $signature = hash_hmac('sha256','{"casino_id":"tigergames-int","issue_id":"12458114135","currency":"USD","games":["MechanicalOrange"],"valid_until":"2022-03-12T20:03:19Z","bet_level":3,"freespins_quantity":10,"user":{"id":"55011","email":"casino14@betrnk.com","firstname":"casino14","lastname":"casino14","nickname":"casino14 casino14","city":"PH","country":"PH","date_of_birth":"2021-01-29","gender":"m"}}','HZhPwLMXtHrmQUxjmMvBmCPM');
+        // dd($signature);
+
         Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
         if($signature != $request_sign){
                 $response = [
