@@ -658,7 +658,7 @@ class SpadeController extends Controller
 							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
 							$updateFreespinData = [
 								"status" => $status,
-								"win" => $getFreespin->win + $amount,
+								"win" => $getFreespin->win + $details->amount,
 								"spin_remaining" => $getFreespin->spin_remaining - 1
 							];
 							$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
