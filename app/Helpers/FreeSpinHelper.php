@@ -560,6 +560,11 @@ class FreeSpinHelper{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
+            $data = [
+                "status" => 3,
+                "details" => json_encode($dataresponse->freespinids[0][1])
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
                 "freespin_id" => $id,
                 "mw_request" => json_encode($requesttosend),
