@@ -2106,6 +2106,49 @@ class GameLobby{
             return "false";
         }
     }
+
+
+    public static function ygglaunchUrl($data,$device){
+        $provider_id = config("providerlinks.ygg002.provider_db_id");
+        if($device == 'desktop'){$channel = 'pc';$fullscreen='yes';}else{ $channel = 'mobile';$fullscreen='no';}
+        ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), "Endpoing hit");
+        $api_url = config("providerlinks.ygg002.api_url");
+        $org = config("providerlinks.ygg002.Org");
+        $key = config("providerlinks.ygg002.key");
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        try{
+            $requesttosend = [
+                "loginname" => $client_details->username,
+                "key" => $data['token'],
+                "currency" => $client_details->default_currency,
+                "lang" => $data['lang'],
+                "gameid" => $data['game_code'],
+                "org" => $org,
+                "channel" => $channel,
+                "home" => $data['exitUrl'],
+                "fullscreen" => $fullscreen,
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ]
+            ]);
+            $response = $client->post($api_url,[
+                'form_params' => $requesttosend,
+            ]);
+            $res = json_decode($response->getBody(),TRUE);
+            $url = $res['data']['launchurl'];
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $url);
+            return $url;
+        }catch(\Exception $e){
+            $error = [
+                'error' => $e->getMessage()
+            ];
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $e->getMessage());
+            return $error;
+        }
+
+    }
 }
 
 ?>

@@ -732,7 +732,13 @@ return [
         'operator_key' => 'nXxOCeSCh4ko4q6q',
         'opid'=> 2540
     ],
-
+    'ygg002'=>[
+        'api_url' => 'https://seamless-stage.248ka.com/restless/launchClient.html?',
+        'Org' => 'TIGERGAMES002',
+        'topOrg' => 'TigerGamesGroup',
+        'key' => 'yGdqhLKv7E5WUf3ThmW',
+        'provider_db_id' => 70,
+    ],
 ];
 
 ?>
