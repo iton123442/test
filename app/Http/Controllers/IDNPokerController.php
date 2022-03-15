@@ -90,7 +90,8 @@ class IDNPokerController extends Controller
 
         // $player_id = "TGTW_". $client_details->player_id;
         $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
-        $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+        // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+        $player_id = $client_details->username;
         $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
         if ($data != "false") {
             $msg = array(
@@ -240,7 +241,8 @@ class IDNPokerController extends Controller
                     Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($clientFunds_response), "FUNDSTRANSFER RESPONSE");
                     if (isset($clientFunds_response->fundtransferresponse->status->code)) {
                         $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
-                        $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                        // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                        $player_id = $client_details->username;
                         $msg = array(
                             "status" => "ok",
                             "message" => "Transaction success",
@@ -439,7 +441,8 @@ class IDNPokerController extends Controller
                      * -----------------------------------------------
                      */   
                     $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
-                    $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                    // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                    $player_id = $client_details->username;
                     $data = IDNPokerHelper::playerDetails($player_id,$auth_token); // check balance
                     if(isset($data["userid"]) && isset($data["username"]) &&  isset($data["balance"]) ) {
                         if($data["balance"] == 0 || $data["balance"] == "0") {
@@ -610,8 +613,9 @@ class IDNPokerController extends Controller
                         ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"]);
                         if($value["status"] != "Withdraw" && $value["status"] != "Deposit") {
                             $gameDetails = self::getSubGameDetails(config('providerlinks.idnpoker.PROVIDER_ID'), $value["game"]);
-                            $playerID = substr($value["userid"],4);
-                            $getClientDetails = ProviderHelper::getClientDetails("player_id", $playerID);
+                            // $playerID = substr($value["userid"],4);
+                            $playerDetails = IDNPokerHelper::getPlayerID($value["userid"]); //TESTINGn); // check balance
+                            $getClientDetails = ProviderHelper::getClientDetails("player_id", $playerDetails->player_id);
                             if($getClientDetails != null){
                                 $pay_amount = 0;
                                 $bet_amount = 0;
@@ -738,7 +742,8 @@ class IDNPokerController extends Controller
                  * -----------------------------------------------
                  */   
                 $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
-                $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                $player_id = $client_details->username;
                 $data = IDNPokerHelper::playerDetails($player_id,$auth_token); // check balance
                 if(isset($data["userid"]) && isset($data["username"]) &&  isset($data["balance"]) ) {
                     if($data["balance"] == 0 || $data["balance"] == "0") {
@@ -756,6 +761,7 @@ class IDNPokerController extends Controller
                         Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
                         return response($msg, 200)->header('Content-Type', 'application/json');
                     } 
+                    $client_transaction_id = $client_details->client_id.'_'.$checkPlayerRestricted->client_transaction_id;
                     /**
                      * -----------------------------------------------
                      *  PROVIDER WITHDRAW
@@ -783,7 +789,7 @@ class IDNPokerController extends Controller
                                 "amount" => $amount_to_withdraw,
                                 "client_id" => $client_details->client_id,
                                 "operator_id" => $client_details->operator_id,
-                                "client_transaction_id" => $checkPlayerRestricted->client_transaction_id, //UNIQUE TRANSACTION
+                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                                 "status" => 5,
                             ];
                             $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
@@ -791,7 +797,7 @@ class IDNPokerController extends Controller
                                 "client_request" => json_encode($data_deposit),
                                 "mw_response" =>  json_encode($provider_response),
                                 "wallet_type" => $wallet_type,
-                                "client_transaction_id" => $checkPlayerRestricted->client_transaction_id, //UNIQUE TRANSACTION
+                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                                 "tw_account_id" => $game_trans_id,
                                 "status_code" => "200",
                                 "general_details" => json_encode("Provider Success Response")
@@ -810,7 +816,7 @@ class IDNPokerController extends Controller
                              */   
                             $log_data = [
                                 "wallet_type" => $wallet_type,
-                                "client_transaction_id" => $checkPlayerRestricted->client_transaction_id, //UNIQUE TRANSACTION
+                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                                 "tw_account_id" => $game_trans_id,
                             ];
                             $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($log_data);
