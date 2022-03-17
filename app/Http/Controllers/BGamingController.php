@@ -646,7 +646,7 @@ public function gameBet($request, $client_details){
                                 'transaction_detail' => 'success',
                                 'general_details' => 'success',
                             );
-                        Helper::saveLog('Bgaming after success updateTransactionEXt', $this->provider_db_id, json_encode($payload), $client_response);   
+                        Helper::saveLog('Bgaming after success updateTransactionEXt', $this->provider_db_id, json_encode($request->all()), $client_response);   
                         GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                     case '402':
                         $response = [
