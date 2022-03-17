@@ -611,6 +611,7 @@ $app->get('/public/api/justplay/callback', 'JustPlayController@callback');
 
 // BGaming Single Controller Endpoints
 $app->post('/public/api/bgaming/play', 'BGamingController@gameTransaction');
+$app->post('/public/api/bgaming/freespins', 'BGamingController@freeSpinSettlement');
 $app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
 $app->post('/public/api/bgaming/checkSign', 'BGamingController@signatureChecker');
 
