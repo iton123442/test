@@ -626,7 +626,7 @@ public function gameBet($request, $client_details){
             "round_id" => $request->issue_id,
             "amount" => 0,
             "game_transaction_type"=> 1,
-            "provider_request" =>json_encode($request),
+            "provider_request" =>json_encode($request->all()),
         );
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
@@ -673,6 +673,9 @@ public function gameBet($request, $client_details){
             ];
         Helper::saveLog('BG find client_detailss', $this->provider_db_id, json_encode($request),$client_details);
         GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+        $response = [
+            "balance" => (float)$balance,
+        ];
         $status = 2;
         $updateFreespinData = [
             "status" => 2,
@@ -718,9 +721,7 @@ public function gameBet($request, $client_details){
         $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
         $win_bal = number_format($winbBalance,2,'.','');
         $balance = str_replace(".", "", $win_bal);
-        $response = [
-            "balance" => (float)$balance,
-        ];
+        
         return $response;
 
     }//end freespin action
