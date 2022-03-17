@@ -165,7 +165,6 @@ class GameLobbyController extends Controller
                );
                return $msg;
            }
-
             // // Filters
             if(ClientHelper::checkClientID($request->all()) != 200){
                 $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->client_id);
@@ -179,13 +178,12 @@ class GameLobbyController extends Controller
                 ->header('Content-Type', 'application/json');
             }
             
-            
            $solid_gamings = [2, 3, 5, 6, 7, 8, 10, 9, 11, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25, 26, 28];
-
+      
             $lang = $request->has("lang")?$request->input("lang"):"en";
             if($token=Helper::checkPlayerExist($request->client_id,$request->client_player_id,$request->username,$request->email,$request->display_name,$request->token,$ip_address)){
 
-               
+                
 
                 # Check if player is allowed to play a specific game
                 Helper::savePLayerGameRound( $request->input("game_code"), $request->input("token"), $request->input("game_provider"));
@@ -209,7 +207,6 @@ class GameLobbyController extends Controller
                  # EXPERIMENTAL - GAME BALANCE INHOUSE (SAVE ALL PLAYER BALANCE)
 
                  $save_balance = ProviderHelper::saveBalance($request->token);
-
                  if($save_balance == false){
                      $log_id = Helper::saveLog('GAME LAUNCH', 1223, json_encode($request->all()), 'FAILED LAUNCH SAVE BALANCE'.$request->client_id);
                      $msg = array(
@@ -220,7 +217,6 @@ class GameLobbyController extends Controller
                      return response($msg,200)
                      ->header('Content-Type', 'application/json');
                  }
-
                 
                 if($provider_code==35){
                     $url = GameLobby::icgLaunchUrl($request->game_code,$token,$request->exitUrl,$request->input('game_provider'),$lang);
@@ -978,6 +974,15 @@ class GameLobbyController extends Controller
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::SpearHeadGameLaunch($request->all(), $device), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code == 131 || $provider_code == 132){
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::ygglaunchUrl($request->all(), $device), 
                         "game_launch" => true
                     );
                     return response($msg,200)
