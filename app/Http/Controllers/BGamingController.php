@@ -629,8 +629,8 @@ public function gameBet($request, $client_details){
                 "game_transaction_type"=> 1,
                 "provider_request" =>json_encode($request->all()),
             );
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+            $game_trans_ext_idbet = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_details->game_code, $game_details->game_name, $game_trans_ext_idbet, $game_transaction_id, 'debit');
             if (isset($client_response->fundtransferresponse->status->code)) {
                 switch ($client_response->fundtransferresponse->status->code) {
                     case '200':
@@ -639,7 +639,6 @@ public function gameBet($request, $client_details){
                             "balance" => (float)$balance,
                         ];
                         $updateTransactionEXt = array(
-                                "provider_request" =>json_encode($request->all()),
                                 "mw_response" => json_encode($response),
                                 'mw_request' => json_encode($client_response->requestoclient),
                                 'client_response' => json_encode($client_response->fundtransferresponse),
@@ -682,7 +681,7 @@ public function gameBet($request, $client_details){
                 "game_transaction_type"=> 2,
                 "provider_request" =>json_encode($request->all()),
             );
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            $game_trans_ext_idwin = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
             $responseWin = [
                 "balance" => (float)$balance,
             ];
@@ -727,19 +726,19 @@ public function gameBet($request, $client_details){
                     ]
                 ]
             ];
-            Helper::saveLog('Bg Create Ext FS.', $this->provider_db_id, json_encode($request),$action_payload);
+            Helper::saveLog('Bg Create Ext FS.', $this->provider_db_id, json_encode($request->all()),$action_payload);
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
             $win_bal = number_format($winbBalance,2,'.','');
             $balance = str_replace(".", "", $win_bal);
             $updateTransactionEXt = array(
                     "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
+                    "mw_response" => json_encode($responseWin),
                     'mw_request' => json_encode($client_response->requestoclient),
                     'client_response' => json_encode($client_response->fundtransferresponse),
                     'transaction_detail' => 'success',
                     'general_details' => 'success',
                 );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_idwin,$client_details);
             return $responseWin;
         } catch (\Exception $e) {
             $msg = array(
