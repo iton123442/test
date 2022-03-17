@@ -587,7 +587,7 @@ public function gameBet($request, $client_details){
         $getFreespinTransaction = FreeSpinHelper::getFreeSpinDetails($request->issue_id, "provider_trans_id" );
         $client_details = ProviderHelper::getClientDetails('player_id', $getFreespinTransaction->player_id);
         try{
-            ProviderHelper::idenpotencyTable($request->issue_id);
+            ProviderHelper::idenpotencyTable("fs".$request->issue_id);
         }catch(\Exception $e){
             $balance = str_replace(".", "", $client_details->balance);
             $response = [
