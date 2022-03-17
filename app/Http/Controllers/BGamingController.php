@@ -583,6 +583,7 @@ public function gameBet($request, $client_details){
 		
 	}
     public function freeSpinSettlement(Request $request){
+        Helper::saveLog('Bgaming freespin transact', $this->provider_db_id, json_encode($request->all()), "ENDPOINTHIT");
         $getFreespinTransaction = FreeSpinHelper::getFreeSpinDetails($request->issue_id, "provider_trans_id" );
         $client_details = ProviderHelper::getClientDetails('player_id', $getFreespinTransaction->player_id);
         try{
