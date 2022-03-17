@@ -584,145 +584,154 @@ public function gameBet($request, $client_details){
 	}
     public function freeSpinSettlement(Request $request){
         Helper::saveLog('Bgaming freespin transact', $this->provider_db_id, json_encode($request->all()), "ENDPOINTHIT");
-        $getFreespinTransaction = FreeSpinHelper::getFreeSpinDetails($request->issue_id, "provider_trans_id" );
-        $client_details = ProviderHelper::getClientDetails('player_id', $getFreespinTransaction->player_id);
-        try{
-            ProviderHelper::idenpotencyTable("fs".$request->issue_id);
-        }catch(\Exception $e){
-            $balance = str_replace(".", "", $client_details->balance);
-            $response = [
-                "balance" => (float)$balance,
-              ];
-            return $response;
-        }
-        if($request->status != 'played'){
-            $balance = str_replace(".", "", $client_details->balance);
-            $response = [
-                "balance" => (float)$balance,
-              ];
-            return $response;
-        }
-        $game_details = Game::findbyid($getFreespinTransaction->game_id);
-        // dd($game_details);
-        $pay_amount = $request->total_amount/100;
-        $win_or_lost = $pay_amount > 0 ?  1 : 0;
-        $entry_id = $pay_amount > 0 ?  2 : 1;
-        $winbBalance = $client_details->balance + $pay_amount;
-        $gameTransactionData = array(
-            "provider_trans_id" => $request->issue_id,
-            "token_id" => $client_details->token_id,
-            "game_id" => $getFreespinTransaction->game_id,
-            "round_id" => $request->issue_id,
-            "bet_amount" => 0,
-            "win" => $win_or_lost,
-            "pay_amount" => 0,
-            "income" => 0,
-            "entry_id" => 1,
-        ); 
-        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-        $gameTransactionEXTData = array(
-            "game_trans_id" => $game_transaction_id,
-            "provider_trans_id" => $request->issue_id,
-            "round_id" => $request->issue_id,
-            "amount" => 0,
-            "game_transaction_type"=> 1,
-            "provider_request" =>json_encode($request->all()),
-        );
-        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-        $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-        if (isset($client_response->fundtransferresponse->status->code)) {
-            switch ($client_response->fundtransferresponse->status->code) {
-                case '200':
-                    $balance = str_replace(".", "", $client_details->balance);
-                    $response = [
-                        "balance" => (float)$balance,
-                      ];
-                    $updateTransactionEXt = array(
+        try {
+            $getFreespinTransaction = FreeSpinHelper::getFreeSpinDetails($request->issue_id, "provider_trans_id" );
+            $client_details = ProviderHelper::getClientDetails('player_id', $getFreespinTransaction->player_id);
+            try{
+                ProviderHelper::idenpotencyTable("fs".$request->issue_id);
+            }catch(\Exception $e){
+                $balance = str_replace(".", "", $client_details->balance);
+                $response = [
+                    "balance" => (float)$balance,
+                  ];
+                return $response;
+            }
+            if($request->status != 'played'){
+                $balance = str_replace(".", "", $client_details->balance);
+                $response = [
+                    "balance" => (float)$balance,
+                  ];
+                return $response;
+            }
+            $game_details = Game::findbyid($getFreespinTransaction->game_id);
+            // dd($game_details);
+            $pay_amount = $request->total_amount/100;
+            $win_or_lost = $pay_amount > 0 ?  1 : 0;
+            $entry_id = $pay_amount > 0 ?  2 : 1;
+            $winbBalance = $client_details->balance + $pay_amount;
+            $gameTransactionData = array(
+                "provider_trans_id" => $request->issue_id,
+                "token_id" => $client_details->token_id,
+                "game_id" => $getFreespinTransaction->game_id,
+                "round_id" => $request->issue_id,
+                "bet_amount" => 0,
+                "win" => $win_or_lost,
+                "pay_amount" => 0,
+                "income" => 0,
+                "entry_id" => 1,
+            ); 
+            $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+            $gameTransactionEXTData = array(
+                "game_trans_id" => $game_transaction_id,
+                "provider_trans_id" => $request->issue_id,
+                "round_id" => $request->issue_id,
+                "amount" => 0,
+                "game_transaction_type"=> 1,
+                "provider_request" =>json_encode($request->all()),
+            );
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+            if (isset($client_response->fundtransferresponse->status->code)) {
+                switch ($client_response->fundtransferresponse->status->code) {
+                    case '200':
+                        $balance = str_replace(".", "", $client_details->balance);
+                        $response = [
+                            "balance" => (float)$balance,
+                          ];
+                        $updateTransactionEXt = array(
+                                "provider_request" =>json_encode($request->all()),
+                                "mw_response" => json_encode($response),
+                                'mw_request' => json_encode($client_response->requestoclient),
+                                'client_response' => json_encode($client_response->fundtransferresponse),
+                                'transaction_detail' => 'success',
+                                'general_details' => 'success',
+                            );
+                        Helper::saveLog('Bgaming after success updateTransactionEXt', $this->provider_db_id, json_encode($payload), $client_response);   
+                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    case '402':
+                        $response = [
+                             "Error Code" => 500,
+                             "Message" => "Internal Error"
+                        ];
+                        $updateTransactionEXt = array(
                             "provider_request" =>json_encode($request->all()),
                             "mw_response" => json_encode($response),
                             'mw_request' => json_encode($client_response->requestoclient),
                             'client_response' => json_encode($client_response->fundtransferresponse),
-                            'transaction_detail' => 'success',
-                            'general_details' => 'success',
+                            'transaction_detail' => 'failed',
+                            'general_details' => 'failed',
                         );
-                    Helper::saveLog('Bgaming after success updateTransactionEXt', $this->provider_db_id, json_encode($payload), $client_response);   
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                case '402':
-                    $response = [
-                         "Error Code" => 500,
-                         "Message" => "Internal Error"
-                    ];
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($request->all()),
-                        "mw_response" => json_encode($response),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'failed',
-                        'general_details' => 'failed',
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-            }//end switch client response
-        }
-        ProviderHelper::_insertOrUpdate($client_details->token_id,$winbBalance);
-        $updateGameTransaction = [
-                'win' =>5,
-                'pay_amount' => $pay_amount,
-                'income' => 0 - $pay_amount,
-                'entry_id' => $entry_id,
-                'trans_status' => 2
+                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                }//end switch client response
+            }
+            ProviderHelper::_insertOrUpdate($client_details->token_id,$winbBalance);
+            $updateGameTransaction = [
+                    'win' =>5,
+                    'pay_amount' => $pay_amount,
+                    'income' => 0 - $pay_amount,
+                    'entry_id' => $entry_id,
+                    'trans_status' => 2
+                ];
+            Helper::saveLog('BG find client_detailss', $this->provider_db_id, json_encode($request),$client_details);
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+            $responseWin = [
+                "balance" => (float)$balance,
             ];
-        Helper::saveLog('BG find client_detailss', $this->provider_db_id, json_encode($request),$client_details);
-        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
-        $response = [
-            "balance" => (float)$balance,
-        ];
-        $status = 2;
-        $updateFreespinData = [
-            "status" => 2,
-            "spin_remaining" => 0
-        ];
-        FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespinTransaction->freespin_id);
-            //create transction 
-        if($status == 2) {
-            $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
-        }  else {
-            $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-        }
-        $action_payload = [
-            "type" => "custom", #genreral,custom :D # REQUIRED!
-            "custom" => [
-                "provider" => 'BGaming',
-                "client_connection_name" => $client_details->connection_name,
-                "win_or_lost" => $win_or_lost,
-                "entry_id" => $entry_id,
-                "pay_amount" => $pay_amount,
-                "income" => 0 - $pay_amount,
-                "game_trans_ext_id" => $game_trans_ext_id
-            ],
-            "provider" => [
-                "provider_request" => $request->all(), #R
-                "provider_trans_id"=> $request->issue_id, #R
-                "provider_round_id"=> $request->issue_id, #R
-            ],
-            "mwapi" => [
-                "roundId"=>$game_transaction_id, #R
-                "type"=>2, #R
-                "game_id" => $game_details->game_id, #R
-                "player_id" => $client_details->player_id, #R
-                "mw_response" => $response, #R
-            ],
-            'fundtransferrequest' => [
-                'fundinfo' => [
-                    'freespin' => false,
+            $status = 2;
+            $updateFreespinData = [
+                "status" => 2,
+                "spin_remaining" => 0
+            ];
+            FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespinTransaction->freespin_id);
+                //create transction 
+            if($status == 2) {
+                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+            }  else {
+                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+            }
+            $action_payload = [
+                "type" => "custom", #genreral,custom :D # REQUIRED!
+                "custom" => [
+                    "provider" => 'BGaming',
+                    "client_connection_name" => $client_details->connection_name,
+                    "win_or_lost" => $win_or_lost,
+                    "entry_id" => $entry_id,
+                    "pay_amount" => $pay_amount,
+                    "income" => 0 - $pay_amount,
+                    "game_trans_ext_id" => $game_trans_ext_id
+                ],
+                "provider" => [
+                    "provider_request" => $request->all(), #R
+                    "provider_trans_id"=> $request->issue_id, #R
+                    "provider_round_id"=> $request->issue_id, #R
+                ],
+                "mwapi" => [
+                    "roundId"=>$game_transaction_id, #R
+                    "type"=>2, #R
+                    "game_id" => $game_details->game_id, #R
+                    "player_id" => $client_details->player_id, #R
+                    "mw_response" => $responseWin, #R
+                ],
+                'fundtransferrequest' => [
+                    'fundinfo' => [
+                        'freespin' => false,
+                    ]
                 ]
-            ]
-        ];
-        Helper::saveLog('Bg Create Ext.', $this->provider_db_id, json_encode($request),$action_payload);
-        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
-        $win_bal = number_format($winbBalance,2,'.','');
-        $balance = str_replace(".", "", $win_bal);
-        
-        return $response;
+            ];
+            Helper::saveLog('Bg Create Ext FS.', $this->provider_db_id, json_encode($request),$action_payload);
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
+            $win_bal = number_format($winbBalance,2,'.','');
+            $balance = str_replace(".", "", $win_bal);
+            
+            return $responseWin;
+        } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            Helper::saveLog('Bg Create Ext FS err.', $this->provider_db_id, json_encode($request),json_encode($msg));
+        }
 
     }//end freespin action
 	public  function rollbackTransaction(Request $request){
