@@ -893,7 +893,7 @@ class FreeSpinHelper{
                 "spin_remaining" => $data["details"]["rounds"],
                 "provider_trans_id" => $freeround_id,
                 "denominations" => $data["details"]["denomination"],
-                "start_time" => $data["details"]["expiration_date"],
+                "date_start" => $data["details"]["start_time"],
                 "date_expire" => $data["details"]["expiration_date"],
             ];
         } catch (\Exception $e) {
