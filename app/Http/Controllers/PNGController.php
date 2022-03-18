@@ -213,7 +213,7 @@ class PNGController extends Controller
         $xmlparser = new SimpleXMLElement($data);
         Helper::saveLog('PNGReleasechecker(PNG)', 189, json_encode($xmlparser), "Checker");
         $accessToken = "secrettoken";
-        $client_details = ProviderHelper::getClientDetails('token',$xmlparser->externalGameSessionId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$xmlparser->externalId);
         if($client_details){
             if($xmlparser->roundId == 0){
                 $array_data = array(
@@ -491,7 +491,8 @@ class PNGController extends Controller
         $xmlparser = new SimpleXMLElement($data);
         $accessToken = "secrettoken";
         if($xmlparser->externalGameSessionId){
-            $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
+            // $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
+            $client_details = ProviderHelper::getClientDetails('player_id',$xmlparser->externalId);
         if($client_details){
             $reservechecker = GameTransactionMDB::checkGameTransactionExist($xmlparser->transactionId,false,false,$client_details);
             $rollbackchecker = $this->checkGameTransactionExist($xmlparser->transactionId,false,3,$client_details);
@@ -600,7 +601,7 @@ class PNGController extends Controller
                     $trans_data["entry_id"] = 1;
                 break;
             case "credit":
-                    $trans_data["win"] = 5;
+                    // $trans_data["win"] = 5;
                     $trans_data["pay_amount"] = abs($request_data["amount"]);
                     $trans_data["income"]=$existingdata->bet_amount-$request_data["amount"];
                     $trans_data["entry_id"] = 2;

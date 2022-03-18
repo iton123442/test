@@ -16,7 +16,7 @@ class IDNPokerHelper{
             <request>
                 <secret_key>'.$auth.'</secret_key>
                 <id>10</id>
-                <userid>'.strval($player_id).'</userid>
+                <userid>'.$player_id.'</userid>
             </request>';
             Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK PLAYER DETAILS REQUEST" );
             $client = new Client();
@@ -25,7 +25,7 @@ class IDNPokerHelper{
                         <request>
                             <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
                             <id>10</id>
-                            <userid>'.strval($player_id).'</userid>
+                            <userid>'.$player_id.'</userid>
                         </request>'
             ]
             );
@@ -41,17 +41,17 @@ class IDNPokerHelper{
         
     }
 
-    public static function registerPlayer($player_id,$auth,$password){
+    public static function registerPlayer($player_id,$auth){
         try {
             $url = config('providerlinks.idnpoker.URL');
             $request = '
             <request>
             <secret_key>'.$auth.'</secret_key>
                 <id>1</id>
-                <userid>'.strval($player_id).'</userid>
-                <password>'.$password.'</password>
-                <confirm_password>'.$password.'</confirm_password>
-                <username>TGTW'.$player_id.'</username>
+                <userid>'.$player_id.'</userid>
+                <password>'.$player_id.'</password>
+                <confirm_password>'.$player_id.'</confirm_password>
+                <username>'.$player_id.'</username>
             </request>';
             Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK REGISTER REQUEST" );
             $client = new Client();
@@ -60,10 +60,10 @@ class IDNPokerHelper{
                         <request>
                         <secret_key>'.$auth.'</secret_key>
                             <id>1</id>
-                            <userid>'.strval($player_id).'</userid>
-                            <password>'.$password.'</password>
-                            <confirm_password>'.$password.'</confirm_password>
-                            <username>TGTW'.$player_id.'</username>
+                            <userid>'.$player_id.'</userid>
+                            <password>'.$player_id.'</password>
+                            <confirm_password>'.$player_id.'</confirm_password>
+                            <username>'.$player_id.'</username>
                         </request>'
             ]
             );
@@ -80,7 +80,7 @@ class IDNPokerHelper{
     }
 
 
-    public static function gameLaunchURLLogin($data, $player_id, $client_details, $auth,$password) {
+    public static function gameLaunchURLLogin($data, $player_id, $client_details, $auth) {
         try {
             $url = config('providerlinks.idnpoker.URL');
             $supportlang = [
@@ -102,7 +102,7 @@ class IDNPokerHelper{
             <secret_key>'.$auth.'</secret_key>
                 <id>2</id>
                 <userid>'.$player_id.'</userid>
-                <password>'.$password.'</password>
+                <password>'.$player_id.'</password>
                 <ip>'.$IP.'</ip>
                 <secure>1</secure>
                 <mobile>1</mobile>
@@ -115,8 +115,8 @@ class IDNPokerHelper{
                         <request>
                         <secret_key>'.$auth.'</secret_key>
                             <id>2</id>
-                            <userid>'.strval($player_id).'</userid>
-                            <password>'.$password.'</password>
+                            <userid>'.$player_id.'</userid>
+                            <password>'.$player_id.'</password>
                             <ip>'.$IP.'</ip>
                             <secure>1</secure>
                             <mobile>1</mobile>
@@ -145,7 +145,7 @@ class IDNPokerHelper{
                         <request>
                             <secret_key>'.$auth.'</secret_key>
                             <id>3</id>
-                            <userid>'.strval($data["player_id"]).'</userid>
+                            <userid>'.$data["player_id"].'</userid>
                             <id_transaction>'.$data["transaction_id"].'</id_transaction>
                             <deposit>'.$data["amount"].'</deposit>
                         </request>'
@@ -172,7 +172,7 @@ class IDNPokerHelper{
                         <request>
                             <secret_key>'.$auth.'</secret_key>
                             <id>4</id>
-                            <userid>'.strval($data["player_id"]).'</userid>
+                            <userid>'.$data["player_id"].'</userid>
                             <id_transaction>'.$data["transaction_id"].'</id_transaction>
                             <withdraw>'.$data["amount"].'</withdraw>
                         </request>'
@@ -276,5 +276,11 @@ class IDNPokerHelper{
     public static function deletePlayerRestricted($identifier){
         $where = 'where idtw_player_restriction = '.$identifier;
         DB::select('delete from tw_player_restriction '.$where);
+    }
+
+    public static function getPlayerID($player_id){
+        $query = DB::select('select * from players where username = "'.$player_id.'"');
+        $data = count($query);
+        return $data > 0 ? $query[0] : "false";
     }
 }

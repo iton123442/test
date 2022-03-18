@@ -611,6 +611,7 @@ $app->get('/public/api/justplay/callback', 'JustPlayController@callback');
 
 // BGaming Single Controller Endpoints
 $app->post('/public/api/bgaming/play', 'BGamingController@gameTransaction');
+$app->post('/public/api/bgaming/freespins', 'BGamingController@freeSpinSettlement');
 $app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
 $app->post('/public/api/bgaming/checkSign', 'BGamingController@signatureChecker');
 
@@ -758,3 +759,21 @@ $app->post('/public/api/transferwallet/makeDeposit','TransferWalletController@ma
 $app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']], function() use ($app) {
     $app->post('player-operator-details','PlayerOperatorPortController@getPlayerOperatorDetails');
 });
+
+
+// Yggdrasil 
+$app->get('/public/playerinfo.json','YGG002Controller@playerinfo');
+$app->get('/public/wager.json','YGG002Controller@wager');
+$app->get('/public/cancelwager.json','YGG002Controller@cancelwager');
+$app->get('/public/appendwagerresult.json','YGG002Controller@appendwagerresult');
+$app->get('/public/endwager.json','YGG002Controller@endwager');
+$app->get('/public/campaignpayout.json','YGG002Controller@campaignpayout');
+$app->get('/public/getbalance.json','YGG002Controller@getbalance');
+// ygg local
+$app->post('/public/playerinfo/test','YGG002Controller@playerinfo');
+$app->post('/public/wager/test','YGG002Controller@wager');
+$app->post('/public/cancelwager/test','YGG002Controller@cancelwager');
+$app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult');
+$app->post('/public/endwager/test','YGG002Controller@endwager');
+$app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
+$app->post('/public/getbalance/test','YGG002Controller@getbalance');
