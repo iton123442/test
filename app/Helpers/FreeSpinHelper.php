@@ -963,12 +963,13 @@ class FreeSpinHelper{
     } 
     public static function cancelFreeSpinBGaming($freeround_id){
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+        dd($getFreespin);
         $requesttosend = [
             "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
             "issue_id" => $freeround_id
         ];
         $signature = hash_hmac('sha256',json_encode($requesttosend),config("providerlinks.bgaming.AUTH_TOKEN"));
-        $api_url = config("providerlinks.bgaming.GCP_URL")."/freespins/issue";
+        $api_url = config("providerlinks.bgaming.GCP_URL")."/freespins/cancel";
         $client = new Client(['headers' => [ 
                 'Content-Type' => 'application/json',
                 'X-REQUEST-SIGN' => $signature
@@ -988,7 +989,8 @@ class FreeSpinHelper{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
-            Helper::saveLog('BGaming Cancelfreespin error', 57, json_encode($data), json_encode($msg));
+            dd($msg);
+            Helper::saveLog('BGaming Cancelfreespin error', 57, json_encode($freeround_id), json_encode($msg));
             return 400;
         }
     } 
