@@ -263,18 +263,18 @@ class IDNPokerHelper{
     }
 
     public static function checkPlayerRestricted($player_id){
-		$query = DB::select('select * from tw_player_restriction where player_id = '.$player_id);
-		$data = count($query);
-		return $data > 0 ? $query[0] : "false";
-	}
+        $query = DB::select('select * from tw_player_restriction where player_id = '.$player_id);
+        $data = count($query);
+        return $data > 0 ? $query[0] : "false";
+    }
 
     public static function createPlayerRestricted($data) {
-		$data_saved = DB::table('tw_player_restriction')->insertGetId($data);
-		return $data_saved;
-	}
+        $data_saved = DB::table('tw_player_restriction')->insertGetId($data);
+        return $data_saved;
+    }
 
     public static function deletePlayerRestricted($identifier){
-		$where = 'where idtw_player_restriction = '.$identifier;
-		DB::select('delete from tw_player_restriction '.$where);
-	}
+        $where = 'where idtw_player_restriction = '.$identifier;
+        DB::select('delete from tw_player_restriction '.$where);
+    }
 }
