@@ -214,8 +214,8 @@ class IDNPokerController extends Controller
                     
                     Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "FUNDSTRANSFER HIT");
                     $fund_extra_data = [
-	                    'provider_name' => $game_details->provider_name
-	                ]; 
+                        'provider_name' => $game_details->provider_name
+                    ]; 
                     $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false,$fund_extra_data);
                     $transactionDetails = [
                         "game_trans_ext_id" => $game_trans_ext_id,
@@ -687,22 +687,22 @@ class IDNPokerController extends Controller
     }
 
      /**
-	 * GLOBAL
-	 * @param $[sub_provider_id], $[game_code], 
-	 * 
-	 */
-	public static function getSubGameDetails($sub_provider_id, $game_code){
-		$query = DB::select('select * from games where sub_provider_id = "'.$sub_provider_id.'" and game_code = "'.$game_code.'"');
-		$game_details = count($query);
-		return $game_details > 0 ? $query[0] : false;
-	}
+     * GLOBAL
+     * @param $[sub_provider_id], $[game_code], 
+     * 
+     */
+    public static function getSubGameDetails($sub_provider_id, $game_code){
+        $query = DB::select('select * from games where sub_provider_id = "'.$sub_provider_id.'" and game_code = "'.$game_code.'"');
+        $game_details = count($query);
+        return $game_details > 0 ? $query[0] : false;
+    }
 
 
      /**
-	 * GLOBAL
-	 * @param $[playerID], $[client_id ],$[client_player_id] 
-	 * 
-	 */
+     * GLOBAL
+     * @param $[playerID], $[client_id ],$[client_player_id] 
+     * 
+     */
     public function retryWithdrawalRestriction(Request $request)
     {
         Helper::saveLog('IDN WITHDRAW RETRY ', $this->provider_db_id, json_encode($request->all()), "HIT WITHDRAW");
