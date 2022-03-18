@@ -50,7 +50,7 @@ class DebitRefund extends Job
 
         $data = [
             "method_name" => "jobs",
-            "round_id" => 123,
+            "provider_id" => 123,
             "request_data" => json_encode($this->data),
             "response_data" => json_encode($requesttocient)
         ];
@@ -107,7 +107,7 @@ class DebitRefund extends Job
 
             // $data = [
             //     "method_name" => "jobs",
-            //     "round_id" => 123,
+            //     "provider_id" => 123,
             //     "request_data" => json_encode($this->data),
             //     "response_data" => json_encode($e->getMessage().' '.$e->getLine())
             // ];
