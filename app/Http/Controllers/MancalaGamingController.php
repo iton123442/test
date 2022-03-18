@@ -79,7 +79,8 @@ class MancalaGamingController extends Controller
 				];
 		}
 		else
-		{
+		{	
+			// dd($this->_hashGenerator(['Credit/', $json_data['SessionId'], $json_data['TransactionId'], $json_data['RoundId'], $json_data['Amount']]));
 			if ($this->_hashGenerator(['Credit/', $json_data['SessionId'], $json_data['TransactionId'], $json_data['RoundId'], $json_data['Amount']]) !== $json_data["Hash"]) {
 				$http_status = 200;
 				$response = [
@@ -262,7 +263,7 @@ class MancalaGamingController extends Controller
 					}
 					else
 					{
-						
+						$win_or_lost = $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
 						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
 						
 						$bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($session_token->player_token, $json_data['RoundId'], $client_details);
@@ -280,7 +281,7 @@ class MancalaGamingController extends Controller
 							];
 						
 			            $update_game_transaction = array(
-		                    "win" => $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1,
+		                    "win" => 5,
 		                    "pay_amount" => $bet_transaction->pay_amount + $json_data["Amount"],
 		                    "income" => $bet_transaction->income - $json_data["Amount"],
 		                    "entry_id" => $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
@@ -304,8 +305,9 @@ class MancalaGamingController extends Controller
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
-			                    "provider" => 'Mancala Gaming',
+			                    "provider" => 'MancalaGaming',
 			                    "game_trans_ext_id" => $game_trans_ext_id,
+			                    "win_or_lost" => $win_or_lost,
 			                    "client_connection_name" => $client_details->connection_name
 			                ],
 			                "provider" => [
