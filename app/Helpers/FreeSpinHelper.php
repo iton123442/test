@@ -963,7 +963,6 @@ class FreeSpinHelper{
     } 
     public static function cancelFreeSpinBGaming($freeround_id){
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
-        dd($getFreespin);
         $requesttosend = [
             "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
             "issue_id" => $freeround_id
@@ -989,7 +988,6 @@ class FreeSpinHelper{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
-            dd($msg);
             Helper::saveLog('BGaming Cancelfreespin error', 57, json_encode($freeround_id), json_encode($msg));
             return 400;
         }
