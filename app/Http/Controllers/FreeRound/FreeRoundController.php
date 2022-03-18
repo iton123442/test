@@ -191,6 +191,8 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRound5Men($player_details, $data, $sub_provder_id,$freeround_id);
         }  elseif ($sub_provder_id == 59) {
             return FreeSpinHelper::createFreeRoundSpadeGaming($player_details, $data, $sub_provder_id,$freeround_id);
+        }  elseif ($sub_provder_id == 93) {
+            return FreeSpinHelper::issueFreeSpinBGaming($player_details, $data, $sub_provder_id,$freeround_id);
         }
         else {
             return 400;
