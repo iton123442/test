@@ -683,6 +683,8 @@ class SpadeController extends Controller
 						);
 						//THIS RESPONSE IF THE TIMEOUT NOT FAILED
 					} catch (\Exception $e) {
+						Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($details), $response);
+	            		return $response;
 					}
 					Helper::saveLog('Spade '.$header['API'].' RESPONSE', $this->provider_db_id, json_encode($details), $response);
 					return $response;
