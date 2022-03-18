@@ -63,7 +63,7 @@ class BGamingController extends Controller
         if(isset($payload['actions'][0]['action'])){
             if(!isset($payload['actions'][1]['action'])){
                 if($payload['actions'][0]['action'] == 'bet'){
-                    if($payload['actions'][0]['amount'] > $client_details->balance){
+                    if(($payload['actions'][0]['amount'] / 100) > $client_details->balance){
                         $response = [
                             "code" => 100,
                             "message" => "Not enough funds",
@@ -80,7 +80,7 @@ class BGamingController extends Controller
                 }
             }else{
                 if($payload['actions'][1]['action'] == 'win'){
-                    if($payload['actions'][0]['amount'] > $client_details->balance){
+                    if(($payload['actions'][0]['amount'] / 100) > $client_details->balance){
                         $response = [
                             "code" => 100,
                             "message" => "Not enough funds",
