@@ -34,7 +34,7 @@ class GameLobby{
                 $lang = GameLobby::getLanguage("Iconic Gaming",$lang);
                 Helper::savePLayerGameRound($game["productId"],$token,$provider);
                 ProviderHelper::saveLogGameLaunch('GAMELAUNCH ICG', 11, json_encode($game_code), json_encode($game["href"]));
-                return $game["href"].'&token='.$token.'&lang='.$lang.'&home_URL='.$exitUrl;
+                return $game["href"].'&token='.$token.'&lang='.$lang.'&home_URL='.$exitUrl.'&showPanel=false';
                 
             }
         }
@@ -712,7 +712,7 @@ class GameLobby{
         
     }
 
-    public static function tgglaunchUrl( $game_code = null, $token = null){
+    public static function tgglaunchUrl( $game_code = null, $token = null,$exitUrl = null){
         $client_player_details = Providerhelper::getClientDetails('token', $token);
         $requesttosend = [
           "project" => config('providerlinks.tgg.project_id'),
@@ -723,7 +723,8 @@ class GameLobby{
             'user_id'=> $client_player_details->player_id,
             'language'=> $client_player_details->language ? $client_player_details->language : 'en',
             'https' => 1,
-            'platform' => 'mobile'
+            'platform' => 'mobile',
+            'exit_url' => $exitUrl
           ],
           "denomination" => 'default', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
@@ -1990,8 +1991,7 @@ class GameLobby{
             $key = "LUGTPyr6u8sRjCfh";
             $aes = new AES($key);
             // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
-            $player_id = $client_details->client_player_id;// USERNAME
-            $password =  'idnTW@'.$client_details->client_player_id.$client_details->player_id;
+            $player_id = $client_details->username;
             $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
             /***************************************************************
             *
@@ -2006,7 +2006,7 @@ class GameLobby{
             ****************************************************************/
             if ($data != "false") {
                 if (isset($data["error"])) {
-                    $data = IDNPokerHelper::registerPlayer($player_id,$auth_token,$password);
+                    $data = IDNPokerHelper::registerPlayer($player_id,$auth_token);
                 }
                 $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
                 if(isset($data["userid"]) && isset($data["username"])) {
@@ -2022,7 +2022,7 @@ class GameLobby{
                         * GET URL / OR LOGIN TO PROVIDER
                         *
                         ****************************************************************/
-                        $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token,$password);
+                        $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token);
                         if(isset($data["lobby_url"])){
                             // do deposit
                             $player_details = ProviderHelper::playerDetailsCall($request['token']);
@@ -2105,6 +2105,49 @@ class GameLobby{
             Helper::saveLog('IDNPOKER GAMELUANCH ERROR', 110, json_encode($request),  $e->getMessage() );
             return "false";
         }
+    }
+
+
+    public static function ygglaunchUrl($data,$device){
+        $provider_id = config("providerlinks.ygg002.provider_db_id");
+        if($device == 'desktop'){$channel = 'pc';$fullscreen='yes';}else{ $channel = 'mobile';$fullscreen='no';}
+        ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), "Endpoing hit");
+        $api_url = config("providerlinks.ygg002.api_url");
+        $org = config("providerlinks.ygg002.Org");
+        $key = config("providerlinks.ygg002.key");
+        $client_details = ProviderHelper::getClientDetails('token',$data['token']);
+        try{
+            $requesttosend = [
+                "loginname" => $client_details->username,
+                "key" => $data['token'],
+                "currency" => $client_details->default_currency,
+                "lang" => $data['lang'],
+                "gameid" => $data['game_code'],
+                "org" => $org,
+                "channel" => $channel,
+                "home" => $data['exitUrl'],
+                "fullscreen" => $fullscreen,
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ]
+            ]);
+            $response = $client->post($api_url,[
+                'form_params' => $requesttosend,
+            ]);
+            $res = json_decode($response->getBody(),TRUE);
+            $url = $res['data']['launchurl'];
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $url);
+            return $url;
+        }catch(\Exception $e){
+            $error = [
+                'error' => $e->getMessage()
+            ];
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $e->getMessage());
+            return $error;
+        }
+
     }
 }
 

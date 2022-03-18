@@ -3,6 +3,8 @@ namespace App\Helpers;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
+use App\Jobs\DebitRefund;
+use Queue;
 use App\Helpers\Helper;
 use App\Helpers\GameLobby;
 use App\Helpers\ProviderHelper;
@@ -100,6 +102,7 @@ class ClientRequestHelper{
                             ];
                             ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
+                        'timeout' => 2, # 2 seconds
                         'body' => json_encode(
                             $requesttocient
                     )],
@@ -121,6 +124,7 @@ class ClientRequestHelper{
                 }
                 return $client_reponse;
             }catch(\Exception $e){
+
                 if($type == 'credit'){
                     $game_details_id = providerHelper::getGameDetailsByCodeName($game_name, $game_code);
                     Providerhelper::createRestrictGame($game_details_id->game_id,$client_details->player_id,$transactionId, $requesttocient);
@@ -135,6 +139,22 @@ class ClientRequestHelper{
                         'balance' => 0.0
                     )
                 );
+
+                // Add Refund Queue
+                if($type == 'debit'){
+                    $gameTransactionEXTRefundData = array(
+                            "game_trans_id" => $roundId,
+                            "provider_trans_id" => $transactionId,
+                            "round_id" => $roundId,
+                            "amount" => $amount,
+                            "game_transaction_type"=> 33, // refund change
+                            "provider_request" =>json_encode($requesttocient),
+                    );
+                    $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
+                    $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
+                    Queue::push(new DebitRefund($debitRefund));
+                }
+
                 Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);
                 try{
                     $dataToUpdate = array(
