@@ -756,6 +756,7 @@ public function gameBet($request, $client_details){
 	public  function rollbackTransaction(Request $request){
 		$payload = $request->all();
 		 // check request signature
+        Helper::saveLog('Bgaming Refund updateTransactionEXt', $this->provider_db_id, json_encode($payload), 'ENDPOINT HIT'); 
         if(!BGamingHelper::checkSignature($request->header('x-request-sign'), $payload)) {
             $http_status = 403;
                 $response = [
