@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-// use App\Helpers\Helper; # Deprecated Centralized to KAHelper (Single Load)
 use App\Helpers\ProviderHelper;
 use App\Helpers\KAHelper;
 use App\Helpers\TransferWalletHelper;
@@ -19,10 +18,6 @@ class KAGamingController extends Controller
 {
 
     public $gamelaunch, $partnerName, $ka_api, $access_key, $secret_key, $tw_partnerName, $tw_access_key, $tw_secret_key = '';
-    // public $gamelaunch = 'https://gamesstage.kaga88.com/';
-    // public $ka_api = 'https://rmpstage.kaga88.com/kaga/';
-    // public $access_key = 'A95383137CE37E4E19EAD36DF59D589A';
-    // public $secret_key = '40C6AB9E806C4940E4C9D2B9E3A0AA25';
     public $provider_db_id = 43; // Nothing todo with the provider
     public $prefix = 'KAGAMING';
 
@@ -168,7 +163,8 @@ class KAGamingController extends Controller
 
     
     /** 
-     * 1 WAY CALL KAGAming
+     * EXPIREMENTAL (1 WAY CALL KAGAming) NOT USED
+     * 
      */
     public function checkPlayOneWay($payload_request){
         $data = json_decode($payload_request);
@@ -318,22 +314,6 @@ class KAGamingController extends Controller
             $is_freespin = false;
         }
 
-
-        #1DEBUGGING
-        // $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
-        // $player_details = KAHelper::playerDetailsCall($client_details->player_token);
-        // $balance = KAHelper::amountToFloat($player_details->playerdetailsresponse->balance);
-        // if(!$freeGames) {
-        //    if(($balance - $this->formatAmounts($data->betAmount)) > 0) {
-        //       $balance -= $this->formatAmounts($data->betAmount);
-        //       $balance += $this->formatAmounts($data->winAmount);
-        //    }
-        // } else { // is free games
-        //     $balance += $this->formatAmounts($data->winAmount);
-        // }
-        // return $balance;
-        #1DEBUGGING
-        
         $amount = $bet_amount;
         $win_amount = $this->formatAmounts($data->winAmount);
         $pay_amount =  0; //abs($data['amount']);
@@ -345,43 +325,18 @@ class KAGamingController extends Controller
         $payout_reason = 'settled';
         $rounds_remaining = isset($data->roundsRemaining) ? $data->roundsRemaining : 0;
         $complete = isset($data->complete) ? $data->complete : false;
-        
-        // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
-        // if($session_check == 'false'){
-        //     return  $response = ["status" => "failed", "statusCode" =>  100];
-        // }
+      
         $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
-
-        // if($client_details->api_version == 2){
-        //     return $this->checkPlayOneWay($request_body);
-        // }
 
         $game_information = KAHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
 
-        # Check Game Restricted
-        // $restricted_player = ProviderHelper::checkGameRestricted($game_information->game_id, $client_details->player_id);
-        // if($restricted_player){
-        //     // $attempt_resend_transaction = ClientRequestHelper::fundTransferResend($restricted_player);
-        //     // if(!$attempt_resend_transaction){
-        //         return  $response = ["status" => "failed - player restricted", "statusCode" =>  4];
-        //     // }
-        // }
 
-        // $all_round = $this->findAllGameExt($provider_trans_id, 'all', $round_id);
-        // dd($all_round);
-        if(KAHelper::isNegativeBalance($amount2, $client_details)){
-            if($freeGames != true){
-               return  $response = ["status" => "failed", "statusCode" => 200];
-            }
-        }
-
-        // $game_ext_check = KAHelper::findGameExt($round_id, 1, 'round_id');
         $game_ext_check = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
         if($game_ext_check != 'false'){ // Duplicate transaction
             if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){
@@ -392,18 +347,6 @@ class KAGamingController extends Controller
                }
             }
         }
-
-        # Insert Idenpotent
-        // try{
-        //  ProviderHelper::idenpotencyTable($this->prefix.'_'.$round_id);
-        // }catch(\Exception $e){
-        //  return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
-        // }
-
-        // // if(KAHelper::amountToFloat($player_details->playerdetailsresponse->balance) < $amount){
-        // if(KAHelper::amountToFloat($client_details->balance) < $amount){
-        //      return  $response = ["status" => "Insufficient balance", "statusCode" =>  200];
-        // }
 
         $general_details['client']['before_balance'] = KAHelper::amountToFloat($client_details->balance);
         // $general_details['client']['before_balance'] = KAHelper::amountToFloat($player_details->playerdetailsresponse->balance);
