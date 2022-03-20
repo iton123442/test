@@ -813,6 +813,14 @@ public function gameBet($request, $client_details){
                  ],
                 ];
             }
+            $updateGameTransaction = [
+                'win' => 4,
+                "pay_amount" => $amount,
+                'income' => $income,
+                'entry_id' => $entry_id,
+                'trans_status' => 3
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $getRefundTrans->game_trans_id, $client_details);
             return $response;
         }
 
