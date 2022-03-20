@@ -779,7 +779,7 @@ public function gameBet($request, $client_details){
         $rollback_id = $payload['actions'][0]['original_action_id'];
         $processtime = new DateTime('NOW');
 
-        $getRefundTrans = GameTransactionMDB::findGameExt($provider_trans_id, 3, "transaction_id",$client_details);
+        $getRefundTrans = GameTransactionMDB::findGameExt($rollback_id, 3, "transaction_id",$client_details);
         if($getRefundTrans != "false"){
             if(isset($payload['actions'][1]['action'])){
                 if($payload['actions'][1]['action'] == 'rollback' ){
