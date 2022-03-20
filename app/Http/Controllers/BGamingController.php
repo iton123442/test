@@ -813,6 +813,7 @@ public function gameBet($request, $client_details){
                  ],
                 ];
             }
+            return $response;
         }
 
         
