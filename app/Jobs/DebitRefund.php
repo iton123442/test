@@ -48,13 +48,13 @@ class DebitRefund extends Job
         $payload['payload']['fundtransferrequest']['fundinfo']['transactiontype'] = 'credit'; // change the type to true
         $requesttocient = $payload['payload'];
 
-        $data = [
-            "method_name" => "jobs",
-            "provider_id" => 123,
-            "request_data" => json_encode($this->data),
-            "response_data" => json_encode($requesttocient)
-        ];
-        DB::connection('savelog')->table('seamless_request_logs')->insert($data);
+        // $data = [
+        //     "method_name" => "jobs",
+        //     "provider_id" => 123,
+        //     "request_data" => json_encode($this->data),
+        //     "response_data" => json_encode($requesttocient)
+        // ];
+        // DB::connection('savelog')->table('seamless_request_logs')->insert($data);
 
         try {
             $sendtoclient =  microtime(true);
