@@ -81,8 +81,6 @@ class DebitRefund extends Job
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             $client_response_time = microtime(true) - $sendtoclient;
 
-          
-
             if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 200){
                 $updateTransactionEXt = array(
                     // "provider_request" =>json_encode($payload),
@@ -90,6 +88,16 @@ class DebitRefund extends Job
                     'mw_request' => json_encode($requesttocient),
                     'client_response' => json_encode($client_response),
                     'transaction_detail' => 'SUCCESS',
+                    'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                );
+                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+            elseif(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 402){
+                $updateTransactionEXt = array(
+                    // "provider_request" =>json_encode($payload),
+                    "mw_response" => json_encode(['retry' => 'jobs']),
+                    'mw_request' => json_encode($requesttocient),
+                    'client_response' => json_encode($client_response),
+                    'transaction_detail' => 'NOT ENOUGH FUNDS',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
@@ -103,6 +111,7 @@ class DebitRefund extends Job
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                throw new ModelNotFoundException('UNKNOWN_ERROR');
             }
 
         } catch (\Exception $e) {
