@@ -48,13 +48,13 @@ class DebitRefund extends Job
         $payload['payload']['fundtransferrequest']['fundinfo']['transactiontype'] = 'credit'; // change the type to true
         $requesttocient = $payload['payload'];
 
-        $data = [
-            "method_name" => "jobs",
-            "provider_id" => 123,
-            "request_data" => json_encode($this->data),
-            "response_data" => json_encode($requesttocient)
-        ];
-        DB::connection('savelog')->table('seamless_request_logs')->insert($data);
+        // $data = [
+        //     "method_name" => "jobs",
+        //     "provider_id" => 123,
+        //     "request_data" => json_encode($this->data),
+        //     "response_data" => json_encode($requesttocient)
+        // ];
+        // DB::connection('savelog')->table('seamless_request_logs')->insert($data);
 
         try {
             $sendtoclient =  microtime(true);
@@ -81,8 +81,6 @@ class DebitRefund extends Job
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             $client_response_time = microtime(true) - $sendtoclient;
 
-          
-
             if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 200){
                 $updateTransactionEXt = array(
                     // "provider_request" =>json_encode($payload),
@@ -93,32 +91,37 @@ class DebitRefund extends Job
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+            }else if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 402){
+                $updateTransactionEXt = array(
+                    // "provider_request" =>json_encode($payload),
+                    "mw_response" => json_encode(['retry' => 'jobs']),
+                    'mw_request' => json_encode($requesttocient),
+                    'client_response' => json_encode($client_response),
+                    'transaction_detail' => 'NOT_ENOUGH_FUNDS',
+                    'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                );
+                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }else{
                 $updateTransactionEXt = array(
                     // "provider_request" =>json_encode($payload),
                     "mw_response" => json_encode(['retry' => 'jobs']),
                     'mw_request' => json_encode($requesttocient),
                     'client_response' => json_encode($client_response),
-                    'transaction_detail' => 'FAILED',
+                    'transaction_detail' => 'UNKNOWN_STATUS_CODE',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                throw new ModelNotFoundException('UNKNOWN_ERROR');
             }
 
         } catch (\Exception $e) {
 
-            // $data = [
-            //     "method_name" => "jobs",
-            //     "provider_id" => 123,
-            //     "request_data" => json_encode($this->data),
-            //     "response_data" => json_encode($e->getMessage().' '.$e->getLine())
-            // ];
-            // DB::connection('savelog')->table('seamless_request_logs')->insert($data);
             $updateTransactionEXt = array(
                 // "provider_request" =>json_encode(['gg' => 'gg']),
                 'mw_request' => json_encode(['retry' => 'jobs']),
                 'client_response' => json_encode($e->getMessage().' '.$e->getLine()),
-                'transaction_detail' => 'FAILED',
+                'transaction_detail' => 'FAILED_EXCEPTION',
+                'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             throw new ModelNotFoundException($e->getMessage());
