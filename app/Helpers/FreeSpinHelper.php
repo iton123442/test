@@ -518,6 +518,9 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id, $freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         $quickSpinValue = $data["details"]["denomination"] * 100;
         try{
             $freeroundtransac = [
@@ -631,6 +634,9 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundSpearHeadEm($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -766,6 +772,9 @@ class FreeSpinHelper{
     }
     public static function BNGcreateFreeBet($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         try{
             if($data["details"]["type"] != "FIXED_FREEBET"){
                 $freeroundtransac = [
@@ -929,6 +938,9 @@ class FreeSpinHelper{
     } 
     public static function issueFreeSpinBGaming($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -1593,6 +1605,14 @@ class FreeSpinHelper{
     
          }
         
+    }
+    public static function createFreeSpinKA($player_details,$data, $sub_provder_id,$freeround_id){
+        dd($data);
+        Helper::saveLog('KAGa Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
     }
 }
 ?>
