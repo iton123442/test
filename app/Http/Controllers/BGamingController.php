@@ -63,7 +63,7 @@ class BGamingController extends Controller
         if(isset($payload['actions'][0]['action'])){
             if(!isset($payload['actions'][1]['action'])){
                 if($payload['actions'][0]['action'] == 'bet'){
-                    if($payload['actions'][0]['amount'] > $client_details->balance){
+                    if(($payload['actions'][0]['amount'] / 100) > $client_details->balance){
                         $response = [
                             "code" => 100,
                             "message" => "Not enough funds",
@@ -80,7 +80,7 @@ class BGamingController extends Controller
                 }
             }else{
                 if($payload['actions'][1]['action'] == 'win'){
-                    if($payload['actions'][0]['amount'] > $client_details->balance){
+                    if(($payload['actions'][0]['amount'] / 100) > $client_details->balance){
                         $response = [
                             "code" => 100,
                             "message" => "Not enough funds",
@@ -756,6 +756,9 @@ public function gameBet($request, $client_details){
 	public  function rollbackTransaction(Request $request){
 		$payload = $request->all();
 		 // check request signature
+
+
+        Helper::saveLog('Bgaming Refund updateTransactionEXt', $this->provider_db_id, json_encode($payload), 'ENDPOINT HIT'); 
         if(!BGamingHelper::checkSignature($request->header('x-request-sign'), $payload)) {
             $http_status = 403;
                 $response = [
@@ -775,6 +778,49 @@ public function gameBet($request, $client_details){
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         $rollback_id = $payload['actions'][0]['original_action_id'];
         $processtime = new DateTime('NOW');
+
+        $getRefundTrans = GameTransactionMDB::findGameExt($rollback_id, 3, "transaction_id",$client_details);
+        if($getRefundTrans != "false"){
+            if(isset($payload['actions'][1]['action'])){
+                if($payload['actions'][1]['action'] == 'rollback' ){
+                     $response = [
+                        "balance" => (float)$client_details->balance,
+                        "game_id" => $request['game_id'],
+                        "transactions" =>[
+                            [
+                            "action_id" =>$payload['actions'][0]['action_id'],
+                            "tx_id" => $getRefundTrans->game_trans_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                        [
+                          "action_id" =>$payload['actions'][1]['action_id'],
+                            "tx_id" =>$getRefundTrans->game_trans_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                       ],
+                      ];
+                }
+             }else{
+                $response = [
+                  "balance" => (float)$client_details->balance,
+                  "game_id" => $request['game_id'],
+                  "transactions" =>[
+                    [
+                    "action_id" =>$payload['actions'][0]['action_id'],
+                    "tx_id" =>  $getRefundTrans->game_trans_id,
+                    "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                  ],
+                 ],
+                ];
+            }
+            $updateGameTransaction = [
+                'win' => 4,
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $getRefundTrans->game_trans_id, $client_details);
+            return $response;
+        }
+
+        
         if($rollback_id == "unknown"){
             $balance = str_replace(".", "", $client_details->balance);
             $response = [
@@ -884,7 +930,7 @@ public function gameBet($request, $client_details){
                     "round_id" => $rollback_id,
                     "amount" => $amount,
                     "game_transaction_type"=> 3,
-                    "provider_request" =>json_encode($request),
+                    "provider_request" =>json_encode($request->all()),
                     "mw_response" =>json_encode($response),
                 );
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
