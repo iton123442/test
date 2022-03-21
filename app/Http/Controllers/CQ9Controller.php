@@ -2625,7 +2625,7 @@ class CQ9Controller extends Controller
   		}
 
 		$client_details = Providerhelper::getClientDetails('player_id', $find_mtcode->player_id);
-		$transaction_record = GameTransactionMDB::findGameExt($find_mtcode->provider_trans_id, 2,'provider_trans_id', $client_details);
+		$transaction_record = GameTransactionMDB::findGameExt($find_mtcode->provider_trans_id, 2,'transaction_id', $client_details);
 
 		Helper::saveLog('CQ9 playerRecord', $this->provider_db_id, json_encode($request->all()), $mtcode);
 		// dd($transaction_record);
