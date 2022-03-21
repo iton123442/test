@@ -120,7 +120,7 @@ class DebitRefund extends Job
                 // "provider_request" =>json_encode(['gg' => 'gg']),
                 'mw_request' => json_encode(['retry' => 'jobs']),
                 'client_response' => json_encode($e->getMessage().' '.$e->getLine()),
-                'transaction_detail' => 'FAILED',
+                'transaction_detail' => 'FAILED EXCEPTION',
                 'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
