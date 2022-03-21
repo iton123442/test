@@ -73,7 +73,7 @@ class DebitRefund extends Job
                         ];
                         ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                     },
-                    // 'timeout' => 2, # 2 seconds
+                    'timeout' => 2, # 2 seconds
                     'body' => json_encode($requesttocient)
                 ],
                 ['defaults' => [ 'exceptions' => false ]]
@@ -116,18 +116,12 @@ class DebitRefund extends Job
 
         } catch (\Exception $e) {
 
-            // $data = [
-            //     "method_name" => "jobs",
-            //     "provider_id" => 123,
-            //     "request_data" => json_encode($this->data),
-            //     "response_data" => json_encode($e->getMessage().' '.$e->getLine())
-            // ];
-            // DB::connection('savelog')->table('seamless_request_logs')->insert($data);
             $updateTransactionEXt = array(
                 // "provider_request" =>json_encode(['gg' => 'gg']),
                 'mw_request' => json_encode(['retry' => 'jobs']),
                 'client_response' => json_encode($e->getMessage().' '.$e->getLine()),
                 'transaction_detail' => 'FAILED',
+                'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             throw new ModelNotFoundException($e->getMessage());
