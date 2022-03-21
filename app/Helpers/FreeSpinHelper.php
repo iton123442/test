@@ -720,6 +720,50 @@ class FreeSpinHelper{
         }
         Helper::saveLog('Spearhead freespin response', 67, json_encode($data), $response->getBody()->getContents());
     }
+    public static function cancelFreeSpinSpearHead($freeround_id){
+        $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+        // dd($getFreespin);
+        $username = "TigerGamesStageBonus";
+        $password = "YoqJcvRHFUcr2un4";
+        $credentials = base64_encode($username.":".$password);
+        $httpClient = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $credentials,
+            ]
+        ]);
+        $requesttosend = [
+            "BonusSource" => 2,
+            "Comment" => "This is Staging Test",
+            "OperatorUserId" => $getFreespin->player_id,
+            "BonusId" => $freeround_id,
+            "DomainId" => config("providerlinks.spearhead.opid")
+        ];
+        $baseUrl = "https://vendorapi-stage.everymatrix.com/vendorbonus/RGS_Matrix/ForfeitBonus";
+        try {
+            $response = $httpClient->post(
+                $baseUrl,[
+                    'body' => json_encode($requesttosend)]
+            );
+            $dataresponse = json_decode($response->getBody()->getContents());
+             $data = [
+                    "status" => 4,
+            ];
+            FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            return 200;
+        } catch (\Exception $e) {
+            $dataresponse = [
+                "error" => json_encode($e)
+            ];
+            $data = [
+                "status" => 0,
+                "provider_trans_id" => $id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
+    }
     public static function BNGcreateFreeBet($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         try{
