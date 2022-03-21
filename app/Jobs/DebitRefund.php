@@ -91,7 +91,7 @@ class DebitRefund extends Job
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
-            elseif(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 402){
+            }else if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 402){
                 $updateTransactionEXt = array(
                     // "provider_request" =>json_encode($payload),
                     "mw_response" => json_encode(['retry' => 'jobs']),
