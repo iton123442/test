@@ -73,7 +73,7 @@ class DebitRefund extends Job
                         ];
                         ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                     },
-                    'timeout' => 2, # 2 seconds
+                    // 'timeout' => 2, # 2 seconds
                     'body' => json_encode($requesttocient)
                 ],
                 ['defaults' => [ 'exceptions' => false ]]
