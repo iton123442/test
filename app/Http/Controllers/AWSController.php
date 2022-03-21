@@ -57,17 +57,6 @@ class AWSController extends Controller
 	 * @param [int] $[signature_type] [<1 = balance, 2 = fundtransfer, fundquery>] // SIGNATURE TYPE 2 REMOVED
 	 *
 	 */
-	// public function signatureCheck($details, $signature_type){
-	// 	if($signature_type == 1){
-	// 		$signature = md5($this->merchant_id.$details->currentTime.$details->accountId.$details->currency.base64_encode($this->merchant_key));
-	// 	}
-
-	// 	if($signature == $details->sign){
-	// 		return true;
-	// 	}else{
-	// 		return false;
-	// 	}
-	// }
 
 	/**
 	 * SINGLE WALLET
@@ -152,7 +141,9 @@ class AWSController extends Controller
 		return $response;
 	}
 
-
+	/**
+	 * EXPERIMENTAL NO LONGER USED (OUTDATED)
+	 */
 	public function checkPlayOneWay($data, $client_details){
 		$details = json_decode($data);
 
@@ -383,26 +374,8 @@ class AWSController extends Controller
 		$payout_reason = AWSHelper::getOperationType($details->txnTypeId);
 		$provider_trans_id = $details->txnId;
 
-		# Insert Idenpotent
-		// try {
-		// 	ProviderHelper::idenpotencyTable($this->prefix . '_' . $details->txnId);
-		// } catch (\Exception $e) {
-		// 	$response = [
-		// 		"msg" => "marchantTransId already exist",
-		// 		"code" => 2200,
-		// 		"data" => [
-		// 			"currency" => $client_details->default_currency,
-		// 			// "balance"=> floatval(number_format((float)$player_details->playerdetailsresponse->balance, 2, '.', '')),
-		// 			"balance" => floatval(number_format((float) $client_details->balance, 2, '.', '')),
-		// 			"bonusBalance" => 0
-		// 		]
-		// 	];
-		// 	AWSHelper::saveLog('AWS singleFundTransfer - Order Already Exist', $this->provider_db_id, $data, $e->getMessage() . ' ' . $e->getLine());
-		// 	return $response;
-		// }
 
 		AWSHelper::saveLog('AWS singleFundTransfer - findGameExt CHECK', $this->provider_db_id, $data, 'CHECK');
-		// $game_ext_check = AWSHelper::findGameExt($details->txnId, $game_transaction_type, 'transaction_id');
 		$game_ext_check = GameTransactionMDB::findGameExt($details->txnId, 2,'transaction_id', $client_details);
 		if($game_ext_check != 'false'){
 			$response = [
@@ -410,7 +383,6 @@ class AWSController extends Controller
 			"code"=> 2200,
 			"data"=> [
 					"currency"=> $client_details->default_currency,
-					// "balance"=> floatval(number_format((float)$player_details->playerdetailsresponse->balance, 2, '.', '')),
 					"balance"=> floatval(number_format((float)$client_details->balance, 2, '.', '')),
 					"bonusBalance"=> 0
 				]
@@ -420,7 +392,6 @@ class AWSController extends Controller
 		}
 
 		if ($transaction_type == 'debit') {
-			// if($bet_amount > $player_details->playerdetailsresponse->balance){
 			if ($bet_amount > $client_details->balance) {
 				$response = [
 					"msg" => "Insufficient balance",
@@ -441,16 +412,7 @@ class AWSController extends Controller
 			} else {
 				$is_freespin = false;
 			}
-			if(AWSHelper::isNegativeBalance($win_amount_2way, $client_details)){
-				if($is_freespin != true){
-					$response = ["msg" => "Insufficient balance","code" => 1201];
-					return $response;
-				}
-			}
 			
-			// $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $provider_trans_id);
-			// $game_transextension1 = AWSHelper::createGameTransExtV2($gamerecord, $provider_trans_id, $provider_trans_id, $bet_amount_2way, 1);
-
 			$gameTransactionData = array(
 				"provider_trans_id" => $provider_trans_id,
 				"token_id" => $token_id,
@@ -487,8 +449,6 @@ class AWSController extends Controller
 				// return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
 				$response = ["msg" => "Fund transfer encountered error", "code" => 2205, "data" => []];
 				if (isset($gamerecord)) {
-					// AWSHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-					// AWSHelper::updatecreateGameTransExt($game_transextension1, 'FAILED', $response, 'FAILED', $e->getMessage() . ' ' . $e->getLine(), false, 'FAILED');
 					
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
@@ -506,10 +466,7 @@ class AWSController extends Controller
 
 			if (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "200") {
-				// ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 2);
-				// AWSHelper::updatecreateGameTransExt($game_transextension1, $details, $client_response, $client_response->requestoclient, $client_response, $client_response);
-				
-				# $game_transextension2 = AWSHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $provider_trans_id, $win_amount_2way, 2);
+			
 				try {
 					$new_balance = $client_details->balance - $bet_amount_2way;
 					$new_balance = $new_balance + $win_amount_2way;
@@ -541,8 +498,6 @@ class AWSController extends Controller
 						$win_type = 0;
 					}
 
-					// ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 2);
-					// ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income,  $win_type, $method);
 					$updateGameTransaction = [
 						"pay_amount" => $pay_amount,
 						"income" =>  $income,
@@ -591,9 +546,6 @@ class AWSController extends Controller
 						]
 					];
 
-					
-					# $client_response2_requestBody = ProviderHelper::fundTransfer_requestBody($client_details,abs($win_amount_2way),$game_details->game_code,$game_details->game_name,$game_transextension2,$gamerecord,'credit');
-					# $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details,abs($win_amount_2way),$game_details->game_code,$game_details->game_name,$game_transextension2,$gamerecord,'credit',false,$action_payload);
 					$client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, abs($win_amount_2way), $game_details->game_code, $game_details->game_name, $gamerecord, 'credit', false, $action_payload);
 				} catch (\Exception $e) {
 					// return $e->getMessage() . ' ' . $e->getLine() . ' ' . $e->getFile();
@@ -622,11 +574,6 @@ class AWSController extends Controller
 					# AWSHelper::updatecreateGameTransExt($game_transextension2, $details, $response, $client_response2->requestoclient, $client_response,$response);
 				} elseif (isset($client_response2->fundtransferresponse->status->code)
 					&& $client_response2->fundtransferresponse->status->code == "402") {
-					// if (ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)) :
-					// 	AWSHelper::updateGameTransactionStatus($gamerecord, 2, 6);
-					// else :
-					// 	AWSHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-					// endif;
 
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
@@ -640,11 +587,6 @@ class AWSController extends Controller
 				}
 			} elseif (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "402") {
-				// if (ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)) :
-				// 	AWSHelper::updateGameTransactionStatus($gamerecord, 2, 6);
-				// else :
-				// 	AWSHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-				// endif;
 
 				$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
@@ -661,6 +603,13 @@ class AWSController extends Controller
 			return $response;
 		}
 	}
+
+
+
+	/**
+	 *  BELOW LINE OF CODES NO LONGER USED (TRANSFER WALLET INTEGRATION OUTDATED)
+	 * 
+	 */
 
 	/**
 	 * SINGLE WALLET
