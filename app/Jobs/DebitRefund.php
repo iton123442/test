@@ -90,6 +90,7 @@ class DebitRefund extends Job
                     'mw_request' => json_encode($requesttocient),
                     'client_response' => json_encode($client_response),
                     'transaction_detail' => 'SUCCESS',
+                    'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }else{
@@ -99,6 +100,7 @@ class DebitRefund extends Job
                     'mw_request' => json_encode($requesttocient),
                     'client_response' => json_encode($client_response),
                     'transaction_detail' => 'FAILED',
+                    'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }
