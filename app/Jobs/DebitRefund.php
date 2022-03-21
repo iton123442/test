@@ -97,7 +97,7 @@ class DebitRefund extends Job
                     "mw_response" => json_encode(['retry' => 'jobs']),
                     'mw_request' => json_encode($requesttocient),
                     'client_response' => json_encode($client_response),
-                    'transaction_detail' => 'NOT ENOUGH FUNDS',
+                    'transaction_detail' => 'NOT_ENOUGH_FUNDS',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
@@ -107,7 +107,7 @@ class DebitRefund extends Job
                     "mw_response" => json_encode(['retry' => 'jobs']),
                     'mw_request' => json_encode($requesttocient),
                     'client_response' => json_encode($client_response),
-                    'transaction_detail' => 'UNKNOWN STATUS CODE',
+                    'transaction_detail' => 'UNKNOWN_STATUS_CODE',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
@@ -120,7 +120,7 @@ class DebitRefund extends Job
                 // "provider_request" =>json_encode(['gg' => 'gg']),
                 'mw_request' => json_encode(['retry' => 'jobs']),
                 'client_response' => json_encode($e->getMessage().' '.$e->getLine()),
-                'transaction_detail' => 'FAILED EXCEPTION',
+                'transaction_detail' => 'FAILED_EXCEPTION',
                 'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
