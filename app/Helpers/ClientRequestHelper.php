@@ -73,7 +73,7 @@ class ClientRequestHelper{
               ]
             ]
               ];
-
+            $connection_timeout = 2;// as default 2s 
             if(count($action) > 0){
                 // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
                 if(isset($action['provider_name'])){
@@ -90,7 +90,6 @@ class ClientRequestHelper{
                 if(isset($action["fundtransferrequest"]["fundinfo"]["freeroundend"] )) {
                     $requesttocient["fundtransferrequest"]['fundinfo']['freeroundend'] = $action["fundtransferrequest"]['fundinfo']['freeroundend'];
                 }
-                $connection_timeout = 2;// as default 2s
                 if(isset($action["connection_timeout"] )) {
                     $connection_timeout = $action["connection_timeout"]; //set by provider
                 }
