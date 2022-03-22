@@ -28,6 +28,7 @@ class BNGController extends Controller
             return $this->_authPlayer($data,$client_details);
         }
         elseif($data["name"]== "transaction"){
+            sleep(10);
             $data = $this->_transaction($data,$client_details);
             $invokeEnd = microtime(true) - $invokeStart;
             Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "indexTransaction" ,"Time" => $invokeEnd]), "");
@@ -35,6 +36,7 @@ class BNGController extends Controller
             //return $this->_betGame($data);
         }
         elseif($data["name"]=="rollback"){
+            Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "indexTransaction" ,"Time" => $invokeStart]), $data["name"]);
             return $this->_rollbackGame($data,$client_details);
         }
         elseif($data["name"]=="getbalance"){
