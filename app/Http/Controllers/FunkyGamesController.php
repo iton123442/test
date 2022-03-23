@@ -159,10 +159,10 @@ class FunkyGamesController extends Controller
 		$client_details = ProviderHelper::getClientDetails('token', $token_id);
 		if($bet_amount > $client_details->balance ){
 			$response = [							                            
-				"errorCodee" => 402,
+				"errorCode" => 402,
 				"errorMessage" => "Insufficient Balance",
 				"data" => [
-				   "balance" => $playerBal
+				   "balance" => -3.2
 			   ],
 			 
 		   ];
@@ -253,10 +253,10 @@ class FunkyGamesController extends Controller
 													$playerBal = sprintf('%.2f', $client_details->balance);
 							                        $response = [
 							                            
-							                             "errorCodee" => 402,
+							                             "errorCode" => 402,
 							                             "errorMessage" => "Insufficient Balance",
 														 "data" => [
-															"balance" => $playerBal
+															"balance" => -3.2
 														],
 							                          
 							                        ];
