@@ -162,7 +162,7 @@ class FunkyGamesController extends Controller
 				"errorCodee" => 402,
 				"errorMessage" => "Insufficient Balance",
 				"data" => [
-				   "balance" => $playerBal
+				   "balance" => -3.2
 			   ],
 			 
 		   ];
@@ -256,7 +256,7 @@ class FunkyGamesController extends Controller
 							                             "errorCodee" => 402,
 							                             "errorMessage" => "Insufficient Balance",
 														 "data" => [
-															"balance" => $playerBal
+															"balance" => -3.2
 														],
 							                          
 							                        ];
