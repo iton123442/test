@@ -73,7 +73,7 @@ class ClientRequestHelper{
               ]
             ]
               ];
-
+            $connection_timeout = 2;// as default 2s 
             if(count($action) > 0){
                 // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
                 if(isset($action['provider_name'])){
@@ -90,6 +90,9 @@ class ClientRequestHelper{
                 if(isset($action["fundtransferrequest"]["fundinfo"]["freeroundend"] )) {
                     $requesttocient["fundtransferrequest"]['fundinfo']['freeroundend'] = $action["fundtransferrequest"]['fundinfo']['freeroundend'];
                 }
+                if(isset($action["connection_timeout"] )) {
+                    $connection_timeout = $action["connection_timeout"]; //set by provider
+                }
             }
 
             try{
@@ -102,7 +105,7 @@ class ClientRequestHelper{
                             ];
                             ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
-                        'timeout' => 2, # 2 seconds
+                        'timeout' => $connection_timeout, # 2 seconds
                         'body' => json_encode(
                             $requesttocient
                     )],
@@ -125,10 +128,10 @@ class ClientRequestHelper{
                 return $client_reponse;
             }catch(\Exception $e){
 
-                if($type == 'credit'){
-                    $game_details_id = providerHelper::getGameDetailsByCodeName($game_name, $game_code);
-                    Providerhelper::createRestrictGame($game_details_id->game_id,$client_details->player_id,$transactionId, $requesttocient);
-                }
+                // if($type == 'credit'){
+                //     $game_details_id = providerHelper::getGameDetailsByCodeName($game_name, $game_code);
+                //     Providerhelper::createRestrictGame($game_details_id->game_id,$client_details->player_id,$transactionId, $requesttocient);
+                // }
                 $response = array(
                     "fundtransferresponse" => array(
                         "status" => array(
