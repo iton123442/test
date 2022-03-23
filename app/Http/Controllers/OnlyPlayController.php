@@ -375,8 +375,6 @@ class OnlyPlayController extends Controller
                             "balance" => $formatBalance
                         ];
                         break;
-                }
-
                 $updateTransactionEXt = array(
                     "provider_request" =>json_encode($request->all()),
                     "mw_response" => json_encode($response),
@@ -386,6 +384,9 @@ class OnlyPlayController extends Controller
                     'general_details' => 'success',
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
+                }
+
+               
 
             }
 

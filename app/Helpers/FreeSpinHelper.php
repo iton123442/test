@@ -1607,12 +1607,46 @@ class FreeSpinHelper{
         
     }
     public static function createFreeSpinKA($player_details,$data, $sub_provder_id,$freeround_id){
-        dd($data);
+        // dd($data);
         Helper::saveLog('KAGa Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         if($game_details == false){
             return 400;
         }
+        $requesttosend = [
+            "partnerName" => config("providerlinks.kagaming.partner_name"),
+            "currency" => $player_details->default_currency,
+            "playerId" => (string) $player_details->player_id,
+            "numberSpins" => (int) $data['details']['rounds'],
+            "betLevel" => (int) $data['details']['denomination'],
+            "endDate" => $data["details"]["expiration_date"],
+            "games" =>[$data["game_code"]] 
+        ];
+        // dd($requesttosend);
+        $hash = hash_hmac('sha256', json_encode($requesttosend), config("providerlinks.kagaming.secret_key"));
+        // dd($hash);
+        $actionUrl = "https://rmpstage.kaga88.com/kaga/promotionspin/create?hash=".$hash;
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        $guzzle_response = $client->post($actionUrl,
+            ['body' => json_encode(
+                    $requesttosend
+            )]
+        );
+        $dataresponse = json_decode($guzzle_response->getBody()->getContents());
+        dd($dataresponse);
+        // try {
+        //     $guzzle_response = $client->post($actionUrl,
+        //         ['body' => json_encode(
+        //                 $requesttosend
+        //         )]
+        //     );
+        // } catch (\Exception $e) {
+        //     return 400;
+        // }
     }
 }
 ?>
