@@ -318,6 +318,18 @@ class OnlyPlayController extends Controller
         $user_id = explode('TG_',$request->user_id);
         $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', 1, $get_client_details);
+        $balance = str_replace(".","", $get_client_details->balance);
+        $formatBalance = (int) $balance;
+        if($bet_transaction != 'false'){
+            $get_failed_trans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $get_client_details);
+            if($get_failed_trans->transaction_detail == 'failed'){
+                $response = [
+                    'success' => true,
+                    'balance' => $formatBalance
+                ];
+                return $balance;
+            }
+        }
 
             try{
                 ProviderHelper::idenpotencyTable($request->tx_id);
@@ -375,23 +387,25 @@ class OnlyPlayController extends Controller
                             "balance" => $formatBalance
                         ];
                         break;
+                        $updateTransactionEXt = array(
+                            "provider_request" =>json_encode($request->all()),
+                            "mw_response" => json_encode($response),
+                            'mw_request' => json_encode($client_response->requestoclient),
+                            'client_response' => json_encode($client_response->fundtransferresponse),
+                            'transaction_detail' => 'success',
+                            'general_details' => 'success',
+                        );
+                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
+                        Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()),$response);
+                        return response($response,200)
+                        ->header('Content-Type', 'application/json');
                 }
 
-                $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
-                    'mw_request' => json_encode($client_response->requestoclient),
-                    'client_response' => json_encode($client_response->fundtransferresponse),
-                    'transaction_detail' => 'success',
-                    'general_details' => 'success',
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
+               
 
             }
 
-        Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()),$response);
-        return response($response,200)
-                ->header('Content-Type', 'application/json');
+        
 
     }
     public function createSignature(Request $request){
