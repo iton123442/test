@@ -213,7 +213,12 @@ class OnlyPlayController extends Controller
             }
         try {       
 
-                    $get_failedTrans = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', 2, $get_client_details);
+                    
+                    $game_details = Game::find($request->game_bundle, $this->provider_db_id);
+        
+                    // multi DB
+                    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', false, $get_client_details);
+                    $get_failedTrans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id, 1, 'game_trans_id',$client_details);
                     if($get_failedTrans != "false"){
                         if($get_failedTrans->transaction_detail == 'failed'){
                             $response = [
@@ -224,10 +229,6 @@ class OnlyPlayController extends Controller
                             return $response;
                         }
                     }
-                    $game_details = Game::find($request->game_bundle, $this->provider_db_id);
-        
-                    // multi DB
-                    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', false, $get_client_details);
                     $get_client_details->connection_name = $bet_transaction->connection_name;
                     $winbBalance = ($formatBalance/100) + $pay_amount;
                     $win_bal = number_format($winbBalance,2,'.','');
