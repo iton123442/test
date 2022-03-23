@@ -1032,9 +1032,9 @@ public function gameBet($request, $client_details){
         $payload = $request->all();
         $request_sign = $request->header('x-request-sign');
         $secret = config('providerlinks.bgaming.AUTH_TOKEN');
-        $signature = hash_hmac('sha256',json_encode($payload),$secret);
+        $signature = hash_hmac('SHA256',json_encode($payload),"A95383137CE37E4E19EAD36DF59D589A");
         // $signature = hash_hmac('sha256','{"casino_id":"tigergames-int","issue_id":"12458114135","currency":"USD","games":["MechanicalOrange"],"valid_until":"2022-03-12T20:03:19Z","bet_level":3,"freespins_quantity":10,"user":{"id":"55011","email":"casino14@betrnk.com","firstname":"casino14","lastname":"casino14","nickname":"casino14 casino14","city":"PH","country":"PH","date_of_birth":"2021-01-29","gender":"m"}}','HZhPwLMXtHrmQUxjmMvBmCPM');
-        // dd($signature);
+        dd($signature);
 
         Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
         if($signature != $request_sign){
