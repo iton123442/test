@@ -215,7 +215,7 @@ class OnlyPlayController extends Controller
 
                     $get_failedTrans = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', 2, $get_client_details);
                     if($get_failedTrans != "false"){
-                        if($get_failedTrans->win == 2){
+                        if($get_failedTrans->transaction_detail == 'failed'){
                             $response = [
                                 'success' => true,
                                 'balance' => $formatBalance
