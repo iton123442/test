@@ -62,7 +62,10 @@ class FunkyGamesController extends Controller
 				if($client_details == null){
 					$response = [
 						"errorCode" => 401,
-						"errorMessage" => "Player Is Not Logged In"
+						"errorMessage" => "Player Is Not Logged In",
+						"data" => [
+							"balance" => 0
+						],
 					];
 					return response($response,200)->header('Content-Type', 'application/json');
 				}else{
@@ -97,6 +100,7 @@ class FunkyGamesController extends Controller
 				Helper::saveLog('FunkyG checkBet', $this->provider_db_id, json_encode($req->all()), "checkbet HIT");
 					$transaction_id = $req['id'];
 					$client_details = ProviderHelper::getClientDetails('player_id', $req['playerId']);
+					$playerBal = sprintf('%.2f', $client_details->balance);
 					$bet_transaction = $this->findGameTransactionDetails($transaction_id,'transaction_id',false,$client_details);
 					if($bet_transaction != 'false'){
 						$newDateFormat = new DateTime($bet_transaction->created_at);
@@ -127,7 +131,10 @@ class FunkyGamesController extends Controller
 					}else{
 						$response = [
 							"errorCode" => 404,
-							"errorMessage" => "Bet was not found"
+							"errorMessage" => "Bet was not found",
+							"data" => [
+								"balance" => floatval($playerBal)
+							],
 						];
 					}
 						Helper::saveLog('FunkyG checkBet', $this->provider_db_id, json_encode($req->all()), $response);
@@ -150,13 +157,27 @@ class FunkyGamesController extends Controller
 		$provider_trans_id = $req['bet']['refNo'];
 		$token_id = $req['sessionId'];
 		$client_details = ProviderHelper::getClientDetails('token', $token_id);
+		if($bet_amount > $client_details->balance ){
+			$response = [							                            
+				"errorCodee" => 402,
+				"errorMessage" => "Insufficient Balance",
+				"data" => [
+				   "balance" => $playerBal
+			   ],
+			 
+		   ];
+		   return $response;
+		}
         $game_details = Game::find($game_code, $this->provider_db_id);
 		try{
             ProviderHelper::idenpotencyTable($round_id);
         }catch(\Exception $e){
             $response = [
 				"errorCode" => 403,
-				"errorMessage" => "Bet already exists"
+				"errorMessage" => "Bet already exists",
+				"data" => [
+					"balance" => 0
+				],
 			];
             return $response;
         }
@@ -229,10 +250,14 @@ class FunkyGamesController extends Controller
 							                    case '402':
 							                            // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
 							                        $http_status = 200;
+													$playerBal = sprintf('%.2f', $client_details->balance);
 							                        $response = [
 							                            
 							                             "errorCodee" => 402,
-							                             "errorMessage" => "Insufficient Balance"
+							                             "errorMessage" => "Insufficient Balance",
+														 "data" => [
+															"balance" => $playerBal
+														],
 							                          
 							                        ];
 
@@ -257,7 +282,10 @@ class FunkyGamesController extends Controller
      	 	}else{
 		       	$response = [
 						"errorCode" => 401,
-						"errorMessage" => "Player Is Not Logged In"
+						"errorMessage" => "Player Is Not Logged In",
+						"data" => [
+							"balance" => $playerBal
+						],
 				];
 				Helper::saveLog('FunkyG Error Client details', $this->provider_db_id, json_encode($req->all()), json_encode($response));
 				return response($response,200)
@@ -277,6 +305,7 @@ class FunkyGamesController extends Controller
 		$pay_amount = $req['betResultReq']['winAmount'];
 		$effectiveStake = $req['betResultReq']['effectiveStake'];
 		$client_details = ProviderHelper::getClientDetails('player_id', $req['betResultReq']['playerId']);
+		$playerBal = sprintf('%.2f', $client_details->balance);
 		// dd($client_details);
 
         $game_details = Game::find($game_code, $this->provider_db_id);
@@ -284,8 +313,11 @@ class FunkyGamesController extends Controller
         if($bet_transaction == 'false'){
         	$response = [
 				"errorCode" => 404,
-				"errorMessage" => "Bet was not found"
-			];
+				"errorMessage" => "Bet was not found",
+				"data" => [
+					"balance" => $playerBal
+				],
+		];
 	        return $response;
         }
         try {
@@ -294,14 +326,20 @@ class FunkyGamesController extends Controller
         	if($bet_transaction->win == 4){
         		$response = [
 					"errorCode" => 410,
-					"errorMessage" => "Bet was already cancelled"
+					"errorMessage" => "Bet was already cancelled",
+					"data" => [
+						"balance" => $playerBal
+					],
 				];
 	            return $response;
         	}
 	        if($bet_transaction->win != 5){
 	        	$response = [
 					"errorCode" => 409,
-					"errorMessage" => "Bet was already settled"
+					"errorMessage" => "Bet was already settled",
+					"data" => [
+						"balance" => $playerBal
+					],
 				];
 	            return $response;
 	        }
@@ -409,11 +447,14 @@ class FunkyGamesController extends Controller
 		$round_id = "R-".$req['refNo'];
 		$client_details = ProviderHelper::getClientDetails('player_id',$req['playerId']);
 		$bet_transaction = $this->findGameTransactionDetails($trans_id, 'transaction_id', 1,$client_details);
-
+		$playerBal = sprintf('%.2f', $winbBalance);
 		if($bet_transaction == 'false'){
         	$response = [
 				"errorCode" => 404,
-				"errorMessage" => "Bet was not found"
+				"errorMessage" => "Bet was not found",
+				"data" => [
+					"balance" => $playerBal
+				],
 			];
 	        return $response;
         }
@@ -423,14 +464,20 @@ class FunkyGamesController extends Controller
         	if($bet_transaction->win == 4){
         		$response = [
 					"errorCode" => 410,
-					"errorMessage" => "Bet was already cancelled"
+					"errorMessage" => "Bet was already cancelled",
+					"data" => [
+						"balance" => 0
+					],
 				];
 	            return $response;
         	}
 	        if($bet_transaction->win != 5){
 	        	$response = [
 					"errorCode" => 409,
-					"errorMessage" => "Bet was already settled"
+					"errorMessage" => "Bet was already settled",
+					"data" => [
+						"balance" => $playerBal
+					],
 				];
 	            return $response;
 	        }
