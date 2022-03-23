@@ -215,11 +215,14 @@ class OnlyPlayController extends Controller
 
                     $get_failedTrans = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', 2, $get_client_details);
                     if($get_failedTrans != "false"){
-                        $response = [
-                            'success' => true,
-                            'balance' => $formatBalance
-                        ];
-                        return $response;
+                        if($get_failedTrans->win == 2){
+                            $response = [
+                                'success' => true,
+                                'balance' => $formatBalance
+                            ];
+                            Helper::saveLog('OnlyPlay deny credit', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
+                            return $response;
+                        }
                     }
                     $game_details = Game::find($request->game_bundle, $this->provider_db_id);
         
