@@ -322,12 +322,14 @@ class OnlyPlayController extends Controller
         $formatBalance = (int) $balance;
         if($bet_transaction != 'false'){
             $get_failed_trans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $get_client_details);
-            if($get_failed_trans->transaction_detail == 'failed'){
-                $response = [
-                    'success' => true,
-                    'balance' => $formatBalance
-                ];
-                return $balance;
+            if($get_failed_trans != false){
+                if($get_failed_trans->transaction_detail == 'failed'){
+                    $response = [
+                        'success' => true,
+                        'balance' => $formatBalance
+                    ];
+                    return $balance;
+                }
             }
         }
 
