@@ -193,6 +193,7 @@ class OnlyPlayController extends Controller
 
             try{
                 ProviderHelper::idenpotencyTable($request->tx_id);
+                
             }catch(\Exception $e){
                 $response = [
                     "success" =>  false,
@@ -210,9 +211,18 @@ class OnlyPlayController extends Controller
                 return $response;
 
             }
-        try {
+        try {       
+
+                    $get_failedTrans = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', 2, $get_client_details);
+                    if($get_failedTrans != "false"){
+                        $response = [
+                            'success' => true,
+                            'balance' => $formatBalance
+                        ];
+                        return $response;
+                    }
                     $game_details = Game::find($request->game_bundle, $this->provider_db_id);
-    
+        
                     // multi DB
                     $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', false, $get_client_details);
                     $get_client_details->connection_name = $bet_transaction->connection_name;
