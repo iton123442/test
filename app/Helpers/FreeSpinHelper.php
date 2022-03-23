@@ -518,6 +518,9 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundQuickSpinD($player_details,$data, $sub_provder_id, $freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         $quickSpinValue = $data["details"]["denomination"] * 100;
         try{
             $freeroundtransac = [
@@ -631,6 +634,9 @@ class FreeSpinHelper{
     }
     public static function createFreeRoundSpearHeadEm($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -720,8 +726,55 @@ class FreeSpinHelper{
         }
         Helper::saveLog('Spearhead freespin response', 67, json_encode($data), $response->getBody()->getContents());
     }
+    public static function cancelFreeSpinSpearHead($freeround_id){
+        $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+        // dd($getFreespin);
+        $username = "TigerGamesStageBonus";
+        $password = "YoqJcvRHFUcr2un4";
+        $credentials = base64_encode($username.":".$password);
+        $httpClient = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Basic ' . $credentials,
+            ]
+        ]);
+        $requesttosend = [
+            "BonusSource" => 2,
+            "Comment" => "This is Staging Test",
+            "OperatorUserId" => $getFreespin->player_id,
+            "BonusId" => $freeround_id,
+            "DomainId" => config("providerlinks.spearhead.opid")
+        ];
+        $baseUrl = "https://vendorapi-stage.everymatrix.com/vendorbonus/RGS_Matrix/ForfeitBonus";
+        try {
+            $response = $httpClient->post(
+                $baseUrl,[
+                    'body' => json_encode($requesttosend)]
+            );
+            $dataresponse = json_decode($response->getBody()->getContents());
+             $data = [
+                    "status" => 4,
+            ];
+            FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            return 200;
+        } catch (\Exception $e) {
+            $dataresponse = [
+                "error" => json_encode($e)
+            ];
+            $data = [
+                "status" => 0,
+                "provider_trans_id" => $id,
+                "details" => json_encode($dataresponse)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
+    }
     public static function BNGcreateFreeBet($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         try{
             if($data["details"]["type"] != "FIXED_FREEBET"){
                 $freeroundtransac = [
@@ -885,6 +938,9 @@ class FreeSpinHelper{
     } 
     public static function issueFreeSpinBGaming($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -1549,6 +1605,48 @@ class FreeSpinHelper{
     
          }
         
+    }
+    public static function createFreeSpinKA($player_details,$data, $sub_provder_id,$freeround_id){
+        // dd($data);
+        Helper::saveLog('KAGa Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
+        $requesttosend = [
+            "partnerName" => config("providerlinks.kagaming.partner_name"),
+            "currency" => $player_details->default_currency,
+            "playerId" => (string) $player_details->player_id,
+            "numberSpins" => (int) $data['details']['rounds'],
+            "betLevel" => (int) $data['details']['denomination'],
+            "endDate" => $data["details"]["expiration_date"],
+            "games" =>[$data["game_code"]] 
+        ];
+        // dd($requesttosend);
+        $hash = hash_hmac('sha256', json_encode($requesttosend), config("providerlinks.kagaming.secret_key"));
+        // dd($hash);
+        $actionUrl = "https://rmpstage.kaga88.com/kaga/promotionspin/create?hash=".$hash;
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        $guzzle_response = $client->post($actionUrl,
+            ['body' => json_encode(
+                    $requesttosend
+            )]
+        );
+        $dataresponse = json_decode($guzzle_response->getBody()->getContents());
+        dd($dataresponse);
+        // try {
+        //     $guzzle_response = $client->post($actionUrl,
+        //         ['body' => json_encode(
+        //                 $requesttosend
+        //         )]
+        //     );
+        // } catch (\Exception $e) {
+        //     return 400;
+        // }
     }
 }
 ?>

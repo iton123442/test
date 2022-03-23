@@ -756,6 +756,9 @@ public function gameBet($request, $client_details){
 	public  function rollbackTransaction(Request $request){
 		$payload = $request->all();
 		 // check request signature
+
+
+        Helper::saveLog('Bgaming Refund updateTransactionEXt', $this->provider_db_id, json_encode($payload), 'ENDPOINT HIT'); 
         if(!BGamingHelper::checkSignature($request->header('x-request-sign'), $payload)) {
             $http_status = 403;
                 $response = [
@@ -775,6 +778,49 @@ public function gameBet($request, $client_details){
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         $rollback_id = $payload['actions'][0]['original_action_id'];
         $processtime = new DateTime('NOW');
+
+        $getRefundTrans = GameTransactionMDB::findGameExt($rollback_id, 3, "transaction_id",$client_details);
+        if($getRefundTrans != "false"){
+            if(isset($payload['actions'][1]['action'])){
+                if($payload['actions'][1]['action'] == 'rollback' ){
+                     $response = [
+                        "balance" => (float)$client_details->balance,
+                        "game_id" => $request['game_id'],
+                        "transactions" =>[
+                            [
+                            "action_id" =>$payload['actions'][0]['action_id'],
+                            "tx_id" => $getRefundTrans->game_trans_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                        [
+                          "action_id" =>$payload['actions'][1]['action_id'],
+                            "tx_id" =>$getRefundTrans->game_trans_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                       ],
+                      ];
+                }
+             }else{
+                $response = [
+                  "balance" => (float)$client_details->balance,
+                  "game_id" => $request['game_id'],
+                  "transactions" =>[
+                    [
+                    "action_id" =>$payload['actions'][0]['action_id'],
+                    "tx_id" =>  $getRefundTrans->game_trans_id,
+                    "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                  ],
+                 ],
+                ];
+            }
+            $updateGameTransaction = [
+                'win' => 4,
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $getRefundTrans->game_trans_id, $client_details);
+            return $response;
+        }
+
+        
         if($rollback_id == "unknown"){
             $balance = str_replace(".", "", $client_details->balance);
             $response = [
@@ -884,7 +930,7 @@ public function gameBet($request, $client_details){
                     "round_id" => $rollback_id,
                     "amount" => $amount,
                     "game_transaction_type"=> 3,
-                    "provider_request" =>json_encode($request),
+                    "provider_request" =>json_encode($request->all()),
                     "mw_response" =>json_encode($response),
                 );
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
@@ -986,9 +1032,9 @@ public function gameBet($request, $client_details){
         $payload = $request->all();
         $request_sign = $request->header('x-request-sign');
         $secret = config('providerlinks.bgaming.AUTH_TOKEN');
-        // $signature = hash_hmac('sha256',json_encode($payload),$secret);
-        $signature = hash_hmac('sha256','{"casino_id":"tigergames-int","issue_id":"12458114135","currency":"USD","games":["MechanicalOrange"],"valid_until":"2022-03-12T20:03:19Z","bet_level":3,"freespins_quantity":10,"user":{"id":"55011","email":"casino14@betrnk.com","firstname":"casino14","lastname":"casino14","nickname":"casino14 casino14","city":"PH","country":"PH","date_of_birth":"2021-01-29","gender":"m"}}','HZhPwLMXtHrmQUxjmMvBmCPM');
-        // dd($signature);
+        $signature = hash_hmac('SHA256',json_encode($payload),"A95383137CE37E4E19EAD36DF59D589A");
+        // $signature = hash_hmac('sha256','{"casino_id":"tigergames-int","issue_id":"12458114135","currency":"USD","games":["MechanicalOrange"],"valid_until":"2022-03-12T20:03:19Z","bet_level":3,"freespins_quantity":10,"user":{"id":"55011","email":"casino14@betrnk.com","firstname":"casino14","lastname":"casino14","nickname":"casino14 casino14","city":"PH","country":"PH","date_of_birth":"2021-01-29","gender":"m"}}','HZhPwLMXtHrmQUxjmMvBmCPM');
+        dd($signature);
 
         Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
         if($signature != $request_sign){

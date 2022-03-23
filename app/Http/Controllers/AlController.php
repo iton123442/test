@@ -10,6 +10,7 @@ use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\GameTransactionMDB;
 use Illuminate\Support\Facades\Hash;
 use Session;
 use Auth;
@@ -453,7 +454,17 @@ class AlController extends Controller
       //     }
       //   }
       // }
+      $client_details = Providerhelper::getClientDetails('player_id', 10210);
 
+      $updateTransactionEXt = array(
+            // "provider_request" =>json_encode($payload),
+            "mw_response" => json_encode(['retry' => 'jobs']),
+            'mw_request' => json_encode(['retry' => 'jobs']),
+            'client_response' => json_encode(['retry' => 'jobs']),
+            'transaction_detail' => 'SUCCESS',
+            'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+      );
+      GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,21021376,$client_details);
 
       // return 1;
 

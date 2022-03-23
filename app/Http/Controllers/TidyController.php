@@ -261,7 +261,7 @@ class TidyController extends Controller
 	            'provider_name' => $game_details->provider_name
 	        ];
 			try {
-				$client_response = ClientRequestHelper::fundTransferFunta($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
+				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 	        } catch (\Exception $e) {
 	            $response = array(
@@ -540,6 +540,18 @@ class TidyController extends Controller
 			Helper::saveLog('Tidy Rollback error', $this->provider_db_id, json_encode(file_get_contents("php://input")), $data_response);
 			return $data_response;
 		}
+		$bet_transaction = GameTransactionMDB::findGameExt($reference_transaction_uuid, 3,'transaction_id', $client_details);
+		if ($bet_transaction != 'false') {
+			$response = [
+				"uid" => $uid,
+				"request_uuid" => $request_uuid,
+				"currency" => TidyHelper::getcurrencyCode($client_details->default_currency,$client_details->client_id),
+				"balance" =>  ProviderHelper::amountToFloat($client_details->balance)
+			];
+			Helper::saveLog('Tidy BET duplicate_transaction success', $this->provider_db_id, json_encode($request->all()),  $bet_transaction->mw_response);
+			return response($response,200)
+			->header('Content-Type', 'application/json');
+		} 
 		try{
 	 		ProviderHelper::idenpotencyTable($this->prefix.'_'.$transaction_uuid);
 		}catch(\Exception $e){
