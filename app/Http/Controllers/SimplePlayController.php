@@ -109,17 +109,17 @@ class SimplePlayController extends Controller
             }
                 $player_currency = $client_details->default_currency;
 
-
-            $get_failed_trans = GameTransactionMDB::findGameExt($request_params['txn_reverse_id'],1,'round_id', $client_details);
-            if($get_failed_trans != false){
-                if($get_failed_trans->transaction_detail == 'FAILED'){
-                    header("Content-type: text/xml; charset=utf-8");
-                    $response = '<?xml version="1.0" encoding="utf-8"?>';
-                    $response .= '<RequestResponse><username>'.$request_params['username'].'</username><currency>'.$player_currency.'</currency><amount>'.$client_details->balance.'</amount><error>0</error></RequestResponse>';
-                    return $response;
+            if(isset($request_params['txn_reverse_id'])){
+                $get_failed_trans = GameTransactionMDB::findGameExt($request_params['txn_reverse_id'],1,'transaction_id', $client_details);
+                if($get_failed_trans != false){
+                    if($get_failed_trans->transaction_detail == 'FAILED'){
+                        header("Content-type: text/xml; charset=utf-8");
+                        $response = '<?xml version="1.0" encoding="utf-8"?>';
+                        $response .= '<RequestResponse><username>'.$request_params['username'].'</username><currency>'.$player_currency.'</currency><amount>'.$client_details->balance.'</amount><error>0</error></RequestResponse>';
+                        return $response;
+                    }
                 }
             }
-            
             //GameRound::create($json_data['roundid'], $player_details->token_id);
 
             // Check if the game is available for the client
