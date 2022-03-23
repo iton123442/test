@@ -264,6 +264,7 @@ $app->post('/public/api/sa/PlaceBetCancel','SAGamingController@PlaceBetCancel');
 
 // KAGaming
 $app->post('/public/api/ka/gamelist','KAGamingController@index');
+$app->post('/public/api/ka/direct','KAGamingController@DirectSend');
 $app->post('/public/api/ka/start','KAGamingController@gameStart');
 $app->post('/public/api/ka/end','KAGamingController@gameEnd');
 $app->post('/public/api/ka/play','KAGamingController@checkPlay');
@@ -356,6 +357,7 @@ $app->post('/public/api/booming/rollback','BoomingGamingController@rollBack');
 // Spade Gaming
 $app->post('/public/api/spade','SpadeController@index');//single route
 $app->post('/public/api/spade/authorize','SpadeController@authorize');
+$app->post('/public/api/spade/getBetCost','SpadeController@getBetCost');
 $app->post('/public/api/spade/getBalance','SpadeController@getBalance');
 $app->post('/public/api/spade/transfer','SpadeController@makeTransfer');
 $app->post('/public/api/spade/getgame','SpadeController@getGameList');

@@ -58,6 +58,41 @@ class KAGamingController extends Controller
         }
     }
 
+    public function DirectSend(Request $request){
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        $body = [
+            "partnerName"=> $request->partnerName,
+            "currency"=> $request->currency,
+            "playerId"=> $request->playerId,
+            "numberSpins"=> $request->numberSpins,
+            "betLevel"=> $request->betLevel,
+            "endDate"=> $request->endDate,
+            "games"=>[
+                $request->games[0]
+            ]
+        ];
+        $hash = $this->generateHash($body);
+
+        
+        // dd($hash);
+        $guzzle_response = $client->post($this->ka_api.'promotionspin/create?hash='.$this->generateHash($body),
+            ['body' => json_encode(
+                    $body
+            )]
+        );
+        $client_response = json_decode($guzzle_response->getBody()->getContents());
+        dump($this->generateHash($body));
+        dump($guzzle_response);
+        dump($client_response);
+        dd($hash);
+    }
+    
+    
+
     public function index(){
         $client = new Client([
             'headers' => [ 
