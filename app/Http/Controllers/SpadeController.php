@@ -48,6 +48,63 @@ class SpadeController extends Controller
 	
 	}
 	
+	public function getBetCost(Request $request){
+//Auto Bulk insert in table FreeRound Denomination!!
+		$api = $this->api_url;
+		$games = DB::select("Select * FROM games as g where g.sub_provider_id = ". $this->provider_db_id.";");
+		$results =array();
+		foreach($games as $item){
+			$gametocompare = DB::select("select * FROM  free_round_denominations WHERE game_id = ".$item->game_id.";");
+
+			if(count($gametocompare) == 0){
+				try{
+					$requesttosend = [
+						'serialNo' =>  $this->generateSerialNo(),
+						'merchantCode' => $this->merchantCode,
+						'currency' => $request->currency,
+						'gameCode' => $item->game_code
+					];
+					$client = new Client([
+						'headers' => [ 
+							'API' => "getBetCost",
+							'DataType' => "JSON"
+						]
+					]);
+					$guzzle_response = $client->post($api,['body' => json_encode($requesttosend)]);
+					$client_response = json_decode($guzzle_response->getBody()->getContents());
+					if (isset($client_response->betCosts)){
+						$responsetoarray = json_decode(json_encode($client_response->betCosts));
+						// dd($responsetoarray->betCosts[0]->betCost);
+						$availBet = $responsetoarray->betCosts[0]->betCost;	
+						// dd($game_details);
+						$denominations = '';
+						foreach ($availBet as $value) {
+							$denominations .= $value . " ";
+						}
+						$arraydenom = array(
+							'game_id' => $item->game_id,
+							'denominations' => $denominations,
+							'currency' => $request->currency
+						) ;
+						$result[] = $arraydenom;
+						DB::table('free_round_denominations')->insert($arraydenom);
+					}
+				}
+				catch(\Exception $e) {
+					$msg = $e->getMessage().' '.$e->getLine().' '.$e->getFile();
+					$arr = array(
+						'Message' => $msg,
+						'Game Code' => $item->game_code
+					);
+					return $arr;
+				}
+			}
+		}
+
+		return $result;
+		
+	}
+
 	public function index(Request $request){
 		if(!$request->header('API')){
 			$response = [
@@ -658,7 +715,7 @@ class SpadeController extends Controller
 							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
 							$updateFreespinData = [
 								"status" => $status,
-								"win" => $getFreespin->win + $amount,
+								"win" => $getFreespin->win + $details->amount,
 								"spin_remaining" => $getFreespin->spin_remaining - 1
 							];
 							$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
@@ -683,6 +740,8 @@ class SpadeController extends Controller
 						);
 						//THIS RESPONSE IF THE TIMEOUT NOT FAILED
 					} catch (\Exception $e) {
+						Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($details), $response);
+	            		return $response;
 					}
 					Helper::saveLog('Spade '.$header['API'].' RESPONSE', $this->provider_db_id, json_encode($details), $response);
 					return $response;
