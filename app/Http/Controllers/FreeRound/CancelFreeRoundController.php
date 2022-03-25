@@ -74,10 +74,11 @@ class CancelFreeRoundController extends Controller
                         return FreeSpinHelper::cancelFreeSpinBGaming($freeround_id);
                     } elseif($game_details->sub_provider_id == 127) {
                         return FreeSpinHelper::cancelFreeSpinSpearHead($freeround_id);
-                    
+                    } elseif($game_details->sub_provider_id == 75) {
+                        return FreeSpinHelper::cancelFreeSpinKA($freeround_id);
                     }
                     
-                }
+                }  
             }
         }
         return 400;
