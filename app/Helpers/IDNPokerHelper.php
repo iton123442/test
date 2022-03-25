@@ -283,4 +283,13 @@ class IDNPokerHelper{
         $data = count($query);
         return $data > 0 ? $query[0] : "false";
     }
+
+    
+    /**
+	 * [updateSessionTime - update set session to default $session_time]
+	 * 
+	 */
+    public static function updatePlayerRestricted($data,$player_id){
+       return DB::table('tw_player_restriction')->where('player_id',$player_id)->update($data);
+    }
 }

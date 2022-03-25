@@ -747,6 +747,7 @@ $app->post('/public/api/idnpoker/getPlayerBalance', 'IDNPokerController@getPlaye
 $app->post('/public/api/idnpoker/getPlayerWalletBalance', 'IDNPokerController@getPlayerWalletBalance');
 $app->post('/public/api/idnpoker/getTransaction', 'IDNPokerController@getTransactionHistory');
 $app->post('/public/api/idnpoker/retryWithdrawalWallet', 'IDNPokerController@retryWithdrawalRestriction');
+$app->post('/public/api/idnpoker/renewSession', 'IDNPokerController@renewSession');
 // Transfer Wallet New Update
 $app->post('/public/api/transferwallet/renewsession','TransferWalletController@renewSession');
 $app->post('/public/api/transferwallet/createsession','TransferWalletController@createWalletSession');
