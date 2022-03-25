@@ -885,7 +885,7 @@ class IDNPokerController extends Controller
     }
 
     public static function callRetryPlayerRestricted() {
-        $getRestricted = DB::select('select * from tw_player_restriction');
+        $getRestricted = DB::select('select * from tw_player_restriction'); // get all interval 1minute then sent
         foreach($getRestricted as $item)
         {
             try {
@@ -909,5 +909,25 @@ class IDNPokerController extends Controller
                 return "false";
             }
         }
+    }
+
+    /**
+	 * Transfer Waller and Semi Transfer Wallet
+	 * [updateSession - update set session to default $session_time]
+	 *  1 - still active
+     *  2 - not active
+	 */
+    public function renewSession(Request $request){
+    	// $data = $request->all();
+        Helper::saveLog('IDNPOKER RENEWSESSION', 110, json_encode($request->all()),  "renewSession");
+    	if($request->has('token') && $request->has('player_id')){
+            $updateStatus = [
+                'status' => 1, // active session
+            ];
+    		IDNPokerHelper::updatePlayerRestricted($updateStatus, $request->player_id);
+    	}
+    	$response = ["status" => "error", 'message' => 'Success Renew!'];
+    	// SessionWalletHelper::saveLog('TW updateSession', 1223, json_encode($data), 1223);
+    	return $response;
     }
 }
