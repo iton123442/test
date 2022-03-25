@@ -302,10 +302,13 @@ class AlController extends Controller
           return ['status'=>'failed', ['msg'=>'Missing Required Parameters']];
         }
 
+        $client_details_time =  microtime(true);
         $client_details = Providerhelper::getClientDetails('player_id',  $request->player_id);
         if($client_details == 'false'){
            return ['status'=>'failed', ['msg'=>'Player Not Found']];
         }
+        $client_details_process_time = microtime(true) - $client_details_time;
+
         $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
         if($player_details == 'false'){
            return  $response = ["status" => "failed", "msg" =>  'Server Timeout'];
@@ -454,6 +457,12 @@ class AlController extends Controller
       //     }
       //   }
       // }
+
+
+      $hashed_password = password_hash('kirill', PASSWORD_DEFAULT);
+      dd($hashed_password);
+
+
       $client_details = Providerhelper::getClientDetails('player_id', 10210);
 
       $updateTransactionEXt = array(
