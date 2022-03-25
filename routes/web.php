@@ -264,9 +264,9 @@ $app->post('/public/api/sa/PlaceBetCancel','SAGamingController@PlaceBetCancel');
 
 // KAGaming
 $app->post('/public/api/ka/gamelist','KAGamingController@index');
-$app->post('/public/api/ka/direct','KAGamingController@DirectSend');
 $app->post('/public/api/ka/start','KAGamingController@gameStart');
 $app->post('/public/api/ka/end','KAGamingController@gameEnd');
+$app->post('/public/api/ka/promo','KAGamingController@getPromo');
 $app->post('/public/api/ka/play','KAGamingController@checkPlay');
 $app->post('/public/api/ka/credit','KAGamingController@gameCredit');
 $app->post('/public/api/ka/balance','KAGamingController@playerBalance');

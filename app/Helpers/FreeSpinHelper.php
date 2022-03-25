@@ -1480,9 +1480,9 @@ class FreeSpinHelper{
                         "provider_trans_id" => $freeround_id,
                     ];
                 }
-                }catch(\Exception $e){
-                    return 400;
-                }
+            }catch(\Exception $e){
+                return 400;
+            }
                 $explode_freeroundid = explode('_', $freeround_id);
                 $id = FreeSpinHelper::createFreeRound($insertFreespin);
                 $client_player_details = ProviderHelper::getClientDetails('player_id',  $player_details->player_id);
@@ -1613,7 +1613,23 @@ class FreeSpinHelper{
         if($game_details == false){
             return 400;
         }
-        $requesttosend = [
+        try{
+            $insertFreespin = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+                "provider_trans_id" => $freeround_id,
+            ];
+        }catch(\Exception $e){
+            return 400;
+        }
+
+        $id = FreeSpinHelper::createFreeRound($insertFreespin);
+        
+         $requesttosend = [
             "partnerName" => config("providerlinks.kagaming.partner_name"),
             "currency" => $player_details->default_currency,
             "playerId" => (string) $player_details->player_id,
@@ -1622,31 +1638,110 @@ class FreeSpinHelper{
             "endDate" => $data["details"]["expiration_date"],
             "games" =>[$data["game_code"]] 
         ];
-        // dd($requesttosend);
+
         $hash = hash_hmac('sha256', json_encode($requesttosend), config("providerlinks.kagaming.secret_key"));
-        // dd($hash);
         $actionUrl = "https://rmpstage.kaga88.com/kaga/promotionspin/create?hash=".$hash;
+
         $client = new Client([
-            'headers' => [ 
+            'headers' => [
                 'Content-Type' => 'application/json'
             ]
         ]);
-        $guzzle_response = $client->post($actionUrl,
-            ['body' => json_encode(
-                    $requesttosend
-            )]
-        );
+
+        try{
+            $guzzle_response = $client->post($actionUrl,['body' => json_encode($requesttosend)]);
         $dataresponse = json_decode($guzzle_response->getBody()->getContents());
-        dd($dataresponse);
-        // try {
-        //     $guzzle_response = $client->post($actionUrl,
-        //         ['body' => json_encode(
-        //                 $requesttosend
-        //         )]
-        //     );
-        // } catch (\Exception $e) {
-        //     return 400;
-        // }
+
+        }catch(\Exception $e) {
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreespinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExt = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreespinHelper::createFreeRoundExtenstion($freespinExt);
+            return 400;
+        }
+        if($dataresponse->statusCode != 0){
+            Helper::saveLog('KAGaming Freespin Failed',75, json_encode($freeround_id), $dataresponse);
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }
+        else {      
+            $data = [
+                "details" => json_encode($dataresponse->promotionSpinId)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];  
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            Helper::saveLog('KAGaming Freespin Success',75, json_encode($freeround_id), $dataresponse);  
+            return 200;
+        }
+    }
+
+    public static function cancelFreeSpinKA($freeround_id){
+        Helper::saveLog('KAGaming CancelFreeRound',75, json_encode($freeround_id), 'Cancel FreeRound HIT!');
+         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+         if(isset($getFreespin)) {
+            $datatosend = [
+                "partnerName"=> config("providerlinks.kagaming.partner_name"),
+                "promotionSpinId"=>  json_decode($getFreespin->details)
+            ];
+            $client = new Client(['headers' => [ 
+                'Content-Type' => 'application/json'
+                ]
+            ]);
+            try{
+                $hash = hash_hmac('sha256', json_encode($datatosend), config("providerlinks.kagaming.secret_key"));
+                $actionUrl = "https://rmpstage.kaga88.com/kaga/promotionspin/cancel?hash=".$hash;
+
+                $game_link_response = $client->post($actionUrl,['body' => json_encode($datatosend)]);
+                $dataresponse = json_decode($game_link_response->getBody()->getContents());
+                $data = [
+                    "status" => 4,
+                ];
+                Helper::saveLog('KA Cancelfreespin Success', 75, json_encode($data), json_encode($dataresponse));
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+                 return 200;
+            }catch (\Exception $e) {
+                $dataresponse = [
+                    "error" => json_encode($e)
+                ];
+                $data = [
+                    "status" => 0,
+                ];
+
+                Helper::saveLog('KA Cancelfreespin error', 75, json_encode($data), json_encode($dataresponse));
+
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            
+                return 400;
+            }
+    
+         }
+        
     }
 }
 ?>

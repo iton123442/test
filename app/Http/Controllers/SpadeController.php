@@ -49,6 +49,7 @@ class SpadeController extends Controller
 	}
 	
 	public function getBetCost(Request $request){
+//Auto Bulk insert in table FreeRound Denomination!!
 		$api = $this->api_url;
 		$games = DB::select("Select * FROM games as g where g.sub_provider_id = ". $this->provider_db_id.";");
 		$results =array();
