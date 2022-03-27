@@ -987,7 +987,7 @@ class IDNPokerController extends Controller
             $checkPlayerRestricted = IDNPokerHelper::checkPlayerRestricted($request->player_id);
             if($checkPlayerRestricted != 'false'){
                 $updateStatus = [
-                    'status' => $checkPlayerRestricted + 1, // active session
+                    'status' => $checkPlayerRestricted->status + 1, // active session
                 ];
                 IDNPokerHelper::updatePlayerRestricted($updateStatus, $checkPlayerRestricted->idtw_player_restriction);
             }
