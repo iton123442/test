@@ -983,11 +983,12 @@ class IDNPokerController extends Controller
     	// $data = $request->all();
         Helper::saveLog('IDNPOKER RENEWSESSION', 110, json_encode($request->all()),  "renewSession");
     	if($request->has('token') && $request->has('player_id')){
-            $updateStatus = [
-                'status' => 1, // active session
-            ];
+           
             $checkPlayerRestricted = IDNPokerHelper::checkPlayerRestricted($request->player_id);
             if($checkPlayerRestricted != 'false'){
+                $updateStatus = [
+                    'status' => $checkPlayerRestricted + 1, // active session
+                ];
                 IDNPokerHelper::updatePlayerRestricted($updateStatus, $checkPlayerRestricted->idtw_player_restriction);
             }
     	}
