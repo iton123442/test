@@ -3,6 +3,7 @@ namespace App\Helpers;
 
 use App\Helpers\Helper;
 use GuzzleHttp\Client;
+use Webpatser\Uuid\Uuid;
 use DB;
 
 class IDNPokerHelper{
@@ -260,6 +261,41 @@ class IDNPokerHelper{
             Helper::saveLog('IDNPOKER getTransactionHistory', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getTransactionHistory ERROR" );
             return "false";
         }
+    }
+
+    public static function getCheckTransactionIDAvailable($data,$auth){
+        $x = 1; // limit 5 times retry
+        $id_transaction = false;// false or id
+        do {
+            $id = Uuid::generate()->string;
+            try {
+                $url = config('providerlinks.idnpoker.URL');
+                $client = new Client();
+                $guzzle_response = $client->post($url,[
+                    'body' => '
+                            <request>
+                                <secret_key>'.$auth.'</secret_key>
+                                <id>7</id>
+                                <userid>'.$data["player_id"].'</userid>
+                                <id_transaction>'.$id.'</id_transaction>
+                                <action>'.$data["action"].'</action>
+                            </request>'
+                ]
+                );
+                $details = $guzzle_response->getBody();
+                $json = json_encode(simplexml_load_string($details));
+                $response = json_decode($json,true);
+                if(isset($response["status"])  && $response["status"] == 0){
+                    $id_transaction = $response["id_transaction"]; 
+                    $x = 6;
+                }
+                Helper::saveLog('IDNPOKER checkTransactionID', 110, json_encode($response),  "CHECK RESPONSE checkTransactionID" );
+            } catch (\Exception $e) {
+                Helper::saveLog('IDNPOKER DEPOSIT', 110, json_encode($e->getMessage()),  "CHECK RESPONSE DEPOSIT ERROR" );
+            }
+            $x++;
+        } while ($x <= 5);
+        return $id_transaction;
     }
 
     public static function checkPlayerRestricted($player_id){
