@@ -986,7 +986,10 @@ class IDNPokerController extends Controller
             $updateStatus = [
                 'status' => 1, // active session
             ];
-    		IDNPokerHelper::updatePlayerRestricted($updateStatus, $request->player_id);
+            $checkPlayerRestricted = IDNPokerHelper::checkPlayerRestricted($request->player_id);
+            if($checkPlayerRestricted != 'false'){
+                IDNPokerHelper::updatePlayerRestricted($updateStatus, $checkPlayerRestricted->idtw_player_restriction);
+            }
     	}
     	$response = ["status" => "error", 'message' => 'Success Renew!'];
     	// SessionWalletHelper::saveLog('TW updateSession', 1223, json_encode($data), 1223);
