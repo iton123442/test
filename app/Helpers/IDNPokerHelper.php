@@ -325,7 +325,7 @@ class IDNPokerHelper{
 	 * [updateSessionTime - update set session to default $session_time]
 	 * 
 	 */
-    public static function updatePlayerRestricted($data,$player_id){
-       return DB::table('tw_player_restriction')->where('player_id',$player_id)->update($data);
+    public static function updatePlayerRestricted($data,$idtw_player_restriction){
+       return DB::table('tw_player_restriction')->where('idtw_player_restriction',$idtw_player_restriction)->update($data);
     }
 }
