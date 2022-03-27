@@ -187,7 +187,9 @@ class MancalaGamingController extends Controller
 
 			                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
 			                        $data_to_update = array(
-			                            "mw_response" => json_encode($response)
+			                            "mw_response" => json_encode($response),
+			                            'transaction_detail' => 'failed',
+	                                    'general_details' => 'failed',
 			                        );
 			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    }catch(\Exception $e){
@@ -269,6 +271,14 @@ class MancalaGamingController extends Controller
 						$bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($session_token->player_token, $json_data['RoundId'], $client_details);
 
 						$game_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transaction->game_trans_id, 'game_transaction', false, $client_details);
+						$get_failed_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transaction->game_trans_id, 'game_transaction', 3, $client_details);
+						if($get_failed_transaction != 'false'){
+							$response = [
+								"Error" =>  0,
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance),
+							];
+							return $response;
+						}
 						$client_details->connection_name = $game_transaction->connection_name;
 
 						$winbBalance = $client_details->balance + $json_data["Amount"];
