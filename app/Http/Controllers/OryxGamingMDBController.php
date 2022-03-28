@@ -24,7 +24,7 @@ use GuzzleHttp\Client;
 
 use DB;
 
-class OryxGamingController extends Controller
+class OryxGamingMDBController extends Controller
 {
 
 	public $prefix = 'ORYX'; 
@@ -34,7 +34,6 @@ class OryxGamingController extends Controller
 		/*$this->middleware('oauth', ['except' => ['index']]);*/
 		/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
 		$this->middleware_api = config('providerlinks.oauth_mw_api.mwurl'); 
-		$this->provider_db_id = 18;
 
 	}
 
@@ -42,7 +41,6 @@ class OryxGamingController extends Controller
 
 	public function authPlayer(Request $request)
 	{
-		Helper::saveLog('Oryx Auth', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
 		$token = RouteParam::get($request, 'token');
@@ -73,36 +71,8 @@ class OryxGamingController extends Controller
 					"currencyCode" => $client_details->default_currency, 
 					"languageCode" => "ENG",
 					"balance" => $this->_toPennies($client_response->playerdetailsresponse->balance),
-					// "balance" => $this->_toPennies($client_details->balance),
 					"sessionToken" => $token
 				];
-
-				// $client_response = ClientRequestHelper::playerDetailsCall($client_details->player_token);
-			
-				// if(isset($client_response->playerdetailsresponse->status->code) 
-				// 	&& $client_response->playerdetailsresponse->status->code == "200") {
-
-				// 	// save player details if not exist
-				// 	$player_id = PlayerHelper::saveIfNotExist($client_details, $client_response);
-
-				// 	// save token to system if not exist
-				// 	TokenHelper::saveIfNotExist($player_id, $token);
-
-				// 	$http_status = 200;
-				// 	$response = [
-				// 		"playerId" => "$player_id",
-				// 		// "currencyCode" => "USD", // RiAN
-				// 		"currencyCode" => $client_details->default_currency, 
-				// 		"languageCode" => "ENG",
-				// 		"balance" => $this->_toPennies($client_response->playerdetailsresponse->balance),
-				// 		"sessionToken" => $token
-				// 	];
-				// }
-				// else
-				// {
-				// 	// change token status to expired
-				// 	// TokenHelper::changeStatus($player_id, 'expired');
-				// }
 			}
 		}
 
@@ -114,7 +84,7 @@ class OryxGamingController extends Controller
 	
 	public function getBalance(Request $request) 
 	{
-		Helper::saveLog('Oryx Auth', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
+		// Helper::saveLog('getBalance', 18, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
 		$player_id = RouteParam::get($request, 'player_id');
