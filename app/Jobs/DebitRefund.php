@@ -41,7 +41,7 @@ class DebitRefund extends Job
         $client_callback_url = $client_details->fund_transfer_url;
         $client_access_token = $client_details->client_access_token;
         $transaction_id = $payload['transaction_id'];
-        $round_id = $payload['payload']['fundtransferrequest']['fundinfo']['roundId']
+        $round_id = $payload['payload']['fundtransferrequest']['fundinfo']['roundId'];
 
         // Modify the payload use the generated extension
         $payload['payload']['fundtransferrequest']['fundinfo']['transactionId'] = $transaction_id; // use the same generated game ext id every call
