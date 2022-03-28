@@ -355,7 +355,7 @@ class OryxGamingMDBController extends Controller
                     'general_details' => 'success',
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-            Helper::saveLog('Oryx Gaming Win success', $this->provider_db_id, $payload, $response);
+            //Helper::saveLog('Oryx Gaming Win success', $this->provider_db_id, $payload, $response);
                 return response($response,200)
                       ->header('Content-Type', 'application/json');
             }else{
