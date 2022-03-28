@@ -865,12 +865,18 @@ class OryxGamingController extends Controller
 		try {
 			$client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, $details["type"]);
 		} catch (\Exception $e) {
-			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED');
+   			$response = [
+				"responseCode" =>  "OUT_OF_MONEY",
+				"errorDescription" => "Player ran out of money.",
+				"balance" => 0
+			];
+			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', 'FAILED', 'FAILED', 'FAILED');
 			ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
 			$mw_payload = ProviderHelper::fundTransfer_requestBody($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$details["type"]);
 			ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $mw_payload);
 			Helper::saveLog('fundTransfer error credit', 18, json_encode($details), $e);
 			// Helper::saveLog('fundTransfer FATAL ERROR', 18, json_encode($details),Helper::datesent());
+			return $response;
 		}
 	     
 	    if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200") 
