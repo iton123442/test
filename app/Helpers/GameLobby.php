@@ -2015,7 +2015,7 @@ class GameLobby{
                     * CHECK IF PLAYER RESTRICTION
                     *
                     ****************************************************************/
-                    $data = IDNPokerHelper::checkPlayerRestricted($client_details->player_id);
+                    $data = IDNPokerHelper::checkPlayerRestricted($client_details->player_id); // HANDLE IF PLAYER WANT TO NEW REQUEST URL
                     if($data == "false"){
                         /***************************************************************
                         *
