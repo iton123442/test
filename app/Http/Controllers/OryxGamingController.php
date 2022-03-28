@@ -161,7 +161,8 @@ class OryxGamingController extends Controller
 	}
 
 	public function gameTransaction(Request $request) 
-	{
+	{	
+		Helper::saveLog('Oryx Bet', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Bet");
 		$hit_time =  microtime(true);
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		// Helper::saveLog('ORYX GAMETRAN v1', 18, file_get_contents("php://input"), 'ENDPOINT HIT');
