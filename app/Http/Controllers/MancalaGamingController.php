@@ -103,7 +103,7 @@ class MancalaGamingController extends Controller
 					try{
 						ProviderHelper::idenpotencyTable($json_data['TransactionId']);
 					}catch(\Exception $e){
-						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 1, 'transaction_id',$client_details)
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 1, 'transaction_id',$client_details);
 						if($game_transaction != 'false'){
 							return $game_transaction->mw_response;
 						}
