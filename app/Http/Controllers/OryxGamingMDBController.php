@@ -88,7 +88,7 @@ class OryxGamingMDBController extends Controller
 	public function getBalance(Request $request) 
 	{
         Helper::saveLog('Oryx GetBalance', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Balance");
-		$data = $request->all();
+		$data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
 		$player_id = RouteParam::get($request, 'player_id');
 
@@ -124,7 +124,7 @@ class OryxGamingMDBController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{
-        $data = $request->all();
+        $data = json_decode(file_get_contents("php://input"), true);
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
          if(isset($data['bet']['transactionId'])){
