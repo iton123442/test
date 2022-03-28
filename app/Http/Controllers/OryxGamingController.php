@@ -866,7 +866,7 @@ class OryxGamingController extends Controller
 			$client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, $details["type"]);
 		} catch (\Exception $e) {
 			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED');
-			ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+			ProviderHelper::updateGameTransactionStatus($game_transaction_id, 3, 99);
 			$mw_payload = ProviderHelper::fundTransfer_requestBody($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$details["type"]);
 			ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $mw_payload);
 			Helper::saveLog('fundTransfer error credit', 18, json_encode($details), $e);
