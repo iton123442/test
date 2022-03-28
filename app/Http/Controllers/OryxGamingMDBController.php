@@ -173,7 +173,7 @@ class OryxGamingMDBController extends Controller
                 return response($response,$http_status)->header('Content-Type', 'application/json');
             }
             
-            Helper::saveLog('Oryx Find Game Trans', $this->provider_db_id, json_encode($request->all()),$client_details);
+            //Helper::saveLog('Oryx Find Game Trans', $this->provider_db_id, json_encode($request->all()),$client_details);
             $game_details = Game::find($game_code, $this->provider_db_id);
             $find_bet = GameTransactionMDB::findGameTransactionDetails($provider_trans_id,'transaction_id',false,$client_details);
                 if($find_bet != 'false'){
@@ -186,7 +186,7 @@ class OryxGamingMDBController extends Controller
                         'entry_id' => 1,
                         'trans_status'=>1
                     ];
-                    Helper::savelog('Oryx Sidebet success', $this->provider_db_id,json_encode($request->all()),$updateGameTransaction);
+                    //Helper::savelog('Oryx Sidebet success', $this->provider_db_id,json_encode($request->all()),$updateGameTransaction);
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id,$client_details);
 
                 }else{
