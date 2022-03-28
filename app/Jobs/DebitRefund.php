@@ -41,6 +41,7 @@ class DebitRefund extends Job
         $client_callback_url = $client_details->fund_transfer_url;
         $client_access_token = $client_details->client_access_token;
         $transaction_id = $payload['transaction_id'];
+        $round_id = $payload['payload']['fundtransferrequest']['fundinfo']['roundId'];
 
         // Modify the payload use the generated extension
         $payload['payload']['fundtransferrequest']['fundinfo']['transactionId'] = $transaction_id; // use the same generated game ext id every call
@@ -100,6 +101,7 @@ class DebitRefund extends Job
                     'transaction_detail' => 'NOT_ENOUGH_FUNDS',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
+                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }else{
                 $updateTransactionEXt = array(
@@ -111,6 +113,7 @@ class DebitRefund extends Job
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'UNKNOWN_STATUS_CODE');
                 throw new ModelNotFoundException('UNKNOWN_ERROR');
             }
 
@@ -124,6 +127,7 @@ class DebitRefund extends Job
                 'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+            ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($updateTransactionEXt), 'FAILED_EXCEPTION');
             throw new ModelNotFoundException($e->getMessage());
 
         }
