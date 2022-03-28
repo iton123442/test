@@ -101,6 +101,7 @@ class DebitRefund extends Job
                     'transaction_detail' => 'NOT_ENOUGH_FUNDS',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
+                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }else{
                 $updateTransactionEXt = array(
@@ -112,7 +113,7 @@ class DebitRefund extends Job
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
-                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($requesttocient), 'UNKNOWN_STATUS_CODE');
+                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'UNKNOWN_STATUS_CODE');
                 throw new ModelNotFoundException('UNKNOWN_ERROR');
             }
 
