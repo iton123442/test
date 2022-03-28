@@ -52,9 +52,26 @@ class KAGamingController extends Controller
             return false;
         }
     }
-
+    public function getPromo(){
+        $client = new Client([  
+            'headers' => [ 
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+        $body = [
+            "partnerName" => 'TIGER',
+            "promotionSpinId" => 'a1824d9f646f964ab564c53b86341ca8'
+        ];
+        $guzzle_response = $client->post($this->ka_api.'promotionspin/get?hash='.$this->generateHash($body),
+            ['body' => json_encode(
+                    $body
+            )]
+        );
+        $client_response = json_decode($guzzle_response->getBody()->getContents());
+        dd($client_response);
+    }
     public function index(){
-        $client = new Client([
+        $client = new Client([  
             'headers' => [ 
                 'Content-Type' => 'application/json'
             ]

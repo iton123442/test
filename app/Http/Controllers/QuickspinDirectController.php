@@ -159,7 +159,7 @@ class QuickspinDirectController extends Controller
                                         'win' => 2,
                                         'trans_status' => 5
                                     ];
-                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
                                     $http_status = 200;
                                     $res = [
                                         
@@ -420,7 +420,7 @@ class QuickspinDirectController extends Controller
         try {
             ProviderHelper::idenpotencyTable($provider_trans_id);
         } catch (\Exception $e) {
-            $getTransaction = GameTransactionMDB::findGameTransactionDetails($provider_trans_id, 'transaction_id',false, $client_details);
+            $getTransaction = GameTransactionMDB::findGameTransactionDetails($bet_transaction_id, 'transaction_id',false, $client_details);
             $res = [
                 "balance" => (int)$formatBal,
                 "txid" => (int) $provider_trans_id,
@@ -435,6 +435,17 @@ class QuickspinDirectController extends Controller
                 "errormessage" => "transaction not found"
             ];
             return $res;
+        }
+        $get_faildTrans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $client_details);
+        if($get_faildTrans != false){
+            if($get_faildTrans->transaction_detail == 'failed'){
+                $res = [
+                    "balance" => (int)$formatBal,
+                    "txid" => (int) $provider_trans_id,
+                    "remotetxid" => $bet_transaction->game_trans_id,
+                ];
+                return $res;
+            }
         }
         $game_details = Game::findbyid($bet_transaction->game_id);
         if($game_details == false){
@@ -480,22 +491,22 @@ class QuickspinDirectController extends Controller
                         "txid" => (int)$provider_trans_id,
                         "remotetxid" => (string)$bet_transaction->game_trans_id,
                     ];
-            }
-
-            $updateTransactionEXt = array(
-                "provider_request" =>json_encode($req->all()),
-                "mw_response" => json_encode($res),
-                'mw_request' => json_encode($client_response->requestoclient),
-                'client_response' => json_encode($client_response->fundtransferresponse),
-                'transaction_detail' => 'success',
-                'general_details' => 'success',
-            );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-
-        }
-        Helper::saveLog('OnlyPlay', config("providerlinks.quickspinDirect.provider_db_id"), json_encode($req->all()),$res);
-        return response($res,200)
+                break;
+                $updateTransactionEXt = array(
+                    "provider_request" =>json_encode($req->all()),
+                    "mw_response" => json_encode($res),
+                    'mw_request' => json_encode($client_response->requestoclient),
+                    'client_response' => json_encode($client_response->fundtransferresponse),
+                    'transaction_detail' => 'success',
+                    'general_details' => 'success',
+                );
+                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details); 
+                Helper::saveLog('QuickcSPin', config("providerlinks.quickspinDirect.provider_db_id"), json_encode($req->all()),$res);
+                return response($res,200)
                 ->header('Content-Type', 'application/json');
+            }
+        }
+        
     }
     public function freeRound($data){
         dd($data);
