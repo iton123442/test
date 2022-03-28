@@ -77,7 +77,13 @@ $app->post('/public/api/oryx/{brand_code}/tokens/{token}/authenticate', 'OryxGam
 $app->post('/public/api/oryx/{brand_code}/players/{player_id}/balance', 'OryxGamingController@getBalance');
 $app->post('/public/api/oryx/{brand_code}/game-transaction', 'OryxGamingController@gameTransaction');
 $app->put('/public/api/oryx/{brand_code}/game-transactions', 'OryxGamingController@gameTransactionV2');
+
+// $app->post('/public/api/oryx/{brand_code}/tokens/{token}/authenticate', 'OryxGamingMDBController@authPlayer');
+// $app->post('/public/api/oryx/{brand_code}/players/{player_id}/balance', 'OryxGamingMDBController@getBalance');
+// $app->post('/public/api/oryx/{brand_code}/game-transaction', 'OryxGamingMDBController@gameTransaction');
+// $app->put('/public/api/oryx/{brand_code}/game-transactions', 'OryxGamingMDBController@gameTransactionV2');
 $app->post('/public/api/oryx/{brand_code}/free-rounds/finish', 'OryxGamingController@roundFinished');
+
 
 // SimplePlay Endpoints
 $app->post('/public/api/simpleplay/{brand_code}/GetUserBalance', 'SimplePlayController@getBalance');

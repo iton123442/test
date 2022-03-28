@@ -34,6 +34,7 @@ class OryxGamingController extends Controller
 		/*$this->middleware('oauth', ['except' => ['index']]);*/
 		/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
 		$this->middleware_api = config('providerlinks.oauth_mw_api.mwurl'); 
+		$this->provider_db_id = 18;
 
 	}
 
@@ -41,6 +42,7 @@ class OryxGamingController extends Controller
 
 	public function authPlayer(Request $request)
 	{
+		Helper::saveLog('Oryx Auth', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
 		$token = RouteParam::get($request, 'token');
@@ -112,7 +114,7 @@ class OryxGamingController extends Controller
 	
 	public function getBalance(Request $request) 
 	{
-		// Helper::saveLog('getBalance', 18, file_get_contents("php://input"), 'ENDPOINT HIT');
+		Helper::saveLog('Oryx Auth', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
 		$player_id = RouteParam::get($request, 'player_id');
@@ -159,7 +161,8 @@ class OryxGamingController extends Controller
 	}
 
 	public function gameTransaction(Request $request) 
-	{
+	{	
+		Helper::saveLog('Oryx Bet', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Bet");
 		$hit_time =  microtime(true);
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		// Helper::saveLog('ORYX GAMETRAN v1', 18, file_get_contents("php://input"), 'ENDPOINT HIT');
@@ -361,7 +364,7 @@ class OryxGamingController extends Controller
 										"errorDescription" => "Player ran out of money.",
 										"balance" => $this->_toPennies($client_response->fundtransferresponse->balance)
 									];
-									// ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+									ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
 									return response()->json($response, $http_status);
 								}
 								else
@@ -865,12 +868,18 @@ class OryxGamingController extends Controller
 		try {
 			$client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, $details["type"]);
 		} catch (\Exception $e) {
-			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED', 'FAILED');
+   			$response = [
+				"responseCode" =>  "OUT_OF_MONEY",
+				"errorDescription" => "Player ran out of money.",
+				"balance" => 0
+			];
+			ProviderHelper::updatecreateGameTransExt($game_trans_ext_id, 'FAILED', $response, 'FAILED', 'FAILED', 'FAILED', 'FAILED');
 			ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
 			$mw_payload = ProviderHelper::fundTransfer_requestBody($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$details["type"]);
 			ProviderHelper::createRestrictGame($game_details->game_id, $client_details->player_id, $game_trans_ext_id, $mw_payload);
 			Helper::saveLog('fundTransfer error credit', 18, json_encode($details), $e);
 			// Helper::saveLog('fundTransfer FATAL ERROR', 18, json_encode($details),Helper::datesent());
+			return $response;
 		}
 	     
 	    if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200") 
