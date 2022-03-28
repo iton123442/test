@@ -34,13 +34,15 @@ class OryxGamingMDBController extends Controller
 		/*$this->middleware('oauth', ['except' => ['index']]);*/
 		/*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
 		$this->middleware_api = config('providerlinks.oauth_mw_api.mwurl'); 
+        $this->provider_db_id = 18;
 
 	}
 
 	public function show(Request $request) { }
 
 	public function authPlayer(Request $request)
-	{
+	{   
+        Helper::saveLog('Oryx Auth', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT AUth");
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
 		$token = RouteParam::get($request, 'token');
@@ -84,48 +86,37 @@ class OryxGamingMDBController extends Controller
 	
 	public function getBalance(Request $request) 
 	{
-		// Helper::saveLog('getBalance', 18, file_get_contents("php://input"), 'ENDPOINT HIT');
-		$json_data = json_decode(file_get_contents("php://input"), true);
+        Helper::saveLog('Oryx GetBalance', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Balance");
+		$data = $request->all();
 		$client_code = RouteParam::get($request, 'brand_code');
 		$player_id = RouteParam::get($request, 'player_id');
 
-		if(!CallParameters::check_keys($json_data, 'gameCode', 'sessionToken')) {
+		if($data['gameCode'] == null) {
 				$http_status = 401;
 				$response = [
 							"responseCode" =>  "REQUEST_DATA_FORMAT",
 							"errorDescription" => "Data format of request not as expected."
 						];
-		}
-		else
-		{
-			$http_status = 402;
-			$response = [
-							"responseCode" =>  "TOKEN_NOT_VALID",
-							"errorDescription" => "Token provided in request not valid in Wallet."
-						];
-
+                return response($response,$http_status)->header('Content-Type', 'application/json');
+		}if($data['sessionToken'] == null){
+                $http_status = 402;
+                $response = [
+                                "responseCode" =>  "TOKEN_NOT_VALID",
+                                "errorDescription" => "Token provided in request not valid in Wallet."
+                            ];
+                return response($response,$http_status)->header('Content-Type', 'application/json');
+        }
 			// Find the player and client details
 			$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
-
 			if ($client_details) {
 					$client_response = ClientRequestHelper::playerDetailsCall($client_details->player_token);
 					ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->playerdetailsresponse->balance); 
-					// if(isset($client_response->playerdetailsresponse->status->code) 
-					// && $client_response->playerdetailsresponse->status->code == "200") {
-					// 	$http_status = 200;
-					// 	$response = [
-					// 		"balance" => $this->_toPennies($client_response->playerdetailsresponse->balance)
-					// 	];
-					// }
-
 					$http_status = 200;
 						$response = [
 							"balance" => $this->_toPennies($client_response->playerdetailsresponse->balance)
 					];
 			}
-		}
-
-		// Helper::saveLog('oryx_balance', 18, file_get_contents("php://input"), $response);
+		
 		return response()->json($response, $http_status);
 
 	}
