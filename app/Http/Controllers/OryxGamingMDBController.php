@@ -161,6 +161,7 @@ class OryxGamingMDBController extends Controller
             $provider_trans_id = $payload['bet']['transactionId'];
             $round_id = $payload['roundId'];
             $bet_amount = $payload['bet']['amount']/100;
+            $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
             try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
