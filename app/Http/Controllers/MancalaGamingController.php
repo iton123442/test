@@ -103,13 +103,11 @@ class MancalaGamingController extends Controller
 					try{
 						ProviderHelper::idenpotencyTable($json_data['TransactionId']);
 					}catch(\Exception $e){
-						$response = [
-							"Error" =>  0,
-							"Balance" => ProviderHelper::amountToFloat($client_details->balance),
-						];
-						return $response;
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 1, 'transaction_id',$client_details)
+						if($game_transaction != 'false'){
+							return $game_transaction->mw_response;
+						}
 					}
-
 					$response = [
 						"Error" =>  10100,
 						"message" => "Server is not ready!",
