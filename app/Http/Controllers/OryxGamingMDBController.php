@@ -127,7 +127,10 @@ class OryxGamingMDBController extends Controller
          if(isset($data['bet']['transactionId'])){
             $response = $this->gameBet($data, $client_details);
             return response($response,200)->header('Content-Type', 'application/json');
-          }
+          }if($data['roundAction'] == 'CANCEL'){
+			$response = $this->_isCancelled($transaction_id);
+            return response($response,200)->header('Content-Type', 'application/json');
+		  }
          if($data['roundAction']== 'CLOSE'){
             if(isset($data['win']['transactionId'])){
              $response = $this->gameWin($data, $client_details);
@@ -253,7 +256,7 @@ class OryxGamingMDBController extends Controller
                                     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                 break;
                             }
-							Helper::saveLog('Oryx Success Bet', $this->provider_db_id, json_encode($payload),$client_details);
+							Helper::saveLog('Oryx Success Bet', $this->provider_db_id, json_encode($payload),$response);
                             return response()->json($response, $http_status);
                     }
                 }
