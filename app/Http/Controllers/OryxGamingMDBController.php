@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PlayerDetail;
 use App\Models\PlayerSessionToken;
 use App\Helpers\Helper;
+use App\Helpers\ProviderHelper;
 use App\Helpers\GameTransaction;
 use App\Helpers\GameSubscription;
 use App\Helpers\GameRound;
@@ -12,17 +13,12 @@ use App\Helpers\Game;
 use App\Helpers\CallParameters;
 use App\Helpers\PlayerHelper;
 use App\Helpers\TokenHelper;
-use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
-
 use App\Support\RouteParam;
-
 use Illuminate\Http\Request;
-
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
-
 use DB;
 
 class OryxGamingMDBController extends Controller
@@ -124,7 +120,7 @@ class OryxGamingMDBController extends Controller
 	}
 
 	public function gameTransaction(Request $request) 
-	{	
+	{	Helper::saveLog('Oryx Transaction', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Balance");
         $data = json_decode(file_get_contents("php://input"), true);
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
@@ -155,8 +151,8 @@ class OryxGamingMDBController extends Controller
 	}
 
     public function gameBet($request, $client_details){
-
             $payload = json_decode(file_get_contents("php://input"), true);
+			Helper::saveLog('Oryx Bet', $this->provider_db_id, $payload,$client_details);
             $player_id = $payload['playerId'];
             $game_code = $payload['gameCode'];
             $provider_trans_id = $payload['bet']['transactionId'];
@@ -174,7 +170,7 @@ class OryxGamingMDBController extends Controller
                 return response($response,$http_status)->header('Content-Type', 'application/json');
             }
             
-            //Helper::saveLog('Oryx Find Game Trans', $this->provider_db_id, json_encode($request->all()),$client_details);
+            Helper::saveLog('Oryx Find Game Trans', $this->provider_db_id, $payload,$client_details);
             $game_details = Game::find($game_code, $this->provider_db_id);
             $find_bet = GameTransactionMDB::findGameTransactionDetails($provider_trans_id,'transaction_id',false,$client_details);
                 if($find_bet != 'false'){
