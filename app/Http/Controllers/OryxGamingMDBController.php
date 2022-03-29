@@ -269,10 +269,10 @@ class OryxGamingMDBController extends Controller
             $game_code = $payload['gameCode'];
             $round_id = $payload['roundId'];
             if(isset($payload['win']['amount'])){
-               $win_amount = $payload['win']['amount']/100;  
+               $pay_amount = $payload['win']['amount']/100;  
 			   $provider_trans_id = $payload['win']['transactionId'];
             }else{
-                $win_amount = 0;
+                $pay_amount = 0;
 				$provider_trans_id = "ORYX".$payload['sessionToken'];
             }
             $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
