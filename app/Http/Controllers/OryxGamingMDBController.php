@@ -43,6 +43,7 @@ class OryxGamingMDBController extends Controller
 
 	public function authPlayer(Request $request)
 	{   
+		Helper::saveLog('Oryx Auth', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT AUth");
         $json_data = json_decode(file_get_contents("php://input"), true);
         Helper::saveLog('Oryx Auth', $this->provider_db_id, $json_data, "ENDPOINT HIT AUth");
 		$client_code = RouteParam::get($request, 'brand_code');
@@ -123,20 +124,20 @@ class OryxGamingMDBController extends Controller
 	}
 
 	public function gameTransaction(Request $request) 
-	{
+	{	
         $data = json_decode(file_get_contents("php://input"), true);
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
          if(isset($data['bet']['transactionId'])){
-            $response = $this->gameBet($request->all(), $client_details);
+            $response = $this->gameBet($data, $client_details);
             return response($response,200)->header('Content-Type', 'application/json');
           }
          if($data['roundAction']== 'CLOSE'){
             if(isset($data['win']['transactionId'])){
-             $response = $this->gameWin($request->all(), $client_details);
+             $response = $this->gameWin($data, $client_details);
              return response($response,200)->header('Content-Type', 'application/json');
               }else{
-                $response = $this->gameWin($request->all(), $client_details);
+                $response = $this->gameWin($data, $client_details);
                 return response($response,200)->header('Content-Type', 'application/json');
               }
             }
@@ -208,7 +209,7 @@ class OryxGamingMDBController extends Controller
                         "round_id" => $round_id,
                         "amount" => $bet_amount,
                         "game_transaction_type"=> 1,
-                        "provider_request" =>json_encode($request->all()),
+                        "provider_request" =>$payload,
                     );
                     $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
                     $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
@@ -224,7 +225,7 @@ class OryxGamingMDBController extends Controller
                                         "balance" => $this->_toPennies($client_response->fundtransferresponse->balance),
                                     ];
                                     $updateTransactionEXt = array(
-                                        "provider_request" =>json_encode($request->all()),
+                                        "provider_request" =>$payload,
                                         "mw_response" => json_encode($response),
                                         'mw_request' => json_encode($client_response->requestoclient),
                                         'client_response' => json_encode($client_response->fundtransferresponse),
@@ -244,7 +245,7 @@ class OryxGamingMDBController extends Controller
                                     ];
 
                                     $updateTransactionEXt = array(
-                                        "provider_request" =>json_encode($request->all()),
+                                        "provider_request" =>$payload,
                                         "mw_response" => json_encode($response),
                                         'mw_request' => json_encode($client_response->requestoclient),
                                         'client_response' => json_encode($client_response->fundtransferresponse),
