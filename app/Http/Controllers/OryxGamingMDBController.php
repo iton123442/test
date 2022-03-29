@@ -124,6 +124,7 @@ class OryxGamingMDBController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
+			
          if(isset($data['bet']['transactionId'])){
             $response = $this->gameBet($data, $client_details);
             return response($response,200)->header('Content-Type', 'application/json');
@@ -172,7 +173,14 @@ class OryxGamingMDBController extends Controller
 						];
                 return $response;
             }
-            
+			if($bet_amount > $client_details->balance){
+				$response = [
+					"responseCode" =>  "OUT_OF_MONEY",
+					"errorDescription" => "Player ran out of money.",
+					"balance" => $this->_toPennies($client_response->fundtransferresponse->balance)
+				];
+				return $response;
+			}
             Helper::saveLog('Oryx Find Game Trans', $this->provider_db_id, json_encode($payload),$client_details);
             $game_details = Game::find($game_code, $this->provider_db_id);
             $find_bet = GameTransactionMDB::findGameTransactionDetails($provider_trans_id,'transaction_id',false,$client_details);
