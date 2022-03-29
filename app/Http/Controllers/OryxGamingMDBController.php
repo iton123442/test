@@ -125,14 +125,17 @@ class OryxGamingMDBController extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
 			
-         if(isset($data['bet']['transactionId'])){
-			if(!isset($data['roundAction']) == 'CANCEL'){
+         if(isset($data['bet']['transactionId'])){			 
+			if($this->_isCancelled($data['bet']['transactionId'])) {
+				$http_status = 501;
+				$response = [
+					"responseCode" => "ERROR",
+					"balance" => $this->_toPennies($client_details->balance),
+				];
+				return response()->json($response, $http_status);
+			}
 				$response = $this->gameBet($data, $client_details);
 				return response($response,200)->header('Content-Type', 'application/json');
-			  }
-			  $transaction_id= $data['bet']['transactionId'];
-			  $response = $this->_isCancelled($transaction_id);
-			  return response($response,200)->header('Content-Type', 'application/json'); 
           }
          if($data['roundAction']== 'CLOSE'){
             if(isset($data['win']['transactionId'])){
