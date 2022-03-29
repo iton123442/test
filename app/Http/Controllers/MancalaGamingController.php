@@ -268,12 +268,11 @@ class MancalaGamingController extends Controller
 					}
 					else
 					{
-						$win_or_lost = $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
-						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
 						
+						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
 						$bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($session_token->player_token, $json_data['RoundId'], $client_details);
-
 						$game_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transaction->game_trans_id, 'game_transaction', false, $client_details);
+						$win_or_lost = $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
 						
 						$client_details->connection_name = $game_transaction->connection_name;
 
@@ -282,9 +281,9 @@ class MancalaGamingController extends Controller
 						ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
 						
 						$response = [
-								"Error" => 0,
-								"Balance" => ProviderHelper::amountToFloat($winbBalance)
-							];
+							"Error" => 0,
+							"Balance" => ProviderHelper::amountToFloat($winbBalance)
+						];
 						
 			            $update_game_transaction = array(
 		                    "win" => 5,
