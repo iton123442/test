@@ -277,16 +277,16 @@ class OryxGamingMDBController extends Controller
             }
             $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
             if($client_details){
-                try{
-                    ProviderHelper::idenpotencyTable($provider_trans_id);
-                }catch(\Exception $e){
-                    $http_status = 401;
-				$response = [
-							"responseCode" =>  "REQUEST_DATA_FORMAT",
-							"errorDescription" => "Data format of request not as expected."
-						];
-                return $response;;
-                }
+                // try{
+                //     ProviderHelper::idenpotencyTable($provider_trans_id);
+                // }catch(\Exception $e){
+                //     $http_status = 401;
+				// $response = [
+				// 			"responseCode" =>  "REQUEST_DATA_FORMAT",
+				// 			"errorDescription" => "Data format of request not as expected."
+				// 		];
+                // return $response;;
+                // }
 
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
