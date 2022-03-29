@@ -245,7 +245,7 @@ class OryxGamingMDBController extends Controller
                                     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                 break;
                                 case '402':
-                                        // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                   ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
                                     $http_status = 200;
                                     $response = [
                                         "responseCode" =>  "OUT_OF_MONEY",
