@@ -121,18 +121,18 @@ class OryxGamingMDBController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{	Helper::saveLog('Oryx Transaction', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Balance");
-        $data = json_encode($request->all());
+        $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
 			
          if(isset($data['bet']['transactionId'])){
-			if(isset($data['roundAction']) == 'CANCEL'){
-				$transaction_id= $data['bet']['transactionId'];
-				$response = $this->_isCancelled($transaction_id);
+			if(!isset($data['roundAction']) == 'CANCEL'){
+				$response = $this->gameBet($data, $client_details);
 				return response($response,200)->header('Content-Type', 'application/json');
 			  }
-            $response = $this->gameBet($data, $client_details);
-            return response($response,200)->header('Content-Type', 'application/json');
+			  $transaction_id= $data['bet']['transactionId'];
+			  $response = $this->_isCancelled($transaction_id);
+			  return response($response,200)->header('Content-Type', 'application/json'); 
           }
          if($data['roundAction']== 'CLOSE'){
             if(isset($data['win']['transactionId'])){
