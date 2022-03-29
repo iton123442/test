@@ -354,11 +354,6 @@ class MancalaGamingController extends Controller
 		}
 		else
 		{
-			$response = [
-				"Error" =>  0, 
-				"Balance" => 0
-			];
-			return $response;
 			if ($this->_hashGenerator(['RefundId', $json_data['SessionId'], $json_data['TransactionId'], $json_data['RefundTransactionId'], $json_data['RoundId'], $json_data['Amount']]) !== $json_data["Hash"]) {
 
 				$http_status = 200;
