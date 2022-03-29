@@ -121,7 +121,7 @@ class OryxGamingMDBController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{	Helper::saveLog('Oryx Transaction', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Balance");
-        $data = $request->all();
+        $data = json_encode($request->all());
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
 			
