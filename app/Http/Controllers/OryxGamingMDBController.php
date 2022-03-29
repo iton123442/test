@@ -121,7 +121,7 @@ class OryxGamingMDBController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{	Helper::saveLog('Oryx Transaction', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Balance");
-        $data = json_decode(file_get_contents("php://input"), true);
+        $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
          if(isset($data['bet']['transactionId'])){
@@ -150,8 +150,8 @@ class OryxGamingMDBController extends Controller
 		
 	}
 
-    public function gameBet($request, $client_details){
-            $payload = json_decode(file_get_contents("php://input"), true);
+    public function gameBet($data, $client_details){
+            $payload = $data;
 			Helper::saveLog('Oryx Bet', $this->provider_db_id, $payload,$client_details);
             $player_id = $payload['playerId'];
             $game_code = $payload['gameCode'];
@@ -256,9 +256,9 @@ class OryxGamingMDBController extends Controller
                 }
 
     }
-    public function gameWin($request, $client_details){
-        //Helper::saveLog('Oryx Win', $this->provider_db_id, json_encode($request->all()), "Win HIT");
-            $payload = json_decode(file_get_contents("php://input"), true);
+    public function gameWin($data, $client_details){
+    Helper::saveLog('Oryx Win', $this->provider_db_id, $data, "Win HIT");
+            $payload = $data;
             $player_id = $payload['playerId'];
             $game_code = $payload['gameCode'];
             $provider_trans_id = $payload['bet']['transactionId'];
