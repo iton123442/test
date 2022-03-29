@@ -246,7 +246,7 @@ class OryxGamingMDBController extends Controller
                                     ];
 
                                     $updateTransactionEXt = array(
-                                        "provider_request" =>$payload,
+                                        "provider_request" =>json_encode($payload),
                                         "mw_response" => json_encode($response),
                                         'mw_request' => json_encode($client_response->requestoclient),
                                         'client_response' => json_encode($client_response->fundtransferresponse),
@@ -320,7 +320,7 @@ class OryxGamingMDBController extends Controller
                     "round_id" => $round_id,
                     "amount" => $pay_amount,
                     "game_transaction_type"=> 2,
-                    "provider_request" =>$payload,
+                    "provider_request" =>json_encode($payload),
                     "mw_response" => json_encode($response),
                 );
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
@@ -336,7 +336,7 @@ class OryxGamingMDBController extends Controller
                         "game_trans_ext_id" => $game_trans_ext_id
                     ],
                     "provider" => [
-                        "provider_request" => $payload, #R
+                        "provider_request" => json_encode($payload), #R
                         "provider_trans_id"=> $provider_trans_id, #R
                         "provider_round_id"=> $round_id, #R
                         "provider_name" => $game_details->provider_name,
@@ -351,7 +351,7 @@ class OryxGamingMDBController extends Controller
                 ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
                 $updateTransactionEXt = array(
-                    "provider_request" =>$payload,
+                    "provider_request" =>json_encode($payload),
                     "mw_response" => json_encode($response),
                     'mw_request' => json_encode($client_response->requestoclient),
                     'client_response' => json_encode($client_response->fundtransferresponse),
