@@ -43,8 +43,8 @@ class OryxGamingMDBController extends Controller
 
 	public function authPlayer(Request $request)
 	{   
-        Helper::saveLog('Oryx Auth', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT AUth");
-		$json_data = json_decode(file_get_contents("php://input"), true);
+        $json_data = json_decode(file_get_contents("php://input"), true);
+        Helper::saveLog('Oryx Auth', $this->provider_db_id, $json_data, "ENDPOINT HIT AUth");
 		$client_code = RouteParam::get($request, 'brand_code');
 		$token = RouteParam::get($request, 'token');
 
@@ -88,7 +88,7 @@ class OryxGamingMDBController extends Controller
 	public function getBalance(Request $request) 
 	{
         Helper::saveLog('Oryx GetBalance', $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT Balance");
-		$data = $request->all();
+		$data = json_decode(file_get_contents("php://input"), true);
 		$client_code = RouteParam::get($request, 'brand_code');
 		$player_id = RouteParam::get($request, 'player_id');
 
@@ -124,7 +124,7 @@ class OryxGamingMDBController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{
-        $data = $request->all();
+        $data = json_decode(file_get_contents("php://input"), true);
         $client_details = ProviderHelper::getClientDetails('player_id', $data['playerId']);
         if($client_details != null){
          if(isset($data['bet']['transactionId'])){
@@ -155,7 +155,7 @@ class OryxGamingMDBController extends Controller
 
     public function gameBet($request, $client_details){
 
-            $payload = $request;
+            $payload = json_decode(file_get_contents("php://input"), true);
             $player_id = $payload['playerId'];
             $game_code = $payload['gameCode'];
             $provider_trans_id = $payload['bet']['transactionId'];
@@ -260,8 +260,8 @@ class OryxGamingMDBController extends Controller
 
     }
     public function gameWin($request, $client_details){
-        Helper::saveLog('Oryx Win', $this->provider_db_id, json_encode($request->all()), "Win HIT");
-            $payload = $request;
+        //Helper::saveLog('Oryx Win', $this->provider_db_id, json_encode($request->all()), "Win HIT");
+            $payload = json_decode(file_get_contents("php://input"), true);
             $player_id = $payload['playerId'];
             $game_code = $payload['gameCode'];
             $provider_trans_id = $payload['bet']['transactionId'];
@@ -316,7 +316,7 @@ class OryxGamingMDBController extends Controller
                     "round_id" => $round_id,
                     "amount" => $pay_amount,
                     "game_transaction_type"=> 2,
-                    "provider_request" =>json_encode($request->all()),
+                    "provider_request" =>$payload,
                     "mw_response" => json_encode($response),
                 );
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
@@ -347,7 +347,7 @@ class OryxGamingMDBController extends Controller
                 ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
                 $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($request->all()),
+                    "provider_request" =>$payload,
                     "mw_response" => json_encode($response),
                     'mw_request' => json_encode($client_response->requestoclient),
                     'client_response' => json_encode($client_response->fundtransferresponse),
@@ -355,7 +355,7 @@ class OryxGamingMDBController extends Controller
                     'general_details' => 'success',
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-            Helper::saveLog('Oryx Gaming Win success', $this->provider_db_id, json_encode($request->all()), $response);
+            //Helper::saveLog('Oryx Gaming Win success', $this->provider_db_id, $payload, $response);
                 return response($response,200)
                       ->header('Content-Type', 'application/json');
             }else{
