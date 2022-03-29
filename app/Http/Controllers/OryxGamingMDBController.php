@@ -170,7 +170,7 @@ class OryxGamingMDBController extends Controller
 							"responseCode" =>  "REQUEST_DATA_FORMAT",
 							"errorDescription" => "Data format of request not as expected."
 						];
-                return response($response,$http_status)->header('Content-Type', 'application/json');
+                return $response;
             }
             
             Helper::saveLog('Oryx Find Game Trans', $this->provider_db_id, json_encode($payload),$client_details);
@@ -257,7 +257,7 @@ class OryxGamingMDBController extends Controller
                                 break;
                             }
 							Helper::saveLog('Oryx Success Bet', $this->provider_db_id, json_encode($payload),$response);
-                            return response()->json($response, $http_status);
+                            return $response;
                     }
                 }
 
@@ -284,7 +284,7 @@ class OryxGamingMDBController extends Controller
 							"responseCode" =>  "REQUEST_DATA_FORMAT",
 							"errorDescription" => "Data format of request not as expected."
 						];
-                return response($response,$http_status)->header('Content-Type', 'application/json');
+                return $response;;
                 }
 
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
@@ -359,8 +359,7 @@ class OryxGamingMDBController extends Controller
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
             //Helper::saveLog('Oryx Gaming Win success', $this->provider_db_id, $payload, $response);
-                return response($response,200)
-                      ->header('Content-Type', 'application/json');
+                return $response;
             }else{
                 $http_status = 402;
                 $response = [
@@ -368,7 +367,7 @@ class OryxGamingMDBController extends Controller
                     "errorDescription" => "Token provided in request not valid in Wallet."
                 ];
     
-                return response($response,$http_status)->header('Content-Type', 'application/json');
+                return $response;
 
             }
            
