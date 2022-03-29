@@ -126,12 +126,14 @@ class OryxGamingMDBController extends Controller
         if($client_details != null){
 			
          if(isset($data['bet']['transactionId'])){
+			if(isset($data['roundAction']) == 'CANCEL'){
+				$transaction_id= $data['bet']['transactionId'];
+				$response = $this->_isCancelled($transaction_id);
+				return response($response,200)->header('Content-Type', 'application/json');
+			  }
             $response = $this->gameBet($data, $client_details);
             return response($response,200)->header('Content-Type', 'application/json');
-          }if($data['roundAction'] == 'CANCEL'){
-			$response = $this->_isCancelled($transaction_id);
-            return response($response,200)->header('Content-Type', 'application/json');
-		  }
+          }
          if($data['roundAction']== 'CLOSE'){
             if(isset($data['win']['transactionId'])){
              $response = $this->gameWin($data, $client_details);
@@ -171,7 +173,7 @@ class OryxGamingMDBController extends Controller
 							"responseCode" =>  "REQUEST_DATA_FORMAT",
 							"errorDescription" => "Data format of request not as expected."
 						];
-                return $response;
+						return response($response,$http_status)->header('Content-Type', 'application/json');
             }
 			if($bet_amount > $client_details->balance){
 				$response = [
@@ -281,7 +283,7 @@ class OryxGamingMDBController extends Controller
 			   $provider_trans_id = $payload['win']['transactionId'];
             }else{
                 $pay_amount = 0;
-				$provider_trans_id = "ORYX".$payload['sessionToken'];
+				$provider_trans_id = "ORYX_".$payload['sessionToken'];
             }
             $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
             if($client_details){
@@ -376,7 +378,7 @@ class OryxGamingMDBController extends Controller
                     "errorDescription" => "Token provided in request not valid in Wallet."
                 ];
     
-                return $response;
+				return response($response,$http_status)->header('Content-Type', 'application/json');
 
             }
            
@@ -387,18 +389,6 @@ class OryxGamingMDBController extends Controller
 		$hit_time = microtime(true);
 		Helper::saveLog('ORYX GAMETRAN v2', 18, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$json_data = json_decode(file_get_contents("php://input"), true);
-
-		// if($this->_isIdempotent($json_data['transactionId'], true)) {
-		// 	$http_status = 409;
-		// 		$response = [
-		// 					"responseCode" =>  "ERROR",
-		// 					"errorDescription" => "This transaction is already processed."
-		// 				];
-
-		// 	return response()->json($response, $http_status);
-		// }
-
-		# Insert Idenpotent -RIAN
 		try{
 			ProviderHelper::idenpotencyTable($this->prefix.'_'.$json_data['transactionId']);
 		}catch(\Exception $e){
