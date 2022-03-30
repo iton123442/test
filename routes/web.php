@@ -73,11 +73,16 @@ $app->post('/public/api/solid/{brand_code}/endround', 'SolidGamingController@end
 $app->post('/public/api/solid/{brand_code}/endsession', 'SolidGamingController@endPlayerSession');
 
 // Oryx Gaming Endpoints
-$app->post('/public/api/oryx/{brand_code}/tokens/{token}/authenticate', 'OryxGamingController@authPlayer');
-$app->post('/public/api/oryx/{brand_code}/players/{player_id}/balance', 'OryxGamingController@getBalance');
-$app->post('/public/api/oryx/{brand_code}/game-transaction', 'OryxGamingController@gameTransaction');
-$app->put('/public/api/oryx/{brand_code}/game-transactions', 'OryxGamingController@gameTransactionV2');
+// $app->post('/public/api/oryx/{brand_code}/tokens/{token}/authenticate', 'OryxGamingController@authPlayer');
+// $app->post('/public/api/oryx/{brand_code}/players/{player_id}/balance', 'OryxGamingController@getBalance');
+// $app->post('/public/api/oryx/{brand_code}/game-transaction', 'OryxGamingController@gameTransaction');
+// $app->put('/public/api/oryx/{brand_code}/game-transactions', 'OryxGamingController@gameTransactionV2');
+$app->post('/public/api/oryx/{brand_code}/tokens/{token}/authenticate', 'OryxGamingMDBController@authPlayer');
+$app->post('/public/api/oryx/{brand_code}/players/{player_id}/balance', 'OryxGamingMDBController@getBalance');
+$app->post('/public/api/oryx/{brand_code}/game-transaction', 'OryxGamingMDBController@gameTransaction');
+$app->put('/public/api/oryx/{brand_code}/game-transactions', 'OryxGamingMDBController@gameTransactionV2');
 $app->post('/public/api/oryx/{brand_code}/free-rounds/finish', 'OryxGamingController@roundFinished');
+
 
 // SimplePlay Endpoints
 $app->post('/public/api/simpleplay/{brand_code}/GetUserBalance', 'SimplePlayController@getBalance');
@@ -749,6 +754,7 @@ $app->post('/public/api/idnpoker/getPlayerBalance', 'IDNPokerController@getPlaye
 $app->post('/public/api/idnpoker/getPlayerWalletBalance', 'IDNPokerController@getPlayerWalletBalance');
 $app->post('/public/api/idnpoker/getTransaction', 'IDNPokerController@getTransactionHistory');
 $app->post('/public/api/idnpoker/retryWithdrawalWallet', 'IDNPokerController@retryWithdrawalRestriction');
+$app->post('/public/api/idnpoker/renewSession', 'IDNPokerController@renewSession');
 // Transfer Wallet New Update
 $app->post('/public/api/transferwallet/renewsession','TransferWalletController@renewSession');
 $app->post('/public/api/transferwallet/createsession','TransferWalletController@createWalletSession');

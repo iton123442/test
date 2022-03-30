@@ -103,13 +103,16 @@ class MancalaGamingController extends Controller
 					try{
 						ProviderHelper::idenpotencyTable($json_data['TransactionId']);
 					}catch(\Exception $e){
-						$response = [
-							"Error" =>  0,
-							"Balance" => ProviderHelper::amountToFloat($client_details->balance),
-						];
-						return $response;
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 1, 'transaction_id',$client_details);
+						if($game_transaction != 'false'){
+							$data = array(
+	                            "win"=> 2,
+	                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+	                        );
+	                        GameTransactionMDB::updateGametransaction($data, $game_transaction->game_trans_id, $client_details);
+							return $game_transaction->mw_response;
+						}
 					}
-
 					$response = [
 						"Error" =>  10100,
 						"message" => "Server is not ready!",
@@ -187,7 +190,9 @@ class MancalaGamingController extends Controller
 
 			                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
 			                        $data_to_update = array(
-			                            "mw_response" => json_encode($response)
+			                            "mw_response" => json_encode($response),
+			                            'transaction_detail' => 'failed',
+	                                    'general_details' => 'failed',
 			                        );
 			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    }catch(\Exception $e){
@@ -263,12 +268,12 @@ class MancalaGamingController extends Controller
 					}
 					else
 					{
-						$win_or_lost = $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
-						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
 						
+						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
 						$bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($session_token->player_token, $json_data['RoundId'], $client_details);
-
 						$game_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transaction->game_trans_id, 'game_transaction', false, $client_details);
+						$win_or_lost = $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
+						
 						$client_details->connection_name = $game_transaction->connection_name;
 
 						$winbBalance = $client_details->balance + $json_data["Amount"];
@@ -276,9 +281,9 @@ class MancalaGamingController extends Controller
 						ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance); 
 						
 						$response = [
-								"Error" => 0,
-								"Balance" => ProviderHelper::amountToFloat($winbBalance)
-							];
+							"Error" => 0,
+							"Balance" => ProviderHelper::amountToFloat($winbBalance)
+						];
 						
 			            $update_game_transaction = array(
 		                    "win" => 5,
@@ -349,6 +354,11 @@ class MancalaGamingController extends Controller
 		}
 		else
 		{
+			$response = [
+				"Error" =>  0, 
+				"Balance" => 0
+			];
+			return $response;
 			if ($this->_hashGenerator(['RefundId', $json_data['SessionId'], $json_data['TransactionId'], $json_data['RefundTransactionId'], $json_data['RoundId'], $json_data['Amount']]) !== $json_data["Hash"]) {
 
 				$http_status = 200;
@@ -372,8 +382,8 @@ class MancalaGamingController extends Controller
 						ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
 					}catch(\Exception $e){
 						$response = [
-							"Error" =>  0,
-							"Balance" => ProviderHelper::amountToFloat($client_details->balance),
+							"Error" =>  0, 
+							"Balance" => ProviderHelper::amountToFloat($client_details->balance)
 						];
 						return $response;
 					}

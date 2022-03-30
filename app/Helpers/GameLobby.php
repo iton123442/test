@@ -2015,7 +2015,7 @@ class GameLobby{
                     * CHECK IF PLAYER RESTRICTION
                     *
                     ****************************************************************/
-                    $data = IDNPokerHelper::checkPlayerRestricted($client_details->player_id);
+                    $data = IDNPokerHelper::checkPlayerRestricted($client_details->player_id); // HANDLE IF PLAYER WANT TO NEW REQUEST URL
                     if($data == "false"){
                         /***************************************************************
                         *
@@ -2061,7 +2061,7 @@ class GameLobby{
                                         );
                                         $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
                                         // return urlencode($encoded_data);
-                                        return config('providerlinks.play_betrnk') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
+                                        return config('providerlinks.play_tigergames') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
                                     case 2:
                                         //TRANSFER WALLET CLIENT
                                         //TRANSFER WALLET SA PROIVDER
