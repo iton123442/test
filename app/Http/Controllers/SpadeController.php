@@ -714,9 +714,9 @@ class SpadeController extends Controller
 							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
 							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
 							$updateFreespinData = [
-								"status" => $status,
+								"status" => 2,
 								"win" => $getFreespin->win + $details->amount,
-								"spin_remaining" => $getFreespin->spin_remaining - 1
+								"spin_remaining" => 0
 							];
 							$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
 							if($status == 2 ){
