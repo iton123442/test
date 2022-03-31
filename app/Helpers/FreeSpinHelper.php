@@ -1799,7 +1799,7 @@ class FreeSpinHelper{
                 "mw_request" => json_encode($requesttosend),
                 "provider_response" => "SUCCEESSS",
                 "client_request" => json_encode($data),
-                "mw_response" => "200"
+                "mw_response" => json_encode($dataresponse)
             ];
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 200;
