@@ -1765,26 +1765,23 @@ class FreeSpinHelper{
             return 400;
         }
         $id = FreeSpinHelper::createFreeRound($insertFreespin);
+        $hash = md5("AppFreeSpinRules/".(int)config("providerlinks.mancala.PARTNER_ID").(int)$data["game_code"].(string)$player_details->player_id.$player_details->default_currency.config("providerlinks.mancala.API_KEY"));
+        // dd($hash);
         $requesttosend = [
-            "ClientId" => config("providerlinks.mancala.PARTNER_ID"),
-            "Name" => "freesping grant",
-            "GameIds" => [$data["game_code"]],
-            "UserIds" => null,
-            "PartnerUserIds" => [$player_details->player_id],
-            "FreeSpinSetting" => [
-                "BetPerLine" => $data["details"]["denomination"],
-                "FreeSpinAmount" => $data["details"]["rounds"],
+            "Settings" => [
+                "BetPerLine" => 2,
+                "FreeSpinAmount" => 10
             ],
-            "GameBetAmountTrigers" => array([
-                "TrigerBetAmount" => 0.0,
-                "SingleBetAmount" => true
-            ]),
-            "SessionSpinAmountTrigers" => [],
-            "TrigerOnFirstGameLaunch" => true,
+            "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
+            "Hash" => "",
+            "Name" => "freesping grant",
+            "GameId" => $data["game_code"],
+            "UserId" => $player_details->player_id,
             "StartDate" => $data["details"]["start_time"],
             "EndDate" => $data["details"]["expiration_date"],
             "Currency" => $player_details->default_currency,
-            "ExternalId" => null
+            "ExternalId" => null,
+            "BonusType" => 1
         ];
         // dd($requesttosend);
         $client = new Client(['headers' => [ 
