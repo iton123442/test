@@ -1791,14 +1791,16 @@ class FreeSpinHelper{
             'Content-Type' => 'application/json'
             ]
         ]);
+        Helper::saveLog('Mancala Freespin datas', $sub_provder_id,json_encode($freeround_id), json_encode($requesttosend));
         $sendtoUrl = "https://api.mancalagaming.net/partners/free-spins/AddFreeSpinRules";
         // try {
             $guzzle_response = $client->post($sendtoUrl,['body' => json_encode($requesttosend)]);
             $dataresponse = json_decode($guzzle_response->getBody()->getContents());
+            Helper::saveLog('Mancala Freespin datas2', $sub_provder_id,json_encode($requesttosend), json_encode($guzzle_response));
         // } catch (\Exception $e) {
         //     return 400;
         // }
-        
+
     }
 }
 ?>
