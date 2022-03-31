@@ -1765,7 +1765,7 @@ class FreeSpinHelper{
             return 400;
         }
         $id = FreeSpinHelper::createFreeRound($insertFreespin);
-        $hash = md5("AddFreespinRuless/".config("providerlinks.mancala.PARTNER_ID").$data["game_code"].$player_details->player_id.$player_details->default_currency.config("providerlinks.mancala.API_KEY"));
+        $hash = md5("AddFreespinRules/".config("providerlinks.mancala.PARTNER_ID").$data["game_code"].$player_details->player_id.$player_details->default_currency.config("providerlinks.mancala.API_KEY"));
         // AppFreespinRules/2641900152036USDQNGIXXAI
         $requesttosend = [
             "Settings" => [
