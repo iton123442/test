@@ -1792,12 +1792,12 @@ class FreeSpinHelper{
             ]
         ]);
         $sendtoUrl = "https://api.mancalagaming.net/partners/free-spins/AddFreeSpinRules";
-        try {
+        // try {
             $guzzle_response = $client->post($sendtoUrl,['body' => json_encode($requesttosend)]);
             $dataresponse = json_decode($guzzle_response->getBody()->getContents());
-        } catch (\Exception $e) {
-            return 400;
-        }
+        // } catch (\Exception $e) {
+        //     return 400;
+        // }
         
     }
 }
