@@ -1743,5 +1743,62 @@ class FreeSpinHelper{
          }
         
     }
+    public static function createFreeSpinMancala($player_details,$data, $sub_provder_id,$freeround_id){
+        // dd($data);
+        Helper::saveLog('Mancala Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        // dd($game_details);
+        if($game_details == false){
+            return 400;
+        }
+        try{
+            $insertFreespin = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+                "provider_trans_id" => $freeround_id,
+            ];
+        }catch(\Exception $e){
+            return 400;
+        }
+        $id = FreeSpinHelper::createFreeRound($insertFreespin);
+        $requesttosend = [
+            "ClientId" => config("providerlinks.mancala.PARTNER_ID"),
+            "Name" => "freesping grant",
+            "GameIds" => [$data["game_code"]],
+            "UserIds" => null,
+            "PartnerUserIds" => [$player_details->player_id],
+            "FreeSpinSetting" => [
+                "BetPerLine" => $data["details"]["denomination"],
+                "FreeSpinAmount" => $data["details"]["rounds"],
+            ],
+            "GameBetAmountTrigers" => array([
+                "TrigerBetAmount" => 0.0,
+                "SingleBetAmount" => true
+            ]),
+            "SessionSpinAmountTrigers" => [],
+            "TrigerOnFirstGameLaunch" => true,
+            "StartDate" => $data["details"]["start_time"],
+            "EndDate" => $data["details"]["expiration_date"],
+            "Currency" => $player_details->default_currency,
+            "ExternalId" => null
+        ];
+        // dd($requesttosend);
+        $client = new Client(['headers' => [ 
+            'Content-Type' => 'application/json'
+            ]
+        ]);
+        $sendtoUrl = "https://api.mancalagaming.net/partners/free-spins/AddFreeSpinRules";
+        try {
+            $guzzle_response = $client->post($sendtoUrl,['body' => json_encode($requesttosend)]);
+            $dataresponse = json_decode($guzzle_response->getBody()->getContents());
+        } catch (\Exception $e) {
+            return 400;
+        }
+        
+    }
 }
 ?>
