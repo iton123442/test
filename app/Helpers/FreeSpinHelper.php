@@ -1793,13 +1793,32 @@ class FreeSpinHelper{
         ]);
         Helper::saveLog('Mancala Freespin datas', $sub_provder_id,json_encode($freeround_id), json_encode($requesttosend));
         $sendtoUrl = "https://api.mancalagaming.net/partners/free-spins/AddFreeSpinRules";
-        // try {
+        try {
             $guzzle_response = $client->post($sendtoUrl,['body' => json_encode($requesttosend)]);
             $dataresponse = json_decode($guzzle_response->getBody()->getContents());
-            Helper::saveLog('Mancala Freespin datas2', $sub_provder_id,json_encode($requesttosend), json_encode($guzzle_response));
-        // } catch (\Exception $e) {
-        //     return 400;
-        // }
+            Helper::saveLog('Mancala Freespin datas2', $sub_provder_id,json_encode($requesttosend), json_encode($dataresponse));
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => "SUCCEESSS",
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 200;
+        } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            $data = [
+                "status" => 3,
+                "details" => json_encode($msg)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
 
     }
 }
