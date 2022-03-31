@@ -709,9 +709,10 @@ class SpadeController extends Controller
 					if($details->gameCode == "B-FS02") {
 						$freeroundID = $details->serialNo;
 						$getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
-						Helper::saveLog('Spade FreeRound', $this->provider_db_id, json_encode($details),json_encode($getFreespin));
-						if($getFreespin){
-							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID; //explod the provider trans use the original
+						Helper::saveLog('Spade FreeRound', $this->provider_db_id, json_encode($details),$freeroundID);
+						if($getFreespin){	
+							$getOrignalfreeroundID = explode("_",$freeroundID);
+							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
 							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
 							$updateFreespinData = [
 								"status" => $status,
