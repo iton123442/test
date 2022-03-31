@@ -1773,7 +1773,7 @@ class FreeSpinHelper{
                 "FreeSpinAmount" => 10
             ],
             "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
-            "Hash" => "",
+            "Hash" => $hash,
             "Name" => "freesping grant",
             "GameId" => $data["game_code"],
             "UserId" => $player_details->player_id,
