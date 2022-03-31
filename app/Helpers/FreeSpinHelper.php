@@ -995,7 +995,7 @@ class FreeSpinHelper{
             $freespinExtenstion = [
                 "freespin_id" => $id,
                 "mw_request" => json_encode($requesttosend),
-                "provider_response" => "SUCCEESSS",
+                "provider_response" => json_encode($dataresponse),
                 "client_request" => json_encode($data),
                 "mw_response" => "200"
             ];
@@ -1765,18 +1765,18 @@ class FreeSpinHelper{
             return 400;
         }
         $id = FreeSpinHelper::createFreeRound($insertFreespin);
-        $hash = md5("AppFreeSpinRules/".(int)config("providerlinks.mancala.PARTNER_ID").(int)$data["game_code"].(string)$player_details->player_id.$player_details->default_currency.config("providerlinks.mancala.API_KEY"));
-        // dd($hash);
+        $hash = md5("AddFreespinRuless/".config("providerlinks.mancala.PARTNER_ID").$data["game_code"].$player_details->player_id.$player_details->default_currency.config("providerlinks.mancala.API_KEY"));
+        // AppFreespinRules/2641900152036USDQNGIXXAI
         $requesttosend = [
             "Settings" => [
-                "BetPerLine" => 2,
-                "FreeSpinAmount" => 10
+                "BetPerLine" => (int) $data["details"]["denomination"],
+                "FreeSpinAmount" => (int) $data["details"]["rounds"]
             ],
             "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
             "Hash" => $hash,
             "Name" => "freesping grant",
-            "GameId" => $data["game_code"],
-            "UserId" => $player_details->player_id,
+            "GameId" => (int) $data["game_code"],
+            "UserId" => (string) $player_details->player_id,
             "StartDate" => $data["details"]["start_time"],
             "EndDate" => $data["details"]["expiration_date"],
             "Currency" => $player_details->default_currency,
@@ -1789,20 +1789,11 @@ class FreeSpinHelper{
             ]
         ]);
         Helper::saveLog('Mancala Freespin datas', $sub_provder_id,json_encode($freeround_id), json_encode($requesttosend));
-        $sendtoUrl = "https://api.mancalagaming.net/partners/free-spins/AddFreeSpinRules";
+        $sendtoUrl = "https://api.mancalagaming.net/partners/free-spins/v2/AddFreeSpinRules";
         try {
             $guzzle_response = $client->post($sendtoUrl,['body' => json_encode($requesttosend)]);
             $dataresponse = json_decode($guzzle_response->getBody()->getContents());
             Helper::saveLog('Mancala Freespin datas2', $sub_provder_id,json_encode($requesttosend), json_encode($dataresponse));
-            $freespinExtenstion = [
-                "freespin_id" => $id,
-                "mw_request" => json_encode($requesttosend),
-                "provider_response" => "SUCCEESSS",
-                "client_request" => json_encode($data),
-                "mw_response" => json_encode($dataresponse)
-            ];
-            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
-            return 200;
         } catch (\Exception $e) {
             $msg = array(
                 'err_message' => $e->getMessage(),
@@ -1815,6 +1806,31 @@ class FreeSpinHelper{
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             return 400;
+        }
+        if(isset($dataresponse->StatusCode) && $dataresponse->StatusCode != 0){
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }else{
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 200;
         }
 
     }
