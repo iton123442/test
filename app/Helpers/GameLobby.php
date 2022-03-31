@@ -1867,20 +1867,20 @@ class GameLobby{
     public static function FunkyGamesLaunch($data){
         Helper::saveLog('FunkyGames GAMELUANCH', 110, json_encode($data),  "HIT" );
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-        if (!empty($_SERVER['HTTP_CLIENT_IP']))   
-          {
-            $ip_address = $_SERVER['HTTP_CLIENT_IP'];
-          }
-        //whether ip is from proxy
-        elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  
-          {
-            $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-          }
-        //whether ip is from remote address
-        else
-          {
-            $ip_address = $_SERVER['REMOTE_ADDR'];
-          }
+        // if (!empty($_SERVER['HTTP_CLIENT_IP']))   
+        //   {
+        //     $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+        //   }
+        // //whether ip is from proxy
+        // elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  
+        //   {
+        //     $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        //   }
+        // //whether ip is from remote address
+        // else
+        //   {
+        //     $ip_address = $_SERVER['REMOTE_ADDR'];
+        //   }
         try {
             
                 $paramsToSend = [
@@ -1889,7 +1889,7 @@ class GameLobby{
                     'playerId' => $client_details->player_id,
                     'currency' => $client_details->default_currency,
                     'language' => 'en',
-                    'playerIp' => $ip_address,
+                    'playerIp' => $client_details->ip_address,
                     'sessionId' => $data['token'],
                     'isTestAccount' => true
                 ];
