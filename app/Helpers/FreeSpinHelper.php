@@ -1483,7 +1483,6 @@ class FreeSpinHelper{
             }catch(\Exception $e){
                 return 400;
             }
-                $explode_freeroundid = explode('_', $freeround_id);
                 $id = FreeSpinHelper::createFreeRound($insertFreespin);
                 $client_player_details = ProviderHelper::getClientDetails('player_id',  $player_details->player_id);
                 $details= ProviderHelper::getPlayerOperatorDetails("player_id", $player_details->player_id);
@@ -1501,7 +1500,7 @@ class FreeSpinHelper{
                         ]),
                         "acctId" => config("providerlinks.spade.prefix") ."_". $player_details->player_id,
                         "bufferTime" => $data['details']['buffer_time'],
-                        "serialNo" => $explode_freeroundid[1],
+                        "serialNo" => $freeround_id,
                 ];
                 $client = new Client(['headers' => [ 
                     'API' => 'createLoyalFreeSpin',
