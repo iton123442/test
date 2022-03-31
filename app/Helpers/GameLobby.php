@@ -1889,7 +1889,7 @@ class GameLobby{
                     'playerId' => $client_details->player_id,
                     'currency' => $client_details->default_currency,
                     'language' => 'en',
-                    'playerIp' => $client_details->ip_address,
+                    'playerIp' => $data['ip_address'],
                     'sessionId' => $data['token'],
                     'isTestAccount' => true
                 ];
