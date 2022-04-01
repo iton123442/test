@@ -935,11 +935,12 @@ class GameLobbyController extends Controller
                         "game_code" => $request->input("game_code"),
                         "game_launch" => true
                     );
-                    if ($URL != "false") {
-                        $msg["url"] = $URL;
-                    } else {
-                        $msg["url"] = $this->createFallbackLink($request->all()) ;
-                    }
+                    // if ($URL != "false") {
+                    //     $msg["url"] = $URL;
+                    // } else {
+                    //     $msg["url"] = $this->createFallbackLink($request->all()) ;
+                    // }
+                    $msg["url"] = $URL;
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
