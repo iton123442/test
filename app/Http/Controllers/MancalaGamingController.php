@@ -315,7 +315,7 @@ class MancalaGamingController extends Controller
 				                    }
 				                    //create transction 
 				                    $createFreeRoundTransaction = array(
-				                        "game_trans_id" => $gametransactionid,
+				                        "game_trans_id" => $bet_transaction->game_trans_id,
 				                        'freespin_id' => $getFreespin->freespin_id
 				                    );
 				                    FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
