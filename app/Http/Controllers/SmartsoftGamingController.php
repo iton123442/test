@@ -268,7 +268,7 @@ class SmartsoftGamingController extends Controller
                     $income = $bet_transaction->income;
 
                     $updateGameTransaction = [
-                        'win' => 5,
+                        'win' => $win_or_lost,
                         'pay_amount' => $amount,
                         'income' => $income,
                         'entry_id' => $entry_id,
@@ -394,8 +394,6 @@ class SmartsoftGamingController extends Controller
                 );
 
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
-
                     $action_payload = [
                         "type" => "custom", #genreral,custom :D # REQUIRED!
                         "custom" => [

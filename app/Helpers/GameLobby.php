@@ -1432,22 +1432,20 @@ class GameLobby{
             ]);
         
         $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
-
+        $datatosend = [
+                "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
+                "GameId" => $request_data['game_code'],
+                "UserId" => $client_details->player_id,
+                "Currency" => $client_details->default_currency,
+                "Lang" => "EN",
+                "ClientType" => 1,
+                "IsVirtual" => false,
+                "Hash" => $hash,
+                "DemoMode" => false,
+                "ExtraData" => "data"
+            ];
         $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
-                ['body' => json_encode(
-                        [
-                            "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
-                            "GameId" => $request_data['game_code'],
-                            "UserId" => $client_details->player_id,
-                            "Currency" => $client_details->default_currency,
-                            "Lang" => "EN",
-                            "ClientType" => 1,
-                            "IsVirtual" => false,
-                            "Hash" => $hash,
-                            "DemoMode" => false,
-                            "ExtraData" => "data"
-                        ]
-                )]
+                ['body' => json_encode($datatosend)]
             );
 
         $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
