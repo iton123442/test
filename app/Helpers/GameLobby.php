@@ -2096,7 +2096,7 @@ class GameLobby{
                         } catch (\Exception $e) {
                             Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
                             // return "false";
-                            return config('providerlinks.play_tigergames').'/tigergames/api?msg=Something went wrong please contact Tiger Games!';
+                            return config('providerlinks.play_tigergames').'/tigergames/api?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                         }
                     }
                     
