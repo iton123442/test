@@ -8,6 +8,7 @@ use App\Helpers\CallParameters;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\Helper;
+use App\Helpers\FreeSpinHelper;
 use App\Helpers\Game;
 use App\Models\GameTransaction;
 use App\Models\GameTransactionMDB;
@@ -294,18 +295,6 @@ class MancalaGamingController extends Controller
 
 			           	GameTransactionMDB::updateGametransaction($update_game_transaction, $bet_transaction->game_trans_id, $client_details);
 
-
-		                $win_game_transaction_ext = array(
-		                    "game_trans_id" => $bet_transaction->game_trans_id,
-		                    "provider_trans_id" => $json_data["TransactionId"],
-		                    "round_id" => $json_data["RoundId"],
-		                    "amount" => $json_data["Amount"],
-		                    "game_transaction_type"=> 2,
-		                    "provider_request" =>json_encode($json_data),
-		                    "mw_response" => json_encode($response)
-		                );
-		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
-
 		                if(isset($json_data['BonusTransaction']) && $json_data['BonusTransaction'] == true){
 		                	if(isset($json_data['ExternalBonusId'])){
 		                		$getFreespin = FreeSpinHelper::getFreeSpinDetails($json_data['ExternalBonusId'], "provider_trans_id" );
@@ -333,7 +322,16 @@ class MancalaGamingController extends Controller
 				                }
 		                	}
 		                }
-
+		                $win_game_transaction_ext = array(
+		                    "game_trans_id" => $bet_transaction->game_trans_id,
+		                    "provider_trans_id" => $json_data["TransactionId"],
+		                    "round_id" => $json_data["RoundId"],
+		                    "amount" => $json_data["Amount"],
+		                    "game_transaction_type"=> 2,
+		                    "provider_request" =>json_encode($json_data),
+		                    "mw_response" => json_encode($response)
+		                );
+		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
