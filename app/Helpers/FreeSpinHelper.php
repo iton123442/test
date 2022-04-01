@@ -1780,7 +1780,7 @@ class FreeSpinHelper{
             "StartDate" => $data["details"]["start_time"],
             "EndDate" => $data["details"]["expiration_date"],
             "Currency" => $player_details->default_currency,
-            "ExternalId" => $id,
+            "ExternalId" => $freeround_id,
             "BonusType" => 1
         ];
         // dd($requesttosend);
