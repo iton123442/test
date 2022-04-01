@@ -403,7 +403,8 @@ return [
            'JPY' => '91e006399cad8230d2d97091d8300412',
            'KZT' => '5826d08f7295fbd7754080c5aa81ad08',
            'TND' => '7ed09f9194573e2d0bc6788ddab84237',
-           'RUB' => '122482672d17fc9085e9b4ecab391bc8'
+           'RUB' => '122482672d17fc9085e9b4ecab391bc8',
+           'UAH' => '8547721c9ab10553ca4ea63344af9da2'
         ],
     ],
     // 'manna'=>[
