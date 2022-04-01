@@ -304,7 +304,9 @@ class MancalaGamingController extends Controller
 		                    "provider_request" =>json_encode($json_data),
 		                    "mw_response" => json_encode($response)
 		                );
-
+		                // if(isset($json_data['BonusTransaction']) && $json_data['BonusTransaction'] == true){
+		                	
+		                // }
 		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
 
 						$action_payload = [
