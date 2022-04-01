@@ -304,10 +304,35 @@ class MancalaGamingController extends Controller
 		                    "provider_request" =>json_encode($json_data),
 		                    "mw_response" => json_encode($response)
 		                );
-		                // if(isset($json_data['BonusTransaction']) && $json_data['BonusTransaction'] == true){
-		                	
-		                // }
 		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
+
+		                if(isset($json_data['BonusTransaction']) && $json_data['BonusTransaction'] == true){
+		                	if(isset($json_data['ExternalBonusId'])){
+		                		$getFreespin = FreeSpinHelper::getFreeSpinDetails($json_data['ExternalBonusId'], "provider_trans_id" );
+				                if($getFreespin){
+				                    $getOrignalfreeroundID = explode("_",$json_data['ExternalBonusId']);
+				                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+				                    $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+				                    $updateFreespinData = [
+				                        "status" => $status,
+				                        "win" => $getFreespin->win + $json_data['Amount'],
+				                        "spin_remaining" => $getFreespin->spin_remaining - 1
+				                    ];
+				                    $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+				                    if($status == 2 ){
+				                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+				                    } else {
+				                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+				                    }
+				                    //create transction 
+				                    $createFreeRoundTransaction = array(
+				                        "game_trans_id" => $gametransactionid,
+				                        'freespin_id' => $getFreespin->freespin_id
+				                    );
+				                    FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+				                }
+		                	}
+		                }
 
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
