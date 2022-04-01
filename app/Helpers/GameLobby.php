@@ -2091,13 +2091,15 @@ class GameLobby{
                             Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode($iframe_data),  json_encode($iframe_data) );
                             if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
                                 // return "false";
-                                return config('providerlinks.play_tigergames').'/tigergames/api?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
+                                // return config('providerlinks.play_tigergames').'/tigergames/api?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                             }
+                            // return config('providerlinks.play_tigergames').'/tigergames/api?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                         } catch (\Exception $e) {
                             Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
                             // return "false";
-                            return config('providerlinks.play_tigergames').'/tigergames/api?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
+                            // return config('providerlinks.play_tigergames').'/tigergames/api?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                         }
+                        return config('providerlinks.play_tigergames').'/tigergames/api?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                     }
                     
                 }
