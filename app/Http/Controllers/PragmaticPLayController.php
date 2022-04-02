@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\AWSHelper;
+use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 
 class PragmaticPLayController extends Controller
