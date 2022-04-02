@@ -1834,6 +1834,48 @@ class FreeSpinHelper{
         }
 
     }
-
+    public static function createFreeSpinPragmaticPlay($player_details,$data, $sub_provder_id,$freeround_id){
+        // dd($data);
+        Helper::saveLog('PragmaticPlay Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        // dd($game_details);
+        if($game_details == false){
+            return 400;
+        }
+        try{
+            $insertFreespin = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+                "provider_trans_id" => $freeround_id,
+            ];
+        }catch(\Exception $e){
+            return 400;
+        }
+        $id = FreeSpinHelper::createFreeRound($insertFreespin);
+        $date1 = $data["details"]["expiration_date"];
+        $timestamp1 = strtotime($date1);
+        $hash = md5("bonusCode=".$data["details"]["rounds"]."&currency=".$player_details->default_currency."&expirationDate=".$timestamp1."&gameIDList=".$data["game_code"]."&playerId=".$player_details->player_id."&rounds=".$data["details"]["rounds"]."&secureLogin=tg_tigergames".config("providerlinks.tpp.secret_key"));
+        // dd($hash);
+        $requesttosend = [
+            "secureLogin" => "tg_tigergames",
+            "playerId" => $player_details->player_id,
+            "currency" => $player_details->default_currency,
+            "gameIDList" => $data['game_code'],
+            "rounds" => $data['details']['rounds'],
+            "bonusCode" => $freeround_id,
+            "expirationDate" => $timestamp1,
+            "hash" => $hash
+        ];
+        $client = new Client();
+        $response = $client->post("https://api.prerelease-env.biz/IntegrationService/v3/http/FreeRoundsBonusAPI/createFRB/",[
+            'form_params' => $requesttosend,
+        ]);
+        $dataresponse = json_decode($response->getBody()->getContents());
+        dd($dataresponse);
+    }
 }
 ?>
