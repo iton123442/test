@@ -194,7 +194,7 @@ class IDNPokerHelper{
     public static function getAuthPerOperator($client_details, $type = false){
         $auth = "";
         if($type == "staging") {
-            $auth = config('providerlinks.idnpoker.agent.JFPAA');
+            $auth = config('providerlinks.idnpoker.agent.DSPAA');
         }
         if($type == "production"){
             if($client_details->operator_id == 1 ){

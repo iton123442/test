@@ -673,7 +673,8 @@ return [
         'prefix' => "TGTW",
         'type' => "staging",// [production, staging]
         "agent" => [
-            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production
+            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
+            "DSPAA" => "b972d12c42bd31d56fd1bd5cc", // testing Staging and production USD
             "9" => [
                 "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA
                 "122" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB
