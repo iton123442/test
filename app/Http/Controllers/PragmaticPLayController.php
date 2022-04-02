@@ -852,7 +852,7 @@ class PragmaticPLayController extends Controller
         $response = [
             "transactionId" => $getFreespin->freespin_id,
             "currency" => $client_details->default_currency,
-            "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+            "cash" => floatval(number_format($client_details->balance, 2, '.', '')) + $data->amount,
             "bonus" => $data->amount,
             "error" => 0,
             "description" => "success"
