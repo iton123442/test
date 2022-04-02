@@ -486,7 +486,6 @@ class PragmaticPLayController extends Controller
                     $getOrignalfreeroundID = explode("_",$data->bonusCode);
                     $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
                     $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-                    
                     if($status == 2 ){
                         $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
                     } else {
@@ -844,6 +843,7 @@ class PragmaticPLayController extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
 
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($data->bonusCode, "provider_trans_id" );
+        $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
         $updateFreespinData = [
             "status" => $status,
             "win" => $getFreespin->win + $data->amount,
