@@ -53,6 +53,7 @@ class KAGamingController extends Controller
         }
     }
     public function getPromo(){
+    //Get given promotion details
         $client = new Client([  
             'headers' => [ 
                 'Content-Type' => 'application/json'
@@ -60,7 +61,7 @@ class KAGamingController extends Controller
         ]);
         $body = [
             "partnerName" => 'TIGER',
-            "promotionSpinId" => 'a1824d9f646f964ab564c53b86341ca8'
+            "promotionSpinId" => '0963b9eafbce0d29691fde224f0d35e0'
         ];
         $guzzle_response = $client->post($this->ka_api.'promotionspin/get?hash='.$this->generateHash($body),
             ['body' => json_encode(

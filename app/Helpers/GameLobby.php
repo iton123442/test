@@ -1432,22 +1432,20 @@ class GameLobby{
             ]);
         
         $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
-
+        $datatosend = [
+                "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
+                "GameId" => $request_data['game_code'],
+                "UserId" => $client_details->player_id,
+                "Currency" => $client_details->default_currency,
+                "Lang" => "EN",
+                "ClientType" => 1,
+                "IsVirtual" => false,
+                "Hash" => $hash,
+                "DemoMode" => false,
+                "ExtraData" => "data"
+            ];
         $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
-                ['body' => json_encode(
-                        [
-                            "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
-                            "GameId" => $request_data['game_code'],
-                            "UserId" => $client_details->player_id,
-                            "Currency" => $client_details->default_currency,
-                            "Lang" => "EN",
-                            "ClientType" => 1,
-                            "IsVirtual" => false,
-                            "Hash" => $hash,
-                            "DemoMode" => false,
-                            "ExtraData" => "data"
-                        ]
-                )]
+                ['body' => json_encode($datatosend)]
             );
 
         $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
@@ -1869,20 +1867,6 @@ class GameLobby{
     public static function FunkyGamesLaunch($data){
         Helper::saveLog('FunkyGames GAMELUANCH', 110, json_encode($data),  "HIT" );
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
-        // if (!empty($_SERVER['HTTP_CLIENT_IP']))   
-        //   {
-        //     $ip_address = $_SERVER['HTTP_CLIENT_IP'];
-        //   }
-        // //whether ip is from proxy
-        // elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))  
-        //   {
-        //     $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        //   }
-        // //whether ip is from remote address
-        // else
-        //   {
-        //     $ip_address = $_SERVER['REMOTE_ADDR'];
-        //   }
         try {
             
                 $paramsToSend = [
@@ -1891,7 +1875,7 @@ class GameLobby{
                     'playerId' => $client_details->player_id,
                     'currency' => $client_details->default_currency,
                     'language' => 'en',
-                    'playerIp' => $client_details->ip_address,
+                    'playerIp' => $data['ip_address'],
                     'sessionId' => $data['token'],
                     'isTestAccount' => true
                 ];
@@ -2048,10 +2032,12 @@ class GameLobby{
                                             Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
                                             if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
                                                 return "false";
+                                                // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                                             }
                                         } catch (\Exception $e) {
                                             Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, json_encode($player_details),  $e->getMessage() );
                                             return "false";
+                                            // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                                         }
                                         $data_to_send_play = array(
                                             "url" => $data["lobby_url"],
@@ -2068,9 +2054,11 @@ class GameLobby{
                                         return $data["lobby_url"];
                                     default:
                                         return "false";
+                                        // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                                 }
                             }else{
                                 return "false";
+                                // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                             }
                             
                         }
@@ -2088,22 +2076,29 @@ class GameLobby{
                             $iframe_data = json_decode((string) $response->getBody(), true);
                             Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode($iframe_data),  json_encode($iframe_data) );
                             if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
-                                return "false";
+                                // return "false";
+                                // return config('providerlinks.play_tigergames').'/online-poker?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                             }
+                            // return config('providerlinks.play_tigergames').'/online-poker?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                         } catch (\Exception $e) {
                             Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
-                            return "false";
+                            // return "false";
+                            // return config('providerlinks.play_tigergames').'/online-poker?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                         }
+                        return config('providerlinks.play_tigergames').'/online-poker?msg=Currently in the process of withdrawal. Please wait a moment and try again!';
                     }
                     
                 }
                 return "false";
+                // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
             } else {
-                return $data;
+                return "false";
+                // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
             }
         } catch (\Exception $e) {
             Helper::saveLog('IDNPOKER GAMELUANCH ERROR', 110, json_encode($request),  $e->getMessage() );
             return "false";
+            // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
         }
     }
 
