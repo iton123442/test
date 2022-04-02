@@ -842,8 +842,12 @@ class PragmaticPLayController extends Controller
         $data = json_decode($json_encode);
 
         Helper::saveLog('PP bonus', $this->provider_id, json_encode($data) , "");
-
-        $game_trans = DB::table("game_transactions")->where("round_id","=",$data->roundId)->first();
+        if(isset($data->bonusCode)){
+            $roundId = $data->bonusCode;
+        }else{
+            $roundId = $data->roundId;
+        }
+        $game_trans = DB::table("game_transactions")->where("round_id","=",$roundId)->first();
         $game_details = DB::table("games")->where("game_id","=",$game_trans->game_id)->first();
         
         $playerId = ProviderHelper::explodeUsername('_',$data->userId);
