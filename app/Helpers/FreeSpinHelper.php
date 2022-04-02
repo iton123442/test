@@ -1858,11 +1858,12 @@ class FreeSpinHelper{
         $id = FreeSpinHelper::createFreeRound($insertFreespin);
         $date1 = $data["details"]["expiration_date"];
         $timestamp1 = strtotime($date1);
-        $hash = md5("bonusCode=".$data["details"]["rounds"]."&currency=".$player_details->default_currency."&expirationDate=".$timestamp1."&gameIDList=".$data["game_code"]."&playerId=".$player_details->player_id."&rounds=".$data["details"]["rounds"]."&secureLogin=tg_tigergames".config("providerlinks.tpp.secret_key"));
+        $user_id = "TGaming_".$player_details->player_id;
+        $hash = md5("bonusCode=".$freeround_id."&currency=".$player_details->default_currency."&expirationDate=".$timestamp1."&gameIDList=".$data["game_code"]."&playerId=".$user_id."&rounds=".$data["details"]["rounds"]."&secureLogin=".config("providerlinks.tpp.secureLogin")."".config("providerlinks.tpp.secret_key"));
         // dd($hash);
         $requesttosend = [
-            "secureLogin" => "tg_tigergames",
-            "playerId" => $player_details->player_id,
+            "secureLogin" => config("providerlinks.tpp.secureLogin"),
+            "playerId" => $user_id,
             "currency" => $player_details->default_currency,
             "gameIDList" => $data['game_code'],
             "rounds" => $data['details']['rounds'],
@@ -1871,11 +1872,49 @@ class FreeSpinHelper{
             "hash" => $hash
         ];
         $client = new Client();
-        $response = $client->post("https://api.prerelease-env.biz/IntegrationService/v3/http/FreeRoundsBonusAPI/createFRB/",[
+        try {
+            $response = $client->post("https://api.prerelease-env.biz/IntegrationService/v3/http/FreeRoundsBonusAPI/createFRB/",[
             'form_params' => $requesttosend,
-        ]);
-        $dataresponse = json_decode($response->getBody()->getContents());
-        dd($dataresponse);
+            ]);
+            $dataresponse = json_decode($response->getBody()->getContents());
+        } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            $data = [
+                "status" => 3,
+                "details" => json_encode($msg)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
+        if(isset($dataresponse->error) && $dataresponse->error == "0" && $dataresponse->description == "OK"){
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 200;
+        }else{
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }
     }
 }
 ?>
