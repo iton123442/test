@@ -851,12 +851,12 @@ class PragmaticPLayController extends Controller
         $playerId = ProviderHelper::explodeUsername('_',$data->userId);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
 
-        $client = new Client([
-            'headers' => [ 
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer '.$client_details->client_access_token
-            ]
-        ]);
+        // $client = new Client([
+        //     'headers' => [ 
+        //         'Content-Type' => 'application/json',
+        //         'Authorization' => 'Bearer '.$client_details->client_access_token
+        //     ]
+        // ]);
         
     }
 
