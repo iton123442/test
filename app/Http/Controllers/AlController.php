@@ -459,11 +459,16 @@ class AlController extends Controller
       // }
 
 
-      $hashed_password = password_hash('kirill', PASSWORD_DEFAULT);
-      dd($hashed_password);
+      // $hashed_password = password_hash('kirill', PASSWORD_DEFAULT);
+      // dd($hashed_password);
 
-
+      $gameDetails = ProviderHelper::findGameDetails('game_code', 1, 1);
+      dd($gameDetails);
       $client_details = Providerhelper::getClientDetails('player_id', 10210);
+
+
+
+      
 
       $updateTransactionEXt = array(
             // "provider_request" =>json_encode($payload),

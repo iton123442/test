@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\AWSHelper;
+use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 
 class PragmaticPLayController extends Controller
@@ -479,7 +480,15 @@ class PragmaticPLayController extends Controller
         }
         
         try {
-
+            if(isset($data->bonusCode)){
+                $getFreespin = FreeSpinHelper::getFreeSpinDetails($data->bonusCode, "provider_trans_id" );
+                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                if($status == 2 ){
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                } else {
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                }
+            }
             $income = $game_trans->bet_amount - $data->amount;
             $balance = $client_details->balance + $data->amount;
            
@@ -819,18 +828,35 @@ class PragmaticPLayController extends Controller
 
         Helper::saveLog('PP bonus', $this->provider_id, json_encode($data) , "");
 
-        $game_trans = DB::table("game_transactions")->where("round_id","=",$data->roundId)->first();
-        $game_details = DB::table("games")->where("game_id","=",$game_trans->game_id)->first();
-        
+        // $game_trans = DB::table("game_transactions")->where("round_id","=",$data->roundId)->first();
+        // $game_details = DB::table("games")->where("game_id","=",$game_trans->game_id)->first();
+        if(isset($data->bonusCode)){
+            $getFreespin = FreeSpinHelper::getFreeSpinDetails($data->bonusCode, "provider_trans_id" );
+                $getOrignalfreeroundID = explode("_",$data->bonusCode);
+                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                $updateFreespinData = [
+                    "status" => $status,
+                    "win" => $getFreespin->win + $data->amount,
+                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                ];
+                $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                //create transction 
+                $createFreeRoundTransaction = array(
+                    "game_trans_id" => $game_trans->game_trans_id,
+                    'freespin_id' => $getFreespin->freespin_id
+                );
+                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+        }
         $playerId = ProviderHelper::explodeUsername('_',$data->userId);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
 
-        $client = new Client([
-            'headers' => [ 
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer '.$client_details->client_access_token
-            ]
-        ]);
+        // $client = new Client([
+        //     'headers' => [ 
+        //         'Content-Type' => 'application/json',
+        //         'Authorization' => 'Bearer '.$client_details->client_access_token
+        //     ]
+        // ]);
         
     }
 

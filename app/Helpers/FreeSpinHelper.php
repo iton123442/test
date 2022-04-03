@@ -1834,6 +1834,87 @@ class FreeSpinHelper{
         }
 
     }
-
+    public static function createFreeSpinPragmaticPlay($player_details,$data, $sub_provder_id,$freeround_id){
+        // dd($data);
+        Helper::saveLog('PragmaticPlay Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        // dd($game_details);
+        if($game_details == false){
+            return 400;
+        }
+        try{
+            $insertFreespin = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+                "provider_trans_id" => $freeround_id,
+            ];
+        }catch(\Exception $e){
+            return 400;
+        }
+        $id = FreeSpinHelper::createFreeRound($insertFreespin);
+        $date1 = $data["details"]["expiration_date"];
+        $timestamp1 = strtotime($date1);
+        $user_id = "TGaming_".$player_details->player_id;
+        $hash = md5("bonusCode=".$freeround_id."&currency=".$player_details->default_currency."&expirationDate=".$timestamp1."&gameIDList=".$data["game_code"]."&playerId=".$user_id."&rounds=".$data["details"]["rounds"]."&secureLogin=".config("providerlinks.tpp.secureLogin")."".config("providerlinks.tpp.secret_key"));
+        // dd($hash);
+        $requesttosend = [
+            "secureLogin" => config("providerlinks.tpp.secureLogin"),
+            "playerId" => $user_id,
+            "currency" => $player_details->default_currency,
+            "gameIDList" => $data['game_code'],
+            "rounds" => $data['details']['rounds'],
+            "bonusCode" => $freeround_id,
+            "expirationDate" => $timestamp1,
+            "hash" => $hash
+        ];
+        $client = new Client();
+        try {
+            $response = $client->post("https://api.prerelease-env.biz/IntegrationService/v3/http/FreeRoundsBonusAPI/createFRB/",[
+            'form_params' => $requesttosend,
+            ]);
+            $dataresponse = json_decode($response->getBody()->getContents());
+        } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            $data = [
+                "status" => 3,
+                "details" => json_encode($msg)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
+        if(isset($dataresponse->error) && $dataresponse->error == "0" && $dataresponse->description == "OK"){
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 200;
+        }else{
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }
+    }
 }
 ?>
