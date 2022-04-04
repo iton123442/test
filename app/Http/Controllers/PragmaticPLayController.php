@@ -827,7 +827,8 @@ class PragmaticPLayController extends Controller
         $data = json_decode($json_encode);
 
         Helper::saveLog('PP bonus', $this->provider_id, json_encode($data) , "");
-
+        $playerId = ProviderHelper::explodeUsername('_',$data->userId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         // $game_trans = DB::table("game_transactions")->where("round_id","=",$data->roundId)->first();
         // $game_details = DB::table("games")->where("game_id","=",$game_trans->game_id)->first();
         if(isset($data->bonusCode)){
@@ -843,13 +844,22 @@ class PragmaticPLayController extends Controller
                 $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
                 //create transction 
                 $createFreeRoundTransaction = array(
-                    "game_trans_id" => $game_trans->game_trans_id,
+                    "game_trans_id" => $data->reference,
                     'freespin_id' => $getFreespin->freespin_id
                 );
                 FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+
+                $response = [
+                    "transactionId"  => $data->reference,
+                    "currency" => $client_details->default_currency,
+                    "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "bonus" => $data->amount,
+                    "error" => 0,
+                    "description" => "Success"
+                ];
+
+                return $response;
         }
-        $playerId = ProviderHelper::explodeUsername('_',$data->userId);
-        $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
 
         // $client = new Client([
         //     'headers' => [ 
@@ -857,7 +867,6 @@ class PragmaticPLayController extends Controller
         //         'Authorization' => 'Bearer '.$client_details->client_access_token
         //     ]
         // ]);
-        
     }
 
     public function promoWin(Request $request){
