@@ -24,7 +24,7 @@ class IDNPokerHelper{
             $guzzle_response = $client->post($url,[
                 'body' => '
                         <request>
-                            <secret_key>'.config('providerlinks.idnpoker.agent.JFPAA').'</secret_key>
+                            <secret_key>'.$auth.'</secret_key>
                             <id>10</id>
                             <userid>'.$player_id.'</userid>
                         </request>'
