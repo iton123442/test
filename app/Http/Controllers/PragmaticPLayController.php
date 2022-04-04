@@ -839,7 +839,7 @@ class PragmaticPLayController extends Controller
                 $updateFreespinData = [
                     "status" => $status,
                     "win" => $getFreespin->win + $data->amount,
-                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                    "spin_remaining" => $getFreespin->spin_remaining - $getFreespin->spin_remaining
                 ];
                 $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
                 //create transction 
