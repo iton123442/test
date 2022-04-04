@@ -857,7 +857,7 @@ class PragmaticPLayController extends Controller
                     "error" => 0,
                     "description" => "Success"
                 ];
-
+                Helper::saveLog('PP bonus', $this->provider_id, json_encode($data) , $response);
                 return $response;
         }
 
