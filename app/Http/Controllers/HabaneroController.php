@@ -1069,8 +1069,8 @@ class HabaneroController extends Controller
             "game_id" => $game_details->game_id,
             "round_id" => $round_id,
             "bet_amount" => 0,
-            "win" => 5,
-            "pay_amount" => 0,
+            "win" => 1,
+            "pay_amount" => $data->amount,
             "income" => 0,
             "entry_id" =>1,
             "trans_status" =>1,
@@ -1081,7 +1081,7 @@ class HabaneroController extends Controller
             "provider_trans_id" => $data->transferid,
             "round_id" => $round_id,
             "amount" => $data->amount,
-            "game_transaction_type"=> 1,
+            "game_transaction_type"=> 2,
             "provider_request" =>json_encode($details),
         );
         $game_trans_ext = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
@@ -1105,7 +1105,7 @@ class HabaneroController extends Controller
                         "mw_request"=>json_encode($client_response->requestoclient),
                         "client_response" =>json_encode($client_response->fundtransferresponse),
                         "transaction_detail" =>json_encode("success"),
-                        "general_details" =>json_encode("success"),
+                        "general_details" =>json_encode("FREE BONUS"),
                     );
                     GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
                     $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
