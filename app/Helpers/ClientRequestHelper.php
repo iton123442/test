@@ -145,7 +145,7 @@ class ClientRequestHelper{
                     "fundtransferresponse" => array(
                         "status" => array(
                             "code" => 402,
-                            "status" => "FAILED",
+                            "status" => "TIME_OUT",
                             "message" => $e->getMessage().' '.$e->getLine(),
                         ),
                         'balance' => 0.0

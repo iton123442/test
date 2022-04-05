@@ -153,7 +153,11 @@ class SimplePlayController extends Controller
 
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
 
-                $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name,
+                    'sub_provider_id' => 67
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 
                 if (isset($client_response->fundtransferresponse->status->code)) {
                     $response = '<?xml version="1.0" encoding="utf-8"?>';

@@ -140,7 +140,11 @@ class HabaneroController extends Controller
                 }
             
                 if($details->fundtransferrequest->isrecredit == true){
-                    return $this->reCredit($details,$data,$client_details->player_token,$game_details,$round_id);
+                    if(isset($details->fundtransferrequest->bonusdetails) && $data->isbonus == true){
+                        return $this->creditBonus($details,$data,$client_details->player_token,$game_details,$round_id);
+                    }else{
+                        return $this->reCredit($details,$data,$client_details->player_token,$game_details,$round_id);
+                    }
                 }
             }
             
@@ -1039,6 +1043,159 @@ class HabaneroController extends Controller
         return $response;
     }
 
+    public function creditBonus($details,$data,$token,$game_details,$round_id){
+
+        AWSHelper::saveLog("Habanero Request CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"CreditBonus");
+        $client_details = Providerhelper::getClientDetails('token', $token);
+        $findGameTransactionDetails = GameTransactionMDB::findGameTransactionDetails($data->transferid,'transaction_id',false,$client_details);
+        if($findGameTransactionDetails != 'false' ){
+            $response = [
+                "fundtransferresponse" => [
+                    "status" => [
+                        "success" => true,
+                        "successdebit" => true,
+                        "successcredit" => true
+                    ],
+                    "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "currencycode" => $client_details->default_currency,
+                    ]
+            ];
+            Helper::saveLog('HBN trans duplicate', 24, json_encode($details), $response);
+            return $response;
+        }
+        $gameTransactionData = array(
+            "provider_trans_id" => $data->transferid,
+            "token_id" => $client_details->token_id,
+            "game_id" => $game_details->game_id,
+            "round_id" => $round_id,
+            "bet_amount" => 0,
+            "win" => 1,
+            "pay_amount" => $data->amount,
+            "income" => 0,
+            "entry_id" =>1,
+            "trans_status" =>1,
+        );
+        $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+        $gameTransactionEXTData = array(
+            "game_trans_id" => $gamerecord,
+            "provider_trans_id" => $data->transferid,
+            "round_id" => $round_id,
+            "amount" => $data->amount,
+            "game_transaction_type"=> 2,
+            "provider_request" =>json_encode($details),
+        );
+        $game_trans_ext = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        try{
+            $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext, $gamerecord, 'credit');
+            if(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "200"){
+                    $response = [
+                        "fundtransferresponse" => [
+                            "status" => [
+                                "success" => true,
+                                "successdebit" => true,
+                                "successcredit" => true
+                            ],
+                            "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')), #old_method
+                            "currencycode" => $client_details->default_currency,
+                        ]
+                    ];
+                    $update_gametransactionext = array(
+                        "mw_response" =>json_encode($response),
+                        "mw_request"=>json_encode($client_response->requestoclient),
+                        "client_response" =>json_encode($client_response->fundtransferresponse),
+                        "transaction_detail" =>json_encode("success"),
+                        "general_details" =>json_encode("FREE BONUS"),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
+                    $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
+                    AWSHelper::saveLog("Habanero Response CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$response);
+            }elseif(isset($client_response->fundtransferresponse->status->code) 
+                && $client_response->fundtransferresponse->status->code == "402"){
+                    $response = [
+                        "fundtransferresponse" => [
+                            "status" => [
+                                "success" => false,
+                                "nofunds" => true,
+                            ],
+                            "balance" => $client_details->balance,
+                            "currencycode" => $client_details->default_currency
+                        ]
+                    ];
+                    Helper::saveLog('HBN trans balance not enough', 24, json_encode($data), $response);
+                    $update_gametransactionext = array(
+                        "mw_response" =>json_encode($response),
+                        "mw_request"=>json_encode($client_response->requestoclient),
+                        "client_response" =>json_encode($client_response->fundtransferresponse),
+                        "transaction_detail" =>json_encode("FAILED"),
+                        "general_details" =>json_encode("FAILED")
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
+                    $updateGameTransaction = [
+                        "win" => 2,
+                        'trans_status' => 5
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                    return $response;
+            }else{
+                $response = [
+                    "fundtransferresponse" => [
+                        "status" => [
+                            "success" => false,
+                            "nofunds" => true,
+                        ],
+                        "balance" => $client_details->balance,
+                        "currencycode" => $client_details->default_currency
+                    ]
+                ];
+                Helper::saveLog('HBN trans ERRRRR', 24, json_encode($data), $response);
+                $update_gametransactionext = array(
+                    "mw_response" =>json_encode($response),
+                    "mw_request"=>json_encode($client_response->requestoclient),
+                    "client_response" =>json_encode($client_response->fundtransferresponse),
+                    "transaction_detail" =>json_encode("FAILED"),
+                    "general_details" =>json_encode("FAILED")
+                );
+                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
+                $updateGameTransaction = [
+                    "win" => 2,
+                    'trans_status' => 5
+                ];
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                return $response;
+            }
+        }catch (\Exception $e) {
+            $msg = array("status" => 'error',"message" => $e->getMessage());
+            $response = [
+                "fundtransferresponse" => [
+                    "status" => [
+                        "success" => false,
+                        "nofunds" => true,
+                    ],
+                    "balance" => $client_details->balance,
+                    "currencycode" => $client_details->default_currency
+                ]
+            ];
+            $update_gametransactionext = array(
+                "mw_response" =>json_encode($response),
+                "mw_request"=>$msg,
+                "client_response" =>$msg,
+                "transaction_detail" =>json_encode("FAILED"),
+                "general_details" =>json_encode("FAILED")
+            );
+            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
+            $updateGameTransaction = [
+                "win" => 2,
+                'trans_status' => 5
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+            Helper::saveLog('habanero CreditBonus Err', $this->provider_id, json_encode($data), Helper::datesent());
+            return $response;
+        }
+        return $response;
+    }
+
+    
     public function queryrequest(Request $request){
         $data = file_get_contents("php://input");
         $details = json_decode($data);
