@@ -1047,6 +1047,22 @@ class HabaneroController extends Controller
 
         AWSHelper::saveLog("Habanero Request CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"CreditBonus");
         $client_details = Providerhelper::getClientDetails('token', $token);
+        $findGameTransactionDetails = GameTransactionMDB::findGameTransactionDetails($data->transferid,'transaction_id',false,$client_details);
+        if($findGameTransactionDetails != 'false' ){
+            $response = [
+                "fundtransferresponse" => [
+                    "status" => [
+                        "success" => true,
+                        "successdebit" => true,
+                        "successcredit" => true
+                    ],
+                    "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "currencycode" => $client_details->default_currency,
+                    ]
+            ];
+            Helper::saveLog('HBN trans duplicate', 24, json_encode($details), $response);
+            return $response;
+        }
         $gameTransactionData = array(
             "provider_trans_id" => $data->transferid,
             "token_id" => $client_details->token_id,
