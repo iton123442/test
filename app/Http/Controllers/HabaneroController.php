@@ -140,7 +140,7 @@ class HabaneroController extends Controller
                 }
             
                 if($details->fundtransferrequest->isrecredit == true){
-                    if(isset($data->isbonus) && $data->isbonus == true){
+                    if(isset($details->fundtransferrequest->bonusdetails) && $data->isbonus == true){
                         return $this->creditBonus($details,$data,$client_details->player_token,$game_details,$round_id);
                     }else{
                         return $this->reCredit($details,$data,$client_details->player_token,$game_details,$round_id);
