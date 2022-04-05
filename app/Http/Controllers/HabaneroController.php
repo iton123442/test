@@ -141,7 +141,7 @@ class HabaneroController extends Controller
             
                 if($details->fundtransferrequest->isrecredit == true){
                     if(isset($data->isbonus)){
-                        return $this->reCreditBonus($details,$data,$client_details->player_token,$game_details,$round_id);
+                        return $this->creditBonus($details,$data,$client_details->player_token,$game_details,$round_id);
                     }else{
                         return $this->reCredit($details,$data,$client_details->player_token,$game_details,$round_id);
                     }
@@ -1043,7 +1043,7 @@ class HabaneroController extends Controller
         return $response;
     }
 
-    public function CreditBonus($details,$data,$token,$game_details,$round_id){
+    public function creditBonus($details,$data,$token,$game_details,$round_id){
 
         AWSHelper::saveLog("Habanero Request CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"CreditBonus");
         $client_details = Providerhelper::getClientDetails('token', $token);
