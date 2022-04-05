@@ -1606,6 +1606,7 @@ class FreeSpinHelper{
          }
         
     }
+
     public static function createFreeSpinKA($player_details,$data, $sub_provder_id,$freeround_id){
         // dd($data);
         Helper::saveLog('KAGa Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
@@ -1916,5 +1917,127 @@ class FreeSpinHelper{
             return 400;
         }
     }
+
+   
+    public static function createFreeRoundHabanero($player_details,$data, $sub_provder_id,$freeround_id){
+        // dd($data);
+        Helper::saveLog('HabaneroGaming Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
+        try{
+            $insertFreespin = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+                "provider_trans_id" => $freeround_id,
+            ];
+        }catch(\Exception $e){
+            return 400;
+        }
+
+        $id = FreeSpinHelper::createFreeRound($insertFreespin);
+        
+         $requesttosend = [
+            "BrandId" => config("providerlinks.habanero.brandID"),
+            "APIKey" => config("providerlinks.habanero.apiKey"),
+            "ReplaceActiveCoupon" => true,
+            "CouponTypeId" => 5,
+            "DtStartUTC" => $data["details"]["start_date"],
+            "DtEndUTC" => $data["details"]["expiration_date"],
+            "ExpireAfterDays" => 3,
+            "MaxRedemptionsPerPlayer" => 10,
+            "MaxRedemptionsForBrand" => 1000,
+            "MaxRedemptionIntervalId" => 0,
+            "WagerMultiplierRequirement" => 0,
+            "MaxConversionToRealMultiplier" => 0,
+            "NumberOfFreeSpins" => $data['details']['rounds'],
+            "GameKeyNames" => [$data["game_code"]],
+            "couponCurrencyData" =>[
+                    [
+                        "CurrencyCode" => "USD",
+                        "CoinPosition" => 0
+                    ],
+                    [
+                        "CurrencyCode" => "CNY",
+                        "CoinPosition" => 2 
+                    ]
+                ],
+
+            "QueueUnregisteredPlayers" => true,
+            "CreatePlayerIfNotExist" => true,
+            "Players" => array([
+                "Username" => $player_details->player_id,
+                "CurrencyCode" => $player_details->default_currency
+            ])
+        ];
+        $actionUrl = "https://ws-test.insvr.com/jsonapi/createandapplybonusmulti";
+
+        $client = new Client([
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ]
+        ]);
+
+        try{
+            $guzzle_response = $client->post($actionUrl,['body' => json_encode($requesttosend)]);
+        $dataresponse = json_decode($guzzle_response->getBody()->getContents());
+
+        }catch(\Exception $e) {
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreespinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExt = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreespinHelper::createFreeRoundExtenstion($freespinExt);
+            return 400;
+        }
+        if($dataresponse->Created == false){
+            Helper::saveLog('HabaneroGaming Freespin Failed',47, json_encode($freeround_id), $dataresponse);
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }
+        else {      
+            $data = [
+                "provider_trans_id" => json_encode($dataresponse->Players->BonusBalanceId),
+                "details" => json_encode($dataresponse->CouponCodeCreated)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];  
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            Helper::saveLog('HabaneroGaming Freespin Success',47, json_encode($freeround_id), $dataresponse);  
+            return 200;
+        }
+    }
+
+    
 }
 ?>
+ 
