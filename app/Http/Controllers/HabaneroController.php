@@ -1176,6 +1176,7 @@ class HabaneroController extends Controller
             Helper::saveLog('habanero CreditBonus Err', $this->provider_id, json_encode($data), Helper::datesent());
             return $response;
         }
+        return $response;
     }
 
     
