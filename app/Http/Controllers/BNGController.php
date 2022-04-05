@@ -207,7 +207,7 @@ class BNGController extends Controller
                                 "provider_id" => $this->prefix,
                             );
                             GameTransaction::createFailedTransaction($failedData);
-                            return response($response,200)->header('Content-Type', 'application/json');
+                            return response($response,503)->header('Content-Type', 'application/json');
                         }
                     }
                     // gameTransactionExtChecker ins empty or null then we will consider it as failed on the  provider side and reafund the client side
@@ -230,7 +230,7 @@ class BNGController extends Controller
                             "provider_id" => $this->prefix,
                         );
                         GameTransaction::createFailedTransaction($failedData);
-                        return response($response,200)->header('Content-Type', 'application/json');
+                        return response($response,503)->header('Content-Type', 'application/json');
                     }
                 }else{
                     ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($client_details),"ELSE");
@@ -252,7 +252,7 @@ class BNGController extends Controller
                         "provider_id" => $this->prefix,
                     );
                     GameTransaction::createFailedTransaction($failedData);
-                    return response($response,200)->header('Content-Type', 'application/json');
+                    return response($response,503)->header('Content-Type', 'application/json');
                 } 
             }elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
                 $failedData = array(
@@ -289,7 +289,7 @@ class BNGController extends Controller
                     "provider_id" => $this->prefix,
                 );
                 GameTransaction::createFailedTransaction($failedData);
-                return response($response,200)->header('Content-Type', 'application/json'); 
+                return response($response,503)->header('Content-Type', 'application/json'); 
             }  
         }
             //$client_details = ProviderHelper::getClientDetails('token', $data["token"]);
