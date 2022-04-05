@@ -483,7 +483,7 @@ class BNGController extends Controller
                 Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
             }
             // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
-            return response($response,200)
+            return response($response,503)
                         ->header('Content-Type', 'application/json');
         }
         
