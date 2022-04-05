@@ -29,7 +29,6 @@ class BNGController extends Controller
         }
         elseif($data["name"]== "transaction"){
             $data = $this->_transaction($data,$client_details);
-            sleep(20);
             $invokeEnd = microtime(true) - $invokeStart;
             Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "indexTransaction" ,"Time" => $invokeEnd]), "");
             return $data;
