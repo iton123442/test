@@ -1934,7 +1934,8 @@ class FreeSpinHelper{
                 "spin_remaining" => $data["details"]["rounds"],
                 "denominations" => $data["details"]["denomination"],
                 "date_expire" => $data["details"]["expiration_date"],
-                "provider_trans_id" => $freeround_id,
+                "date_start" => $data["details"]["start_date"],
+                "provider_trans_id" => $freeround_id
             ];
         }catch(\Exception $e){
             return 400;
@@ -1956,7 +1957,9 @@ class FreeSpinHelper{
             "WagerMultiplierRequirement" => 0,
             "MaxConversionToRealMultiplier" => 0,
             "NumberOfFreeSpins" => $data['details']['rounds'],
-            "GameKeyNames" => [$data["game_code"]],
+            "GameKeyNames" => [
+                $data["game_code"]
+            ],
             "couponCurrencyData" =>[
                     [
                         "CurrencyCode" => "USD",
@@ -1986,7 +1989,6 @@ class FreeSpinHelper{
         try{
             $guzzle_response = $client->post($actionUrl,['body' => json_encode($requesttosend)]);
         $dataresponse = json_decode($guzzle_response->getBody()->getContents());
-
         }catch(\Exception $e) {
             $createFreeround = [
                 "status" => 3,
@@ -2020,7 +2022,8 @@ class FreeSpinHelper{
         }
         else {      
             $data = [
-                "provider_trans_id" => json_encode($dataresponse->Players->BonusBalanceId),
+                "provider_trans_id" => $dataresponse->Players[0]->BonusBalanceId,
+                "denominations" => $dataresponse->Players[0]->BonusValue,
                 "details" => json_encode($dataresponse->CouponCodeCreated)
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
