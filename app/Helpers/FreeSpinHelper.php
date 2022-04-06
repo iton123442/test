@@ -1835,7 +1835,7 @@ class FreeSpinHelper{
         }
 
     }
-    public static function createFreeSpinPragmaticPlay($player_details,$data, $sub_provder_id,$freeround_id){
+    public static function createFreeRoundPragmaticPlay($player_details,$data, $sub_provder_id,$freeround_id){
         // dd($data);
         Helper::saveLog('PragmaticPlay Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
