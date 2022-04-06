@@ -713,7 +713,7 @@ class HabaneroController extends Controller
       
     }
     public function newCredit($data,$token,$gamerecord,$game_details,$round_id){
-        AWSHelper::saveLog("Habanero Request New WIN", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"Recieved");
+        AWSHelper::saveLog("Habanero Request New WIN", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$gamerecord);
         $client_details = Providerhelper::getClientDetails('token', $token);
         $checkDuplicateCall = GameTransactionMDB::findGameExt($data->transferid,2,'transaction_id',$client_details);
         if($checkDuplicateCall != 'false'){
@@ -741,7 +741,7 @@ class HabaneroController extends Controller
             ]
         ];
         $create_gametransactionext = array(
-            "game_trans_id" =>$gamerecord->game_trans_id,
+            "game_trans_id" => $gamerecord->game_trans_id,
             "provider_trans_id" => $data->transferid,
             "round_id" => $round_id,
             "amount" => abs($data->amount),
