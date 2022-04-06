@@ -101,7 +101,7 @@ class HabaneroController extends Controller
         if(isset($details->fundtransferrequest->bonusdetails)) {
             $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
             $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
-            Helper::saveLog('Habanero FreeRound', $this->provider_db_id, json_encode($details),$freeroundID);
+            Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),$freeroundID);
             if($getFreespin){
                 $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID;
                 $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
