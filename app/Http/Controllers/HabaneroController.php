@@ -10,6 +10,7 @@ use App\Helpers\Helper;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Client;
 use App\Helpers\AWSHelper;
+use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 
 class HabaneroController extends Controller
@@ -96,7 +97,34 @@ class HabaneroController extends Controller
         AWSHelper::saveLog("Habanero Request", $this->provider_id, json_encode($details,JSON_FORCE_OBJECT),"Recieved");
         $client_details = Providerhelper::getClientDetails('token', $details->fundtransferrequest->token);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $details->basegame->keyname);
-       
+        $game_trans_details = GameTransactionMDB::findGameTransactionDetails($details->fundtransferrequest->funds->fundinfo->transferid,'transaction_id',false,$client_details);
+        if(isset($details->bonusdetails)) {
+            $freeroundID = $details->bonusdetails->bonusbalanceid;
+            $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+            Helper::saveLog('Habanero FreeRound', $this->provider_db_id, json_encode($details),$freeroundID);
+            if($getFreespin){
+                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID;
+                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                $updateFreespinData = [
+                    "status" => $status,
+                    "win" => $getFreespin->win + $details->fundtransferrequest->funds->fundinfo->amount,
+                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                ];
+                $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                if($status == 2 ){
+                    $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                } else {
+                    $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                }
+                //create transction 
+                $createFreeRoundTransaction = array(
+                    "game_trans_id" => $game_trans_details->game_trans_id,
+                    'freespin_id' => $getFreespin->freespin_id
+                );
+                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+            }
+        }
+
         $checktoken = $this->sessionExpire($client_details->player_token);
         if($details->auth->passkey != $this->passkey){
             $response = [
@@ -746,6 +774,7 @@ class HabaneroController extends Controller
                 "mw_response" => $response,
             ]
         ];
+        
         $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $gamerecord->game_trans_id, 'credit', false, $action_payload);
         $updateGameTransaction = [
             'win' => $win,
