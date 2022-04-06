@@ -12,9 +12,9 @@ use DB;
 class CancelFreeRoundController extends Controller
 {
     
-    public function __construct(){
-        $this->middleware('oauth', ['except' => ['index']]);
-    }
+    // public function __construct(){
+    //     $this->middleware('oauth', ['except' => ['index']]);
+    // }
     public function cancelfreeRoundController(Request $request){
         if( !$request->has('client_id') || !$request->has('freeround_id') ){
             $mw_response = ["error_code" => "404","error_description" => "Missing Paramater!"];
@@ -76,6 +76,8 @@ class CancelFreeRoundController extends Controller
                         return FreeSpinHelper::cancelFreeSpinSpearHead($freeround_id);
                     } elseif($game_details->sub_provider_id == 75) {
                         return FreeSpinHelper::cancelFreeSpinKA($freeround_id);
+                    } elseif($game_details->sub_provider_id == 49) {
+                        return FreeSpinHelper::cancelFreeSpinPP($freeround_id);
                     }
                     
                 }  

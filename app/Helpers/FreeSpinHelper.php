@@ -1916,5 +1916,35 @@ class FreeSpinHelper{
             return 400;
         }
     }
+    public static function cancelFreeSpinPP($freeround_id){
+        Helper::saveLog('PragmaticPlay CancelFreeRound',49, json_encode($freeround_id), 'Cancel FreeRound HIT!');
+        $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+        $hash = md5("bonusCode=".$freeround_id."&secureLogin=".config("providerlinks.tpp.secureLogin")."".config("providerlinks.tpp.secret_key"));
+        $requesttosend = [
+            "secureLogin" => config("providerlinks.tpp.secureLogin"),
+            "bonusCode" => $freeround_id,
+            "hash" => $hash
+        ];
+        $client = new Client();
+        try {
+            $response = $client->post("https://api.prerelease-env.biz/IntegrationService/v3/http/FreeRoundsBonusAPI/cancelFRB/",[
+            'form_params' => $requesttosend,
+            ]);
+            $dataresponse = json_decode($response->getBody()->getContents());
+            return 200;
+        } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            $data = [
+                "status" => 3,
+                "details" => json_encode($msg)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
+    }
 }
 ?>
