@@ -99,7 +99,7 @@ class HabaneroController extends Controller
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $details->basegame->keyname);
         $game_trans_details = GameTransactionMDB::findGameTransactionDetails($details->fundtransferrequest->funds->fundinfo[0]->transferid,'transaction_id',false,$client_details);
         if(isset($details->fundtransferrequest->bonusdetails)) {
-            $freeroundID = $details->bonusdetails->bonusbalanceid;
+            $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
             $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
             Helper::saveLog('Habanero FreeRound', $this->provider_db_id, json_encode($details),$freeroundID);
             if($getFreespin){
@@ -257,6 +257,7 @@ class HabaneroController extends Controller
             "trans_status" =>1,
         );
         $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+        AWSHelper::saveLog("Habanero Request TEST", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$gameTransactionData);
         foreach($data as $item){
             if($item->gamestatemode == 1){
                 $bet = $item;
