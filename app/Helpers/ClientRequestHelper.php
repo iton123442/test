@@ -155,32 +155,41 @@ class ClientRequestHelper{
                 // Add Refund Queue
                 if($type == 'debit'){
                     // $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);   
-                    $game_trans_ext_data = GameTransactionMDB::findGameExt($transactionId, 1,'game_transaction_ext_id', $client_details);   
-                    if($game_trans_ext_data == 'false'){
-                        $gameTransactionEXTRefundData = array(
-                                "game_trans_id" => $roundId,
-                                "provider_trans_id" => $transactionId,
-                                "round_id" => $roundId,
-                                "amount" => $amount,
-                                "game_transaction_type"=> 3, // refund change
-                                "provider_request" =>json_encode($requesttocient),
-                                "mw_response" => json_encode(['retry' => 'jobs']),
-                        );
-                        $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
-                    }else{
-                        $gameTransactionEXTRefundData = array(
-                                "game_trans_id" => $roundId,
-                                "provider_trans_id" => $game_trans_ext_data->provider_trans_id,
-                                "round_id" => $game_trans_ext_data->round_id,
-                                "amount" => $amount,
-                                "game_transaction_type"=> 3, // refund change
-                                "provider_request" =>json_encode($requesttocient),
-                                "mw_response" => json_encode(['retry' => 'jobs']),
-                        );
-                        $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
+                    $exclude_provider = ["IDNPoker"];
+                    $bol = true;
+                    if(isset($action['provider_name'])){
+                        if (in_array($action["provider_name"], $exclude_provider)) {
+                            $bol =  false;
+                        }
                     }
-                    $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
-                    Queue::push(new DebitRefund($debitRefund));
+                    if ($bol) {
+                        $game_trans_ext_data = GameTransactionMDB::findGameExt($transactionId, 1,'game_transaction_ext_id', $client_details);   
+                        if($game_trans_ext_data == 'false'){
+                            $gameTransactionEXTRefundData = array(
+                                    "game_trans_id" => $roundId,
+                                    "provider_trans_id" => $transactionId,
+                                    "round_id" => $roundId,
+                                    "amount" => $amount,
+                                    "game_transaction_type"=> 3, // refund change
+                                    "provider_request" =>json_encode($requesttocient),
+                                    "mw_response" => json_encode(['retry' => 'jobs']),
+                            );
+                            $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
+                        }else{
+                            $gameTransactionEXTRefundData = array(
+                                    "game_trans_id" => $roundId,
+                                    "provider_trans_id" => $game_trans_ext_data->provider_trans_id,
+                                    "round_id" => $game_trans_ext_data->round_id,
+                                    "amount" => $amount,
+                                    "game_transaction_type"=> 3, // refund change
+                                    "provider_request" =>json_encode($requesttocient),
+                                    "mw_response" => json_encode(['retry' => 'jobs']),
+                            );
+                            $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
+                        }
+                        $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
+                        Queue::push(new DebitRefund($debitRefund));
+                    }
                 }
 
                 try{
