@@ -98,7 +98,7 @@ class HabaneroController extends Controller
         $client_details = Providerhelper::getClientDetails('token', $details->fundtransferrequest->token);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $details->basegame->keyname);
         $game_trans_details = GameTransactionMDB::findGameTransactionDetails($details->fundtransferrequest->funds->fundinfo[0]->transferid,'transaction_id',false,$client_details);
-        if(isset($details->bonusdetails)) {
+        if(isset($details->fundtransferrequest->bonusdetails)) {
             $freeroundID = $details->bonusdetails->bonusbalanceid;
             $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
             Helper::saveLog('Habanero FreeRound', $this->provider_db_id, json_encode($details),$freeroundID);
