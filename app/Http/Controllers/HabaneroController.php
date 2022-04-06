@@ -97,7 +97,7 @@ class HabaneroController extends Controller
         AWSHelper::saveLog("Habanero Request", $this->provider_id, json_encode($details,JSON_FORCE_OBJECT),"Recieved");
         $client_details = Providerhelper::getClientDetails('token', $details->fundtransferrequest->token);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $details->basegame->keyname);
-        $game_trans_details = GameTransactionMDB::findGameTransactionDetails($details->fundtransferrequest->funds->fundinfo->transferid,'transaction_id',false,$client_details);
+        $game_trans_details = GameTransactionMDB::findGameTransactionDetails($details->fundtransferrequest->funds->fundinfo[0]->transferid,'transaction_id',false,$client_details);
         if(isset($details->bonusdetails)) {
             $freeroundID = $details->bonusdetails->bonusbalanceid;
             $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
@@ -107,7 +107,7 @@ class HabaneroController extends Controller
                 $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
                 $updateFreespinData = [
                     "status" => $status,
-                    "win" => $getFreespin->win + $details->fundtransferrequest->funds->fundinfo->amount,
+                    "win" => $getFreespin->win + $details->fundtransferrequest->funds->fundinfo[0]->amount,
                     "spin_remaining" => $getFreespin->spin_remaining - 1
                 ];
                 $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
