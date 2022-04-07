@@ -17,9 +17,9 @@ class YGGController extends Controller
     public $org;
 
     public function __construct(){
-        $this->provider_id = config("providerlinks.ygg.provider_id");
-        $this->org = config("providerlinks.ygg.Org");
-        $this->topOrg = config("providerlinks.ygg.topOrg");
+        $this->provider_id = config("providerlinks.ygg002.provider_id");
+        $this->org = config("providerlinks.ygg002.Org");
+        $this->topOrg = config("providerlinks.ygg002.topOrg");
     }
 
     public function playerinfo(Request $request)
