@@ -699,6 +699,7 @@ class IDNPokerController extends Controller
                                 $idn_transaciton = [
                                     "game_trans_id" => $game_trans_id,
                                     "transaction_no" => $value["transaction_no"],
+                                    "userid" => $value["userid"],
                                     "tableno" => $value["tableno"],
                                     "date" => $value["date"],
                                     "game" => $value["game"],
