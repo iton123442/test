@@ -245,6 +245,20 @@ class YGG002Controller extends Controller
 
         if($checkTrans != 'false'){
             $game_details = Helper::findGameDetails('game_id', $this->provider_id, $checkTrans->game_id);
+            $checktTran = GameTransactionMDB::findGameExt($request->subreference,3,'transaction_id',$client_details);
+            if($checktTran != 'false'){
+                $response = array(
+                    "code" => 0,
+                    "data" => array(
+                        "playerId" => "TGaming_".$client_details->player_id,
+                        "organization" => $this->org,
+                        "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                        "currency" => $client_details->default_currency,
+                    )
+                );
+                Helper::saveLog('YGG 002 cancelwager duplicate call', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return $response;
+            }
             $checktTransExt = GameTransactionMDB::findGameExt($round_id,3,'round_id',$client_details);
             if($checktTransExt != 'false'){
                 $response = array(
@@ -413,7 +427,7 @@ class YGG002Controller extends Controller
                 );
                 GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
                 $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $client_response->fundtransferresponse->balance]);
-                Helper::saveLog('YGG 002 wager', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                Helper::saveLog('YGG 002 wager response', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }elseif(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402"){
