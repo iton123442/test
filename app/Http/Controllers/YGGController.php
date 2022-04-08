@@ -399,7 +399,7 @@ class YGGController extends Controller
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $round_id,
                 "amount" => $bonusamount,
-                "game_transaction_type"=> 1,
+                "game_transaction_type"=> 2,
                 "provider_request" =>json_encode($request->all()),
             );
             $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);

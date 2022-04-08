@@ -145,8 +145,6 @@ class HabaneroController extends Controller
             
             if(isset($details->fundtransferrequest->bonusdetails) && $data->isbonus == true){
                 return $this->creditBonus($details,$data,$client_details->player_token,$game_details,$round_id);
-            }else{
-                return $this->reCredit($details,$data,$client_details->player_token,$game_details,$round_id);
             }
             $findGameTransactionDetails = GameTransactionMDB::findGameTransactionDetails($data->transferid,'transaction_id',false,$client_details);
             if($details->fundtransferrequest->funds->debitandcredit == true){
@@ -1154,6 +1152,19 @@ class HabaneroController extends Controller
                                 'freespin_id' => $getFreespin->freespin_id
                             );
                             FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                            $response = [
+                                "fundtransferresponse" => [
+                                    "status" => [
+                                        "success" => true,
+                                        "successdebit" => true,
+                                        "successcredit" => true
+                                    ],
+                                    "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')), #old_method
+                                    "currencycode" => $client_details->default_currency,
+                                ]
+                            ];
+                            
+                            Helper::saveLog('Habanero FreeRound1', $this->provider_id, json_encode($details),$response);
                         }
                     }
             }elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -1211,6 +1222,7 @@ class HabaneroController extends Controller
                 return $response;
             }
         }catch (\Exception $e) {
+            Helper::saveLog('habanero CreditBonus Err1', $this->provider_id, json_encode($data), Helper::datesent());
             $msg = array("status" => 'error',"message" => $e->getMessage());
             $response = [
                 "fundtransferresponse" => [
@@ -1222,6 +1234,7 @@ class HabaneroController extends Controller
                     "currencycode" => $client_details->default_currency
                 ]
             ];
+            Helper::saveLog('habanero CreditBonus Err2', $this->provider_id, json_encode($data), Helper::datesent());
             $update_gametransactionext = array(
                 "mw_response" =>json_encode($response),
                 "mw_request"=>$msg,
@@ -1229,13 +1242,14 @@ class HabaneroController extends Controller
                 "transaction_detail" =>json_encode("FAILED"),
                 "general_details" =>json_encode("FAILED")
             );
+            Helper::saveLog('habanero CreditBonus Err3', $this->provider_id, json_encode($data), Helper::datesent());
             GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
             $updateGameTransaction = [
                 "win" => 2,
                 'trans_status' => 5
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
-            Helper::saveLog('habanero CreditBonus Err', $this->provider_id, json_encode($data), Helper::datesent());
+            Helper::saveLog('habanero CreditBonus Err4', $this->provider_id, json_encode($data), Helper::datesent());
             return $response;
         }
         return $response;
