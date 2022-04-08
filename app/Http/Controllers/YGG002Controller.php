@@ -156,7 +156,7 @@ class YGG002Controller extends Controller
                     "general_details" =>json_encode("success"),
                 );
                 GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
-                $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $client_response->fundtransferresponse->balance]);
+                ProviderHelper::_insertOrUpdate($tokenId, $client_response->fundtransferresponse->balance);
                 Helper::saveLog('YGG 002 wager', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -308,8 +308,9 @@ class YGG002Controller extends Controller
                 'trans_status' => 2
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
+            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
             return $response;
-            
+
         }else{
             $response = array(
                 "code" => 0,
