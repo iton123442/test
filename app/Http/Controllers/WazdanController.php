@@ -114,6 +114,7 @@ class WazdanController extends Controller
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('getStake(Wazdan)', 33, $data, "Initialize");
+        // dd($datadecoded["user"]["token"]);
         if($datadecoded["user"]["token"]){    
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
@@ -468,7 +469,7 @@ class WazdanController extends Controller
                     "income" =>$game->income - round($datadecoded["amount"],2),
                     "entry_id" =>round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
                 );
-                // $game_transactionid = GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
+                $game_transactionid = GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
                 //$transactionId= WazdanHelper::createWazdanGameTransactionExt($gametransactionid,$datadecoded,null,null,null,2); 
                 $response = array(
                     "status" => 0,
