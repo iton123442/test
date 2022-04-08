@@ -309,6 +309,7 @@ class YGG002Controller extends Controller
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+            Helper::saveLog('YGG 002 cancelwager response', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
 
         }else{
