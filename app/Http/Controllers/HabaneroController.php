@@ -1234,15 +1234,15 @@ class HabaneroController extends Controller
                     "currencycode" => $client_details->default_currency
                 ]
             ];
-            Helper::saveLog('habanero CreditBonus Err2', $this->provider_id, json_encode($data), Helper::datesent());
+            Helper::saveLog('habanero CreditBonus Err2', $this->provider_id, json_encode($msg), Helper::datesent());
             $update_gametransactionext = array(
                 "mw_response" =>json_encode($response),
-                "mw_request"=>$msg,
-                "client_response" =>$msg,
+                "mw_request"=>json_encode($msg),
+                "client_response" =>json_encode($msg),
                 "transaction_detail" =>json_encode("FAILED"),
                 "general_details" =>json_encode("FAILED")
             );
-            Helper::saveLog('habanero CreditBonus Err3', $this->provider_id, json_encode($data), Helper::datesent());
+            Helper::saveLog('habanero CreditBonus Err3', $this->provider_id, $update_gametransactionext, $game_trans_ext);
             GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
             $updateGameTransaction = [
                 "win" => 2,
