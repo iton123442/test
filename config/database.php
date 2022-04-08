@@ -16,9 +16,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            // 'options'   => [
-            //     PDO::ATTR_EMULATE_PREPARES => true
-            // ],
+            'options'   => [
+                // PDO::ATTR_EMULATE_PREPARES => true
+                \PDO::ATTR_PERSISTENT => true
+            ],
          ],
          'server2' => [
             'driver'    => 'mysql',
@@ -31,9 +32,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            // 'options'   => [
-            //     PDO::ATTR_EMULATE_PREPARES => true
-            // ],
+            'options'   => [
+                // PDO::ATTR_EMULATE_PREPARES => true
+                \PDO::ATTR_PERSISTENT => true
+            ],
         ],
 
         'server3' => [
@@ -47,9 +49,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            // 'options'   => [
-            //     PDO::ATTR_EMULATE_PREPARES => true
-            // ],
+            'options'   => [
+                // PDO::ATTR_EMULATE_PREPARES => true
+                \PDO::ATTR_PERSISTENT => true
+            ],
         ],
         'savelog' => [
             'driver'    => 'mysql',
@@ -62,9 +65,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            // 'options'   => [
-            //     PDO::ATTR_EMULATE_PREPARES => true
-            // ],
+            'options'   => [
+                // PDO::ATTR_EMULATE_PREPARES => true
+                \PDO::ATTR_PERSISTENT => true
+            ],
         ],
     ],
 ];
