@@ -231,7 +231,6 @@ class YGG002Controller extends Controller
         Helper::saveLog("YGG 002 cancelwager req", $this->provider_id, json_encode($request->all()), "");
         $playerId = ProviderHelper::explodeUsername('_',$request->playerid);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
-        Helper::saveLog("YGG cancelwager request", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), "");
         if($client_details == null){ 
             $response = array(
                 "code" => 1000,
@@ -260,12 +259,13 @@ class YGG002Controller extends Controller
                 Helper::saveLog('YGG 002 cancelwager duplicate call', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }
+            $balance = $client_details->balance + $checkTrans->bet_amount;
             $response = array(
                 "code" => 0,
                 "data" => array(
                     "playerId" => "TGaming_".$client_details->player_id,
                     "organization" => $this->org,
-                    "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "balance" => floatval(number_format($balance, 2, '.', '')),
                     "currency" => $client_details->default_currency
                 )
             );
