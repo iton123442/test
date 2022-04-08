@@ -217,7 +217,7 @@ class HabaneroController extends Controller
                             }
                             //create transction 
                             $createFreeRoundTransaction = array(
-                                "game_trans_id" => $$trans->game_trans_id,
+                                "game_trans_id" => $trans->game_trans_id,
                                 'freespin_id' => $getFreespin->freespin_id
                             );
                             FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
