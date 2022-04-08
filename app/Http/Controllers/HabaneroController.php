@@ -1223,7 +1223,11 @@ class HabaneroController extends Controller
             }
         }catch (\Exception $e) {
             Helper::saveLog('habanero CreditBonus Err1', $this->provider_id, json_encode($data), Helper::datesent());
-            $msg = array("status" => 'error',"message" => $e->getMessage());
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
             $response = [
                 "fundtransferresponse" => [
                     "status" => [
