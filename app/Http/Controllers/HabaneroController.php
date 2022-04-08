@@ -170,36 +170,6 @@ class HabaneroController extends Controller
             }
             if($details->fundtransferrequest->funds->debitandcredit == false){
                 if($findGameTransactionDetails != 'false' ){
-                    
-                    if(isset($details->fundtransferrequest->bonusdetails)) {
-                        $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
-                        $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
-                        $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
-                        Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),$trans);
-                        if($getFreespin){
-                            $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID;
-                            $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-                            $updateFreespinData = [
-                                "status" => $status,
-                                "win" => $getFreespin->win + $details->fundtransferrequest->funds->fundinfo[0]->amount,
-                                "spin_remaining" => $getFreespin->spin_remaining - 1
-                            ];
-                            $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                            if($status == 2 ){
-                                $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
-                            } else {
-                                $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-                            }
-                            //create transction 
-                            $createFreeRoundTransaction = array(
-                                "game_trans_id" => $trans->game_trans_id,
-                                'freespin_id' => $getFreespin->freespin_id
-                            );
-                            FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-                        }
-                    }
-        
-                    
                     $response = [
                         "fundtransferresponse" => [
                             "status" => [
@@ -211,6 +181,35 @@ class HabaneroController extends Controller
                     ];
                     return $response;
                 }
+
+                if(isset($details->fundtransferrequest->bonusdetails)) {
+                    $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
+                    $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
+                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+                    Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),$trans);
+                    if($getFreespin){
+                        $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID;
+                        $status = 2;
+                        $updateFreespinData = [
+                            "status" => $status,
+                            "win" => $getFreespin->win + $details->fundtransferrequest->funds->fundinfo[0]->amount,
+                            "spin_remaining" => 0
+                        ];
+                        $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                        if($status == 2 ){
+                            $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                        } else {
+                            $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                        }
+                        //create transction 
+                        $createFreeRoundTransaction = array(
+                            "game_trans_id" => $trans->game_trans_id,
+                            'freespin_id' => $getFreespin->freespin_id
+                        );
+                        FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                    }
+                }
+        
                 if($data->gamestatemode == 1){
                     $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
                     if($trans != 'false'){
