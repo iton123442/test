@@ -561,7 +561,6 @@ class YGG002Controller extends Controller
                         "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                         "nickName" => $client_details->display_name,
                         "playerId" => "TGaming_".$client_details->player_id,
-                        "balik" => true
                     ),
                 );
                 Helper::saveLog("YGG 002 endwager(win) dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -643,10 +642,9 @@ class YGG002Controller extends Controller
                     "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                     "nickName" => $client_details->display_name,
                     "playerId" => "TGaming_".$client_details->player_id,
-                    "balik" => true
                 ),
             );
-            Helper::saveLog("YGG 002 endwager exist", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            Helper::saveLog("YGG 002 endwager not exist", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
         
