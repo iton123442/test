@@ -96,7 +96,11 @@ class IDNPokerHelper{
             if (isset($data["ip_address"])) {
                $IP = $data["ip_address"];
             }
-     
+            
+            $mobile = 1;
+            if (isset($data["device"])) {
+               $mobile = $data["device"] == 'desktop' ? 1 : 0;
+            }
             $client = new Client();
             $request = '
             <request>
@@ -106,7 +110,7 @@ class IDNPokerHelper{
                 <password>'.$player_id.'</password>
                 <ip>'.$IP.'</ip>
                 <secure>1</secure>
-                <mobile>1</mobile>
+                <mobile>'.$mobile.'</mobile>
                 <game>'.$data['game_code'].'</game>
                 <lang>'.$lang.'</lang>
             </request>';
@@ -120,7 +124,7 @@ class IDNPokerHelper{
                             <password>'.$player_id.'</password>
                             <ip>'.$IP.'</ip>
                             <secure>1</secure>
-                            <mobile>1</mobile>
+                            <mobile>'.$mobile.'</mobile>
                             <game>'.$data['game_code'].'</game>
                             <lang>'.$lang.'</lang>
                         </request>'
