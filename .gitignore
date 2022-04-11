@@ -4,3 +4,5 @@ Homestead.json
 Homestead.yaml
 composer.lock
 .env
+nohup.out
+

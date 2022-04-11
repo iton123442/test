@@ -695,6 +695,34 @@ class IDNPokerController extends Controller
                                     "win" => $win,
                                 ];
                                 $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $getClientDetails);
+
+                                $idn_transaciton = [
+                                    "game_trans_id" => $game_trans_id,
+                                    "transaction_no" => $value["transaction_no"],
+                                    "userid" => $value["userid"],
+                                    "tableno" => $value["tableno"],
+                                    "date" => $value["date"],
+                                    "game" => $value["game"],
+                                    "table" => $value["table"],
+                                    "periode" => $value["periode"],
+                                    "room" => $value["room"],
+                                    "bet" => $value["bet"],
+                                    "curr_bet" => $value["curr_bet"],
+                                    "status" => $value["status"],
+                                    "hand" => $value["hand"],
+                                    "card" => $value["card"],
+                                    "prize" => $value["prize"],
+                                    "curr" => $value["curr"],
+                                    "curr_player" => $value["curr_player"],
+                                    "amount" => $value["amount"],
+                                    "curr_amount" => $value["curr_amount"],
+                                    "total" => $value["total"],
+                                    "agent_comission" => $value["agent_comission"],
+                                    "agent_bill" => $value["agent_bill"],
+
+                                ];
+                                IDNPokerHelper::createIDNTransaction($idn_transaciton);
+
                                 $bet_game_transaction_ext = [
                                     "game_trans_id" => $game_trans_id,
                                     "provider_trans_id" => $value["transaction_no"],

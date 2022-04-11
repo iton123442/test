@@ -122,7 +122,6 @@ class HabaneroController extends Controller
             Helper::saveLog('HBN trans session', 24, json_encode($details), $response);
             return $response;
         }
-        
         $round_id = $details->fundtransferrequest->gameinstanceid;
         if(isset($details->fundtransferrequest->funds->debitandcredit)){
             $data = $details->fundtransferrequest->funds->fundinfo;
@@ -140,14 +139,13 @@ class HabaneroController extends Controller
                 }
             
                 if($details->fundtransferrequest->isrecredit == true){
-                    if(isset($details->fundtransferrequest->bonusdetails) && $data->isbonus == true){
-                        return $this->creditBonus($details,$data,$client_details->player_token,$game_details,$round_id);
-                    }else{
                         return $this->reCredit($details,$data,$client_details->player_token,$game_details,$round_id);
-                    }
                 }
             }
             
+            if(isset($details->fundtransferrequest->bonusdetails) && $data->isbonus == true){
+                return $this->creditBonus($details,$data,$client_details->player_token,$game_details,$round_id);
+            }
             $findGameTransactionDetails = GameTransactionMDB::findGameTransactionDetails($data->transferid,'transaction_id',false,$client_details);
             if($details->fundtransferrequest->funds->debitandcredit == true){
                 if($findGameTransactionDetails != 'false' ){
@@ -181,34 +179,6 @@ class HabaneroController extends Controller
                     ];
                     return $response;
                 }
-
-                if(isset($details->fundtransferrequest->bonusdetails)) {
-                    $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
-                    $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
-                    Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),$findGameTransactionDetails);
-                    if($getFreespin){
-                        $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID;
-                        $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-                        $updateFreespinData = [
-                            "status" => $status,
-                            "win" => $getFreespin->win + $details->fundtransferrequest->funds->fundinfo[0]->amount,
-                            "spin_remaining" => $getFreespin->spin_remaining - 1
-                        ];
-                        $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                        if($status == 2 ){
-                            $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
-                        } else {
-                            $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-                        }
-                        //create transction 
-                        $createFreeRoundTransaction = array(
-                            "game_trans_id" => $findGameTransactionDetails->game_trans_id,
-                            'freespin_id' => $getFreespin->freespin_id
-                        );
-                        FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-                    }
-                }
-        
                 if($data->gamestatemode == 1){
                     $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
                     if($trans != 'false'){
@@ -1076,7 +1046,23 @@ class HabaneroController extends Controller
     public function creditBonus($details,$data,$token,$game_details,$round_id){
 
         AWSHelper::saveLog("Habanero Request CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"CreditBonus");
+        $checkFreespin = DB::select("select * from freespin where provider_trans_id = '".$details->fundtransferrequest->bonusdetails->bonusbalanceid."';");
         $client_details = Providerhelper::getClientDetails('token', $token);
+        if(!count($checkFreespin) > 0){
+            $response = [
+                "fundtransferresponse" => [
+                    "status" => [
+                        "success" => true,
+                        "successdebit" => true,
+                        "successcredit" => true
+                    ],
+                    "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "currencycode" => $client_details->default_currency,
+                    ]
+            ];
+            Helper::saveLog('HBN trans FreeSpin not found', 24, json_encode($details), $response);
+            return $response;
+        }
         $findGameTransactionDetails = GameTransactionMDB::findGameTransactionDetails($data->transferid,'transaction_id',false,$client_details);
         if($findGameTransactionDetails != 'false' ){
             $response = [
@@ -1093,13 +1079,14 @@ class HabaneroController extends Controller
             Helper::saveLog('HBN trans duplicate', 24, json_encode($details), $response);
             return $response;
         }
+        $status = $data->amount == 0 ? 0 : 1;
         $gameTransactionData = array(
             "provider_trans_id" => $data->transferid,
             "token_id" => $client_details->token_id,
             "game_id" => $game_details->game_id,
             "round_id" => $round_id,
             "bet_amount" => 0,
-            "win" => 1,
+            "win" => $status,
             "pay_amount" => $data->amount,
             "income" => 0,
             "entry_id" =>1,
@@ -1140,6 +1127,33 @@ class HabaneroController extends Controller
                     GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext,$client_details);
                     $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $client_response->fundtransferresponse->balance]);
                     AWSHelper::saveLog("Habanero Response CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$response);
+
+                    if(isset($details->fundtransferrequest->bonusdetails)) {
+                        $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
+                        $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+                        Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),"FREEROUND HIT!");
+                        if($getFreespin){
+                            $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID;
+                            $status = 2;
+                            $updateFreespinData = [
+                                "status" => $status,
+                                "win" => $getFreespin->win + $details->fundtransferrequest->funds->fundinfo[0]->amount,
+                                "spin_remaining" => 0
+                            ];
+                            $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                            if($status == 2 ){
+                                $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                            } else {
+                                $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                            }
+                            //create transction 
+                            $createFreeRoundTransaction = array(
+                                "game_trans_id" => $gamerecord,
+                                'freespin_id' => $getFreespin->freespin_id
+                            );
+                            FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                        }
+                    }
             }elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
                     $response = [
@@ -1195,7 +1209,11 @@ class HabaneroController extends Controller
                 return $response;
             }
         }catch (\Exception $e) {
-            $msg = array("status" => 'error',"message" => $e->getMessage());
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
             $response = [
                 "fundtransferresponse" => [
                     "status" => [
@@ -1208,8 +1226,8 @@ class HabaneroController extends Controller
             ];
             $update_gametransactionext = array(
                 "mw_response" =>json_encode($response),
-                "mw_request"=>$msg,
-                "client_response" =>$msg,
+                "mw_request"=>json_encode($msg),
+                "client_response" =>json_encode($msg),
                 "transaction_detail" =>json_encode("FAILED"),
                 "general_details" =>json_encode("FAILED")
             );
@@ -1219,7 +1237,7 @@ class HabaneroController extends Controller
                 'trans_status' => 5
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
-            Helper::saveLog('habanero CreditBonus Err', $this->provider_id, json_encode($data), Helper::datesent());
+            Helper::saveLog('habanero CreditBonus Err', $this->provider_id, json_encode($data), json_encode($msg));
             return $response;
         }
         return $response;
