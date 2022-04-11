@@ -162,6 +162,7 @@ class ClientRequestHelper{
                             $bol =  false;
                         }
                     }
+
                     if ($bol) {
                         $game_trans_ext_data = GameTransactionMDB::findGameExt($transactionId, 1,'game_transaction_ext_id', $client_details);   
                         if($game_trans_ext_data == 'false'){
