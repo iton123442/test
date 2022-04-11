@@ -101,7 +101,10 @@ class OnlyPlayController extends Controller
                     "provider_request" =>json_encode($request->all()),
                     );
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$get_client_details);
-                $client_response = ClientRequestHelper::fundTransfer($get_client_details, $bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, 'debit');
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($get_client_details, $bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, 'debit', false, $fund_extra_data);
                 $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
                 $balance = str_replace(".","", $fundtransfer_bal);
                 $formatBalance = (int) $balance;
