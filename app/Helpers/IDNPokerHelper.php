@@ -332,4 +332,9 @@ class IDNPokerHelper{
     public static function updatePlayerRestricted($data,$idtw_player_restriction){
        return DB::table('tw_player_restriction')->where('idtw_player_restriction',$idtw_player_restriction)->update($data);
     }
+
+    public static function createIDNTransaction($data) {
+        $data_saved = DB::table('idn_transaction_list')->insertGetId($data);
+        return $data_saved;
+    }
 }
