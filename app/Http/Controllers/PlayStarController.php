@@ -107,11 +107,11 @@ class PlayStarController extends Controller
         try{
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
             $gameTransactionData = array(
-                        "provider_trans_id" => "",
-                        "token_id" => "",
-                        "game_id" => "",
-                        "round_id" => "",
-                        "bet_amount" => "",
+                        "provider_trans_id" => null,
+                        "token_id" => null,
+                        "game_id" => null,
+                        "round_id" => null,
+                        "bet_amount" => 0,
                         "win" => 5,
                         "pay_amount" => 0,
                         "income" => 0,
@@ -201,7 +201,7 @@ class PlayStarController extends Controller
                         "income" => 0,
                         "entry_id" => 1,
                     ); 
-                        GameTransactionMDB::updateGametransaction($gameTransactionData,$client_details,);
+                        GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transaction_id,$client_details,);
                         GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
 
 
