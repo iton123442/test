@@ -306,10 +306,6 @@ class PlayStarController extends Controller
                 $updateTransactionEXt = array(
                         "provider_request" =>json_encode($request->all()),
                         "mw_response" => json_encode($response),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'success',
-                        'general_details' => 'success',
                     );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
