@@ -137,7 +137,7 @@ class PlayStarController extends Controller
                 "provider_trans_id" => "",
                 "round_id" => "",
                 "amount" => "",
-                "game_transaction_type"=> 1,
+                "game_transaction_type"=>"",
                 "provider_request" =>"",
                 );
                 // $gameTransactionEXTData = array(
@@ -182,14 +182,7 @@ class PlayStarController extends Controller
                                 ];
                                 break;
                         }
-                    $gameTransactionEXTData = array(
-                                "game_trans_id" => $game_transaction_id,
-                                "provider_trans_id" => $data['ts'],
-                                "round_id" => $data['txn_id'],
-                                "amount" => $bet_amount,
-                                "game_transaction_type"=> 1,
-                                "provider_request" =>json_encode($request->all()),              
-                                );
+              
                     // $updateTransactionEXt = array(
                     //             "provider_request" =>json_encode($request->all()),
                     //             "mw_response" => json_encode($response),
@@ -209,8 +202,16 @@ class PlayStarController extends Controller
                         "income" => 0,
                         "entry_id" => 1,
                     ); 
-                        GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transaction_id,$client_details,);
-                        GameTransactionMDB::updateGametransactionEXT($gameTransactionEXTData,$game_trans_ext_id,$client_details);
+                    GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transaction_id,$client_details,);
+                        $gameTransactionEXTData = array(
+                            "game_trans_id" => $game_transaction_id,
+                            "provider_trans_id" => $data['ts'],
+                            "round_id" => $data['txn_id'],
+                            "amount" => $bet_amount,
+                            "game_transaction_type"=> 1,
+                            "provider_request" =>json_encode($request->all()),              
+                        );
+                    GameTransactionMDB::updateGametransactionEXT($gameTransactionEXTData,$game_trans_ext_id,$client_details);
 
 
                     }
