@@ -283,7 +283,7 @@ class PlayStarController extends Controller
                                     "entry_id" => $entry_id,
                                     "pay_amount" => $bet_amount,
                                     "income" => $income,
-                                    "game_trans_ext_id" => $game_trans_ext_id
+                                    "game_transaction_ext_id" => $game_trans_ext_id
                                 ],
                                 "provider" => [
                                     "provider_request" => $data, #R
