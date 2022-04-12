@@ -107,14 +107,7 @@ class PlayStarController extends Controller
         try{
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
            $game_transaction_id = GameTransactionMDB::createGametransactionV2($client_details);
-            $gameTransactionEXTData = array(
-                "game_trans_id" => "",
-                "provider_trans_id" => "",
-                "round_id" => "",
-                "amount" => "",
-                "game_transaction_type"=>"",
-                "provider_request" =>"",
-                );
+            $gameTransactionEXTData = null;
                 // $gameTransactionEXTData = array(
                 //     "game_trans_id" => $game_transaction_id,
                 //     "provider_trans_id" => $data['ts'],
