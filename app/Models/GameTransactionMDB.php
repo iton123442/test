@@ -218,6 +218,18 @@ class GameTransactionMDB
             return null;
         }
     }
+    public static function createGametransactionV2($client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        $data['operator_id'] = $client_details->operator_id;
+        $data['client_id'] = $client_details->client_id;
+        $data['player_id'] = $client_details->player_id;
+        if($connection != null){
+            Helper::saveLog('createGametransaction', 12, json_encode($connection), "createGametransaction");
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->insertGetId($data);
+        }else{
+            return null;
+        }
+    }
     public static function updateGametransaction($data,$game_transaction_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
@@ -227,6 +239,16 @@ class GameTransactionMDB
         }
     }
     public static function createGameTransactionExt($gametransactionext,$client_details){
+        Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode("Hit the createGameTransactionExt"), "");
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->insertGetId($gametransactionext);
+        }else{
+            Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode("error or null connection"), "");
+            return null;
+        }
+    }
+    public static function createGameTransactionExtV2($client_details){
         Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode("Hit the createGameTransactionExt"), "");
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
