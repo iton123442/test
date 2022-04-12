@@ -274,12 +274,10 @@ class PlayStarController extends Controller
                     );
 
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
-
                             $action_payload = [
                                 "type" => "custom", #genreral,custom :D # REQUIRED!
                                 "custom" => [
-                                    "provider" => 'PlayStar',
+                                    "provider" => 'PlayStar Gaming',
                                     "win_or_lost" => $win_or_lost,
                                     "entry_id" => $entry_id,
                                     "pay_amount" => $bet_amount,
