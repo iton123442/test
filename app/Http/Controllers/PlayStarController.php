@@ -106,31 +106,7 @@ class PlayStarController extends Controller
 
         try{
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
-            // $gameTransactionData = array(
-            //             "provider_trans_id" => "",
-            //             "token_id" => "",
-            //             "game_id" => "",
-            //             "round_id" => "",
-            //             "bet_amount" => "",
-            //             "win" => "",
-            //             "pay_amount" => "",
-            //             "income" => "",
-            //             "entry_id" => "",
-            //         ); 
-                    // $gameTransactionData = array(
-                    //     "provider_trans_id" => $data['ts'],
-                    //     "token_id" => $client_details->token_id,
-                    //     "game_id" => $game_details->game_id,
-                    //     "round_id" => $data['txn_id'],
-                    //     "bet_amount" => $bet_amount,
-                    //     "win" => 5,
-                    //     "pay_amount" => 0,
-                    //     "income" => 0,
-                    //     "entry_id" => 1,
-                    // ); 
-            
-            
-            $game_transaction_id = GameTransactionMDB::createGametransactionV2($client_details);      
+           $game_transaction_id = GameTransactionMDB::createGametransactionV2($client_details);
             $gameTransactionEXTData = array(
                 "game_trans_id" => "",
                 "provider_trans_id" => "",
@@ -149,8 +125,6 @@ class PlayStarController extends Controller
                 //     );
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details); 
             $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-                   
-                    
                     if (isset($client_response->fundtransferresponse->status->code)) {
 
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -208,7 +182,12 @@ class PlayStarController extends Controller
                             "round_id" => $data['txn_id'],
                             "amount" => $bet_amount,
                             "game_transaction_type"=> 1,
-                            "provider_request" =>json_encode($request->all()),              
+                            "provider_request" =>json_encode($request->all()),
+                            "mw_response" => json_encode($response),
+                            'mw_request' => json_encode($client_response->requestoclient),
+                            'client_response' => json_encode($client_response->fundtransferresponse),
+                            'transaction_detail' => 'success',
+                            'general_details' => 'success',           
                         );
                     GameTransactionMDB::updateGametransactionEXT($gameTransactionEXTData,$game_trans_ext_id,$client_details);
 
