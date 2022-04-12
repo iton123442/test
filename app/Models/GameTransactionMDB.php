@@ -248,7 +248,7 @@ class GameTransactionMDB
             return null;
         }
     }
-    public static function createGameTransactionExtV2($client_details){
+    public static function createGameTransactionExtV2($gametransactionext,$client_details){
         Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode("Hit the createGameTransactionExt"), "");
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
