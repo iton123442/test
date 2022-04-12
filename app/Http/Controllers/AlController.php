@@ -445,8 +445,19 @@ class AlController extends Controller
     }
 
 
-
     public function tapulan(Request $request){
+
+      $client_details = Providerhelper::getClientDetails('player_id', 10210);
+      // GameTransactionMDB::createGametransactionLog(123,'genera_details', json_encode($request->all()),$client_details);
+
+    
+      $data = [
+        'logs' => json_encode(["GG"=>"OH YEAH"])
+      ];  
+      GameTransactionMDB::updateGametransactionLog($data, 123, "general_details",$client_details);
+
+      $gg = GameTransactionMDB::findGameTransactionLogs(123,'general_details',$client_details);
+      dd($gg);
       // $client_details = Providerhelper::getClientDetails('player_id',  98);
       // $player= DB::table('players')->where('client_id', $client_details->client_id)
       //     ->where('player_id', $client_details->player_id)->first();
