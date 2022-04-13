@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Jobs\CreateGameTransactionLog;
+use Queue;
 // use Illuminate\Support\Facades\Hash;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
