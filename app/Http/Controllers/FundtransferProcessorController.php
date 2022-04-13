@@ -340,11 +340,12 @@ class FundtransferProcessorController extends Controller
                                 $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
                                     "client_response" =>json_encode($client_response),
-                                    "transaction_detail" =>json_encode("success"),
-                                    "general_details" =>json_encode("success")
+                                    "transaction_detail" => "success",
+                                    "general_details" => "success",
                                 );
 
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                GameTransactionMDB::updateGametransactionLog($ext_data,$gteid,false, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
