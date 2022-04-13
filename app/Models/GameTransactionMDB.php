@@ -693,21 +693,6 @@ class GameTransactionMDB
     /**
      * Create Game transaction logs
      */
-    // public static function createGametransactionLog($log_id,$log_type,$log,$client_details){
-    //     $data = [
-    //         "game_trans_ext_id" => $log_id,
-    //         "log_type" => $log_type,
-    //         "logs" => $log
-    //     ];
-
-    //     $connection = self::getAvailableConnection($client_details->connection_name);
-    //     if($connection != null){
-    //         return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insert($data);
-    //     }else{
-    //         return null;
-    //     }
-    // }
-
     public static function createGametransactionLog($game_transaction_logs,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
