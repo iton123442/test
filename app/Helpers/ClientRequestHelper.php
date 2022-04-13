@@ -742,6 +742,19 @@ class ClientRequestHelper{
         }
     }
 
+    /**
+     * NOTE ONLY FOR UPDATE GAME TRANSACTION EXT IN FUNDTRANSFER PROCESSOR CONTROLLER!  MDB
+     * CutCall Multi DB
+     */
+    public static function updateGametransactionLogEXTCCMD($data,$game_trans_ext_id,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+        }else{
+            return null;
+        }
+    }
+
      /**
     *   @author FUNNTA
     *   ONLY FUNTA FUNDTRANSFER

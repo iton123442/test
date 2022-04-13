@@ -344,8 +344,8 @@ class FundtransferProcessorController extends Controller
                                     "general_details" => "success",
                                 );
 
-                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
-                                GameTransactionMDB::updateGametransactionLog($ext_data,$gteid,false, $payload->action->custom->client_connection_name);
+                                ClientRequestHelper::updateGametransactionLogEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                // GameTransactionMDB::updateGametransactionLog($ext_data,$gteid,false, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
