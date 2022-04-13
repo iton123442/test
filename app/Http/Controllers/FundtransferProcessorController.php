@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Jobs\CreateGameTransactionLog;
 // use Illuminate\Support\Facades\Hash;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
@@ -337,14 +338,27 @@ class FundtransferProcessorController extends Controller
                                 $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif ($payload->action->custom->provider == 'MannaPlay') {
-                                $ext_data = array(
-                                    "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response->fundtransferresponse),
-                                    "transaction_detail" => "success",
-                                    "general_details" => "success",
-                                );
+                                // $ext_data = array(
+                                //     "mw_request"=>json_encode($requesttocient),
+                                //     "client_response" =>json_encode($client_response->fundtransferresponse),
+                                //     "transaction_detail" => "success",
+                                //     "general_details" => "success",
+                                // );
 
-                                ClientRequestHelper::updateGametransactionLogEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                // ClientRequestHelper::updateGametransactionLogEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+
+                                $updateGameTrasnactionLog = [
+									"connection" => $payload->action->custom->client_connection_name,
+									"type" => "cutcall_update",
+									"game_trans_ext_id" => $gteid,
+									"column" =>[
+										"mw_request"=>json_encode($requesttocient),
+                                        "client_response" =>json_encode($client_response->fundtransferresponse),
+                                        "transaction_detail" => "success",
+                                        "general_details" => "success",
+									]
+								];
+								Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
                                 // GameTransactionMDB::updateGametransactionLog($ext_data,$gteid,false, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
