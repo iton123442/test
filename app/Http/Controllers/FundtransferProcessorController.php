@@ -353,8 +353,9 @@ class FundtransferProcessorController extends Controller
                                         "type" => "createlog_cutcall",
                                         "column" =>[
                                             "game_trans_ext_id" => $gteid,
-                                            "mw_request"=>json_encode($requesttocient),
-                                            "client_response" =>json_encode($client_response->fundtransferresponse),
+                                            "request"=>json_encode($requesttocient),
+                                            "response" =>json_encode($client_response->fundtransferresponse),
+                                            "log_type" => "client_details",
                                             "transaction_detail" => "success",
                                             "general_details" => "success",
                                         ]
