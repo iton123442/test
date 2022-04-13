@@ -2051,9 +2051,8 @@ class FreeSpinHelper{
         }
         else {      
             $data = [
-                "provider_trans_id" => $dataresponse->Players[0]->BonusBalanceId,
-                "denominations" => $dataresponse->Players[0]->BonusValue,
-                "details" => json_encode($dataresponse->CouponCodeCreated)
+                "provider_trans_id" =>$data["client_id"]."_".$dataresponse->Players[0]->BonusBalanceId,
+                "denominations" => $dataresponse->Players[0]->BonusValue
             ];
             FreeSpinHelper::updateFreeRound($data, $id);
             $freespinExtenstion = [
@@ -2082,7 +2081,6 @@ class FreeSpinHelper{
                 "BonusBalanceId"=>$originalfreeround_id[1],
                 "ActivateNextBonus" =>"true"
             ];
-
             $actionUrl = "https://ws-test.insvr.com/jsonapi/DeletePlayerBonusBalance";
 
             $client = new Client([
