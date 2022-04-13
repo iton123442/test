@@ -368,7 +368,7 @@ class YGG002Controller extends Controller
                     "code" => 0,
                     "data" => array(
                         "currency" => $client_details->default_currency,
-                        "applicableBonus" => floatval(number_format($balance, 2, '.', '')),
+                        "applicableBonus" => 0.00,
                         "homeCurrency" => $client_details->default_currency,
                         "organization" => $this->org,
                         "balance" => floatval(number_format($balance, 2, '.', '')),
@@ -380,127 +380,74 @@ class YGG002Controller extends Controller
                 Helper::saveLog("YGG 002 appendwagerresult dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }
-
-            $gameTransactionData = array(
-                "provider_trans_id" => $provider_trans_id,
-                "token_id" => $tokenId,
-                "game_id" => $game_details->game_id,
-                "round_id" => $round_id,
-                "bet_amount" => 0,
-                "win" => 1,
-                "pay_amount" => $bonusamount,
-                "income" => 0,
-                "entry_id" =>1,
-                "trans_status" =>1,
-            );
-            $gametrans = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
-            $gameTransactionEXTData = array(
-                "game_trans_id" => $gametrans,
-                "provider_trans_id" => $provider_trans_id,
-                "round_id" => $round_id,
-                "amount" => $bonusamount,
-                "game_transaction_type"=> 1,
-                "provider_request" =>json_encode($request->all()),
-            );
-            $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            try{   
-                $client_response = ClientRequestHelper::fundTransfer($client_details, $bonusamount, $game_details->game_code, $game_details->game_name, $game_trans_ext_v2, $gametrans, 'credit');
-                $bonus = 'getbonusprize';
-                if(isset($client_response->fundtransferresponse->status->code) 
-                 && $client_response->fundtransferresponse->status->code == "200"){
-                    $response = array(
-                        "code" => 0,
-                        "data" => array(
-                            "currency" => $client_details->default_currency,
-                            "applicableBonus" =>  floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
-                            "homeCurrency" => $client_details->default_currency,
-                            "organization" => $this->org,
-                            "balance" =>  floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
-                            "nickName" => $client_details->display_name,
-                            "playerId" => "TGaming_".$client_details->player_id,
-                            "bonus" => 0
-                        ),
-                    );
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" =>json_encode("success"),
-                        "general_details" =>json_encode("success"),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
-                    $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $client_response->fundtransferresponse->balance]);
-                    Helper::saveLog('YGG 002 wager response', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
-                    return $response;
-                }elseif(isset($client_response->fundtransferresponse->status->code) 
-                && $client_response->fundtransferresponse->status->code == "402"){
-                    $response = array(
-                        "code" => 1006,
-                        "msg" => "You do not have sufficient fundsfor the bet."
-                    );
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" =>json_encode("402"),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
-                    $updateGameTransaction = [
-                        "win" => 2,
-                        'trans_status' => 5
-                    ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametrans, $client_details);
-                    Helper::saveLog("YGG wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
-                    return $response;
-                }else{
-                    $response = array(
-                        "code" => 1,
-                        "msg" => "Something went wrong!"
-                    );
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" =>json_encode("402"),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
-                    $updateGameTransaction = [
-                        "win" => 2,
-                        'trans_status' => 5
-                    ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametrans, $client_details);
-                    Helper::saveLog("YGG wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
-                    return $response;
-                }
-                
-                Helper::saveLog('Yggdrasil appendwagerresult', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            $income = $checkTrans->bet_amount - $bonusamount;
+            $entry_id = $bonusamount > 0 ? 2 : 1;
+            $win = $bonusamount > 0 ? 1 : 0;
+            $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
+            try{
+                $balance = $client_details->balance + $bonusamount;
+                $response = array(
+                    "code" => 0,
+                    "data" => array(
+                        "currency" => $client_details->default_currency,
+                        "applicableBonus" => 0.00,
+                        "homeCurrency" => $client_details->default_currency,
+                        "organization" => $this->org,
+                        "balance" => floatval(number_format($balance, 2, '.', '')),
+                        "nickName" => $client_details->display_name,
+                        "playerId" => "TGaming_".$client_details->player_id
+                    ),
+                );
+                $create_gametransactionext = array(
+                    "game_trans_id" => $checkTrans->game_trans_id,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" => $round_id,
+                    "amount" => $bonusamount,
+                    "game_transaction_type"=> 2,
+                    "provider_request" => json_encode($request->all()),
+                    "mw_response" => json_encode($response)
+                );
+                $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+                $action_payload = [
+                    "type" => "custom", #genreral,custom :D # REQUIRED!
+                    "custom" => [
+                        "provider" => 'ygg',
+                        "game_trans_ext_id" => $game_trans_ext_v2,
+                        "client_connection_name" => $client_details->connection_name,
+                    ],
+                    "provider" => [
+                        "provider_request" => $request->all(),
+                        "provider_trans_id"=>$provider_trans_id,
+                        "provider_round_id"=>$round_id,
+                    ],
+                    "mwapi" => [
+                        "roundId"=> $checkTrans->game_trans_id,
+                        "type" => 2,
+                        "game_id" => $game_details->game_id,
+                        "player_id" => $client_details->player_id,
+                        "mw_response" => $response,
+                    ]
+                ];
+                $updateGameTransaction = [
+                    'win' => $win,
+                    'pay_amount' => $bonusamount,
+                    'income' => $income,
+                    'entry_id' => $entry_id,
+                    'trans_status' => 2
+                ];
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
+                ClientRequestHelper::fundTransfer_TG($client_details, $bonusamount, $game_details->game_code, $game_details->game_name, $checkTrans->game_trans_id, 'credit', false, $action_payload);
+                $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $balance]);
+                Helper::saveLog("YGG 002 appendwager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
     
             }catch(\Exception $e){
                 $msg = array(
-                    'err_message' => $e->getMessage(),
-                    'err_line' => $e->getLine(),
-                    'err_file' => $e->getFile()
+                    'error' => '1',
+                    'message' => $e->getMessage(),
                 );
-                $response = array(
-                    "code" => 1,
-                    "msg" => "Something went wrong!"
-                );
-                $update_gametransactionext = array(
-                    "mw_response" =>json_encode($response),
-                    "mw_request"=>json_encode($msg),
-                    "client_response" =>json_encode($msg),
-                    "transaction_detail" =>json_encode("FAILED"),
-                    "general_details" =>json_encode("FAILED")
-                );
-                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
-                $updateGameTransaction = [
-                    "win" => 2,
-                    'trans_status' => 5
-                ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametrans, $client_details);
-                Helper::saveLog('Yggdrasil wager error', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
-                return json_encode($response, JSON_FORCE_OBJECT); 
+                Helper::saveLog('YGG 002 appendwager error', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
+                return json_encode($msg, JSON_FORCE_OBJECT); 
             }
 
 
