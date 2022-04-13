@@ -1046,7 +1046,7 @@ class HabaneroController extends Controller
     public function creditBonus($details,$data,$token,$game_details,$round_id){
 
         AWSHelper::saveLog("Habanero Request CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"CreditBonus");
-        $checkFreespin = DB::select("select * from freespin where provider_trans_id = '".$details->fundtransferrequest->bonusdetails->bonusbalanceid."';");
+        $checkFreespin = DB::select("select * from freespin where provider_trans_id = '92_".$details->fundtransferrequest->bonusdetails->bonusbalanceid."';");
         $client_details = Providerhelper::getClientDetails('token', $token);
         if(!count($checkFreespin) > 0){
             $response = [
@@ -1129,9 +1129,9 @@ class HabaneroController extends Controller
                     AWSHelper::saveLog("Habanero Response CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$response);
 
                     if(isset($details->fundtransferrequest->bonusdetails)) {
-                        $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
+                        $freeroundID = "92_". $details->fundtransferrequest->bonusdetails->bonusbalanceid;
                         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
-                        Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),"FREEROUND HIT!");
+                        Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),$freeroundID);
                         if($getFreespin){
                             $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $freeroundID;
                             $status = 2;
