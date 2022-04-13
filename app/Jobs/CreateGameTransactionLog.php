@@ -34,8 +34,9 @@ class CreateGameTransactionLog extends Job
     {
         //
         $payload = $this->data;
-        $client_details = $payload['client_details'];
+        
         if($payload["type"] == "create") {
+            $client_details = $payload['client_details'];
             $createGameLog = $payload['column'];
             GameTransactionMDB::createGametransactionLog($createGameLog,$client_details);
         }
