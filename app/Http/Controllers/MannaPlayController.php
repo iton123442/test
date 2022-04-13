@@ -280,10 +280,24 @@ class MannaPlayController extends Controller
 								"type" => "create",
 								"column" =>[
 									"game_trans_ext_id" => $game_trans_ext_id,
-									"provider_request" => json_encode($json_data),
-									"mw_response" => json_encode($response),
-									"mw_request" => json_encode($client_response->requestoclient),
-									"client_response" => json_encode($client_response->fundtransferresponse),
+									"request" => json_encode($json_data),
+									"response" => json_encode($response),
+									"log_type" => "provider_details",
+									"transaction_detail" => "success",
+								]
+							];
+                        	Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
+
+
+							$createGameTransactionLog = [
+								"client_details" => $client_details,
+								"type" => "create",
+								"column" =>[
+									"game_trans_ext_id" => $game_trans_ext_id,
+									"request" => json_encode($client_response->requestoclient),
+									"response" => json_encode($client_response->fundtransferresponse),
+									"log_type" => "client_details",
+									"transaction_detail" => "success",
 								]
 							];
                         	Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
@@ -406,15 +420,16 @@ class MannaPlayController extends Controller
 								"type" => "create",
 								"column" =>[
 									"game_trans_ext_id" => $game_trans_ext_id,
-									"provider_request" =>json_encode($json_data),
-		                    		"mw_response" => json_encode($response)
+									"request" => json_encode($json_data),
+									"response" => json_encode($response),
+									"log_type" => "provider_details",
+									"transaction_detail" => "success",
 								]
 							];
-                        	Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
+							Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
 						}catch(\Exception $e){
 							Helper::saveLog("manna Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"");
 						}
-
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [

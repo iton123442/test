@@ -750,4 +750,18 @@ class GameTransactionMDB
         }
     }
 
+    
+     /**
+     * NOTE ONLY FOR UPDATE GAME TRANSACTION EXT IN FUNDTRANSFER PROCESSOR CONTROLLER!  MDB
+     * CutCall Multi DB
+     */
+    public static function createGametransactionLogCCMD($data,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insertGetId($data);
+        }else{
+            return null;
+        }
+    }
+
 }
