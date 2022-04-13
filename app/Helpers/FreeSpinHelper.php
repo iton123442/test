@@ -2068,6 +2068,55 @@ class FreeSpinHelper{
             return 200;
         }
     }
+
+    
+    public static function cancelFreespinHabanero($freeround_id){
+        Helper::saveLog('Habanero CancelFreeRound',47, json_encode($freeround_id), 'Cancel FreeRound HIT!');
+        $originalfreeround_id = explode("_", $freeround_id);
+         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
+         if(isset($getFreespin)) {
+            $datatosend = [
+                "BrandId" => config("providerlinks.habanero.brandID"),
+                "APIKey" => config("providerlinks.habanero.apiKey"),
+                "Username" => $getFreespin->player_id,
+                "BonusBalanceId"=>$originalfreeround_id[1],
+                "ActivateNextBonus" =>"true"
+            ];
+
+            $actionUrl = "https://ws-test.insvr.com/jsonapi/DeletePlayerBonusBalance";
+
+            $client = new Client([
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+            try{
+                $guzzle_response = $client->post($actionUrl,['body' => json_encode($datatosend)]);
+                $dataresponse = json_decode($guzzle_response->getBody()->getContents());
+                $data = [
+                    "status" => 4,
+                ];
+                Helper::saveLog('Habanero Cancelfreespin Success', 47, json_encode($data), json_encode($dataresponse));
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+                 return 200;
+            }catch (\Exception $e) {
+                $dataresponse = [
+                    "error" => json_encode($e)
+                ];
+                $data = [
+                    "status" => 0,
+                ];
+
+                Helper::saveLog('Habanero Cancelfreespin error', 47, json_encode($data), json_encode($dataresponse));
+
+                FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
+            
+                return 400;
+            }
+    
+         }
+        
+    }
 }
 ?>
  
