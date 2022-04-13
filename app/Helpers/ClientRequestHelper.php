@@ -132,15 +132,15 @@ class ClientRequestHelper{
                 Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
                 $client_reponse->requestoclient = $requesttocient;
                 //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
-                try{
-                    $dataToUpdate = array(
-                        "client_response" => json_encode($client_reponse),
-                        "mw_request" => json_encode($requesttocient),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
-                }catch(\Exception $e){
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
-                }
+                // try{
+                //     $dataToUpdate = array(
+                //         "client_response" => json_encode($client_reponse),
+                //         "mw_request" => json_encode($requesttocient),
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                // }catch(\Exception $e){
+                //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+                // }
                 // try{
                 //     $updateGameTrasnactionLog = [
                 //         "client_details" => $client_details,
@@ -741,6 +741,7 @@ class ClientRequestHelper{
             return null;
         }
     }
+
 
     /**
      * NOTE ONLY FOR UPDATE GAME TRANSACTION EXT IN FUNDTRANSFER PROCESSOR CONTROLLER!  MDB

@@ -347,19 +347,34 @@ class FundtransferProcessorController extends Controller
                                 // );
 
                                 // ClientRequestHelper::updateGametransactionLogEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
-
-                                $updateGameTrasnactionLog = [
-									"connection" => $payload->action->custom->client_connection_name,
-									"type" => "cutcall_update",
-									"game_trans_ext_id" => $gteid,
-									"column" =>[
-										"mw_request"=>json_encode($requesttocient),
-                                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                                        "transaction_detail" => "success",
-                                        "general_details" => "success",
-									]
-								];
-								Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
+                                try{
+                                    $createGameTransactionLog = [
+                                        "client_details" => $payload->action->custom->client_connection_name,
+                                        "type" => "createlog_cutcall",
+                                        "column" =>[
+                                            "game_trans_ext_id" => $gteid,
+                                            "mw_request"=>json_encode($requesttocient),
+                                            "client_response" =>json_encode($client_response->fundtransferresponse),
+                                            "transaction_detail" => "success",
+                                            "general_details" => "success",
+                                        ]
+                                    ];
+                                    Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
+                                }catch(\Exception $e){
+                                    Helper::saveLog("manna Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+                                }
+                                // $updateGameTrasnactionLog = [
+								// 	"client_details" => $payload->action->custom->client_connection_name,
+								// 	"type" => "cutcall_update",
+								// 	"game_trans_ext_id" => $gteid,
+								// 	"column" =>[
+								// 		   "mw_request"=>json_encode($requesttocient),
+                                //         "client_response" =>json_encode($client_response->fundtransferresponse),
+                                //         "transaction_detail" => "success",
+                                //         "general_details" => "success",
+								// 	]
+								// ];
+								// Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
                                 // GameTransactionMDB::updateGametransactionLog($ext_data,$gteid,false, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
