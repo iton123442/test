@@ -4,6 +4,7 @@ namespace App\Helpers;
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 use App\Jobs\DebitRefund;
+use App\Jobs\CreateGameTransactionLog;
 use Queue;
 use App\Helpers\Helper;
 use App\Helpers\GameLobby;
@@ -100,7 +101,14 @@ class ClientRequestHelper{
                 if(isset($action["connection_timeout"] )) {
                     $connection_timeout = $action["connection_timeout"]; //set by provider
                 }
+
+                // if(isset($action["provider_request"] )) {
+                //     $provider_request = $action["provider_request"]; //set by provider
+                // }
+
             }
+
+            
 
             try{
                 $guzzle_response = $client->post($client_details->fund_transfer_url,
@@ -133,6 +141,20 @@ class ClientRequestHelper{
                 }catch(\Exception $e){
                     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
                 }
+                // try{
+                //     $updateGameTrasnactionLog = [
+                //         "client_details" => $client_details,
+                //         "type" => "update",
+                //         "game_trans_ext_id" => $transactionId,
+                //         "column" =>[
+                //             "mw_request" => json_encode($requesttocient),
+                //             "client_response" => json_encode($client_reponse),
+                //         ]
+                //     ];
+                //     Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
+                // }catch(\Exception $e){
+                //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+                // }
                 return $client_reponse;
             }catch(\Exception $e){
 
