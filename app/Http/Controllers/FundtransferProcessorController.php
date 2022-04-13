@@ -339,7 +339,7 @@ class FundtransferProcessorController extends Controller
                             elseif ($payload->action->custom->provider == 'MannaPlay') {
                                 $ext_data = array(
                                     "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response),
+                                    "client_response" =>json_encode($client_response->fundtransferresponse),
                                     "transaction_detail" => "success",
                                     "general_details" => "success",
                                 );
