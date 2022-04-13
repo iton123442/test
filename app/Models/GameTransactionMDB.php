@@ -218,6 +218,18 @@ class GameTransactionMDB
             return null;
         }
     }
+    public static function createGametransactionV2($client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        $data['operator_id'] = $client_details->operator_id;
+        $data['client_id'] = $client_details->client_id;
+        $data['player_id'] = $client_details->player_id;
+        if($connection != null){
+            Helper::saveLog('createGametransaction', 12, json_encode($connection), "createGametransaction");
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->insertGetId($data);
+        }else{
+            return null;
+        }
+    }
     public static function updateGametransaction($data,$game_transaction_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
@@ -233,6 +245,16 @@ class GameTransactionMDB
             return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->insertGetId($gametransactionext);
         }else{
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode("error or null connection"), "");
+            return null;
+        }
+    }
+    public static function createGameTransactionExtV2($gametransactionext,$client_details){
+        Helper::saveLog('createGameTransactionExt', 99, json_encode("Hit the createGameTransactionExt"), "");
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->insertGetId($gametransactionext);
+        }else{
+            Helper::saveLog('createGameTransactionExt(PS)', 12, json_encode("error or null connection"), "");
             return null;
         }
     }
@@ -666,5 +688,71 @@ class GameTransactionMDB
         return DB::table('provider_transactions')->insertGetId($data);
     }
     # END Queries That Query Default Server and Schema
+
+
+    /**
+     * Create Game transaction logs
+     */
+    public static function createGametransactionLog($log_id,$log_type,$log,$client_details){
+        $data = [
+            "game_trans_ext_id" => $log_id,
+            "log_type" => $log_type,
+            "logs" => $log
+        ];
+
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insert($data);
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * @type [provider_request, mw_response, mw_request, client_response]
+     */
+    public  static function findGameTransactionLogs($game_trans_ext_id, $type=false,$client_details)
+    {
+        if($type != false){
+            if ($type == 'provider_request') {
+                $where = 'where gte.game_trans_ext_id = "'.$game_trans_ext_id.'" AND gte.log_type = "'.$type.'"';
+            }
+            if ($type == 'mw_response') {
+                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id.'" AND gte.log_type = "'.$type.'"';
+            }
+            if ($type == 'mw_request') {
+                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
+            }
+            if ($type == 'client_response') {
+                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
+            }
+            if ($type == 'general_details') {
+                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
+            }
+        }else{
+            $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'"' ;
+        }
+        
+        try {
+            $connection = config("serverlist.server_list.".$client_details->connection_name);
+            $details = DB::connection($connection["connection_name"])->select('select  * from  `'.$connection['db_list'][2].'`.`game_transaction_logs` as gte ' . $where);
+            return count($details)  > 0 ? $details[0] : null;
+        } catch (\Exception $e) {
+            return null;
+        }
+
+    }
+
+    /**
+     * Update Logs
+     */
+    public static function updateGametransactionLog($data,$game_trans_ext_id,$type,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->where('game_trans_ext_id',$game_trans_ext_id)->where('log_type',$type)->update($data);
+        }else{
+            return null;
+        }
+    }
 
 }
