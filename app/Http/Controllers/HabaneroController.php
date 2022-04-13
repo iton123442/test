@@ -1129,7 +1129,7 @@ class HabaneroController extends Controller
                     AWSHelper::saveLog("Habanero Response CreditBonus", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),$response);
 
                     if(isset($details->fundtransferrequest->bonusdetails)) {
-                        $freeroundID = $details->fundtransferrequest->bonusdetails->bonusbalanceid;
+                        $freeroundID = "92_". $details->fundtransferrequest->bonusdetails->bonusbalanceid;
                         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
                         Helper::saveLog('Habanero FreeRound', $this->provider_id, json_encode($details),"FREEROUND HIT!");
                         if($getFreespin){
