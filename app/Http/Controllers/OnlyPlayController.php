@@ -391,7 +391,6 @@ class OnlyPlayController extends Controller
                             "success" => true,
                             "balance" => $formatBalance
                         ];
-                        break;
                         $updateTransactionEXt = array(
                             "provider_request" =>json_encode($request->all()),
                             "mw_response" => json_encode($response),
@@ -404,6 +403,7 @@ class OnlyPlayController extends Controller
                         Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()),$response);
                         return response($response,200)
                         ->header('Content-Type', 'application/json');
+                        break;
                 }
 
                
