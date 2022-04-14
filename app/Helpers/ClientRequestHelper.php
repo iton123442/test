@@ -176,8 +176,18 @@ class ClientRequestHelper{
 
                 // Add Refund Queue
                 if($type == 'debit'){
-                    // $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);   
-                    $exclude_provider = ["IDNPoker"];
+                    // $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);  
+                    if($action["provider_name"]  == "SimplePlay"){
+                        $exclude_provider = ["SimplePlay"];
+                    } elseif($action["provider_name"]  == "BGaming"){
+                        $exclude_provider = ["BGaming"];
+                    } elseif($action["provider_name"]  == "QuickSpin Direct"){
+                        $exclude_provider = ["QuickSpin Direct"];
+                    } elseif($action["provider_name"]  == "OnlyPlay"){
+                        $exclude_provider = ["OnlyPlay"];
+                    }else{
+                        $exclude_provider = ["IDNPoker"];
+                    }
                     $bol = true;
                     if(isset($action['provider_name'])){
                         if (in_array($action["provider_name"], $exclude_provider)) {
