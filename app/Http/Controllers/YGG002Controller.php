@@ -24,7 +24,8 @@ class YGG002Controller extends Controller
 
     public function playerinfo(Request $request){
         Helper::saveLog("YGG 002 playerinfo req", $this->provider_id, json_encode($request->all()), "RECEIVED");
-        $client_details = ProviderHelper::getClientDetails('token',$request->sessiontoken);
+        $playerId = ProviderHelper::explodeUsername('_',$request->playerid);
+        $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         if($client_details == null){ 
             $response = array(
                 "code" => 1000,
