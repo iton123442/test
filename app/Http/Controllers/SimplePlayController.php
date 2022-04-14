@@ -544,46 +544,29 @@ class SimplePlayController extends Controller
                   );
                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
-                 $action_payload = [
-                            "type" => "custom", #genreral,custom :D # REQUIRED!
-                            "custom" => [
-                                "provider" => 'SimplePlay',
-                                "client_connection_name" => $client_details->connection_name,
-                                "win_or_lost" => $win_or_lost,
-                                "entry_id" => $entry_id,
-                                "pay_amount" => $rollback_amount,
-                                "income" => $income,
-                                "game_trans_ext_id" => $game_trans_ext_id
-                            ],
-                            "provider" => [
-                                "provider_request" => $request_params, #R
-                                "provider_trans_id"=> $transaction_id, #R
-                                "provider_round_id"=> $round_id, #R
-                            ],
-                            "mwapi" => [
-                                "roundId"=>$round_id, #R
-                                "type"=>2, #R
-                                "game_id" => $game_details->game_id, #R
-                                "player_id" => $client_details->player_id, #R
-                                "mw_response" => $response, #R
-                            ],
-                            'fundtransferrequest' => [
-                                'fundinfo' => [
-                                    'freespin' => false,
-                                ]
-                                ]
-                            ];
-                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$rollback_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'refund',false,$action_payload);
-
-                $updateTransactionEXt = array(
-                      "provider_request" =>json_encode($request_params),
-                      "mw_response" => json_encode($response),
-                      'mw_request' => json_encode($client_response->requestoclient),
-                      'client_response' => json_encode($client_response->fundtransferresponse),
-                      'transaction_detail' => 'success',
-                      'general_details' => 'success',
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                $client_response = ClientRequestHelper::fundTransfer($client_details, $rollback_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $bet_transaction->game_trans_id, 'credit', "true");
+                if (isset($client_response->fundtransferresponse->status->code)) {
+                    switch ($client_response->fundtransferresponse->status->code) {
+                        case '200':
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+                            header("Content-type: text/xml; charset=utf-8");
+                            $response = '<?xml version="1.0" encoding="utf-8"?>';
+                            $response .= '<RequestResponse><username>'.$request_params['username'].'</username><currency>'.$player_currency.'</currency><amount>'.$balance.'</amount><error>0</error></RequestResponse>';
+                        $updateTransactionEXt = array(
+                            "provider_request" =>json_encode($request_params),
+                            "mw_response" => json_encode($response),
+                            'mw_request' => json_encode($client_response->requestoclient),
+                            'client_response' => json_encode($client_response->fundtransferresponse),
+                            'transaction_detail' => 'success',
+                            'general_details' => 'success',
+                        );
+                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details); 
+                        Helper::saveLog('SimplePLay', config("providerlinks.simpleplay.PROVIDER_ID"), json_encode($request_params),$response);
+                        return response($response,200)
+                        ->header('Content-Type', 'application/json');
+                        break;
+                    }
+                }
             }
             
         }
