@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Jobs\CreateGameTransactionLog;
-use Queue;
 use GuzzleHttp\Client;
 use App\Helpers\CallParameters;
 use App\Helpers\ClientRequestHelper;
@@ -276,8 +275,7 @@ class MannaPlayController extends Controller
 
 						try{
 							$createGameTransactionLog = [
-								"client_details" => $client_details,
-								"type" => "create",
+								"connection_name" => $client_details->connection_name,
 								"column" =>[
 									"game_trans_ext_id" => $game_trans_ext_id,
 									"request" => json_encode($json_data),
@@ -286,21 +284,7 @@ class MannaPlayController extends Controller
 									"transaction_detail" => "success",
 								]
 							];
-                        	Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
-
-
-							$createGameTransactionLog = [
-								"client_details" => $client_details,
-								"type" => "create",
-								"column" =>[
-									"game_trans_ext_id" => $game_trans_ext_id,
-									"request" => json_encode($client_response->requestoclient),
-									"response" => json_encode($client_response->fundtransferresponse),
-									"log_type" => "client_details",
-									"transaction_detail" => "success",
-								]
-							];
-                        	Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
+                        	dispatch(new CreateGameTransactionLog($createGameTransactionLog));
 						}catch(\Exception $e){
 							// ProviderHelper::saveLogWithExeption('manna_debit', $this->provider_db_id, json_encode($json_data), "GAME TRANACTION LOG");
 							Helper::saveLog("manna Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"");
@@ -416,8 +400,7 @@ class MannaPlayController extends Controller
 
 						try{
 							$createGameTransactionLog = [
-								"client_details" => $client_details,
-								"type" => "create",
+								"connection_name" => $client_details->connection_name,
 								"column" =>[
 									"game_trans_ext_id" => $game_trans_ext_id,
 									"request" => json_encode($json_data),
@@ -426,7 +409,7 @@ class MannaPlayController extends Controller
 									"transaction_detail" => "success",
 								]
 							];
-							Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
+							dispatch(new CreateGameTransactionLog($createGameTransactionLog));
 						}catch(\Exception $e){
 							Helper::saveLog("manna Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"");
 						}
