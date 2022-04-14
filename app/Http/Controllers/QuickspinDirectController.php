@@ -439,17 +439,17 @@ class QuickspinDirectController extends Controller
             ];
             return $res;
         }
-        $get_faildTrans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $client_details);
-        if($get_faildTrans != false){
-            if($get_faildTrans->transaction_detail == 'failed'){
-                $res = [
-                    "balance" => (int)$formatBal,
-                    "txid" => (int) $provider_trans_id,
-                    "remotetxid" => $bet_transaction->game_trans_id,
-                ];
-                return $res;
-            }
-        }
+        // $get_faildTrans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $client_details);
+        // if($get_faildTrans != false){
+        //     if($get_faildTrans->transaction_detail == 'failed'){
+        //         $res = [
+        //             "balance" => (int)$formatBal,
+        //             "txid" => (int) $provider_trans_id,
+        //             "remotetxid" => $bet_transaction->game_trans_id,
+        //         ];
+        //         return $res;
+        //     }
+        // }
         $game_details = Game::findbyid($bet_transaction->game_id);
         if($game_details == false){
             $res = [
