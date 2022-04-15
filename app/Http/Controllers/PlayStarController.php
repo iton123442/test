@@ -96,7 +96,6 @@ class PlayStarController extends Controller
                     ];
                     return $response; 
             }
-
         try{
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
            $gameTransactionData = array(
@@ -137,37 +136,37 @@ class PlayStarController extends Controller
                                 ];
                                 break;
                         }
-                       
-                        $gameTransactionDataforQue = array(
-                            "connection_name" => $client_details->connection_name,
-                            "game_trans_id" => $game_transaction_id,
-								"column" =>[
-                                    "token_id" => $client_details->token_id,
-                                    "game_id" => $game_details->game_id,
-                                    "bet_amount" => $bet_amount,
-                                    "win" => 5,
-                                    "pay_amount" => 0,
-                                    "income" => 0,
-                                    "entry_id" => 1,
-                                ]   
-                        ); 
-                        dispatch(new UpdateGametransactionJobs($gameTransactionDataforQue));
+                    }
+                    $gameTransactionDataforQue = array(
+                        "connection_name" => $client_details->connection_name,
+                        "game_trans_id" => $game_transaction_id,
+                            "column" =>[
+                                "token_id" => $client_details->token_id,
+                                "game_id" => $game_details->game_id,
+                                "bet_amount" => $bet_amount,
+                                "win" => 5,
+                                "pay_amount" => 0,
+                                "income" => 0,
+                                "entry_id" => 1,
+                            ]   
+                    ); 
+                    Helper::saveLog('PlayStarQue', $this->provider_db_id, json_encode($request->all()), $gameTransactionDataforQue);
+                    dispatch(new UpdateGametransactionJobs($gameTransactionDataforQue));
 
-                            $gameTransactionEXTData = array(
-                                "game_trans_id" => $game_transaction_id,
-                                "provider_trans_id" => $data['ts'],
-                                "round_id" => $data['txn_id'],
-                                "amount" => $bet_amount,
-                                "game_transaction_type"=> 1,
-                                "provider_request" =>json_encode($request->all()),
-                                "mw_response" => json_encode($response),
-                                'mw_request' => json_encode($client_response->requestoclient),
-                                'client_response' => json_encode($client_response->fundtransferresponse),
-                                'transaction_detail' => 'success',
-                                'general_details' => 'success',           
-                            );
-                        GameTransactionMDB::updateGametransactionEXT($gameTransactionEXTData,$game_trans_ext_id,$client_details);
-                    }                       
+                        $gameTransactionEXTData = array(
+                            "game_trans_id" => $game_transaction_id,
+                            "provider_trans_id" => $data['ts'],
+                            "round_id" => $data['txn_id'],
+                            "amount" => $bet_amount,
+                            "game_transaction_type"=> 1,
+                            "provider_request" =>json_encode($request->all()),
+                            "mw_response" => json_encode($response),
+                            'mw_request' => json_encode($client_response->requestoclient),
+                            'client_response' => json_encode($client_response->fundtransferresponse),
+                            'transaction_detail' => 'success',
+                            'general_details' => 'success',           
+                        );
+                    GameTransactionMDB::updateGametransactionEXT($gameTransactionEXTData,$game_trans_ext_id,$client_details);                       
                     Helper::saveLog('PlayStar Debit', $this->provider_db_id, json_encode($data), $response);
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
