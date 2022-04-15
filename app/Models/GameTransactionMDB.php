@@ -218,7 +218,7 @@ class GameTransactionMDB
             return null;
         }
     }
-    public static function createGametransactionV2($client_details){
+    public static function createGametransactionV2($data,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         $data['operator_id'] = $client_details->operator_id;
         $data['client_id'] = $client_details->client_id;
