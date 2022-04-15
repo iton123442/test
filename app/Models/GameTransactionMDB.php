@@ -764,4 +764,13 @@ class GameTransactionMDB
         }
     }
 
+    public static function updateGameTransactionCCMD($data,$game_transaction_id,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->where('game_trans_id',$game_transaction_id)->update($data);
+        }else{
+            return null;
+        }
+    }
+
 }
