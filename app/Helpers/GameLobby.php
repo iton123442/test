@@ -2052,7 +2052,7 @@ class GameLobby{
                                         );
                                         $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
                                         // return urlencode($encoded_data);
-                                        return config('providerlinks.play_tigergames') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
+                                        return $default_frame . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
                                     case 2:
                                         //TRANSFER WALLET CLIENT
                                         //TRANSFER WALLET SA PROIVDER
