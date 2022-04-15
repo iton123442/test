@@ -1980,7 +1980,7 @@ class GameLobby{
 
             $default_frame = config('providerlinks.play_tigergames');
             if ($client_details->operator_id == 11) {
-                $default_frame = 'https://kbpoker.69master.cc/';
+                $default_frame = 'https://kbpoker.69master.cc';
             }
             /***************************************************************
             *
