@@ -141,6 +141,7 @@ class PlayStarController extends Controller
                         $gameTransactionDataforQue = array(
                             "connection_name" => $client_details->connection_name,
 								"column" =>[
+                                    "game_trans_id" =>$game_transaction_id,
                                     "token_id" => $client_details->token_id,
                                     "game_id" => $game_details->game_id,
                                     "bet_amount" => $bet_amount,
