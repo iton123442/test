@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use Illuminate\Http\Request;
+use App\Jobs\UpdateGametransactionJobs;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
@@ -98,7 +99,11 @@ class PlayStarController extends Controller
 
         try{
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
-           $game_transaction_id = GameTransactionMDB::createGametransactionV2($client_details); //create game_transaction
+           $gameTransactionData = array(
+                    "provider_trans_id" => $data['ts'],
+                    "round_id" => $data['txn_id'],
+                );
+           $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$client_details); //create game_transaction
             $gameTransactionEXTData = array(
                 "game_trans_id" => "",
                 "provider_trans_id" => "",
@@ -133,13 +138,11 @@ class PlayStarController extends Controller
                                 break;
                         }
                        
-                        $gameTransactionData = array(
+                        $gameTransactionDataforQue = array(
                             "connection_name" => $client_details->connection_name,
 								"column" =>[
-                                    "provider_trans_id" => $data['ts'],
                                     "token_id" => $client_details->token_id,
                                     "game_id" => $game_details->game_id,
-                                    "round_id" => $data['txn_id'],
                                     "bet_amount" => $bet_amount,
                                     "win" => 5,
                                     "pay_amount" => 0,
@@ -147,7 +150,8 @@ class PlayStarController extends Controller
                                     "entry_id" => 1,
                                 ]   
                         ); 
-                        dispatch(new UpdateGametransactionJobs($gameTransactionData));
+                        dispatch(new UpdateGametransactionJobs($gameTransactionDataforQue));
+
                             $gameTransactionEXTData = array(
                                 "game_trans_id" => $game_transaction_id,
                                 "provider_trans_id" => $data['ts'],
@@ -177,7 +181,6 @@ class PlayStarController extends Controller
 
     public function getResult(Request $request){
         Helper::saveLog('PlayStar Result', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
-
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $data["total_win"] / 100;
@@ -203,7 +206,11 @@ class PlayStarController extends Controller
             try{
                 $game_details = Game::find($request->game_id, $this->provider_db_id);
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["txn_id"],'round_id', 1, $client_details);
+                if($bet_transaction->connection_name == null){
+                    $client_details->connection_name = "mysql";
+                }else{
                 $client_details->connection_name = $bet_transaction->connection_name;
+                }
                 $winbBalance = $balance + $bet_amount; 
                 $formatWinBalance = $winbBalance;
                 $formatBalance = (int)str_replace(".","", $formatWinBalance);
