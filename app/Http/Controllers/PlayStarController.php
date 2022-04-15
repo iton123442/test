@@ -134,20 +134,25 @@ class PlayStarController extends Controller
                                 ];
                                 break;
                         }
-
+                       
                         $gameTransactionData = array(
-                            "provider_trans_id" => $data['ts'],
-                            "token_id" => $client_details->token_id,
-                            "game_id" => $game_details->game_id,
-                            "round_id" => $data['txn_id'],
-                            "bet_amount" => $bet_amount,
-                            "win" => 5,
-                            "pay_amount" => 0,
-                            "income" => 0,
-                            "entry_id" => 1,
+                            "connection_name" => $client_details->connection_name,
+								"column" =>[
+                                    "provider_trans_id" => $data['ts'],
+                                    "token_id" => $client_details->token_id,
+                                    "game_id" => $game_details->game_id,
+                                    "round_id" => $data['txn_id'],
+                                    "bet_amount" => $bet_amount,
+                                    "win" => 5,
+                                    "pay_amount" => 0,
+                                    "income" => 0,
+                                    "entry_id" => 1,
+                                ]   
                         ); 
-                        GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transaction_id,$client_details,);
+                        dispatch(new UpdateGametransactionJobs($gameTransactionData));
                         
+                        GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transaction_id,$client_details,);
+
                             $gameTransactionEXTData = array(
                                 "game_trans_id" => $game_transaction_id,
                                 "provider_trans_id" => $data['ts'],
