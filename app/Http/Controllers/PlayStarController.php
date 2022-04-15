@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use Illuminate\Http\Request;
+use App\Jobs\UpdateGametransactionJobs;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
@@ -148,7 +149,7 @@ class PlayStarController extends Controller
                                 ]   
                         ); 
                         dispatch(new UpdateGametransactionJobs($gameTransactionData));
-                        
+
                             $gameTransactionEXTData = array(
                                 "game_trans_id" => $game_transaction_id,
                                 "provider_trans_id" => $data['ts'],
