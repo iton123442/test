@@ -51,8 +51,6 @@ class PlayStarController extends Controller
     }
 
     public function getBalance(Request $request){
-
-
         Helper::saveLog("PlayStar get Bal", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT"); 
         $data = $request->all();
         $get_client_details = ProviderHelper::getClientDetails("token",$data['access_token']);
@@ -150,9 +148,6 @@ class PlayStarController extends Controller
                                 ]   
                         ); 
                         dispatch(new UpdateGametransactionJobs($gameTransactionData));
-                        
-                        GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transaction_id,$client_details,);
-
                             $gameTransactionEXTData = array(
                                 "game_trans_id" => $game_transaction_id,
                                 "provider_trans_id" => $data['ts'],
@@ -181,8 +176,6 @@ class PlayStarController extends Controller
 }
 
     public function getResult(Request $request){
-
-
         Helper::saveLog('PlayStar Result', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
 
         $data = $request->all();
