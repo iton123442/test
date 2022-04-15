@@ -2828,12 +2828,12 @@ class DigitainController extends Controller
 		if($json_data == null){
 			return $this->noBody();
 		}
-		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
-			return $this->wrongOperatorID();
-		}
-		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
-			return $this->authError();
-		}
+		// if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
+		// 	return $this->wrongOperatorID();
+		// }
+		// if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
+		// 	return $this->authError();
+		// }
 
 		# Missing Parameters
 		if(!isset($json_data['items']) || !isset($json_data['operatorId']) || !isset($json_data['timestamp']) || !isset($json_data['signature']) || !isset($json_data['allOrNone']) || !isset($json_data['providerId'])){
@@ -2906,7 +2906,8 @@ class DigitainController extends Controller
 			// }
 			if($key['refundRound'] == true){  // Use round id always
 
-				$idempotik = GameTransactionMDB::findGameExt($key['roundId'], 3,'round_id', $client_details);
+				// $idempotik = GameTransactionMDB::findGameExt($key['roundId'], 3,'round_id', $client_details); // OLD
+				$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details);  // NEW 4-15-22
 				if($idempotik != false && $idempotik != "false"){
 					$items_array[] = [
 							"errorCode" => 14, // TransactionAlreadyRolledBack
@@ -2957,7 +2958,8 @@ class DigitainController extends Controller
 				$player_id = $key['playerId'];
 			}else{ // use both round id and orignaltxtid
 
-				$idempotik = GameTransactionMDB::findGameExt($key['originalTxId'], 3,'transaction_id', $client_details);
+				// $idempotik = GameTransactionMDB::findGameExt($key['originalTxId'], 3,'transaction_id', $client_details); // OLD 
+				$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details); // NEW 4-15-22
 				if($idempotik != false && $idempotik != "false"){
 					$items_array[] = [
 							"errorCode" => 14, // TransactionAlreadyRolledBack
@@ -3137,7 +3139,12 @@ class DigitainController extends Controller
 			}
 
 			if($datatrans != 'false'){ // TRANSACTION IS FOUND
-					$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+
+					// $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+					// partial approach
+					$gameTransactionDetails = GameTransactionMDB::findGameTransactionDetails($datatrans->game_trans_id, 'game_transaction', false, $client_details);
+
+				    $game_details = Helper::findGameDetails('game_id',$this->provider_db_id,$gameTransactionDetails->game_id);
 					$round_id = $transaction_identifier;
 					$bet_amount = $datatrans->amount;
 					$entry_id = 3;
@@ -3413,7 +3420,8 @@ class DigitainController extends Controller
 				if ($value['refundRound'] == true) {  // Use round id always
 					// $datatrans = $this->findTransactionRefund($value['roundId'], 'round_id');
 
-					$idempotik = GameTransactionMDB::findGameExt($value['roundId'], 3,'roundId', $client_details);
+					// $idempotik = GameTransactionMDB::findGameExt($value['roundId'], 3,'roundId', $client_details);
+					$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details); // NEW 4-15-22
 					if($idempotik != false && $idempotik != "false"){
 						$items_array[] = [
 								"errorCode" => 14, // TransactionAlreadyRolledBack
@@ -3478,7 +3486,8 @@ class DigitainController extends Controller
 				} else { // use both round id and orignaltxtid
 					// $datatrans = $this->findTransactionRefund($key['originalTxId'], 'transaction_id');
 
-					$idempotik = GameTransactionMDB::findGameExt($value['originalTxId'], 3,'transaction_id', $client_details);
+					// $idempotik = GameTransactionMDB::findGameExt($value['originalTxId'], 3,'transaction_id', $client_details);
+					$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details); // NEW 4-15-22
 					if($idempotik != false && $idempotik != "false"){
 						$items_array[] = [
 								"errorCode" => 14, // TransactionAlreadyRolledBack
