@@ -207,11 +207,6 @@ class PlayStarController extends Controller
             try{
                 $game_details = Game::find($request->game_id, $this->provider_db_id);
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["txn_id"],'round_id', 1, $client_details);
-                if($bet_transaction->connection_name == null){
-                    $client_details->connection_name = "mysql";
-                }else{
-                $client_details->connection_name = $bet_transaction->connection_name;
-                }
                 $winbBalance = $balance + $bet_amount; 
                 $formatWinBalance = $winbBalance;
                 $formatBalance = (int)str_replace(".","", $formatWinBalance);
