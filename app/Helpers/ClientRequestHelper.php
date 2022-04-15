@@ -155,6 +155,22 @@ class ClientRequestHelper{
                 // }catch(\Exception $e){
                 //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
                 // }
+                try {
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $transactionId,
+                            "request" => json_encode($requesttocient),
+                            "response" => json_encode($client_reponse->fundtransferresponse),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                } catch (\Exception $e) {
+                    //throw $th;
+                }
+                
                 return $client_reponse;
             }catch(\Exception $e){
 
@@ -177,17 +193,18 @@ class ClientRequestHelper{
                 // Add Refund Queue
                 if($type == 'debit'){
                     // $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);  
-                    if($action["provider_name"]  == "SimplePlay"){
-                        $exclude_provider = ["SimplePlay"];
-                    } elseif($action["provider_name"]  == "BGaming"){
-                        $exclude_provider = ["BGaming"];
-                    } elseif($action["provider_name"]  == "QuickSpin Direct"){
-                        $exclude_provider = ["QuickSpin Direct"];
-                    } elseif($action["provider_name"]  == "OnlyPlay"){
-                        $exclude_provider = ["OnlyPlay"];
-                    }else{
-                        $exclude_provider = ["IDNPoker"];
-                    }
+                    // if($action["provider_name"]  == "SimplePlay"){
+                    //     $exclude_provider = ["SimplePlay"];
+                    // } elseif($action["provider_name"]  == "BGaming"){
+                    //     $exclude_provider = ["BGaming"];
+                    // } elseif($action["provider_name"]  == "QuickSpin Direct"){
+                    //     $exclude_provider = ["QuickSpin Direct"];
+                    // } elseif($action["provider_name"]  == "OnlyPlay"){
+                    //     $exclude_provider = ["OnlyPlay"];
+                    // }else{
+                    //     $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay"];
+                    // }
+                    $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay"];
                     $bol = true;
                     if(isset($action['provider_name'])){
                         if (in_array($action["provider_name"], $exclude_provider)) {
@@ -225,17 +242,32 @@ class ClientRequestHelper{
                     }
                 }
 
-                try{
-                    $dataToUpdate = array(
-                        "client_response" => json_encode($e->getMessage().' '.$e->getLine()),
-                        "mw_request" => json_encode($requesttocient),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
-                }catch(\Exception $e){
-                    Providerhelper::mandatorySaveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$requesttocient);
-                }
+                // try{
+                //     $dataToUpdate = array(
+                //         "client_response" => json_encode($e->getMessage().' '.$e->getLine()),
+                //         "mw_request" => json_encode($requesttocient),
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                // }catch(\Exception $e){
+                //     Providerhelper::mandatorySaveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$requesttocient);
+                // }
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
+
+                try {
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $transactionId,
+                            "request" => json_encode($requesttocient),
+                            "response" => json_encode($client_reponse->fundtransferresponse),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                } catch (\Exception $e) {
+                }
                 return $client_reponse;
             }
     }
@@ -411,7 +443,7 @@ class ClientRequestHelper{
                         ];
                         ProviderHelper::saveLogLatency($requesttocient['request_body']['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() . ' TG_PROCESS');
                     },
-                    'timeout' => 0.5, # enough tobe received by the server!
+                    'timeout' => 5.5, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
                 ],
                 ['defaults' => ['exceptions' => false]]

@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\GameTransactionMDB;
-use App\Helpers\ClientRequestHelper;
+ 
 
 class CreateGameTransactionLog extends Job
 {
@@ -48,17 +48,20 @@ class CreateGameTransactionLog extends Job
         //
         $payload = $this->data;
         
-        if($payload["type"] == "create") {
-            $client_details = $payload['client_details'];
-            $createGameLog = $payload['column'];
-            GameTransactionMDB::createGametransactionLog($createGameLog,$client_details);
-        }
+        // if($payload["type"] == "create") {
+        //     $client_details = $payload['client_details'];
+        //     $createGameLog = $payload['column'];
+        //     GameTransactionMDB::createGametransactionLog($createGameLog,$client_details);
+        // }
 
-        if($payload["type"] == "createlog_cutcall") {
-            $client_details = $payload['client_details'];
-            $createGameLog = $payload['column'];
-            GameTransactionMDB::createGametransactionLogCCMD($createGameLog,$client_details);
-        }
+        // if($payload["type"] == "createlog_cutcall") {
+        //     $client_details = $payload['connection_name'];
+        //     $createGameLog = $payload['column'];
+        //     GameTransactionMDB::createGametransactionLogCCMD($createGameLog,$client_details);
+        // }
+        $client_details = $payload['connection_name'];
+        $createGameLog = $payload['column'];
+        GameTransactionMDB::createGametransactionLogCCMD($createGameLog,$client_details);
 
         
 

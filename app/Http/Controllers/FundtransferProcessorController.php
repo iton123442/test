@@ -349,18 +349,16 @@ class FundtransferProcessorController extends Controller
                                 // ClientRequestHelper::updateGametransactionLogEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 try{
                                     $createGameTransactionLog = [
-                                        "client_details" => $payload->action->custom->client_connection_name,
-                                        "type" => "createlog_cutcall",
+                                        "connection_name" => $payload->action->custom->client_connection_name,
                                         "column" =>[
                                             "game_trans_ext_id" => $gteid,
                                             "request"=>json_encode($requesttocient),
                                             "response" =>json_encode($client_response->fundtransferresponse),
                                             "log_type" => "client_details",
                                             "transaction_detail" => "success",
-                                            "general_details" => "success",
                                         ]
                                     ];
-                                    Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
+                                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
                                 }catch(\Exception $e){
                                     Helper::saveLog("manna Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"");
                                 }
