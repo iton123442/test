@@ -3,6 +3,7 @@
 
 namespace App\Jobs;
 use App\Models\GameTransactionMDB;
+use App\Helpers\Helper;
 
 class UpdateGametransactionJobs extends Job
 {
@@ -45,6 +46,7 @@ class UpdateGametransactionJobs extends Job
     public function handle()
     {
         $payload = $this->data;
+        Helper::saveLog('PlayStarQueJobs', 55, json_encode($payload), $payload);
         $client_details = $payload['connection_name'];
         $createGameLog = $payload['column'];
         $game_transaction_id = $payload['game_trans_id'];
