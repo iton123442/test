@@ -3,7 +3,8 @@
 
 namespace App\Jobs;
 use App\Models\GameTransactionMDB;
-class Updatejobs extends Job
+
+class UpdateGametransactionJobs extends Job
 {
      /**
      * The number of times the job may be attempted.
