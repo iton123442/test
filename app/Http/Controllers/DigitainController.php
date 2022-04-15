@@ -2907,7 +2907,7 @@ class DigitainController extends Controller
 			if($key['refundRound'] == true){  // Use round id always
 
 				// $idempotik = GameTransactionMDB::findGameExt($key['roundId'], 3,'round_id', $client_details); // OLD
-				$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details);  // NEW 4-15-22
+				$idempotik = GameTransactionMDB::findGameExt($key['txId'], 3,'transaction_id', $client_details);  // NEW 4-15-22
 				if($idempotik != false && $idempotik != "false"){
 					$items_array[] = [
 							"errorCode" => 14, // TransactionAlreadyRolledBack
@@ -2959,7 +2959,7 @@ class DigitainController extends Controller
 			}else{ // use both round id and orignaltxtid
 
 				// $idempotik = GameTransactionMDB::findGameExt($key['originalTxId'], 3,'transaction_id', $client_details); // OLD 
-				$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details); // NEW 4-15-22
+				$idempotik = GameTransactionMDB::findGameExt($key['txId'], 3,'transaction_id', $client_details); // NEW 4-15-22
 				if($idempotik != false && $idempotik != "false"){
 					$items_array[] = [
 							"errorCode" => 14, // TransactionAlreadyRolledBack
@@ -3421,7 +3421,7 @@ class DigitainController extends Controller
 					// $datatrans = $this->findTransactionRefund($value['roundId'], 'round_id');
 
 					// $idempotik = GameTransactionMDB::findGameExt($value['roundId'], 3,'roundId', $client_details);
-					$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details); // NEW 4-15-22
+					$idempotik = GameTransactionMDB::findGameExt($key['txId'], 3,'transaction_id', $client_details); // NEW 4-15-22
 					if($idempotik != false && $idempotik != "false"){
 						$items_array[] = [
 								"errorCode" => 14, // TransactionAlreadyRolledBack
@@ -3487,7 +3487,7 @@ class DigitainController extends Controller
 					// $datatrans = $this->findTransactionRefund($key['originalTxId'], 'transaction_id');
 
 					// $idempotik = GameTransactionMDB::findGameExt($value['originalTxId'], 3,'transaction_id', $client_details);
-					$idempotik = GameTransactionMDB::findGameExt($key['TxId'], 3,'transaction_id', $client_details); // NEW 4-15-22
+					$idempotik = GameTransactionMDB::findGameExt($value['txId'], 3,'transaction_id', $client_details); // NEW 4-15-22
 					if($idempotik != false && $idempotik != "false"){
 						$items_array[] = [
 								"errorCode" => 14, // TransactionAlreadyRolledBack
