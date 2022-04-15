@@ -205,7 +205,7 @@ class PlayStarController extends Controller
             try
             {
                 $game_details = Game::find($request->game_id, $this->provider_db_id);
-                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["txn_id"],'round_id', 1, $client_details);
+                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["txn_id"],'round_id', false, $client_details);
                 Helper::saveLog('PlayStar Bet_trans', $this->provider_db_id, json_encode($request->all()),$bet_transaction);
                 if($bet_transaction != false)
                 {
