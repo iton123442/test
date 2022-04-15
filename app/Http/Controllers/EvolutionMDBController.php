@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Helpers\ClientRequestHelper;
+use App\Jobs\CreateGameTransactionLog;
 use App\Helpers\EVGHelper;
 use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
@@ -159,7 +160,7 @@ class EvolutionMDBController extends Controller
                         "provider_trans_id" => $data["transaction"]["id"],
                         "amount" =>$data["transaction"]["amount"],
                         "game_transaction_type"=>1,
-                        "provider_request" =>json_encode($data),
+                        // "provider_request" =>json_encode($data),
                     );
                     $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
                     $fund_extra_data = [
@@ -175,12 +176,23 @@ class EvolutionMDBController extends Controller
                             "balance"=>(float)$balance,
                             "uuid"=>$data["uuid"],
                         );
-                        $dataToUpdate = array(
-                            "mw_response" => json_encode($msg),
-                            "transaction_detail" =>"success",
-							"general_details" => "success",
-                        );
-                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        // $dataToUpdate = array(
+                        //     "mw_response" => json_encode($msg),
+                        //     "transaction_detail" =>"success",
+						// 	"general_details" => "success",
+                        // );
+                        // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        $createGameTransactionLog = [
+                            "connection_name" => $client_details->connection_name,
+                            "column" =>[
+                                "game_trans_ext_id" => $betGametransactionExtId,
+                                "request" => json_encode($data),
+                                "response" => json_encode($msg),
+                                "log_type" => "provider_details",
+                                "transaction_detail" => "success",
+                            ]
+                        ];
+                        dispatch(new CreateGameTransactionLog($createGameTransactionLog));
                         return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
@@ -195,12 +207,23 @@ class EvolutionMDBController extends Controller
                             "status"=>"INSUFFICIENT_FUNDS",
                             "uuid"=>$data["uuid"],
                         );
-                        $dataToUpdate = array(
-                            "mw_response" => json_encode($msg),
-                            "transaction_detail" =>"FAILED",
-							"general_details" => "FAILED",
-                        );
-                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        // $dataToUpdate = array(
+                        //     "mw_response" => json_encode($msg),
+                        //     "transaction_detail" =>"FAILED",
+						// 	"general_details" => "FAILED",
+                        // );
+                        // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        $createGameTransactionLog = [
+                            "connection_name" => $client_details->connection_name,
+                            "column" =>[
+                                "game_trans_ext_id" => $betGametransactionExtId,
+                                "request" => json_encode($data),
+                                "response" => json_encode($msg),
+                                "log_type" => "provider_details",
+                                "transaction_detail" => "success",
+                            ]
+                        ];
+                        dispatch(new CreateGameTransactionLog($createGameTransactionLog));
                         return response($msg,200)
                         ->header('Content-Type', 'application/json');
                     }
@@ -268,8 +291,8 @@ class EvolutionMDBController extends Controller
                     "round_id" => $data["transaction"]["refId"],
                     "amount" => $data["transaction"]["amount"],
                     "game_transaction_type"=>2,
-                    "provider_request" =>json_encode($data),
-                    "mw_response" => json_encode($msg)
+                    // "provider_request" =>json_encode($data),
+                    // "mw_response" => json_encode($msg)
                 );
                 $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                 $action_payload = [
@@ -303,7 +326,7 @@ class EvolutionMDBController extends Controller
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+                    // ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                     $msg = array(
                         "status"=>"OK",
                         "balance"=>(float)$balance,
