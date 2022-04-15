@@ -148,6 +148,7 @@ class PlayStarController extends Controller
                                 ]   
                         ); 
                         dispatch(new UpdateGametransactionJobs($gameTransactionData));
+                        
                             $gameTransactionEXTData = array(
                                 "game_trans_id" => $game_transaction_id,
                                 "provider_trans_id" => $data['ts'],
