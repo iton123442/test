@@ -167,15 +167,15 @@ class FundtransferProcessorController extends Controller
         if(isset($payload->request_body->fundtransferrequest->fundinfo->freeroundend)){
             $requesttocient["fundtransferrequest"]['fundinfo']['freeroundend'] = $payload->request_body->fundtransferrequest->fundinfo->freeroundend;
         }
-        if(isset($payload->action->custom->client_connection_name) && isset($gteid)) {
-            try{
-                $ext_Data = ['mw_request' => json_encode($requesttocient)];
-                // Helper::saveLog($gteid, 999999, json_encode($ext_Data), "UPDATE TRANSACTION EXTENSION");
-                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
-            }catch (\Exception $e){
-                //Do nothing 
-            }
-        }
+        // if(isset($payload->action->custom->client_connection_name) && isset($gteid)) {
+        //     try{
+        //         $ext_Data = ['mw_request' => json_encode($requesttocient)];
+        //         // Helper::saveLog($gteid, 999999, json_encode($ext_Data), "UPDATE TRANSACTION EXTENSION");
+        //         ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+        //     }catch (\Exception $e){
+        //         //Do nothing 
+        //     }
+        // }
 
         $attempt_count = 1; # Number Of Re Attempt
         $is_succes = false; # Transaction Succeed First Try
@@ -309,7 +309,18 @@ class FundtransferProcessorController extends Controller
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                $createGameTransactionLog = [
+                                    "connection_name" => $payload->action->custom->client_connection_name,
+                                    "column" =>[
+                                        "game_trans_ext_id" => $gteid,
+                                        "request"=>json_encode($requesttocient),
+                                        "response" =>json_encode($client_response->fundtransferresponse),
+                                        "log_type" => "client_details",
+                                        "transaction_detail" => "success",
+                                    ]
+                                ];
+                                dispatch(new CreateGameTransactionLog($createGameTransactionLog));
                             }
                             elseif($payload->action->custom->provider == 'bng'){
                                 // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);

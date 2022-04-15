@@ -218,7 +218,7 @@ class GameTransactionMDB
             return null;
         }
     }
-    public static function createGametransactionV2($client_details){
+    public static function createGametransactionV2($data,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         $data['operator_id'] = $client_details->operator_id;
         $data['client_id'] = $client_details->client_id;
@@ -759,6 +759,15 @@ class GameTransactionMDB
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
         if($connection != null){
             return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insertGetId($data);
+        }else{
+            return null;
+        }
+    }
+
+    public static function updateGameTransactionCCMD($data,$game_transaction_id,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->where('game_trans_id',$game_transaction_id)->update($data);
         }else{
             return null;
         }
