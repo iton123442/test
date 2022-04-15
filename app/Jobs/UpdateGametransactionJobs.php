@@ -48,6 +48,6 @@ class UpdateGametransactionJobs extends Job
         $client_details = $payload['connection_name'];
         $createGameLog = $payload['column'];
         $game_transaction_id = $payload['game_trans_id'];
-        GameTransactionMDB::updateGameTransactionCCMD($createGameLog,$game_transaction_id,$client_details);
+        GameTransactionMDB::updateGameTransactionCCMD($createGameLog, $game_transaction_id, $client_details);
     }
 }
