@@ -669,7 +669,7 @@ class IDNPokerController extends Controller
                                 } elseif ($value["status"] == "Win" || $value["status"] == "Draw" || $value["status"] == "Refund" ) {
                                     // $bet_amount = ($value["r_bet"] / $rate);
                                     $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
-                                    $pay_amount = $value["curr_amount"];
+                                    $pay_amount = ($value["curr_amount"] == "Draw") ? $bet_amount : $value["curr_amount"];
                                     $win =  ($value["status"] == "Refund") ? 4 : 1;
                                 } elseif ($value["status"] == "Buy Jackpot" ) {
                                     $bet_amount = $value["curr_amount"]; // already calculated from IDN system

@@ -219,7 +219,7 @@ class IDNPokerHelper{
                         <request>
                             <secret_key>'.$auth.'</secret_key>
                             <id>9</id>
-                            <currency>JPY</currency>
+                            <currency>USD</currency>
                         </request>'
             ]
             );
