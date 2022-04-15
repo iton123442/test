@@ -24,7 +24,8 @@ class YGG002Controller extends Controller
 
     public function playerinfo(Request $request){
         Helper::saveLog("YGG 002 playerinfo req", $this->provider_id, json_encode($request->all()), "RECEIVED");
-        $client_details = ProviderHelper::getClientDetails('token',$request->sessiontoken);
+        $player_details = ProviderHelper::getClientDetails('token',$request->sessiontoken);
+        $client_details = ProviderHelper::getClientDetails('player_id',$player_details->player_id);
         if($client_details == null){ 
             $response = array(
                 "code" => 1000,
@@ -619,7 +620,8 @@ class YGG002Controller extends Controller
 
     public function getbalance(Request $request){
         Helper::saveLog('YGG 002 getbalance request', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), "");
-        $client_details = ProviderHelper::getClientDetails('token',$request->sessiontoken);
+        $player_details = ProviderHelper::getClientDetails('token',$request->sessiontoken);
+        $client_details = ProviderHelper::getClientDetails('player_id',$player_details->player_id);
         if($client_details == null){ 
             $response = array(
                 "code" => 1000,
