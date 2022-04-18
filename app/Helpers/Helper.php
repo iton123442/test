@@ -167,10 +167,9 @@ class Helper
 			 		["g.game_id",'=', $identification],
 			 	]);
 			}
-			$total = count($game_details);
 			$result= $game_details->first();
-
-			return $total > 0 ? $result : null;
+			
+	 		return $result;
 	}
 
     /* ERAIN 
