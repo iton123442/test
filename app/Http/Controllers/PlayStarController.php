@@ -146,8 +146,8 @@ class PlayStarController extends Controller
                                 break;
                         }
                     }
+                    $connection_name = $client_details->connection_name;
                     $gameTransactionDataforLogs = array(
-                        "connection_name" => $client_details->connection_name,
                         "provider_request" =>json_encode($request->all()),
                         "mw_response" => json_encode($response),
                         'mw_request' => json_encode($client_response->requestoclient),
@@ -156,7 +156,7 @@ class PlayStarController extends Controller
                         'general_details' => 'success',       
                             
                     ); 
-                GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$client_details);
+                GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name);
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($gameTransactionDataforLogs), $game_transid_den);
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
