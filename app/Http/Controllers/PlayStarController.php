@@ -80,6 +80,7 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
+        $game_transid_den = system('date +%s%N');
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -165,7 +166,7 @@ class PlayStarController extends Controller
                         'general_details' => 'success',           
                     );
                 GameTransactionMDB::updateGametransactionEXT($gameTransactionEXTData,$game_trans_ext_id,$client_details);                       
-                Helper::saveLog('PlayStar Debit', $this->provider_db_id, json_encode($data), $response);
+                Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $game_transid_den);
                     dispatch(new UpdateGametransactionJobs($gameTransactionDataforQue));
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
