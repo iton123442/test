@@ -2828,12 +2828,12 @@ class DigitainController extends Controller
 		if($json_data == null){
 			return $this->noBody();
 		}
-		// if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
-		// 	return $this->wrongOperatorID();
-		// }
-		// if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
-		// 	return $this->authError();
-		// }
+		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
+			return $this->wrongOperatorID();
+		}
+		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
+			return $this->authError();
+		}
 
 		# Missing Parameters
 		if(!isset($json_data['items']) || !isset($json_data['operatorId']) || !isset($json_data['timestamp']) || !isset($json_data['signature']) || !isset($json_data['allOrNone']) || !isset($json_data['providerId'])){
@@ -3224,14 +3224,14 @@ class DigitainController extends Controller
 						// 	continue;
 
 						$updateGameTransaction = ["win" => 2];
-						GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);  
+						GameTransactionMDB::updateGametransaction($updateGameTransaction, $datatrans->game_trans_id, $client_details);  
 						$updateTransactionEXt = array(
-							"mw_response" => json_encode($response),
+							"mw_response" => json_encode($items_array),
 							'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
 							'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
 						);
 						GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-						ProviderHelper::saveLogWithExeption($datatrans->game_trans_id, $this->provider_db_id, json_encode($items_array), 'FATAL ERROR');
+						ProviderHelper::saveLogWithExeption($datatrans->game_trans_id, $this->provider_db_id, json_encode($items_array), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
 						continue;
 					}
 
