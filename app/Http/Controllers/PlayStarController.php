@@ -148,14 +148,13 @@ class PlayStarController extends Controller
                     }
                     $gameTransactionDataforLogs = array(
                         "connection_name" => $client_details->connection_name,
-                            "column" =>[
-                                "provider_request" =>json_encode($request->all()),
-                                "mw_response" => json_encode($response),
-                                'mw_request' => json_encode($client_response->requestoclient),
-                                'client_response' => json_encode($client_response->fundtransferresponse),
-                                'transaction_detail' => 'success',
-                                'general_details' => 'success',       
-                            ]   
+                        "provider_request" =>json_encode($request->all()),
+                        "mw_response" => json_encode($response),
+                        'mw_request' => json_encode($client_response->requestoclient),
+                        'client_response' => json_encode($client_response->fundtransferresponse),
+                        'transaction_detail' => 'success',
+                        'general_details' => 'success',       
+                            
                     ); 
                 GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$client_details);
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($gameTransactionDataforLogs), $game_transid_den);
