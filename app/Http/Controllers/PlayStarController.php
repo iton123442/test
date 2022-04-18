@@ -122,6 +122,7 @@ class PlayStarController extends Controller
                 );
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details); 
             $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+            Helper::saveLog('PlayStar client response', $this->provider_db_id, json_encode($data), $client_response);
                     if (isset($client_response->fundtransferresponse->status->code)) 
                     {
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);                       
