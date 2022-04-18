@@ -1977,6 +1977,11 @@ class GameLobby{
             // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
             $player_id = $client_details->username;
             $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
+
+            $default_frame = config('providerlinks.play_tigergames');
+            if ($client_details->operator_id == 11) {
+                $default_frame = 'https://kbpoker.69master.cc';
+            }
             /***************************************************************
             *
             * CHECK PLAYER IF EXIST
@@ -2047,7 +2052,7 @@ class GameLobby{
                                         );
                                         $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
                                         // return urlencode($encoded_data);
-                                        return config('providerlinks.play_tigergames') . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
+                                        return $default_frame . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
                                     case 2:
                                         //TRANSFER WALLET CLIENT
                                         //TRANSFER WALLET SA PROIVDER

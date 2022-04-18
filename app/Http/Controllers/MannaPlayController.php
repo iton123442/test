@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Jobs\CreateGameTransactionLog;
 use GuzzleHttp\Client;
 use App\Helpers\CallParameters;
 use App\Helpers\ClientRequestHelper;
@@ -184,19 +185,29 @@ class MannaPlayController extends Controller
 						"round_id" => $json_data['round_id'],
 						"amount" => $json_data['amount'],
 						"game_transaction_type" => 1,
-						"provider_request" => json_encode($json_data),
+						// "provider_request" => json_encode($json_data),
 					);
 
 					$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details); 
 					
 					$fund_extra_data = [
-	                    'provider_name' => $game_details->provider_name
+	                    'provider_name' => $game_details->provider_name,
+						// 'provider_request' => $request->all(),
 	                ]; 
+
+					// $createGameTransactionLog = [
+					// 	"client_details" => $client_details,
+					// 	"type" => "create",
+					// 	"column" =>[
+					// 		"game_trans_ext_id" => $game_trans_ext_id,
+					// 		"provider_request" => json_encode($json_data),
+					// 	]
+					// ];
+					// Queue::push(new CreateGameTransactionLog($createGameTransactionLog));
 
 					// change $json_data['round_id'] to $game_transaction_id
 					// ProviderHelper::updateGameTransactionStatus($game_transaction_id, 5, 5);
 			        $client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
-					
 					if (isset($client_response->fundtransferresponse->status->code)) {
 						/*ProviderHelper::updateGameTransactionFlowStatus($game_transaction_id, 1);*/
 						switch ($client_response->fundtransferresponse->status->code) {
@@ -207,12 +218,22 @@ class MannaPlayController extends Controller
 									"transaction_id" => $json_data['transaction_id'],
 									"balance" => ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance)
 								];
-								
-								$data_to_update = array(
-			                        "mw_response" => json_encode($response)
-			                    );
 
-			                    GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+								// $updateGameTrasnactionLog = [
+								// 	"client_details" => $client_details,
+								// 	"type" => "update",
+								// 	"game_trans_ext_id" => $game_trans_ext_id,
+								// 	"column" =>[
+								// 		"mw_response" => json_encode($response)
+								// 	]
+								// ];
+								// Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
+								
+								// $data_to_update = array(
+			                    //     "mw_response" => json_encode($response)
+			                    // );
+
+			                    // GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 
 								break;
 							case '402':
@@ -230,10 +251,21 @@ class MannaPlayController extends Controller
 			                        );
 
 			                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
-			                        $data_to_update = array(
-			                            "mw_response" => json_encode($response)
-			                        );
-			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+
+									// $updateGameTrasnactionLog = [
+									// 	"client_details" => $client_details,
+									// 	"type" => "update",
+									// 	"id" => $game_trans_ext_id,
+									// 	"column" =>[
+									// 		"mw_response" => json_encode($response)
+									// 	]
+									// ];
+									// Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
+
+			                        // $data_to_update = array(
+			                        //     "mw_response" => json_encode($response)
+			                        // );
+			                        // GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    }catch(\Exception $e){
 			                        /*ProviderHelper::saveLogWithExeption('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
 			                    } 
@@ -241,7 +273,22 @@ class MannaPlayController extends Controller
 								break;
 						}
 
-
+						try{
+							$createGameTransactionLog = [
+								"connection_name" => $client_details->connection_name,
+								"column" =>[
+									"game_trans_ext_id" => $game_trans_ext_id,
+									"request" => json_encode($json_data),
+									"response" => json_encode($response),
+									"log_type" => "provider_details",
+									"transaction_detail" => "success",
+								]
+							];
+                        	dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+						}catch(\Exception $e){
+							// ProviderHelper::saveLogWithExeption('manna_debit', $this->provider_db_id, json_encode($json_data), "GAME TRANACTION LOG");
+							Helper::saveLog("manna Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+						}
 					}
 						
 					ProviderHelper::saveLogWithExeption('manna_debit', $this->provider_db_id, json_encode($json_data), $response);
@@ -345,12 +392,27 @@ class MannaPlayController extends Controller
 		                    "round_id" => $json_data["round_id"],
 		                    "amount" => $json_data["amount"],
 		                    "game_transaction_type"=> 2,
-		                    "provider_request" =>json_encode($json_data),
-		                    "mw_response" => json_encode($response)
+		                    // "provider_request" =>json_encode($json_data),
+		                    // "mw_response" => json_encode($response)
 		                );
 
 		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
 
+						try{
+							$createGameTransactionLog = [
+								"connection_name" => $client_details->connection_name,
+								"column" =>[
+									"game_trans_ext_id" => $game_trans_ext_id,
+									"request" => json_encode($json_data),
+									"response" => json_encode($response),
+									"log_type" => "provider_details",
+									"transaction_detail" => "success",
+								]
+							];
+							dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+						}catch(\Exception $e){
+							Helper::saveLog("manna Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+						}
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [

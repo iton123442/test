@@ -321,20 +321,20 @@ class OnlyPlayController extends Controller
         $user_id = explode('TG_',$request->user_id);
         $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', 1, $get_client_details);
-        $balance = str_replace(".","", $get_client_details->balance);
-        $formatBalance = (int) $balance;
-        if($bet_transaction != 'false'){
-            $get_failed_trans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $get_client_details);
-            if($get_failed_trans != false){
-                if($get_failed_trans->transaction_detail == 'failed'){
-                    $response = [
-                        'success' => true,
-                        'balance' => $formatBalance
-                    ];
-                    return $balance;
-                }
-            }
-        }
+        // $balance = str_replace(".","", $get_client_details->balance);
+        // $formatBalance = (int) $balance;
+        // if($bet_transaction != 'false'){
+        //     $get_failed_trans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $get_client_details);
+        //     if($get_failed_trans != false){
+        //         if($get_failed_trans->transaction_detail == 'failed'){
+        //             $response = [
+        //                 'success' => true,
+        //                 'balance' => $formatBalance
+        //             ];
+        //             return $balance;
+        //         }
+        //     }
+        // }
 
             try{
                 ProviderHelper::idenpotencyTable($request->tx_id);
@@ -391,7 +391,6 @@ class OnlyPlayController extends Controller
                             "success" => true,
                             "balance" => $formatBalance
                         ];
-                        break;
                         $updateTransactionEXt = array(
                             "provider_request" =>json_encode($request->all()),
                             "mw_response" => json_encode($response),
@@ -404,6 +403,7 @@ class OnlyPlayController extends Controller
                         Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()),$response);
                         return response($response,200)
                         ->header('Content-Type', 'application/json');
+                        break;
                 }
 
                

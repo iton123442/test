@@ -439,17 +439,17 @@ class QuickspinDirectController extends Controller
             ];
             return $res;
         }
-        $get_faildTrans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $client_details);
-        if($get_faildTrans != false){
-            if($get_faildTrans->transaction_detail == 'failed'){
-                $res = [
-                    "balance" => (int)$formatBal,
-                    "txid" => (int) $provider_trans_id,
-                    "remotetxid" => $bet_transaction->game_trans_id,
-                ];
-                return $res;
-            }
-        }
+        // $get_faildTrans = GameTransactionMDB::findGameExt($bet_transaction->game_trans_id,1,'game_trans_id', $client_details);
+        // if($get_faildTrans != false){
+        //     if($get_faildTrans->transaction_detail == 'failed'){
+        //         $res = [
+        //             "balance" => (int)$formatBal,
+        //             "txid" => (int) $provider_trans_id,
+        //             "remotetxid" => $bet_transaction->game_trans_id,
+        //         ];
+        //         return $res;
+        //     }
+        // }
         $game_details = Game::findbyid($bet_transaction->game_id);
         if($game_details == false){
             $res = [
@@ -494,7 +494,6 @@ class QuickspinDirectController extends Controller
                         "txid" => (int)$provider_trans_id,
                         "remotetxid" => (string)$bet_transaction->game_trans_id,
                     ];
-                break;
                 $updateTransactionEXt = array(
                     "provider_request" =>json_encode($req->all()),
                     "mw_response" => json_encode($res),
@@ -507,6 +506,7 @@ class QuickspinDirectController extends Controller
                 Helper::saveLog('QuickcSPin', config("providerlinks.quickspinDirect.provider_db_id"), json_encode($req->all()),$res);
                 return response($res,200)
                 ->header('Content-Type', 'application/json');
+                break;
             }
         }
         

@@ -218,7 +218,7 @@ class GameTransactionMDB
             return null;
         }
     }
-    public static function createGametransactionV2($client_details){
+    public static function createGametransactionV2($data,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         $data['operator_id'] = $client_details->operator_id;
         $data['client_id'] = $client_details->client_id;
@@ -693,19 +693,12 @@ class GameTransactionMDB
     /**
      * Create Game transaction logs
      */
-    public static function createGametransactionLog($log_id,$log_type,$log,$client_details){
-        $data = [
-            "game_trans_ext_id" => $log_id,
-            "log_type" => $log_type,
-            "logs" => $log
-        ];
-
+    public static function createGametransactionLog($game_transaction_logs,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insert($data);
-        }else{
-            return null;
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insertGetId($game_transaction_logs);
         }
+        return null;
     }
 
     /**
@@ -713,25 +706,27 @@ class GameTransactionMDB
      */
     public  static function findGameTransactionLogs($game_trans_ext_id, $type=false,$client_details)
     {
-        if($type != false){
-            if ($type == 'provider_request') {
-                $where = 'where gte.game_trans_ext_id = "'.$game_trans_ext_id.'" AND gte.log_type = "'.$type.'"';
-            }
-            if ($type == 'mw_response') {
-                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id.'" AND gte.log_type = "'.$type.'"';
-            }
-            if ($type == 'mw_request') {
-                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
-            }
-            if ($type == 'client_response') {
-                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
-            }
-            if ($type == 'general_details') {
-                $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
-            }
-        }else{
-            $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'"' ;
-        }
+        // if($type != false){
+        //     if ($type == 'provider_request') {
+        //         $where = 'where gte.game_trans_ext_id = "'.$game_trans_ext_id.'" AND gte.log_type = "'.$type.'"';
+        //     }
+        //     if ($type == 'mw_response') {
+        //         $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id.'" AND gte.log_type = "'.$type.'"';
+        //     }
+        //     if ($type == 'mw_request') {
+        //         $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
+        //     }
+        //     if ($type == 'client_response') {
+        //         $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
+        //     }
+        //     if ($type == 'general_details') {
+        //         $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'" AND gte.log_type = "'.$type.'"';
+        //     }
+        // }else{
+        //     $where = 'where gte.game_trans_ext_id = "' . $game_trans_ext_id .'"' ;
+        // }
+
+        $where = 'where gte.game_trans_ext_id = ' . $game_trans_ext_id;
         
         try {
             $connection = config("serverlist.server_list.".$client_details->connection_name);
@@ -749,7 +744,30 @@ class GameTransactionMDB
     public static function updateGametransactionLog($data,$game_trans_ext_id,$type,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->where('game_trans_ext_id',$game_trans_ext_id)->where('log_type',$type)->update($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+        }else{
+            return null;
+        }
+    }
+
+    
+     /**
+     * NOTE ONLY FOR UPDATE GAME TRANSACTION EXT IN FUNDTRANSFER PROCESSOR CONTROLLER!  MDB
+     * CutCall Multi DB
+     */
+    public static function createGametransactionLogCCMD($data,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insertGetId($data);
+        }else{
+            return null;
+        }
+    }
+
+    public static function updateGameTransactionCCMD($data,$game_transaction_id,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->where('game_trans_id',$game_transaction_id)->update($data);
         }else{
             return null;
         }

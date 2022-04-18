@@ -4,6 +4,7 @@ namespace App\Helpers;
 use GuzzleHttp\Client;
 use GuzzleHttp\TransferStats;
 use App\Jobs\DebitRefund;
+use App\Jobs\CreateGameTransactionLog;
 use Queue;
 use App\Helpers\Helper;
 use App\Helpers\GameLobby;
@@ -100,7 +101,14 @@ class ClientRequestHelper{
                 if(isset($action["connection_timeout"] )) {
                     $connection_timeout = $action["connection_timeout"]; //set by provider
                 }
+
+                // if(isset($action["provider_request"] )) {
+                //     $provider_request = $action["provider_request"]; //set by provider
+                // }
+
             }
+
+            
 
             try{
                 $guzzle_response = $client->post($client_details->fund_transfer_url,
@@ -124,15 +132,45 @@ class ClientRequestHelper{
                 Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
                 $client_reponse->requestoclient = $requesttocient;
                 //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
-                try{
-                    $dataToUpdate = array(
-                        "client_response" => json_encode($client_reponse),
-                        "mw_request" => json_encode($requesttocient),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
-                }catch(\Exception $e){
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+                // try{
+                //     $dataToUpdate = array(
+                //         "client_response" => json_encode($client_reponse),
+                //         "mw_request" => json_encode($requesttocient),
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                // }catch(\Exception $e){
+                //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+                // }
+                // try{
+                //     $updateGameTrasnactionLog = [
+                //         "client_details" => $client_details,
+                //         "type" => "update",
+                //         "game_trans_ext_id" => $transactionId,
+                //         "column" =>[
+                //             "mw_request" => json_encode($requesttocient),
+                //             "client_response" => json_encode($client_reponse),
+                //         ]
+                //     ];
+                //     Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
+                // }catch(\Exception $e){
+                //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+                // }
+                try {
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $transactionId,
+                            "request" => json_encode($requesttocient),
+                            "response" => json_encode($client_reponse->fundtransferresponse),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                } catch (\Exception $e) {
+                    //throw $th;
                 }
+                
                 return $client_reponse;
             }catch(\Exception $e){
 
@@ -154,8 +192,19 @@ class ClientRequestHelper{
 
                 // Add Refund Queue
                 if($type == 'debit'){
-                    // $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);   
-                    $exclude_provider = ["IDNPoker"];
+                    // $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);  
+                    // if($action["provider_name"]  == "SimplePlay"){
+                    //     $exclude_provider = ["SimplePlay"];
+                    // } elseif($action["provider_name"]  == "BGaming"){
+                    //     $exclude_provider = ["BGaming"];
+                    // } elseif($action["provider_name"]  == "QuickSpin Direct"){
+                    //     $exclude_provider = ["QuickSpin Direct"];
+                    // } elseif($action["provider_name"]  == "OnlyPlay"){
+                    //     $exclude_provider = ["OnlyPlay"];
+                    // }else{
+                    //     $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay"];
+                    // }
+                    $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay"];
                     $bol = true;
                     if(isset($action['provider_name'])){
                         if (in_array($action["provider_name"], $exclude_provider)) {
@@ -193,17 +242,32 @@ class ClientRequestHelper{
                     }
                 }
 
-                try{
-                    $dataToUpdate = array(
-                        "client_response" => json_encode($e->getMessage().' '.$e->getLine()),
-                        "mw_request" => json_encode($requesttocient),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
-                }catch(\Exception $e){
-                    Providerhelper::mandatorySaveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$requesttocient);
-                }
+                // try{
+                //     $dataToUpdate = array(
+                //         "client_response" => json_encode($e->getMessage().' '.$e->getLine()),
+                //         "mw_request" => json_encode($requesttocient),
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                // }catch(\Exception $e){
+                //     Providerhelper::mandatorySaveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$requesttocient);
+                // }
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
+
+                try {
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $transactionId,
+                            "request" => json_encode($requesttocient),
+                            "response" => json_encode($client_reponse->fundtransferresponse),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                } catch (\Exception $e) {
+                }
                 return $client_reponse;
             }
     }
@@ -379,7 +443,7 @@ class ClientRequestHelper{
                         ];
                         ProviderHelper::saveLogLatency($requesttocient['request_body']['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime() . ' TG_PROCESS');
                     },
-                    'timeout' => 0.5, # enough tobe received by the server!
+                    'timeout' => 5.5, # enough tobe received by the server!
                     'body' => json_encode($requesttocient)
                 ],
                 ['defaults' => ['exceptions' => false]]
@@ -715,6 +779,20 @@ class ClientRequestHelper{
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
         if($connection != null){
             return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+        }else{
+            return null;
+        }
+    }
+
+
+    /**
+     * NOTE ONLY FOR UPDATE GAME TRANSACTION EXT IN FUNDTRANSFER PROCESSOR CONTROLLER!  MDB
+     * CutCall Multi DB
+     */
+    public static function updateGametransactionLogEXTCCMD($data,$game_trans_ext_id,$connection_name){
+        $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
         }else{
             return null;
         }

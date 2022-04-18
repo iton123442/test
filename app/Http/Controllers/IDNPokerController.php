@@ -662,22 +662,23 @@ class IDNPokerController extends Controller
                                 $bet_amount = 0;
                                 $win = 5;
                                 // $pay_amount =  ($value["status"] == "Lose"  || $value["status"] == "Fold") ? 0 :  $value["curr_amount"];
-                                if($value["status"] == "Lose" || $value["status"] == "Fold"){
-                                    $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
+                                if($value["status"] == "Lose" || $value["status"] == "Fold" || $value["status"] == 'Buy Jackpot'){
+                                    // $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
+                                    $bet_amount = $value['curr_amount'];
                                     $pay_amount = 0;
                                     $win = 0;
-                                } elseif ($value["status"] == "Win" || $value["status"] == "Draw" || $value["status"] == "Refund" ) {
+                                } elseif ($value["status"] == "Win") {
                                     // $bet_amount = ($value["r_bet"] / $rate);
                                     $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
                                     $pay_amount = $value["curr_amount"];
-                                    $win =  ($value["status"] == "Refund") ? 4 : 1;
-                                } elseif ($value["status"] == "Buy Jackpot" ) {
-                                    $bet_amount = $value["curr_amount"]; // already calculated from IDN system
-                                    $pay_amount = 0;
-                                    $win = 0;
+                                    $win = 1;
                                 } elseif ($value["status"] == "Win Global Jackpot" ) {
                                     $bet_amount = 0; // already calculated from IDN system
                                     $pay_amount = $value["curr_amount"];
+                                    $win = 1;
+                                } elseif ($value["status"] == "Draw" || $value["status"] == "Refund" ) {
+                                    $bet_amount =  $value["curr_amount"]; // already calculated from IDN system
+                                    $pay_amount =  $value["curr_amount"];
                                     $win = 1;
                                 }
                                 $income = $bet_amount - $pay_amount;
