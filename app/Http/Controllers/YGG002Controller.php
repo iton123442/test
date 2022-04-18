@@ -71,8 +71,8 @@ class YGG002Controller extends Controller
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
         
         # Check Game Restricted
-		
-        if($client_details == null || $game_details == null){ 
+		dd($game_details);
+        if($client_details == null){ 
             $response = array(
                 "code" => 1000,
                 "msg" => "Session expired. Please log in again."
