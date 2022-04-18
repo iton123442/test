@@ -168,6 +168,7 @@ class Helper
 			 	]);
 			}
 			$result= $game_details->first();
+			
 	 		return $result;
 	}
 
