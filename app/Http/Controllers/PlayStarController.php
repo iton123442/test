@@ -80,7 +80,7 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
-        $game_transid_den = system('date +%s%N');
+        $game_transid_gen = system('date +%s%N');
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -103,7 +103,7 @@ class PlayStarController extends Controller
                     "provider_trans_id" => $data['ts'],
                     "round_id" => $data['txn_id'],
                 );
-           $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$client_details); //create game_transaction
+           $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
             $gameTransactionEXTData = array(
                 "game_trans_id" => "",
                 "provider_trans_id" => "",
