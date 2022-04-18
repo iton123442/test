@@ -80,7 +80,7 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
-        $game_transid_gen = system('date +%s%N');
+        $game_transid_gen = system('date +%s%N'); // ID generator
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -120,7 +120,7 @@ class PlayStarController extends Controller
                 "game_transaction_type"=> 1,
                 // "provider_request" =>json_encode($request->all()),
                 );
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details); 
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details); //create extension
             $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
             Helper::saveLog('PlayStar client response', $this->provider_db_id, json_encode($data), $client_response);
                     if (isset($client_response->fundtransferresponse->status->code)) 
@@ -157,7 +157,7 @@ class PlayStarController extends Controller
                         'general_details' => 'success',       
                             
                     ); 
-                GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name);
+                GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name); // create extension logs
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $gameTransactionDataforLogs);
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
@@ -171,7 +171,7 @@ class PlayStarController extends Controller
 }
 
     public function getResult(Request $request){
-        Helper::saveLog('PlayStar Result', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
+        Helper::saveLog('PlayStar Result for win call', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $data["total_win"] / 100;
