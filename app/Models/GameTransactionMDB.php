@@ -239,6 +239,14 @@ class GameTransactionMDB
             return null;
         }
     }
+    public static function updateGametransactionV2($data,$game_transaction_id,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions_newgen")->where('game_trans_id',$game_transaction_id)->update($data);
+        }else{
+            return null;
+        }
+    }
     public static function createGameTransactionExt($gametransactionext,$client_details){
         Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode("Hit the createGameTransactionExt"), "");
         $connection = self::getAvailableConnection($client_details->connection_name);
@@ -268,6 +276,20 @@ class GameTransactionMDB
             } catch (\Exception $e) {
                 $data["mw_request"] .= $e->getMessage();
                 return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+            }
+            return null;
+        }else{
+            return null;
+        }
+    } 
+    public static function updateGametransactionEXTV2($data,$game_trans_ext_id,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            try {
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext_newgen")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+            } catch (\Exception $e) {
+                $data["mw_request"] .= $e->getMessage();
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext_newgen")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
             }
             return null;
         }else{
@@ -354,6 +376,69 @@ class GameTransactionMDB
                 if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
                     $connection_default = config("serverlist.server_list.default");
                     $data = DB::connection( $connection_default["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection_default['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                    
+                    if ( count($data) > 0  ) {
+                        $connection_name = "default";
+                        $details = $data;
+                        
+                    }
+                } 
+                // $connection_list = config("serverlist.server_list");
+                // foreach($connection_list as $key => $connection){
+                //     $status = self::checkDBConnection($connection["connection_name"]);
+                //     if($status && $connection_name != $connection["connection_name"]){
+                //         $data = DB::connection( $connection["connection_name"] )->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                //         if ( count($data) > 0  ) {
+                //             $connection_name = $key;
+                //             $details = $data;
+                //             break;
+                //         }
+                //     }
+                // }
+
+
+            }
+            $count = count($details);
+            if ($count > 0 ) {
+                $details[0]->connection_name = $connection_name;
+            }
+            return $count > 0 ? $details[0] : 'false';
+        } catch (\Exception $e) {
+            return 'false';
+        }
+
+    }
+
+    public static  function findGameTransactionDetailsV2($identifier, $type, $entry_id= false, $client_details) {
+        $connection_name = $client_details->connection_name;
+        $entry_type = "";
+        if ($entry_id) {
+            $entry_type = "AND gt.entry_id = ". $entry_id;
+        }
+
+        if ($type == 'transaction_id') {
+            $where = 'where gt.provider_trans_id = "'.$identifier.'" '.$entry_type.'';
+        } elseif ( $type == 'game_transaction') {
+            $where = 'where gt.game_trans_id = '.$identifier;
+        } elseif ( $type == "round_id") {
+            $where = 'where gt.round_id = "'.$identifier.'" '.$entry_type.'';
+        } elseif ( $type == "token_id") {
+            $where = 'where gt.token_id = "'.$identifier.'" '.$entry_type.'';
+        }
+        try {
+            $connection_name = $client_details->connection_name;
+            $details = [];
+            $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
+            $status = self::checkDBConnection($connection);
+            if ( ($connection != null) && $status) {
+                $connection = config("serverlist.server_list.".$client_details->connection_name);
+                $details = DB::connection( $connection["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection['db_list'][1].'`.`game_transactions_newgen` gt '.$where.' LIMIT 1');
+            }
+            if ( !(count($details) > 0 )) {
+
+                if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
+                    $connection_default = config("serverlist.server_list.default");
+                    $data = DB::connection( $connection_default["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection_default['db_list'][1].'`.`game_transactions_newgen` gt '.$where.' LIMIT 1');
                     
                     if ( count($data) > 0  ) {
                         $connection_name = "default";
