@@ -475,15 +475,15 @@ class DigitainController extends Controller
 	        	    continue;
 				}
 				// $client_player = DigitainHelper::playerDetailsCall($client_details);
-				$client_player = ProviderHelper::playerDetailsCall($client_details->player_token);
-				if($client_player == 'false'){ 
-					$items_array[] = [
-						 "info" => $key['info'], 
-						 "errorCode" => 999, 
-						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-	        	    ];   
-					continue;
-				}
+				// $client_player = ProviderHelper::playerDetailsCall($client_details->player_token);
+				// if($client_player == 'false'){ 
+				// 	$items_array[] = [
+				// 		 "info" => $key['info'], 
+				// 		 "errorCode" => 999, 
+				// 		 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+	   //      	    ];   
+				// 	continue;
+				// }
 				if($key['currencyId'] != $client_details->default_currency){
 	        		$items_array[] = [
 						 "info" => $key['info'], 
@@ -492,7 +492,7 @@ class DigitainController extends Controller
 	        	    ];   
 	        	    continue;
 				}
-				if(abs($client_player->playerdetailsresponse->balance) < $key['betAmount']){
+				if(abs($client_details->balance) < $key['betAmount']){
 			        $items_array[] = array(
 						 "info" => $key['info'], 
 						 "errorCode" => 6, 
@@ -502,7 +502,7 @@ class DigitainController extends Controller
 				}
 
 				// if($isset_before_balance == false){
-					$general_details['client']['beforebalance'] = $this->formatBalance(abs($client_player->playerdetailsresponse->balance));
+					$general_details['client']['beforebalance'] = $this->formatBalance(abs($client_details->balance));
 					// $isset_before_balance = true;
 				// }
 				
