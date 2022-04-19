@@ -83,16 +83,12 @@ class YGG002Controller extends Controller
         }
         # Check Game Restricted
         if($client_details == null){ 
-            $check_token = ProviderHelper::getClientDetails('token',$request->sessiontoken);
-            if($check_token == null){ 
-                $response = array(
-                    "code" => 1000,
-                    "msg" => "Session expired. Please log in again."
-                );
-                Helper::saveLog("YGG 002 wager client_details response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
-                return $response;
-            }
-            $client_details = $check_token;
+            $response = array(
+                "code" => 1000,
+                "msg" => "Session expired. Please log in again."
+            );
+            Helper::saveLog("YGG 002 wager client_details response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            return $response;
         }
   
         $balance = $client_details->balance;
