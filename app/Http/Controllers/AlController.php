@@ -446,7 +446,7 @@ class AlController extends Controller
 
 
     public function tapulan(Request $request){
-
+	dd($nanotime = system('date +%s%N'));
       $client_details = Providerhelper::getClientDetails('player_id', 10210);
       // GameTransactionMDB::createGametransactionLog(123,'genera_details', json_encode($request->all()),$client_details);
 
@@ -550,30 +550,64 @@ class AlController extends Controller
     }
 
 
-    public function debugMe(){
-        // SAGAMING
-        $client_details = Providerhelper::getClientDetails('player_id', 98);
-        $time = date('YmdHms'); //20140101123456
-        $method = 'VerifyUsername';
-        $querystring = [
-            "method" => $method,
-            "Key" => config('providerlinks.sagaming.SecretKey'),
-            "Time" => $time,
-            "Username" => config('providerlinks.sagaming.prefix').$client_details->player_id,
-        ];
-        $method == 'RegUserInfo' || $method == 'LoginRequest' ? $querystring['CurrencyType'] = $client_details->default_currency : '';
-        $data = http_build_query($querystring); // QS
-        $encrpyted_data = SAHelper::encrypt($data);
-        $md5Signature = md5($data.config('providerlinks.sagaming.MD5Key').$time.config('providerlinks.sagaming.SecretKey'));
-        $http = new Client();
-        $response = $http->post(config('providerlinks.sagaming.API_URL'), [
-            'form_params' => [
-                'q' => $encrpyted_data, 
-                's' => $md5Signature
-            ],
+    public function debugMe(Request $request){
+
+        $client_details = ProviderHelper::getClientDetails('player_id',$request->player_id);
+        $requesttocient = $request->getContent();
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer '.$client_details->client_access_token
+            ]
         ]);
-        Helper::saveLog('ALDEBUG '.$method, config('providerlinks.sagaming.pdbid'), json_encode(['for_params' => ['q'=>$encrpyted_data, 's'=>$md5Signature]]), $querystring);
-        return $response->getBody()->getContents();
+
+        try {
+             $guzzle_response = $client->post($client_details->fund_transfer_url,
+                [
+                    'body' => $requesttocient
+                ],
+                ['defaults' => [ 'exceptions' => false ]]
+            );
+             $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+             return json_encode($client_reponse);
+        } catch (\Exception $e) {
+              $response = array(
+                    "fundtransferresponse" => array(
+                        "status" => array(
+                            "code" => 402,
+                            "status" => "Exception",
+                            "message" => $e->getMessage().' '.$e->getLine(),
+                        ),
+                        'balance' => 0.0
+                    )
+              );
+              return $response;
+        }
+
+
+        // SAGAMING
+        // $client_details = Providerhelper::getClientDetails('player_id', 98);
+        // $time = date('YmdHms'); //20140101123456
+        // $method = 'VerifyUsername';
+        // $querystring = [
+        //     "method" => $method,
+        //     "Key" => config('providerlinks.sagaming.SecretKey'),
+        //     "Time" => $time,
+        //     "Username" => config('providerlinks.sagaming.prefix').$client_details->player_id,
+        // ];
+        // $method == 'RegUserInfo' || $method == 'LoginRequest' ? $querystring['CurrencyType'] = $client_details->default_currency : '';
+        // $data = http_build_query($querystring); // QS
+        // $encrpyted_data = SAHelper::encrypt($data);
+        // $md5Signature = md5($data.config('providerlinks.sagaming.MD5Key').$time.config('providerlinks.sagaming.SecretKey'));
+        // $http = new Client();
+        // $response = $http->post(config('providerlinks.sagaming.API_URL'), [
+        //     'form_params' => [
+        //         'q' => $encrpyted_data, 
+        //         's' => $md5Signature
+        //     ],
+        // ]);
+        // Helper::saveLog('ALDEBUG '.$method, config('providerlinks.sagaming.pdbid'), json_encode(['for_params' => ['q'=>$encrpyted_data, 's'=>$md5Signature]]), $querystring);
+        // return $response->getBody()->getContents();
     }
 
     public function currency(){

@@ -218,14 +218,15 @@ class GameTransactionMDB
             return null;
         }
     }
-    public static function createGametransactionV2($data,$client_details){
+    public static function createGametransactionV2($data,$game_transid_gen,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         $data['operator_id'] = $client_details->operator_id;
         $data['client_id'] = $client_details->client_id;
         $data['player_id'] = $client_details->player_id;
+        $data['game_trans_id'] = $game_transid_gen;
         if($connection != null){
             Helper::saveLog('createGametransaction', 12, json_encode($connection), "createGametransaction");
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->insertGetId($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions_newgen")->insertGetId($data);
         }else{
             return null;
         }
@@ -757,6 +758,7 @@ class GameTransactionMDB
      */
     public static function createGametransactionLogCCMD($data,$connection_name){
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
+        Helper::saveLog('PlayStar create logs', 99, json_encode($connection), "Hit the logs");
         if($connection != null){
             return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insertGetId($data);
         }else{
