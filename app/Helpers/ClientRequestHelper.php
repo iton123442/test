@@ -204,7 +204,7 @@ class ClientRequestHelper{
                     // }else{
                     //     $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay"];
                     // }
-                    $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay"];
+                    $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming"];
                     $bol = true;
                     if(isset($action['provider_name'])){
                         if (in_array($action["provider_name"], $exclude_provider)) {

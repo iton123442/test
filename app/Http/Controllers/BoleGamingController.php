@@ -441,8 +441,12 @@ class BoleGamingController extends Controller
 							$general_details['provider']['amount '] = abs($pay_amount);
 							// END LOGGER
 
+							$fund_extra_data = [
+					            'provider_name' => 'bolegaming'
+					        ];
+
 							try {
-								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$existing_bet->game_trans_id,$transaction_type);
+								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$existing_bet->game_trans_id,$transaction_type,false,$fund_extra_data);
 								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost CRID '.$existing_bet->game_trans_id, $this->provider_db_id,$request->getContent(), $client_response);
 							   
 							} catch (\Exception $e) {
@@ -614,8 +618,12 @@ class BoleGamingController extends Controller
 							$general_details['provider']['amount '] = abs($pay_amount);
 							// END LOGGER
 
+							$fund_extra_data = [
+					            'provider_name' => 'bolegaming'
+					        ];
+
 							try {
-								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$gamerecord,$transaction_type);
+								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$gamerecord,$transaction_type,false,$fund_extra_data);
 							    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost CRID '.$gamerecord, $this->provider_db_id, $request->getContent(), $client_response);
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];

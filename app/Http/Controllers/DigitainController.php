@@ -587,8 +587,13 @@ class DigitainController extends Controller
 			);
 			$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+
+			$fund_extra_data = [
+	            'provider_name' => 'digitain'
+	        ];
+
 			try {
-				 $client_response = ClientRequestHelper::fundTransfer($client_details,abs($key['betAmount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
+				 $client_response = ClientRequestHelper::fundTransfer($client_details,abs($key['betAmount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit',$fund_extra_data);
 			} catch (\Exception $e) {
 				$items_array[] = array(
 					 "info" => $key['info'], 
@@ -975,8 +980,12 @@ class DigitainController extends Controller
 				);
 				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+				$fund_extra_data = [
+		            'provider_name' => 'digitain'
+		        ];
+
 				try {
-					$client_response = ClientRequestHelper::fundTransfer($client_details, abs($key['betAmount']), $game_details->game_code, $game_details->game_name, $game_transextension, $game_trans, 'debit');
+					$client_response = ClientRequestHelper::fundTransfer($client_details, abs($key['betAmount']), $game_details->game_code, $game_details->game_name, $game_transextension, $game_trans, 'debit',$fund_extra_data );
 					ProviderHelper::saveLogWithExeption('RSG bet CRID = ' . $game_trans, $this->provider_db_id, file_get_contents("php://input"), $client_response);
 				} catch (\Exception $e) {
 					$items_array[] = array(
@@ -2149,8 +2158,12 @@ class DigitainController extends Controller
 				);
 				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+				$fund_extra_data = [
+		            'provider_name' => 'digitain'
+		        ];
+
 				try {
-				  $client_response = ClientRequestHelper::fundTransfer($client_details,abs($key['betAmount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
+				  $client_response = ClientRequestHelper::fundTransfer($client_details,abs($key['betAmount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit',$fund_extra_data );
 				} catch (\Exception $e) {
 					$items_array[] = array(
 						"info" => isset($key['betInfo']) ? $key['betInfo'] : "", 
@@ -2610,8 +2623,12 @@ class DigitainController extends Controller
 				);
 				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+				$fund_extra_data = [
+		            'provider_name' => 'digitain'
+		        ];
+
 				try {
-					$client_response = ClientRequestHelper::fundTransfer($client_details, abs($key['betAmount']), $game_details->game_code, $game_details->game_name, $game_transextension, $game_trans, 'debit');
+					$client_response = ClientRequestHelper::fundTransfer($client_details, abs($key['betAmount']), $game_details->game_code, $game_details->game_name, $game_transextension, $game_trans, 'debit',$fund_extra_data);
 				} catch (\Exception $e) {
 					$items_array[] = array(
 						"info" => $key['info'],
@@ -3209,9 +3226,13 @@ class DigitainController extends Controller
 						"provider_request" =>json_encode($request->all()),
 					);
 					$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-								 	
+					
+					$fund_extra_data = [
+			            'provider_name' => 'digitain'
+			        ];
+
 					try {
-					$client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_details->game_code,$game_details->game_name,$game_transextension,$datatrans->game_trans_id,$transactiontype,true);
+					$client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_details->game_code,$game_details->game_name,$game_transextension,$datatrans->game_trans_id,$transactiontype,true,$fund_extra_data);
 					} catch (\Exception $e) {
 						$items_array[] = array(
 							 "info" => $key['info'], 
@@ -3883,10 +3904,14 @@ class DigitainController extends Controller
 						"provider_request" =>json_encode($json_data),
 					);
 					$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-								 	
+						
+					$fund_extra_data = [
+			            'provider_name' => 'digitain'
+			        ];
+			 	
 
 					try {
-						$client_response = ClientRequestHelper::fundTransfer($client_details, abs($amount), $game_details->game_code, $game_details->game_name, $game_transextension, $datatrans->game_trans_id, $transactiontype, true);
+						$client_response = ClientRequestHelper::fundTransfer($client_details, abs($amount), $game_details->game_code, $game_details->game_name, $game_transextension, $datatrans->game_trans_id, $transactiontype, true,$fund_extra_data);
 					} catch (\Exception $e) {
 						$items_array[] = array(
 							"info" => $key['info'],
@@ -4306,8 +4331,12 @@ class DigitainController extends Controller
 			);
 			$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+			$fund_extra_data = [
+	            'provider_name' => 'digitain'
+	        ];
+
 	 		try {
-			 $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_details->game_code,$game_details->game_name,$game_transextension,$gametransaction_details->game_trans_id,$transaction_type,true);
+			 $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_details->game_code,$game_details->game_name,$game_transextension,$gametransaction_details->game_trans_id,$transaction_type,true,$fund_extra_data);
 			//  ProviderHelper::saveLogWithExeption('RSG amend CRID = '.$gametransaction_details->game_trans_id, $this->provider_db_id, file_get_contents("php://input"), $client_response);
 			} catch (\Exception $e) {
 			$items_array[] = array(
@@ -4806,8 +4835,12 @@ class DigitainController extends Controller
 				);
 				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+				$fund_extra_data = [
+		            'provider_name' => 'digitain'
+		        ];
+
 				try {
-					$client_response = ClientRequestHelper::fundTransfer($client_details, abs($amount), $game_details->game_code, $game_details->game_name, $game_transextension, $gametransaction_details->game_trans_id, $transaction_type, true);
+					$client_response = ClientRequestHelper::fundTransfer($client_details, abs($amount), $game_details->game_code, $game_details->game_name, $game_transextension, $gametransaction_details->game_trans_id, $transaction_type, true,$fund_extra_data);
 					// ProviderHelper::saveLogWithExeption('RSG amend CRID = ' . $gametransaction_details->game_trans_id, $this->provider_db_id, file_get_contents("php://input"), $client_response);
 				} catch (\Exception $e) {
 					$items_array[] = array(
@@ -5048,8 +5081,12 @@ class DigitainController extends Controller
 		);
 		$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+		$fund_extra_data = [
+            'provider_name' => 'digitain'
+        ];
+
 		try {
-			$client_response = ClientRequestHelper::fundTransfer($client_details,abs($bet_amount),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
+			$client_response = ClientRequestHelper::fundTransfer($client_details,abs($bet_amount),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit',$fund_extra_data);
 			// ProviderHelper::saveLogWithExeption('RSG PromoWin CRID = '.$game_trans, $this->provider_db_id, file_get_contents("php://input"), $client_response);
 		} catch (\Exception $e) {
 			$response = [
@@ -5337,8 +5374,12 @@ class DigitainController extends Controller
 		);
 		$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+		$fund_extra_data = [
+            'provider_name' => 'digitain'
+        ];
+
 		try {
-			$client_response = ClientRequestHelper::fundTransfer($client_details,abs($bet_amount),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
+			$client_response = ClientRequestHelper::fundTransfer($client_details,abs($bet_amount),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit',$fund_extra_data);
 		} catch (\Exception $e) {
 			$response = [
 				 "timestamp" => date('YmdHisms'),
