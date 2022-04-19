@@ -139,7 +139,7 @@ class PlayStarController extends Controller
                         );
                    $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
                    $gameTransactionEXTData = array(
-                    "game_trans_id" => $game_transaction_id,
+                    "game_trans_id" => $game_transid_ext,
                     "provider_trans_id" => $data['ts'],
                     "round_id" => $data['txn_id'],
                     "amount" => $bet_amount,
