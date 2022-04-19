@@ -156,7 +156,7 @@ class PlayStarController extends Controller
 									"transaction_detail" => "success",
                     ); 
                 GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name); // create extension logs
-                Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $gameTransactionDataforLogs);
+                Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
             $msg = array(
