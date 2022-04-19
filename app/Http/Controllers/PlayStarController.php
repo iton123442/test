@@ -81,7 +81,7 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
         $game_transid_gen = system('date +%s%N'); // ID generator
-        $game_transid_ext = system('date +%s%N')+ 12345;
+        $game_transid_ext = system('date +%s%N');
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
