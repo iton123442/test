@@ -99,7 +99,6 @@ class PlayStarController extends Controller
                     return $response; 
             }
         try{
-            
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
             $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_transid_ext, $game_transid_gen, 'debit');
             Helper::saveLog('PlayStar client response', $this->provider_db_id, json_encode($data), $client_response);
