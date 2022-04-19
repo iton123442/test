@@ -144,19 +144,19 @@ class PlayStarController extends Controller
                     "round_id" => $data['txn_id'],
                     "amount" => $bet_amount,
                     "game_transaction_type"=> 1,
-                    "provider_request" =>json_encode($request->all()),
+                    //"provider_request" =>json_encode($request->all()),
                     );
-                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details); //create extension
-                //     $connection_name = $client_details->connection_name;
-                //     $gameTransactionDataforLogs = array(
-                //                     "game_trans_ext_id" => $game_trans_ext_id,
-				// 					"request" => json_encode($data),
-				// 					"response" => json_encode($response),
-				// 					"log_type" => "provider_details",
-				// 					"transaction_detail" => "success",
-                //     ); 
-                // GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name); // create extension logs
-                //Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $gameTransactionDataforLogs);
+                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
+                    $connection_name = $client_details->connection_name;
+                    $gameTransactionDataforLogs = array(
+                                    "game_trans_ext_id" => $game_transid_ext,
+									"request" => json_encode($data),
+									"response" => json_encode($response),
+									"log_type" => "provider_details",
+									"transaction_detail" => "success",
+                    ); 
+                GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name); // create extension logs
+                Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $gameTransactionDataforLogs);
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
             $msg = array(
