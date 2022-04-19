@@ -2118,7 +2118,7 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         try{
             $requesttosend = [
-                "loginname" => $client_details->username,
+                "loginname" => $client_details->player_id,
                 "key" => $data['token'],
                 "currency" => $client_details->default_currency,
                 "lang" => $data['lang'],
