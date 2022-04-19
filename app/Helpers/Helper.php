@@ -172,12 +172,6 @@ class Helper
 	 		return $result;
 	}
 
-	public static function findGameDetailsSecondaryGameCode( $provider_id, $identification) {
-			$game_details = DB::select("select g.game_id,game_code,game_name,secondary_game_code from games g inner join secondary_gamecode using (game_id) where  secondary_game_code = '$identification' and g.provider_id = $provider_id limit 1 ");
-			$total = count($game_details);
-			return $total > 0 ? $game_details[0] : null ;
-	}
-
     /* ERAIN 
  	 * Added new $income 05-08-20
  	 * $income=null
