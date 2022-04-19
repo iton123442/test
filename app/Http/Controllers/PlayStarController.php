@@ -101,16 +101,15 @@ class PlayStarController extends Controller
         try{
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
            $gameTransactionData = array(
-                        "provider_trans_id" => $data['ts'],
-                        "token_id" => $client_details->token_id,
-                        "game_id" => $game_details->game_id,
-                        "round_id" => $data['txn_id'],
-                        "bet_amount" => $bet_amount,
-                        "win" => 5,
-                        "pay_amount" => 0,
-                        "income" => 0,
-                        "entry_id" => 1,
-
+                "provider_trans_id" => $data['ts'],
+                "token_id" => $client_details->token_id,
+                "game_id" => $game_details->game_id,
+                "round_id" => $data['txn_id'],
+                "bet_amount" => $bet_amount,
+                "win" => 5,
+                "pay_amount" => 0,
+                "income" => 0,
+                "entry_id" => 1,
                 );
            $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
             $gameTransactionEXTData = array(
@@ -157,7 +156,7 @@ class PlayStarController extends Controller
 									"transaction_detail" => "success",
                     ); 
                 GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name); // create extension logs
-                Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $gameTransactionDataforLogs);
+                //Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $gameTransactionDataforLogs);
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
             $msg = array(
