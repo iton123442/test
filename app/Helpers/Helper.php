@@ -173,7 +173,7 @@ class Helper
 	}
 
 	public static function findGameDetailsSecondaryGameCode( $provider_id, $identification) {
-			$game_details = DB::select("select game_id,game_code,game_name,secondary_game_code from games inner join secondary_gamecode using (game_id) where  secondary_game_code = $identification and provider_id = $provider_id limit 1 ");
+			$game_details = DB::select("select game_id,game_code,game_name,secondary_game_code from games inner join secondary_gamecode using (game_id) where  secondary_game_code = '$identification' and provider_id = $provider_id limit 1 ");
 			$total = count($game_details);
 			return $total > 0 ? $game_details[0] : null ;
 	}
