@@ -253,7 +253,7 @@ class GameTransactionMDB
         Helper::saveLog('createGameTransactionExt', 99, json_encode("Hit the createGameTransactionExt"), "");
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->insertGetId($gametransactionext);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext_newgen")->insertGetId($gametransactionext);
         }else{
             Helper::saveLog('createGameTransactionExt(PS)', 12, json_encode("error or null connection"), "");
             return null;
