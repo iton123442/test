@@ -118,7 +118,7 @@ class PlayStarController extends Controller
                                 ];
                                 break;
                             case '402':
-                                ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                ProviderHelper::updateGameTransactionStatus($game_transid_gen, 2, 99);
                                 $http_status = 200;
                                 $response = [
                                     "status_code" => 3,
