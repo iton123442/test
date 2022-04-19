@@ -70,15 +70,16 @@ class YGG002Controller extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
         if($game_details == null){
-            $game_details = Helper::findGameDetailsSecondaryGameCode($this->provider_id, $request->cat4);
-            if($game_details == null){
+            $secondary_game_code = Helper::findGameDetailsSecondaryGameCode($this->provider_id, $request->cat4);
+            if($secondary_game_code == null){
                 $response = array(
                     "code" => 1000,
                     "msg" => "Session expired. Please log in again."
                 );
-                Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                Helper::saveLog("YGG 002 wager game_details response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }
+            $game_details = $secondary_game_code;
         }
         # Check Game Restricted
         if($client_details == null){ 
@@ -86,7 +87,7 @@ class YGG002Controller extends Controller
                 "code" => 1000,
                 "msg" => "Session expired. Please log in again."
             );
-            Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            Helper::saveLog("YGG 002 wager client_details response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
   
@@ -119,7 +120,7 @@ class YGG002Controller extends Controller
                 "code" => 1006,
                 "msg" => "You do not have sufficient fundsfor the bet."
             );
-            Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            Helper::saveLog("YGG 002 wager balance response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
         $gameTransactionData = array(
