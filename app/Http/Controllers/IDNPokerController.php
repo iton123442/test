@@ -651,8 +651,8 @@ class IDNPokerController extends Controller
             if($transactionList != "false"){
                 foreach ($transactionList["row"] as  $value) {
                     try {
-                        ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"]);
                         if($value["status"] != "Withdraw" && $value["status"] != "Deposit") {
+                            ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"]);
                             $gameDetails = self::getSubGameDetails(config('providerlinks.idnpoker.PROVIDER_ID'), $value["game"]);
                             // $playerID = substr($value["userid"],4);
                             $playerDetails = IDNPokerHelper::getPlayerID($value["userid"]); //TESTINGn); // check balance
