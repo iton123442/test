@@ -81,7 +81,8 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
         $game_transid_gen = shell_exec('date +%s%N'); // ID generator
-        $game_transid_ext = (int)$game_transid_gen + 54321;
+        $for_ext = (string)shell_exec('date +%s%N')."54321";
+        $game_transid_ext = (int)$for_ext;
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -147,15 +148,17 @@ class PlayStarController extends Controller
                         //"provider_request" =>json_encode($request->all()),
                     );
                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
-                    $connection_name = $client_details->connection_name;
-                    $gameTransactionDataforLogs = array(
-                        "game_trans_ext_id" => $game_transid_ext,
-                        "request" => json_encode($data),
-                        "response" => json_encode($response),
-                        "log_type" => "provider_details",
-                        "transaction_detail" => "success",
-                    ); 
-                    dispatch(new CreateGameTransactionLog($gameTransactionDataforLogs));// create extension logs
+                   $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transid_ext,
+                            "request" => json_encode($data),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
                 return response($response,200)->header('Content-Type', 'application/json');
         }catch(\Exception $e){
@@ -173,8 +176,8 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $data["total_win"] / 100;
         $balance = $client_details->balance;
-        $game_transid_gen = shell_exec('date +%s%N'); // ID generator
-        $game_transid_ext = (int)$game_transid_gen + 54321;
+        $for_ext = (string)shell_exec('date +%s%N')."54321";
+        $game_transid_ext = (int)$for_ext;
             try{
                 ProviderHelper::idenpotencyTable($data["ts"]);
             }catch(\Exception $e){
