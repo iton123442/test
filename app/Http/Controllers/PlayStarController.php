@@ -24,8 +24,10 @@ class PlayStarController extends Controller
         
     }
 
-    public function game_transid_gen(){
-        return system('date +%s%N');
+    public function game_transid_gen($game_transid_gen){
+
+        $game_transid_gen = system('date +%s%N');
+        return $game_transid_gen;
     }
     public function getAuth(Request $request){
 
@@ -84,7 +86,7 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
-        game_transid_gen();
+        $this->game_transid_gen;
 
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
