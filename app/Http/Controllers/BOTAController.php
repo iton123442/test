@@ -12,7 +12,7 @@ use App\Helpers\TransactionHelper;
 use App\Models\GameTransactionMDB;
 use App\Models\GameTransaction;
 use DB;
-class BOTACONTROLLER extends Controller{
+class BOTAController extends Controller{
 
     protected $startTime;
     public function __construct() {
