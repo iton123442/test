@@ -75,13 +75,12 @@ class PlayStarController extends Controller
     }
 
     public function getBet(Request $request){
-
         Helper::saveLog('PlayStar', $this->provider_db_id, json_encode($request->all()), "ENDPOINTHIT BET");
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
         $game_transid_gen = system('date +%s%N'); // ID generator
-        $game_transid_ext = rand();
+        $game_transid_ext = rand();// int id generator
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -157,7 +156,7 @@ class PlayStarController extends Controller
                     ); 
                 GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name); // create extension logs
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
-                    return response()->json($response, $http_status);
+                return response($response,200)->header('Content-Type', 'application/json');
         }catch(\Exception $e){
             $msg = array(
                 'error' => '1',
