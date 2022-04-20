@@ -785,3 +785,5 @@ $app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult'
 $app->post('/public/endwager/test','YGG002Controller@endwager');
 $app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
 $app->post('/public/getbalance/test','YGG002Controller@getbalance');
+//BOTA
+$app->post('/public/api/bota', 'BOTAController@index');
