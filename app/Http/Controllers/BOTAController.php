@@ -90,14 +90,14 @@ class BOTAController extends Controller{
                     "user_id" => $data["user"],
                     "game_token"=>$data["token"]
                 );
-                Helper::saveLog('BOTA Auth Successful', $this->provider_db_id, $msg, $client_details);
+                Helper::saveLog('BOTA Auth Successful', $this->provider_db_id, json_encode($msg), $client_details);
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
             else{
                 $msg = array(
                     "result_code" => "1.Invalid Reqeust"
                 );
-                Helper::saveLog('BOTA Auth FAILED', $this->provider_db_id, $msg, $client_details);
+                Helper::saveLog('BOTA Auth FAILED', $this->provider_db_id, json_encode($msg), $client_details);
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
         }    
