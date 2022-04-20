@@ -240,13 +240,13 @@ class PlayStarController extends Controller
                             $createGameTransactionLog = [
                                 "connection_name" => $client_details->connection_name,
 								"column" =>[
-									"game_trans_ext_id" => $game_trans_ext_id,
+									"game_trans_ext_id" => $game_transid_ext,
 									"request" => json_encode($data),
 									"response" => json_encode($response),
 									"log_type" => "provider_details",
 									"transaction_detail" => "success",
 								 ]
-                             ];
+                            ];
                                 dispatch(new CreateGameTransactionLog($createGameTransactionLog));
                             }catch(\Exception $e){
                                 Helper::saveLog("Playstar Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
@@ -281,15 +281,6 @@ class PlayStarController extends Controller
                                         ]
                                     ];
                         $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-                        $updateTransactionEXt = array(
-                            "provider_request" =>json_encode($request->all()),
-                            "mw_response" => json_encode($response),
-                            'mw_request' => json_encode($client_response->requestoclient),
-                            'client_response' => json_encode($client_response->fundtransferresponse),
-                            'transaction_detail' => 'success',
-                            'general_details' => 'success',
-                        );
-                            GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_trans_ext_id,$client_details);
                         Helper::saveLog('PlayStar Win Result', $this->provider_db_id, json_encode($request->all()),$response);
                             return response($response,200)
                                     ->header('Content-Type', 'application/json');
