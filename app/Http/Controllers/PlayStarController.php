@@ -137,7 +137,7 @@ class PlayStarController extends Controller
                         "income" => 0,
                         "entry_id" => 1,
                     );
-                   $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+                   GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
                    $gameTransactionEXTData = array(
                         "game_trans_id" => $game_transid_gen,
                         "provider_trans_id" => $data['ts'],
@@ -146,7 +146,7 @@ class PlayStarController extends Controller
                         "game_transaction_type"=> 1,
                         //"provider_request" =>json_encode($request->all()),
                     );
-                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
+                   GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
                     $connection_name = $client_details->connection_name;
                     $gameTransactionDataforLogs = array(
                         "game_trans_ext_id" => $game_transid_ext,
@@ -155,7 +155,7 @@ class PlayStarController extends Controller
                         "log_type" => "provider_details",
                         "transaction_detail" => "success",
                     ); 
-                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
+                    dispatch(new CreateGameTransactionLog($gameTransactionDataforLogs));// create extension logs
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
                 return response($response,200)->header('Content-Type', 'application/json');
         }catch(\Exception $e){
@@ -235,7 +235,7 @@ class PlayStarController extends Controller
                                 // "provider_request" =>json_encode($request->all()),
                                 // "mw_response" => json_encode($response),
                             );
-                            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
+                            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
                             try{
                             $createGameTransactionLog = [
                                 "connection_name" => $client_details->connection_name,
@@ -259,7 +259,7 @@ class PlayStarController extends Controller
                                             "entry_id" => $entry_id,
                                             "pay_amount" => $bet_amount,
                                             "income" => $income,
-                                            "game_trans_ext_id" => $game_trans_ext_id,
+                                            "game_trans_ext_id" => $game_transid_ext,
                                             "client_connection_name" => $client_details->connection_name,
                                         ],
                                         "provider" => [
