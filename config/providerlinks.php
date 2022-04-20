@@ -746,7 +746,7 @@ return [
     'bota'=>[
         'api_key' => '6659fc8266bf70ac08933e3ba794422be56ad036a4f2db56514b59fcf8536594',
         'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36',
-        'api_url' => 'http://bota-cn.com/api',
+        'api_url' => 'http://bota-en.com/api',
         'prefix' => 'TG',
         'provider_db_id' => 135
     ],
