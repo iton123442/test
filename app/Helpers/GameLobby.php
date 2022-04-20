@@ -17,6 +17,7 @@ use App\Helpers\ProviderHelper;
 use App\Helpers\DigitainHelper;
 use App\Helpers\MGHelper;
 use App\Helpers\EVGHelper;
+use App\Helpers\BOTAHelper;
 use DOMDocument;
 use App\Services\AES;
 use Webpatser\Uuid\Uuid;
@@ -2156,7 +2157,7 @@ class GameLobby{
         $token = $request->token;
         $game_code = $request->game_code;
         $get_player_details = ProviderHelper::getClientDetails('token',$token);
-        $gameToken = ProviderHelper::botaGenerateGametoken($get_player_details);
+        $gameToken = BOTAHelper::botaGenerateGametoken($get_player_details);
         Helper::saveLog('bota gametoken', 135, json_encode($get_player_details), $gameToken);
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $requesttosend = [

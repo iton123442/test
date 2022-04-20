@@ -9,6 +9,7 @@ use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
+use App\Helpers\BOTAHelper;
 use App\Models\GameTransactionMDB;
 use App\Models\GameTransaction;
 use DB;
@@ -82,7 +83,6 @@ class BOTAController extends Controller{
     }
     private function _authenticate($data,$client_details){
         Helper::saveLog('BOTA Auth HIT', $this->provider_db_id, $data, $client_details);
-        // $getgame_token = ProviderHelper::botaGenerateGametoken($client_details);
         // $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
         if($client_details != null){
             $msg = array(

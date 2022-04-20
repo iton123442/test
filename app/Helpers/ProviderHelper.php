@@ -239,29 +239,7 @@ class ProviderHelper{
 		   return false;
 		}
 	}
-	/*
-	* BOTA Only For Gamelaunch
-	*/
-   public static function botaGenerateGametoken($player_details){
-	   $datafortoken = [
-		   "user_id" => config('providerlinks.bota.prefix')."_".$player_details->player_id,
-		   "user_ip" => $player_details->player_ip_address
-	   ];
-
-	   $client = new Client([
-		   'headers' => [ 
-			   'Content-Type' => 'application/x-www-form-urlencoded',
-		   ]
-	   ]);
-	   $response = $client->post(config('providerlinks.bota.api_url').'/game/token',[
-		   'form_params' => $datafortoken,
-	   ]);
-
-	   $res = json_decode($response->getBody(),TRUE);
-	   Helper::saveLog('bota gametoken', 135, json_encode($response), $res);
-	   return $res; 
-   }
-
+	
     /**
      * GLOBAL 
      * [explodeUsername description]
