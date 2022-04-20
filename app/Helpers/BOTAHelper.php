@@ -21,7 +21,7 @@ class BOTAHelper{
                     'User-Agent' => config('providerlinks.bota.user_agent')
                 ]
             ]);
-            $response = $client->get(config('providerlinks.bota.api_url').'/user/balance',
+            $response = $client->post(config('providerlinks.bota.api_url').'/user/balance',
             ['form_params' => $datatosend,]);
             $responseBody = json_decode($response->getBody()->getContents());
             return $responseBody;
@@ -39,7 +39,7 @@ class BOTAHelper{
                     'User-Agent' => config('providerlinks.bota.user_agent')
                 ]
             ]);
-            $response = $client->get(config('providerlinks.bota.api_url').'/user/create',
+            $response = $client->post(config('providerlinks.bota.api_url').'/user/create',
             ['form_params' => $datatosend,]);
             $responseBody = json_decode($response->getBody()->getContents());
             return $responseBody;
