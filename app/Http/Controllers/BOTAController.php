@@ -26,79 +26,57 @@ class BOTAController extends Controller{
 
     public function index(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        Helper::saveLog('BOTA Auth INDEX', $this->provider_db_id, $data, 'INDEX HIT!');
+        Helper::saveLog('BOTA Auth INDEX', $this->provider_db_id, json_encode($data), 'INDEX HIT!');
         $originalPlayerID = explode('_', $data["user"]);
         $client_details = ProviderHelper::getClientDetails('player_id', $originalPlayerID[1]);
-        //auth
-        if($client_details != null){
-            return $this->_authenticate($data,$client_details);
-            Helper::saveLog('BOTA Auth Success',$this->provider_db_id,$client_details,$data);
-        }
-        else{
-            $msg = array(
-                "result_code" => "1.Invalid Reqeust"
-            );
-            Helper::saveLog('BOTA Auth FAILED',$this->provider_db_id,$msg,$data);
+        $playerChecker = BOTAHelper::botaPlayerChecker($client_details,'Verify');//Auth
+        if($playerChecker){
+            //flow structure
+            foreach($_POST as $key=>$request) {
+                $json = json_decode($key);
+                if($json->types == "balance") {
+                    $data = $this->_getBalance($data,$client_details);
+                    Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($data), 'Balance HIT!');
+                    return $data;
+                }
+                elseif($json->types == "bet") {
+                    $data = $this->_betProcess($data,$client_details);
+                    Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($data), 'BET HIT');
+                    return $data;
+                    // $data["user"] = $json->user;
+                    // $data["balance"] = "200000"; // 
+                    // $data["confirm"] = "ok";
+                }
+                elseif($json->types == "win") {
+                    $data = $this->_winProcess($data,$client_details);
+                    Helper::saveLog('BOTA WIN', $this->provider_db_id, json_encode($data), 'WIN HIT');
+                    return $data;
+                    // $data["user"] = $json->user;
+                    // $data["balance"] = "200000"; // 
+                    // $data["confirm"] = "ok";
+                }
+                elseif($json->types == "cancel") {
+                    $data = $this->_cancelProcess($data,$client_details);
+                    Helper::saveLog('BOTA CANCEL', $this->provider_db_id, json_encode($data), 'CANCEL HIT');
+                    return $data;
+                    // $data["user"] = $json->user;
+                    // $data["balance"] = "200000"; // 베
+                    // $data["confirm"] = "ok";
+                }
+                else {
+                    exit;
+                }
+            }
+            return response($data,200)->header('Content-Type', 'application/json');
+        }else{
+            $msg = [
+                "result_code" => "11",
+                "result_msg" =>(string) "(no account)"
+            ];
             return response($msg,200)->header('Content-Type', 'application/json');
+            Helper::saveLog('BOTA NOT FOUND PLAYER',$this->provider_db_id, json_encode($msg), $data);
         }
-        //flow structure
-        foreach($_POST as $key=>$request) {
-            $json = json_decode($key);
-            if($json->types == "balance") {
-                $data = $this->_getBalance($data,$client_details);
-                Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($data), $data);
-                return $data;
-                // $data["user"] = $json->user;
-                // $data["balance"] = "100000"; 
-            }
-            elseif($json->types == "bet") {
-                $data = $this->_betProcess($data,$client_details);
-                Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($data), $data);
-                return $data;
-                // $data["user"] = $json->user;
-                // $data["balance"] = "200000"; // 
-                // $data["confirm"] = "ok";
-            }
-            elseif($json->types == "win") {
-                $data = $this->_winProcess($data,$client_details);
-                Helper::saveLog('BOTA WIN', $this->provider_db_id, json_encode($data), $data);
-                return $data;
-                // $data["user"] = $json->user;
-                // $data["balance"] = "200000"; // 
-                // $data["confirm"] = "ok";
-            }
-            elseif($json->types == "cancel") {
-                $data = $this->_cancelProcess($data,$client_details);
-                Helper::saveLog('BOTA CANCEL', $this->provider_db_id, json_encode($data), $data);
-                return $data;
-                // $data["user"] = $json->user;
-                // $data["balance"] = "200000"; // 베
-                // $data["confirm"] = "ok";
-            }
-            else {
-                exit;
-            }
-        }
-    return response($data,200)->header('Content-Type', 'application/json');
-    }
-    private function _authenticate($data,$client_details){
-        Helper::saveLog('BOTA Auth HIT', $this->provider_db_id, $data, $client_details);
-        // $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
-        if($client_details != null){
-            $msg = array(
-                "user_id" => $data["user"],
-                "game_token"=>$data["token"]
-            );
-            Helper::saveLog('BOTA Auth Successful', $this->provider_db_id, json_encode($msg), $client_details);
-            return response($msg,200)->header('Content-Type', 'application/json');
-        }
-        else{
-            $msg = array(
-                "result_code" => "1.Invalid Reqeust"
-            );
-            Helper::saveLog('BOTA Auth FAILED', $this->provider_db_id, json_encode($msg), $client_details);
-            return response($msg,200)->header('Content-Type', 'application/json');
-        }
+       
     }
     private function _getBalance($data,$client_details){
         Helper::saveLog('BOTA GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
@@ -111,6 +89,15 @@ class BOTAController extends Controller{
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
         }
+    }
+    private function _betProcess($data,$client_details){
+
+    }
+    private function _winProcess($data,$client_details){
+
+    }
+    private function _cancelProcess($data,$client_details){
+
     }
 }
 ?>
