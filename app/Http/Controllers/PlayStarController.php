@@ -80,6 +80,8 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
+        $game_transid_gen = system('date +%s%N'); // ID generator
+        $game_transid_ext = rand();
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -89,7 +91,7 @@ class PlayStarController extends Controller
             ];
             return $response;
         }
-            if($client_details == null){
+        if($client_details == null){
                 $response = [
                         "status_code" =>  1,
                         "message" => "Invalid Token",
@@ -98,21 +100,8 @@ class PlayStarController extends Controller
             }
         try{
            $game_details = Game::find($data["game_id"], $this->provider_db_id);
-           $gameTransactionData = array(
-                    "provider_trans_id" => $data['ts'],
-                    "round_id" => $data['txn_id'],
-                );
-           $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$client_details); //create game_transaction
-            $gameTransactionEXTData = array(
-                "game_trans_id" => "",
-                "provider_trans_id" => "",
-                "round_id" => "",
-                "amount" => "",
-                "game_transaction_type"=> "",
-                "provider_request" =>"",
-                );
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details); 
-            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_transid_ext, $game_transid_gen, 'debit');
+            Helper::saveLog('PlayStar client response', $this->provider_db_id, json_encode($data), $client_response);
                     if (isset($client_response->fundtransferresponse->status->code)) 
                     {
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);                       
@@ -128,7 +117,7 @@ class PlayStarController extends Controller
                                 ];
                                 break;
                             case '402':
-                                ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
+                                ProviderHelper::updateGameTransactionStatus($game_transid_gen, 2, 99);
                                 $http_status = 200;
                                 $response = [
                                     "status_code" => 3,
@@ -137,36 +126,37 @@ class PlayStarController extends Controller
                                 break;
                         }
                     }
-                    $gameTransactionDataforQue = array(
-                        "connection_name" => $client_details->connection_name,
-                        "game_trans_id" => $game_transaction_id,
-                            "column" =>[
-                                "token_id" => $client_details->token_id,
-                                "game_id" => $game_details->game_id,
-                                "bet_amount" => $bet_amount,
-                                "win" => 5,
-                                "pay_amount" => 0,
-                                "income" => 0,
-                                "entry_id" => 1,
-                            ]   
-                    ); 
-                    Helper::saveLog('PlayStarQue', $this->provider_db_id, json_encode($request->all()), $gameTransactionDataforQue);
-                    $gameTransactionEXTData = array(
-                        "game_trans_id" => $game_transaction_id,
+                    $gameTransactionData = array(
                         "provider_trans_id" => $data['ts'],
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $game_details->game_id,
                         "round_id" => $data['txn_id'],
-                        "amount" => $bet_amount,
-                        "game_transaction_type"=> 1,
-                        "provider_request" =>json_encode($request->all()),
-                        "mw_response" => json_encode($response),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'success',
-                        'general_details' => 'success',           
+                        "bet_amount" => $bet_amount,
+                        "win" => 5,
+                        "pay_amount" => 0,
+                        "income" => 0,
+                        "entry_id" => 1,
+                        );
+                   $game_transaction_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+                   $gameTransactionEXTData = array(
+                    "game_trans_id" => $game_transid_gen,
+                    "provider_trans_id" => $data['ts'],
+                    "round_id" => $data['txn_id'],
+                    "amount" => $bet_amount,
+                    "game_transaction_type"=> 1,
+                    //"provider_request" =>json_encode($request->all()),
                     );
-                GameTransactionMDB::updateGametransactionEXT($gameTransactionEXTData,$game_trans_ext_id,$client_details);                       
-                Helper::saveLog('PlayStar Debit', $this->provider_db_id, json_encode($data), $response);
-                    dispatch(new UpdateGametransactionJobs($gameTransactionDataforQue));
+                 $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
+                    $connection_name = $client_details->connection_name;
+                    $gameTransactionDataforLogs = array(
+                                    "game_trans_ext_id" => $game_transid_ext,
+									"request" => json_encode($data),
+									"response" => json_encode($response),
+									"log_type" => "provider_details",
+									"transaction_detail" => "success",
+                    ); 
+                GameTransactionMDB::createGametransactionLogCCMD($gameTransactionDataforLogs,$connection_name); // create extension logs
+                Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
                     return response()->json($response, $http_status);
         }catch(\Exception $e){
             $msg = array(
@@ -177,13 +167,13 @@ class PlayStarController extends Controller
             return json_encode($msg, JSON_FORCE_OBJECT); 
         }
 }
-
     public function getResult(Request $request){
-        Helper::saveLog('PlayStar Result', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
+        Helper::saveLog('PlayStar Result for win call', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $data["total_win"] / 100;
         $balance = $client_details->balance;
+        $game_transid_ext = rand();
             try{
                 ProviderHelper::idenpotencyTable($data["ts"]);
             }catch(\Exception $e){
@@ -205,7 +195,7 @@ class PlayStarController extends Controller
             try
             {
                 $game_details = Game::find($request->game_id, $this->provider_db_id);
-                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["txn_id"],'round_id', false, $client_details);
+                $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($data["txn_id"],'round_id', false, $client_details);
                 Helper::saveLog('PlayStar Bet_trans', $this->provider_db_id, json_encode($request->all()),$bet_transaction);
                 if($bet_transaction != false)
                 {
@@ -240,7 +230,7 @@ class PlayStarController extends Controller
                                 'entry_id' => $entry_id,
                                 'trans_status' => 2
                             ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                    GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
 
                             $gameTransactionEXTData = array(
                                 "game_trans_id" => $bet_transaction->game_trans_id,
@@ -252,7 +242,7 @@ class PlayStarController extends Controller
                                 "mw_response" => json_encode($response),
                             );
 
-                        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+                        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
                                     $action_payload = [
                                         "type" => "custom", #genreral,custom :D # REQUIRED!
                                         "custom" => [
@@ -261,7 +251,8 @@ class PlayStarController extends Controller
                                             "entry_id" => $entry_id,
                                             "pay_amount" => $bet_amount,
                                             "income" => $income,
-                                            "game_trans_ext_id" => $game_trans_ext_id
+                                            "game_trans_ext_id" => $game_trans_ext_id,
+                                            "client_connection_name" => $client_details->connection_name,
                                         ],
                                         "provider" => [
                                             "provider_request" => $data, #R
@@ -290,7 +281,7 @@ class PlayStarController extends Controller
                             'transaction_detail' => 'success',
                             'general_details' => 'success',
                         );
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                            GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_trans_ext_id,$client_details);
                         Helper::saveLog('PlayStar Win Result', $this->provider_db_id, json_encode($request->all()),$response);
                             return response($response,200)
                                     ->header('Content-Type', 'application/json');
