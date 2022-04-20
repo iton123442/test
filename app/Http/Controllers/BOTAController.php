@@ -30,7 +30,7 @@ class BOTAController extends Controller{
         $originalPlayerID = explode('_', $data["user"]);
         $client_details = ProviderHelper::getClientDetails('player_id', $originalPlayerID[1]);
         $playerChecker = BOTAHelper::botaPlayerChecker($client_details,'Verify');//Auth
-        if($playerChecker){
+        if($playerChecker->result_code != 1){
             //flow structure
             foreach($_POST as $key=>$request) {
                 $json = json_decode($key);
@@ -70,7 +70,7 @@ class BOTAController extends Controller{
             return response($data,200)->header('Content-Type', 'application/json');
         }else{
             $msg = [
-                "result_code" => "11",
+                "result_code" => "1",
                 "result_msg" =>(string) "(no account)"
             ];
             return response($msg,200)->header('Content-Type', 'application/json');
