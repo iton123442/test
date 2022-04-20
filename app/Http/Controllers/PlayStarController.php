@@ -21,10 +21,12 @@ class PlayStarController extends Controller
         $this->api_url = config('providerlinks.playstar.api_url');
         $this->provider_db_id = config('providerlinks.playstar.provider_db_id');
         $this->host_id = config('providerlinks.playstar.host_id');
-        $this->game_transid_gen = system('date +%s%N');
+        
     }
 
-
+    public function game_transid_gen(){
+        return system('date +%s%N');
+    }
     public function getAuth(Request $request){
 
         Helper::saveLog("PlayStar", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
@@ -82,7 +84,7 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
-        $this->game_transid_gen;
+        game_transid_gen();
 
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
