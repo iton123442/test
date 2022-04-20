@@ -2149,6 +2149,36 @@ class GameLobby{
         }
 
     }
+    public static function botaLaunchUrl($request){
+        $exit_url = $request->exitUrl;
+        $provider = $request->provider;
+        $token = $request->token;
+        $game_code = $request->game_code;
+        $get_player_details = ProviderHelper::getClientDetails('token',$token);
+        $gameToken = ProviderHelper::botaGenerateGametoken($get_player_details);
+        Helper::saveLog('bota gametoken', 135, json_encode($get_player_details), $gameToken);
+        Helper::savePLayerGameRound($game_code,$token,$provider);
+        $requesttosend = [
+            "token" => $gameToken->result_value->token,
+            "game" => config('providerlinks.bota.prefix')
+        ];
+
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ]
+        ]);
+        
+        $response = $client->post(config('providerlinks.bota.api_url').'/game/url',[
+            'form_params' => $requesttosend,
+        ]);
+                
+        $res = json_decode($response->getBody(),TRUE);
+        Helper::saveLog('bota gamelaunch', 135, json_encode($response), $res);
+        $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exit_url;//partial
+        Helper::saveLog('bota gamelaunchfinal', 135, json_encode($response), $gameurl);
+        return $gameurl;  
+    }
 }
 
 ?>
