@@ -82,7 +82,7 @@ class PlayStarController extends Controller
         $bet_amount = $request->total_bet/100;
         $game_transid_gen = shell_exec('date +%s%N'); // ID generator
         $for_ext = shell_exec('date +%s%N');
-        $identifier = (string)$for_ext."54321";
+        $identifier = (int)$for_ext + 54321;
         $game_transid_ext = (int)$identifier;
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
@@ -178,7 +178,7 @@ class PlayStarController extends Controller
         $bet_amount = $data["total_win"] / 100;
         $balance = $client_details->balance;
         $for_ext = shell_exec('date +%s%N');
-        $identifier = (string)$for_ext."54321";
+        $identifier = (int)$for_ext + 54321;
         $game_transid_ext = (int)$identifier;
             try{
                 ProviderHelper::idenpotencyTable($data["ts"]);
