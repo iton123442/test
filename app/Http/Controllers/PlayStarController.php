@@ -81,8 +81,9 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
         $game_transid_gen = shell_exec('date +%s%N'); // ID generator
-        $for_ext = (string)shell_exec('date +%s%N')."54321";
-        $game_transid_ext = (int)$for_ext;
+        $for_ext = shell_exec('date +%s%N');
+        $identifier = string($for_ext)."54321";
+        $game_transid_ext = (int)$identifier;
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -169,15 +170,16 @@ class PlayStarController extends Controller
             Helper::saveLog('Playstar bet error', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
             return json_encode($msg, JSON_FORCE_OBJECT); 
         }
-}
+    }
     public function getResult(Request $request){
         Helper::saveLog('PlayStar Result for win call', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $data["total_win"] / 100;
         $balance = $client_details->balance;
-        $for_ext = (string)shell_exec('date +%s%N')."54321";
-        $game_transid_ext = (int)$for_ext;
+        $for_ext = shell_exec('date +%s%N');
+        $identifier = string($for_ext)."54321";
+        $game_transid_ext = (int)$identifier;
             try{
                 ProviderHelper::idenpotencyTable($data["ts"]);
             }catch(\Exception $e){
@@ -386,10 +388,4 @@ class PlayStarController extends Controller
                 ->header('Content-Type', 'application/json');
 
     }
-
-
-
-
-
-
 }
