@@ -83,24 +83,22 @@ class BOTAController extends Controller{
     private function _authenticate($data,$client_details){
         Helper::saveLog('BOTA Auth HIT', $this->provider_db_id, $data, $client_details);
         // $getgame_token = ProviderHelper::botaGenerateGametoken($client_details);
-        if($data["token "]){
-            // $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
-            if($client_details){
-                $msg = array(
-                    "user_id" => $data["user"],
-                    "game_token"=>$data["token"]
-                );
-                Helper::saveLog('BOTA Auth Successful', $this->provider_db_id, json_encode($msg), $client_details);
-                return response($msg,200)->header('Content-Type', 'application/json');
-            }
-            else{
-                $msg = array(
-                    "result_code" => "1.Invalid Reqeust"
-                );
-                Helper::saveLog('BOTA Auth FAILED', $this->provider_db_id, json_encode($msg), $client_details);
-                return response($msg,200)->header('Content-Type', 'application/json');
-            }
-        }    
+        // $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+        if($client_details != null){
+            $msg = array(
+                "user_id" => $data["user"],
+                "game_token"=>$data["token"]
+            );
+            Helper::saveLog('BOTA Auth Successful', $this->provider_db_id, json_encode($msg), $client_details);
+            return response($msg,200)->header('Content-Type', 'application/json');
+        }
+        else{
+            $msg = array(
+                "result_code" => "1.Invalid Reqeust"
+            );
+            Helper::saveLog('BOTA Auth FAILED', $this->provider_db_id, json_encode($msg), $client_details);
+            return response($msg,200)->header('Content-Type', 'application/json');
+        }
     }
     private function _getBalance($data,$client_details){
         Helper::saveLog('BOTA GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
