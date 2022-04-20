@@ -2151,33 +2151,33 @@ class GameLobby{
 
     }
     public static function botaLaunchUrl($request){
-        $exit_url = $request->exitUrl;
-        $provider = $request->provider;
-        $token = $request->token;
-        $game_code = $request->game_code;
-        $get_player_details = ProviderHelper::getClientDetails('token',$token);
+        $exit_url = $request['exitUrl'];
+        $provider = $request['game_provider'];
+        $token = $request['token'];
+        $game_code = $request['game_code'];
+        $get_player_details = ProviderHelper::getClientDetails('token',$request['token']);
         $gameToken = BOTAHelper::botaGenerateGametoken($get_player_details);
-        Helper::saveLog('bota gametoken', 135, json_encode($get_player_details), $gameToken);
+        Helper::saveLog('bota gametoken', 135, json_encode($get_player_details), json_encode($gameToken));
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $requesttosend = [
             "token" => $gameToken->result_value->token,
             "game" => config('providerlinks.bota.prefix')
         ];
-
         $client = new Client([
             'headers' => [ 
-                'Content-Type' => 'application/x-www-form-urlencoded',
+                'Content-type' => 'x-www-form-urlencoded',
+                'Authorization' => "Bearer ".config('providerlinks.bota.api_key'),
+                'User-Agent' => config('providerlinks.bota.user_agent')
             ]
         ]);
         
-        $response = $client->post(config('providerlinks.bota.api_url').'/game/url',[
-            'form_params' => $requesttosend,
-        ]);
-                
-        $res = json_decode($response->getBody(),TRUE);
-        Helper::saveLog('bota gamelaunch', 135, json_encode($response), $res);
-        $gameurl = isset($res['data']['link']) ? $res['data']['link'] : $exit_url;//partial
-        Helper::saveLog('bota gamelaunchfinal', 135, json_encode($response), $gameurl);
+        $response = $client->get(config('providerlinks.bota.api_url').'/game/url',
+        ['form_params' => $requesttosend,]);
+        
+        $dataresponse = json_decode($response->getBody()->getContents());
+        Helper::saveLog('bota gamelaunch', 135, json_encode($dataresponse), 'Initialized');
+        $gameurl = isset($dataresponse->result_value->link) ? $dataresponse->result_value->link : $exit_url;
+        Helper::saveLog('bota gamelaunchfinal', 135, $gameurl, 'Gamelaunch Success');
         return $gameurl;  
     }
 }
