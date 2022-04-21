@@ -317,11 +317,12 @@ class FCController extends Controller
                 );
                 $client_response = json_decode($guzzle_response->getBody()->getContents());
                 $client_response_time = microtime(true) - $sendtoclient;
+                ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, $client_response, 'CLIENT RESPONSE');
                 $msg = array(
                     "Result"=>0,
                     "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
                 );
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalance","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
+                // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalance","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
             else{
