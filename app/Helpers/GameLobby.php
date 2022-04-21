@@ -2157,12 +2157,14 @@ class GameLobby{
         $token = $request['token'];
         $game_code = $request['game_code'];
         $get_player_details = ProviderHelper::getClientDetails('token',$request['token']);
+        $prefix = config('providerlinks.bota.prefix');
         $gameToken = BOTAHelper::botaGenerateGametoken($get_player_details);
         Helper::saveLog('bota gametoken', 135, json_encode($get_player_details), json_encode($gameToken));
         Helper::savePLayerGameRound($game_code,$token,$provider);
         $requesttosend = [
             "token" => $gameToken->result_value->token,
-            "game" => config('providerlinks.bota.prefix')
+            "user_id" => $prefix."_".$get_player_details->player_id,
+            "game" => $prefix
         ];
         $client = new Client([
             'headers' => [ 
@@ -2178,7 +2180,7 @@ class GameLobby{
         $dataresponse = json_decode($response->getBody()->getContents());
         Helper::saveLog('bota gamelaunch', 135, json_encode($dataresponse), 'Initialized');
         $gameurl = isset($dataresponse->result_value->link) ? $dataresponse->result_value->link : $exit_url;
-        Helper::saveLog('bota gamelaunchfinal', 135, $gameurl, 'Gamelaunch Success');
+        Helper::saveLog('bota gamelaunchfinal', 135, json_encode($gameurl), 'Gamelaunch Success');
         return $gameurl;  
     }
 }
