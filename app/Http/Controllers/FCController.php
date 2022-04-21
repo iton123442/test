@@ -33,6 +33,7 @@ class FCController extends Controller
     }
     public function transactionMake(Request $request){
         $datareq = FCHelper::AESDecode((string)$request->Params);
+        ProviderHelper::saveLogWithExeption('FCC transactionMake', $this->provider_db_id, $datareq, 'ENDPOINT HIT');
         Helper::saveLog('get params', 2, $datareq, "dataRequest In Transaction Make");
         $data = json_decode($datareq,TRUE);
         // $data = $request->all();
@@ -287,6 +288,7 @@ class FCController extends Controller
     public function getBalance(Request $request){
         if($request->has("Params")){
             $datareq = FCHelper::AESDecode((string)$request->Params);
+            ProviderHelper::saveLogWithExeption('FCC getBalance', $this->provider_db_id, $datareq, 'ENDPOINT HIT');
             $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
             if($client_details){
                 $sendtoclient =  microtime(true);
@@ -336,7 +338,8 @@ class FCController extends Controller
                 "Result"=>500,
                 "ErrorText"=>"Account does not exist.",
             );
-            Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalanceAccountnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+            ProviderHelper::saveLogWithExeption('FCC getBalance', $this->provider_db_id, $datareq, 'ENDPOINT HIT ELSE');
+            // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalanceAccountnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
             return response($msg,200)->header('Content-Type', 'application/json');
         }
     }
