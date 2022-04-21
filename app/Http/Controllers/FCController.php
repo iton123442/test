@@ -33,6 +33,7 @@ class FCController extends Controller
     }
     public function transactionMake(Request $request){
         $datareq = FCHelper::AESDecode((string)$request->Params);
+        ProviderHelper::saveLogWithExeption('FCC transactionMake', $this->provider_db_id, $datareq, 'ENDPOINT HIT');
         Helper::saveLog('get params', 2, $datareq, "dataRequest In Transaction Make");
         $data = json_decode($datareq,TRUE);
         // $data = $request->all();
@@ -287,47 +288,75 @@ class FCController extends Controller
     public function getBalance(Request $request){
         if($request->has("Params")){
             $datareq = FCHelper::AESDecode((string)$request->Params);
+            ProviderHelper::saveLogWithExeption('FCC getBalance', $this->provider_db_id, $datareq, $request->Params);
             $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
             if($client_details){
-                $sendtoclient =  microtime(true);
-                $client = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$client_details->client_access_token
-                    ]
-                ]);
-                $guzzle_response = $client->post($client_details->player_details_url,
-                    ['body' => json_encode(
-                            [
-                                "access_token" => $client_details->client_access_token,
-                                "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                                "type" => "playerdetailsrequest",
-                                "datesent" => "",
-                                "gameid" => "",
-                                "clientid" => $client_details->client_id,
-                                "playerdetailsrequest" => [
-                                    "player_username"=>$client_details->username,
-                                    "client_player_id"=>$client_details->client_player_id,
-                                    "token" => $client_details->player_token,
-                                    "gamelaunch" => "true"
-                                ]]
-                    )]
-                );
-                $client_response = json_decode($guzzle_response->getBody()->getContents());
-                $client_response_time = microtime(true) - $sendtoclient;
-                $msg = array(
-                    "Result"=>0,
-                    "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
-                );
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalance","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
-                return response($msg,200)->header('Content-Type', 'application/json');
+
+
+                try {
+                    $client_response = ProviderHelper::playerDetailsCall($client_details->player_token);
+                    ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, json_encode($client_response), 'CLIENT RESPONSE');
+
+                    $msg = array(
+                        "Result"=>0,
+                        "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
+                    );
+                    return response($msg,200)->header('Content-Type', 'application/json');
+                } catch (\Exception $e) {
+                    ProviderHelper::saveLogWithExeption('FCC getBalance Response Error', $this->provider_db_id, json_encode($client_response), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
+                    $msg = array(
+                        "Result"=>500,
+                        "ErrorText"=>"Account does not exist.",
+                    );
+                    return response($msg,200)->header('Content-Type', 'application/json');
+                }
+
+
+                // $sendtoclient =  microtime(true);
+                // $client = new Client([
+                //     'headers' => [ 
+                //         'Content-Type' => 'application/json',
+                //         'Authorization' => 'Bearer '.$client_details->client_access_token
+                //     ]
+                // ]);
+                // try {
+                //     $guzzle_response = $client->post($client_details->player_details_url,
+                //         ['body' => json_encode(
+                //                 [
+                //                     "access_token" => $client_details->client_access_token,
+                //                     "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+                //                     "type" => "playerdetailsrequest",
+                //                     "datesent" => "",
+                //                     "gameid" => "",
+                //                     "clientid" => $client_details->client_id,
+                //                     "playerdetailsrequest" => [
+                //                         "player_username"=>$client_details->username,
+                //                         "client_player_id"=>$client_details->client_player_id,
+                //                         "token" => $client_details->player_token,
+                //                         "gamelaunch" => "true"
+                //                     ]]
+                //         )]
+                //     );
+                //     $client_response = json_decode($guzzle_response->getBody()->getContents());
+                //     $client_response_time = microtime(true) - $sendtoclient;
+                //     ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, json_encode($client_response), 'CLIENT RESPONSE');
+                //     $msg = array(
+                //         "Result"=>0,
+                //         "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
+                //     );
+                //   // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalance","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
+                //    return response($msg,200)->header('Content-Type', 'application/json');
+                // } catch (\Exception $e) {
+                //     ProviderHelper::saveLogWithExeption('FCC getBalance Response Error', $this->provider_db_id, json_encode($client_response), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
+                // }
             }
             else{
                 $msg = array(
                     "Result"=>500,
                     "ErrorText"=>"Account does not exist.",
                 );
-                Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalanceAccountnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, $msg, 500);
+                // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalanceAccountnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
         }
@@ -336,7 +365,8 @@ class FCController extends Controller
                 "Result"=>500,
                 "ErrorText"=>"Account does not exist.",
             );
-            Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalanceAccountnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+            ProviderHelper::saveLogWithExeption('FCC getBalance', $this->provider_db_id, $datareq, 'ENDPOINT HIT ELSE');
+            // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalanceAccountnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
             return response($msg,200)->header('Content-Type', 'application/json');
         }
     }
