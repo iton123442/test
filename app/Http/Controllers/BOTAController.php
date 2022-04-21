@@ -78,7 +78,7 @@ class BOTAController extends Controller{
         }
        
     }
-    private function _getBalance($data,$client_details){
+    public function _getBalance($data,$client_details){
         Helper::saveLog('BOTA GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
         // if($data["token"]){
             if($client_details){
@@ -90,7 +90,7 @@ class BOTAController extends Controller{
             }
         // }
     }
-    private function _betProcess($data,$client_details){
+    public function _betProcess($data,$client_details){
         Helper::saveLog('BOTA betProcess', $this->provider_db_id, json_encode($data), 'BET Initialized');
         if($data["token"]){
             if($client_details){
@@ -189,7 +189,7 @@ class BOTAController extends Controller{
             ->header('Content-Type', 'application/json');
         }
     }
-    private function _winProcess($data,$client_details){
+    public function _winProcess($data,$client_details){
         Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
         if($data['token']){
             if(isset($client_details)){
@@ -326,7 +326,7 @@ class BOTAController extends Controller{
             ->header('Content-Type', 'application/json');
         }
     }
-    private function _cancelProcess($data,$client_details){
+    public function _cancelProcess($data,$client_details){
 
     }
 }
