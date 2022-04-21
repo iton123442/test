@@ -486,8 +486,9 @@ class OnlyPlayController extends Controller
     }
     public function generateId($type){
         if($type == "ext"){
-            return "5".shell_exec('date +%s%N');
-        }else{
+            return shell_exec('date +%s%N');
+        }
+        if($type == "transid"){
             return shell_exec('date +%s%N');
         }
     }
