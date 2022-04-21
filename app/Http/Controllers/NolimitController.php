@@ -235,7 +235,7 @@ class NolimitController extends Controller
                                                             'currency' => $client_details->default_currency,
 
                                                     ],
-                                                    'transactionId' =>$game_transaction_id,
+                                                    'transactionId' =>$game_transid_gen,
                                                   ],
                                                   'id'=>$data['id']
                                             ];
