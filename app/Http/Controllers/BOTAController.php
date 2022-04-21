@@ -19,9 +19,9 @@ class BOTAController extends Controller{
     public function __construct() {
         $this->startTime = microtime(true);
         $this->provider_db_id = config('providerlinks.bota.provider_db_id');
-        $this->api_key = config('providerlinks.bota.provider_db_id');
-        $this->api_url = config('providerlinks.bota.provider_db_id');
-        $this->prefix = config('providerlinks.bota.provider_db_id');
+        $this->api_key = config('providerlinks.bota.api_key');
+        $this->api_url = config('providerlinks.bota.api_url');
+        $this->prefix = config('providerlinks.bota.prefix');
     }
 
     public function index(Request $request){
@@ -83,7 +83,7 @@ class BOTAController extends Controller{
         if($data["token"]){
             if($client_details){
                 $msg = array(
-                    "user" => $data["user"],
+                    "user" => $this->prefix."_".$client_details->player_id,
                     "balance"=>number_format($client_details->balance,2,'.', ''),
                 );
                 return response($msg,200)->header('Content-Type', 'application/json');
