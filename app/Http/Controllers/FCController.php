@@ -288,7 +288,7 @@ class FCController extends Controller
     public function getBalance(Request $request){
         if($request->has("Params")){
             $datareq = FCHelper::AESDecode((string)$request->Params);
-            ProviderHelper::saveLogWithExeption('FCC getBalance', $this->provider_db_id, $datareq, 'ENDPOINT HIT');
+            ProviderHelper::saveLogWithExeption('FCC getBalance', $this->provider_db_id, $datareq, $request->Params);
             $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
             if($client_details){
                 $sendtoclient =  microtime(true);
