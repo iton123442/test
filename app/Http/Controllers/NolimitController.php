@@ -475,7 +475,7 @@ class NolimitController extends Controller
                         // "mw_response" => json_encode($response),
                     );
 
-                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
                 try{
                     $createGameTransactionLog = [
                                 "connection_name" => $client_details->connection_name,
