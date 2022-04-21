@@ -293,11 +293,10 @@ class FCController extends Controller
             if($client_details){
 
 
-
                 try {
                     $client_response = ProviderHelper::playerDetailsCall($client_details->player_token);
                     ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, json_encode($client_response), 'CLIENT RESPONSE');
-                    
+
                     $msg = array(
                         "Result"=>0,
                         "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
@@ -305,10 +304,12 @@ class FCController extends Controller
                     return response($msg,200)->header('Content-Type', 'application/json');
                 } catch (\Exception $e) {
                     ProviderHelper::saveLogWithExeption('FCC getBalance Response Error', $this->provider_db_id, json_encode($client_response), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
+                    $msg = array(
+                        "Result"=>500,
+                        "ErrorText"=>"Account does not exist.",
+                    );
+                    return response($msg,200)->header('Content-Type', 'application/json');
                 }
-
-
-
 
 
                 // $sendtoclient =  microtime(true);
