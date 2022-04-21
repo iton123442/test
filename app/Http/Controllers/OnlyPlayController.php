@@ -184,7 +184,7 @@ class OnlyPlayController extends Controller
                                 "income" => 0,
                                 "entry_id" =>1,
                             );
-                           GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+                           GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$get_client_details); //create game_transaction
                            $gameTransactionEXTData = array(
                                 "game_trans_id" => $gen_game_trans_id,
                                 "provider_trans_id" => $request->tx_id,
@@ -192,9 +192,9 @@ class OnlyPlayController extends Controller
                                 "amount" => $bet_amount,
                                 "game_transaction_type"=> 1,
                             );
-                           GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
+                           GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$get_client_details); //create extension
                            $createGameTransactionLog = [
-                                "connection_name" => $client_details->connection_name,
+                                "connection_name" => $get_client_details->connection_name,
                                 "column" =>[
                                     "game_trans_ext_id" => $gen_game_extid,
                                     "request" => json_encode($data),
@@ -321,7 +321,7 @@ class OnlyPlayController extends Controller
                     );
                     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$get_client_details);
                     $createGameTransactionLog = [
-                        "connection_name" => $client_details->connection_name,
+                        "connection_name" => $get_client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $gen_game_extid,
                             "request" => json_encode($data),
