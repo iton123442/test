@@ -10,7 +10,7 @@ use DB;
 class BOTAHelper{
     public static function botaPlayerChecker($details,$method){
 		if($method == 'Verify'){
-            Helper::saveLog('bota PLAYER EXIST', 135, $details, 'VERIFICATION HIT');
+            Helper::saveLog('bota PLAYER EXIST', 135, json_encode($details), 'VERIFICATION HIT');
 			$datatosend = [ 
                 "user_id" => config('providerlinks.bota.prefix')."_".$details->player_id
             ];
@@ -26,7 +26,7 @@ class BOTAHelper{
             $responseBody = json_decode($response->getBody()->getContents());
             return $responseBody;
 		} elseif($method == 'NoAccount'){
-            Helper::saveLog('bota NEW PLAYER', 135, $details, 'Create new player');
+            Helper::saveLog('bota NEW PLAYER', 135, json_encode($details), 'Create new player');
 			$datatosend = [
 				"user_id" => config('providerlinks.bota.prefix')."_".$details->player_id,
 				"user_name" => $details->username,
