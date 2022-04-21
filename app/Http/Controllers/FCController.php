@@ -317,7 +317,7 @@ class FCController extends Controller
                 );
                 $client_response = json_decode($guzzle_response->getBody()->getContents());
                 $client_response_time = microtime(true) - $sendtoclient;
-                ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, $client_response, 'CLIENT RESPONSE');
+                ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, json_encode($client_response), 'CLIENT RESPONSE');
                 $msg = array(
                     "Result"=>0,
                     "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
