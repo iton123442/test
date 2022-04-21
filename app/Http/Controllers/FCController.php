@@ -330,7 +330,7 @@ class FCController extends Controller
                     "Result"=>500,
                     "ErrorText"=>"Account does not exist.",
                 );
-                ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, $client_response, 500);
+                ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, $msg, 500);
                 // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalanceAccountnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                 return response($msg,200)->header('Content-Type', 'application/json');
             }
