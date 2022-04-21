@@ -291,43 +291,63 @@ class FCController extends Controller
             ProviderHelper::saveLogWithExeption('FCC getBalance', $this->provider_db_id, $datareq, $request->Params);
             $client_details = ProviderHelper::getClientDetails("player_id",json_decode($datareq,TRUE)["MemberAccount"],1,'fachai');
             if($client_details){
-                $sendtoclient =  microtime(true);
-                $client = new Client([
-                    'headers' => [ 
-                        'Content-Type' => 'application/json',
-                        'Authorization' => 'Bearer '.$client_details->client_access_token
-                    ]
-                ]);
+
+
+
                 try {
-                    $guzzle_response = $client->post($client_details->player_details_url,
-                        ['body' => json_encode(
-                                [
-                                    "access_token" => $client_details->client_access_token,
-                                    "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                                    "type" => "playerdetailsrequest",
-                                    "datesent" => "",
-                                    "gameid" => "",
-                                    "clientid" => $client_details->client_id,
-                                    "playerdetailsrequest" => [
-                                        "player_username"=>$client_details->username,
-                                        "client_player_id"=>$client_details->client_player_id,
-                                        "token" => $client_details->player_token,
-                                        "gamelaunch" => "true"
-                                    ]]
-                        )]
-                    );
-                    $client_response = json_decode($guzzle_response->getBody()->getContents());
-                    $client_response_time = microtime(true) - $sendtoclient;
+                    $client_response = ProviderHelper::playerDetailsCall($client_details->player_token);
                     ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, json_encode($client_response), 'CLIENT RESPONSE');
+                    
                     $msg = array(
                         "Result"=>0,
                         "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
                     );
-                  // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalance","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
-                   return response($msg,200)->header('Content-Type', 'application/json');
+                    return response($msg,200)->header('Content-Type', 'application/json');
                 } catch (\Exception $e) {
                     ProviderHelper::saveLogWithExeption('FCC getBalance Response Error', $this->provider_db_id, json_encode($client_response), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
                 }
+
+
+
+
+
+                // $sendtoclient =  microtime(true);
+                // $client = new Client([
+                //     'headers' => [ 
+                //         'Content-Type' => 'application/json',
+                //         'Authorization' => 'Bearer '.$client_details->client_access_token
+                //     ]
+                // ]);
+                // try {
+                //     $guzzle_response = $client->post($client_details->player_details_url,
+                //         ['body' => json_encode(
+                //                 [
+                //                     "access_token" => $client_details->client_access_token,
+                //                     "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+                //                     "type" => "playerdetailsrequest",
+                //                     "datesent" => "",
+                //                     "gameid" => "",
+                //                     "clientid" => $client_details->client_id,
+                //                     "playerdetailsrequest" => [
+                //                         "player_username"=>$client_details->username,
+                //                         "client_player_id"=>$client_details->client_player_id,
+                //                         "token" => $client_details->player_token,
+                //                         "gamelaunch" => "true"
+                //                     ]]
+                //         )]
+                //     );
+                //     $client_response = json_decode($guzzle_response->getBody()->getContents());
+                //     $client_response_time = microtime(true) - $sendtoclient;
+                //     ProviderHelper::saveLogWithExeption('FCC getBalance Response', $this->provider_db_id, json_encode($client_response), 'CLIENT RESPONSE');
+                //     $msg = array(
+                //         "Result"=>0,
+                //         "MainPoints"=>(float)number_format($client_response->playerdetailsresponse->balance,2,'.', '')
+                //     );
+                //   // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"getbalance","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time]);
+                //    return response($msg,200)->header('Content-Type', 'application/json');
+                // } catch (\Exception $e) {
+                //     ProviderHelper::saveLogWithExeption('FCC getBalance Response Error', $this->provider_db_id, json_encode($client_response), $e->getMessage().' '.$e->getLine().' '.$e->getFile());
+                // }
             }
             else{
                 $msg = array(
