@@ -12,6 +12,8 @@ use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
 use Carbon\Carbon;
+use App\Jobs\UpdateGametransactionJobs;
+use App\Jobs\CreateGameTransactionLog;
 use DB;
 
 class NolimitController extends Controller
