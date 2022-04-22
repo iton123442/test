@@ -2164,7 +2164,7 @@ class GameLobby{
         $requesttosend = [
             "token" => $gameToken->result_value->token,
             "user_id" => $prefix."_".$get_player_details->player_id,
-            "game" => $prefix
+            "game" => $game_code
         ];
         $client = new Client([
             'headers' => [ 
