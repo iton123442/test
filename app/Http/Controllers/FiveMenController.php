@@ -150,34 +150,12 @@ public function gameBet($request, $client_details)
 			$provider_trans_id = $request['data']['action_id']; // ROUND ID MW TRANSACTION
 			$round_xt = $request['callback_id']; // PROVIDER TRANS ID MW
 			//Create GameTransaction, GameExtension
-
-			$gameTransactionData = array(
-	            "provider_trans_id" => $provider_trans_id,
-	            "token_id" => $client_details->token_id,
-	            "game_id" => $game_details->game_id,
-	            "round_id" => $round_id,
-	            "bet_amount" => $bet_amount,
-	            "win" => 5,
-	            "pay_amount" => 0,
-	            "income" => 0,
-	            "entry_id" =>1,
-	            "trans_status" =>1,
-	        );
-
-			$game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-
-			$gameTransactionEXTData = array(
-	            "game_trans_id" => $game_trans_id,
-	            "provider_trans_id" => $provider_trans_id,
-	            "round_id" => $round_xt,
-	            "amount" => $bet_amount,
-	            "game_transaction_type"=> 1,
-	            "provider_request" =>json_encode($request),
-	        );
-	        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-	        
+			$game_transid_gen = shell_exec('date +%s%N'); // ID generator
+			$for_ext = shell_exec('date +%s%N');
+			$identifier = (int)$for_ext + 54321;
+			$game_transid_ext = (int)$identifier;
 			try {
-				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
+				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_transid_ext,$game_transid_gen,"debit",false);
 	        } catch (\Exception $e) {
 			    $response = array(
 					"status" => 'error',
@@ -187,15 +165,18 @@ public function gameBet($request, $client_details)
 						"message" => "Internal error. Please reopen the game",
 					]
 				);
-		        $updateTransactionEXt = array(
-		            "mw_response" => json_encode($response),
-		            'mw_request' => json_encode("FAILED"),
-		            'client_response' => json_encode("FAILED"),
-		            "transaction_detail" =>"FAILED",
-					"general_details" => "FAILED",
-		        );
-		        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
 
+				$createGameTransactionLog = [
+					"connection_name" => $client_details->connection_name,
+					"column" =>[
+						"game_trans_ext_id" => $game_transid_ext,
+						"request" => json_encode($data),
+						"response" => json_encode($response),
+						"log_type" => "provider_details",
+						"transaction_detail" => "Failed",
+					]
+				];
+				dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
 				$updateGameTransaction = [
 	                "win" => 2,
 	                'trans_status' => 5,
@@ -216,16 +197,41 @@ public function gameBet($request, $client_details)
 								'currency' => $client_details->default_currency,
 							],
 					  	);
-			            
-			            $update_gametransactionext = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"success",
-							"general_details" => "success",
-						);
-				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
 				        Helper::saveLog('5Men success BET PROCESS ', $this->provider_db_id, json_encode($request), $response);
+						$gameTransactionData = array(
+							"provider_trans_id" => $provider_trans_id,
+							"token_id" => $client_details->token_id,
+							"game_id" => $game_details->game_id,
+							"round_id" => $round_id,
+							"bet_amount" => $bet_amount,
+							"win" => 5,
+							"pay_amount" => 0,
+							"income" => 0,
+							"entry_id" =>1,
+						);
+	
+						GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+						$gameTransactionEXTData = array(
+							"game_trans_id" => $game_transid_gen,
+							"provider_trans_id" => $provider_trans_id,
+							"round_id" => $round_xt,
+							"amount" => $bet_amount,
+							"game_transaction_type"=> 1,
+							// "provider_request" =>json_encode($request),
+						);
+						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
+						$createGameTransactionLog = [
+							"connection_name" => $client_details->connection_name,
+							"column" =>[
+								"game_trans_ext_id" => $game_transid_ext,
+								"request" => json_encode($data),
+								"response" => json_encode($response),
+								"log_type" => "provider_details",
+								"transaction_detail" => "success",
+							]
+						];
+						dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
+						return $response;
 						break;
 					case "402":
 
@@ -237,23 +243,8 @@ public function gameBet($request, $client_details)
 								'message' => "Not enough money",
 							]
 					  	);
-	          			$update_gametransactionext = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"FAILED",
-							"general_details" => "FAILED",
-						);
-				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
-
-				        
-						$updateGameTransaction = [
-			                "win" => 2,
-			                'trans_status' => 5
-			            ];
-			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+		
 	          			Helper::saveLog('5Men success BET Not enough money ', $this->provider_db_id, json_encode($request), $response);
-						// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
 						break;
 					default:
 						$response = array(
@@ -264,22 +255,41 @@ public function gameBet($request, $client_details)
 								"message" => "Internal error. Please reopen the game",
 							]
 						);
-	          			$update_gametransactionext = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"FAILED",
-							"general_details" => "FAILED",
-						);
-				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
-	          			$updateGameTransaction = [
-			                "win" => 2,
-			                'trans_status' => 5
-			            ];
-			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
 	          			Helper::saveLog('5Men success BET FAILED ', $this->provider_db_id, json_encode($request), $response);
-				}
-
+				   }
+				   $gameTransactionData = array(
+					"provider_trans_id" => $provider_trans_id,
+					"token_id" => $client_details->token_id,
+					"game_id" => $game_details->game_id,
+					"round_id" => $round_id,
+					"bet_amount" => $bet_amount,
+					"win" => 2,
+					"pay_amount" => 0,
+					"income" => 0,
+					"entry_id" =>1,
+					'trans_status' => 5
+				);
+				GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+				  $gameTransactionEXTData = array(
+					"game_trans_id" => $game_transid_gen,
+					"provider_trans_id" => $provider_trans_id,
+					"round_id" => $round_xt,
+					"amount" => $bet_amount,
+					"game_transaction_type"=> 1,
+					// "provider_request" =>json_encode($request),
+				);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
+				$createGameTransactionLog = [
+					"connection_name" => $client_details->connection_name,
+					"column" =>[
+						"game_trans_ext_id" => $game_transid_ext,
+						"request" => json_encode($data),
+						"response" => json_encode($response),
+						"log_type" => "provider_details",
+						"transaction_detail" => "Failed",
+					]
+				];
+				dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs	
 				return $response;
 	        }
 
@@ -302,7 +312,9 @@ public function gameBet($request, $client_details)
 
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-
+		$for_ext = shell_exec('date +%s%N');
+        $identifier = (int)$for_ext + 54321;
+        $game_transid_ext = (int)$identifier;
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
@@ -370,10 +382,8 @@ public function gameBet($request, $client_details)
 			            "round_id" => $transaction_uuid,
 			            "amount" => $amount,
 			            "game_transaction_type"=> 2,
-			            "provider_request" =>json_encode($request),
-			            "mw_response" =>json_encode($response),
 			        );
-			        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
 		            
 			        $win_or_lost = $amount > 0 ?  1 : 0;
 		            $entry_id = $amount > 0 ?  2 : 1;
@@ -455,10 +465,10 @@ public function gameBet($request, $client_details)
 		            "round_id" => $transaction_uuid,
 		            "amount" => $amount,
 		            "game_transaction_type"=> 2,
-		            "provider_request" =>json_encode($request),
-		            "mw_response" =>json_encode($response),
+		            // "provider_request" =>json_encode($request),
+		            // "mw_response" =>json_encode($response),
 		        );
-		        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
 
 				
 				$pay_amount = $existing_bet->pay_amount + $amount;
@@ -487,7 +497,7 @@ public function gameBet($request, $client_details)
 		                "amount" => $amount
 		            ],
 		            "connection_name" => $existing_bet->connection_name,
-		            "game_trans_ext_id" => $game_trans_ext_id,
+		            "game_trans_ext_id" => $game_transid_ext,
 		            "game_transaction_id" => $existing_bet->game_trans_id
 
 		        ];
