@@ -226,7 +226,7 @@ class GameTransactionMDB
         $data['game_trans_id'] = $game_transid_gen;
         if($connection != null){
             Helper::saveLog('createGametransaction', 12, json_encode($connection), "createGametransaction");
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions_newgen")->insertGetId($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->insertGetId($data);
         }else{
             return null;
         }
@@ -242,7 +242,7 @@ class GameTransactionMDB
     public static function updateGametransactionV2($data,$game_transaction_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions_newgen")->where('game_trans_id',$game_transaction_id)->update($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][1].".game_transactions")->where('game_trans_id',$game_transaction_id)->update($data);
         }else{
             return null;
         }
@@ -262,7 +262,7 @@ class GameTransactionMDB
         $gametransactionext['game_trans_ext_id'] = $game_transid_ext;
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext_newgen")->insertGetId($gametransactionext);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->insertGetId($gametransactionext);
         }else{
             Helper::saveLog('createGameTransactionExt(PS)', 12, json_encode("error or null connection"), "");
             return null;
@@ -286,10 +286,10 @@ class GameTransactionMDB
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
             try {
-                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext_newgen")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
             } catch (\Exception $e) {
                 $data["mw_request"] .= $e->getMessage();
-                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext_newgen")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".game_transaction_ext")->where('game_trans_ext_id',$game_trans_ext_id)->update($data);
             }
             return null;
         }else{
