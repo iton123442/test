@@ -140,7 +140,7 @@ class BOTAController extends Controller{
             ]; 
             $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"debit",false,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code)
-            && $client_response->fundtransaferresponse->status->code == "200"){
+            && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 $msg = array(
@@ -155,7 +155,7 @@ class BOTAController extends Controller{
                 return response($msg, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
-            && $client_response->fundtransaferresponse->status->code == "402"){
+            && $client_response->fundtransferresponse->status->code == "402"){
                 $response ="OYY SIPYAT> USAB BET TAMAN SA MAHUROT";//error response
                 try{
                     $datatosend = array(
@@ -210,8 +210,8 @@ class BOTAController extends Controller{
                         'connect_time' => 1,
                     ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"debit",false,$fund_extra_data);
-                    if(isset($client_response->fundtransferrequest->status->code)
-                    && $client_response->fundtransferrequest->status->code == 200){
+                    if(isset($client_response->fundtransferresponse->status->code)
+                    && $client_response->fundtransferresponse->status->code == 200){
                         $balance = round($client_response->fundtransferresponse->balance,2,'.', '');
                         $client_details->balance = $balance;
                         ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
@@ -281,7 +281,7 @@ class BOTAController extends Controller{
                         }
                     }
                     elseif(isset($client_response->fundtransferresponse->status->code)
-                    && $client_response->fundtransaferresponse->status->code == "402"){
+                    && $client_response->fundtransferresponse->status->code == "402"){
                         $response ="OYY SIPYAT> USAB BET TAMAN SA MAHUROT";//error response
                         try{
                             $datatosend = array(
