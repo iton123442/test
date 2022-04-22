@@ -170,7 +170,7 @@ public function gameBet($request, $client_details)
 					"connection_name" => $client_details->connection_name,
 					"column" =>[
 						"game_trans_ext_id" => $game_transid_ext,
-						"request" => json_encode($data),
+						"request" => json_encode($string_to_obj),
 						"response" => json_encode($response),
 						"log_type" => "provider_details",
 						"transaction_detail" => "Failed",
@@ -283,7 +283,7 @@ public function gameBet($request, $client_details)
 					"connection_name" => $client_details->connection_name,
 					"column" =>[
 						"game_trans_ext_id" => $game_transid_ext,
-						"request" => json_encode($data),
+						"request" => json_encode($string_to_obj),
 						"response" => json_encode($response),
 						"log_type" => "provider_details",
 						"transaction_detail" => "Failed",
@@ -396,7 +396,21 @@ public function gameBet($request, $client_details)
 			            'trans_status' => 2
 			        ];
 		        	GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
-
+					try{
+						$createGameTransactionLog = [
+							"connection_name" => $client_details->connection_name,
+							"column" =>[
+								"game_trans_ext_id" => $game_transid_ext,
+								"request" => json_encode($string_to_obj),
+								"response" => json_encode($response),
+								"log_type" => "provider_details",
+								"transaction_detail" => "success",
+							 ]
+						];
+							dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+						}catch(\Exception $e){
+							Helper::saveLog("Playstar Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
+						}
 			        $body_details = [
 			            "type" => "credit",
 			            "win" => $win_or_lost,
