@@ -425,7 +425,7 @@ public function gameBet($request, $client_details)
 			                "amount" => $amount
 			            ],
 			            "connection_name" => $existing_bet->connection_name,
-			            "game_trans_ext_id" => $game_trans_ext_id,
+			            "game_trans_ext_id" => $game_transid_ext,
 			            "game_transaction_id" => $existing_bet->game_trans_id
 
 			        ];
