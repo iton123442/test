@@ -33,7 +33,7 @@ class BOTAController extends Controller{
         $originalPlayerID = explode('_', $data["user"]);
         $client_details = ProviderHelper::getClientDetails('player_id', $originalPlayerID[1]);
         $playerChecker = BOTAHelper::botaPlayerChecker($client_details,'Verify');//Auth
-        if($playerChecker->result_code != 1){
+        if(isset($playerChecker->result_code) && $playerChecker->result_code != 1){
             //flow structure
             if($data['types'] == "balance") {
                 Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($data), 'BALANCE HIT!');
@@ -172,7 +172,7 @@ class BOTAController extends Controller{
             }
         }
     }
-    
+
     public function _winProcess($data,$client_details){
         Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
         if(isset($client_details)){
