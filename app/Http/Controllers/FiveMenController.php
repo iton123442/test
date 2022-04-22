@@ -436,10 +436,10 @@ public function gameBet($request, $client_details)
 				 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 				 		);
 				 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-			            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					} catch (\Exception $e) {
-			            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					}
 				} else {
@@ -523,10 +523,10 @@ public function gameBet($request, $client_details)
 			 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 			 		);
 			 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-		            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+		            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 		            return $response;
 				} catch (\Exception $e) {
-		            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+		            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 		            return $response;
 				}
 			} elseif ($string_to_obj->game->action == 'collect') {
