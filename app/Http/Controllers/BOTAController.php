@@ -155,7 +155,7 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response ="OYY SIPYAT> USAB BET TAMAN SA MAHUROT";//error response
+                $response ="ERROR FAILED BET";//error response
                 try{
                     $datatosend = array(
                     "win" => 2
@@ -177,28 +177,28 @@ class BOTAController extends Controller{
         Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
         if(isset($client_details)){
             try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_2');
+                ProviderHelper::idenpotencyTable($this->prefix.'_'.['detail']['shoeNo'].'_2');
             }catch(\Exception $e){
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, $data['detail']['casino']);
-                $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
-                if($game == null){
+                // $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
+                // if($game == null){
                     $win_or_lost = $data["price"] == 0 ? 0 : 1;
                     $gameTransactionData = array(
-                        "provider_trans_id" => $data['idx'],
+                        "provider_trans_id" => $data['detail']['shoeNo'],
                         "token_id" => $client_details->token_id,
                         "game_id" => $gamedetails->game_id,
-                        "round_id" => $data['detail']['shoeNo'],
+                        "round_id" => $data['idx'],
                         "bet_amount" => $data['bet'],
                         "pay_amount" => $data['price'],
                         "win" => 5,
-                        "income" => $data['bet']-$data['prcie'],
+                        "income" => $data['bet']-$data['price'],
                         "entry_id" => $data['price'] == 0 ? 1 : 2
                     );
                     $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
                     $bettransactionExt = array(
                         "game_trans_id" => $game_trans_id,
-                        "provider_trans_id" => $data['idx'],
-                        "round_id" => $data['detail']['shoeNo'],
+                        "provider_trans_id" => $data['detail']['shoeNo'],
+                        "round_id" => $data['idx'],
                         "amount" => $data['bet'],
                         "game_transaction_type" => 1,
                         "provider_request" => json_encode($data),
@@ -231,7 +231,7 @@ class BOTAController extends Controller{
                         );
                         $winTransactionExt = array(
                             "game_trans_id" => $game_trans_id,
-                            "provider_trans_id"=>$data['idx'],
+                            "provider_trans_id"=>$data['detail']['shoeNo'],
                             "round_id"=>$data['idx'],
                             "amount"=>$data['price'],
                             "game_transaction_type"=> 2,
@@ -251,8 +251,8 @@ class BOTAController extends Controller{
                             ],
                             "provider" => [
                                 "provider_request" => $data, #R
-                                "provider_trans_id"=>$data["idx"], #R
-                                "provider_round_id"=>$data["detail"]["shoeNo"], #R
+                                "provider_trans_id"=>$data['detail']['shoeNo'], #R
+                                "provider_round_id"=>$data['idx'], #R
                                 'provider_name' => $gamedetails->provider_name
                             ],
                             "mwapi" => [
@@ -274,6 +274,7 @@ class BOTAController extends Controller{
                                 "balance" => $balance,
                                 "confirm" => "ok"
                             );
+                            dd('fundtransferhit');
                             Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
                             return response($response,200)
                                 ->header('Content-Type', 'application/json');
@@ -281,7 +282,7 @@ class BOTAController extends Controller{
                     }
                     elseif(isset($client_response->fundtransferresponse->status->code)
                     && $client_response->fundtransferresponse->status->code == "402"){
-                        $response ="OYY SIPYAT> USAB BET TAMAN SA MAHUROT";//error response
+                        $response ="ERROR WIN";//error response
                         try{
                             $datatosend = array(
                             "win" => 2
@@ -292,12 +293,19 @@ class BOTAController extends Controller{
                             );
                             GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                         }catch(\Exception $e){
-                        Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
+                        Helper::savelog('WIN FAILED(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                         }
                         return response($response, 200)->header('Content-Type', 'application/json');
                     }
-                }
+                // }
             }
+        }else {
+            $msg = array(
+                "result_code" => "1",
+                "result_message" => "(NoAccount)"
+            );
+            
+            return response($msg, 200)->header('Content-Type', 'application/json');
         }
     }
     public function _cancelProcess($data,$client_details){
