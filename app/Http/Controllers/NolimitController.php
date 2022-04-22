@@ -457,7 +457,7 @@ class NolimitController extends Controller
                     }
                 
                    $updateGameTransaction = [
-                        'win' => 5,
+                        'win' => $win_or_lost,
                         'pay_amount' => $amount,
                         'income' => $income,
                         'entry_id' => $entry_id,
