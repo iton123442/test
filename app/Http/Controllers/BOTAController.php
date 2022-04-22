@@ -181,7 +181,6 @@ class BOTAController extends Controller{
             }catch(\Exception $e){
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, $data['detail']['casino']);
                 // $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
-                // if($game == null){
                     $win_or_lost = $data["price"] == 0 ? 0 : 1;
                     $gameTransactionData = array(
                         "provider_trans_id" => $data['detail']['shoeNo'],
@@ -208,7 +207,7 @@ class BOTAController extends Controller{
                         'provider_name' => $gamedetails->game_name,
                         'connect_time' => 1,
                     ];
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"debit",false,$fund_extra_data);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"credit",false,$fund_extra_data);
                     if(isset($client_response->fundtransferresponse->status->code)
                     && $client_response->fundtransferresponse->status->code == 200){
                         $balance = round($client_response->fundtransferresponse->balance,2);
@@ -263,7 +262,7 @@ class BOTAController extends Controller{
                                 "mw_response" => $response, #R
                             ]
                         ];
-                        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"debit",false,$action_payload);
+                        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"credit",false,$action_payload);
                         if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
                             $balance = round($client_response->fundtransferresponse->balance,2);
@@ -297,7 +296,6 @@ class BOTAController extends Controller{
                         }
                         return response($response, 200)->header('Content-Type', 'application/json');
                     }
-                // }
             }
         }else {
             $msg = array(
