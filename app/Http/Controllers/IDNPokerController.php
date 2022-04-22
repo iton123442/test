@@ -646,7 +646,7 @@ class IDNPokerController extends Controller
         ];
         $key = config('providerlinks.idnpoker');
         foreach ($key["keys"] as  $keyVal) {
-            $rate = IDNPokerHelper::getRate($keyVal); //TESTINGn); // check balance
+            // $rate = IDNPokerHelper::getRate($keyVal); //TESTINGn); // check balance
             $transactionList = IDNPokerHelper::getTransactionHistory($data,$keyVal);
             if($transactionList != "false"){
                 foreach ($transactionList["row"] as  $value) {
@@ -671,7 +671,8 @@ class IDNPokerController extends Controller
                                         $win = 0;
                                     } elseif ($value["status"] == "Win") {
                                         // $bet_amount = ($value["r_bet"] / $rate);
-                                        $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
+                                        // $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
+                                        $bet_amount = $value["curr_bet"];
                                         $pay_amount = $value["curr_amount"];
                                         $win = 1;
                                     } elseif ($value["status"] == "Win Global Jackpot" ) {

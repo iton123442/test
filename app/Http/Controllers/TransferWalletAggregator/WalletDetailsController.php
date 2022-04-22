@@ -419,31 +419,58 @@ class WalletDetailsController extends Controller
                     where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id."  ".$and_player.";
                     ")[0];
               
-
-                $query = "
-                    select 
-                    game_trans_id,
-                    (select client_name from ".$connection["TG_ClientInfo"].".clients where client_id = c.client_id) as client_name,
-                    (select client_player_id from ".$connection["TG_PlayerInfo"].".players where player_id = c.player_id) as client_player_id,
-                    (select sub_provider_name from ".$connection["TG_GameInfo"].".sub_providers where sub_provider_id = (SELECT sub_provider_id FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) ) as provider_name,
-                    (SELECT game_name FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_name,
-                    (SELECT game_code FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_code,
-                    bet_amount,
-                    pay_amount,
-                    bet_amount - pay_amount as income,
-                    case
-                        when win = 1 then 'win'
-                        when win = 2 then 'failed'
-                        when win = 0 then 'lose'
-                        when win = 5 then 'progressing'
-                        when win = 4 then 'refunded'
-                    end as status,
-                    convert_tz(c.created_at,'+00:00', '+08:00') created_at
-                    from ".$connection["db_list"][1].".game_transactions c 
-                    where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
-                    order by game_trans_id desc
-                    limit ".$page.", ".TWHelpers::getLimitAvailable($request->limit).";
-                ";
+                if($client_details->operator_id == 11){
+                    $query = "
+                        select 
+                        game_trans_id,
+                        (select client_name from ".$connection["TG_ClientInfo"].".clients where client_id = c.client_id) as client_name,
+                        (select client_player_id from ".$connection["TG_PlayerInfo"].".players where player_id = c.player_id) as client_player_id,
+                        (select sub_provider_name from ".$connection["TG_GameInfo"].".sub_providers where sub_provider_id = (SELECT sub_provider_id FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) ) as provider_name,
+                        (SELECT game_name FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_name,
+                        (SELECT game_code FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_code,
+                        curr_bet,
+                        bet,
+                        r_bet,
+                        status,
+                        hand,
+                        card,
+                        curr_amount,
+                        amount,
+                        total,
+                        convert_tz(c.created_at,'+00:00', '+08:00') created_at
+                        from ".$connection["db_list"][1].".game_transactions c 
+                        inner join ".$connection["db_list"][1].".idn_transaction_list using (game_trans_id)
+                        where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
+                        order by game_trans_id desc
+                        limit ".$page.", ".TWHelpers::getLimitAvailable($request->limit).";
+                    ";
+                } else {
+                    $query = "
+                        select 
+                        game_trans_id,
+                        (select client_name from ".$connection["TG_ClientInfo"].".clients where client_id = c.client_id) as client_name,
+                        (select client_player_id from ".$connection["TG_PlayerInfo"].".players where player_id = c.player_id) as client_player_id,
+                        (select sub_provider_name from ".$connection["TG_GameInfo"].".sub_providers where sub_provider_id = (SELECT sub_provider_id FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) ) as provider_name,
+                        (SELECT game_name FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_name,
+                        (SELECT game_code FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_code,
+                        bet_amount,
+                        pay_amount,
+                        bet_amount - pay_amount as income,
+                        case
+                            when win = 1 then 'win'
+                            when win = 2 then 'failed'
+                            when win = 0 then 'lose'
+                            when win = 5 then 'progressing'
+                            when win = 4 then 'refunded'
+                        end as status,
+                        convert_tz(c.created_at,'+00:00', '+08:00') created_at
+                        from ".$connection["db_list"][1].".game_transactions c 
+                        where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id." ".$and_player."
+                        order by game_trans_id desc
+                        limit ".$page.", ".TWHelpers::getLimitAvailable($request->limit).";
+                    ";
+                }
+                
                 $details = DB::connection( $connection["connection_name"] )->select($query);
                 if (count($details) == 0) {
                     $details = ["data" => null,"status" => ["code" => "200","message" => TWHelpers::getPTW_Message(200)]];
@@ -452,19 +479,41 @@ class WalletDetailsController extends Controller
                 }
 
                 $data = array();//this is to add data and reformat the $table object to datatables standard array
-                foreach($details as $datas){
-                    $datatopass['game_trans_id']=$datas->game_trans_id;
-                    $datatopass['client_name']=$datas->client_name;
-                    $datatopass['client_player_id']=$datas->client_player_id;
-                    $datatopass['provider_name']=$datas->provider_name;
-                    $datatopass['game_name']=$datas->game_name;
-                    $datatopass['game_code']=$datas->game_code;
-                    $datatopass['bet_amount']=$datas->bet_amount;
-                    $datatopass['pay_amount']=$datas->pay_amount;
-                    $datatopass['income']=$datas->income;
-                    $datatopass['status']=$datas->status;
-                    $datatopass['created_at']=$datas->created_at;
-                    $data[]=$datatopass;
+                if($client_details->operator_id = 11){
+                    foreach($details as $datas){
+                        $datatopass['game_trans_id']=$datas->game_trans_id;
+                        $datatopass['client_name']=$datas->client_name;
+                        $datatopass['client_player_id']=$datas->client_player_id;
+                        $datatopass['provider_name']=$datas->provider_name;
+                        $datatopass['game_name']=$datas->game_name;
+                        $datatopass['game_code']=$datas->game_code;
+                        $datatopass['bet']=$datas->bet;
+                        $datatopass['curr_bet']=$datas->curr_bet;
+                        $datatopass['r_bet']=$datas->r_bet;
+                        $datatopass['status']=$datas->status;
+                        $datatopass['hand']=$datas->hand;
+                        $datatopass['card']=$datas->card;
+                        $datatopass['curr_amount']=$datas->curr_amount;
+                        $datatopass['amount']=$datas->amount;
+                        $datatopass['total']=$datas->total;
+                        $datatopass['created_at']=$datas->created_at;
+                        $data[]=$datatopass;
+                    }
+                } else {
+                    foreach($details as $datas){
+                        $datatopass['game_trans_id']=$datas->game_trans_id;
+                        $datatopass['client_name']=$datas->client_name;
+                        $datatopass['client_player_id']=$datas->client_player_id;
+                        $datatopass['provider_name']=$datas->provider_name;
+                        $datatopass['game_name']=$datas->game_name;
+                        $datatopass['game_code']=$datas->game_code;
+                        $datatopass['bet_amount']=$datas->bet_amount;
+                        $datatopass['pay_amount']=$datas->pay_amount;
+                        $datatopass['income']=$datas->income;
+                        $datatopass['status']=$datas->status;
+                        $datatopass['created_at']=$datas->created_at;
+                        $data[]=$datatopass;
+                    }
                 }
                 $mw_response = [
                     "data" => $data,
