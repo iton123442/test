@@ -196,7 +196,7 @@ class TTGController extends Controller
                                         "income" => 0,
                                         "entry_id" =>1,
                                     );
-                                    $game_trans_id = GameTransactionMDB::createGametransactionV2($gameTransactionData, $get_client_details);
+                                    $game_trans_id = GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id, $get_client_details);
                               }else{
                                   // GameTransactionMDB
                                     // $bet_amount = $checkTransaction->bet_amount + $bet_amount;
@@ -214,7 +214,7 @@ class TTGController extends Controller
                                 "game_transaction_type"=> 1,
                                 // "provider_request" =>json_encode($data),
                                 );
-                              $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$get_client_details);
+                              $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $get_client_details);
                               $createGameTransactionLog = [
                                 "connection_name" => $get_client_details->connection_name,
                                 "column" =>[
@@ -292,7 +292,7 @@ class TTGController extends Controller
                           'entry_id' => $entry_id,
                           'trans_status' => 2
                       ];
-                  GameTransactionMDB::updateGametransactionv2($updateGameTransaction, $bet_transaction->game_trans_id, $get_client_details);
+                  GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $get_client_details);
 
                   $gameTransactionEXTData = array(
                           "game_trans_id" => $bet_transaction->game_trans_id,
@@ -303,7 +303,7 @@ class TTGController extends Controller
                           // "provider_request" =>json_encode($data),
                           // "mw_response" => json_encode($response),
                       );
-                  $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$get_client_details);
+                  $game_trans_ext_id = GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$gen_game_extid,$get_client_details);
                   $createGameTransactionLog = [
                         "connection_name" => $get_client_details->connection_name,
                         "column" =>[
