@@ -224,7 +224,7 @@ public function gameBet($request, $client_details)
 							"connection_name" => $client_details->connection_name,
 							"column" =>[
 								"game_trans_ext_id" => $game_transid_ext,
-								"request" => json_encode($data),
+								"request" => json_encode($string_to_obj),
 								"response" => json_encode($response),
 								"log_type" => "provider_details",
 								"transaction_detail" => "success",
