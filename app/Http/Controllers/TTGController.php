@@ -11,7 +11,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransaction;
 use App\Models\GameTransactionMDB;
 use App\Jobs\UpdateGametransactionJobs;
-use App\Jobs\CreateGameTransaction
+use App\Jobs\CreateGameTransactionLog;
 use App\Helpers\Game;
 use Carbon\Carbon;
 use DB;
