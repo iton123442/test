@@ -70,7 +70,7 @@ class YGG002Controller extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
         if($game_details == null){
-            $secondary_game_code = Helper::findGameDetailsSecondaryGameCode($this->provider_id, $request->cat4);
+            $secondary_game_code = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
             if($secondary_game_code == null){
                 $response = array(
                     "code" => 1000,
@@ -369,7 +369,7 @@ class YGG002Controller extends Controller
         }
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
         if($game_details == null){
-            $game_details = Helper::findGameDetailsSecondaryGameCode($this->provider_id, $request->cat4);
+            $game_details = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
             if($game_details == null){
                 $response = array(
                     "code" => 1000,
@@ -521,7 +521,7 @@ class YGG002Controller extends Controller
         $win = $win_amount > 0 ? 1 : 0;
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
         if($game_details == null){
-            $game_details = Helper::findGameDetailsSecondaryGameCode($this->provider_id, $request->cat4);
+            $game_details = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
             if($game_details == null){
                 $response = array(
                     "code" => 1000,
@@ -638,7 +638,7 @@ class YGG002Controller extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
         if($game_details == null){
-            $game_details = Helper::findGameDetailsSecondaryGameCode($this->provider_id, $request->cat4);
+            $game_details = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
             if($game_details == null){
                 $response = array(
                     "code" => 1000,
