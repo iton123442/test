@@ -204,7 +204,7 @@ class BOTAController extends Controller{
                     );
                     $bettransactionExtId = GameTransactionMDB::createGameTransactionExt($bettransactionExt, $client_details);
                     $fund_extra_data = [
-                        'provider_name' => $gamedetails->game_name,
+                        'provider_name' => $gamedetails->provider_name,
                         'connect_time' => 1,
                     ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"credit",false,$fund_extra_data);
@@ -273,7 +273,6 @@ class BOTAController extends Controller{
                                 "balance" => $balance,
                                 "confirm" => "ok"
                             );
-                            dd('fundtransferhit');
                             Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
                             return response($response,200)
                                 ->header('Content-Type', 'application/json');
