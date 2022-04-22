@@ -33,7 +33,15 @@ class BOTAController extends Controller{
         $originalPlayerID = explode('_', $data["user"]);
         $client_details = ProviderHelper::getClientDetails('player_id', $originalPlayerID[1]);
         $playerChecker = BOTAHelper::botaPlayerChecker($client_details,'Verify');//Auth
-        if(isset($playerChecker->result_code) && $playerChecker->result_code != 1){
+        if(isset($playerChecker->result_code) && $playerChecker->result_code == 1){
+            $msg = [
+                "result_code" => "1",
+                "result_msg" =>(string) "(no account)"
+            ];
+            return response($msg,200)->header('Content-Type', 'application/json');
+            Helper::saveLog('BOTA NOT FOUND PLAYER',$this->provider_db_id, json_encode($msg), $data);
+                
+        }else{
             //flow structure
             if($data['types'] == "balance") {
                 Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($data), 'BALANCE HIT!');
@@ -62,13 +70,6 @@ class BOTAController extends Controller{
                 exit;
             }
             return response($data,200)->header('Content-Type', 'application/json');
-        }else{
-            $msg = [
-                "result_code" => "1",
-                "result_msg" =>(string) "(no account)"
-            ];
-            return response($msg,200)->header('Content-Type', 'application/json');
-            Helper::saveLog('BOTA NOT FOUND PLAYER',$this->provider_db_id, json_encode($msg), $data);
         }
     }
 
