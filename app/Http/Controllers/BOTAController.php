@@ -177,7 +177,7 @@ class BOTAController extends Controller{
         Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
         if(isset($client_details)){
             try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.['detail']['shoeNo'].'_2');
+                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['detail']['shoeNo'].'_2');
             }catch(\Exception $e){
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, $data['detail']['casino']);
                 // $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
