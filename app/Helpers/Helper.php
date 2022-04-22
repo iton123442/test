@@ -161,6 +161,12 @@ class Helper
 			 		["g.game_code",'=', $identification],
 			 	]);
 			}
+			if ($type == 'secondary_game_code') {
+				$game_details->where([
+			 		["g.provider_id", "=", $provider_id],
+			 		["g.secondary_game_code",'=', $identification],
+			 	]);
+			}
 			if ($type == 'game_id') {
 				$game_details->where([
 			 		["g.provider_id", "=", $provider_id],

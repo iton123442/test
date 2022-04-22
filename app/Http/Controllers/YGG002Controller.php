@@ -55,7 +55,7 @@ class YGG002Controller extends Controller
                 "applicableBonus" => "",
                 "currency" => $client_details->default_currency,
                 "homeCurrency" => $client_details->default_currency,
-                "nickName" => $client_details->display_name,
+                "nickName" => $player_id,
                 "country" => $client_details->country_code
             ),
             "msg" => "Success"
@@ -69,14 +69,25 @@ class YGG002Controller extends Controller
         $playerId = ProviderHelper::explodeUsername('_',$request->playerid);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
-        
+        if($game_details == null){
+            $secondary_game_code = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
+            if($secondary_game_code == null){
+                $response = array(
+                    "code" => 1000,
+                    "msg" => "Session expired. Please log in again."
+                );
+                Helper::saveLog("YGG 002 wager game_details response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return $response;
+            }
+            $game_details = $secondary_game_code;
+        }
         # Check Game Restricted
-        if($client_details == null || $game_details == null){ 
+        if($client_details == null){ 
             $response = array(
                 "code" => 1000,
                 "msg" => "Session expired. Please log in again."
             );
-            Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            Helper::saveLog("YGG 002 wager client_details response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
   
@@ -109,7 +120,7 @@ class YGG002Controller extends Controller
                 "code" => 1006,
                 "msg" => "You do not have sufficient fundsfor the bet."
             );
-            Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            Helper::saveLog("YGG 002 wager balance response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
         $gameTransactionData = array(
@@ -357,6 +368,17 @@ class YGG002Controller extends Controller
             return $response;
         }
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
+        if($game_details == null){
+            $game_details = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
+            if($game_details == null){
+                $response = array(
+                    "code" => 1000,
+                    "msg" => "Session expired. Please log in again."
+                );
+                Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return $response;
+            }
+        }
         $balance = $client_details->balance;
         $tokenId = $client_details->token_id;
         $bonusamount = $request->amount;
@@ -386,7 +408,6 @@ class YGG002Controller extends Controller
             $income = $checkTrans->bet_amount - $bonusamount;
             $entry_id = $bonusamount > 0 ? 2 : 1;
             $win = $bonusamount > 0 ? 1 : 0;
-            $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
             try{
                 $balance = $client_details->balance + $bonusamount;
                 $response = array(
@@ -499,6 +520,17 @@ class YGG002Controller extends Controller
         $entry_id = $win_amount > 0 ? 2 : 1;
         $win = $win_amount > 0 ? 1 : 0;
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
+        if($game_details == null){
+            $game_details = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
+            if($game_details == null){
+                $response = array(
+                    "code" => 1000,
+                    "msg" => "Session expired. Please log in again."
+                );
+                Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return $response;
+            }
+        }
         if($checkTrans != 'false'){
             if($checkTransExt != 'false'){
                 $response = array(
@@ -605,6 +637,17 @@ class YGG002Controller extends Controller
         $playerId = ProviderHelper::explodeUsername('_',$request->playerid);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $request->cat5);
+        if($game_details == null){
+            $game_details = Helper::findGameDetails('secondary_game_code',$this->provider_id, $request->cat4);
+            if($game_details == null){
+                $response = array(
+                    "code" => 1000,
+                    "msg" => "Session expired. Please log in again."
+                );
+                Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return $response;
+            }
+        }
         $balance = $client_details->balance;
         $tokenId = $client_details->token_id;
         $bonusamount = $request->cash + $request->bonus;
