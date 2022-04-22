@@ -211,7 +211,7 @@ class BOTAController extends Controller{
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"debit",false,$fund_extra_data);
                     if(isset($client_response->fundtransferresponse->status->code)
                     && $client_response->fundtransferresponse->status->code == 200){
-                        $balance = round($client_response->fundtransferresponse->balance,2,'.', '');
+                        $balance = round($client_response->fundtransferresponse->balance,2);
                         $client_details->balance = $balance;
                         ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
                         $response = array(
@@ -266,7 +266,7 @@ class BOTAController extends Controller{
                         $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"debit",false,$action_payload);
                         if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
-                            $balance = round($client_response->fundtransferresponse->balance,2,'.', '');
+                            $balance = round($client_response->fundtransferresponse->balance,2);
                             $client_details->balance = $balance;
                             ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
                             $response = array(
