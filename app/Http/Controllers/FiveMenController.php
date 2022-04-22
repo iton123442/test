@@ -12,6 +12,8 @@ use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
 use Carbon\Carbon;
 use DB;
+use App\Jobs\UpdateGametransactionJobs;
+use App\Jobs\CreateGameTransactionLog;
 
 class FiveMenController extends Controller
 {
