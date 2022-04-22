@@ -103,7 +103,6 @@ class BOTAController extends Controller{
             if($bet_transaction != "false"){//check if bet transaction is existing
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $game_trans_id = $bet_transaction->game_trans_id;
-                dd($game_trans_id);
                 $datatosend = [
                     'win' => 5,
                     'bet_amount' => $bet_transaction->bet_amount + round($data['price'],2),
