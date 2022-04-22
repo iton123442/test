@@ -434,7 +434,7 @@ class WalletDetailsController extends Controller
                         status,
                         hand,
                         card,
-                        curr_amount
+                        curr_amount,
                         amount,
                         total,
                         convert_tz(c.created_at,'+00:00', '+08:00') created_at
