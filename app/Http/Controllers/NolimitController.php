@@ -356,13 +356,13 @@ class NolimitController extends Controller
             $identifier = (int)$for_ext + 54321;
             $game_transid_ext = (int)$identifier;
             $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
-            ProviderHelper::saveLogWithExeption('NOLIMIT after data request', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
+                Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request->all()), $bet_transaction); 
             try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
 
             try{
-            if($bet_transaction->pay_amount != $pay_amount){
+                if(isset($bet_transaction->pay_amount != $pay_amount)){
 
                     $response = [
                         'jsonrpc' => '2.0',
@@ -457,7 +457,7 @@ class NolimitController extends Controller
                     }
                 
                    $updateGameTransaction = [
-                        'win' => 5,
+                        'win' => $win_or_lost,
                         'pay_amount' => $amount,
                         'income' => $income,
                         'entry_id' => $entry_id,
