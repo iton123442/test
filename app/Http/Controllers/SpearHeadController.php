@@ -161,6 +161,8 @@ public function DebitProcess($req){
       $provider_trans_id = $data['TransactionId'];
       $game_code = $data['AdditionalData']['GameSlug'];
       $round_id = $data['RoundId'];
+      $gen_game_trans_id = $this->generateId("transid");
+      $gen_game_extid = $this->generateId("ext");
     if($client_details != null){
       try{
           ProviderHelper::idenpotencyTable($provider_trans_id);
@@ -175,29 +177,29 @@ public function DebitProcess($req){
           }
       
      $game_details = Game::find($game_code, $this->provider_db_id);  
-        $gameTransactionData = array(
-          "provider_trans_id" => $provider_trans_id,
-          "token_id" => $client_details->token_id,
-          "game_id" => $game_details->game_id,
-          "round_id" => $round_id,
-          "bet_amount" => $bet_amount,
-          "win" => 5,
-          "pay_amount" => 0,
-          "income" => 0,
-          "entry_id" => 1,
-      ); 
-      Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
-      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-      $gameTransactionEXTData = array(
-        "game_trans_id" => $game_transaction_id,
-        "provider_trans_id" => $provider_trans_id,
-        "round_id" => $round_id,
-        "amount" => $bet_amount,
-        "game_transaction_type"=> 1,
-        "provider_request" =>json_encode($req),
-        );
-        Helper::saveLog('Spearhead  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
+      //   $gameTransactionData = array(
+      //     "provider_trans_id" => $provider_trans_id,
+      //     "token_id" => $client_details->token_id,
+      //     "game_id" => $game_details->game_id,
+      //     "round_id" => $round_id,
+      //     "bet_amount" => $bet_amount,
+      //     "win" => 5,
+      //     "pay_amount" => 0,
+      //     "income" => 0,
+      //     "entry_id" => 1,
+      // ); 
+      // Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
+      // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+      // $gameTransactionEXTData = array(
+      //   "game_trans_id" => $game_transaction_id,
+      //   "provider_trans_id" => $provider_trans_id,
+      //   "round_id" => $round_id,
+      //   "amount" => $bet_amount,
+      //   "game_transaction_type"=> 1,
+      //   "provider_request" =>json_encode($req),
+      //   );
+      //   Helper::saveLog('Spearhead  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
+      //   $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
         $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
         if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -217,22 +219,21 @@ public function DebitProcess($req){
                             "Message" => 'Success',
                             "Details" => null,
                     ];
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($req),
-                        "mw_response" => json_encode($res),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'success',
-                        'general_details' => 'success',
-                    );
-                   Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                   GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                   //  $updateTransactionEXt = array(
+                   //      "provider_request" =>json_encode($req),
+                   //      "mw_response" => json_encode($res),
+                   //      'mw_request' => json_encode($client_response->requestoclient),
+                   //      'client_response' => json_encode($client_response->fundtransferresponse),
+                   //      'transaction_detail' => 'success',
+                   //      'general_details' => 'success',
+                   //  );
+                   // Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                   // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                 break;
                 case '402':
                     $http_status = 400;
                     $updateGameTransaction = [
                           'win' => 2,
-                          'trans_status' => 5
                     ];
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
                     $res = [
@@ -242,20 +243,50 @@ public function DebitProcess($req){
                       "Message" => "Insufficient funds"
                     ];
 
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($req),
-                        "mw_response" => json_encode($res),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'failed',
-                        'general_details' => 'failed',
-                    );
-                    Helper::saveLog('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    // $updateTransactionEXt = array(
+                    //     "provider_request" =>json_encode($req),
+                    //     "mw_response" => json_encode($res),
+                    //     'mw_request' => json_encode($client_response->requestoclient),
+                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                    //     'transaction_detail' => 'failed',
+                    //     'general_details' => 'failed',
+                    // );
+                    // Helper::saveLog('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                 break;
           }
       }
-          
+      $gameTransactionData = array(
+          "provider_trans_id" => $request->tx_id,
+          "token_id" => $get_client_details->token_id,
+          "game_id" => $game_details->game_id,
+          "round_id" => $request->round_id,
+          "bet_amount" => $bet_amount,
+          "win" => 5,
+          "pay_amount" => 0,
+          "income" => 0,
+          "entry_id" =>1,
+      );
+     GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$get_client_details); //create game_transaction
+     $gameTransactionEXTData = array(
+          "game_trans_id" => $gen_game_trans_id,
+          "provider_trans_id" => $request->tx_id,
+          "round_id" => $request->round_id,
+          "amount" => $bet_amount,
+          "game_transaction_type"=> 1,
+      );
+     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$get_client_details); //create extension
+     $createGameTransactionLog = [
+          "connection_name" => $get_client_details->connection_name,
+          "column" =>[
+              "game_trans_ext_id" => $gen_game_extid,
+              "request" => json_encode($data),
+              "response" => json_encode($response),
+              "log_type" => "provider_details",
+              "transaction_detail" => "success",
+          ]
+      ];
+      dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
       Helper::saveLog('Spearhead Debit', $this->provider_db_id, json_encode($data), $res);
       return response()->json($res, $http_status);
 
