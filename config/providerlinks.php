@@ -751,6 +751,7 @@ return [
         'provider_db_id' => 135,
         'gamelaunch_url' => 'http://seam.go-65.com/token/',
     ],
+
 ];
 
 ?>
