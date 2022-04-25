@@ -35,7 +35,7 @@ class DebitRefund extends Job
     public function handle()
     {
         $payload = $this->data;
-
+        return $payload;
         
         $client_details = $payload['client_details'];
         $client_callback_url = $client_details->fund_transfer_url;
