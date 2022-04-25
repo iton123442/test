@@ -163,8 +163,8 @@ public function DebitProcess($req){
       $provider_trans_id = $data['TransactionId'];
       $game_code = $data['AdditionalData']['GameSlug'];
       $round_id = $data['RoundId'];
-      $gen_game_trans_id = $this->generateId("transid");
-      $gen_game_extid = $this->generateId("ext");
+      $gen_game_trans_id = ProviderHelper::idGen();
+      $gen_game_extid = ProviderHelper::idGen();
     if($client_details != null){
       try{
           ProviderHelper::idenpotencyTable($provider_trans_id);
@@ -315,7 +315,7 @@ public function CreditProcess($req){
   $provider_trans_id = $data['TransactionId'];
   $game_code = $data['AdditionalData']['GameSlug'];
   $round_id = $data['RoundId'];
-  $gen_game_extid = $this->generateId("ext");
+  $gen_game_extid = ProviderHelper::idGen();
   if($client_details != null){
     try{
       ProviderHelper::idenpotencyTable($provider_trans_id);
