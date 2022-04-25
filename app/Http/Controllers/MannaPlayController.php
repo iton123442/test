@@ -103,7 +103,6 @@ class MannaPlayController extends Controller
 	}
 
 	public function debitProcess(Request $request){
-
         $json_data = json_decode(file_get_contents("php://input"), true);
 		ProviderHelper::saveLogWithExeption('manna_debit', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
 		$api_key = $request->header('apiKey');
@@ -132,9 +131,13 @@ class MannaPlayController extends Controller
 				];
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				
 				if ($client_details != null) {
-
-
+					// $game_trans_id = ProviderHelper::idGenerate($client_details->connection_name, 1);
+					// $game_trans_id = config("generateID.generate_id.default.game_trans_id");
+					// dd($game_trans_id);
+					// $game_transaction_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
+					
 					if (!$this->CheckAuth($client_details, $api_key)){
 						$http_status = 200;
 						$response = [
