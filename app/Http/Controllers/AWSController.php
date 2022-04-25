@@ -631,7 +631,7 @@ class AWSController extends Controller
 
 			// V2
 			// ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $client_response->requestoclient, $client_response, "client_details", "success");
-			// ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $details, $response, "provider_details", "success");
+			ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $details, $response, "provider_details", "success");
 
 			AWSHelper::saveLog('AWS singleFundTransfer SUCCESS = ' . $gamerecord, $this->provider_db_id, $data, $response);
 			return $response;
