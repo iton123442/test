@@ -120,7 +120,7 @@ class ClientRequestHelper{
                             ];
                             ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
-                        // 'timeout' => $timeout,
+                        'timeout' => $timeout,
                         'body' => json_encode(
                             $requesttocient
                         )
@@ -241,7 +241,8 @@ class ClientRequestHelper{
                             $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
                         }
                         $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
-                        Queue::push(new DebitRefund($debitRefund));
+                        // Queue::push(new DebitRefund($debitRefund));
+                        ProviderHelper::queDebitRefund($debitRefund);
                     }
                 }
 
@@ -910,7 +911,8 @@ class ClientRequestHelper{
                         $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
                     }
                     $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
-                    Queue::push(new DebitRefund($debitRefund));
+                    // Queue::push(new DebitRefund($debitRefund));
+                    ProviderHelper::queDebitRefund($debitRefund);
                 }
                 
                 Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);

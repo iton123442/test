@@ -6,13 +6,18 @@ use App\Models\GameTransactionMDB;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\TransferStats;
-use Carbon\Carbon;
-use DB;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Carbon\Carbon;
+use App\Jobs\Job;
+use DB;
+
 
 
 // NOT USED
-class DebitRefund extends Job
+class DebitRefund extends Job implements ShouldQueue
 {
     /**
      * Create a new job instance.

@@ -4,8 +4,9 @@ namespace App\Helpers;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Jobs\UpdateGametransactionJobs;
-// use App\Jobs\CreateGameTransactionLog;
+use App\Jobs\CreateGameTransactionLog;
 use App\Jobs\CreateTransLog;
+use App\Jobs\DebitRefund;
 use App\Helpers\Helper;
 use App\Helpers\AWSHelper;
 use App\Helpers\DESHelper;
@@ -41,11 +42,16 @@ class ProviderHelper{
 		        "transaction_detail" => $transaction_detail,
 		     ]
 		];
-		
+
 		// dispatch(new CreateGameTransactionLog($createGameTransactionLogClient));
 
 		$job = (new CreateTransLog($createGameTransactionLogClient))->onQueue('transaction_log');
      	dispatch($job);
+	}
+
+	public static function queDebitRefund($debitRefund){
+	    $job = (new DebitRefund($debitRefund))->onQueue('debit_refund');
+        dispatch($job);
 	}
 
 	/**
