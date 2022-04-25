@@ -476,19 +476,41 @@ class AWSController extends Controller
 				];
 				$client_response = ClientRequestHelper::fundTransfer($client_details, abs($bet_amount_2way), $game_details->game_code, $game_details->game_name, $game_transextension1, $gamerecord, 'debit', false, $fund_extra_data);
 			} catch (\Exception $e) {
-				// return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
 				$response = ["msg" => "Fund transfer encountered error", "code" => 2205, "data" => []];
 				if (isset($gamerecord)) {
 					
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
-					$updateTransactionEXt = array(
-						"mw_response" => json_encode($response),
-						'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
-						'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
-						'transaction_detail' => json_encode($response),
-					);
-					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension1,$client_details);
+					// $updateTransactionEXt = array(
+					// 	"mw_response" => json_encode($response),
+					// 	'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
+					// 	'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+					// 	'transaction_detail' => json_encode($response),
+					// );
+					// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension1,$client_details);
+					$createGameTransactionLog = [
+		                "connection_name" => $client_details->connection_name,
+		                "column" =>[
+		                    "game_trans_ext_id" => $game_transextension1,
+		                    "request" => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'failed',
+		                    "response" => $e->getMessage().' '.$e->getLine().' '.$e->getFile(),
+		                    "log_type" => "client_details",
+		                    "transaction_detail" => "failed",
+		                ]
+		            ];
+					ProviderHelper::queTransactionLogs($createGameTransactionLog);
+
+					$createGameTransactionLogProvider = [
+		                "connection_name" => $client_details->connection_name,
+		                "column" =>[
+		                    "game_trans_ext_id" => $game_transextension1,
+		                    "request" => json_encode($details),
+		                    "response" => json_encode($response),
+		                    "log_type" => "provider_details",
+		                    "transaction_detail" => "failed",
+		                ]
+		            ];
+					ProviderHelper::queTransactionLogs($createGameTransactionLogProvider);
 				}
 				AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
 				return $response;
@@ -652,10 +674,23 @@ class AWSController extends Controller
 				];
 			}
 
+
+
 			// V2
 			// ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $client_response->requestoclient, $client_response, "client_details", "success");
-			ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $details, $response, "provider_details", "success");
+			// ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $details, $response, "provider_details", "success");
 
+			$createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_transextension1,
+                    "request" => json_encode($details),
+                    "response" => json_encode($response),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "success",
+                ]
+            ];
+			ProviderHelper::queTransactionLogs($createGameTransactionLog);
 			AWSHelper::saveLog('AWS singleFundTransfer SUCCESS = ' . $gamerecord, $this->provider_db_id, $data, $response);
 			return $response;
 		} catch (\Exception $e) {

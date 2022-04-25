@@ -30,7 +30,7 @@ class ProviderHelper{
         return $identifier;
 	}
 
-
+	// NOTED TOEB REMOVED USE queTransactionLogs instead
 	public static function queLogs($connection_name, $game_ext_id, $request, $response, $log_type, $transaction_detail='failed'){
 		$createGameTransactionLogClient = [
 		    "connection_name" => $connection_name,
@@ -42,13 +42,23 @@ class ProviderHelper{
 		        "transaction_detail" => $transaction_detail,
 		     ]
 		];
-
-		// dispatch(new CreateGameTransactionLog($createGameTransactionLogClient));
-
 		$job = (new CreateTransLog($createGameTransactionLogClient))->onQueue('transaction_log');
      	dispatch($job);
 	}
 
+	/**
+	 * Global [ADD TRANSACTION LOGS TO JOBS]
+	 * 
+	 */
+	public static function queTransactionLogs($createGameTransactionLogClient){
+		$job = (new CreateTransLog($createGameTransactionLogClient))->onQueue('transaction_log');
+     	dispatch($job);
+	}
+
+	/**
+	 * Global [ADD REFUND ENTRY TO JOBS]
+	 * 
+	 */
 	public static function queDebitRefund($debitRefund){
 	    $job = (new DebitRefund($debitRefund))->onQueue('debit_refund');
         dispatch($job);
