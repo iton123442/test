@@ -315,6 +315,7 @@ public function CreditProcess($req){
   $provider_trans_id = $data['TransactionId'];
   $game_code = $data['AdditionalData']['GameSlug'];
   $round_id = $data['RoundId'];
+  $gen_game_extid = $this->generateId("ext");
   if($client_details != null){
     try{
       ProviderHelper::idenpotencyTable($provider_trans_id);
