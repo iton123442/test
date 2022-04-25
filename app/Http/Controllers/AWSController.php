@@ -611,7 +611,7 @@ class AWSController extends Controller
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
 					$response = [
-						"msg" => "Insufficient balance2",
+						"msg" => "Insufficient balance",
 						"code" => 1201
 					];
 
@@ -620,23 +620,23 @@ class AWSController extends Controller
 				}
 			} elseif (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "402") {
-				dd($client_response);
+				// dd($client_response);
 				$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
 				$response = [
-					"msg" => "Insufficient balance3",
+					"msg" => "Insufficient balance",
 					"code" => 1201
 				];
 			}
 
 			// V2
-			ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $client_response->requestoclient, $client_response, "client_details", "success");
-			ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $details, $response, "provider_details", "success");
+			// ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $client_response->requestoclient, $client_response, "client_details", "success");
+			// ProviderHelper::queLogs($client_details->connection_name, $game_transextension1, $details, $response, "provider_details", "success");
 
 			AWSHelper::saveLog('AWS singleFundTransfer SUCCESS = ' . $gamerecord, $this->provider_db_id, $data, $response);
 			return $response;
 		} catch (\Exception $e) {
-			dd($e->getMessage() . ' ' . $e->getLine());
+			// dd($e->getMessage() . ' ' . $e->getLine());
 			$response = ["msg" => "Fund transfer encountered error", "code" => 2205];
 			AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, $data, $e->getMessage() . ' ' . $e->getLine());
 			return $response;
