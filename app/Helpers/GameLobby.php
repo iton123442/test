@@ -2119,7 +2119,7 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         try{
             $requesttosend = [
-                "loginname" => $client_details->username,
+                "loginname" => "TG_".$client_details->player_id,
                 "key" => $data['token'],
                 "currency" => $client_details->default_currency,
                 "lang" => $data['lang'],
@@ -2139,7 +2139,8 @@ class GameLobby{
             ]);
             $res = json_decode($response->getBody(),TRUE);
             $url = $res['data']['launchurl'];
-            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $url);
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch1', $provider_id, json_encode($requesttosend), $url);
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch2', $provider_id, json_encode($data), $url);
             return $url;
         }catch(\Exception $e){
             $error = [
@@ -2160,25 +2161,26 @@ class GameLobby{
         $gameToken = BOTAHelper::botaGenerateGametoken($get_player_details);
         Helper::saveLog('bota gametoken', 135, json_encode($get_player_details), json_encode($gameToken));
         Helper::savePLayerGameRound($game_code,$token,$provider);
-        $requesttosend = [
-            "token" => $gameToken->result_value->token,
-            "user_id" => $prefix."_".$get_player_details->player_id,
-            "game" => $prefix
-        ];
-        $client = new Client([
-            'headers' => [ 
-                'Content-type' => 'x-www-form-urlencoded',
-                'Authorization' => "Bearer ".config('providerlinks.bota.api_key'),
-                'User-Agent' => config('providerlinks.bota.user_agent')
-            ]
-        ]);
+        $game_launch_url = config('providerlinks.bota.gamelaunch_url').$gameToken->result_value->token;
+        // $requesttosend = [
+        //     "token" => $gameToken->result_value->token,
+        //     "user_id" => $prefix."_".$get_player_details->player_id,
+        //     "game" => $game_code
+        // ];
+        // $client = new Client([
+        //     'headers' => [ 
+        //         'Content-type' => 'x-www-form-urlencoded',
+        //         'Authorization' => "Bearer ".config('providerlinks.bota.api_key'),
+        //         'User-Agent' => config('providerlinks.bota.user_agent')
+        //     ]
+        // ]);
         
-        $response = $client->get(config('providerlinks.bota.api_url').'/game/url',
-        ['form_params' => $requesttosend,]);
+        // $response = $client->get(config('providerlinks.bota.api_url').'/game/url',
+        // ['form_params' => $requesttosend,]);
         
-        $dataresponse = json_decode($response->getBody()->getContents());
-        Helper::saveLog('bota gamelaunch', 135, json_encode($dataresponse), 'Initialized');
-        $gameurl = isset($dataresponse->result_value->link) ? $dataresponse->result_value->link : $exit_url;
+        // $dataresponse = json_decode($response->getBody()->getContents());
+        Helper::saveLog('bota gamelaunch', 135, json_encode($game_launch_url), 'Initialized');
+        $gameurl = isset($game_launch_url) ? $game_launch_url : $exit_url;
         Helper::saveLog('bota gamelaunchfinal', 135, json_encode($gameurl), 'Gamelaunch Success');
         return $gameurl;  
     }

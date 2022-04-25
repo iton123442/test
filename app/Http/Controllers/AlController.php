@@ -446,7 +446,7 @@ class AlController extends Controller
 
 
     public function tapulan(Request $request){
-
+	dd($nanotime = system('date +%s%N'));
       $client_details = Providerhelper::getClientDetails('player_id', 10210);
       // GameTransactionMDB::createGametransactionLog(123,'genera_details', json_encode($request->all()),$client_details);
 
