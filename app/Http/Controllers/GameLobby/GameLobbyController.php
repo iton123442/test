@@ -980,7 +980,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code == 131 || $provider_code == 132 || $provider_code == 133 || $provider_code == 134){
+                elseif($provider_code == 131 || $provider_code == 132 || $provider_code == 133 || $provider_code == 134 || $provider_code == 136){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::ygglaunchUrl($request->all(), $device), 

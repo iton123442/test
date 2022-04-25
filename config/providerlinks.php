@@ -749,7 +749,9 @@ return [
         'api_url' => 'http://bota-en.com/api',
         'prefix' => 'SPEED',
         'provider_db_id' => 135,
+        'gamelaunch_url' => 'http://seam.go-65.com/token/',
     ],
+
 ];
 
 ?>
