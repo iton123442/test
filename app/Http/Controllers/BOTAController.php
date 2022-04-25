@@ -44,23 +44,23 @@ class BOTAController extends Controller{
         }else{
             //flow structure
             if($data['types'] == "balance") {
-                Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($data), 'BALANCE HIT!');
                 $result = $this->_getBalance($data,$client_details);
+                Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
                 return $result;
             }
             elseif($data['types'] == "bet") {
                 $result = $this->_betProcess($data,$client_details);
-                Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($data), 'BET HIT');
+                Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($result), 'BET HIT');
                 return $result;
             }
             elseif($data['types'] == "win") {
                 $result = $this->_winProcess($data,$client_details);
-                Helper::saveLog('BOTA WIN', $this->provider_db_id, json_encode($data), 'WIN HIT');
+                Helper::saveLog('BOTA WIN', $this->provider_db_id, json_encode($result), 'WIN HIT');
                 return $result;
             }
             elseif($data['types'] == "cancel") {
                 $result = $this->_cancelProcess($data,$client_details);
-                Helper::saveLog('BOTA CANCEL', $this->provider_db_id, json_encode($data), 'CANCEL HIT');
+                Helper::saveLog('BOTA CANCEL', $this->provider_db_id, json_encode($result), 'CANCEL HIT');
                 return $result;
                 // $data["user"] = $data['user'];
                 // $data["balance"] = "200000"; // 베
