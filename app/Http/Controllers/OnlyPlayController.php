@@ -81,6 +81,8 @@ class OnlyPlayController extends Controller
             
         try{
                 $game_details = Game::find($request->game_bundle, $this->provider_db_id);
+
+                //v1
                 // $gameTransactionData = array(
                 //     "provider_trans_id" => $request->tx_id,
                 //     "token_id" => $get_client_details->token_id,
@@ -104,6 +106,9 @@ class OnlyPlayController extends Controller
                 //     "provider_request" =>json_encode($request->all()),
                 //     );
                 // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$get_client_details);
+
+
+                
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];
@@ -195,17 +200,17 @@ class OnlyPlayController extends Controller
                                 "game_transaction_type"=> 1,
                             );
                            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$get_client_details); //create extension
-                           $createGameTransactionLog = [
-                                "connection_name" => $get_client_details->connection_name,
-                                "column" =>[
-                                    "game_trans_ext_id" => $gen_game_extid,
-                                    "request" => json_encode($data),
-                                    "response" => json_encode($response),
-                                    "log_type" => "provider_details",
-                                    "transaction_detail" => "success",
-                                ]
-                            ];
-                            dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
+                           // $createGameTransactionLog = [
+                           //      "connection_name" => $get_client_details->connection_name,
+                           //      "column" =>[
+                           //          "game_trans_ext_id" => $gen_game_extid,
+                           //          "request" => json_encode($data),
+                           //          "response" => json_encode($response),
+                           //          "log_type" => "provider_details",
+                           //          "transaction_detail" => "success",
+                           //      ]
+                           //  ];
+                           //  dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
                 Helper::saveLog('OnlyPlay debit', $this->provider_db_id, json_encode($request->all()), $response);
                 return response($response,200)
                         ->header('Content-Type', 'application/json');

@@ -456,7 +456,6 @@ class AlController extends Controller
       $job = (new AlJobs($debitRefund))->onQueue('al');
       $this->dispatch($job);
       dd( $job);
-
       $client_details = Providerhelper::getClientDetails('player_id', 10210);
       // GameTransactionMDB::createGametransactionLog(123,'genera_details', json_encode($request->all()),$client_details);
 

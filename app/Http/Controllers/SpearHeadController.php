@@ -163,8 +163,8 @@ public function DebitProcess($req){
       $provider_trans_id = $data['TransactionId'];
       $game_code = $data['AdditionalData']['GameSlug'];
       $round_id = $data['RoundId'];
-      $gen_game_trans_id = $this->generateId("transid");
-      $gen_game_extid = $this->generateId("ext");
+      $gen_game_trans_id = ProviderHelper::idGen();
+      $gen_game_extid = ProviderHelper::idGen();
     if($client_details != null){
       try{
           ProviderHelper::idenpotencyTable($provider_trans_id);
@@ -202,6 +202,7 @@ public function DebitProcess($req){
       //   );
       //   Helper::saveLog('Spearhead  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
       //   $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
+     
         $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit');
         if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -315,7 +316,7 @@ public function CreditProcess($req){
   $provider_trans_id = $data['TransactionId'];
   $game_code = $data['AdditionalData']['GameSlug'];
   $round_id = $data['RoundId'];
-  $gen_game_extid = $this->generateId("ext");
+  $gen_game_extid = ProviderHelper::idGen();
   if($client_details != null){
     try{
       ProviderHelper::idenpotencyTable($provider_trans_id);
@@ -501,26 +502,15 @@ public function CreditProcess($req){
     $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
     if(isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "200"){
-        // $updateTransactionEXt = array(
-        //       "provider_request" =>json_encode($req),
-        //       "mw_response" => json_encode($res),
-        //       'mw_request' => json_encode($client_response->requestoclient),
-        //       'client_response' => json_encode($client_response->fundtransferresponse),
-        //       'transaction_detail' => 'success',
-        //       'general_details' => 'success',
-        // );
-        // // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-        $createGameTransactionLog = [
-            "connection_name" => $client_details->connection_name,
-            "column" =>[
-                "game_trans_ext_id" => $gen_game_extid,
-                "request" => json_encode($data),
-                "response" => json_encode($res),
-                "log_type" => "provider_details",
-                "transaction_detail" => "success",
-             ]
-        ];
-        dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+        $updateTransactionEXt = array(
+              "provider_request" =>json_encode($req),
+              "mw_response" => json_encode($res),
+              'mw_request' => json_encode($client_response->requestoclient),
+              'client_response' => json_encode($client_response->fundtransferresponse),
+              'transaction_detail' => 'success',
+              'general_details' => 'success',
+        );
+        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$gen_game_extid,$client_details);
         return $res;
     }elseif (isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "402") {
@@ -530,17 +520,15 @@ public function CreditProcess($req){
         "ReturnCode" => 104,
         "Message" => "Casino session limit exceeded"
       ];
-      $createGameTransactionLog = [
-          "connection_name" => $client_details->connection_name,
-          "column" =>[
-              "game_trans_ext_id" => $gen_game_extid,
-              "request" => json_encode($data),
-              "response" => json_encode($res),
-              "log_type" => "provider_details",
-              "transaction_detail" => "FAILED",
-           ]
-      ];
-      dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+      $updateTransactionEXt = array(
+            "provider_request" =>json_encode($req),
+            "mw_response" => json_encode($res),
+            'mw_request' => json_encode($client_response->requestoclient),
+            'client_response' => json_encode($client_response->fundtransferresponse),
+            'transaction_detail' => 'FAILED',
+            'general_details' => 'FAILED',
+      );
+      GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$gen_game_extid,$client_details);
       return $res;
 
     }
