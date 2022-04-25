@@ -209,7 +209,7 @@ public function DebitProcess($req){
               case '200':
                 $http_status = 200;
                     $res = [
-                            "AccountTransactionId" => $game_transaction_id,
+                            "AccountTransactionId" => $gen_game_trans_id,
                             "Currency" => $client_details->default_currency,
                             "Balance" => (float)$client_response->fundtransferresponse->balance,
                             "SessionId" => $data['SessionId'],
@@ -276,7 +276,7 @@ public function DebitProcess($req){
           "round_id" => $round_id,
           "amount" => $bet_amount,
           "game_transaction_type"=> 1,
-          "provider_request" =>json_encode($req),
+          // "provider_request" =>json_encode($req),
       );
      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
      $createGameTransactionLog = [
@@ -334,55 +334,57 @@ public function CreditProcess($req){
     $win_or_lost = $pay_amount > 0 ?  1 : 0;
     $entry_id = $pay_amount > 0 ?  2 : 1;
     if($bet_transaction == 'false'){
-      $gameTransactionData = array(
-          "provider_trans_id" => $provider_trans_id,
-          "token_id" => $client_details->token_id,
-          "game_id" => $game_details->game_id,
-          "round_id" => $round_id,
-          "bet_amount" => 0,
-          "win" => $win_or_lost,
-          "pay_amount" => 0,
-          "income" => 0,
-          "entry_id" => 1,
-      ); 
-      Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
-      $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-      $game_trans_id = $game_transaction_id;
-      $income = 0;
-      $gameTransactionEXTData = array(
-          "game_trans_id" => json_encode($game_trans_id),
-          "provider_trans_id" => $provider_trans_id,
-          "round_id" => $round_id,
-          "amount" => 0,
-          "game_transaction_type"=> 1,
-          "provider_request" => json_encode($req),
-      );
-      $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-      if(isset($data['AdditionalData']['BonusId'])){
-      $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
-      // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
-      $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
-          if($getFreespin){
-              //update transaction
-              $status = 2;
-              $updateFreespinData = [
-                  "status" => $status,
-                  "spin_remaining" => 0
-              ];
-              FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                  //create transction 
-              if($status == 2) {
-                  $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
-              }  else {
-                  $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-              }
-              
-                  $createFreeRoundTransaction = array(
-                      "game_trans_id" => $bet_transaction->game_trans_id,
-                      'freespin_id' => $getFreespin->freespin_id
-              );
-              FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-          }
+        $gameTransactionData = array(
+            "provider_trans_id" => $provider_trans_id,
+            "token_id" => $client_details->token_id,
+            "game_id" => $game_details->game_id,
+            "round_id" => $round_id,
+            "bet_amount" => 0,
+            "win" => $win_or_lost,
+            "pay_amount" => 0,
+            "income" => 0,
+            "entry_id" => 1,
+        ); 
+        Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
+        // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);// not generated game trans id
+        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //generated game trans id
+        $game_trans_id = $gen_game_trans_id;
+        $income = 0;
+        $gameTransactionEXTData = array(
+            "game_trans_id" => json_encode($game_trans_id),
+            "provider_trans_id" => $provider_trans_id,
+            "round_id" => $round_id,
+            "amount" => 0,
+            "game_transaction_type"=> 1,
+            "provider_request" => json_encode($req),
+        );
+        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
+        if(isset($data['AdditionalData']['BonusId'])){
+        $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
+        // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);// not generated game trans id ext
+        $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);//generated game trans id ext
+            if($getFreespin){
+                //update transaction
+                $status = 2;
+                $updateFreespinData = [
+                    "status" => $status,
+                    "spin_remaining" => 0
+                ];
+                FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                    //create transction 
+                if($status == 2) {
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+                }  else {
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                }
+                
+                    $createFreeRoundTransaction = array(
+                        "game_trans_id" => $bet_transaction->game_trans_id,
+                        'freespin_id' => $getFreespin->freespin_id
+                );
+                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+            }
       }
       $msg = [
               "AccountTransactionId" => $game_transaction_id,
