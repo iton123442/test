@@ -41,11 +41,16 @@ class ProviderHelper{
 		        "transaction_detail" => $transaction_detail,
 		     ]
 		];
-		
+
 		// dispatch(new CreateGameTransactionLog($createGameTransactionLogClient));
 
 		$job = (new CreateTransLog($createGameTransactionLogClient))->onQueue('transaction_log');
      	dispatch($job);
+	}
+
+	public static function queDebitRefund($debitRefund){
+	    $job = (new DebitRefund($debitRefund))->onQueue('debit_refund');
+        dispatch($job);
 	}
 
 	/**
