@@ -45,7 +45,7 @@ class ProviderHelper{
 		// dispatch(new CreateGameTransactionLog($createGameTransactionLogClient));
 
 		$job = (new CreateTransLog($createGameTransactionLogClient))->onQueue('transaction_log');
-     	$this->dispatch($job);
+     	dispatch($job);
 	}
 
 	/**
