@@ -3,6 +3,10 @@ namespace App\Helpers;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use App\Jobs\UpdateGametransactionJobs;
+use App\Jobs\CreateGameTransactionLog;
+use App\Jobs\CreateTransLog;
+use App\Jobs\DebitRefund;
 use App\Helpers\Helper;
 use App\Helpers\AWSHelper;
 use App\Helpers\DESHelper;
@@ -15,6 +19,50 @@ use DB;
  * 
  */
 class ProviderHelper{
+
+	/**
+	 * Generate Random IDENTIFICATION
+	 */
+	public static function idGen(){
+		$rand = shell_exec('date +%s%N');
+        $identifier = (int)$rand + 54321;
+		// $identifier = rand(); 
+        return $identifier;
+	}
+
+	// NOTED TOEB REMOVED USE queTransactionLogs instead
+	public static function queLogs($connection_name, $game_ext_id, $request, $response, $log_type, $transaction_detail='failed'){
+		$createGameTransactionLogClient = [
+		    "connection_name" => $connection_name,
+		    "column" =>[
+		        "game_trans_ext_id" => $game_ext_id,
+		        "request" => json_encode($request),
+		        "response" => json_encode($response),
+		        "log_type" => $log_type,
+		        "transaction_detail" => $transaction_detail,
+		     ]
+		];
+		$job = (new CreateTransLog($createGameTransactionLogClient))->onQueue('transaction_log');
+     	dispatch($job);
+	}
+
+	/**
+	 * Global [ADD TRANSACTION LOGS TO JOBS]
+	 * 
+	 */
+	public static function queTransactionLogs($createGameTransactionLogClient){
+		$job = (new CreateTransLog($createGameTransactionLogClient))->onQueue('transaction_log');
+     	dispatch($job);
+	}
+
+	/**
+	 * Global [ADD REFUND ENTRY TO JOBS]
+	 * 
+	 */
+	public static function queDebitRefund($debitRefund){
+	    $job = (new DebitRefund($debitRefund))->onQueue('debit_refund');
+        dispatch($job);
+	}
 
 	/**
 	 * Global [ONLY FOR RESPONSE ROUND LOG TIME!] [A MUST TO ADD]
