@@ -12,7 +12,10 @@ use App\Helpers\ClientRequestHelper;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\GameTransactionMDB;
 use Illuminate\Support\Facades\Hash;
+use App\Jobs\DebitRefund;
+use App\Jobs\AlJobs;
 use Session;
+use Queue;
 use Auth;
 use DB;
 
@@ -446,7 +449,14 @@ class AlController extends Controller
 
 
     public function tapulan(Request $request){
-	dd($nanotime = system('date +%s%N'));
+      $debitRefund = ["payload" => "AWIT"];
+      Queue::push(new DebitRefund($debitRefund));
+
+
+      $job = (new AlJobs($debitRefund))->onQueue('al');
+      $this->dispatch($job);
+      dd( $job);
+
       $client_details = Providerhelper::getClientDetails('player_id', 10210);
       // GameTransactionMDB::createGametransactionLog(123,'genera_details', json_encode($request->all()),$client_details);
 
