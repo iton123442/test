@@ -284,7 +284,7 @@ public function DebitProcess($req){
           "column" =>[
               "game_trans_ext_id" => $gen_game_extid,
               "request" => json_encode($data),
-              "response" => json_encode($response),
+              "response" => json_encode($res),
               "log_type" => "provider_details",
               "transaction_detail" => "success",
           ]
