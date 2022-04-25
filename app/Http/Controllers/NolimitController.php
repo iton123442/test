@@ -362,7 +362,7 @@ class NolimitController extends Controller
             }catch(\Exception $e){
 
             try{
-                if(isset($bet_transaction->pay_amount != $pay_amount)){
+                if($bet_transaction->pay_amount != $pay_amount){
 
                     $response = [
                         'jsonrpc' => '2.0',
