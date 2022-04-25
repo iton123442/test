@@ -141,34 +141,19 @@ class ClientRequestHelper{
                 // }catch(\Exception $e){
                 //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
                 // }
-                // try{
-                //     $updateGameTrasnactionLog = [
-                //         "client_details" => $client_details,
-                //         "type" => "update",
-                //         "game_trans_ext_id" => $transactionId,
-                //         "column" =>[
-                //             "mw_request" => json_encode($requesttocient),
-                //             "client_response" => json_encode($client_reponse),
-                //         ]
-                //     ];
-                //     Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
-                // }catch(\Exception $e){
-                //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
-                // }
                 try {
 
-                    // $createGameTransactionLog = [
-                    //     "connection_name" => $client_details->connection_name,
-                    //     "column" =>[
-                    //         "game_trans_ext_id" => $transactionId,
-                    //         "request" => json_encode($requesttocient),
-                    //         "response" => json_encode($client_reponse->fundtransferresponse),
-                    //         "log_type" => "client_details",
-                    //         "transaction_detail" => "success",
-                    //     ]
-                    // ];
-                    // dispatch(new CreateGameTransactionLog($createGameTransactionLog));
-                    ProviderHelper::queLogs($client_details->connection_name, $transactionId, $requesttocient, $client_reponse->fundtransferresponse, "client_details", "success");
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $transactionId,
+                            "request" => json_encode($requesttocient),
+                            "response" => json_encode($client_reponse->fundtransferresponse),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
                 } catch (\Exception $e) {
                     //throw $th;
@@ -195,18 +180,6 @@ class ClientRequestHelper{
 
                 // Add Refund Queue
                 if($type == 'debit'){
-                    // $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);  
-                    // if($action["provider_name"]  == "SimplePlay"){
-                    //     $exclude_provider = ["SimplePlay"];
-                    // } elseif($action["provider_name"]  == "BGaming"){
-                    //     $exclude_provider = ["BGaming"];
-                    // } elseif($action["provider_name"]  == "QuickSpin Direct"){
-                    //     $exclude_provider = ["QuickSpin Direct"];
-                    // } elseif($action["provider_name"]  == "OnlyPlay"){
-                    //     $exclude_provider = ["OnlyPlay"];
-                    // }else{
-                    //     $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay"];
-                    // }
                     $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming"];
                     $bol = true;
                     if(isset($action['provider_name'])){
@@ -241,7 +214,6 @@ class ClientRequestHelper{
                             $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
                         }
                         $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
-                        // Queue::push(new DebitRefund($debitRefund));
                         ProviderHelper::queDebitRefund($debitRefund);
                     }
                 }
@@ -255,24 +227,22 @@ class ClientRequestHelper{
                 // }catch(\Exception $e){
                 //     Providerhelper::mandatorySaveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$requesttocient);
                 // }
+                
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
 
                 try {
-                    // $createGameTransactionLog = [
-                    //     "connection_name" => $client_details->connection_name,
-                    //     "column" =>[
-                    //         "game_trans_ext_id" => $transactionId,
-                    //         "request" => json_encode($requesttocient),
-                    //         "response" => json_encode($client_reponse->fundtransferresponse),
-                    //         "log_type" => "client_details",
-                    //         "transaction_detail" => "failed", // edited to failed its in the exception -Al
-                    //     ]
-                    // ];
-                    // dispatch(new CreateGameTransactionLog($createGameTransactionLog));
-
-                    ProviderHelper::queLogs($client_details->connection_name, $transactionId, $requesttocient, $client_reponse->fundtransferresponse, "client_details", "failed");
-
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $transactionId,
+                            "request" => json_encode($requesttocient),
+                            "response" => json_encode($client_reponse->fundtransferresponse),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "failed", // edited to failed its in the exception -Al
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 } catch (\Exception $e) {
                 }
                 return $client_reponse;
