@@ -156,17 +156,20 @@ class ClientRequestHelper{
                 //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
                 // }
                 try {
-                    $createGameTransactionLog = [
-                        "connection_name" => $client_details->connection_name,
-                        "column" =>[
-                            "game_trans_ext_id" => $transactionId,
-                            "request" => json_encode($requesttocient),
-                            "response" => json_encode($client_reponse->fundtransferresponse),
-                            "log_type" => "client_details",
-                            "transaction_detail" => "success",
-                        ]
-                    ];
-                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+
+                    // $createGameTransactionLog = [
+                    //     "connection_name" => $client_details->connection_name,
+                    //     "column" =>[
+                    //         "game_trans_ext_id" => $transactionId,
+                    //         "request" => json_encode($requesttocient),
+                    //         "response" => json_encode($client_reponse->fundtransferresponse),
+                    //         "log_type" => "client_details",
+                    //         "transaction_detail" => "success",
+                    //     ]
+                    // ];
+                    // dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                    ProviderHelper::queLogs($client_details->connection_name, $transactionId, $requesttocient, $client_reponse->fundtransferresponse, "client_details", "success");
+
                 } catch (\Exception $e) {
                     //throw $th;
                 }
@@ -255,17 +258,20 @@ class ClientRequestHelper{
                 $client_reponse->requestoclient = $requesttocient;
 
                 try {
-                    $createGameTransactionLog = [
-                        "connection_name" => $client_details->connection_name,
-                        "column" =>[
-                            "game_trans_ext_id" => $transactionId,
-                            "request" => json_encode($requesttocient),
-                            "response" => json_encode($client_reponse->fundtransferresponse),
-                            "log_type" => "client_details",
-                            "transaction_detail" => "success",
-                        ]
-                    ];
-                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                    // $createGameTransactionLog = [
+                    //     "connection_name" => $client_details->connection_name,
+                    //     "column" =>[
+                    //         "game_trans_ext_id" => $transactionId,
+                    //         "request" => json_encode($requesttocient),
+                    //         "response" => json_encode($client_reponse->fundtransferresponse),
+                    //         "log_type" => "client_details",
+                    //         "transaction_detail" => "failed", // edited to failed its in the exception -Al
+                    //     ]
+                    // ];
+                    // dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+
+                    ProviderHelper::queLogs($client_details->connection_name, $transactionId, $requesttocient, $client_reponse->fundtransferresponse, "client_details", "failed");
+
                 } catch (\Exception $e) {
                 }
                 return $client_reponse;
