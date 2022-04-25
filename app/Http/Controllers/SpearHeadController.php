@@ -202,6 +202,7 @@ public function DebitProcess($req){
       //   );
       //   Helper::saveLog('Spearhead  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
       //   $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
+     
         $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit');
         if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
