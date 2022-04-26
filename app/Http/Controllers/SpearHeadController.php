@@ -238,7 +238,7 @@ public function DebitProcess($req){
                               "connection_name" => $client_details->connection_name,
                               "column" =>[
                                   "game_trans_ext_id" => $gen_game_extid,
-                                  "request" => json_encode($details),
+                                  "request" => json_encode($data),
                                   "response" => json_encode($res),
                                   "log_type" => "provider_details",
                                   "transaction_detail" => "SUCCESS",
@@ -274,7 +274,7 @@ public function DebitProcess($req){
                               "connection_name" => $client_details->connection_name,
                               "column" =>[
                                   "game_trans_ext_id" => $gen_game_extid,
-                                  "request" => json_encode($details),
+                                  "request" => json_encode($data),
                                   "response" => json_encode($res),
                                   "log_type" => "provider_details",
                                   "transaction_detail" => "failed",
