@@ -241,7 +241,7 @@ public function CheckBet(Request $req){
 													$createGameTransactionLog = [
 														"connection_name" => $client_details->connection_name,
 														"column" =>[
-															"game_trans_ext_id" => $game_transid_ext,
+															"game_trans_ext_id" => $game_trans_ext_id,
 															"request" => json_encode($data),
 															"response" => json_encode($response),
 															"log_type" => "provider_details",
@@ -269,7 +269,7 @@ public function CheckBet(Request $req){
 													$createGameTransactionLog = [
 														"connection_name" => $client_details->connection_name,
 														"column" =>[
-															"game_trans_ext_id" => $game_transid_ext,
+															"game_trans_ext_id" => $game_trans_ext_id,
 															"request" => json_encode($data),
 															"response" => json_encode($response),
 															"log_type" => "provider_details",
