@@ -390,7 +390,7 @@ public function CheckBet(Request $req){
 	              "amount" => $pay_amount,
 	              "game_transaction_type"=> 2,
 	          );
-       GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$client_details);
+       GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
 		$createGameTransactionLog = [
 			"connection_name" => $client_details->connection_name,
 			"column" =>[
