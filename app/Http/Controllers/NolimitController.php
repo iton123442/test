@@ -201,10 +201,10 @@ class NolimitController extends Controller
                     return $response;
                 }
             try{
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];
-                $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_transid_ext,$game_transid_gen, 'debit',false,$fund_extra_data);
                 if($client_response == false){
 
