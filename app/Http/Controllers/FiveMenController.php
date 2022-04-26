@@ -152,10 +152,8 @@ public function gameBet($request, $client_details)
 			$provider_trans_id = $request['data']['action_id']; // ROUND ID MW TRANSACTION
 			$round_xt = $request['callback_id']; // PROVIDER TRANS ID MW
 			//Create GameTransaction, GameExtension
-			$game_transid_gen = shell_exec('date +%s%N'); // ID generator
-			$for_ext = shell_exec('date +%s%N');
-			$identifier = (int)$for_ext + 54321;
-			$game_transid_ext = (int)$identifier;
+			$game_transid_gen = ProviderHelper::idGen(); // ID generator
+			$game_transid_ext =  ProviderHelper::idGen();
 			try {
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_transid_ext,$game_transid_gen,"debit",false);
 	        } catch (\Exception $e) {
@@ -178,7 +176,7 @@ public function gameBet($request, $client_details)
 						"transaction_detail" => "Failed",
 					]
 				];
-				dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
+				ProviderHelper::queTransactionLogs($createGameTransactionLog); //create extension logs
 				$updateGameTransaction = [
 	                "win" => 2,
 	                'trans_status' => 5,
@@ -187,7 +185,6 @@ public function gameBet($request, $client_details)
 				Helper::saveLog('5Men BET FATAL ERROR', $this->provider_db_id, json_encode($request), $response);
 			    return $response;
 	        }
-
 	        if (isset($client_response->fundtransferresponse->status->code)) {
 	        	ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 	        	switch ($client_response->fundtransferresponse->status->code) {
@@ -232,7 +229,7 @@ public function gameBet($request, $client_details)
 								"transaction_detail" => "success",
 							]
 						];
-						dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
+						ProviderHelper::queTransactionLogs($createGameTransactionLog);// create extension logs
 						return $response;
 						break;
 					case "402":
@@ -291,7 +288,7 @@ public function gameBet($request, $client_details)
 						"transaction_detail" => "Failed",
 					]
 				];
-				dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs	
+				ProviderHelper::queTransactionLogs($createGameTransactionLog);
 				return $response;
 	        }
 
@@ -314,9 +311,7 @@ public function gameBet($request, $client_details)
 
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-		$for_ext = shell_exec('date +%s%N');
-        $identifier = (int)$for_ext + 54321;
-        $game_transid_ext = (int)$identifier;
+        $game_transid_ext = ProviderHelper::idGen(); 
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
@@ -409,7 +404,7 @@ public function gameBet($request, $client_details)
 								"transaction_detail" => "success",
 							 ]
 						];
-							dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+							ProviderHelper::queTransactionLogs($createGameTransactionLog);// create extension logs
 						}catch(\Exception $e){
 							Helper::saveLog("Playstar Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
 						}

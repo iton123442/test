@@ -94,7 +94,7 @@ class FunkyGamesController extends Controller
 
 	}
 
-	public function CheckBet(Request $req){
+public function CheckBet(Request $req){
 			try {
 
 				Helper::saveLog('FunkyG checkBet', $this->provider_db_id, json_encode($req->all()), "checkbet HIT");
@@ -157,6 +157,8 @@ class FunkyGamesController extends Controller
 		$provider_trans_id = $req['bet']['refNo'];
 		$token_id = $req['sessionId'];
 		$client_details = ProviderHelper::getClientDetails('token', $token_id);
+		$game_transaction_id = ProviderHelper::idGen();
+		$game_trans_ext_id = ProviderHelper::idGen();
 		if($bet_amount > $client_details->balance ){
 			$response = [							                            
 				"errorCode" => 402,
@@ -181,11 +183,12 @@ class FunkyGamesController extends Controller
 			];
             return $response;
         }
-	 	try{  
+	 	try{ 
+			$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit'); 
  			if($client_details != null ){
 				Helper::saveLog('FunkyG Check CLient Deatails', $this->provider_db_id, json_encode($req->all()),$client_details);
 		      	$find_bet = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
-	        		if($find_bet  != 'false'){
+	        if($find_bet  != 'false'){
 				        	$client_details->connection_name = $find_bet->connection_name;
 				        	$amount = $find_bet->bet_amount + $bet_amount;
 				        	$game_transaction_id = $find_bet->game_trans_id;
@@ -210,7 +213,7 @@ class FunkyGamesController extends Controller
 					            "income" => 0,
 					            "entry_id" => 1,
 					        ); 
-					        $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+					       GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transaction_id, $client_details);
 					        Helper::saveLog('FunkyG Check gameTransactionData', $this->provider_db_id, json_encode($req->all()), $gameTransactionData);
 					        $gameTransactionEXTData = array(
 					            "game_trans_id" => $game_transaction_id,
@@ -218,11 +221,11 @@ class FunkyGamesController extends Controller
 					            "round_id" => $round_id,
 					            "amount" => $bet_amount,
 					            "game_transaction_type"=> 1,
-					            "provider_request" =>json_encode($req->all()),
+					            // "provider_request" =>json_encode($req->all()),
 				            );
-					        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
-					        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-							        if(isset($client_response->fundtransferresponse->status->code)){
+					      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); 
+					        
+				if(isset($client_response->fundtransferresponse->status->code)){
 							        	$playerBal = sprintf('%.2f', $client_response->fundtransferresponse->balance);
 							        	ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 							        	switch ($client_response->fundtransferresponse->status->code) {
@@ -235,17 +238,19 @@ class FunkyGamesController extends Controller
 								                          	"Balance" => floatval($playerBal)
 								                          ]
 							                        ];
-
-							                        $updateTransactionEXt = array(
-							                            "provider_request" =>json_encode($req->all()),
-							                            "mw_response" => json_encode($response),
-							                            'mw_request' => json_encode($client_response->requestoclient),
-							                            'client_response' => json_encode($client_response->fundtransferresponse),
-							                            'transaction_detail' => 'success',
-							                            'general_details' => 'success',
-							                        
-							                        );
-							                    	GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+													$createGameTransactionLog = [
+														"connection_name" => $client_details->connection_name,
+														"column" =>[
+															"game_trans_ext_id" => $game_trans_ext_id,
+															"request" => json_encode($req->all()),
+															"response" => json_encode($response),
+															"log_type" => "provider_details",
+															"transaction_detail" => "success",
+														]
+													];
+													ProviderHelper::queTransactionLogs($createGameTransactionLog);
+													Helper::saveLog('FunkyG Debit success', $this->provider_db_id, json_encode($req->all()), $response);
+													return response()->json($response, $http_status);
 							                    break;
 							                    case '402':
 							                            // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
@@ -261,23 +266,22 @@ class FunkyGamesController extends Controller
 							                          
 							                        ];
 
-							                        $updateTransactionEXt = array(
-							                            "provider_request" =>json_encode($req->all()),
-							                            "mw_response" => json_encode($response),
-							                            'mw_request' => json_encode($client_response->requestoclient),
-							                            'client_response' => json_encode($client_response->fundtransferresponse),
-							                            'transaction_detail' => 'failed',
-							                            'general_details' => 'failed',
-							                        );
-							                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+													$createGameTransactionLog = [
+														"connection_name" => $client_details->connection_name,
+														"column" =>[
+															"game_trans_ext_id" => $game_trans_ext_id,
+															"request" => json_encode($req->all()),
+															"response" => json_encode($response),
+															"log_type" => "provider_details",
+															"transaction_detail" => "Failed",
+														]
+													];
+													ProviderHelper::queTransactionLogs($createGameTransactionLog);
+													return response()->json($response, $http_status);
 							    				break;
 						                }
 							        }
-
-
-							Helper::saveLog('FunkyG Debit success', $this->provider_db_id, json_encode($req->all()), $response);
-					        return response()->json($response, $http_status);
-      				}//end else find bet
+      			}//end else find bet
 
      	 	}else{
 		       	$response = [
@@ -295,7 +299,6 @@ class FunkyGamesController extends Controller
         	return $e->getMessage();
    		}
 	}
-
 	public function SettleBet(Request $req){
 		Helper::saveLog('FunkyG Settlebet', $this->provider_db_id, json_encode($req->all()), "settlebet HIT");
 		$game_code = $req['betResultReq']['gameCode'];
@@ -306,8 +309,7 @@ class FunkyGamesController extends Controller
 		$effectiveStake = $req['betResultReq']['effectiveStake'];
 		$client_details = ProviderHelper::getClientDetails('player_id', $req['betResultReq']['playerId']);
 		$playerBal = sprintf('%.2f', $client_details->balance);
-		// dd($client_details);
-
+		$game_trans_ext_id = ProviderHelper::idGen();
         $game_details = Game::find($game_code, $this->provider_db_id);
         $bet_transaction = $this->findGameTransactionDetails($trans_id, 'transaction_id', false,$client_details);
         if($bet_transaction == 'false'){
@@ -387,11 +389,19 @@ class FunkyGamesController extends Controller
 	              "round_id" => $round_id,
 	              "amount" => $pay_amount,
 	              "game_transaction_type"=> 2,
-	              "provider_request" => json_encode($req->all()),
-	              "mw_response" => json_encode($response),
 	          );
-      	$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
+       GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
+		$createGameTransactionLog = [
+			"connection_name" => $client_details->connection_name,
+			"column" =>[
+				"game_trans_ext_id" => $game_trans_ext_id,
+				"request" => json_encode($req->all()),
+				"response" => json_encode($response),
+				"log_type" => "provider_details",
+				"transaction_detail" => "success",
+			 ]
+		];
+		ProviderHelper::queTransactionLogs($createGameTransactionLog);
   		$action_payload = [
             "type" => "custom", #genreral,custom :D # REQUIRED!
             "custom" => [
@@ -423,16 +433,6 @@ class FunkyGamesController extends Controller
         ];
                           
         $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-
-        $updateTransactionEXt = array(
-                  "provider_request" =>json_encode($req->all()),
-                  "mw_response" => json_encode($response),
-                  'mw_request' => json_encode($client_response->requestoclient),
-                  'client_response' => json_encode($client_response->fundtransferresponse),
-                  'transaction_detail' => 'success',
-                  'general_details' => 'success',
-      	);
-      	GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
       Helper::saveLog('FunkyG Settlebet success', $this->provider_db_id, json_encode($req->all()), $response);
       	return response($response,200)
                 ->header('Content-Type', 'application/json');
