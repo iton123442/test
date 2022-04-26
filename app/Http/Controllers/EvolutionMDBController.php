@@ -142,6 +142,8 @@ class EvolutionMDBController extends Controller
                     }
                    
                     $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game"]["details"]["table"]["id"]);
+                    $game_trans_id = ProviderHelper::idGenerate($client_details->connection_name, 1);
+                    $game_trans_id_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
                     $TransactionData = array(
                         "provider_trans_id" => $data["transaction"]["id"],
                         "token_id" => $client_details->token_id,
@@ -153,20 +155,22 @@ class EvolutionMDBController extends Controller
                         "income" =>$data["transaction"]["amount"],
                         "entry_id" =>1,
                     );
-                    $game_transactionid = GameTransactionMDB::createGametransaction($TransactionData,$client_details);
+                    // $game_trans_id = GameTransactionMDB::createGametransaction($TransactionData,$client_details);
+                    GameTransactionMDB::createGametransactionV2($TransactionData,$game_trans_id,$client_details); //create game_transaction
                     $betgametransactionext = array(
-                        "game_trans_id" => $game_transactionid,
+                        "game_trans_id" => $game_trans_id,
                         "round_id" =>$data["transaction"]["refId"],
                         "provider_trans_id" => $data["transaction"]["id"],
                         "amount" =>$data["transaction"]["amount"],
                         "game_transaction_type"=>1,
                         // "provider_request" =>json_encode($data),
                     );
-                    $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
+                    // $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
+                    GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$game_trans_id_ext,$client_details);
                     $fund_extra_data = [
                         'provider_name' => $game_details->provider_name
                     ];
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,$data["transaction"]["amount"],$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$data["transaction"]["amount"],$game_details->game_code,$game_details->game_name,$game_trans_id_ext,$game_trans_id,"debit",false,$fund_extra_data);
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -181,18 +185,19 @@ class EvolutionMDBController extends Controller
                         //     "transaction_detail" =>"success",
 						// 	"general_details" => "success",
                         // );
-                        // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_id_ext,$client_details);
                         $createGameTransactionLog = [
                             "connection_name" => $client_details->connection_name,
                             "column" =>[
-                                "game_trans_ext_id" => $betGametransactionExtId,
+                                "game_trans_ext_id" => $game_trans_id_ext,
                                 "request" => json_encode($data),
                                 "response" => json_encode($msg),
                                 "log_type" => "provider_details",
                                 "transaction_detail" => "success",
                             ]
                         ];
-                        dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                        // dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                         return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
@@ -201,8 +206,8 @@ class EvolutionMDBController extends Controller
                         $datatoupdate = array(
                             "win"=>2
                         );
-                        // GameTransaction::updateGametransaction($datatoupdate,$game_transactionid);
-                        GameTransactionMDB::updateGametransaction($datatoupdate, $game_transactionid, $client_details);
+                        // GameTransaction::updateGametransaction($datatoupdate,$game_trans_id);
+                        GameTransactionMDB::updateGametransaction($datatoupdate, $game_trans_id, $client_details);
                         $msg = array(
                             "status"=>"INSUFFICIENT_FUNDS",
                             "uuid"=>$data["uuid"],
@@ -212,18 +217,19 @@ class EvolutionMDBController extends Controller
                         //     "transaction_detail" =>"FAILED",
 						// 	"general_details" => "FAILED",
                         // );
-                        // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                        // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_id_ext,$client_details);
                         $createGameTransactionLog = [
                             "connection_name" => $client_details->connection_name,
                             "column" =>[
-                                "game_trans_ext_id" => $betGametransactionExtId,
+                                "game_trans_ext_id" => $game_trans_id_ext,
                                 "request" => json_encode($data),
                                 "response" => json_encode($msg),
                                 "log_type" => "provider_details",
                                 "transaction_detail" => "success",
                             ]
                         ];
-                        dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                        // dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                         return response($msg,200)
                         ->header('Content-Type', 'application/json');
                     }
@@ -285,6 +291,7 @@ class EvolutionMDBController extends Controller
                     "balance"=>$client_details->balance+$data["transaction"]["amount"],
                     "uuid"=>$data["uuid"],
                 );
+                $game_trans_id_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
                 $wingametransactionext = array(
                     "game_trans_id" => $game->game_trans_id,
                     "provider_trans_id" =>  $data["transaction"]["id"],
@@ -294,12 +301,13 @@ class EvolutionMDBController extends Controller
                     // "provider_request" =>json_encode($data),
                     // "mw_response" => json_encode($msg)
                 );
-                $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$game_trans_id_ext,$client_details);
                 $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
                         "provider" => 'evolution',
-                        "game_transaction_ext_id" => $winGametransactionExtId,
+                        "game_transaction_ext_id" => $game_trans_id_ext,
                         "client_connection_name" => $client_details->connection_name,
                         "win_or_lost" => $win_or_lost,
                         "provider_name" => $game_details->provider_name

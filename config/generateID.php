@@ -5,7 +5,7 @@ return [
     'generate_id'=>[
         "default" => [
             'game_trans_id'=> 100000000000000000,
-            'game_transaction_ext' => 100000000000000000,
+            'game_transaction_ext' => 400000000000000000,
         ],
         "server1-askmebet" => [
             'game_trans_id'=> 200000000000000000,
