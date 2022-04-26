@@ -177,27 +177,27 @@ class BOTAController extends Controller{
         Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
         if(isset($client_details)){
             try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['detail']['shoeNo'].'_2');
+                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_2');
             }catch(\Exception $e){
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, $data['detail']['casino']);
-                // $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
+                $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
                 $win_or_lost = $data["price"] == 0 ? 0 : 1;
                 $gameTransactionData = array(
-                    "provider_trans_id" => $data['detail']['shoeNo'],
+                    "provider_trans_id" => $data['idx'],
                     "token_id" => $client_details->token_id,
                     "game_id" => $gamedetails->game_id,
-                    "round_id" => $data['idx'],
+                    "round_id" => $data['detail']['shoeNo'],
                     "bet_amount" => $data['bet'],
                     "pay_amount" => $data['price'],
                     "win" => 5,
-                    "income" => $data['bet']-$data['price'],
+                    "income" => $data['bet'] - $data['price'],
                     "entry_id" => $data['price'] == 0 ? 1 : 2
                 );
                 $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
                 $bettransactionExt = array(
                     "game_trans_id" => $game_trans_id,
-                    "provider_trans_id" => $data['detail']['shoeNo'],
-                    "round_id" => $data['idx'],
+                    "provider_trans_id" => $data['idx'],
+                    "round_id" => $data['detail']['shoeNo'],
                     "amount" => $data['bet'],
                     "game_transaction_type" => 1,
                     "provider_request" => json_encode($data),
@@ -230,8 +230,8 @@ class BOTAController extends Controller{
                     );
                     $winTransactionExt = array(
                         "game_trans_id" => $game_trans_id,
-                        "provider_trans_id"=>$data['detail']['shoeNo'],
-                        "round_id"=>$data['idx'],
+                        "provider_trans_id"=>$data['idx'],
+                        "round_id"=>$data['detail']['shoeNo'],
                         "amount"=>$data['price'],
                         "game_transaction_type"=> 2,
                         "provider_request"=> json_encode($data),
@@ -250,8 +250,8 @@ class BOTAController extends Controller{
                         ],
                         "provider" => [
                             "provider_request" => $data, #R
-                            "provider_trans_id"=>$data['detail']['shoeNo'], #R
-                            "provider_round_id"=>$data['idx'], #R
+                            "provider_trans_id"=>$data['idx'], #R
+                            "provider_round_id"=>$data['detail']['shoeNo'], #R
                             'provider_name' => $gamedetails->provider_name
                         ],
                         "mwapi" => [
@@ -280,7 +280,7 @@ class BOTAController extends Controller{
                 }
                 elseif(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "402"){
-                    $response ="ERROR WIN";//error response
+                    $response ="ERROR WIN TIMEOUT";//error response
                     try{
                         $datatosend = array(
                         "win" => 2
