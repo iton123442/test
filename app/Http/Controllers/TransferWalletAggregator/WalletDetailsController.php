@@ -370,10 +370,11 @@ class WalletDetailsController extends Controller
         $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
 
         $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
-        $page = $request->page;
-        if(!$client_details->operator_id == 20){
-            $page = $request->page * $request->limit;
-        }
+        // $page = $request->page;
+        // if(!$client_details->operator_id == 20){
+        //     $page = $request->page * $request->limit;
+        // }
+        $page = $request->page * $request->limit;
         $status = GameTransactionMDB::checkDBConnection($connection);
 
         if ( ($connection != null) && $status) {
