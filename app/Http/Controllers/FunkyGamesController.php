@@ -242,7 +242,7 @@ public function CheckBet(Request $req){
 														"connection_name" => $client_details->connection_name,
 														"column" =>[
 															"game_trans_ext_id" => $game_trans_ext_id,
-															"request" => json_encode($data),
+															"request" => json_encode($req->all()),
 															"response" => json_encode($response),
 															"log_type" => "provider_details",
 															"transaction_detail" => "success",
@@ -270,7 +270,7 @@ public function CheckBet(Request $req){
 														"connection_name" => $client_details->connection_name,
 														"column" =>[
 															"game_trans_ext_id" => $game_trans_ext_id,
-															"request" => json_encode($data),
+															"request" => json_encode($req->all()),
 															"response" => json_encode($response),
 															"log_type" => "provider_details",
 															"transaction_detail" => "Failed",
