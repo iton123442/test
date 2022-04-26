@@ -460,18 +460,6 @@ public function CreditProcess($req){
     // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
     ProviderHelper::_insertOrUpdate($client_details->token_id, $winBalance);
-    $createGameTransactionLog = [
-              "connection_name" => $client_details->connection_name,
-              "column" =>[
-                  "game_trans_ext_id" => $gen_game_extid,
-                  "request" => json_encode($data),
-                  "response" => json_encode($res),
-                  "log_type" => "provider_details",
-                  "transaction_detail" => "success",
-              ]
-          ];
-    ProviderHelper::queTransactionLogs($createGameTransactionLog);
-
     $action_payload = [
           "type" => "custom", #genreral,custom :D # REQUIRED!
           "custom" => [
