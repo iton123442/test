@@ -143,10 +143,8 @@ class NolimitController extends Controller
         {
             ProviderHelper::saveLogWithExeption('Nolimit bet', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
             $data = $request->all();
-            $game_transid_gen = shell_exec('date +%s%N'); // ID generator
-            $for_ext = shell_exec('date +%s%N');
-            $identifier = (int)$for_ext + 54321;
-            $game_transid_ext = (int)$identifier;
+            $game_transid_gen = ProviderHelper::idGen(); // ID generator
+            $game_transid_ext =  ProviderHelper::idGen(); 
             $client_details = ProviderHelper::getClientDetails('player_id', $data['params']['userId']);
             $bet_amount = $data['params']['withdraw']['amount'];
             $game_code = $data['params']['information']['game'];
@@ -202,12 +200,11 @@ class NolimitController extends Controller
                     ];
                     return $response;
                 }
-            //    $game_details = Game::find($game_code, $this->provider_db_id);
-               $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
             try{
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_transid_ext,$game_transid_gen, 'debit',false,$fund_extra_data);
                 if($client_response == false){
 
@@ -244,12 +241,11 @@ class NolimitController extends Controller
 
                                     break;
                                 case '402':
-                                    // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
                                     $updateGameTransaction = [
                                         'win' => 2,
                                         'trans_status' => 5
                                     ];
-                                ProviderHelper::updateGameTransactionStatus($game_transid_gen, 2, 99);
+                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transid_gen, $client_details);
                                     $http_status = 200;
                                     $response = [
                                         
@@ -274,7 +270,8 @@ class NolimitController extends Controller
                                         'win' => 2,
                                         'trans_status' => 5
                                     ];
-                                $http_status = 200;
+                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transid_gen, $client_details);
+                                    $http_status = 200;
                                     $response = [
                                         
                                         'jsonrpc' => '2.0',
@@ -294,7 +291,7 @@ class NolimitController extends Controller
                             }
                         }
 
-                        $gameTransactionData = array(
+                    $gameTransactionData = array(
                         "provider_trans_id" => $provider_trans_id,
                         "token_id" => $client_details->token_id,
                         "game_id" => $game_details->game_id,
@@ -312,8 +309,8 @@ class NolimitController extends Controller
                             "round_id" => $round_id,
                             "amount" => $bet_amount,
                             "game_transaction_type"=> 1,
-                        //"provider_request" =>json_encode($request->all()),
-                    );
+            
+                        );
                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
@@ -325,7 +322,7 @@ class NolimitController extends Controller
                             "transaction_detail" => "success",
                         ]
                     ];
-                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs      
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                         ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data), $response);
                         return response()->json($response, $http_status);
            }catch(\Exception $e){
@@ -343,7 +340,7 @@ class NolimitController extends Controller
         }// End Catch
         }//end walletwithdraw
 
-         if($method == 'wallet.deposit'){   
+        if($method == 'wallet.deposit'){   
             ProviderHelper::saveLogWithExeption('NOLIMIT credit process', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
             $data = $request->all();
             $client_details = ProviderHelper::getClientDetails('player_id', $data['params']['userId']);
@@ -352,9 +349,7 @@ class NolimitController extends Controller
             $round_id = $data['params']['information']['gameRoundId'];
             $game_code = $data['params']['information']['game'];
             $balance = $client_details->balance;
-            $for_ext = shell_exec('date +%s%N');
-            $identifier = (int)$for_ext + 54321;
-            $game_transid_ext = (int)$identifier;
+            $game_transid_ext = ProviderHelper::idGen();
             $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
                 Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request->all()), $bet_transaction); 
             try{
@@ -362,6 +357,7 @@ class NolimitController extends Controller
             }catch(\Exception $e){
 
             try{
+            if(isset($bet_transaction)){
                 if($bet_transaction->pay_amount != $pay_amount){
 
                     $response = [
@@ -374,7 +370,8 @@ class NolimitController extends Controller
                             ],
                         ];
                         return response($response,200)->header('Content-Type', 'application/json');
-                }      
+                } 
+            }     
                 $response = [
                     'jsonrpc' => '2.0',
                     'result' => [
@@ -390,11 +387,8 @@ class NolimitController extends Controller
                     ],
                     'id' => $data['id']
                 ];
-
               return response($response,200)->header('Content-Type', 'application/json');
             }catch(\Exception $e){
-
-
                      $response = [
                         'jsonrpc' => '2.0',
                         'result' => [
@@ -406,9 +400,7 @@ class NolimitController extends Controller
                         ];
                         ProviderHelper::saveLogWithExeption('Nolimit Credit', $this->provider_db_id, json_encode($request->all()),  $e->getMessage() . ' ' . $e->getLine());
                         return response($response,200)->header('Content-Type', 'application/json');
-
-            }
-              
+            }    
             }
             if($client_details == null) {
                 $response = [
@@ -423,8 +415,6 @@ class NolimitController extends Controller
                 return $response;
             }
           try{
-                ProviderHelper::saveLogWithExeption('NOLIMIT start to process', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
-                // $game_details = Game::find($game_code, $this->provider_db_id);
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
                  ProviderHelper::saveLogWithExeption('NOLIMIT find game_detailss', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
                 $client_details->connection_name = $bet_transaction->connection_name;
@@ -471,8 +461,6 @@ class NolimitController extends Controller
                         "round_id" => $round_id,
                         "amount" => $pay_amount,
                         "game_transaction_type"=> 2,
-                        // "provider_request" =>json_encode($request->all()),
-                        // "mw_response" => json_encode($response),
                     );
 
                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
@@ -487,7 +475,7 @@ class NolimitController extends Controller
                                     "transaction_detail" => "success",
                                  ]
                             ];
-                                dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     }catch(\Exception $e){
                         Helper::saveLog("Playstar Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
                     }
