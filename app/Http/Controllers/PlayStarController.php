@@ -80,10 +80,8 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
-        $game_transid_gen = shell_exec('date +%s%N'); // ID generator
-        $for_ext = shell_exec('date +%s%N');
-        $identifier = (int)$for_ext + 54321;
-        $game_transid_ext = (int)$identifier;
+        $game_transid_gen = ProviderHelper::idGen(); // ID generator
+        $game_transid_ext =  ProviderHelper::idGen();
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -125,6 +123,19 @@ class PlayStarController extends Controller
                                     "status_code" => 3,
                                     "message" => "Insufficient Funds",                                 
                                 ];
+
+                                $createGameTransactionLog = [
+                                    "connection_name" => $client_details->connection_name,
+                                    "column" =>[
+                                        "game_trans_ext_id" => $game_transextension1,
+                                        "request" => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'failed',
+                                        "response" => $response,
+                                        "log_type" => "client_details",
+                                        "transaction_detail" => "failed",
+                                    ]
+                                ];
+                                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                                return $response;
                                 break;
                         }
                     }
@@ -159,7 +170,7 @@ class PlayStarController extends Controller
                             "transaction_detail" => "success",
                         ]
                     ];
-                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
                 return response($response,200)->header('Content-Type', 'application/json');
         }catch(\Exception $e){
@@ -177,9 +188,7 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $data["total_win"] / 100;
         $balance = $client_details->balance;
-        $for_ext = shell_exec('date +%s%N');
-        $identifier = (int)$for_ext + 54321;
-        $game_transid_ext = (int)$identifier;
+        $game_transid_ext = ProviderHelper::idGen();
             try{
                 ProviderHelper::idenpotencyTable($data["ts"]);
             }catch(\Exception $e){
@@ -252,7 +261,7 @@ class PlayStarController extends Controller
 									"transaction_detail" => "success",
 								 ]
                             ];
-                                dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
                             }catch(\Exception $e){
                                 Helper::saveLog("Playstar Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
                             }
