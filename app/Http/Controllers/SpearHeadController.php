@@ -226,25 +226,13 @@ public function DebitProcess($req){
                               "connection_name" => $client_details->connection_name,
                               "column" =>[
                                   "game_trans_ext_id" => $gen_game_extid,
-                                  "request" => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'failed',
-                                  "response" => json_encode($res),
-                                  "log_type" => "client_details",
-                                  "transaction_detail" => "SUCCESS",
-                              ]
-                          ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
-
-                    $createGameTransactionLogProvider = [
-                              "connection_name" => $client_details->connection_name,
-                              "column" =>[
-                                  "game_trans_ext_id" => $gen_game_extid,
                                   "request" => json_encode($data),
                                   "response" => json_encode($res),
                                   "log_type" => "provider_details",
                                   "transaction_detail" => "SUCCESS",
                               ]
                           ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLogProvider);
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 break;
                 case '402':
                     $http_status = 400;
@@ -262,25 +250,13 @@ public function DebitProcess($req){
                               "connection_name" => $client_details->connection_name,
                               "column" =>[
                                   "game_trans_ext_id" => $gen_game_extid,
-                                  "request" => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'failed',
-                                  "response" => "FAILED",
-                                  "log_type" => "client_details",
-                                  "transaction_detail" => "failed",
-                              ]
-                          ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
-
-                    $createGameTransactionLogProvider = [
-                              "connection_name" => $client_details->connection_name,
-                              "column" =>[
-                                  "game_trans_ext_id" => $gen_game_extid,
                                   "request" => json_encode($data),
                                   "response" => json_encode($res),
                                   "log_type" => "provider_details",
                                   "transaction_detail" => "failed",
                               ]
                           ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLogProvider);
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 break;
           }
       }

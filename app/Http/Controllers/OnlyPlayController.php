@@ -57,8 +57,8 @@ class OnlyPlayController extends Controller
         $user_id = explode('TG_',$request->user_id);
         $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
         $bet_amount = $request->amount/100;
-        $gen_game_trans_id = $this->generateId("transid");
-        $gen_game_extid = $this->generateId("ext");
+        $gen_game_trans_id = ProviderHelper::idGen();
+        $gen_game_extid = ProviderHelper::idGen();
             try{
                 ProviderHelper::idenpotencyTable($request->tx_id);
             }catch(\Exception $e){
@@ -200,17 +200,17 @@ class OnlyPlayController extends Controller
                                 "game_transaction_type"=> 1,
                             );
                            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$get_client_details); //create extension
-                           // $createGameTransactionLog = [
-                           //      "connection_name" => $get_client_details->connection_name,
-                           //      "column" =>[
-                           //          "game_trans_ext_id" => $gen_game_extid,
-                           //          "request" => json_encode($data),
-                           //          "response" => json_encode($response),
-                           //          "log_type" => "provider_details",
-                           //          "transaction_detail" => "success",
-                           //      ]
-                           //  ];
-                           //  dispatch(new CreateGameTransactionLog($createGameTransactionLog));// create extension logs
+                           $createGameTransactionLog = [
+                              "connection_name" => $get_client_details->connection_name,
+                              "column" =>[
+                                  "game_trans_ext_id" => $gen_game_extid,
+                                  "request" => json_encode($request->all()),
+                                  "response" => json_encode($response),
+                                  "log_type" => "provider_details",
+                                  "transaction_detail" => "SUCCESS",
+                              ]
+                            ];
+                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 Helper::saveLog('OnlyPlay debit', $this->provider_db_id, json_encode($request->all()), $response);
                 return response($response,200)
                         ->header('Content-Type', 'application/json');
@@ -328,16 +328,16 @@ class OnlyPlayController extends Controller
                     );
                     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$get_client_details);
                     $createGameTransactionLog = [
-                        "connection_name" => $get_client_details->connection_name,
-                        "column" =>[
-                            "game_trans_ext_id" => $gen_game_extid,
-                            "request" => json_encode($data),
-                            "response" => json_encode($response),
-                            "log_type" => "provider_details",
-                            "transaction_detail" => "success",
-                         ]
-                    ];
-                    dispatch(new CreateGameTransactionLog($createGameTransactionLog));
+                              "connection_name" => $get_client_details->connection_name,
+                              "column" =>[
+                                  "game_trans_ext_id" => $gen_game_extid,
+                                  "request" => json_encode($request->all()),
+                                  "response" => json_encode($response),
+                                  "log_type" => "provider_details",
+                                  "transaction_detail" => "SUCCESS",
+                              ]
+                          ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
     
                                 $action_payload = [
                                     "type" => "custom", #genreral,custom :D # REQUIRED!
