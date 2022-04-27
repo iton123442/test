@@ -433,6 +433,7 @@ class WalletDetailsController extends Controller
                         bet,
                         r_bet,
                         status,
+                        pay_amount,
                         hand,
                         card,
                         curr_amount,
@@ -492,6 +493,7 @@ class WalletDetailsController extends Controller
                         $datatopass['curr_bet']=$datas->curr_bet;
                         $datatopass['r_bet']=$datas->r_bet;
                         $datatopass['status']=$datas->status;
+                        $datatopass['pay_amount']=$datas->pay_amount;
                         $datatopass['hand']=$datas->hand;
                         $datatopass['card']=$datas->card;
                         $datatopass['curr_amount']=$datas->curr_amount;
