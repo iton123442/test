@@ -199,9 +199,9 @@ class TTGController extends Controller
 
     }
 
-    public function debitProcess($req,$get_client_details){
+    public function debitProcess($data,$get_client_details){
         try {
-                 $provider_trans_id = $array['@attributes']['txnid'];
+                 $provider_trans_id = $data['txnid'];
                  $game_code = $game_details->game_code;
                  $amount = $data["amt"]; 
                  $bet_amount = abs($amount);
@@ -210,7 +210,7 @@ class TTGController extends Controller
                  // $win_or_lost = $data["win"] == 0.0 ? 0 : 1;  /// 1win 0lost
                  $entry_id = 1 == 0.0 ? 1 : 2;// 1/bet/debit , 2//win/credit
                  // $provider_trans_id = $data['id_stat']; // 
-                 $round_id = $array['@attributes']['handid'];// this is round
+                 $round_id = $data['handid'];// this is round
                  $gen_game_trans_id = ProviderHelper::idGenerate($get_client_details->connection_name,1);
                  $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
                 try {
@@ -264,7 +264,7 @@ class TTGController extends Controller
                                 }// end switch
                             
                             }
-                            $checkTransaction = GameTransactionMDB::findGameTransactionDetails($array['@attributes']['handid'],'round_id', 1, $get_client_details);
+                            $checkTransaction = GameTransactionMDB::findGameTransactionDetails($data['handid'],'round_id', 1, $get_client_details);
                              if($checkTransaction == 'false'){
                                   $gameTransactionData = array(
                                         "provider_trans_id" => $provider_trans_id,
@@ -319,21 +319,21 @@ class TTGController extends Controller
                    return json_encode($msg,JSON_FORCE_OBJECT);
                 }
     }
-    public function creditProcess($req,$get_client_details){
+    public function creditProcess($data,$get_client_details){
         $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
               try {
                   // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($array['@attributes']['handid'],'round_id', 1, $get_client_details);
-                  $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($array['@attributes']['handid'],'round_id', 1, $get_client_details);
+                  $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($data['handid'],'round_id', 1, $get_client_details);
                   $get_client_details->connection_name = $bet_transaction->connection_name;
                   // $bet_transaction = DB::select("select game_trans_id,bet_amount, pay_amount from game_transactions where round_id = '".$array['@attributes']['handid']."'");
                   // $bet_transaction = $bet_transaction[0];
                
-                  $provider_trans_id = $array['@attributes']['txnid'];
+                  $provider_trans_id = $data['txnid'];
                   $game_code = $game_details->game_code;
                   $pay_amount = $data["amt"];
                   $bet_amount = $bet_transaction->bet_amount;
                   $income = abs($bet_amount) - $pay_amount;
-                  $round_id = $array['@attributes']['handid'];
+                  $round_id = $data['handid'];
                   $winbBalance = $get_client_details->balance + $pay_amount;
                   $format_winbBalance = number_format($winbBalance,2,'.','');
                   $entry_id = $pay_amount > 0 ?  2 : 1;
@@ -354,8 +354,8 @@ class TTGController extends Controller
 
                   $gameTransactionEXTData = array(
                           "game_trans_id" => $bet_transaction->game_trans_id,
-                          "provider_trans_id" => $array['@attributes']['txnid'],
-                          "round_id" => $array['@attributes']['handid'],
+                          "provider_trans_id" => $data['txnid'],
+                          "round_id" => $data['handid'],
                           "amount" => $pay_amount,
                           "game_transaction_type"=> 2,
                           // "provider_request" =>json_encode($data),
@@ -386,8 +386,8 @@ class TTGController extends Controller
                                     ],
                                     "provider" => [
                                         "provider_request" => $data, #R
-                                        "provider_trans_id"=> $array['@attributes']['txnid'], #R
-                                        "provider_round_id"=> $array['@attributes']['handid'], #R
+                                        "provider_trans_id"=> $data['txnid'], #R
+                                        "provider_round_id"=> $data['handid'], #R
                                     ],
                                     "mwapi" => [
                                         "roundId"=>$bet_transaction->game_trans_id, #R
