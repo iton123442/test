@@ -107,7 +107,7 @@ class TTGController extends Controller
 
 
         }
-        $game_details = Helper::findGameDetails("game_code",$this->provider_db_id, $data['gameid']);
+        
        
             if($data['txnsubtypeid'] == '400'){//bet start
                 return $this->debitProcess($data,$get_client_details);
@@ -200,7 +200,8 @@ class TTGController extends Controller
     }
 
     public function debitProcess($data,$get_client_details){
-        try {
+        try {       
+                 $game_details = Helper::findGameDetails("game_code",$this->provider_db_id, $data['gameid']);
                  $provider_trans_id = $data['txnid'];
                  $game_code = $game_details->game_code;
                  $amount = $data["amt"]; 
@@ -236,7 +237,7 @@ class TTGController extends Controller
                                           "connection_name" => $get_client_details->connection_name,
                                           "column" =>[
                                               "game_trans_ext_id" => $gen_game_extid,
-                                              "request" => json_encode($request->all()),
+                                              "request" => json_encode($data),
                                               "response" => json_encode($response),
                                               "log_type" => "provider_details",
                                               "transaction_detail" => "FAILED",
@@ -254,7 +255,7 @@ class TTGController extends Controller
                                           "connection_name" => $get_client_details->connection_name,
                                           "column" =>[
                                               "game_trans_ext_id" => $gen_game_extid,
-                                              "request" => json_encode($request->all()),
+                                              "request" => json_encode($data),
                                               "response" => json_encode($response),
                                               "log_type" => "provider_details",
                                               "transaction_detail" => "FAILED",
@@ -300,7 +301,7 @@ class TTGController extends Controller
                                   "connection_name" => $get_client_details->connection_name,
                                   "column" =>[
                                       "game_trans_ext_id" => $gen_game_extid,
-                                      "request" => json_encode($request->all()),
+                                      "request" => json_encode($data),
                                       "response" => json_encode($response),
                                       "log_type" => "provider_details",
                                       "transaction_detail" => "SUCCESS",
@@ -308,7 +309,7 @@ class TTGController extends Controller
                                 ];
                                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
-                  Helper::saveLog('TTGaming bet', $this->provider_db_id, $array, $response);
+                  Helper::saveLog('TTGaming bet', $this->provider_db_id, $data, $response);
                   return response($response,200) 
                     ->header('Content-Type', 'application/xml');
                 } catch (\Exception $e) {
@@ -320,8 +321,9 @@ class TTGController extends Controller
                 }
     }
     public function creditProcess($data,$get_client_details){
-        $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
               try {
+                  $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
+                  $game_details = Helper::findGameDetails("game_code",$this->provider_db_id, $data['gameid']);
                   // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($array['@attributes']['handid'],'round_id', 1, $get_client_details);
                   $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($data['handid'],'round_id', 1, $get_client_details);
                   $get_client_details->connection_name = $bet_transaction->connection_name;
@@ -415,7 +417,7 @@ class TTGController extends Controller
                   // );
                   // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
                   
-                  Helper::saveLog('TTGaming credit', $this->provider_db_id, $array, $response);
+                  Helper::saveLog('TTGaming credit', $this->provider_db_id, $data, $response);
                   return response($response,200) 
                     ->header('Content-Type', 'application/xml');
 
