@@ -78,7 +78,7 @@ class BOTAController extends Controller{
         if($client_details){
             $msg = array(
                 "user" => $data['user'],
-                "balance"=>number_format($client_details->balance,2,'.', ''),
+                "balance"=>(int) number_format($client_details->balance,2,'.', ''),
             );
             return response($msg,200)->header('Content-Type', 'application/json');
         }
@@ -92,13 +92,13 @@ class BOTAController extends Controller{
             }catch(\Exception $e){//if bet exist
                 $msg = array(
                     "user" => $data['user'],
-                    "balance" => round($client_details->balance,2),
+                    "balance" =>(int) round($client_details->balance,2),
                     "confirm" => "ok"
                 );
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, $data['detail']['casino']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data['detail']['shoeNo'], 'round_id', false, $client_details);
             if($bet_transaction != "false"){//check if bet transaction is existing
                 $client_details->connection_name = $bet_transaction->connection_name;
@@ -144,7 +144,7 @@ class BOTAController extends Controller{
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 $msg = array(
                     "user" => $data['user'],
-                    "balance" => $balance,
+                    "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
                 $updateData = array(
@@ -179,7 +179,7 @@ class BOTAController extends Controller{
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_2');
             }catch(\Exception $e){
-                $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, $data['detail']['casino']);
+                $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
                 $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
                 $win_or_lost = $data["price"] == 0 ? 0 : 1;
                 $gameTransactionData = array(
@@ -215,7 +215,7 @@ class BOTAController extends Controller{
                     ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
                     $response = array(
                         "user" => $data['user'],
-                        "balance" => $balance,
+                        "balance" =>(int) $balance,
                         "confirm" => "ok"
                     );
                     $updateData = array(
@@ -225,7 +225,7 @@ class BOTAController extends Controller{
                     //for game Extension
                     $response = array(
                         "user" => $data['user'],
-                        "balance" => $balance,
+                        "balance" =>(int) $balance,
                         "confirm" => "ok"
                     );
                     $winTransactionExt = array(
@@ -238,7 +238,6 @@ class BOTAController extends Controller{
                         "mw_response"=>json_encode($response),
                     );
                     $winTransactionExtID = GameTransactionMDB::createGameTransactionExt($winTransactionExt, $client_details);
-                    Helper::savelog('CreateGameTransactionExt(BOTA)', $this->provider_db_id, json_encode($winTransactionExt),'EXT HIT');
                     $action_payload = [
                         "type" => "custom", #genreral,custom :D # REQUIRED!
                         "custom" => [
@@ -262,6 +261,9 @@ class BOTAController extends Controller{
                             "mw_response" => $response, #R
                         ]
                     ];
+                    
+                    Helper::savelog('CreateGameTransactionExt(BOTA)', $this->provider_db_id, json_encode($action_payload),'EXT HIT');
+                    
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,"credit",false,$action_payload);
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
@@ -270,7 +272,7 @@ class BOTAController extends Controller{
                         ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
                         $response = array(
                             "user" => $data['user'],
-                            "balance" => $balance,
+                            "balance" =>(int) $balance,
                             "confirm" => "ok"
                         );
                         Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
