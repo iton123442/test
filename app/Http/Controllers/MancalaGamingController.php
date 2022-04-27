@@ -157,7 +157,7 @@ class MancalaGamingController extends Controller
 					try {
 						$fund_extra_data = [
 		                    'provider_name' => $game_details->provider_name
-		                ]
+		                ];
 			        	$client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['Amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 
 					} catch (\Exception $e) {
