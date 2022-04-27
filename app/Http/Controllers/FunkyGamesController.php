@@ -157,8 +157,8 @@ public function CheckBet(Request $req){
 		$provider_trans_id = $req['bet']['refNo'];
 		$token_id = $req['sessionId'];
 		$client_details = ProviderHelper::getClientDetails('token', $token_id);
-		$game_transaction_id = ProviderHelper::idGen();
-		$game_trans_ext_id = ProviderHelper::idGen();
+		$game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name, 1);
+		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 		if($bet_amount > $client_details->balance ){
 			$response = [							                            
 				"errorCode" => 402,
@@ -309,7 +309,7 @@ public function CheckBet(Request $req){
 		$effectiveStake = $req['betResultReq']['effectiveStake'];
 		$client_details = ProviderHelper::getClientDetails('player_id', $req['betResultReq']['playerId']);
 		$playerBal = sprintf('%.2f', $client_details->balance);
-		$game_trans_ext_id = ProviderHelper::idGen();
+		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
         $game_details = Game::find($game_code, $this->provider_db_id);
         $bet_transaction = $this->findGameTransactionDetails($trans_id, 'transaction_id', false,$client_details);
         if($bet_transaction == 'false'){

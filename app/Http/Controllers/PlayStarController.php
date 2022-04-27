@@ -80,8 +80,8 @@ class PlayStarController extends Controller
         $data = $request->all();
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $request->total_bet/100;
-        $game_transid_gen = ProviderHelper::idGen(); // ID generator
-        $game_transid_ext =  ProviderHelper::idGen();
+        $game_transid_gen = ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
+        $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
         try{
             ProviderHelper::idenpotencyTable($data['txn_id']);
         }catch(\Exception $e){
@@ -188,7 +188,7 @@ class PlayStarController extends Controller
         $client_details = ProviderHelper::getClientDetails('token',$data['access_token']);
         $bet_amount = $data["total_win"] / 100;
         $balance = $client_details->balance;
-        $game_transid_ext = ProviderHelper::idGen();
+        $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
             try{
                 ProviderHelper::idenpotencyTable($data["ts"]);
             }catch(\Exception $e){

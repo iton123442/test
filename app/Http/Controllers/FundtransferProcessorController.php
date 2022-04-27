@@ -408,12 +408,12 @@ class FundtransferProcessorController extends Controller
                                 
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                             }elseif ($payload->action->custom->provider == 'OnlyPlay') {
-                                $ext_data = array(
-                                    "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response),
-                                    "transaction_detail" =>json_encode("success"),
-                                    "general_details" =>json_encode("success")
-                                );
+                                // $ext_data = array(
+                                //     "mw_request"=>json_encode($requesttocient),
+                                //     "client_response" =>json_encode($client_response),
+                                //     "transaction_detail" =>json_encode("success"),
+                                //     "general_details" =>json_encode("success")
+                                // );
                                 // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                                 $updateGameTransaction = [
@@ -475,12 +475,12 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                
                            }elseif ($payload->action->custom->provider == 'SpearHead'){
-                            $ext_data = array(
-                               "mw_request"=>json_encode($requesttocient),
-                               "client_response" =>json_encode($client_response),
-                               "transaction_detail" =>json_encode("success"),
-                               "general_details" =>json_encode("success")
-                           );
+                           //  $ext_data = array(
+                           //     "mw_request"=>json_encode($requesttocient),
+                           //     "client_response" =>json_encode($client_response),
+                           //     "transaction_detail" =>json_encode("success"),
+                           //     "general_details" =>json_encode("success")
+                           // );
                            // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                             $updateGameTransaction = [
                                 "win" => $payload->action->custom->win_or_lost,
@@ -517,17 +517,18 @@ class FundtransferProcessorController extends Controller
                                 
                             }
                             elseif ($payload->action->custom->provider == 'MancalaGaming') {
-                                 $ext_data = array(
-                                    "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response),
-                                    "transaction_detail" =>json_encode("success"),
-                                    "general_details" =>json_encode("success")
-                                );
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                //  $ext_data = array(
+                                //     "mw_request"=>json_encode($requesttocient),
+                                //     "client_response" =>json_encode($client_response),
+                                //     "transaction_detail" =>json_encode("success"),
+                                //     "general_details" =>json_encode("success")
+                                // );
+                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                                 
                             }elseif ($payload->action->custom->provider == 'Oryx Gaming') {
                                 $ext_data = array(
@@ -557,17 +558,18 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                 
                             }elseif ($payload->action->custom->provider == 'TopTrendGaming') {
-                                $ext_data = array(
-                                    "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response),
-                                    "transaction_detail" =>json_encode("success"),
-                                    "general_details" =>json_encode("success")
-                                );
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                // $ext_data = array(
+                                //     "mw_request"=>json_encode($requesttocient),
+                                //     "client_response" =>json_encode($client_response),
+                                //     "transaction_detail" =>json_encode("success"),
+                                //     "general_details" =>json_encode("success")
+                                // );
+                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                             elseif ($payload->action->custom->provider == 'PlayNGo') {
                                 $ext_data = array(
