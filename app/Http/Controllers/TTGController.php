@@ -309,7 +309,7 @@ class TTGController extends Controller
                                 ];
                                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
-                  Helper::saveLog('TTGaming bet', $this->provider_db_id, $array, $response);
+                  Helper::saveLog('TTGaming bet', $this->provider_db_id, $data, $response);
                   return response($response,200) 
                     ->header('Content-Type', 'application/xml');
                 } catch (\Exception $e) {
@@ -417,7 +417,7 @@ class TTGController extends Controller
                   // );
                   // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
                   
-                  Helper::saveLog('TTGaming credit', $this->provider_db_id, $array, $response);
+                  Helper::saveLog('TTGaming credit', $this->provider_db_id, $data, $response);
                   return response($response,200) 
                     ->header('Content-Type', 'application/xml');
 
