@@ -143,9 +143,9 @@ class NolimitController extends Controller
         {
             ProviderHelper::saveLogWithExeption('Nolimit bet', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
             $data = $request->all();
+            $client_details = ProviderHelper::getClientDetails('player_id', $data['params']['userId']);
             $game_transid_gen =ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
             $game_transid_ext =  ProviderHelper::idGenerate($client_details->connection_name, 2); 
-            $client_details = ProviderHelper::getClientDetails('player_id', $data['params']['userId']);
             $bet_amount = $data['params']['withdraw']['amount'];
             $game_code = $data['params']['information']['game'];
             $provider_trans_id = $data['params']['information']['uniqueReference'];
