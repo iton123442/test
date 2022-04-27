@@ -213,7 +213,7 @@ class MancalaGamingController extends Controller
 				          "token_id" => $client_details->token_id,
 				          "game_id" => $game_details->game_id,
 				          "round_id" => $json_data['RoundId'],
-				          "bet_amount" => $bet_amount,
+				          "bet_amount" => $json_data['Amount'],
 				          "win" => 5,
 				          "pay_amount" => 0,
 				          "income" => 0,
@@ -224,7 +224,7 @@ class MancalaGamingController extends Controller
 				          "game_trans_id" => $gen_game_trans_id,
 				          "provider_trans_id" => $json_data['TransactionId'],
 				          "round_id" => $json_data['RoundId'],
-				          "amount" => $bet_amount,
+				          "amount" => $json_data['Amount'],
 				          "game_transaction_type"=> 1,
 				          // "provider_request" =>json_encode($req),
 				      );
