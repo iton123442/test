@@ -152,8 +152,8 @@ public function gameBet($request, $client_details)
 			$provider_trans_id = $request['data']['action_id']; // ROUND ID MW TRANSACTION
 			$round_xt = $request['callback_id']; // PROVIDER TRANS ID MW
 			//Create GameTransaction, GameExtension
-			$game_transid_gen = ProviderHelper::idGen(); // ID generator
-			$game_transid_ext =  ProviderHelper::idGen();
+			$game_transid_gen = ProviderHelper::idGenerate($client_details->connection_name, 1);// ID generator
+			$game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
 			try {
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_transid_ext,$game_transid_gen,"debit",false);
 	        } catch (\Exception $e) {
@@ -311,7 +311,7 @@ public function gameBet($request, $client_details)
 
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-        $game_transid_ext = ProviderHelper::idGen(); 
+        $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
