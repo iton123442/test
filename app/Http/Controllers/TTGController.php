@@ -237,7 +237,7 @@ class TTGController extends Controller
                                           "connection_name" => $get_client_details->connection_name,
                                           "column" =>[
                                               "game_trans_ext_id" => $gen_game_extid,
-                                              "request" => json_encode($request->all()),
+                                              "request" => json_encode($data),
                                               "response" => json_encode($response),
                                               "log_type" => "provider_details",
                                               "transaction_detail" => "FAILED",
@@ -255,7 +255,7 @@ class TTGController extends Controller
                                           "connection_name" => $get_client_details->connection_name,
                                           "column" =>[
                                               "game_trans_ext_id" => $gen_game_extid,
-                                              "request" => json_encode($request->all()),
+                                              "request" => json_encode($data),
                                               "response" => json_encode($response),
                                               "log_type" => "provider_details",
                                               "transaction_detail" => "FAILED",
@@ -301,7 +301,7 @@ class TTGController extends Controller
                                   "connection_name" => $get_client_details->connection_name,
                                   "column" =>[
                                       "game_trans_ext_id" => $gen_game_extid,
-                                      "request" => json_encode($request->all()),
+                                      "request" => json_encode($data),
                                       "response" => json_encode($response),
                                       "log_type" => "provider_details",
                                       "transaction_detail" => "SUCCESS",
