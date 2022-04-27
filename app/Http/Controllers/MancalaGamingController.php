@@ -70,8 +70,7 @@ class MancalaGamingController extends Controller
 
 	public function debitProcess(Request $request){
         $json_data = $request->all();
-        $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
-      	$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+        
 		Helper::errorDebug('mancala_debit', config("providerlinks.mancala.PROVIDER_ID"), json_encode($json_data), '');
 		if(!CallParameters::check_keys($json_data, 'Amount', 'SessionId', 'TransactionId', 'RoundId', 'Hash', 'ExtraData'))
 		{
@@ -101,6 +100,8 @@ class MancalaGamingController extends Controller
 				// Find the player and client details
 				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
 				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
+				$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+      			$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 				if ($client_details != null) {
 					
 					try{
@@ -282,6 +283,7 @@ class MancalaGamingController extends Controller
 				
 				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
 				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
+				$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 				if ($client_details != null) {
 					
 					try{
