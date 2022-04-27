@@ -159,7 +159,7 @@ class MancalaGamingController extends Controller
 						$fund_extra_data = [
 		                    'provider_name' => $game_details->provider_name
 		                ];
-			        	$client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['Amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
+			        	$client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['Amount'], $game_details->game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit', false, $fund_extra_data);
 
 					} catch (\Exception $e) {
 						return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
@@ -193,7 +193,7 @@ class MancalaGamingController extends Controller
 			                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
 			                        );
 
-			                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
+			                        GameTransactionMDB::updateGametransaction($data, $gen_game_trans_id, $client_details);
 			                        // $data_to_update = array(
 			                        //     "mw_response" => json_encode($response),
 			                        //     'transaction_detail' => 'failed',
