@@ -377,7 +377,7 @@ class MancalaGamingController extends Controller
 	                          // "provider_request" =>json_encode($data),
 	                          // "mw_response" => json_encode($response),
                       	);
-	                  	$game_trans_ext_id = GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$gen_game_extid,$get_client_details);
+	                  	$game_trans_ext_id = GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$gen_game_extid,$client_details);
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
