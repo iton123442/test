@@ -143,8 +143,8 @@ class NolimitController extends Controller
         {
             ProviderHelper::saveLogWithExeption('Nolimit bet', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
             $data = $request->all();
-            $game_transid_gen = ProviderHelper::idGen(); // ID generator
-            $game_transid_ext =  ProviderHelper::idGen(); 
+            $game_transid_gen =ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
+            $game_transid_ext =  ProviderHelper::idGenerate($client_details->connection_name, 2); 
             $client_details = ProviderHelper::getClientDetails('player_id', $data['params']['userId']);
             $bet_amount = $data['params']['withdraw']['amount'];
             $game_code = $data['params']['information']['game'];
@@ -349,7 +349,7 @@ class NolimitController extends Controller
             $round_id = $data['params']['information']['gameRoundId'];
             $game_code = $data['params']['information']['game'];
             $balance = $client_details->balance;
-            $game_transid_ext = ProviderHelper::idGen();
+            $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
             $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
                 Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request->all()), $bet_transaction); 
             try{
