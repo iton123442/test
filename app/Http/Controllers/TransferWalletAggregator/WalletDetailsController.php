@@ -413,14 +413,14 @@ class WalletDetailsController extends Controller
                 //     return response()->json($details); 
                 // }
               
-                $total_data = DB::connection( $connection["connection_name"] )->select("
+                if($client_details->operator_id == 11){
+                    $total_data = DB::connection( $connection["connection_name"] )->select("
                     select 
                     count(game_trans_id) total
                     from ".$connection["db_list"][1].".game_transactions  c 
+                    inner join ".$connection["db_list"][1].".idn_transaction_list using (game_trans_id)
                     where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id."  ".$and_player.";
                     ")[0];
-              
-                if($client_details->operator_id == 11){
                     $query = "
                         select 
                         game_trans_id,
@@ -447,6 +447,12 @@ class WalletDetailsController extends Controller
                         limit ".$page.", ".TWHelpers::getLimitAvailable($request->limit).";
                     ";
                 } else {
+                    $total_data = DB::connection( $connection["connection_name"] )->select("
+                    select 
+                    count(game_trans_id) total
+                    from ".$connection["db_list"][1].".game_transactions  c 
+                    where convert_tz(c.created_at,'+00:00', '+08:00') BETWEEN '".$from."' AND '".$to."' AND c.client_id = ".$request->client_id."  ".$and_player.";
+                    ")[0];
                     $query = "
                         select 
                         game_trans_id,
