@@ -233,7 +233,7 @@ class MancalaGamingController extends Controller
 	                      "connection_name" => $client_details->connection_name,
 	                      "column" =>[
 	                          "game_trans_ext_id" => $gen_game_extid,
-	                          "request" => json_encode($$json_data),
+	                          "request" => json_encode($json_data),
 	                          "response" => json_encode($response),
 	                          "log_type" => "provider_details",
 	                          "transaction_detail" => "SUCCESS",
@@ -370,7 +370,7 @@ class MancalaGamingController extends Controller
 		                // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
 		                $gameTransactionEXTData = array(
 	                          "game_trans_id" => $bet_transaction->game_trans_id,
-	                          "provider_trans_id" => $$json_data["TransactionId"],
+	                          "provider_trans_id" => $json_data["TransactionId"],
 	                          "round_id" => $json_data["RoundId"],
 	                          "amount" => $json_data["Amount"],
 	                          "game_transaction_type"=> 2,
