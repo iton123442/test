@@ -107,7 +107,7 @@ class TTGController extends Controller
 
 
         }
-        $game_details = Helper::findGameDetails("game_code",$this->provider_db_id, $data['gameid']);
+        
        
             if($data['txnsubtypeid'] == '400'){//bet start
                 return $this->debitProcess($data,$get_client_details);
@@ -200,7 +200,8 @@ class TTGController extends Controller
     }
 
     public function debitProcess($data,$get_client_details){
-        try {
+        try {       
+                 $game_details = Helper::findGameDetails("game_code",$this->provider_db_id, $data['gameid']);
                  $provider_trans_id = $data['txnid'];
                  $game_code = $game_details->game_code;
                  $amount = $data["amt"]; 
@@ -320,8 +321,9 @@ class TTGController extends Controller
                 }
     }
     public function creditProcess($data,$get_client_details){
-        $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
               try {
+                  $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
+                  $game_details = Helper::findGameDetails("game_code",$this->provider_db_id, $data['gameid']);
                   // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($array['@attributes']['handid'],'round_id', 1, $get_client_details);
                   $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($data['handid'],'round_id', 1, $get_client_details);
                   $get_client_details->connection_name = $bet_transaction->connection_name;
