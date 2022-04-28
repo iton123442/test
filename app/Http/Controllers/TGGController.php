@@ -156,35 +156,36 @@ class TGGController extends Controller
 			$round_id = $request['data']['round_id']; // ROUND ID MW TRANSACTION
 			$provider_trans_id = $request['data']['action_id']; // ROUND ID MW TRANSACTION
 			$round_xt = $request['callback_id']; // PROVIDER TRANS ID MW
-			//Create GameTransaction, GameExtension
+			$game_trans_id = ProviderHelper::idGenerate($client_details->connection_name, 1);// ID generator
+			$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 
-			$gameTransactionData = array(
-	            "provider_trans_id" => $provider_trans_id,
-	            "token_id" => $client_details->token_id,
-	            "game_id" => $game_details->game_id,
-	            "round_id" => $round_id,
-	            "bet_amount" => $bet_amount,
-	            "win" => 5,
-	            "pay_amount" => 0,
-	            "income" => 0,
-	            "entry_id" =>1,
-	            "trans_status" =>1,
-	            "operator_id" => $client_details->operator_id,
-	            "client_id" => $client_details->client_id,
-	            "player_id" => $client_details->player_id,
-	        );
+			// $gameTransactionData = array(
+	        //     "provider_trans_id" => $provider_trans_id,
+	        //     "token_id" => $client_details->token_id,
+	        //     "game_id" => $game_details->game_id,
+	        //     "round_id" => $round_id,
+	        //     "bet_amount" => $bet_amount,
+	        //     "win" => 5,
+	        //     "pay_amount" => 0,
+	        //     "income" => 0,
+	        //     "entry_id" =>1,
+	        //     "trans_status" =>1,
+	        //     "operator_id" => $client_details->operator_id,
+	        //     "client_id" => $client_details->client_id,
+	        //     "player_id" => $client_details->player_id,
+	        // );
 
-			$game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+			// $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 
-			$gameTransactionEXTData = array(
-	            "game_trans_id" => $game_trans_id,
-	            "provider_trans_id" => $provider_trans_id,
-	            "round_id" => $round_xt,
-	            "amount" => $bet_amount,
-	            "game_transaction_type"=> 1,
-	            "provider_request" =>json_encode($request),
-	        );
-	        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			// $gameTransactionEXTData = array(
+	        //     "game_trans_id" => $game_trans_id,
+	        //     "provider_trans_id" => $provider_trans_id,
+	        //     "round_id" => $round_xt,
+	        //     "amount" => $bet_amount,
+	        //     "game_transaction_type"=> 1,
+	        //     "provider_request" =>json_encode($request),
+	        // );
+	        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 	        
 			try {
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
@@ -197,14 +198,17 @@ class TGGController extends Controller
 						"message" => "Internal error. Please reopen the game",
 					]
 				);
-		        $updateTransactionEXt = array(
-		            "mw_response" => json_encode($response),
-		            'mw_request' => json_encode("FAILED"),
-		            'client_response' => json_encode("FAILED"),
-		            "transaction_detail" =>"FAILED",
-					"general_details" => "FAILED",
-		        );
-		        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+				$createGameTransactionLog = [
+					"connection_name" => $client_details->connection_name,
+					"column" =>[
+						"game_trans_ext_id" => $game_transid_ext,
+						"request" => json_encode($string_to_obj),
+						"response" => json_encode($response),
+						"log_type" => "provider_details",
+						"transaction_detail" => "Failed",
+					]
+				];
+				ProviderHelper::queTransactionLogs($createGameTransactionLog); //create extension logs
 
 				$updateGameTransaction = [
 	                "win" => 2,
@@ -226,16 +230,42 @@ class TGGController extends Controller
 								'currency' => $client_details->default_currency,
 							],
 					  	);
-			            
-			            $update_gametransactionext = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"success",
-							"general_details" => "success",
+						  $gameTransactionData = array(
+							"provider_trans_id" => $provider_trans_id,
+							"token_id" => $client_details->token_id,
+							"game_id" => $game_details->game_id,
+							"round_id" => $round_id,
+							"bet_amount" => $bet_amount,
+							"win" => 5,
+							"pay_amount" => 0,
+							"income" => 0,
+							"entry_id" =>1,
 						);
-				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
+	
+						GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details); //create game_transaction
+						$gameTransactionEXTData = array(
+							"game_trans_id" => $game_trans_id,
+							"provider_trans_id" => $provider_trans_id,
+							"round_id" => $round_xt,
+							"amount" => $bet_amount,
+							"game_transaction_type"=> 1,
+							// "provider_request" =>json_encode($request),
+						);
+						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
+						$createGameTransactionLog = [
+							"connection_name" => $client_details->connection_name,
+							"column" =>[
+								"game_trans_ext_id" => $game_trans_ext_id,
+								"request" => json_encode($string_to_obj),
+								"response" => json_encode($response),
+								"log_type" => "provider_details",
+								"transaction_detail" => "success",
+							]
+						];
+						ProviderHelper::queTransactionLogs($createGameTransactionLog);// create extension logs
+
 				        Helper::saveLog('TGG success BET PROCESS ', $this->provider_db_id, json_encode($request), $response);
+						return $response;
 						break;
 					case "402":
 
@@ -274,21 +304,41 @@ class TGGController extends Controller
 								"message" => "Internal error. Please reopen the game",
 							]
 						);
-	          			$update_gametransactionext = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"FAILED",
-							"general_details" => "FAILED",
-						);
-				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
-	          			$updateGameTransaction = [
-			                "win" => 2,
-			                'trans_status' => 5
-			            ];
-			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-	          			Helper::saveLog('TGG success BET FAILED ', $this->provider_db_id, json_encode($request), $response);
 				}
+
+				$gameTransactionData = array(
+					"provider_trans_id" => $provider_trans_id,
+					"token_id" => $client_details->token_id,
+					"game_id" => $game_details->game_id,
+					"round_id" => $round_id,
+					"bet_amount" => $bet_amount,
+					"win" => 2,
+					"pay_amount" => 0,
+					"income" => 0,
+					"entry_id" =>1,
+					'trans_status' => 5
+				);
+				GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details); //create game_transaction
+				  $gameTransactionEXTData = array(
+					"game_trans_id" => $game_trans_id,
+					"provider_trans_id" => $provider_trans_id,
+					"round_id" => $round_xt,
+					"amount" => $bet_amount,
+					"game_transaction_type"=> 1,
+					// "provider_request" =>json_encode($request),
+				);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
+				$createGameTransactionLog = [
+					"connection_name" => $client_details->connection_name,
+					"column" =>[
+						"game_trans_ext_id" => $game_trans_ext_id,
+						"request" => json_encode($string_to_obj),
+						"response" => json_encode($response),
+						"log_type" => "provider_details",
+						"transaction_detail" => "Failed",
+					]
+				];
+				ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
 				return $response;
 	        }
@@ -314,6 +364,7 @@ class TGGController extends Controller
 		Helper::saveLog('TGG gameWin', $this->provider_db_id, json_encode($request), 'WIN HIT!');
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
+		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 
 		try{
 			ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
