@@ -88,6 +88,7 @@ class BOTAController extends Controller{
         Helper::saveLog('BOTA betProcess', $this->provider_db_id, json_encode($data), 'BET Initialized');
         if($client_details){
             try{
+                Helper::saveLog('BOTA BET DUPLICATE RETURN_TRY', $this->provider_db_id, json_encode($data), $this->prefix.'_'.$data['detail']['shoeNo'].'_1');
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['detail']['shoeNo'].'_1');
             }catch(\Exception $e){//if bet exist
                 $msg = array(
