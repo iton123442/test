@@ -308,16 +308,18 @@ class QuickspinDirectController extends Controller
                 "income" => 0,
                 "entry_id" => 1,
             ); 
-            $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+            // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+            GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id, $client_details);
             $gameTransactionEXTData = array(
                 "game_trans_id" => $game_transaction_id,
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $round_id,
                 "amount" => 0,
                 "game_transaction_type"=> 1,
-                "provider_request" =>json_encode($req->all()),
+                // "provider_request" =>json_encode($req->all()),
             );
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
             $game_trans_id = $game_transaction_id;
             $promocode = explode("TG",$req["promocode"]);
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
@@ -360,8 +362,8 @@ class QuickspinDirectController extends Controller
                   "round_id" => $round_id,
                   "amount" => $pay_amount,
                   "game_transaction_type"=> 2,
-                  "provider_request" => json_encode($req->all()),
-                  "mw_response" => json_encode($res),
+                  // "provider_request" => json_encode($req->all()),
+                  // "mw_response" => json_encode($res),
               );
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
@@ -397,40 +399,42 @@ class QuickspinDirectController extends Controller
             ]
         ];
         $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
-        if($client_response != false){  
-
-        $updateTransactionEXt = array(
-              "provider_request" =>json_encode($req->all()),
-              "mw_response" => json_encode($res),
-              'mw_request' => json_encode($client_response->requestoclient),
-              'client_response' => json_encode($client_response->fundtransferresponse),
-              'transaction_detail' => 'success',
-              'general_details' => 'success',
-        );
-        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-      Helper::saveLog('QuickSpinD Win success', config('providerlinks.quickspinDirect.provider_db_id'), json_encode($req->all()), $res);
-        return response($res,200)
-                ->header('Content-Type', 'application/json');
-    }else{
-        $http_status = 500;
-        $res = [
-            "errorcode" => "UNHANDLED",
-            "errormessage" => "internal server error"
-        ];
-        $updateTransactionEXt = array(
-              "provider_request" =>json_encode($req->all()),
-              "mw_response" => json_encode($res),
-              'mw_request' => json_encode($client_response->requestoclient),
-              'client_response' => json_encode($client_response->fundtransferresponse),
-              'transaction_detail' => json_encode($res),
-              'general_details' => 'failed',
-        );
-        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-        return response($res,$http_status)
-                ->header('Content-Type', 'application/json');
-
-      }
-
+        if(isset($client_response->fundtransferresponse->status->code) 
+        && $client_response->fundtransferresponse->status->code == "200"){  
+            $createGameTransactionLog = [
+              "connection_name" => $client_details->connection_name,
+              "column" =>[
+                  "game_trans_ext_id" => $gen_game_extid,
+                  "request" => json_encode($req->all()),
+                  "response" => json_encode($res),
+                  "log_type" => "provider_details",
+                  "transaction_detail" => "Success",
+              ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
+          Helper::saveLog('QuickSpinD Win success', config('providerlinks.quickspinDirect.provider_db_id'), json_encode($req->all()), $res);
+            return response($res,200)
+                    ->header('Content-Type', 'application/json');
+        }else{
+            $http_status = 500;
+            $res = [
+                "errorcode" => "UNHANDLED",
+                "errormessage" => "internal server error"
+            ];
+            $createGameTransactionLog = [
+              "connection_name" => $client_details->connection_name,
+              "column" =>[
+                  "game_trans_ext_id" => $gen_game_extid,
+                  "request" => json_encode($req->all()),
+                  "response" => json_encode($res),
+                  "log_type" => "provider_details",
+                  "transaction_detail" => "FAILED",
+              ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
+            return response($res,$http_status)
+                    ->header('Content-Type', 'application/json');
+          }
     }// end function win process
     public function rollbackProcess(Request $req){
         $client_details = ProviderHelper::getClientDetails('player_id', $req['customerid']);
