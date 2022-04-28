@@ -114,7 +114,7 @@ class QuickspinDirectController extends Controller
                                     $res = [
                                         "balance" => (int)$formatBal,
                                         "txid" => (int)$provider_trans_id,
-                                        "remotetxid" => (string)$game_transaction_id,
+                                        "remotetxid" => (string)$gen_game_trans_id,
                                     ];
                                         $createGameTransactionLog = [
                                           "connection_name" => $client_details->connection_name,
@@ -134,7 +134,7 @@ class QuickspinDirectController extends Controller
                                         'win' => 2,
                                         'trans_status' => 5
                                     ];
-                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $gen_game_trans_id, $client_details);
                                     $http_status = 200;
                                     $res = [
                                         
@@ -167,9 +167,8 @@ class QuickspinDirectController extends Controller
                                     $http_status = 200;
                                     $updateGameTransaction = [
                                         'win' => 2,
-                                        'trans_status' => 5
                                     ];
-                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $gen_game_trans_id, $client_details);
                                     $res = [
                                         
                                          "errorcode" => "INSUFFICIENT_FUNDS",
