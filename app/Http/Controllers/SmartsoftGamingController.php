@@ -87,6 +87,8 @@ class SmartsoftGamingController extends Controller
             $round_id = $data['TransactionInfo']['RoundId'];
             $currency = $data['CurrencyCode'];
             $gamenumber = $data['TransactionInfo']['GameNumber'];
+            $game_transid_gen = ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
+            $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
             try{
                 ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
@@ -107,6 +109,7 @@ class SmartsoftGamingController extends Controller
             }
                $game_details = Game::find($game_code, $this->provider_db_id);
        try{
+        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_transid_ext, $game_transid_gen, 'debit');
          $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
          if ($bet_transaction != 'false') {
                 $client_details->connection_name = $bet_transaction->connection_name;
@@ -134,20 +137,18 @@ class SmartsoftGamingController extends Controller
                         ); 
 
                    Helper::saveLog(' smartsoft after gameTransactionData', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
-                $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+                   GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen, $client_details);
                 } 
                 $gameTransactionEXTData = array(
-                    "game_trans_id" => $game_transaction_id,
+                    "game_trans_id" => $game_transid_gen,
                     "provider_trans_id" => $provider_trans_id,
                     "round_id" => $round_id,
                     "amount" => $bet_amount,
                     "game_transaction_type"=> 1,
-                    "provider_request" =>json_encode($request->all()),
                     );
 
                  Helper::saveLog(' smartsoft after  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
-                $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); 
                 if($client_response == false){
 
                     $response = [
@@ -174,16 +175,17 @@ class SmartsoftGamingController extends Controller
                                               "Balance" => (float) $client_response->fundtransferresponse->balance
                                             ];
 
-                                $updateTransactionEXt = array(
-                                    "provider_request" =>json_encode($request->all()),
-                                    "mw_response" => json_encode($response),
-                                    'mw_request' => json_encode($client_response->requestoclient),
-                                    'client_response' => json_encode($client_response->fundtransferresponse),
-                                    'transaction_detail' => 'success',
-                                    'general_details' => 'success',
-                                );
-                                 Helper::saveLog('smartsoft after success updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                            $createGameTransactionLog = [
+                                                "connection_name" => $client_details->connection_name,
+                                                "column" =>[
+                                                    "game_trans_ext_id" => $game_transid_ext,
+                                                    "request" => json_encode($request->all()),
+                                                    "response" => json_encode($response),
+                                                    "log_type" => "provider_details",
+                                                    "transaction_detail" => "success",
+                                                ]
+                                            ];
+                                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
                                     break;
                                 case '402':
@@ -196,16 +198,18 @@ class SmartsoftGamingController extends Controller
                                       
                                     ];
 
-                                $updateTransactionEXt = array(
-                                    "provider_request" =>json_encode($request->all()),
-                                    "mw_response" => json_encode($response),
-                                    'mw_request' => json_encode($client_response->requestoclient),
-                                    'client_response' => json_encode($client_response->fundtransferresponse),
-                                    'transaction_detail' => 'failed',
-                                    'general_details' => 'failed',
-                                );
-                                 Helper::saveLog('smartsoft after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                    $createGameTransactionLog = [
+                                        "connection_name" => $client_details->connection_name,
+                                        "column" =>[
+                                            "game_trans_ext_id" => $game_transid_ext,
+                                            "request" => json_encode($request->all()),
+                                            "response" => json_encode($response),
+                                            "log_type" => "provider_details",
+                                            "transaction_detail" => "Failed",
+                                        ]
+                                    ];
+                                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                                    return response()->json($response, $http_status);
                                     break;
                             }
                                
@@ -238,6 +242,7 @@ class SmartsoftGamingController extends Controller
         $currency = $data['CurrencyCode'];
         $gamenumber = $data['TransactionInfo']['GameNumber'];
         $balance = $client_details->balance;
+        $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
         if($client_details == null){
             $response = [
@@ -282,11 +287,21 @@ class SmartsoftGamingController extends Controller
                         "round_id" => $round_id,
                         "amount" => $pay_amount,
                         "game_transaction_type"=> 2,
-                        "provider_request" =>json_encode($request->all()),
-                        "mw_response" => json_encode($response),
+                        // "provider_request" =>json_encode($request->all()),
+                        // "mw_response" => json_encode($response),
                     );
-                    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-                    
+                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transid_ext,
+                            "request" => json_encode($request->all()),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "success",
+                         ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     $action_payload = [
                             "type" => "custom", #genreral,custom :D # REQUIRED!
                             "custom" => [
@@ -296,7 +311,7 @@ class SmartsoftGamingController extends Controller
                                 "entry_id" => $entry_id,
                                 "pay_amount" => $pay_amount,
                                 "income" => $income,
-                                "game_trans_ext_id" => $game_trans_ext_id
+                                "game_trans_ext_id" => $game_transid_ext
                             ],
                             "provider" => [
                                 "provider_request" => $data, #R
@@ -316,11 +331,6 @@ class SmartsoftGamingController extends Controller
                                 ]
                             ]
                         ];
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($request->all()),
-                        "mw_response" => json_encode($response),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                     $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
 
                   Helper::saveLog('SmartSoft Closeround Result', $this->provider_db_id, json_encode($request->all()),$response);
@@ -365,6 +375,7 @@ class SmartsoftGamingController extends Controller
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance);
+                $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
                 $response = [
                     "TransactionId" => $provider_trans_id,
                     "Balance" => (float)$winbBalance                                           
@@ -389,11 +400,21 @@ class SmartsoftGamingController extends Controller
                     "round_id" => $round_id,
                     "amount" => $pay_amount,
                     "game_transaction_type"=> 3,
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
+                    // "provider_request" =>json_encode($request->all()),
+                    // "mw_response" => json_encode($response),
                 );
-
-                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transid_ext,
+                        "request" => json_encode($req->all()),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                     ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
                     $action_payload = [
                         "type" => "custom", #genreral,custom :D # REQUIRED!
                         "custom" => [
@@ -403,7 +424,7 @@ class SmartsoftGamingController extends Controller
                             "entry_id" => $entry_id,
                             "pay_amount" => $pay_amount,
                             "income" => $income,
-                            "game_trans_ext_id" => $game_trans_ext_id
+                            "game_trans_ext_id" => $game_transid_ext
                         ],
                         "provider" => [
                             "provider_request" => $data, #R
@@ -423,11 +444,6 @@ class SmartsoftGamingController extends Controller
                             ]
                         ]
                     ];
-                $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
                 
                   Helper::saveLog('SmartSoft Clear Bet Result', $this->provider_db_id, json_encode($request->all()),$response);
@@ -451,6 +467,7 @@ class SmartsoftGamingController extends Controller
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance);
+                $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
 
                 $response = [
                     "TransactionId" => $provider_trans_id,
@@ -479,10 +496,21 @@ class SmartsoftGamingController extends Controller
                     "round_id" => $round_id,
                     "amount" => $pay_amount,
                     "game_transaction_type"=> 2,
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
+                    // "provider_request" =>json_encode($request->all()),
+                    // "mw_response" => json_encode($response),
                 );
-                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transid_ext,
+                        "request" => json_encode($req->all()),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                     ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     $action_payload = [
                         "type" => "custom", #genreral,custom :D # REQUIRED!
                         "custom" => [
@@ -492,7 +520,7 @@ class SmartsoftGamingController extends Controller
                             "entry_id" => $entry_id,
                             "pay_amount" => $pay_amount,
                             "income" => $income,
-                            "game_trans_ext_id" => $game_trans_ext_id
+                            "game_trans_ext_id" => $game_transid_ext
                         ],
                         "provider" => [
                             "provider_request" => $data, #R
@@ -512,11 +540,6 @@ class SmartsoftGamingController extends Controller
                             ]
                         ]
                     ];
-                 $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                  $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
                 
                   Helper::saveLog('SmartSoft Win Result', $this->provider_db_id, json_encode($request->all()),$response);
