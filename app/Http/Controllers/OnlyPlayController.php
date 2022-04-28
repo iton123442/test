@@ -55,8 +55,8 @@ class OnlyPlayController extends Controller
         $user_id = explode('TG_',$request->user_id);
         $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
         $bet_amount = $request->amount/100;
-        $gen_game_trans_id = ProviderHelper::idGen();
-        $gen_game_extid = ProviderHelper::idGen();
+        $gen_game_trans_id = ProviderHelper::idGenerate($get_client_details->connection_name,1);
+        $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
             try{
                 ProviderHelper::idenpotencyTable($request->tx_id);
             }catch(\Exception $e){

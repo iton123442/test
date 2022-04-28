@@ -324,7 +324,7 @@ class TTGController extends Controller
               try {
                   $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
                   $game_details = Helper::findGameDetails("game_code",$this->provider_db_id, $data['gameid']);
-                  // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($array['@attributes']['handid'],'round_id', 1, $get_client_details);
+                  // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data['handid'],'round_id', 1, $get_client_details);
                   $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($data['handid'],'round_id', 1, $get_client_details);
                   $get_client_details->connection_name = $bet_transaction->connection_name;
                   // $bet_transaction = DB::select("select game_trans_id,bet_amount, pay_amount from game_transactions where round_id = '".$array['@attributes']['handid']."'");
