@@ -177,6 +177,8 @@ class BOTAController extends Controller{
     }
 
     public function _winProcess($data,$client_details){
+        
+        Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
         $response = array(
                             "user" => $data['user'],
                             "balance" =>(int) $client_details->balance,
@@ -185,7 +187,6 @@ class BOTAController extends Controller{
                         Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
                         return response($response,200)
                             ->header('Content-Type', 'application/json');
-        Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
         if(isset($client_details)){
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_2');
