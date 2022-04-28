@@ -116,7 +116,7 @@ class BOTAController extends Controller{
             }
             else{
             $gameTransactionData = array(
-                "provider_trans_id" => $data['detail']['shoeNo'],
+                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
                 "token_id" => $client_details->token_id,
                 "game_id" => $gamedetails->game_id,
                 "round_id" => $data['detail']['shoeNo'],
@@ -130,7 +130,7 @@ class BOTAController extends Controller{
             }
             $bettransactionExt = array(
                 "game_trans_id" => $game_trans_id,
-                "provider_trans_id" => $data['detail']['shoeNo'],
+                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
                 "round_id" => $data['detail']['shoeNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 1,
@@ -179,14 +179,14 @@ class BOTAController extends Controller{
     public function _winProcess($data,$client_details){
         
         Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
-        $response = array(
-                            "user" => $data['user'],
-                            "balance" =>(int) $client_details->balance,
-                            "confirm" => "ok"
-                        );
-                        Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
-                        return response($response,200)
-                            ->header('Content-Type', 'application/json');
+        // $response = array(
+        //                     "user" => $data['user'],
+        //                     "balance" =>(int) $client_details->balance,
+        //                     "confirm" => "ok"
+        //                 );
+        //                 Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
+        //                 return response($response,200)
+        //                     ->header('Content-Type', 'application/json');
         if(isset($client_details)){
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_2');
