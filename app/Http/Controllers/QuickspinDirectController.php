@@ -362,8 +362,8 @@ class QuickspinDirectController extends Controller
                   "round_id" => $round_id,
                   "amount" => $pay_amount,
                   "game_transaction_type"=> 2,
-                  "provider_request" => json_encode($req->all()),
-                  "mw_response" => json_encode($res),
+                  // "provider_request" => json_encode($req->all()),
+                  // "mw_response" => json_encode($res),
               );
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
