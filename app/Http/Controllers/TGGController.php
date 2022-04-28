@@ -361,10 +361,10 @@ class TGGController extends Controller
 	public  function gameWin($request, $client_details){
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-		Helper::saveLog('TGG gameWin', $this->provider_db_id, json_encode($request), 'WIN HIT!');
+        $game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
+
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
-		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 
 		try{
 			ProviderHelper::idenpotencyTable($this->prefix.'_'.$request['callback_id']);
@@ -407,7 +407,7 @@ class TGGController extends Controller
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		if (isset($string_to_obj->game->action)) {
 
-			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double' || $string_to_obj->game->action == 'extrabonusspin' || $string_to_obj->game->action  == 'set_double') {
+			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double') {
 				if ($existing_bet != 'false') {
 					$client_details->connection_name = $existing_bet->connection_name;
 					$amount = $request['data']['amount'];
@@ -429,10 +429,8 @@ class TGGController extends Controller
 			            "round_id" => $transaction_uuid,
 			            "amount" => $amount,
 			            "game_transaction_type"=> 2,
-			            "provider_request" =>json_encode($request),
-			            "mw_response" =>json_encode($response),
 			        );
-			        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
 		            
 			        $win_or_lost = $amount > 0 ?  1 : 0;
 		            $entry_id = $amount > 0 ?  2 : 1;
@@ -445,7 +443,21 @@ class TGGController extends Controller
 			            'trans_status' => 2
 			        ];
 		        	GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
-
+					try{
+						$createGameTransactionLog = [
+							"connection_name" => $client_details->connection_name,
+							"column" =>[
+								"game_trans_ext_id" => $game_transid_ext,
+								"request" => json_encode($string_to_obj),
+								"response" => json_encode($response),
+								"log_type" => "provider_details",
+								"transaction_detail" => "success",
+							 ]
+						];
+							ProviderHelper::queTransactionLogs($createGameTransactionLog);// create extension logs
+						}catch(\Exception $e){
+							Helper::saveLog("TGG Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
+						}
 			        $body_details = [
 			            "type" => "credit",
 			            "win" => $win_or_lost,
@@ -458,38 +470,10 @@ class TGGController extends Controller
 			                "amount" => $amount
 			            ],
 			            "connection_name" => $existing_bet->connection_name,
-			            "game_trans_ext_id" => $game_trans_ext_id,
+			            "game_trans_ext_id" => $game_transid_ext,
 			            "game_transaction_id" => $existing_bet->game_trans_id
 
 			        ];
-
-					if(isset($string_to_obj->extrabonus_bypass->promoCode)) {
-						$freeroundID = $string_to_obj->extrabonus_bypass->promoCode;
-						$getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
-						Helper::saveLog('TGG FreeRound', $this->provider_db_id, json_encode($request),'FREEROUND HIT!');
-						if($getFreespin){
-							$getOrignalfreeroundID = explode("_",$freeroundID);
-							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
-							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-							$updateFreespinData = [
-								"status" => $status,
-								"win" => $getFreespin->win + $amount,
-								"spin_remaining" => $getFreespin->spin_remaining - 1
-							];
-							$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-							if($status == 2 ){
-								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
-							} else {
-								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-							}
-							//create transction 
-							$createFreeRoundTransaction = array(
-								"game_trans_id" => $existing_bet->game_trans_id,
-								'freespin_id' => $getFreespin->freespin_id
-							);
-							FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-						}
-					}
 
 			        try {
 						$client = new Client();
@@ -497,10 +481,10 @@ class TGGController extends Controller
 				 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 				 		);
 				 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-			            Helper::saveLog('TGG Win 1', $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					} catch (\Exception $e) {
-			            Helper::saveLog('TGG Error 1', $this->provider_db_id, json_encode($request), $response);
+			            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 			            return $response;
 					}
 				} else {
@@ -515,7 +499,7 @@ class TGGController extends Controller
 				  	Helper::saveLog("TGG not found transaction Spin", $this->provider_db_id, json_encode($request), $response);
 			        return $response;
 				}
-			}elseif ($string_to_obj->game->action == 'freespin') {
+			} elseif ($string_to_obj->game->action == 'freespin') {
 				$reference_transaction_uuid = $request['data']['round_id'];
 				Helper::saveLog("TGG freespin", $this->provider_db_id, json_encode($request), "HIT");
 				if ($existing_bet == 'false') {
@@ -542,10 +526,10 @@ class TGGController extends Controller
 		            "round_id" => $transaction_uuid,
 		            "amount" => $amount,
 		            "game_transaction_type"=> 2,
-		            "provider_request" =>json_encode($request),
-		            "mw_response" =>json_encode($response),
+		            // "provider_request" =>json_encode($request),
+		            // "mw_response" =>json_encode($response),
 		        );
-		        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
 
 				
 				$pay_amount = $existing_bet->pay_amount + $amount;
@@ -574,7 +558,7 @@ class TGGController extends Controller
 		                "amount" => $amount
 		            ],
 		            "connection_name" => $existing_bet->connection_name,
-		            "game_trans_ext_id" => $game_trans_ext_id,
+		            "game_trans_ext_id" => $game_transid_ext,
 		            "game_transaction_id" => $existing_bet->game_trans_id
 
 		        ];
@@ -584,10 +568,10 @@ class TGGController extends Controller
 			 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 			 		);
 			 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-		            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+		            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 		            return $response;
 				} catch (\Exception $e) {
-		            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
+		            Helper::saveLog($game_transid_ext, $this->provider_db_id, json_encode($request), $response);
 		            return $response;
 				}
 			} elseif ($string_to_obj->game->action == 'collect') {
