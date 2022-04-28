@@ -179,14 +179,14 @@ class BOTAController extends Controller{
     public function _winProcess($data,$client_details){
         
         Helper::saveLog('Win Processing', $this->provider_db_id, json_encode($data), 'Win Initialized!');
-        // $response = array(
-        //                     "user" => $data['user'],
-        //                     "balance" =>(int) $client_details->balance,
-        //                     "confirm" => "ok"
-        //                 );
-        //                 Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
-        //                 return response($response,200)
-        //                     ->header('Content-Type', 'application/json');
+        $response = array(
+                            "user" => $data['user'],
+                            "balance" =>(int) $client_details->balance,
+                            "confirm" => "ok"
+                        );
+                        Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
+                        return response($response,200)
+                            ->header('Content-Type', 'application/json');
         if(isset($client_details)){
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_2');
