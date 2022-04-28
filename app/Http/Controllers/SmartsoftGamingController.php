@@ -140,7 +140,7 @@ class SmartsoftGamingController extends Controller
                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen, $client_details);
                 } 
                 $gameTransactionEXTData = array(
-                    "game_trans_id" => $game_transaction_id,
+                    "game_trans_id" => $game_transid_gen,
                     "provider_trans_id" => $provider_trans_id,
                     "round_id" => $round_id,
                     "amount" => $bet_amount,
@@ -178,8 +178,8 @@ class SmartsoftGamingController extends Controller
                                             $createGameTransactionLog = [
                                                 "connection_name" => $client_details->connection_name,
                                                 "column" =>[
-                                                    "game_trans_ext_id" => $game_trans_ext_id,
-                                                    "request" => json_encode($req->all()),
+                                                    "game_trans_ext_id" => $game_transid_ext,
+                                                    "request" => json_encode($request->all()),
                                                     "response" => json_encode($response),
                                                     "log_type" => "provider_details",
                                                     "transaction_detail" => "success",
@@ -201,8 +201,8 @@ class SmartsoftGamingController extends Controller
                                     $createGameTransactionLog = [
                                         "connection_name" => $client_details->connection_name,
                                         "column" =>[
-                                            "game_trans_ext_id" => $game_trans_ext_id,
-                                            "request" => json_encode($req->all()),
+                                            "game_trans_ext_id" => $game_transid_ext,
+                                            "request" => json_encode($request->all()),
                                             "response" => json_encode($response),
                                             "log_type" => "provider_details",
                                             "transaction_detail" => "Failed",
@@ -295,7 +295,7 @@ class SmartsoftGamingController extends Controller
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transid_ext,
-                            "request" => json_encode($req->all()),
+                            "request" => json_encode($request->all()),
                             "response" => json_encode($response),
                             "log_type" => "provider_details",
                             "transaction_detail" => "success",
