@@ -91,8 +91,8 @@ class QuickspinDirectController extends Controller
             ];
             return $res;
         }
-        $gen_game_trans_id = ProviderHelper::idGenerate($get_client_details->connection_name,1);
-        $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
+        $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         $game_details = Game::find($game_code, config('providerlinks.quickspinDirect.provider_db_id'));
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
 
@@ -116,17 +116,17 @@ class QuickspinDirectController extends Controller
                                         "txid" => (int)$provider_trans_id,
                                         "remotetxid" => (string)$game_transaction_id,
                                     ];
-
-                                    $updateTransactionEXt = array(
-                                        "provider_request" =>json_encode($req->all()),
-                                        "mw_response" => json_encode($res),
-                                        'mw_request' => json_encode($client_response->requestoclient),
-                                        'client_response' => json_encode($client_response->fundtransferresponse),
-                                        'transaction_detail' => 'success',
-                                        'general_details' => 'success',
-                                    
-                                    );
-                                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                        $createGameTransactionLog = [
+                                          "connection_name" => $client_details->connection_name,
+                                          "column" =>[
+                                              "game_trans_ext_id" => $gen_game_extid,
+                                              "request" => json_encode($req->all()),
+                                              "response" => json_encode($res),
+                                              "log_type" => "provider_details",
+                                              "transaction_detail" => "SUCCESS",
+                                          ]
+                                        ];
+                                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                                 break;
                                 case '402':
                                         // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
@@ -142,16 +142,26 @@ class QuickspinDirectController extends Controller
                                          "errormessage" => "not enough funds for withdrawal"
                                       
                                     ];
-
-                                    $updateTransactionEXt = array(
-                                        "provider_request" =>json_encode($req->all()),
-                                        "mw_response" => json_encode($res),
-                                        'mw_request' => json_encode($client_response->requestoclient),
-                                        'client_response' => json_encode($client_response->fundtransferresponse),
-                                        'transaction_detail' => 'failed',
-                                        'general_details' => 'failed',
-                                    );
-                                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                    $createGameTransactionLog = [
+                                      "connection_name" => $client_details->connection_name,
+                                      "column" =>[
+                                          "game_trans_ext_id" => $gen_game_extid,
+                                          "request" => json_encode($req->all()),
+                                          "response" => json_encode($res),
+                                          "log_type" => "provider_details",
+                                          "transaction_detail" => "FAILED",
+                                      ]
+                                    ];
+                                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                                    // $updateTransactionEXt = array(
+                                    //     "provider_request" =>json_encode($req->all()),
+                                    //     "mw_response" => json_encode($res),
+                                    //     'mw_request' => json_encode($client_response->requestoclient),
+                                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                                    //     'transaction_detail' => 'failed',
+                                    //     'general_details' => 'failed',
+                                    // );
+                                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                                 break;
                                 default:
                                     $http_status = 200;
@@ -166,16 +176,26 @@ class QuickspinDirectController extends Controller
                                          "errormessage" => "not enough funds for withdrawal"
                                       
                                     ];
-
-                                    $updateTransactionEXt = array(
-                                        "provider_request" =>json_encode($req->all()),
-                                        "mw_response" => json_encode($res),
-                                        'mw_request' => json_encode($client_response->requestoclient),
-                                        'client_response' => json_encode($client_response->fundtransferresponse),
-                                        'transaction_detail' => 'failed',
-                                        'general_details' => 'failed',
-                                    );
-                                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                     $createGameTransactionLog = [
+                                      "connection_name" => $client_details->connection_name,
+                                      "column" =>[
+                                          "game_trans_ext_id" => $gen_game_extid,
+                                          "request" => json_encode($req->all()),
+                                          "response" => json_encode($res),
+                                          "log_type" => "provider_details",
+                                          "transaction_detail" => "FAILED",
+                                      ]
+                                    ];
+                                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                                    // $updateTransactionEXt = array(
+                                    //     "provider_request" =>json_encode($req->all()),
+                                    //     "mw_response" => json_encode($res),
+                                    //     'mw_request' => json_encode($client_response->requestoclient),
+                                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                                    //     'transaction_detail' => 'failed',
+                                    //     'general_details' => 'failed',
+                                    // );
+                                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                         }
                     }
                     if($bet_transaction != 'false'){
@@ -222,6 +242,7 @@ class QuickspinDirectController extends Controller
         $game_code = $req['gameref'];
         $pay_amount = $req['amount']/100;
         $client_details = ProviderHelper::getClientDetails('player_id', $req['customerid']);
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         if($client_details == null){
             $res = [
                 "errorcode" => "UNHANDLED",
@@ -343,7 +364,8 @@ class QuickspinDirectController extends Controller
                   "provider_request" => json_encode($req->all()),
                   "mw_response" => json_encode($res),
               );
-        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
         ProviderHelper::_insertOrUpdate($client_details->token_id, $winBalance/100); 
 
         $action_payload = [
@@ -355,7 +377,7 @@ class QuickspinDirectController extends Controller
                 "entry_id" => $entry_id,
                 "pay_amount" => $pay_amount,
                 "income" => $income,
-                "game_trans_ext_id" => $game_trans_ext_id
+                "game_trans_ext_id" => $gen_game_extid
             ],
             "provider" => [
                 "provider_request" => json_encode($req->all()), #R
