@@ -253,6 +253,7 @@ class VivoController extends Controller
 	        );
 	        // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 	        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+	        $game_transaction_id = $gen_game_trans_id;
 		}catch(\Exception $e){
 			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 			if($bet_transaction == null){
@@ -284,7 +285,7 @@ class VivoController extends Controller
 	        Helper::saveLog('Vivo Gaming BET prio fundTransfer', 34,json_encode($data), $client_details->balance - $data["Amount"]);
 	       
 	        // $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
-	        $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit', false, $fund_extra_data);
+	        $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $gen_game_extid, $game_transaction_id, 'debit', false, $fund_extra_data);
         } catch (\Exception $e) {
         	return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
         }
