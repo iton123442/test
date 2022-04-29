@@ -272,11 +272,6 @@ class VivoController extends Controller
 			"general_details" => $data["History"],
 		);
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
-        // $bet = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
-        // $updateGameTransaction = [
-        //     "bet_amount" => $bet->amount,
-        // ];
-        // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
 
 		$fund_extra_data = [
             'provider_name' => $game_details->provider_name
