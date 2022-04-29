@@ -28,7 +28,7 @@ class DigitainHelper{
             $check_token = DB::table('player_session_tokens')
             ->selectRaw("TIME_TO_SEC(TIMEDIFF( NOW(), '".$token->created_at."'))/60 as `time`")
             ->first();
-            if(1440 > $check_token->time) {  // TIMEGAP IN MINUTES!
+            if(30 > $check_token->time) {  // TIMEGAP IN MINUTES! -- 1440 1day | 30 min
                 $token = true; // True if Token can still be used!
             }else{
                 $token = false; // Expired Token
