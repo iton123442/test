@@ -262,7 +262,6 @@ class TidyController extends Controller
 	        ];
 			try {
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
-				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 	        } catch (\Exception $e) {
 	            $response = array(
 					'error_code' 	=> '99-005',
@@ -288,6 +287,7 @@ class TidyController extends Controller
 	        if (isset($client_response->fundtransferresponse->status->code)) {
 	        	switch ($client_response->fundtransferresponse->status->code) {
 					case "200":
+						ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 						$num = $client_response->fundtransferresponse->balance;
 						$response = [
 							"uid" => $uid,

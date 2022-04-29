@@ -406,7 +406,7 @@ public function gameBet($request, $client_details)
 						];
 							ProviderHelper::queTransactionLogs($createGameTransactionLog);// create extension logs
 						}catch(\Exception $e){
-							Helper::saveLog("Playstar Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
+							Helper::saveLog("5men Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
 						}
 			        $body_details = [
 			            "type" => "credit",
