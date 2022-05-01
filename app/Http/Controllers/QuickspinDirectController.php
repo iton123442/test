@@ -297,6 +297,7 @@ class QuickspinDirectController extends Controller
         }
         
         if($trans_type == 'freespinspayout'){
+            $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
             $gameTransactionData = array(
                 "provider_trans_id" => $provider_trans_id,
                 "token_id" => $client_details->token_id,
