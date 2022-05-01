@@ -311,16 +311,16 @@ class QuickspinDirectController extends Controller
             ); 
             // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
             GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id, $client_details);
-            $gameTransactionEXTData = array(
-                "game_trans_id" => $gen_game_trans_id,
-                "provider_trans_id" => $provider_trans_id,
-                "round_id" => $round_id,
-                "amount" => 0,
-                "game_transaction_type"=> 1,
-                // "provider_request" =>json_encode($req->all()),
-            );
-            // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
+            // $gameTransactionEXTData = array(
+            //     "game_trans_id" => $gen_game_trans_id,
+            //     "provider_trans_id" => $provider_trans_id,
+            //     "round_id" => $round_id,
+            //     "amount" => 0,
+            //     "game_transaction_type"=> 1,
+            //     // "provider_request" =>json_encode($req->all()),
+            // );
+            // // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            // GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
             $game_trans_id = $gen_game_trans_id;
             $promocode = explode("TG",$req["promocode"]);
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
