@@ -36,22 +36,20 @@ class BGamingController extends Controller
         // dd($signature);
 		Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
 		if($signature != $request_sign){
-                $response = [
-                            "code" =>  403,
-                            "message" => "Forbidden",
-                            "balance" => '0'
-                        ];
-
-
-         return response($response,400)->header('Content-Type', 'application/json');
+            $response = [
+                        "code" =>  403,
+                        "message" => "Forbidden",
+                        "balance" => '0'
+                    ];
+            return response($response,400)->header('Content-Type', 'application/json');
 		}
 		if($client_details == 'false'){
             $http_status = 400;
-                $response = [
-                        "code" =>  101,
-                        "message" => "Player is invalid",
-                        "balance" => 0
-                    ];
+            $response = [
+                    "code" =>  101,
+                    "message" => "Player is invalid",
+                    "balance" => 0
+                ];
             return response()->json($response, $http_status);
         }
         if(!isset($payload['actions'][0]['action'])){
@@ -169,6 +167,8 @@ public function gameBet($request, $client_details){
                 ];
                 return $response;
             }//End of client Details null
+            $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+            $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
             $game_details = Game::find($game_code, $this->provider_db_id);
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
             if ($bet_transaction != 'false') {
@@ -212,19 +212,18 @@ public function gameBet($request, $client_details){
                         $fund_extra_data = [
                             'provider_name' => $game_details->provider_name
                         ];
-                        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
+                try {
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
+                } catch (\Exception $e) {
+                    $response = [
 
-                       if($client_response == false){
-                          $response = [
+                    'code' => 504,
+                    'message' => 'Request timed out',
+                    'balance' => '0'
+                    ];
 
-                            'code' => 504,
-                            'message' => 'Request timed out',
-                            'balance' => '0'
-                            ];
-
-                            return $response;
-                        } 
-
+                    return $response;
+                }
                Helper::saveLog('bgaming after client_response', $this->provider_db_id, json_encode($payload), $client_response->fundtransferresponse->status->code);
               if (isset($client_response->fundtransferresponse->status->code)) {
 
