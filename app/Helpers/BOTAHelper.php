@@ -70,4 +70,16 @@ class BOTAHelper{
 	   return $dataresponse; 
     }
 
+    public static function convertKRW($details){
+        if($details->default_currency == 'USD'){
+            $result = $details->balance*1266.33;//Convert to KRW
+            $formattedResult = round($result,2);
+            return $formattedResult;
+        }else if($details->default_currency == 'JPY'){
+            $result = $details->balance-9.73;
+            $formattedResult = round($result,2);
+            return $formattedResult;
+        }
+    }
+
 }
