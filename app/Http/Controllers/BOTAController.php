@@ -281,12 +281,13 @@ class BOTAController extends Controller{
                 "mw_response"=>json_encode($response),
             );
             $winTransactionExtID = GameTransactionMDB::createGameTransactionExt($winTransactionExt, $client_details);
+            dump($winTransactionExtID);
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'BOTA',
                     "isUpdate" => false,
-                    "game_transaction_ext_id" => $winTransactionExtID,
+                    "game_transaction_ext_id" => 'TG_'.$winTransactionExtID,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => $win_or_lost,
                 ],
