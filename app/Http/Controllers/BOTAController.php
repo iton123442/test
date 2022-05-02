@@ -206,14 +206,13 @@ class BOTAController extends Controller{
                 if($bet_transaction != "false"){//check if bet transaction is existing
                     $client_details->connection_name = $bet_transaction->connection_name;
                     $game_trans_id = $bet_transaction->game_trans_id;
-                    $msg = [
-                        'msg' => 'bet_Exist',
-                        'bet_amount' => $bet_transaction->bet_amount + round($data['price'],2),
+                    $updateGameTransaction = [
+                        'win' => 5,
+                        'bet_amount' => $bet_transaction->bet_amount + round($data["price"],2),
                         'entry_id' => 1,
                         'trans_status' => 1
                     ];
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                 }
                 else{
                     $gameTransactionData = array(
@@ -227,6 +226,7 @@ class BOTAController extends Controller{
                         "income" => 0,
                         "entry_id" => 1
                     );
+                    GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
                 }
                 $bettransactionExt = array(
                     "game_trans_id" => $game_trans_id,
@@ -306,7 +306,7 @@ class BOTAController extends Controller{
             ];
             $updateGameTransaction = [
                 'win' => $win_or_lost,
-                'pay_amount' => $data['price'],
+                'pay_amount' => round($data["price"],2),
                 'income' => $game->income - round($data["price"],2),
                 'entry_id' => round($data["price"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
                 'trans_status' => 2
