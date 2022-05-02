@@ -88,7 +88,6 @@ class BOTAController extends Controller{
         Helper::saveLog('BOTA betProcess', $this->provider_db_id, json_encode($data), 'BET Initialized');
         if($client_details){
             try{
-                Helper::saveLog('BOTA BET DUPLICATE RETURN_TRY', $this->provider_db_id, json_encode($data), $this->prefix.'_'.$data['detail']['shoeNo'].'_1');
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['detail']['shoeNo'].'_1');
             }catch(\Exception $e){//if bet exist
                 $msg = array(
@@ -381,7 +380,7 @@ class BOTAController extends Controller{
                     "balance" =>(int) round($client_details->balance,2),
                     "confirm" => "ok"
                 );
-                Helper::saveLog('BOTA CANCEL DUPLICATE RETURN', $this->provider_db_id, json_encode($msg), 'CANCEL DUPE');
+                Helper::saveLog('BOTA CANCEL DUPLICATE REFUND', $this->provider_db_id, json_encode($msg), 'REFUND DUPE');
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
@@ -405,6 +404,14 @@ class BOTAController extends Controller{
             $fund_extra_data = [
                 'provider_name' => $gamedetails->provider_name
             ];
+            $updateGameTransaction = [
+                'win' => 4,
+                'pay_amount' => $data['price'],
+                'income' => $gameExt->income - round($data["price"],2),
+                'entry_id' => round($data["price"],2) == 0 && $gameExt->pay_amount == 0 ? 1 : 2,
+                'trans_status' => 2
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $gameExt->game_trans_id, $client_details);
             $client_response = ClientRequestHelper::fundTransfer($client_details,round($data['price'],2),$gamedetails->game_code, $gamedetails->game_name,$refundgametransExtID,$gameExt->game_trans_id,"credit",true,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){

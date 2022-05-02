@@ -107,6 +107,7 @@ class FundtransferProcessorController extends Controller
             }
             else if ($payload->action->custom->provider == "BOTA") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
+                Helper::saveLog($payload->request_body->fundtransferrequest->fundinfo->roundId, 12345, json_encode([$gteid]),'hit');
             }
             else{
                 $gteid = ClientRequestHelper::generateGTEID(
