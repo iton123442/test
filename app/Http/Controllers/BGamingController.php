@@ -207,7 +207,7 @@ public function gameBet($request, $client_details){
                             "round_id" => $round_id,
                             "amount" => $bet_amount,
                             "game_transaction_type"=> 1,
-                            // "provider_request" =>json_encode($request),
+                            "provider_request" =>json_encode($request),
                             );
                         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
                         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
