@@ -88,7 +88,7 @@ class BOTAController extends Controller{
         Helper::saveLog('BOTA betProcess', $this->provider_db_id, json_encode($data), 'BET Initialized');
         if($client_details){
             try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['detail']['shoeNo'].'_1');
+                ProviderHelper::idenpotencyTable($this->prefix.$data['detail']['gameNo'].'_'.$data['detail']['shoeNo'].'_1');
             }catch(\Exception $e){//if bet exist
                 $msg = array(
                     "user" => $data['user'],
@@ -188,7 +188,7 @@ class BOTAController extends Controller{
         //                     ->header('Content-Type', 'application/json');
         if(isset($client_details)){
             try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_2');
+                ProviderHelper::idenpotencyTable($this->prefix.$data['detail']['gameNo'].'_'.$data['idx'].'_2');
             }catch(\Exception $e){
                 $msg = array(
                     "user" => $data['user'],
@@ -364,7 +364,7 @@ class BOTAController extends Controller{
         Helper::saveLog('Cancel Processing', $this->provider_db_id, json_encode($data), 'Cancel Initialized!');
         if(isset($client_details)){
             try{
-                ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['idx'].'_3');
+                ProviderHelper::idenpotencyTable($this->prefix.$data['detail']['gameNo'].'_'.$data['idx'].'_3');
             }catch(\Exception $e){
                 $msg = array(
                     "user" => $data['user'],
