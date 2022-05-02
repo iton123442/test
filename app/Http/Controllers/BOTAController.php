@@ -114,7 +114,7 @@ class BOTAController extends Controller{
             }
             else{
             $gameTransactionData = array(
-                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
+                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "token_id" => $client_details->token_id,
                 "game_id" => $gamedetails->game_id,
                 "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
