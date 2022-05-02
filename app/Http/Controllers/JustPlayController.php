@@ -75,11 +75,32 @@ class JustPlayController extends Controller
             try {
                 $type = "debit";
                 $rollback = false;
-                 Helper::saveLog("Justplay client_response", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
                 $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$type,$rollback);
                  Helper::saveLog("Justplay client_response", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-               
+                $gameTransactionData = array(
+                    "provider_trans_id" => $data['id_stat'],
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $data['id_stat'],
+                    "bet_amount" => $bet_amount,
+                    "win" => $win_or_lost,
+                    "pay_amount" => $pay_amount,
+                    "income" => $income,
+                    "entry_id" => $entry_id,
+                ); 
+                GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transaction_id,$client_details); //create game_transaction
+                Helper::saveLog("Justplay game_transaction_id", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
+                    $gameTransactionEXTData = array(
+                        "game_trans_id" => $game_transaction_id,
+                        "provider_trans_id" => $data['id_stat'],
+                        "round_id" => $data['id_stat'],
+                        "amount" => $bet_amount,
+                        "game_transaction_type"=> 1,
+                        // "provider_request" =>json_encode($request->all()),
+                        );
+                    Helper::saveLog("Justplay nga game trann extension", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
             } catch (\Exception $e) {
                 $response = array(
                     'done' => 0,
@@ -91,29 +112,7 @@ class JustPlayController extends Controller
                 Helper::saveLog('JustPlay FATAL ERROR', $this->provider_db_id, json_encode($request->all(), JSON_FORCE_OBJECT),  $response);
                 return json_encode($response, JSON_FORCE_OBJECT); 
             }
-            $gameTransactionData = array(
-                "provider_trans_id" => $data['id_stat'],
-                "token_id" => $client_details->token_id,
-                "game_id" => $game_details->game_id,
-                "round_id" => $data['id_stat'],
-                "bet_amount" => $bet_amount,
-                "win" => $win_or_lost,
-                "pay_amount" => $pay_amount,
-                "income" => $income,
-                "entry_id" => $entry_id,
-            ); 
-            GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transaction_id,$client_details); //create game_transaction
-            Helper::saveLog("Justplay game_transaction_id", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
-                $gameTransactionEXTData = array(
-                    "game_trans_id" => $game_transaction_id,
-                    "provider_trans_id" => $data['id_stat'],
-                    "round_id" => $data['id_stat'],
-                    "amount" => $bet_amount,
-                    "game_transaction_type"=> 1,
-                    // "provider_request" =>json_encode($request->all()),
-                    );
-                Helper::saveLog("Justplay nga game trann extension", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
+
             if (isset($client_response->fundtransferresponse->status->code)) {
 
                 switch ($client_response->fundtransferresponse->status->code) {
@@ -151,24 +150,22 @@ class JustPlayController extends Controller
             $balance = $client_response->fundtransferresponse->balance + $pay_amount;
              Helper::saveLog("Justplay before win response", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+            $game_trans_ext_id_win = ProviderHelper::idGenerate($client_details->connection_name, 2);
             $win_response =  [
                 "done" => 1,
                 "balance" => $balance,
                  "id_stat" => $game_transaction_id,
             ];
             
-         Helper::saveLog("Justplay after win response", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
+           Helper::saveLog("Justplay after win response", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
             $gameTransactionEXTData = array(
                 "game_trans_id" => $game_transaction_id,
                 "provider_trans_id" => $data['id_stat'],
                 "round_id" => $data['id_stat'],
                 "amount" => $pay_amount,
                 "game_transaction_type"=> 2,
-                //"provider_request" =>json_encode($request->all()),
-                );
-
-
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
+            );
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id_win,$client_details); //create extension
              Helper::saveLog("Justplay before sa body_details", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
             $body_details = [
                 "type" => "credit",
@@ -185,7 +182,7 @@ class JustPlayController extends Controller
                 ],
                 "provider_request" => $data,
                 "provider_response" => $win_response,
-                "game_trans_ext_id" => $game_trans_ext_id,
+                "game_trans_ext_id" => $game_trans_ext_id_win,
                 "game_transaction_id" => $game_transaction_id
 
             ];
@@ -193,7 +190,7 @@ class JustPlayController extends Controller
              $createGameTransactionLog = [
                 "connection_name" => $client_details->connection_name,
                 "column" =>[
-                    "game_trans_ext_id" => $game_trans_ext_id,
+                    "game_trans_ext_id" => $game_trans_ext_id_win,
                     "request" => json_encode($data),
                     "response" => json_encode($response),
                     "log_type" => "provider_details",

@@ -24,7 +24,7 @@ class BOTAController extends Controller{
         $this->api_key = config('providerlinks.bota.api_key');
         $this->api_url = config('providerlinks.bota.api_url');
         $this->prefix = config('providerlinks.bota.prefix');
-        $this->providerID = 71; //provider ID
+        $this->providerID = 71; //Real provider ID
     }
 
     public function index(Request $request){
@@ -32,45 +32,49 @@ class BOTAController extends Controller{
         Helper::saveLog('BOTA Auth INDEX', $this->provider_db_id, json_encode($data), 'INDEX HIT!');
         $originalPlayerID = explode('_', $data["user"]);
         $client_details = ProviderHelper::getClientDetails('player_id', $originalPlayerID[1]);
-        $playerChecker = BOTAHelper::botaPlayerChecker($client_details,'Verify');//Auth
-        if(isset($playerChecker->result_code) && $playerChecker->result_code == 1){
-            $msg = [
-                "result_code" => "1",
-                "result_msg" =>(string) "(no account)"
-            ];
-            return response($msg,200)->header('Content-Type', 'application/json');
-            Helper::saveLog('BOTA NOT FOUND PLAYER',$this->provider_db_id, json_encode($msg), $data);
-                
-        }else{
-            //flow structure
-            if($data['types'] == "balance") {
-                $result = $this->_getBalance($data,$client_details);
-                Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
-                return $result;
+        if($client_details){
+            $playerChecker = BOTAHelper::botaPlayerChecker($client_details,'Verify');//Auth
+            if(isset($playerChecker->result_code) && $playerChecker->result_code == 1){
+                $msg = [
+                    "result_code" => "1",
+                    "result_msg" =>(string) "(no account)"
+                ];
+                return response($msg,200)->header('Content-Type', 'application/json');
+                Helper::saveLog('BOTA NOT FOUND PLAYER',$this->provider_db_id, json_encode($msg), $data);
+                    
+            }else{
+                //flow structure
+                if($data['types'] == "balance") {
+                    $result = $this->_getBalance($data,$client_details);
+                    Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+                    return $result;
+                }
+                elseif($data['types'] == "bet") {
+                    $result = $this->_betProcess($data,$client_details);
+                    Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($result), 'BET HIT');
+                    return $result;
+                }
+                elseif($data['types'] == "win") {
+                    $result = $this->_winProcess($data,$client_details);
+                    Helper::saveLog('BOTA WIN', $this->provider_db_id, json_encode($result), 'WIN HIT');
+                    return $result;
+                }
+                elseif($data['types'] == "cancel") {
+                    $result = $this->_cancelProcess($data,$client_details);
+                    Helper::saveLog('BOTA CANCEL', $this->provider_db_id, json_encode($result), 'CANCEL HIT');
+                    return $result;
+                }
+                else {
+                    exit;
+                }
+                return response($data,200)->header('Content-Type', 'application/json');
             }
-            elseif($data['types'] == "bet") {
-                $result = $this->_betProcess($data,$client_details);
-                Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($result), 'BET HIT');
-                return $result;
-            }
-            elseif($data['types'] == "win") {
-                $result = $this->_winProcess($data,$client_details);
-                Helper::saveLog('BOTA WIN', $this->provider_db_id, json_encode($result), 'WIN HIT');
-                return $result;
-            }
-            elseif($data['types'] == "cancel") {
-                $result = $this->_cancelProcess($data,$client_details);
-                Helper::saveLog('BOTA CANCEL', $this->provider_db_id, json_encode($result), 'CANCEL HIT');
-                return $result;
-                // $data["user"] = $data['user'];
-                // $data["balance"] = "200000"; // 베
-                // $data["confirm"] = "ok";
-            }
-            else {
-                exit;
-            }
-            return response($data,200)->header('Content-Type', 'application/json');
-        }
+        }$msg = [
+            "result_code" => "1",
+            "result_msg" =>(string) "(no account)"
+        ];
+        return response($msg,200)->header('Content-Type', 'application/json');
+        Helper::saveLog('BOTA TG FOUND CLIENT DETAILS',$this->provider_db_id, json_encode($msg), $data);
     }
 
     public function _getBalance($data,$client_details){
@@ -343,7 +347,7 @@ class BOTAController extends Controller{
                 $response = array(
                     "status" => [
                         "code" => $client_response->fundtransferresponse->status->code,
-                        "stauts" => $client_response->fundtransferresponse->status->status,
+                        "status" => $client_response->fundtransferresponse->status->status,
                         "message" =>$client_response->fundtransferresponse->status->message,
                     ],
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
@@ -373,6 +377,7 @@ class BOTAController extends Controller{
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
     }
+
     public function _cancelProcess($data,$client_details){
         Helper::saveLog('Cancel Processing', $this->provider_db_id, json_encode($data), 'Cancel Initialized!');
         if(isset($client_details)){
@@ -411,7 +416,7 @@ class BOTAController extends Controller{
             $refundgametransExt = array(
                 "game_trans_id" => $gameExt->game_trans_id,
                 "provider_trans_id" => $data['idx'],
-                "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
+                "round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'], 2),
                 "game_transaction_type" => 3,
                 "provider_request" => json_encode($data),
@@ -453,29 +458,29 @@ class BOTAController extends Controller{
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $gameExt->game_trans_id, $client_details);
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data['price'],2),$gamedetails->game_code, $gamedetails->game_name,$gameExt->game_trans_id,"credit",true,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) 
-                && $client_response->fundtransferresponse->status->code == "200"){
-                    $balance = round($client_response->fundtransferresponse->balance,2);
-                    $client_details->balance = $balance;
-                    ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
-                    $response = array(
-                        "user" => $data['user'],
-                        "balance" =>(int) $balance,
-                        "confirm" => "ok"
-                    );
-                    $dataToUpdate = array(
-                        "mw_response" => json_encode($response)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransExtID,$client_details);
-                    Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "(Cancel)HIT!");
-                    return response($response,200)
-                        ->header('Content-Type', 'application/json');
+            && $client_response->fundtransferresponse->status->code == "200"){
+                $balance = round($client_response->fundtransferresponse->balance,2);
+                $client_details->balance = $balance;
+                ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
+                $response = array(
+                    "user" => $data['user'],
+                    "balance" =>(int) $balance,
+                    "confirm" => "ok"
+                );
+                $dataToUpdate = array(
+                    "mw_response" => json_encode($response)
+                );
+                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransExtID,$client_details);
+                Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "(Cancel)HIT!");
+                return response($response,200)
+                    ->header('Content-Type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
                 $response = array(
                     "status" => [
                         "code" => $client_response->fundtransferresponse->status->code,
-                        "stauts" => $client_response->fundtransferresponse->status->status,
+                        "status" => $client_response->fundtransferresponse->status->status,
                         "message" =>$client_response->fundtransferresponse->status->message,
                     ],
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
@@ -491,7 +496,7 @@ class BOTAController extends Controller{
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $refundgametransExtID, $client_details);
                 }catch(\Exception $e){
-                Helper::savelog('REFUND FAILED(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
+                    Helper::savelog('REFUND FAILED(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
                 return response($response, 200)->header('Content-Type', 'application/json');
             }
