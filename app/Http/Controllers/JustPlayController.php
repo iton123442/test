@@ -201,7 +201,7 @@ class JustPlayController extends Controller
 
             try{
                 $client = new Client();
-                $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-fundtransferV2',
+                $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bgFundTransferV2MultiDB',
                     [ 'body' => json_encode($body_details), 'timeout' => '0.20']
                 );
 
