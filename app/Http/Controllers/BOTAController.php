@@ -447,6 +447,31 @@ class BOTAController extends Controller{
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
             }
+            elseif(isset($client_response->fundtransferresponse->status->code)
+            && $client_response->fundtransferresponse->status->code == "402"){
+                $response = array(
+                    "status" => [
+                        "code" => $client_response->fundtransferresponse->status->code,
+                        "stauts" => $client_response->fundtransferresponse->status->status,
+                        "message" =>$client_response->fundtransferresponse->status->message,
+                    ],
+                    "balance" => round($client_response->fundtransferresponse->balance, 2),
+                    "currencycode" => $client_response->fundtransferresponse->currencycode
+                );
+                try{
+                    $datatosend = array(
+                    "win" => 2
+                    );
+                    GameTransactionMDB::updateGametransaction($datatosend,$gameExt->game_trans_id,$client_details);
+                    $updateData = array(
+                        "mw_response" => json_encode($response)
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($updateData, $refundgametransExtID, $client_details);
+                }catch(\Exception $e){
+                Helper::savelog('REFUND FAILED(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
+                }
+                return response($response, 200)->header('Content-Type', 'application/json');
+            }
         }
         else {
             $msg = array(
