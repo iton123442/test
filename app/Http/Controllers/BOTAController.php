@@ -442,11 +442,11 @@ class BOTAController extends Controller{
                     $dataToUpdate = array(
                         "mw_response" => json_encode($response)
                     );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransExt,$client_details);
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransExtID,$client_details);
                     Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "(Cancel)HIT!");
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
-                }
+            }
         }
         else {
             $msg = array(
