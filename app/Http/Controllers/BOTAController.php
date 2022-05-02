@@ -95,7 +95,7 @@ class BOTAController extends Controller{
                     "balance" =>(int) round($client_details->balance,2),
                     "confirm" => "ok"
                 );
-                Helper::saveLog('BOTA BET DUPLICATE RETURN', $this->provider_db_id, json_encode($msg), 'BET DUPE');
+                Helper::saveLog('BOTA BET DUPLICATE RETURN', $this->provider_db_id, json_encode($msg), 'BET FAILED');
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
@@ -281,7 +281,6 @@ class BOTAController extends Controller{
                 "mw_response"=>json_encode($response),
             );
             $winTransactionExtID = GameTransactionMDB::createGameTransactionExt($winTransactionExt, $client_details);
-            dump($winTransactionExtID);
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
