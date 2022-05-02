@@ -100,7 +100,7 @@ class BOTAController extends Controller{
                 ->header('Content-Type', 'application/json');
             }
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
-            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'], 'transaction_id', false, $client_details);
+            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id', false, $client_details);
             if($bet_transaction != "false"){//check if bet transaction is existing
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $game_trans_id = $bet_transaction->game_trans_id;
@@ -114,7 +114,7 @@ class BOTAController extends Controller{
             }
             else{
             $gameTransactionData = array(
-                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
+                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "token_id" => $client_details->token_id,
                 "game_id" => $gamedetails->game_id,
                 "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
@@ -128,7 +128,7 @@ class BOTAController extends Controller{
             }
             $bettransactionExt = array(
                 "game_trans_id" => $game_trans_id,
-                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
+                "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 1,
@@ -209,7 +209,7 @@ class BOTAController extends Controller{
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
             $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
             if($game == null){
-                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'], 'transaction_id', false, $client_details);
+                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id', false, $client_details);
                 if($bet_transaction != "false"){//check if bet transaction is existing
                     $client_details->connection_name = $bet_transaction->connection_name;
                     $game_trans_id = $bet_transaction->game_trans_id;
@@ -223,7 +223,7 @@ class BOTAController extends Controller{
                 }
                 else{
                     $gameTransactionData = array(
-                        "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
+                        "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                         "token_id" => $client_details->token_id,
                         "game_id" => $gamedetails->game_id,
                         "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
@@ -237,7 +237,7 @@ class BOTAController extends Controller{
                 }
                 $bettransactionExt = array(
                     "game_trans_id" => $game_trans_id,
-                    "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
+                    "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                     "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                     "amount" => round($data['price'],2),
                     "game_transaction_type" => 1,
@@ -388,7 +388,7 @@ class BOTAController extends Controller{
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-            $gameExt = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($this->prefix.'_'.$data['detail']['shoeNo'], 1, $client_details);
+            $gameExt = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 1, $client_details);
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
             if($gameExt==null){
                 $msg = array(
