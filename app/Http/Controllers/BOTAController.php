@@ -156,7 +156,15 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response ="ERROR FAILED BET";//error response
+                $response = array(
+                    "status" => [
+                        "code" => $client_response->fundtransferresponse->status->code,
+                        "stauts" => $client_response->fundtransferresponse->status->status,
+                        "message" =>$client_response->fundtransferresponse->status->message,
+                    ],
+                    "balance" => round($client_response->fundtransferresponse->balance, 2),
+                    "currencycode" => $client_response->fundtransferresponse->currencycode
+                );//error response
                 try{
                     $datatosend = array(
                     "win" => 2
@@ -332,9 +340,15 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response ="ERROR WIN TIMEOUT";
-                //error response
-                //this is temporary
+                $response = array(
+                    "status" => [
+                        "code" => $client_response->fundtransferresponse->status->code,
+                        "stauts" => $client_response->fundtransferresponse->status->status,
+                        "message" =>$client_response->fundtransferresponse->status->message,
+                    ],
+                    "balance" => round($client_response->fundtransferresponse->balance, 2),
+                    "currencycode" => $client_response->fundtransferresponse->currencycode
+                );
                 try{
                     $datatosend = array(
                     "win" => 2
