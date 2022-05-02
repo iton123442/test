@@ -106,8 +106,7 @@ class FundtransferProcessorController extends Controller
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
             else if ($payload->action->custom->provider == "BOTA") {
-                $originalGameTransExtID = explode('_',$payload->custom->game_trans_ext_id);
-                $gteid = $originalGameTransExtID[1];
+                $gteid = $payload->action->custom->game_transaction_ext_id;
             }
             else{
                 $gteid = ClientRequestHelper::generateGTEID(
