@@ -165,9 +165,7 @@ class JustPlayController extends Controller
                 "amount" => $pay_amount,
                 "game_transaction_type"=> 2,
                 //"provider_request" =>json_encode($request->all()),
-                );
-
-
+            );
             GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
              Helper::saveLog("Justplay before sa body_details", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
             $body_details = [
