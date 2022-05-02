@@ -317,13 +317,16 @@ class BOTAController extends Controller{
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance,2);
-                $client_details->balance = $balance;
                 ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,);
                 $response = array(
                     "user" => $data['user'],
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
+                $updateData = array(
+                    "mw_response" => json_encode($msg)
+                );
+                GameTransactionMDB::updateGametransactionEXT($updateData,$winTransactionExtID, $client_details);
                 Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
@@ -372,7 +375,7 @@ class BOTAController extends Controller{
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-            $gameExt = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data['idx'], 1, $client_details);
+            $gameExt = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($this->prefix.'_'.$data['detail']['shoeNo'], 1, $client_details);
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
             if($gameExt==null){
                 $msg = array(
@@ -380,7 +383,7 @@ class BOTAController extends Controller{
                     "balance" =>(int) round($client_details->balance,2),
                     "confirm" => "ok"
                 );
-                Helper::saveLog('BOTA CANCEL DUPLICATE REFUND', $this->provider_db_id, json_encode($msg), 'REFUND DUPE');
+                Helper::saveLog('BOTA CANCEL DUPLICATE REFUND', $this->provider_db_id, json_encode($msg), 'REFUND ALREADY EXIST!');
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
@@ -407,7 +410,7 @@ class BOTAController extends Controller{
             $updateGameTransaction = [
                 'win' => 4,
                 'pay_amount' => $data['price'],
-                'income' => $gameExt->income - round($data["price"],2),
+                'income' => $gameExt->amount - round($data["price"],2),
                 'entry_id' => round($data["price"],2) == 0 && $gameExt->pay_amount == 0 ? 1 : 2,
                 'trans_status' => 2
             ];
@@ -424,7 +427,7 @@ class BOTAController extends Controller{
                         "confirm" => "ok"
                     );
                     $dataToUpdate = array(
-                        "mw_response" => json_encode($msg)
+                        "mw_response" => json_encode($response)
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransExt,$client_details);
                     Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "(Cancel)HIT!");
