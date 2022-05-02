@@ -118,7 +118,7 @@ class BOTAController extends Controller{
                 "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
                 "token_id" => $client_details->token_id,
                 "game_id" => $gamedetails->game_id,
-                "round_id" => $data['detail']['shoeNo'],
+                "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "bet_amount" => round($data['price'],2),
                 "pay_amount" => 0,
                 "win" => 5,
@@ -130,7 +130,7 @@ class BOTAController extends Controller{
             $bettransactionExt = array(
                 "game_trans_id" => $game_trans_id,
                 "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
-                "round_id" => $data['detail']['shoeNo'],
+                "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 1,
                 "provider_request" => json_encode($data),
@@ -219,7 +219,7 @@ class BOTAController extends Controller{
                         "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
                         "token_id" => $client_details->token_id,
                         "game_id" => $gamedetails->game_id,
-                        "round_id" => $data['detail']['shoeNo'],
+                        "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                         "bet_amount" => round($data['price'],2),
                         "pay_amount" => 0,
                         "win" => 5,
@@ -231,7 +231,7 @@ class BOTAController extends Controller{
                 $bettransactionExt = array(
                     "game_trans_id" => $game_trans_id,
                     "provider_trans_id" => $this->prefix.'_'.$data['detail']['shoeNo'],
-                    "round_id" => $data['detail']['shoeNo'],
+                    "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                     "amount" => round($data['price'],2),
                     "game_transaction_type" => 1,
                     "provider_request" => json_encode($data),
@@ -274,7 +274,7 @@ class BOTAController extends Controller{
             $winTransactionExt = array(
                 "game_trans_id" => $game->game_trans_id,
                 "provider_trans_id"=>$data['idx'],
-                "round_id"=>$data['detail']['shoeNo'],
+                "round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount"=>$data['price'],
                 "game_transaction_type"=> 2,
                 "provider_request"=> json_encode($data),
@@ -293,7 +293,7 @@ class BOTAController extends Controller{
                 "provider" => [
                     "provider_request" => $data, #R
                     "provider_trans_id"=>$data['idx'], #R
-                    "provider_round_id"=>$data['detail']['shoeNo'], #R
+                    "provider_round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'], #R
                     'provider_name' => $gamedetails->provider_name
                 ],
                 "mwapi" => [
@@ -387,7 +387,7 @@ class BOTAController extends Controller{
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-            $data['detail']['shoeNo'] = $gameExt->round_id;
+            $data['detail']['shoeNo'].$data['detail']['gameNo'] = $gameExt->round_id;
             $updateGameTransaction = array(
                 "win" => 4,
                 "pay_amount" => round($data['price'], 2),
@@ -398,7 +398,7 @@ class BOTAController extends Controller{
             $refundgametransExt = array(
                 "game_trans_id" => $gameExt->game_trans_id,
                 "provider_trans_id" => $data['idx'],
-                "round_id" => $data['detail']['shoeNo'],
+                "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'], 2),
                 "game_transaction_type" => 3,
                 "provider_request" => json_encode($data),
