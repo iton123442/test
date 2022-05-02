@@ -100,18 +100,17 @@ class BOTAController extends Controller{
                 ->header('Content-Type', 'application/json');
             }
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
-            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data['detail']['shoeNo'], 'transaction_id', false, $client_details);
+            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'], 'transaction_id', false, $client_details);
             if($bet_transaction != "false"){//check if bet transaction is existing
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $game_trans_id = $bet_transaction->game_trans_id;
-                $msg = [
-                    'msg' => 'bet_Exist',
+                $updateGameTransaction = [
+                    'win' => 5,
                     'bet_amount' => $bet_transaction->bet_amount + round($data['price'],2),
                     'entry_id' => 1,
                     'trans_status' => 1
                 ];
-                return response($msg,200)
-                ->header('Content-Type', 'application/json');
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
             }
             else{
             $gameTransactionData = array(
@@ -200,9 +199,9 @@ class BOTAController extends Controller{
                 ->header('Content-Type', 'application/json');
             }
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
-            $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'],$client_details);
+            $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
             if($game == null){
-                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data['detail']['shoeNo'], 'transaction_id', false, $client_details);
+                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'], 'transaction_id', false, $client_details);
                 if($bet_transaction != "false"){//check if bet transaction is existing
                     $client_details->connection_name = $bet_transaction->connection_name;
                     $game_trans_id = $bet_transaction->game_trans_id;
