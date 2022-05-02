@@ -286,7 +286,7 @@ class BOTAController extends Controller{
                 "custom" => [
                     "provider" => 'BOTA',
                     "isUpdate" => false,
-                    "game_transaction_ext_id" => 'TG_'.$winTransactionExtID,
+                    "game_transaction_ext_id" => $winTransactionExtID,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => $win_or_lost,
                 ],
