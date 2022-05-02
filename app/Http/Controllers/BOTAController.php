@@ -323,7 +323,7 @@ class BOTAController extends Controller{
                     "confirm" => "ok"
                 );
                 $updateData = array(
-                    "mw_response" => json_encode($msg)
+                    "mw_response" => json_encode($response)
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateData,$winTransactionExtID, $client_details);
                 Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
