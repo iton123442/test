@@ -292,7 +292,12 @@ class BOTAController extends Controller{
             }
         }
         else{
+            $msg = array(
+                "result_code" => "1",
+                "result_message" => "(NoAccount)"
+            );
             
+            return response($msg, 200)->header('Content-Type', 'application/json');
         }
     }
 
@@ -322,7 +327,7 @@ class BOTAController extends Controller{
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
             $findRebetTransaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id', false, $client_details);
             if($findRebetTransaction != "false"){
-                $findRefund = GameTransactionMDB::findGameTransactionDetails($data['detail']['shoeNo'].$data['detail']['shoeNo'].$data['detail']['gameNo'], 'round_id', false, $client_details);
+                // $findRefund = GameTransactionMDB::findGameTransactionDetails($data['detail']['shoeNo'].$data['detail']['shoeNo'].$data['detail']['gameNo'], 'round_id', false, $client_details);
                 $game = GameTransactionMDB::getGameTransactionByRoundId('RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
             }else{
                 $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
@@ -390,7 +395,7 @@ class BOTAController extends Controller{
                 "income" =>$game->income - round($data["price"],2),
                 "entry_id" =>round($data["price"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
             );
-            $game_transactionid = GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
+            GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
             //for game Extension
             $response = array(
                 "user" => $data['user'],
