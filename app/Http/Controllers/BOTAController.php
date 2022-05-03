@@ -228,7 +228,7 @@ class BOTAController extends Controller{
                 "provider_trans_id" => $this->prefix.'RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "token_id" => $client_details->token_id,
                 "game_id" => $gamedetails->game_id,
-                "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
+                "round_id" => 'RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "bet_amount" => round($data['price'],2),
                 "pay_amount" => 0,
                 "win" => 5,
@@ -240,7 +240,7 @@ class BOTAController extends Controller{
             $bettransactionExt = array(
                 "game_trans_id" => $game_trans_id,
                 "provider_trans_id" => $this->prefix.'RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
-                "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
+                "round_id" => 'RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 1,
                 "provider_request" => json_encode($data),
@@ -320,7 +320,13 @@ class BOTAController extends Controller{
                 ->header('Content-Type', 'application/json');
             }
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
-            $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
+            $findRebetTransaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id', false, $client_details);
+            if($findRebetTransaction != "false"){
+                $findRefund = GameTransactionMDB::findGameTransactionDetails($data['detail']['shoeNo'].$data['detail']['shoeNo'].$data['detail']['gameNo'], 'round_id', false, $client_details);
+                $game = GameTransactionMDB::getGameTransactionByRoundId('RB_'.$data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
+            }else{
+                $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
+            }
             if($game == null){
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id', false, $client_details);
                 if($bet_transaction != "false"){//check if bet transaction is existing
@@ -514,7 +520,7 @@ class BOTAController extends Controller{
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-            $$data['detail']['shoeNo'].$data['detail']['gameNo'] = $gameExt->round_id;
+            $data['detail']['shoeNo'].$data['detail']['gameNo'] = $gameExt->round_id;
             $updateGameTransaction = array(
                 "win" => 4,
                 "pay_amount" => round($data['price'], 2),
