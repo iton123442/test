@@ -211,10 +211,11 @@ public function gameBet($request, $client_details){
                             );
                         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
                         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
-                        $fund_extra_data = [
-                            'provider_name' => $game_details->provider_name
-                        ];
+                        
                 try {
+                    $fund_extra_data = [
+                        'provider_name' => $game_details->provider_name
+                    ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $game_transaction_id, 'debit', false, $fund_extra_data);
                 } catch (\Exception $e) {
                     $response = [
@@ -360,7 +361,7 @@ public function gameBet($request, $client_details){
                                                             // 'general_details' => 'success',
                                                             );
                                                         // GameTransactionMDB::createGameTransactionExt($gameTransactionEXTDataLose,$client_details);
-                                                        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
+                                                        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTDataLose,$gen_game_extid,$client_details); //create extension
                                             }else{
                                                 //     $updateTransactionEXt = array(
                                                 //         "provider_request" =>json_encode($request),
