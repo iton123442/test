@@ -241,7 +241,6 @@ class QuickspinDirectController extends Controller
         $game_code = $req['gameref'];
         $pay_amount = $req['amount']/100;
         $client_details = ProviderHelper::getClientDetails('player_id', $req['customerid']);
-        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         if($client_details == null){
             $res = [
                 "errorcode" => "UNHANDLED",
@@ -297,6 +296,8 @@ class QuickspinDirectController extends Controller
         }
         
         if($trans_type == 'freespinspayout'){
+            $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+            $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
             $gameTransactionData = array(
                 "provider_trans_id" => $provider_trans_id,
                 "token_id" => $client_details->token_id,
@@ -311,7 +312,7 @@ class QuickspinDirectController extends Controller
             // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
             GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id, $client_details);
             $gameTransactionEXTData = array(
-                "game_trans_id" => $game_transaction_id,
+                "game_trans_id" => $gen_game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $round_id,
                 "amount" => 0,
@@ -320,7 +321,7 @@ class QuickspinDirectController extends Controller
             );
             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
             GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
-            $game_trans_id = $game_transaction_id;
+            $game_trans_id = $gen_game_trans_id;
             $promocode = explode("TG",$req["promocode"]);
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
             $getFreespin = FreeSpinHelper::getFreeSpinDetails($promocode[1], "provider_trans_id" );
@@ -356,6 +357,7 @@ class QuickspinDirectController extends Controller
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
             $game_trans_id = $bet_transaction->game_trans_id;
         }
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         $gameTransactionEXTData = array(
                   "game_trans_id" => json_encode($game_trans_id),
                   "provider_trans_id" => $provider_trans_id,
