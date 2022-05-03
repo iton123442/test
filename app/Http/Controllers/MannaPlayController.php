@@ -77,7 +77,8 @@ class MannaPlayController extends Controller
 					"message" => "Account is not exist!",
 				];
 				// Find the player and client details
-				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				$data_encode = ProviderHelper::getDetailsDecryptToken($json_data['sessionId']);
+				$client_details = ProviderHelper::getClientDetails('token_id', $data_encode['token_id']);
 				if ($client_details != null) {
 
 					if (!$this->CheckAuth($client_details, $api_key)){
@@ -130,7 +131,9 @@ class MannaPlayController extends Controller
 					"message" => "Account is not exist!",
 				];
 				// Find the player and client details
-				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				$data_encode = ProviderHelper::getDetailsDecryptToken($json_data['sessionId']);
+				$client_details = ProviderHelper::getClientDetails('token_id', $data_encode['token_id']);
+				// $client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
 				
 				if ($client_details != null) {
 					// $game_trans_id = ProviderHelper::idGenerate($client_details->connection_name, 1);
@@ -165,7 +168,8 @@ class MannaPlayController extends Controller
 					$json_data['income'] = $json_data['amount'];
 					$json_data['roundid'] = $json_data['round_id'];
 					$json_data['transid'] = $json_data['transaction_id'];
-					$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
+					// $game_details = Game::find($json_data["game_id"], $this->provider_db_id);
+					$game_details = Game::findbyid($data_encode["game_id"]);
 
 					$gameTransactionData = array(
 			            "provider_trans_id" => $json_data['transaction_id'],
@@ -333,7 +337,9 @@ class MannaPlayController extends Controller
 					"message" => "Account is not exist!",
 				];
 				// Find the player and client details
-				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				// $client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				$data_encode = ProviderHelper::getDetailsDecryptToken($json_data['sessionId']);
+				$client_details = ProviderHelper::getClientDetails('token_id', $data_encode['token_id']);
 
 				if ($client_details != null) {
 
@@ -365,7 +371,8 @@ class MannaPlayController extends Controller
 					else
 					{
 						
-						$game_details = Game::find($json_data["game_id"], $this->provider_db_id);
+						// $game_details = Game::find($json_data["game_id"], $this->provider_db_id);
+						$game_details = Game::findbyid($data_encode["game_id"]);
 						
 						$bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($json_data['sessionId'], $json_data['round_id'], $client_details);
 						
