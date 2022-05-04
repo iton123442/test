@@ -45,6 +45,26 @@ class BOTAHelper{
             return $responseBody;
 		}
 	}
+    
+    public static function getBettingList($details,$time){
+        $datatosend = [
+            "user_id" => config('providerlinks.bota.prefix')."_".$details->player_id,
+            "start_date" => $time,
+            "end_date" => $time
+        ];
+        $client = new Client([
+            'headers' => [ 
+                'Content-type' => 'x-www-form-urlencoded',
+                'Authorization' => "Bearer ".config('providerlinks.bota.api_key'),
+                'User-Agent' => config('providerlinks.bota.user_agent')
+            ]
+        ]);
+        $response = $client->get(config('providerlinks.bota.api_url').'/betting/list',
+        ['form_params' => $datatosend,]);
+        $responseBody = json_decode($response->getBody()->getContents());
+        return $responseBody;
+    }
+
    	public static function botaGenerateGametoken($player_details){
     //Check player if exist in provider's side
 	   $checkIfEXist = BOTAHelper::botaPlayerChecker($player_details,'Verify');
