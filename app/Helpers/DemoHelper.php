@@ -268,10 +268,10 @@ class DemoHelper{
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].config("providerlinks.mancala.API_KEY"));
+        $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request['game_code'].config("providerlinks.mancala.API_KEY"));
         $datatosend = [
                 "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
-                "GameId" => $request_data['game_code'],
+                "GameId" => $request['game_code'],
                 "Lang" => "EN",
                 "ClientType" => 1,
                 "IsVirtual" => false,
@@ -286,8 +286,8 @@ class DemoHelper{
         $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
 
         if($game_launch_url !== NULL) {
-            Helper::playerGameRoundUuid($request_data["game_code"], $request_data["token"], $request_data["game_provider"], $game_launch_url->Token);
-            return $game_launch_url->IframeUrl."&backurl=".$request_data['exitUrl'];  
+            Helper::playerGameRoundUuid($request["game_code"], $request["token"], $request["game_provider"], $game_launch_url->Token);
+            return $game_launch_url->IframeUrl."&backurl=".$request['exitUrl'];  
         } 
     }
     public static function evoplay($game_code, $lang){
