@@ -1425,7 +1425,6 @@ class GameLobby{
 
     public static function MancalaLaunchUrl($request_data) {
         $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
-
         $game_launch = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json'

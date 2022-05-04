@@ -485,6 +485,17 @@ class BNGController extends Controller
                     "mw_response" => json_encode($response)
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+                $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($data),
+                          "response" => json_encode($response),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "Failed",
+                      ]
+                    ];
+                 ProviderHelper::queTransactionLogs($createGameTransactionLog); 
             }catch(\Exception $e){
                 Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
             }
@@ -496,6 +507,7 @@ class BNGController extends Controller
     }
     private function betNullWinNotNull($data,$client_details,$game_details){
         $game = GameTransactionMDB::getGameTransactionByRoundId($data["args"]["round_id"],$client_details);
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         if($game != null){
             $win_or_lost = 5;
             if($data["args"]["round_finished"] == true){
@@ -525,10 +537,11 @@ class BNGController extends Controller
                 "round_id" =>$data["args"]["round_id"],
                 "amount" =>$data["args"]["win"],
                 "game_transaction_type"=>2,
-                "provider_request" =>json_encode($data),
-                "mw_response" => json_encode($response)
+                // "provider_request" =>json_encode($data),
+                // "mw_response" => json_encode($response)
             );
-            $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+            // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create game_transaction
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
@@ -581,6 +594,8 @@ class BNGController extends Controller
         }
     }
     private function betNotNullWinNull($data,$client_details,$game_details){
+        $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         $win_or_lost = 0;
         $dataToSave = array(
             "provider_trans_id" => $data["uid"],
@@ -593,15 +608,17 @@ class BNGController extends Controller
             "income" =>$data["args"]["bet"],
             "entry_id" =>1,
         );
-        $game_transactionid = GameTransactionMDB::createGametransaction($dataToSave,$client_details);
+        // $game_transactionid = GameTransactionMDB::createGametransaction($dataToSave,$client_details);
+        GameTransactionMDB::createGametransactionV2($dataToSave,$gen_game_trans_id,$client_details); //create game_transaction
         $betgametransactionext = array(
             "game_trans_id" => $game_transactionid,
             "round_id" =>$data["args"]["round_id"],
             "amount" =>$data["args"]["bet"],
             "game_transaction_type"=>1,
-            "provider_request" =>json_encode($data),
+            // "provider_request" =>json_encode($data),
         );
-        $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
+        // $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$gen_game_extid,$client_details); //create game_transaction
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
@@ -622,6 +639,17 @@ class BNGController extends Controller
                 "mw_response" => json_encode($response)
             );
             GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+            $createGameTransactionLog = [
+                  "connection_name" => $client_details->connection_name,
+                  "column" =>[
+                      "game_trans_ext_id" => $gen_game_extid,
+                      "request" => json_encode($data),
+                      "response" => json_encode($response),
+                      "log_type" => "provider_details",
+                      "transaction_detail" => "Success",
+                  ]
+                ];
+             ProviderHelper::queTransactionLogs($createGameTransactionLog); 
             return response($response,200)
                         ->header('Content-Type', 'application/json');
         }
@@ -643,6 +671,17 @@ class BNGController extends Controller
                     "win"=>2
                 );
                 GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
+                $createGameTransactionLog = [
+                  "connection_name" => $client_details->connection_name,
+                  "column" =>[
+                      "game_trans_ext_id" => $gen_game_extid,
+                      "request" => json_encode($data),
+                      "response" => json_encode($response),
+                      "log_type" => "provider_details",
+                      "transaction_detail" => "FAILED",
+                  ]
+                ];
+             ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $dataToUpdate = array(
                     "mw_response" => json_encode($response)
                 );
