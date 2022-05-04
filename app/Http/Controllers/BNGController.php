@@ -401,7 +401,7 @@ class BNGController extends Controller
                 ),
             );
             $wingametransactionext = array(
-                "game_trans_id" => $game_transactionid,
+                "game_trans_id" => $gen_game_trans_id,
                 "provider_trans_id" => $data["uid"],
                 "round_id" => $data["args"]["round_id"],
                 "amount" => $data["args"]["win"],
@@ -436,7 +436,7 @@ class BNGController extends Controller
                     "mw_response" => $response, #R
                 ]
             ];
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game_transactionid,'credit',false,$action_payload);
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$gen_game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
