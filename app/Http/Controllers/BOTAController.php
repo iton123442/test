@@ -216,7 +216,7 @@ class BOTAController extends Controller{
                     ->header('Content-Type', 'application/json');
                 }
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
-                $game = GameTransactionMDB::getGameTransactionByRoundId($betDetails->result_value[0]->c_shoe_idx.$betDetails->result_value[0]->c_game_idx,$client_details);
+                $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
                 if($game == null){
                     $bet_transaction = GameTransactionMDB::findGameTransactionDetails($newProvTransID, 'transaction_id', false, $client_details);
                     if($bet_transaction != "false"){//check if bet transaction is existing
