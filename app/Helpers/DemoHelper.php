@@ -132,7 +132,7 @@ class DemoHelper{
 
             $response = array(
                 "game_code" =>$data->game_code,
-                "url" =>  DemoHelper::mancala($data),
+                "url" =>  DemoHelper::mancalaDemo($data),
                 "game_launch" => true
             );
             
@@ -262,7 +262,7 @@ class DemoHelper{
         $gameurl = config('providerlinks.play_tigergames').'/api/playngo/tgload/'.$urlencode; 
         return $gameurl;
     }
-    public static function mancala($request){ //56
+    public static function mancalaDemo($request){ //56
         $game_launch = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json'
