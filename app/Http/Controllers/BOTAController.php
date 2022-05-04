@@ -202,18 +202,37 @@ class BOTAController extends Controller{
             $betDetails = BOTAHelper::getBettingList($client_details,$this->dateToday);
             if($betDetails->result_count != 0){
                 $newProvTransID = $this->prefix.'_'.$betDetails->result_value[0]->c_idx;
-                try{
-                    Helper::saveLog('IDEMPOTENT BOTA', $this->provider_db_id, json_encode($newProvTransID), 'IDEMPOTENCY HIT!');
-                    ProviderHelper::idenpotencyTable($newProvTransID.'_4');//rebet
-                }catch(\Exception $e){//if bet exist
-                    $msg = array(
-                        "user" => $data['user'],
-                        "balance" =>(int) round($client_details->balance,2),
-                        "confirm" => "ok"
-                    );
-                    Helper::saveLog('BOTA REBET DUPLICATE RETURN', $this->provider_db_id, json_encode($msg), 'REBET FAILED');
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
+                $refundRoundID = $data['detail']['shoeNo'].$data['detail']['shoeNo'].$data['detail']['gameNo'];
+                $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',$client_details);
+                if(count($checkRefundCount) == 2){
+                    try{
+                        Helper::saveLog('IDEMPOTENT BOTA', $this->provider_db_id, json_encode($newProvTransID), 'IDEMPOTENCY HIT!');
+                        ProviderHelper::idenpotencyTable($newProvTransID.'_44');//rebet
+                    }catch(\Exception $e){//if bet exist
+                        $msg = array(
+                            "user" => $data['user'],
+                            "balance" =>(int) round($client_details->balance,2),
+                            "confirm" => "ok"
+                        );
+                        Helper::saveLog('BOTA REBET DUPLICATE RETURN4', $this->provider_db_id, json_encode($msg), 'REBET FAILED');
+                        return response($msg,200)
+                        ->header('Content-Type', 'application/json');
+                    }
+                }
+                else{
+                    try{
+                        Helper::saveLog('IDEMPOTENT BOTA', $this->provider_db_id, json_encode($newProvTransID), 'IDEMPOTENCY HIT!');
+                        ProviderHelper::idenpotencyTable($newProvTransID.'_4');//rebet
+                    }catch(\Exception $e){//if bet exist
+                        $msg = array(
+                            "user" => $data['user'],
+                            "balance" =>(int) round($client_details->balance,2),
+                            "confirm" => "ok"
+                        );
+                        Helper::saveLog('BOTA REBET DUPLICATE RETURN4', $this->provider_db_id, json_encode($msg), 'REBET FAILED');
+                        return response($msg,200)
+                        ->header('Content-Type', 'application/json');
+                    }
                 }
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
                 $game = GameTransactionMDB::getGameTransactionByRoundId($data['detail']['shoeNo'].$data['detail']['gameNo'],$client_details);
