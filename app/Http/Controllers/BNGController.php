@@ -419,7 +419,7 @@ class BNGController extends Controller
                 "custom" => [
                     "provider" => 'bng',
                     "isUpdate" => false,
-                    "game_transaction_ext_id" => $winGametransactionExtId,
+                    "game_transaction_ext_id" => $wingen_game_extid,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => $win_or_lost,
                 ],
@@ -547,7 +547,7 @@ class BNGController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'bng',
-                    "game_transaction_ext_id" => $winGametransactionExtId,
+                    "game_transaction_ext_id" => $gen_game_extid,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => $win_or_lost,
                 ],
@@ -623,7 +623,7 @@ class BNGController extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$gen_game_extid,$game_transactionid,"debit",false,$fund_extra_data);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
