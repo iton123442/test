@@ -430,7 +430,7 @@ class BNGController extends Controller
                     'provider_name' => $game_details->provider_name
                 ],
                 "mwapi" => [
-                    "roundId"=>$game_transactionid, #R
+                    "roundId"=>$gen_game_trans_id, #R
                     "type"=>2, #R
                     "game_id" => $game_details->game_id, #R
                     "player_id" => $client_details->player_id, #R
@@ -480,7 +480,7 @@ class BNGController extends Controller
                 $dataToSave = array(
                     "win"=>2
                 );
-                GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
+                GameTransactionMDB::updateGametransaction($dataToSave,$gen_game_trans_id,$client_details);
                 // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                 $dataToUpdate = array(
                     "mw_response" => json_encode($response)
@@ -623,7 +623,7 @@ class BNGController extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$gen_game_extid,$game_transactionid,"debit",false,$fund_extra_data);
+        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"debit",false,$fund_extra_data);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
@@ -671,7 +671,7 @@ class BNGController extends Controller
                 $dataToSave = array(
                     "win"=>2
                 );
-                GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
+                GameTransactionMDB::updateGametransaction($dataToSave,$gen_game_trans_id,$client_details);
                 $createGameTransactionLog = [
                   "connection_name" => $client_details->connection_name,
                   "column" =>[
