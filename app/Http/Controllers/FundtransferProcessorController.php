@@ -643,10 +643,15 @@ class FundtransferProcessorController extends Controller
                             }
                             elseif ($payload->action->custom->provider == 'BOTA') {
                                 $updateGameTransaction = [
+                                    "pay_amount" => $payload->action->custom->pay_amount,
+                                    "income" =>  $payload->action->custom->income,
                                     "win" => $payload->action->custom->win_or_lost,
+                                    "entry_id" => $payload->action->custom->entry_id,
+                                    "trans_status" => 2,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                             }
                         }else{
                             # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!
@@ -659,7 +664,7 @@ class FundtransferProcessorController extends Controller
                         // $method, $provider_id = 9999, $request_data, $response_data
                         $api_error = false; // true if stop on API CODE 402, false re rerun the 5 times resend
                         $re_attempt = true;
-                        if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan' || $payload->action->custom->provider == 'BOTA'){
+                        if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
                             $updateGameTransaction = [
                                 "win" => 5,
                             ];
@@ -670,7 +675,7 @@ class FundtransferProcessorController extends Controller
                     }else{
                         $api_error = false; // true if stop on API CODE not 402, false re rerun the 5 times resend
                         $re_attempt = true;
-                        if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan' || $payload->action->custom->provider == 'BOTA'){
+                        if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
                             $updateGameTransaction = [
                                 "win" => 5,
                             ];
@@ -691,7 +696,7 @@ class FundtransferProcessorController extends Controller
 
 
                     # Only HTTP Error Should Be Resended
-                    if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan' || $payload->action->custom->provider == 'BOTA'){
+                    if($payload->action->custom->provider == 'bng' || $payload->action->custom->provider == 'wazdan'){
                         $updateGameTransaction = [
                             "win" => 5,
                         ];
