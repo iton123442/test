@@ -643,15 +643,10 @@ class FundtransferProcessorController extends Controller
                             }
                             elseif ($payload->action->custom->provider == 'BOTA') {
                                 $updateGameTransaction = [
-                                    "pay_amount" => $payload->action->custom->pay_amount,
-                                    "income" =>  $payload->action->custom->income,
                                     "win" => $payload->action->custom->win_or_lost,
-                                    "entry_id" => $payload->action->custom->entry_id,
-                                    "trans_status" => 2,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                         }else{
                             # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!

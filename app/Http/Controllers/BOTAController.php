@@ -157,15 +157,22 @@ class BOTAController extends Controller{
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                $msg = array(
+                $response = array(
                     "user" => $data['user'],
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
-                $updateData = array(
-                    "mw_response" => json_encode($msg)
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $bettransactionExtId,
+                        "request" => json_encode($data),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 return response($msg, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
@@ -309,7 +316,6 @@ class BOTAController extends Controller{
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
                         "provider" => 'BOTA',
-                        "isUpdate" => false,
                         "game_transaction_ext_id" => $bettransactionExtId,
                         "client_connection_name" => $client_details->connection_name
                     ],
@@ -345,10 +351,17 @@ class BOTAController extends Controller{
                         "balance" =>(int) $balance,
                         "confirm" => "ok"
                     );
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $bettransactionExtId,
+                            "request" => json_encode($data),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     return response($msg, 200)->header('Content-type', 'application/json');
                 }
                 elseif(isset($client_response->fundtransferresponse->status->code)
@@ -549,10 +562,17 @@ class BOTAController extends Controller{
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
-                $updateData = array(
-                    "mw_response" => json_encode($response)
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateData,$winTransactionExtID, $client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $winTransactionExtID,
+                        "request" => json_encode($data),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "HIT!");
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
@@ -646,7 +666,6 @@ class BOTAController extends Controller{
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'BOTA',
-                    "isUpdate" => false,
                     "game_transaction_ext_id" => $game_trans_ext_id,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => 4,
@@ -680,10 +699,17 @@ class BOTAController extends Controller{
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
-                $dataToUpdate = array(
-                    "mw_response" => json_encode($response)
-                );
-                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_trans_ext_id,
+                        "request" => json_encode($data),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "(Cancel)HIT!");
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
