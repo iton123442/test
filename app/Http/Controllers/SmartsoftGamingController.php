@@ -407,7 +407,7 @@ class SmartsoftGamingController extends Controller
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transid_ext,
-                        "request" => json_encode($req->all()),
+                        "request" => json_encode($request->all()),
                         "response" => json_encode($response),
                         "log_type" => "provider_details",
                         "transaction_detail" => "success",

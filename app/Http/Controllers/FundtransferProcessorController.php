@@ -53,7 +53,7 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "PlayStar Gaming") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "Nolimit City") {
-                $gteid = $payload->action->custom->game_trans_ext_id;
+                $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "BGaming") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "SpearHead") {
@@ -353,7 +353,7 @@ class FundtransferProcessorController extends Controller
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                               // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                                 ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                             elseif($payload->action->custom->provider == 'icg'){
@@ -457,18 +457,12 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                 ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }elseif ($payload->action->custom->provider == 'Nolimit City') {
-                                 $ext_data = array(
-                                    "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response),
-                                    "transaction_detail" =>json_encode("success"),
-                                    "general_details" =>json_encode("success")
-                                );
                                 // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }elseif ($payload->action->custom->provider == 'BGaming') {
                                //  $ext_data = array(
                                //     "mw_request"=>json_encode($requesttocient),
