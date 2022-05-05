@@ -173,7 +173,7 @@ class WazdanControllerNew extends Controller
                     "game_transaction_type"=>1,
                     // "provider_request" =>json_encode($datadecoded),
                 );
-                   GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$betGametransactionExtId,$client_details); 
+                GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details); 
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
@@ -359,26 +359,7 @@ class WazdanControllerNew extends Controller
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
-                // $returnWinTransaction = WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"]);
-                // if($returnWinTransaction){
-                //     $msg = array(
-                //         "status" => 0,
-                //         "funds" => array(
-                //             "balance" => round($client_details->balance,2)
-                //         )
-                //     );
-                //     return response($msg,200)
-                //     ->header('Content-Type', 'application/json');
-                // }
-                // $win = $datadecoded["amount"] == 0 ? 0 : 1;
-                // $game_details = Helper::getInfoPlayerGameRound($datadecoded["user"]["token"]);
-                // $json_data = array(
-                //     "transid" => $datadecoded["transactionId"],
-                //     "amount" => round($datadecoded["amount"],2),
-                //     "roundid" => $datadecoded["roundId"],
-                //     "payout_reason" => null,
-                //     "win" => $win,
-                // );
+
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_2');
                 }catch(\Exception $e){
@@ -489,7 +470,6 @@ class WazdanControllerNew extends Controller
                     ->header('Content-Type', 'application/json');
                     }
                 }
-
                 $win_or_lost = round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 0 : 1;
                 $createGametransaction = array(
                     "win" => 5,
@@ -505,10 +485,18 @@ class WazdanControllerNew extends Controller
                         "balance" => $client_details->balance + round($datadecoded["amount"],2)
                     )
                 );
+                $wingametransactionext = array(
+                    "game_trans_id" => $game->game_trans_id,
+                    "provider_trans_id" => $datadecoded["transactionId"],
+                    "round_id" => $datadecoded["roundId"],
+                    "amount" => round($datadecoded["amount"],2),
+                    "game_transaction_type"=>2,
+                );
+              GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$WinGametransactionExtId,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
-                        "game_trans_ext_id" => $betGametransactionExtId,
+                        "game_trans_ext_id" => $WinGametransactionExtId,
                         "request" => json_encode($datadecoded),
                         "response" => json_encode($response),
                         "log_type" => "provider_details",
@@ -520,7 +508,7 @@ class WazdanControllerNew extends Controller
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
                         "provider" => 'wazdan',
-                        "game_transaction_ext_id" => $winGametransactionExtId,
+                        "game_transaction_ext_id" => $WinGametransactionExtId,
                         "client_connection_name" => $client_details->connection_name,
                         "win_or_lost" => $win_or_lost,
                     ],
