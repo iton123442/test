@@ -488,7 +488,7 @@ class NolimitController extends Controller
                         "entry_id" => $entry_id,
                         "pay_amount" => $pay_amount,
                         "income" => $income,
-                        "game_trans_ext_id" => $game_transid_ext
+                        "game_transaction_ext_id" => $game_transid_ext
                     ],
                     "provider" => [
                         "provider_request" => $data, #R
@@ -530,7 +530,6 @@ class NolimitController extends Controller
                     }
                 }   
                  $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-          
                   ProviderHelper::saveLogWithExeption('Nolimit Win Result', $this->provider_db_id, json_encode($request->all()),$response);
                     return response($response,200)
                             ->header('Content-Type', 'application/json');
