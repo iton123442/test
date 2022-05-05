@@ -660,10 +660,10 @@ class BOTAController extends Controller{
                 "game_transaction_type" => 3,
                 "provider_request" => json_encode($data),
             );
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($refundgametransExt, $client_details);
             $fund_extra_data = [
                 'provider_name' => $gamedetails->provider_name
             ]; 
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($refundgametransExt, $client_details);
             $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$gameExt->game_trans_id,$game_trans_ext_id,'credit',true, $fund_extra_data);
             Helper::saveLog('BOTA CANCEL HIT FUNDTRANSFER', $this->provider_db_id, json_encode($gameExt), $game_trans_ext_id);
             if(isset($client_response->fundtransferresponse->status->code) 
