@@ -367,7 +367,7 @@ class BNGController extends Controller
                     $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
                 }
                 $createFreeRoundTransaction = array(
-                    "game_trans_id" => $game_transactionid,
+                    "game_trans_id" => $gen_game_trans_id,
                     'freespin_id' => $getFreespin->freespin_id
                 );
                 FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
