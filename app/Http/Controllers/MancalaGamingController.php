@@ -462,7 +462,12 @@ class MancalaGamingController extends Controller
 					if ($game_transaction != 'false') {
 
 						if ($game_transaction->win == 2) {
-							return response()->json($response, $http_status);
+							$response = [
+								"Error" =>  0, 
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance)
+							];
+							return $response;
+							// return response()->json($response, $http_status);
 						}
 
 						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
