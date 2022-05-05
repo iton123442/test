@@ -42,7 +42,7 @@ class YGG002Controller extends Controller
             return $response;
             Helper::saveLog("YGG 002 playerinfo response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
         }
-        $player_id = "TG_".$client_details->player_id;
+        $player_id = "TG002_".$client_details->player_id;
         $balance = floatval(number_format($client_details->balance, 2, '.', ''));
         $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => $balance]); #new method
         $response = array(
