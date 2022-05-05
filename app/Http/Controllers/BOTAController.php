@@ -315,7 +315,7 @@ class BOTAController extends Controller{
                 $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
-                        "provider" => 'BOTA',
+                        "provider" => 'bota',
                         "game_transaction_ext_id" => $bettransactionExtId,
                         "client_connection_name" => $client_details->connection_name
                     ],
@@ -665,7 +665,7 @@ class BOTAController extends Controller{
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
-                    "provider" => 'BOTA',
+                    "provider" => 'bota',
                     "game_transaction_ext_id" => $game_trans_ext_id,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => 4,
