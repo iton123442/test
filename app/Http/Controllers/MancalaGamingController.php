@@ -444,15 +444,15 @@ class MancalaGamingController extends Controller
 
 				if ($client_details != null) {
 					
-					try{
-						ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
-					}catch(\Exception $e){
-						$response = [
-							"Error" =>  0, 
-							"Balance" => ProviderHelper::amountToFloat($client_details->balance)
-						];
-						return $response;
-					}
+					// try{
+					// 	ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
+					// }catch(\Exception $e){
+					// 	$response = [
+					// 		"Error" =>  0, 
+					// 		"Balance" => ProviderHelper::amountToFloat($client_details->balance)
+					// 	];
+					// 	return $response;
+					// }
 
 					// $game_transaction =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($json_data["RefundTransactionId"], 1, $client_details);
 					$game_transaction =  GameTransactionMDB::findGameTransactionDetails($json_data["TransactionId"], 'transaction_id', false, $client_details);
