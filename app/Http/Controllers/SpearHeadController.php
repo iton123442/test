@@ -345,7 +345,7 @@ public function CreditProcess($req){
         $game_transaction_id = $gen_game_trans_id;
         $income = 0;
         $gameTransactionEXTData = array(
-            "game_trans_id" => json_encode($game_trans_id),
+            "game_trans_id" => json_encode($game_transaction_id),
             "provider_trans_id" => $provider_trans_id,
             "round_id" => $round_id,
             "amount" => 0,
