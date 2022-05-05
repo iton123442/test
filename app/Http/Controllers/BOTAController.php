@@ -173,7 +173,7 @@ class BOTAController extends Controller{
                     ]
                 ];
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                return response($msg, 200)->header('Content-type', 'application/json');
+                return response($response, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
