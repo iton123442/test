@@ -25,9 +25,9 @@ class ProviderHelper{
 	 * Generate Random IDENTIFICATION
 	 */
 	public static function idGen(){
-		$rand = shell_exec('date +%s%N');
-        $identifier = (int)$rand + 54321;
-		// $identifier = rand(); 
+		// $rand = shell_exec('date +%s%N');
+        // $identifier = (int)$rand + 54321;
+		$identifier = rand(); 
         return $identifier;
 	}
 
