@@ -342,26 +342,7 @@ class WazdanController extends Controller
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
-                // $returnWinTransaction = WazdanHelper::gameTransactionExtChecker($datadecoded["transactionId"]);
-                // if($returnWinTransaction){
-                //     $msg = array(
-                //         "status" => 0,
-                //         "funds" => array(
-                //             "balance" => round($client_details->balance,2)
-                //         )
-                //     );
-                //     return response($msg,200)
-                //     ->header('Content-Type', 'application/json');
-                // }
-                // $win = $datadecoded["amount"] == 0 ? 0 : 1;
-                // $game_details = Helper::getInfoPlayerGameRound($datadecoded["user"]["token"]);
-                // $json_data = array(
-                //     "transid" => $datadecoded["transactionId"],
-                //     "amount" => round($datadecoded["amount"],2),
-                //     "roundid" => $datadecoded["roundId"],
-                //     "payout_reason" => null,
-                //     "win" => $win,
-                // );
+
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_2');
                 }catch(\Exception $e){
