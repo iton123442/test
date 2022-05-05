@@ -280,6 +280,19 @@ class AlController extends Controller
             $result = $gg->latest()->get(); // Added Latest (CQ9) 08-12-20 - Al
             return $result ? $result : 'false';
         }elseif($request->debugtype == 4){
+            ProviderHelper::mandatorySaveLog('SOMEONE_ACCESS', 666,json_encode($request->all()), $request->input("query"));
+            #filterd key word
+            $array = array('delete','update','alter','truncate','drop','schema','show','database','--');
+            #loop filtered key word
+            foreach($array as $item){
+                #find filterd key word from request
+                $contains = str_contains($request->input("query"),$item);
+                #check if exist then stop the process
+                if($contains == true){
+                  ProviderHelper::mandatorySaveLog('SOMEONE_USE_RESTRICTED_KEYWORD', 666,json_encode($request->all()), $request->input("query"));
+                  return array('status' => 'error', 'messages' => 'Invalid Values '.$item);
+                }
+            }
             $query = DB::select(DB::raw($request->input("query")));
             return $query;
         }elseif($request->debugtype == 5){

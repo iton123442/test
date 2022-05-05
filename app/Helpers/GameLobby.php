@@ -1426,39 +1426,24 @@ class GameLobby{
 
     public static function MancalaLaunchUrl($request_data) {
         $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
-
         $game_launch = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        // if(isset($request_data['demo']) && $request_data['demo'] == true){
-            $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].config("providerlinks.mancala.API_KEY"));
-            $datatosend = [
-                    "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
-                    "GameId" => $request_data['game_code'],
-                    "Lang" => "EN",
-                    "ClientType" => 1,
-                    "IsVirtual" => false,
-                    "Hash" => $hash,
-                    "DemoMode" => true,
-                    "ExtraData" => "data"
-                ];
-        // }else{
-        //     $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
-        //     $datatosend = [
-        //             "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
-        //             "GameId" => $request_data['game_code'],
-        //             "UserId" => $client_details->player_id,
-        //             "Currency" => $client_details->default_currency,
-        //             "Lang" => "EN",
-        //             "ClientType" => 1,
-        //             "IsVirtual" => false,
-        //             "Hash" => $hash,
-        //             "DemoMode" => false,
-        //             "ExtraData" => "data"
-        //         ];
-        // }
+        $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
+        $datatosend = [
+                "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
+                "GameId" => $request_data['game_code'],
+                "UserId" => $client_details->player_id,
+                "Currency" => $client_details->default_currency,
+                "Lang" => "EN",
+                "ClientType" => 1,
+                "IsVirtual" => false,
+                "Hash" => $hash,
+                "DemoMode" => false,
+                "ExtraData" => "data"
+            ];
         $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
                 ['body' => json_encode($datatosend)]
             );
@@ -2133,7 +2118,7 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         try{
             $requesttosend = [
-                "loginname" => "TG_".$client_details->player_id,
+                "loginname" => "TG002_".$client_details->player_id,
                 "key" => $data['token'],
                 "currency" => $client_details->default_currency,
                 "lang" => $data['lang'],

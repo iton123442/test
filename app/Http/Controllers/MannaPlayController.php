@@ -427,7 +427,7 @@ class MannaPlayController extends Controller
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
 			                    "provider" => 'MannaPlay',
-			                    "game_trans_ext_id" => $game_trans_ext_id,
+								"game_transaction_ext_id" => $game_trans_ext_id,
 			                    "client_connection_name" => $client_details->connection_name,
 								"win_or_lost" => $win
 			                ],

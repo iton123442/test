@@ -632,7 +632,7 @@ class GameTransactionMDB
 
     }
 
-    public  static function findBOTAGameExt($provider_identifier, $type,$client_details)
+    public  static function findBOTAGameExt($provider_identifier, $type,$game_transaction_type,$client_details)
     {
         $connection_name = $client_details->connection_name;
         if ($type == 'all') {
@@ -645,7 +645,7 @@ class GameTransactionMDB
             $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
         }
         if ($type == 'round_id') {
-            $where = 'where gte.round_id = "' . $provider_identifier . '" ';
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '"';
         }
         if ($type == 'game_transaction_ext_id') {
             $where = 'where gte.provider_trans_id = "' . $provider_identifier . '"';
@@ -926,9 +926,9 @@ class GameTransactionMDB
      */
     public static function createGametransactionLogCCMD($data,$connection_name){
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
-        Helper::saveLog('PlayStar create logs', 99, json_encode($connection), "Hit the logs");
+        // ProviderHelper::saveLogWithExeption('createGametransactionLogCCMD', 99, json_encode($connection), "Hit");
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insertGetId($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insert($data);
         }else{
             return null;
         }
