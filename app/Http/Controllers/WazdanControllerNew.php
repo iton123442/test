@@ -12,7 +12,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransaction as GMT;
 use App\Models\GameTransactionMDB;
 use DB;
-class WazdanController extends Controller
+class WazdanControllerNew extends Controller
 {
     private $prefix = 33;
     public function __construct() {
