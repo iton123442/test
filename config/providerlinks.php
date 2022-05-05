@@ -8,6 +8,7 @@ $play_tigergames = 'https://play-test.tigergames.io';
 $iframe_url = 'https://play-test.betrnk.games/loadgame/transferwallet?param=';
 $puretransferwallet_iframe = 'https://play-test.betrnk.games/api/tw/loadgame?param=';
 $cut_call ='https://api-test.betrnk.games/public';
+// $cut_call = 'http://localhost:8010/public'; 
 return [
     'cut_call_server' => $cut_call,
     'play_betrnk' => $play_betrnk,

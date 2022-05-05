@@ -81,7 +81,7 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "TopTrendGaming") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "MannaPlay") {
-                $gteid = $payload->action->custom->game_trans_ext_id;
+                $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "Ozashiki") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "SG") {
@@ -105,7 +105,7 @@ class FundtransferProcessorController extends Controller
             else if ($payload->action->custom->provider == "PlayNGo") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
-            else if ($payload->action->custom->provider == "BOTA") {
+            else if ($payload->action->custom->provider == "bota") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }
             else{
@@ -194,6 +194,7 @@ class FundtransferProcessorController extends Controller
                     }
                     $guzzle_response = $client->post($payload->header->endpoint,
                     [
+
                         'on_stats' => function (TransferStats $stats) use ($requesttocient){
                             $data = [
                                 'http_body' => $stats->getHandlerStats(),
@@ -269,7 +270,10 @@ class FundtransferProcessorController extends Controller
                                     ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                 }
                                 $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response),'transaction_detail' => "SUCCESS"];
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+
+                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'evoplay'){
                                 // $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
@@ -636,6 +640,13 @@ class FundtransferProcessorController extends Controller
                                 );
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 Helper::saveLog("Amuse Gaming Success Client Request", 65, json_encode($requesttocient), json_encode($client_response));
+                            }
+                            elseif ($payload->action->custom->provider == 'bota') {
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                         }else{
                             # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!
