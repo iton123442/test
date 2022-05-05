@@ -328,7 +328,7 @@ public function CreditProcess($req){
     $entry_id = $pay_amount > 0 ?  2 : 1;
     if($bet_transaction == 'false'){
         $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
-        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+        $gen_game_extid2 = ProviderHelper::idGenerate($client_details->connection_name,2);
         $gameTransactionData = array(
             "provider_trans_id" => $provider_trans_id,
             "token_id" => $client_details->token_id,
@@ -354,7 +354,7 @@ public function CreditProcess($req){
             // "provider_request" => json_encode($req),
         );
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid2,$client_details);
         if(isset($data['AdditionalData']['BonusId'])){
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
         // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);// not generated game trans id ext
