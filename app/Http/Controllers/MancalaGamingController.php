@@ -382,7 +382,7 @@ class MancalaGamingController extends Controller
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
 			                    "provider" => 'MancalaGaming',
-			                    "game_trans_ext_id" => $gen_game_extid,
+			                    "game_transaction_ext_id" => $gen_game_extid,
 			                    "win_or_lost" => $win_or_lost,
 			                    "client_connection_name" => $client_details->connection_name
 			                ],
@@ -434,10 +434,6 @@ class MancalaGamingController extends Controller
 				];
 			} else {
 
-				$response = [
-					"Error" =>  10204,
-					"message" => "Account is not exist!",
-				];
 				// Find the player and client details
 				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
 				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
@@ -456,16 +452,22 @@ class MancalaGamingController extends Controller
 
 					// $game_transaction =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($json_data["RefundTransactionId"], 1, $client_details);
 					$game_transaction =  GameTransactionMDB::findGameTransactionDetails($json_data["TransactionId"], 'transaction_id', false, $client_details);
-
-					$response = [
-						"Error" =>  10210,
-						"message" => "Target transaction id not found!",
-					];
-					
+					if($game_transaction == 'false'){
+						$response = [
+							"Error" =>  10210,
+							"message" => "Target transaction id not found!",
+						];
+						return $response;
+					}
 					if ($game_transaction != 'false') {
 
 						if ($game_transaction->win == 2) {
-							return response()->json($response, $http_status);
+							$response = [
+								"Error" =>  0, 
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance)
+							];
+							return $response;
+							// return response()->json($response, $http_status);
 						}
 
 						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
