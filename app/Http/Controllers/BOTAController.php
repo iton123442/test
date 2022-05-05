@@ -621,7 +621,7 @@ class BOTAController extends Controller{
             $updateGameTransaction = array(
                 "win" => 4,
                 "pay_amount" => round($data['price'], 2),
-                "income" => $gameExt->amount - round($data['price'], 2),
+                "income" => $gameExt->bet_amount - round($data['price'], 2),
                 "entry_id" => 2
             );
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $gameExt->game_trans_id, $client_details);
