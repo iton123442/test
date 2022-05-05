@@ -393,7 +393,7 @@ public function CreditProcess($req){
               "Message" => 'Success',
               "Details" => null,
       ];
-      $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $gen_game_extid, $game_trans_id, 'debit');
+      $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $gen_game_extid, $game_transaction_id, 'debit');
       if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
           switch ($client_response->fundtransferresponse->status->code) {
