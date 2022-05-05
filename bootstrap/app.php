@@ -102,6 +102,7 @@ $app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
 */
 $app->register('Sentry\Laravel\ServiceProvider');
 $app->configure("providerlinks");
+$app->configure("clientcustom");
 $app->configure("serverlist");
 $app->configure("generateid");
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
