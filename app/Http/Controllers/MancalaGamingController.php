@@ -434,10 +434,6 @@ class MancalaGamingController extends Controller
 				];
 			} else {
 
-				$response = [
-					"Error" =>  10204,
-					"message" => "Account is not exist!",
-				];
 				// Find the player and client details
 				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
 				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
