@@ -537,7 +537,7 @@ class FundtransferProcessorController extends Controller
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                                 
                             }elseif ($payload->action->custom->provider == 'Oryx Gaming') {
                                 $ext_data = array(

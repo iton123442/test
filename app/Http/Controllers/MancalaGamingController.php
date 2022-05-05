@@ -382,7 +382,7 @@ class MancalaGamingController extends Controller
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
 			                    "provider" => 'MancalaGaming',
-			                    "game_trans_ext_id" => $gen_game_extid,
+			                    "game_transaction_ext_id" => $gen_game_extid,
 			                    "win_or_lost" => $win_or_lost,
 			                    "client_connection_name" => $client_details->connection_name
 			                ],
