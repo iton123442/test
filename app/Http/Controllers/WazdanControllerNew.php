@@ -136,6 +136,9 @@ class WazdanControllerNew extends Controller
                 $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name, 2);
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($datadecoded["roundId"], 'round_id',false, $client_details);
+                $fund_extra_data = [
+                    'provider_name' => $game_details->provider_name
+                ];
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 if($bet_transaction != "false") {
                     $client_details->connection_name = $bet_transaction->connection_name;
@@ -171,9 +174,6 @@ class WazdanControllerNew extends Controller
                     // "provider_request" =>json_encode($datadecoded),
                 );
                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$betGametransactionExtId,$client_details); 
-                $fund_extra_data = [
-                    'provider_name' => $game_details->provider_name
-                ];
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
