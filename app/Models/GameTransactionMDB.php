@@ -632,7 +632,7 @@ class GameTransactionMDB
 
     }
 
-    public  static function findBOTAGameExt($provider_identifier, $type,$client_details)
+    public  static function findBOTAGameExt($provider_identifier, $type,$game_transaction_type,$client_details)
     {
         $connection_name = $client_details->connection_name;
         if ($type == 'all') {
@@ -645,7 +645,7 @@ class GameTransactionMDB
             $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
         }
         if ($type == 'round_id') {
-            $where = 'where gte.round_id = "' . $provider_identifier . '" ';
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '"';
         }
         if ($type == 'game_transaction_ext_id') {
             $where = 'where gte.provider_trans_id = "' . $provider_identifier . '"';
