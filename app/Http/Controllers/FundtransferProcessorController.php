@@ -641,17 +641,19 @@ class FundtransferProcessorController extends Controller
                                 Helper::saveLog("Amuse Gaming Success Client Request", 65, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif ($payload->action->custom->provider == 'BOTA') {
-                                $ext_data = array(
-                                    "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response),
-                                    "transaction_detail" =>json_encode("success"),
-                                    "general_details" =>json_encode("success")
-                                );
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
-                                $updateGameTransaction = [
-                                    "win" => $payload->action->custom->win_or_lost,
-                                ];
+                                if(!isset($payload->action->custom->update_transaction)){
+                                    $updateGameTransaction = [
+                                        "pay_amount" => $payload->action->custom->pay_amount,
+                                        "income" =>  $payload->action->custom->income,
+                                        "win" => $payload->action->custom->win_or_lost,
+                                        "entry_id" => $payload->action->custom->entry_id,
+                                        "trans_status" => 2,
+                                    ];
+                                }
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                Helper::saveLog("BOTA Success Client Request", 135, json_encode($requesttocient), json_encode($client_response));
                             }
                         }else{
                             # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!
