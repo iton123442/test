@@ -456,12 +456,13 @@ class MancalaGamingController extends Controller
 
 					// $game_transaction =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($json_data["RefundTransactionId"], 1, $client_details);
 					$game_transaction =  GameTransactionMDB::findGameTransactionDetails($json_data["TransactionId"], 'transaction_id', false, $client_details);
-
-					$response = [
-						"Error" =>  10210,
-						"message" => "Target transaction id not found!",
-					];
-					
+					if($game_transaction == 'false'){
+						$response = [
+							"Error" =>  10210,
+							"message" => "Target transaction id not found!",
+						];
+						return $response;
+					}
 					if ($game_transaction != 'false') {
 
 						if ($game_transaction->win == 2) {
