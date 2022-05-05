@@ -95,8 +95,8 @@ class BOTAController extends Controller{
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.$data['detail']['gameNo'].'_'.$data['detail']['shoeNo'].'_1');
             }catch(\Exception $e){//if bet exist
-                $cancelBetRoundID = $data['detail']['shoeNo'].$data['detail']['shoeNo'].$data['detail']['gameNo'];
-                $cancelbetExt = GameTransactionMDB::findGameExt($cancelBetRoundID,false,'round_id',$client_details);
+                $cancelBetRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
+                $cancelbetExt = GameTransactionMDB::findBOTAGameExt($cancelBetRoundID,'round_id',3,$client_details);
                 if($cancelbetExt == false){
                     $msg = array(
                         "user" => $data['user'],
@@ -201,8 +201,8 @@ class BOTAController extends Controller{
         if(isset($client_details)){
             $betDetails = BOTAHelper::getBettingList($client_details,$this->dateToday);
             if($betDetails->result_count != 0){//check if bet history is not null
-                $refundRoundID = $data['detail']['shoeNo'].$data['detail']['shoeNo'].$data['detail']['gameNo'];
-                $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',$client_details);
+                $refundRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
+                $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',3,$client_details);
                 if(count($checkRefundCount) == 2){//if canceled 2 times
                     try{
                         $newProvTransID = $this->prefix.'R_'.$betDetails->result_value[0]->c_idx;//last round's bet idx
@@ -617,7 +617,7 @@ class BOTAController extends Controller{
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-            $data['detail']['shoeNo'].$data['detail']['gameNo'] = $gameExt->round_id;
+            // $data['detail']['shoeNo'].$data['detail']['gameNo'] = $gameExt->round_id;
             $updateGameTransaction = array(
                 "win" => 4,
                 "pay_amount" => round($data['price'], 2),
