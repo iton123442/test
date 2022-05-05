@@ -81,7 +81,7 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "TopTrendGaming") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "MannaPlay") {
-                $gteid = $payload->action->custom->game_trans_ext_id;
+                $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "Ozashiki") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "SG") {
