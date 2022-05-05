@@ -95,7 +95,7 @@ class YGGController extends Controller
                     "organization" => $this->org,
                     "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                     "nickName" => $client_details->display_name,
-                    "playerId" => "TGaming_".$client_details->player_id
+                    "playerId" => "TG001_".$client_details->player_id
                 ),
             );
             Helper::saveLog("YGG 002 wager dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -145,7 +145,7 @@ class YGGController extends Controller
                         "organization" => $this->org,
                         "balance" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
                         "nickName" => $client_details->display_name,
-                        "playerId" => "TGaming_".$client_details->player_id
+                        "playerId" => "TG001_".$client_details->player_id
                     ),
                 );
                 $update_gametransactionext = array(
@@ -250,7 +250,7 @@ class YGGController extends Controller
                 $response = array(
                     "code" => 0,
                     "data" => array(
-                        "playerId" => "TGaming_".$client_details->player_id,
+                        "playerId" => "TG001_".$client_details->player_id,
                         "organization" => $this->org,
                         "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                         "currency" => $client_details->default_currency,
@@ -264,7 +264,7 @@ class YGGController extends Controller
                 $response = array(
                     "code" => 0,
                     "data" => array(
-                        "playerId" => "TGaming_".$client_details->player_id,
+                        "playerId" => "TG001_".$client_details->player_id,
                         "organization" => $this->org,
                         "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                         "currency" => $client_details->default_currency,
@@ -277,7 +277,7 @@ class YGGController extends Controller
             $response = array(
                 "code" => 0,
                 "data" => array(
-                    "playerId" => "TGaming_".$client_details->player_id,
+                    "playerId" => "TG001_".$client_details->player_id,
                     "organization" => $this->org,
                     "balance" => floatval(number_format($balance, 2, '.', '')),
                     "currency" => $client_details->default_currency
@@ -330,7 +330,7 @@ class YGGController extends Controller
             $response = array(
                 "code" => 0,
                 "data" => array(
-                    "playerId" => "TGaming_".$client_details->player_id,
+                    "playerId" => "TG001_".$client_details->player_id,
                     "organization" => $this->org,
                     "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                     "currency" => $client_details->default_currency
@@ -373,7 +373,7 @@ class YGGController extends Controller
                         "organization" => $this->org,
                         "balance" => floatval(number_format($balance, 2, '.', '')),
                         "nickName" => $client_details->display_name,
-                        "playerId" => "TGaming_".$client_details->player_id,
+                        "playerId" => "TG001_".$client_details->player_id,
                         "bonus" => 0
                     ),
                 );
@@ -417,7 +417,7 @@ class YGGController extends Controller
                             "organization" => $this->org,
                             "balance" =>  floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
                             "nickName" => $client_details->display_name,
-                            "playerId" => "TGaming_".$client_details->player_id,
+                            "playerId" => "TG001_".$client_details->player_id,
                             "bonus" => 0
                         ),
                     );
@@ -514,7 +514,7 @@ class YGGController extends Controller
                     "organization" => $this->org,
                     "balance" => floatval(number_format($balance, 2, '.', '')),
                     "nickName" => $client_details->display_name,
-                    "playerId" => "TGaming_".$client_details->player_id,
+                    "playerId" => "TG001_".$client_details->player_id,
                     "bonus" => 0
                 ),
             );
@@ -560,7 +560,7 @@ class YGGController extends Controller
                         "organization" => $this->org,
                         "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                         "nickName" => $client_details->display_name,
-                        "playerId" => "TGaming_".$client_details->player_id,
+                        "playerId" => "TG001_".$client_details->player_id,
                     ),
                 );
                 Helper::saveLog("YGG 002 endwager(win) dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -577,7 +577,7 @@ class YGGController extends Controller
                         "organization" => $this->org,
                         "balance" => floatval(number_format($balance, 2, '.', '')),
                         "nickName" => $client_details->display_name,
-                        "playerId" => "TGaming_".$client_details->player_id
+                        "playerId" => "TG001_".$client_details->player_id
                     ),
                 );
                 $create_gametransactionext = array(
@@ -641,7 +641,7 @@ class YGGController extends Controller
                     "organization" => $this->org,
                     "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                     "nickName" => $client_details->display_name,
-                    "playerId" => "TGaming_".$client_details->player_id,
+                    "playerId" => "TG001_".$client_details->player_id,
                 ),
             );
             Helper::saveLog("YGG 002 endwager not exist", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -663,7 +663,7 @@ class YGGController extends Controller
                 "organization" => $this->org,
                 "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                 "nickName" => $client_details->display_name,
-                "playerId" => "TGaming_".$client_details->player_id
+                "playerId" => "TG001_".$client_details->player_id
             ),
         );
         Helper::saveLog("YGG 002 campaignpayout response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -681,7 +681,7 @@ class YGGController extends Controller
             return $response;
             Helper::saveLog("YGG getbalance response", $this->provider_id,json_encode($request->all(),JSON_FORCE_OBJECT), $response);
         }
-        $player_id = "TGaming_".$client_details->player_id;
+        $player_id = "TG001_".$client_details->player_id;
         $balance = floatval(number_format($client_details->balance, 2, '.', ''));
 
         $response = array(
