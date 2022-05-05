@@ -173,7 +173,7 @@ class WazdanControllerNew extends Controller
                     "game_transaction_type"=>1,
                     // "provider_request" =>json_encode($datadecoded),
                 );
-                   GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$betGametransactionExtId,$client_details); 
+                GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details); 
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
