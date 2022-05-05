@@ -327,6 +327,7 @@ public function CreditProcess($req){
     $win_or_lost = $pay_amount > 0 ?  1 : 0;
     $entry_id = $pay_amount > 0 ?  2 : 1;
     if($bet_transaction == 'false'){
+        $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
         $gameTransactionData = array(
             "provider_trans_id" => $provider_trans_id,
             "token_id" => $client_details->token_id,
