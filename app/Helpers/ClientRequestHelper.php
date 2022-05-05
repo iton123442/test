@@ -47,6 +47,14 @@ class ClientRequestHelper{
                     'Authorization' => 'Bearer '.$client_details->client_access_token
                 ]
             ]);
+
+
+            $custom_operator = config('clientcustom.data_type.transaction.string');
+            if(in_array($client_details->operator_id, $custom_operator)){
+                $roundId = (string)$roundId;
+                $transactionId = (string)$transactionId;
+            } 
+
             $requesttocient = [
                 "access_token" => $client_details->client_access_token,
                 "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
@@ -120,7 +128,7 @@ class ClientRequestHelper{
                             ];
                             ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
-                        'timeout' => $timeout,
+                        // 'timeout' => $timeout,
                         'body' => json_encode(
                             $requesttocient
                         )
@@ -342,16 +350,8 @@ class ClientRequestHelper{
      */
     // public static function fundTransfer_TG($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
     public static function fundTransfer_TG($client_details,$amount,$game_code,$game_name,$roundId,$type,$rollback=false,$action=array()){
-        // Helper::saveLog($roundId, 999, json_encode([]), "fundTransfer_TG HIT");
-        Helper::saveLog("fundTransfer TG", 133443, json_encode($client_details), "CUT CALL HIT");
-        // if($type == 'credit'){
-        //     $game_transaction_type = 2;
-        // }else{
-        //     $game_transaction_type = 1;
-        // }
-        
-        // $gteid = ClientRequestHelper::generateGTEID($roundId, $action['provider_trans_id'], $roundId, $amount, $game_transaction_type, $action['provider_request'], $action['mw_response']);
-        
+        // Helper::saveLog("fundTransfer TG", 133443, json_encode($client_details), "CUT CALL HIT");
+      
         $client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/json',
@@ -392,10 +392,20 @@ class ClientRequestHelper{
             ],
         ];
         
-        Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 1");
+        // Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 1");
         # REQUIRED PARAMETER IN ACTION ARRAY
         if(count($action) > 0){
             $requesttocient["action"] = $action;
+
+            // Client Custom Data Type
+            $custom_operator = config('clientcustom.data_type.transaction.string');
+            if(in_array($client_details->operator_id, $custom_operator)){
+                // ProviderHelper::mandatorySaveLog($requesttocient["action"]['custom']['game_transaction_ext_id'], 123, "GG", 'TG_PROCESS');
+                $requesttocient["action"]['custom']['game_transaction_ext_id'] = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
+                $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'] = (string)$requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'];
+                // ProviderHelper::mandatorySaveLog($requesttocient["action"]['custom']['game_transaction_ext_id'], 123, json_encode($requesttocient), 'NO ERROR 2');
+            }
+
             if(isset($action['fundtransferrequest']['fundinfo']['freespin'])){
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
             }
@@ -406,9 +416,7 @@ class ClientRequestHelper{
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freeroundend'] = $action['fundtransferrequest']['fundinfo']['freeroundend'];
             }
         }
-        // Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), "CUT CALL REQUEST 2");
-        // Helper::saveLog("fundTransfer TG", 133443, json_encode($requesttocient), config('providerlinks.cut_call_server')."/tigergames/fundtransfer");
-
+       
         try{
             # This will call our server for async request! Cut The Connection within 10ms and leave it to the server!
             $guzzle_response = $client->post(config('providerlinks.cut_call_server').'/tigergames/fundtransfer',
@@ -484,6 +492,12 @@ class ClientRequestHelper{
         // }
         
         // $gteid = ClientRequestHelper::generateGTEID($roundId, $action['provider_trans_id'], $roundId, $amount, $game_transaction_type, $action['provider_request'], $action['mw_response']);
+
+        $custom_operator = config('clientcustom.data_type.transaction.string');
+        if(in_array($client_details->operator_id, $custom_operator)){
+            $roundId = (string)$roundId;
+            $transactionId = (string)$transactionId;
+        } 
         
         $client = new Client([
             'headers' => [ 
@@ -787,6 +801,13 @@ class ClientRequestHelper{
                 'Authorization' => 'Bearer '.$client_details->client_access_token
             ]
         ]);
+
+        $custom_operator = config('clientcustom.data_type.transaction.string');
+        if(in_array($client_details->operator_id, $custom_operator)){
+            $roundId = (string)$roundId;
+            $transactionId = (string)$transactionId;
+        } 
+
         $requesttocient = [
             "access_token" => $client_details->client_access_token,
             "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
@@ -903,6 +924,13 @@ class ClientRequestHelper{
                 'Authorization' => 'Bearer '.$client_details->client_access_token
             ]
         ]);
+
+        $custom_operator = config('clientcustom.data_type.transaction.string');
+        if(in_array($client_details->operator_id, $custom_operator)){
+            $roundId = (string)$roundId;
+            $transactionId = (string)$transactionId;
+        } 
+        
         $requesttocient = [
             "access_token" => $client_details->client_access_token,
             "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),

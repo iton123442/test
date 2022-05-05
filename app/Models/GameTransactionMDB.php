@@ -926,9 +926,9 @@ class GameTransactionMDB
      */
     public static function createGametransactionLogCCMD($data,$connection_name){
         $connection = GameTransactionMDB::getAvailableConnection($connection_name);
-        Helper::saveLog('PlayStar create logs', 99, json_encode($connection), "Hit the logs");
+        // ProviderHelper::saveLogWithExeption('createGametransactionLogCCMD', 99, json_encode($connection), "Hit");
         if($connection != null){
-            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insertGetId($data);
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_transaction_logs")->insert($data);
         }else{
             return null;
         }
