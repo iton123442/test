@@ -640,6 +640,19 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 Helper::saveLog("Amuse Gaming Success Client Request", 65, json_encode($requesttocient), json_encode($client_response));
                             }
+                            elseif ($payload->action->custom->provider == 'BOTA') {
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                            }
                         }else{
                             # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!
                             $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success' );
