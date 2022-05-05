@@ -426,7 +426,7 @@ public function CreditProcess($req){
     }else{
       $client_details->connection_name = $bet_transaction->connection_name;
       $income = $bet_transaction->bet_amount - $pay_amount;
-      $game_trans_id = $bet_transaction->game_trans_id;
+      $game_transaction_id = $bet_transaction->game_trans_id;
     }
     $res = [
       "ApiVersion" => "1.0",
@@ -435,7 +435,7 @@ public function CreditProcess($req){
       "Details" => null,
       "SessionId" => $client_details->player_token,
       "ExternalUserId" => $client_details->player_id,
-      "AccountTransactionId" => $game_trans_id,
+      "AccountTransactionId" => $game_transaction_id,
       "Balance" => $winBalance,
       "Currency" => $client_details->default_currency,
       "Message" => "Success"
@@ -448,9 +448,9 @@ public function CreditProcess($req){
           'trans_status' => 2
     ];
     // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-    GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans_id, $client_details);
+    GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction_id, $client_details);
     $gameTransactionEXTData = array(
-              "game_trans_id" => json_encode($game_trans_id),
+              "game_trans_id" => json_encode($game_transaction_id),
               "provider_trans_id" => $provider_trans_id,
               "round_id" => $round_id,
               "amount" => $pay_amount,
@@ -478,7 +478,7 @@ public function CreditProcess($req){
               "provider_round_id"=> $round_id, #R
           ],
           "mwapi" => [
-              "roundId"=>$game_trans_id, #R
+              "roundId"=>$game_transaction_id, #R
               "type"=>2, #R
               "game_id" => $game_details->game_id, #R
               "player_id" => $client_details->player_id, #R
@@ -490,7 +490,7 @@ public function CreditProcess($req){
               ]
           ]
     ];
-    $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
+    $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
     if(isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "200"){
         // $updateTransactionEXt = array(
