@@ -605,7 +605,7 @@ class BOTAController extends Controller{
                 return response($msg,200)
                 ->header('Content-Type', 'application/json');
             }
-            $gameExt = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id',1, $client_details);
+            $gameExt = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id',false, $client_details);
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
             if($gameExt==null){
                 $msg = array(
@@ -651,13 +651,6 @@ class BOTAController extends Controller{
             //         "mw_response" => $response, #R
             //     ]
             // ];
-            $updateGameTransaction = [
-                'win' => 4,
-                'pay_amount' => $data['price'],
-                'income' => $gameExt->bet_amount - round($data["price"],2),
-                'entry_id' => 2
-            ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $gameExt->game_trans_id, $client_details);
             $refundgametransExt = array(
                 "game_trans_id" => $gameExt->game_trans_id,
                 "provider_trans_id" => $data['idx'],
@@ -666,9 +659,9 @@ class BOTAController extends Controller{
                 "game_transaction_type" => 3,
                 "provider_request" => json_encode($data),
             );
-            $refundgametransExtID = GameTransactionMDB::createGameTransactionExt($refundgametransExt, $client_details);
-            Helper::saveLog('BOTA CANCEL HIT FUNDTRANSFER', $this->provider_db_id, json_encode($gameExt), $refundgametransExtID);
-            $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$refundgametransExtID,$gameExt->game_trans_id,"credit",true);
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($refundgametransExt, $client_details);
+            $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$gameExt->game_trans_id,"credit",true);
+            Helper::saveLog('BOTA CANCEL HIT FUNDTRANSFER', $this->provider_db_id, json_encode($gameExt), $game_trans_ext_id);
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance,2);
@@ -682,7 +675,7 @@ class BOTAController extends Controller{
                 $dataToUpdate = array(
                     "mw_response" => json_encode($response)
                 );
-                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$refundgametransExtID,$client_details);
+                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
                 Helper::saveLog('BOTA Success fundtransfer', $this->provider_db_id, json_encode($response), "(Cancel)HIT!");
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
@@ -706,7 +699,7 @@ class BOTAController extends Controller{
                     $updateData = array(
                         "mw_response" => json_encode($response)
                     );
-                    GameTransactionMDB::updateGametransactionEXT($updateData, $refundgametransExtID, $client_details);
+                    GameTransactionMDB::updateGametransactionEXT($updateData, $game_trans_ext_id, $client_details);
                 }catch(\Exception $e){
                     Helper::savelog('REFUND FAILED(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
