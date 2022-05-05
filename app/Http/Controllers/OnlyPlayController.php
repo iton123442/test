@@ -340,7 +340,7 @@ class OnlyPlayController extends Controller
                                         "entry_id" => $entry_id,
                                         "pay_amount" => $pay_amount,
                                         "income" => $income,
-                                        "game_trans_ext_id" => $gen_game_extid
+                                        "game_transaction_ext_id" => $gen_game_extid
                                     ],
                                     "provider" => [
                                         "provider_request" => $data, #R

@@ -469,7 +469,7 @@ public function CreditProcess($req){
               "entry_id" => $entry_id,
               "pay_amount" => $pay_amount,
               "income" => $income,
-              "game_trans_ext_id" => $gen_game_extid
+              "game_transaction_ext_id" => $gen_game_extid
           ],
           "provider" => [
               "provider_request" => json_encode($req), #R

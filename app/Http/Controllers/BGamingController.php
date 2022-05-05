@@ -304,7 +304,7 @@ public function gameBet($request, $client_details){
                                                                             "entry_id" => 1,
                                                                             "pay_amount" => 0,
                                                                             "income" => $bet_amount,
-                                                                            "game_trans_ext_id" => $gen_game_extid
+                                                                            "game_transaction_ext_id" => $gen_game_extid
                                                                         ],
                                                                         "provider" => [
                                                                             "provider_request" => $payload, #R
@@ -576,7 +576,7 @@ public function gameBet($request, $client_details){
                                     "entry_id" => $entry_id,
                                     "pay_amount" => $pay_amount,
                                     "income" => $income,
-                                    "game_trans_ext_id" => $gen_game_extid
+                                    "game_transaction_ext_id" => $gen_game_extid
                                 ],
                                 "provider" => [
                                     "provider_request" => $payload, #R
@@ -763,7 +763,7 @@ public function gameBet($request, $client_details){
                     "entry_id" => $entry_id,
                     "pay_amount" => $pay_amount,
                     "income" => 0 - $pay_amount,
-                    "game_trans_ext_id" => $game_trans_ext_idwin
+                    "game_transaction_ext_id" => $game_trans_ext_idwin
                 ],
                 "provider" => [
                     "provider_request" => $request->all(), #R
