@@ -508,7 +508,7 @@ class WazdanControllerNew extends Controller
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
-                        "game_trans_ext_id" => $betGametransactionExtId,
+                        "game_trans_ext_id" => $WinGametransactionExtId,
                         "request" => json_encode($datadecoded),
                         "response" => json_encode($response),
                         "log_type" => "provider_details",
@@ -520,7 +520,7 @@ class WazdanControllerNew extends Controller
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
                         "provider" => 'wazdan',
-                        "game_transaction_ext_id" => $winGametransactionExtId,
+                        "game_transaction_ext_id" => $WinGametransactionExtId,
                         "client_connection_name" => $client_details->connection_name,
                         "win_or_lost" => $win_or_lost,
                     ],
