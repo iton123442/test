@@ -53,12 +53,12 @@ class BOTAController extends Controller{
                 elseif($data['types'] == "bet") {
                         $result = $this->_betProcess($data,$client_details);
                         Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($result), 'BET HIT');
-                        sleep(10);
                         return $result;
                 }
                 elseif($data['types'] == "win") {
                     $result = $this->_winProcess($data,$client_details);
                     Helper::saveLog('BOTA WIN', $this->provider_db_id, json_encode($result), 'WIN HIT');
+                    sleep(10);
                     return $result;
                 }
                 elseif($data['types'] == "cancel") {
@@ -167,14 +167,11 @@ class BOTAController extends Controller{
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                // $response = array(
-                //     "user" => $data['user'],
-                //     "balance" =>(int) $balance,
-                //     "confirm" => "ok"
-                // );
-                $response = [
-                    "status" => "ok"
-                ];
+                $response = array(
+                    "user" => $data['user'],
+                    "balance" =>(int) $balance,
+                    "confirm" => "ok"
+                );
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
