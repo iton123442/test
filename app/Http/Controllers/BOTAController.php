@@ -167,11 +167,14 @@ class BOTAController extends Controller{
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                $response = array(
-                    "user" => $data['user'],
-                    "balance" =>(int) $balance,
-                    "confirm" => "ok"
-                );
+                // $response = array(
+                //     "user" => $data['user'],
+                //     "balance" =>(int) $balance,
+                //     "confirm" => "ok"
+                // );
+                $response = [
+                    "status" => "ok"
+                ];
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
