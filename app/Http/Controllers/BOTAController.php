@@ -884,6 +884,11 @@ class BOTAController extends Controller{
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
+                $newBet = $gameExt->bet_amount-$data["price"];
+                $updateBet = [
+                    "bet_amount" => round($newBet,2)
+                ];
+                GameTransactionMDB::updateGametransaction($updateBet, $gameExt->game_trans_id, $client_details); 
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
