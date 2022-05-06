@@ -97,6 +97,8 @@ class SimplePlayController extends Controller
         $response .= '<RequestResponse><error>1007</error></RequestResponse>';
 
         $client_details = ProviderHelper::getClientDetails('player_id', $playerId);
+        $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 
         if ($client_details != null) {
             try{
@@ -140,10 +142,11 @@ class SimplePlayController extends Controller
                     "income" => $amount,
                     "entry_id" => 1,
                 );
-                $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
 
                 $bet_game_transaction_ext = array(
-                    "game_trans_id" => $game_transaction_id,
+                    "game_trans_id" => $gen_game_trans_id,
                     "provider_trans_id" => $transaction_id,
                     "round_id" => $round_id,
                     "amount" => $amount,
@@ -151,12 +154,13 @@ class SimplePlayController extends Controller
                     "provider_request" => json_encode($request_params),
                 );
 
-                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
+                // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
+                GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
 
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];
-                $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
+                $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit', false, $fund_extra_data);
 
                 if (isset($client_response->fundtransferresponse->status->code)) {
                     $response = '<?xml version="1.0" encoding="utf-8"?>';
@@ -166,15 +170,26 @@ class SimplePlayController extends Controller
                             header("Content-type: text/xml; charset=utf-8");
                              $response = '<?xml version="1.0" encoding="utf-8"?>';
                              $response .= '<RequestResponse><username>'.$request_params['username'].'</username><currency>'.$player_currency.'</currency><amount>'.$client_response->fundtransferresponse->balance.'</amount><error>0</error></RequestResponse>';
-                            $updateTransactionEXt = array(
-                                "provider_request" =>json_encode($request_params),
-                                "mw_response" => json_encode($response),
-                                'mw_request' => json_encode($client_response->requestoclient),
-                                'client_response' => json_encode($client_response->fundtransferresponse),
-                                'transaction_detail' => 'success',
-                                'general_details' => 'success',
-                            );
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                            // $updateTransactionEXt = array(
+                            //     "provider_request" =>json_encode($request_params),
+                            //     "mw_response" => json_encode($response),
+                            //     'mw_request' => json_encode($client_response->requestoclient),
+                            //     'client_response' => json_encode($client_response->fundtransferresponse),
+                            //     'transaction_detail' => 'success',
+                            //     'general_details' => 'success',
+                            // );
+                            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                            $createGameTransactionLog = [
+                              "connection_name" => $client_details->connection_name,
+                              "column" =>[
+                                  "game_trans_ext_id" => $gen_game_extid,
+                                  "request" => json_encode($request_params),
+                                  "response" => json_encode($response),
+                                  "log_type" => "provider_details",
+                                  "transaction_detail" => "SUCCESS",
+                              ]
+                            ];
+                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
                           
                             break;
                         case '402':
@@ -186,15 +201,26 @@ class SimplePlayController extends Controller
                                         'trans_status' => 3,
                                     ];
                             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
-                            $updateTransactionEXt = array(
-                                "provider_request" =>json_encode($request_params),
-                                "mw_response" => json_encode($response),
-                                'mw_request' => json_encode($client_response->requestoclient),
-                                'client_response' => json_encode($client_response->fundtransferresponse),
-                                'transaction_detail' => 'FAILED',
-                                'general_details' => 'FAILED',
-                            );
-                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                            // $updateTransactionEXt = array(
+                            //     "provider_request" =>json_encode($request_params),
+                            //     "mw_response" => json_encode($response),
+                            //     'mw_request' => json_encode($client_response->requestoclient),
+                            //     'client_response' => json_encode($client_response->fundtransferresponse),
+                            //     'transaction_detail' => 'FAILED',
+                            //     'general_details' => 'FAILED',
+                            // );
+                            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                            $createGameTransactionLog = [
+                              "connection_name" => $client_details->connection_name,
+                              "column" =>[
+                                  "game_trans_ext_id" => $gen_game_extid,
+                                  "request" => json_encode($request_params),
+                                  "response" => json_encode($response),
+                                  "log_type" => "provider_details",
+                                  "transaction_detail" => "FAILED",
+                              ]
+                            ];
+                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
                             break;
                     }
                 
@@ -225,7 +251,7 @@ class SimplePlayController extends Controller
         $response .= '<RequestResponse><error>1007</error></RequestResponse>';
 
         $client_details = ProviderHelper::getClientDetails('player_id', $playerId);
-        
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         if ($client_details != null) {
             try{
                 ProviderHelper::idenpotencyTable($transaction_id);
@@ -275,10 +301,11 @@ class SimplePlayController extends Controller
                       "round_id" => $round_id,
                       "amount" => $pay_amount,
                       "game_transaction_type"=> 2,
-                      "provider_request" => json_encode($request_params),
-                      "mw_response" => json_encode($response),
+                      // "provider_request" => json_encode($request_params),
+                      // "mw_response" => json_encode($response),
                   );
-              $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+              // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+              GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
 
                 $action_payload = [
                             "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -289,7 +316,7 @@ class SimplePlayController extends Controller
                                 "entry_id" => $entry_id,
                                 "pay_amount" => $pay_amount,
                                 "income" => $income,
-                                "game_transaction_ext_id" => $game_trans_ext_id
+                                "game_transaction_ext_id" => $gen_game_extid
                             ],
                             "provider" => [
                                 "provider_request" => $request_params, #R
@@ -312,15 +339,26 @@ class SimplePlayController extends Controller
                   
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
 
-            $updateTransactionEXt = array(
-                  "provider_request" =>json_encode($request_params),
-                  "mw_response" => json_encode($response),
-                  'mw_request' => json_encode($client_response->requestoclient),
-                  'client_response' => json_encode($client_response->fundtransferresponse),
-                  'transaction_detail' => 'success',
-                  'general_details' => 'success',
-            );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            // $updateTransactionEXt = array(
+            //       "provider_request" =>json_encode($request_params),
+            //       "mw_response" => json_encode($response),
+            //       'mw_request' => json_encode($client_response->requestoclient),
+            //       'client_response' => json_encode($client_response->fundtransferresponse),
+            //       'transaction_detail' => 'success',
+            //       'general_details' => 'success',
+            // );
+            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            $createGameTransactionLog = [
+              "connection_name" => $get_client_details->connection_name,
+              "column" =>[
+                  "game_trans_ext_id" => $gen_game_extid,
+                  "request" => json_encode($request->all()),
+                  "response" => json_encode($response),
+                  "log_type" => "provider_details",
+                  "transaction_detail" => "FAILED",
+              ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
             // }
         }
@@ -350,7 +388,7 @@ class SimplePlayController extends Controller
         $response .= '<RequestResponse><error>1007</error></RequestResponse>';
 
         $client_details = ProviderHelper::getClientDetails('player_id', $playerId);
-
+        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         if ($client_details != null) {
             try{
                 ProviderHelper::idenpotencyTable($transaction_id);
@@ -405,14 +443,26 @@ class SimplePlayController extends Controller
                       "round_id" => $round_id,
                       "amount" => $pay_amount,
                       "game_transaction_type"=> 2,
-                      "provider_request" => json_encode($request_params),
-                      "mw_response" => json_encode($response),
-                      'mw_request' => 'Lose Round',
-                      'client_response' => 'Lose Round',
-                      'transaction_detail' => 'success',
-                      'general_details' => 'success',
+                      // "provider_request" => json_encode($request_params),
+                      // "mw_response" => json_encode($response),
+                      // 'mw_request' => 'Lose Round',
+                      // 'client_response' => 'Lose Round',
+                      // 'transaction_detail' => 'success',
+                      // 'general_details' => 'success',
                   );
               $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+              GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
+              $createGameTransactionLog = [
+              "connection_name" => $get_client_details->connection_name,
+              "column" =>[
+                  "game_trans_ext_id" => $gen_game_extid,
+                  "request" => json_encode($request->all()),
+                  "response" => json_encode($response),
+                  "log_type" => "provider_details",
+                  "transaction_detail" => "Lose Round",
+              ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
             //   $action_payload = [
             //                 "type" => "custom", #genreral,custom :D # REQUIRED!

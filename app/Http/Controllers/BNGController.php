@@ -386,10 +386,10 @@ class BNGController extends Controller
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
-            $dataToUpdate = array(
-                "mw_response" => json_encode($response)
-            );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
+            // $dataToUpdate = array(
+            //     "mw_response" => json_encode($response)
+            // );
+            // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
             //Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             $winStart =  microtime(true);
             //$this->_setExtParameter($this->_getExtParameter()+1);
