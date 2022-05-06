@@ -87,6 +87,9 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "SG") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }
+            else if ($payload->action->custom->provider == "SimplePlay") {
+                $gteid = $payload->action->custom->game_trans_ext_id;
+            }
             else if ($payload->action->custom->provider == "VivoGaming") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }
@@ -549,6 +552,21 @@ class FundtransferProcessorController extends Controller
                                
                            }
                             elseif ($payload->action->custom->provider == 'Quickspin') {
+                                //  $ext_data = array(
+                                //     "mw_request"=>json_encode($requesttocient),
+                                //     "client_response" =>json_encode($client_response),
+                                //     "transaction_detail" =>json_encode("success"),
+                                //     "general_details" =>json_encode("success")
+                                // );
+                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                
+                            }
+                            elseif ($payload->action->custom->provider == 'SimplePlay') {
                                 //  $ext_data = array(
                                 //     "mw_request"=>json_encode($requesttocient),
                                 //     "client_response" =>json_encode($client_response),

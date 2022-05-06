@@ -151,7 +151,7 @@ class SimplePlayController extends Controller
                     "round_id" => $round_id,
                     "amount" => $amount,
                     "game_transaction_type" => 1,
-                    "provider_request" => json_encode($request_params),
+                    // "provider_request" => json_encode($request_params),
                 );
 
                 // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
@@ -450,7 +450,7 @@ class SimplePlayController extends Controller
                       // 'transaction_detail' => 'success',
                       // 'general_details' => 'success',
                   );
-              $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+              // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
               GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
               $createGameTransactionLog = [
               "connection_name" => $get_client_details->connection_name,
