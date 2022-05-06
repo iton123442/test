@@ -99,10 +99,10 @@ class BOTAController extends Controller{
                 $betHistory = BOTAHelper::getBettingList($client_details,$this->dateToday);
                 $myRoundID = $betHistory->result_value[0]->c_shoe_idx.$betHistory->result_value[0]->c_game_idx;
                 $cancelbetExt = GameTransactionMDB::findBOTAGameExt($cancelBetRoundID,'round_id',3,$client_details);
-                if($cancelbetExt == false){
+                if($cancelbetExt == 'false'){
                     if($myRoundID == $cancelBetRoundID){//IF bet already exist
                         $result = $this->_newBetProcess($data,$client_details);//double bet
-                        Helper::saveLog('BOTA REBET',$this->provider_db_id, json_encode($result), 'REBET HIT');
+                        Helper::saveLog('BOTA DOUBLEBET',$this->provider_db_id, json_encode($result), 'DOUBLEBET HIT');
                         return $result;
                     }
                     else{
@@ -430,9 +430,10 @@ class BOTAController extends Controller{
         if(isset($client_details)){
             $betDetails = BOTAHelper::getBettingList($client_details,$this->dateToday);
             if($betDetails->result_count != 0){//check if bet history is not null
-                $refundRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
-                $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',3,$client_details);
-                if(count($checkRefundCount) == 2 || $checkRefundCount != false){//if canceled 2 times
+                $betRoundID = $this->prefix.'_'.$betDetails->result_value[0]->c_idx;
+                $myRoundID = $betDetails->result_value[1]->c_shoe_idx.$betDetails->result_value[1]->c_game_idx;
+                $checkBetTransaction = GameTransactionMDB::findBOTAGameExt($betRoundID,'transaction_id',1,$client_details);
+                if($checkBetTransaction != 'false' && $checkBetTransaction[0]->round_id == $myRoundID){//if bet 2 times
                     try{
                         $newProvTransID = $this->prefix.'D_'.$betDetails->result_value[0]->c_idx;//last round's bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_55');//rebet
@@ -589,6 +590,11 @@ class BOTAController extends Controller{
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
+                $newBet = $game->bet_amount+$data["price"];
+                $updateBet = [
+                    "bet_amount" => round($newBet,2)
+                ];
+                GameTransactionMDB::updateGametransaction($updateBet, $game->game_trans_id, $client_details); 
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -599,7 +605,7 @@ class BOTAController extends Controller{
                         "transaction_detail" => "success",
                     ]
                 ];
-                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 return response($msg, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
