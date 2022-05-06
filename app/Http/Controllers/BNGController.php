@@ -411,7 +411,7 @@ class BNGController extends Controller
                 // "mw_response" => json_encode($response)
             );
             // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$wingen_game_extid,$client_details); //create game_transaction
+            GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$wingen_game_extid,$client_details); //create game_transaction
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($wingen_game_extid), "");
 
             $action_payload = [
