@@ -181,7 +181,7 @@ class BOTAController extends Controller{
                         "transaction_detail" => "success",
                     ]
                 ];
-                // ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 return response($response, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
@@ -605,7 +605,7 @@ class BOTAController extends Controller{
                         "transaction_detail" => "success",
                     ]
                 ];
-                // ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 return response($msg, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
