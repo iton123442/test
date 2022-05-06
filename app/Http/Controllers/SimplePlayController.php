@@ -453,7 +453,7 @@ class SimplePlayController extends Controller
               // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
               GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
               $createGameTransactionLog = [
-              "connection_name" => $get_client_details->connection_name,
+              "connection_name" => $client_details->connection_name,
               "column" =>[
                   "game_trans_ext_id" => $gen_game_extid,
                   "request" => json_encode($request->all()),
