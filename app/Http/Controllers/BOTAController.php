@@ -53,6 +53,7 @@ class BOTAController extends Controller{
                 elseif($data['types'] == "bet") {
                         $result = $this->_betProcess($data,$client_details);
                         Helper::saveLog('BOTA BET',$this->provider_db_id, json_encode($result), 'BET HIT');
+                        sleep(10);
                         return $result;
                 }
                 elseif($data['types'] == "win") {
@@ -729,7 +730,7 @@ class BOTAController extends Controller{
             $createGametransaction = array(
                 "win" => 5,
                 "pay_amount" =>$game->pay_amount+round($data["price"],2),
-                "income" =>$game->income - round($data["price"],2),
+                "income" =>$game->bet_amount - round($data["price"],2),
                 "entry_id" =>round($data["price"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
             );
             GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
@@ -749,36 +750,10 @@ class BOTAController extends Controller{
                 "mw_response"=>json_encode($response),
             );
             $winTransactionExtID = GameTransactionMDB::createGameTransactionExt($winTransactionExt, $client_details);
-            // $action_payload = [
-            //     "type" => "custom", #genreral,custom :D # REQUIRED!
-            //     "custom" => [
-            //         "provider" => 'BOTA',
-            //         "isUpdate" => false,
-            //         "game_transaction_ext_id" => $winTransactionExtID,
-            //         "client_connection_name" => $client_details->connection_name,
-            //         "win_or_lost" => $win_or_lost,
-            //         "entry_id" => round($data["price"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
-            //         "income" => $game->income - round($data["price"],2),
-            //         "pay_amount" => $game->pay_amount+round($data["price"],2),
-            //     ],
-            //     "provider" => [
-            //         "provider_request" => $data, #R
-            //         "provider_trans_id"=>$data['idx'], #R
-            //         "provider_round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'], #R
-            //         'provider_name' => $gamedetails->provider_name
-            //     ],
-            //     "mwapi" => [
-            //         "roundId"=>$game->game_trans_id, #R
-            //         "type"=>2, #R
-            //         "game_id" => $gamedetails->game_id, #R
-            //         "player_id" => $client_details->player_id, #R
-            //         "mw_response" => $response, #R
-            //     ]
-            // ];
             $updateGameTransaction = [
                 'win' => $win_or_lost,
                 'pay_amount' => round($data["price"],2),
-                'income' => $game->income - round($data["price"],2),
+                'income' => $game->bet_amount - round($data["price"],2),
                 'entry_id' => round($data["price"],2) == 0 && $game->pay_amount == 0 ? 1 : 2,
                 'trans_status' => 2
             ];
@@ -893,31 +868,6 @@ class BOTAController extends Controller{
                 "balance" =>(int) round($client_details->balance,2),
                 "confirm" => "ok"
             );
-            // $action_payload = [
-            //     "type" => "custom", #genreral,custom :D # REQUIRED!
-            //     "custom" => [
-            //         "provider" => 'bota',
-            //         "game_transaction_ext_id" => $game_trans_ext_id,
-            //         "client_connection_name" => $client_details->connection_name,
-            //         "win_or_lost" => 4,
-            //         "entry_id" => round($data["price"],2) == 0 && $gameExt->pay_amount == 0 ? 1 : 2,
-            //         "income" => $gameExt->income - round($data["price"],2),
-            //         "pay_amount" => $gameExt->pay_amount+round($data["price"],2),
-            //     ],
-            //     "provider" => [
-            //         "provider_request" => $data, #R
-            //         "provider_trans_id"=>$data['idx'], #R
-            //         "provider_round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'], #R
-            //         'provider_name' => $gamedetails->provider_name
-            //     ],
-            //     "mwapi" => [
-            //         "roundId"=>$gameExt->game_trans_id, #R
-            //         "type"=>2, #R
-            //         "game_id" => $gamedetails->game_id, #R
-            //         "player_id" => $client_details->player_id, #R
-            //         "mw_response" => $response, #R
-            //     ]
-            // ];
             $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$gameExt->game_trans_id,'credit',true);
             Helper::saveLog('BOTA CANCEL HIT FUNDTRANSFER', $this->provider_db_id, json_encode($gameExt), $game_trans_ext_id);
             if(isset($client_response->fundtransferresponse->status->code) 
