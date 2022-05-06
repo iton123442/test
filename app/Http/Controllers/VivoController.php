@@ -403,7 +403,7 @@ class VivoController extends Controller
 	            "custom" => [
 	            	"win_or_lost" => $win_or_lost,
 	                "provider" => 'VivoGaming',
-	                "game_trans_ext_id" => $gen_game_extid,
+	                "game_transaction_ext_id" => $gen_game_extid,
 	        		"client_connection_name" => $client_details->connection_name
 	            ],
 	            "provider" => [
@@ -426,7 +426,7 @@ class VivoController extends Controller
 	        	$createGameTransactionLog = [
 	                  "connection_name" => $client_details->connection_name,
 	                  "column" =>[
-	                      "game_trans_ext_id" => $gen_game_extid,
+	                      "game_transaction_ext_id" => $gen_game_extid,
 	                      "request" => json_encode($data),
 	                      "response" => json_encode($response),
 	                      "log_type" => "provider_details",
