@@ -419,7 +419,6 @@ class PNGController extends Controller
             // $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
             GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create extension
             $transactionId = $gen_game_extid;
-            $gametransactionid = $gen_game_trans_id;
             // $transactionId = PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,2);
             $balance = round($client_details->balance,2) + (float)$xmlparser->real;
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
@@ -484,7 +483,7 @@ class PNGController extends Controller
             }
 
             $sendtoclient =  microtime(true);  
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,'credit',false,$action_payload);
             // $client_response_time = microtime(true) - $sendtoclient;
 
 
