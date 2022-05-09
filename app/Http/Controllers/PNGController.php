@@ -147,7 +147,7 @@ class PNGController extends Controller
                     // "mw_response" => 'null'
                 );
                 // $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-                GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create extension
                 $transactionId = $gen_game_extid;
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
@@ -417,7 +417,7 @@ class PNGController extends Controller
                 // "mw_response" => 'null'
             );
             // $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
+            GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create extension
             $transactionId = $gen_game_extid;
             // $transactionId = PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,2);
             $balance = round($client_details->balance,2) + (float)$xmlparser->real;
