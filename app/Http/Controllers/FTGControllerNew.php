@@ -402,7 +402,6 @@ class FTGControllerNew extends Controller
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; // MW round_id
 		$reference_transaction_uuid = $data->reference_transaction_uuid; //  MW -provider_transaction_id
-        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 		//CHECKING TOKEN
 		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
@@ -414,6 +413,7 @@ class FTGControllerNew extends Controller
 			return $errormessage;
 		}
 		$client_details = ProviderHelper::getClientDetails('token',$token);
+        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 		//CHECKING WIN EXISTING game_transaction_ext IF WIN ALREADY PROCESS
 		// $transaction_check = GameTransactionExt::findGameExt($transaction_uuid, 2,'transaction_id');
 		try{
