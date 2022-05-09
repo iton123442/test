@@ -413,7 +413,7 @@ class PNGController extends Controller
                 "round_id" =>$xmlparser->roundId,
                 "amount" =>(float)$xmlparser->real,
                 "game_transaction_type"=>2,
-                // "provider_request" => json_encode($xmlparser),
+                "provider_request" => json_encode($xmlparser),
                 // "mw_response" => 'null'
             );
             // $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
