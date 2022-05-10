@@ -2,6 +2,7 @@
 namespace App\Helpers;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Crypt;
 use GuzzleHttp\Exception\GuzzleException;
 use App\Jobs\UpdateGametransactionJobs;
 use App\Jobs\CreateGameTransactionLog;
@@ -24,9 +25,9 @@ class ProviderHelper{
 	 * Generate Random IDENTIFICATION
 	 */
 	public static function idGen(){
-		$rand = shell_exec('date +%s%N');
+	    $rand = shell_exec('date +%s%N');
         $identifier = (int)$rand + 54321;
-		// $identifier = rand(); 
+	    //$identifier = rand(); 
         return $identifier;
 	}
 
@@ -74,6 +75,31 @@ class ProviderHelper{
 	public static function queDebitRefund($debitRefund){
 	    $job = (new DebitRefund($debitRefund))->onQueue('debit_refund');
         dispatch($job);
+	}
+
+	/**
+	 * Global [getEncryptTokenS]
+	 * [NOTE DONT CHANGE THE PARAMETER]
+	 */
+	public static function getEncryptToken($token_id,$player_id,$game_id, $token){
+		$encrypted = Crypt::encryptString($token_id.'&'.$player_id.'&'.$game_id.'&'.$token);
+		return $encrypted;
+	}
+
+	/**
+	 * Global [getEncryptTokenS]
+	 * [NOTE DONT CHANGE THE PARAMETER]
+	 */
+	public static function getDetailsDecryptToken($token){
+		$decrypted = Crypt::decryptString($token);
+		$val = explode('&', $decrypted);
+		$data = [
+			'token_id' => $val[0],
+			'player_id' => $val[1],
+			'game_id' => $val[2],
+			'token' => $val[3],
+		];
+		return $data;
 	}
 
 	/**

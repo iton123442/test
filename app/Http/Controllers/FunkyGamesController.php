@@ -184,7 +184,7 @@ public function CheckBet(Request $req){
             return $response;
         }
 	 	try{ 
-			$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit'); 
+			$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
  			if($client_details != null ){
 				Helper::saveLog('FunkyG Check CLient Deatails', $this->provider_db_id, json_encode($req->all()),$client_details);
 		      	$find_bet = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
@@ -200,7 +200,7 @@ public function CheckBet(Request $req){
 
 				        	];
 				        	Helper::savelog('funky Sidebet success', $this->provider_db_id,json_encode($req->all()),$updateGameTransaction);
-				        	GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id,$client_details);
+				        	GameTransactionMDB::updateGametransaction($updateGameTransaction, $find_bet->game_trans_id,$client_details);
 	        		}else{
 					        $gameTransactionData = array(
 					            "provider_trans_id" => $provider_trans_id,

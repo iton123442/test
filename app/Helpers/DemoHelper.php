@@ -128,6 +128,15 @@ class DemoHelper{
             );
             
         }
+        elseif($provider_code==109){ //playngo
+
+            $response = array(
+                "game_code" =>$data->game_code,
+                "url" =>  DemoHelper::mancalaDemo($data),
+                "game_launch" => true
+            );
+            
+        }
         // elseif($provider_code == 34){ // EDP
         //     // / $client = new Client();
         //     // $guzzle_response = $client->get('https://edemo.endorphina.com/api/link/accountId/1002 /hash/' . md5("endorphina_4OfAKing@ENDORPHINA") . '/returnURL/' . $returnURL);
@@ -253,7 +262,34 @@ class DemoHelper{
         $gameurl = config('providerlinks.play_tigergames').'/api/playngo/tgload/'.$urlencode; 
         return $gameurl;
     }
+    public static function mancalaDemo($request){ //56
+        $game_launch = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+        $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request->game_code.config("providerlinks.mancala.API_KEY"));
+        $datatosend = [
+                "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
+                "GameId" => $request->game_code,
+                "Lang" => "EN",
+                "ClientType" => 1,
+                "IsVirtual" => false,
+                "Hash" => $hash,
+                "DemoMode" => true,
+                "ExtraData" => "data"
+            ];
+        $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
+                ['body' => json_encode($datatosend)]
+            );
 
+        $game_launch_url = json_decode($game_launch_response->getBody()->getContents());
+
+        if($game_launch_url !== NULL) {
+            Helper::playerGameRoundUuid($request->game_code, $request->token, $request->game_provider, $game_launch_url->Token);
+            return $game_launch_url->IframeUrl."&backurl=".$request->exitUrl;  
+        } 
+    }
     public static function evoplay($game_code, $lang){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
         $requesttosend = [

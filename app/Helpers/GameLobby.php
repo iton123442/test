@@ -1245,7 +1245,8 @@ class GameLobby{
                 $auth_api_key = config("providerlinks.mannaplay.default.AUTH_API_KEY");
                 $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
             }
-            
+            $getGameDetails = Helper::findGameDetails( "game_code",16, $game_code);
+            $token_generate_tg = ProviderHelper::getEncryptToken($client_details->token_id, $client_details->player_id, $getGameDetails->game_id, $client_details->player_token);
 
             $auth_token = new Client([ // auth_token
                 'headers' => [ 
@@ -1259,7 +1260,7 @@ class GameLobby{
                 "id" => $platform_id,
                 "account" => $client_details->player_id,
                 "currency" => $client_details->default_currency,
-                "sessionId" => $token,
+                "sessionId" => $token_generate_tg,
                 "channel" => ($client_details->test_player ? "demo" : "")
             ];
 
@@ -1284,7 +1285,7 @@ class GameLobby{
 
             $game_link_body =  [
              "account" => $client_details->player_id,
-             "sessionId" => $token,
+             "sessionId" => $token_generate_tg,
              "language" => $lang,
              "gameId" => $game_code,
              "exitUrl" => $exitUrl
@@ -1425,13 +1426,11 @@ class GameLobby{
 
     public static function MancalaLaunchUrl($request_data) {
         $client_details = ProviderHelper::getClientDetails('token', $request_data['token']);
-
         $game_launch = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        
         $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
         $datatosend = [
                 "PartnerId" => config("providerlinks.mancala.PARTNER_ID"),
@@ -1557,6 +1556,9 @@ class GameLobby{
                 $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency='.$client_details->default_currency.'';
             break;
 
+            case 'ArrowsEdge':
+                $url = config("providerlinks.vivo.ArrowsEdge_URL").'?tableguid=JJMCHE34297J22JKDX22&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&gameMode=real&currency='.$client_details->default_currency.'';
+            break;
             case '7 Mojos':
                 $get_game_type = DragonGamingHelper::getGameType($game_code, config("providerlinks.vivo.PROVIDER_ID"));
                 
@@ -2119,7 +2121,7 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         try{
             $requesttosend = [
-                "loginname" => "TG_".$client_details->player_id,
+                "loginname" => "TG002_".$client_details->player_id,
                 "key" => $data['token'],
                 "currency" => $client_details->default_currency,
                 "lang" => $data['lang'],

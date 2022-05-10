@@ -407,7 +407,7 @@ class TGGController extends Controller
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		if (isset($string_to_obj->game->action)) {
 
-			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double') {
+			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double' || $string_to_obj->game->action == 'extrabonusspin' || $string_to_obj->game->action  == 'set_double'  || $string_to_obj->game->action  == 'drop') {
 				if ($existing_bet != 'false') {
 					$client_details->connection_name = $existing_bet->connection_name;
 					$amount = $request['data']['amount'];

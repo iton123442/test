@@ -318,26 +318,26 @@ $app->post('/public/api/png/betsofted/release','PNGControllerBetsofted@release')
 $app->post('/public/api/png/betsofted/balance','PNGControllerBetsofted@balance');
 $app->post('/public/api/png/betsofted/cancelReserve','PNGController@cancelReserve');
 //Wazdan Endpoints
-$app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
-$app->post('/public/api/wazdan/getStake','WazdanController@getStake');
-$app->post('/public/api/wazdan/rollbackStake','WazdanController@rollbackState');
-$app->post('/public/api/wazdan/returnWin','WazdanController@returnWin');
-$app->post('/public/api/wazdan/getFunds','WazdanController@getFunds');
-$app->post('/public/api/wazdan/gameClose','WazdanController@gameClose');
-$app->post('/public/api/wazdan/hash','WazdanController@hashCode');
+$app->post('/public/api/wazdan/authenticate','WazdanControllerNew@authenticate');
+$app->post('/public/api/wazdan/getStake','WazdanControllerNew@getStake');
+$app->post('/public/api/wazdan/rollbackStake','WazdanControllerNew@rollbackState');
+$app->post('/public/api/wazdan/returnWin','WazdanControllerNew@returnWin');
+$app->post('/public/api/wazdan/getFunds','WazdanControllerNew@getFunds');
+$app->post('/public/api/wazdan/gameClose','WazdanControllerNew@gameClose');
+$app->post('/public/api/wazdan/hash','WazdanControllerNew@hashCode');
 // BETRNK LOTTO
 $app->post('/public/api/betrnk/lotto', 'BetrnkController@getUrl');
 
 // TIDY
 // $app->post('/public/tidy/api/auth', 'TidyController@conecteccc');
-$app->post('/public/tidy/api/game/outside/link', 'TidyController@getGameUrl'); // CENTRALIZED
-$app->post('/public/tidy/api/checkplayer', 'TidyController@autPlayer');
-$app->post('/public/tidy/api/gamelist', 'TidyController@getGamelist');
-$app->post('/public/tidy/api/gameurl', 'TidyController@gameUrl');
-$app->post('/public/tidy/api/transaction/bet', 'TidyController@gameBet');
-$app->post('/public/tidy/api/transaction/rollback', 'TidyController@gameRollback');
-$app->post('/public/tidy/api/transaction/win', 'TidyController@gameWin');
-$app->post('/public/tidy/api/user/balance', 'TidyController@checkBalance');
+$app->post('/public/tidy/api/game/outside/link', 'FTGControllerNew@getGameUrl'); // CENTRALIZED
+$app->post('/public/tidy/api/checkplayer', 'FTGControllerNew@autPlayer');
+$app->post('/public/tidy/api/gamelist', 'FTGControllerNew@getGamelist');
+$app->post('/public/tidy/api/gameurl', 'FTGControllerNew@gameUrl');
+$app->post('/public/tidy/api/transaction/bet', 'FTGControllerNew@gameBet');
+$app->post('/public/tidy/api/transaction/rollback', 'FTGControllerNew@gameRollback');
+$app->post('/public/tidy/api/transaction/win', 'FTGControllerNew@gameWin');
+$app->post('/public/tidy/api/user/balance', 'FTGControllerNew@checkBalance');
 
 //TGG
 $app->post('/public/api/tgg/gamelist', 'TGGController@getGamelist'); // launch game 

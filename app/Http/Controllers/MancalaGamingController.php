@@ -377,12 +377,12 @@ class MancalaGamingController extends Controller
 	                          // "provider_request" =>json_encode($data),
 	                          // "mw_response" => json_encode($response),
                       	);
-	                  	$game_trans_ext_id = GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$gen_game_extid,$client_details);
+	                  	GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$gen_game_extid,$client_details);
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
 			                    "provider" => 'MancalaGaming',
-			                    "game_trans_ext_id" => $game_trans_ext_id,
+			                    "game_transaction_ext_id" => $gen_game_extid,
 			                    "win_or_lost" => $win_or_lost,
 			                    "client_connection_name" => $client_details->connection_name
 			                ],
@@ -434,38 +434,40 @@ class MancalaGamingController extends Controller
 				];
 			} else {
 
-				$response = [
-					"Error" =>  10204,
-					"message" => "Account is not exist!",
-				];
 				// Find the player and client details
 				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
 				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
 
 				if ($client_details != null) {
 					
-					try{
-						ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
-					}catch(\Exception $e){
-						$response = [
-							"Error" =>  0, 
-							"Balance" => ProviderHelper::amountToFloat($client_details->balance)
-						];
-						return $response;
-					}
+					// try{
+					// 	ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
+					// }catch(\Exception $e){
+					// 	$response = [
+					// 		"Error" =>  0, 
+					// 		"Balance" => ProviderHelper::amountToFloat($client_details->balance)
+					// 	];
+					// 	return $response;
+					// }
 
 					// $game_transaction =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($json_data["RefundTransactionId"], 1, $client_details);
 					$game_transaction =  GameTransactionMDB::findGameTransactionDetails($json_data["TransactionId"], 'transaction_id', false, $client_details);
-
-					$response = [
-						"Error" =>  10210,
-						"message" => "Target transaction id not found!",
-					];
-					
+					if($game_transaction == 'false'){
+						$response = [
+							"Error" =>  10210,
+							"message" => "Target transaction id not found!",
+						];
+						return $response;
+					}
 					if ($game_transaction != 'false') {
 
 						if ($game_transaction->win == 2) {
-							return response()->json($response, $http_status);
+							$response = [
+								"Error" =>  0, 
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance)
+							];
+							return $response;
+							// return response()->json($response, $http_status);
 						}
 
 						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
