@@ -128,7 +128,7 @@ class ClientRequestHelper{
                             ];
                             ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
-                        'timeout' => $timeout,
+                        // 'timeout' => $timeout,
                         'body' => json_encode(
                             $requesttocient
                         )

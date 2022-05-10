@@ -385,7 +385,7 @@ class KAGamingController extends Controller
         #2 END
 
         #22 NEW FLOW - 4-29-22
-        $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 1,'transaction_id', $client_details);
+        $check_bet_round = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
         if($check_bet_round != 'false'){ // Duplicate transaction
             if($check_bet_round->transaction_detail != '"FAILED"' || $check_bet_round->transaction_detail != 'FAILED'){
                // If Round has refund dont filter duplicate (PROCESS THE DATA)
