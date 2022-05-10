@@ -1554,11 +1554,12 @@ class GameLobby{
                 // $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency=USD';
 
                 $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency='.$client_details->default_currency.'';
-            break;
+                break;
 
             case 'ArrowsEdge':
-                $url = config("providerlinks.vivo.ArrowsEdge_URL").'?tableguid=JJMCHE34297J22JKDX22&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&gameMode=real&currency='.$client_details->default_currency.'';
-            break;
+                $url = config("providerlinks.vivo.ArrowsEdge_URL").'?tableguid=JJMCHE34297J22JKDX22&token='.$token.'&OperatorId='.$operator_id.'&homeUrl=&language=en&GameID='.$game_code.'&cashierUrl=&gameMode=real&currency='.$client_details->default_currency.'';
+                https://www.2vivo.com/flashrungame/RunGenericGame.aspx?tableguid=JJMCHE34297J22JKDX22
+                break;
             case '7 Mojos':
                 $get_game_type = DragonGamingHelper::getGameType($game_code, config("providerlinks.vivo.PROVIDER_ID"));
                 
@@ -1580,7 +1581,6 @@ class GameLobby{
                 # code...
                 break;
         }
-        
         return $url;
     }
 
