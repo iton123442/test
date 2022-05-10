@@ -672,7 +672,6 @@ class YGG002Controller extends Controller
             Helper::saveLog("YGG 002 campaignpayout dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
-
         $gameTransactionData = array(
             "provider_trans_id" => $provider_trans_id,
             "token_id" => $tokenId,
