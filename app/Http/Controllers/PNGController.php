@@ -342,7 +342,7 @@ class PNGController extends Controller
                         "entry_id" => $entry_id,
                         "pay_amount" => (float)$xmlparser->real,
                         "income" => $income,
-                        "game_trans_ext_id" => $transactionId
+                        "game_transaction_ext_id" => $transactionId
                     ],
                     "provider" => [
                         "provider_request" => $xmlparser, #R
