@@ -361,16 +361,16 @@ class KAGamingController extends Controller
 
 
         #1 OLD FLOW - 4-29-22
-        // $game_ext_check = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
-        // if($game_ext_check != 'false'){ // Duplicate transaction
-        //     if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){
-        //        // If Round has refund dont filter duplicate (PROCESS THE DATA)
-        //        $game_ext_check_is_refund_success = GameTransactionMDB::findGameExt($round_id, 3, 'round_id', $client_details);
-        //        if($game_ext_check_is_refund_success == 'false'){
-        //            return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
-        //        }
-        //     }
-        // }
+        $game_ext_check = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
+        if($game_ext_check != 'false'){ // Duplicate transaction
+            if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){
+               // If Round has refund dont filter duplicate (PROCESS THE DATA)
+               $game_ext_check_is_refund_success = GameTransactionMDB::findGameExt($round_id, 3, 'round_id', $client_details);
+               if($game_ext_check_is_refund_success == 'false'){
+                   return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
+               }
+            }
+        }
         #1 END
 
         $general_details['client']['before_balance'] = KAHelper::amountToFloat($client_details->balance);
@@ -381,20 +381,20 @@ class KAGamingController extends Controller
         $token_id = $client_details->token_id;
 
         #2 OLD FLOW - 4-29-22
-        // $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 2,'transaction_id', $client_details);
+        $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 2,'transaction_id', $client_details);
         #2 END
 
         #22 NEW FLOW - 4-29-22
-        $check_bet_round = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
-        if($check_bet_round != 'false'){ // Duplicate transaction
-            if($check_bet_round->transaction_detail != '"FAILED"' || $check_bet_round->transaction_detail != 'FAILED'){
-               // If Round has refund dont filter duplicate (PROCESS THE DATA)
-               $game_ext_check_is_refund_success = GameTransactionMDB::findGameExt($round_id, 3, 'round_id', $client_details);
-               if($game_ext_check_is_refund_success == 'false'){
-                   return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
-               }
-            }
-        }
+        // $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 1,'transaction_id', $client_details);
+        // if($check_bet_round != 'false'){ // Duplicate transaction
+        //     if($check_bet_round->transaction_detail != '"FAILED"' || $check_bet_round->transaction_detail != 'FAILED'){
+        //        // If Round has refund dont filter duplicate (PROCESS THE DATA)
+        //        $game_ext_check_is_refund_success = GameTransactionMDB::findGameExt($round_id, 3, 'round_id', $client_details);
+        //        if($game_ext_check_is_refund_success == 'false'){
+        //            return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
+        //        }
+        //     }
+        // }
         
         #22 END
         if($check_bet_round != 'false'){
@@ -438,6 +438,7 @@ class KAGamingController extends Controller
             // $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
             GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
         }
+
 
         $fund_extra_data = [
             'fundtransferrequest' => [
