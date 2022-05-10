@@ -527,6 +527,7 @@ return [
         'PLATIPUS_URL' => 'https://www.2vivo.com/flashrungame/set2/RunPlatipusGame.aspx',
         'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
         '7MOJOS_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
+        'ArrowsEdge_URL' => 'https://2vivo.com/flashrungame/RunGenericGame.aspx',
     ],
     'oryx' => [
         'PROVIDER_ID' => 18,

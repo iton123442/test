@@ -110,6 +110,8 @@ class PNGController extends Controller
                 $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
                 $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
                 // $game = Helper::getGameTransaction($xmlparser->externalGameSessionId,$xmlparser->roundId);
+                $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+                $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
                 if($game == 'false'){
                     $gameTransactionData = array(
                         "provider_trans_id" => $xmlparser->transactionId,
@@ -122,7 +124,9 @@ class PNGController extends Controller
                         "win" => 5,
                         "entry_id" =>1,
                     );
-                    $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                    // $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details); //create game_transaction v1
+                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction v2
+                    $gametransactionid = $gen_game_trans_id;
                 }
                 else{
                     $json_data = array(
@@ -139,26 +143,50 @@ class PNGController extends Controller
                     "round_id" =>$xmlparser->roundId,
                     "amount" =>(float)$xmlparser->real,
                     "game_transaction_type"=>1,
-                    "provider_request" => json_encode($xmlparser),
-                    "mw_response" => 'null'
+                    // "provider_request" => json_encode($xmlparser),
+                    // "mw_response" => 'null'
                 );
-                $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                // $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create extension
+                $transactionId = $gen_game_extid;
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
                 if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
                     if($game != 'false'){
-                        $this->updateGameTransaction($game,$json_data,'debit',$client_details);
+                        // $this->updateGameTransaction($game,$json_data,'debit',$client_details);
+                        $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $gen_game_extid,
+                              "request" => json_encode($xmlparser),
+                              "response" => json_encode($json_data),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "Success",
+                          ]
+                        ];
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     }
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                     $array_data = array(
                         "real" => $balance,
                         "statusCode" => 0,
                     );
-                    $dataToUpdate = array(
-                        "mw_response" => json_encode($array_data),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    // $dataToUpdate = array(
+                    //     "mw_response" => json_encode($array_data),
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($xmlparser),
+                          "response" => json_encode($array_data),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "Success",
+                      ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
@@ -168,15 +196,37 @@ class PNGController extends Controller
                             "win" => 2
                         ];
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametransactionid, $client_details);
+                        $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $gen_game_extid,
+                              "request" => json_encode($xmlparser),
+                              "response" => "FAILED",
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "Failed",
+                          ]
+                        ];
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     }
                     $array_data = array(
                         "statusCode" => 7,
                     );
-                    $dataToUpdate = array(
-                        "mw_response" => json_encode($array_data),
-                        "general_details" => "failed"
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    // $dataToUpdate = array(
+                    //     "mw_response" => json_encode($array_data),
+                    //     "general_details" => "failed"
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($xmlparser),
+                          "response" => json_encode($array_data),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "Failed",
+                      ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 } else {
@@ -189,11 +239,22 @@ class PNGController extends Controller
                     $array_data = array(
                         "statusCode" => 10,
                     );
-                    $dataToUpdate = array(
-                        "mw_response" => json_encode($array_data),
-                        "general_details" => "failed"
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    // $dataToUpdate = array(
+                    //     "mw_response" => json_encode($array_data),
+                    //     "general_details" => "failed"
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($xmlparser),
+                          "response" => json_encode($array_data),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "Failed",
+                      ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
@@ -253,6 +314,8 @@ class PNGController extends Controller
             $fund_extra_data = [];
             $is_freespin = false;
             if($game == 'false'){
+                $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+                $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $entry_id = 1;
                 $gameTransactionData = array(
                     "provider_trans_id" => $xmlparser->transactionId,
@@ -264,7 +327,9 @@ class PNGController extends Controller
                     "income" => 0,
                     "win" => 5,
                 );
-                $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                // $gametransactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+                GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+                $gametransactionid = $gen_game_trans_id;
 
                 $income = 0 - (float)$xmlparser->real;
                 
@@ -276,9 +341,11 @@ class PNGController extends Controller
                     "round_id" =>$xmlparser->roundId,
                     "amount" => 0,
                     "game_transaction_type"=>1,
-                    "provider_request" => json_encode($xmlparser),
+                    // "provider_request" => json_encode($xmlparser),
                 );
-                $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                // $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create extension
+                $transactionId = $gen_game_extid;
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,0,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit",false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code) 
@@ -290,10 +357,21 @@ class PNGController extends Controller
                         "statusCode" => 0,
                     );
                     
-                    $dataToUpdate = array(
-                        "mw_response" => json_encode($array_data2),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    // $dataToUpdate = array(
+                    //     "mw_response" => json_encode($array_data2),
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $transactionId,
+                          "request" => json_encode($xmlparser),
+                          "response" => json_encode($array_data2),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "Success",
+                      ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                 }
                 elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -301,11 +379,22 @@ class PNGController extends Controller
                     $array_data = array(
                         "statusCode" => 7,
                     );
-                    $dataToUpdate = array(
-                        "mw_response" => json_encode($array_data),
-                        "client_response" => json_encode($client_response)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    // $dataToUpdate = array(
+                    //     "mw_response" => json_encode($array_data),
+                    //     "client_response" => json_encode($client_response)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                    $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $transactionId,
+                          "request" => json_encode($xmlparser),
+                          "response" => json_encode($array_data),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "Failed",
+                      ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 }
             }
             else{
@@ -316,6 +405,8 @@ class PNGController extends Controller
                 $gametransactionid = $game->game_trans_id;
                 $income = $game->bet_amount - (float)$xmlparser->real;
             }
+            $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+            $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
             $wingametransactionext = array(
                 "game_trans_id" => $gametransactionid,
                 "provider_trans_id" => $xmlparser->transactionId,
@@ -323,9 +414,11 @@ class PNGController extends Controller
                 "amount" =>(float)$xmlparser->real,
                 "game_transaction_type"=>2,
                 "provider_request" => json_encode($xmlparser),
-                "mw_response" => 'null'
+                // "mw_response" => 'null'
             );
-            $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+            // $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create extension
+            $transactionId = $gen_game_extid;
             // $transactionId = PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,2);
             $balance = round($client_details->balance,2) + (float)$xmlparser->real;
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
@@ -390,7 +483,7 @@ class PNGController extends Controller
             }
 
             $sendtoclient =  microtime(true);  
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,'credit',false,$action_payload);
             // $client_response_time = microtime(true) - $sendtoclient;
 
 
@@ -399,10 +492,21 @@ class PNGController extends Controller
                 if($game != 'false'){
                     $this->updateGameTransaction($game,$json_data,'credit',$client_details);
                 }
-                $dataToUpdate = array(
-                    "mw_response" => json_encode($array_data),
-                );
-                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                // $dataToUpdate = array(
+                //     "mw_response" => json_encode($array_data),
+                // );
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                $createGameTransactionLog = [
+                  "connection_name" => $client_details->connection_name,
+                  "column" =>[
+                      "game_trans_ext_id" => $gen_game_extid,
+                      "request" => json_encode($xmlparser),
+                      "response" => json_encode($array_data),
+                      "log_type" => "provider_details",
+                      "transaction_detail" => "Success",
+                  ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 // ProviderHelper::saveLogProcessTime($gametransactionid, 1334, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                 // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
                 return PNGHelper::arrayToXml($array_data,"<release/>");
@@ -411,10 +515,21 @@ class PNGController extends Controller
                 $array_data = array(
                     "statusCode" => 7,
                 );
-                $dataToUpdate = array(
-                    "mw_response" => json_encode($array_data),
-                );
-                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                // $dataToUpdate = array(
+                //     "mw_response" => json_encode($array_data),
+                // );
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                $createGameTransactionLog = [
+                  "connection_name" => $client_details->connection_name,
+                  "column" =>[
+                      "game_trans_ext_id" => $gen_game_extid,
+                      "request" => json_encode($xmlparser),
+                      "response" => json_encode($array_data),
+                      "log_type" => "provider_details",
+                      "transaction_detail" => "Failed",
+                  ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 return PNGHelper::arrayToXml($array_data,"<release/>");
             }
             // else{
