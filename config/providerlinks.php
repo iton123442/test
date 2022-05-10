@@ -527,6 +527,7 @@ return [
         'PLATIPUS_URL' => 'https://www.2vivo.com/flashrungame/set2/RunPlatipusGame.aspx',
         'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
         '7MOJOS_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
+        'ArrowsEdge_URL' => 'https://2vivo.com/flashrungame/RunGenericGame.aspx',
     ],
     'oryx' => [
         'PROVIDER_ID' => 18,
@@ -742,7 +743,7 @@ return [
         'Org' => 'TIGERGAMES002',
         'topOrg' => 'TigerGamesGroup',
         'key' => 'yGdqhLKv7E5WUf3ThmW',
-        'provider_db_id' => 70,
+        'provider_db_id' => 38,
     ],
     'bota'=>[
         'api_key' => '6659fc8266bf70ac08933e3ba794422be56ad036a4f2db56514b59fcf8536594',
