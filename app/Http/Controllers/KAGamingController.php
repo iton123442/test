@@ -531,28 +531,19 @@ class KAGamingController extends Controller
                         ]
                     ];
                     ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
-                    $createGameTransactionClientDetails = [
-                        "connection_name" => $client_details->connection_name,
-                        "column" =>[
-                            "game_trans_ext_id" => $game_transextension,
-                            "request" => json_encode($client_response->requestoclient),
-                            "response" => json_encode($client_response),
-                            "log_type" => "client_details",
-                            "transaction_detail" => "success",
-                        ]
-                    ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
-                    // $createGameTransactionGeneralDetails = [
+
+                    # Already have in ClientRequestHelper
+                    // $createGameTransactionClientDetails = [
                     //     "connection_name" => $client_details->connection_name,
                     //     "column" =>[
                     //         "game_trans_ext_id" => $game_transextension,
-                    //         "request" => json_encode($data),
-                    //         "response" => json_encode($general_details),
-                    //         "log_type" => "general_details",
+                    //         "request" => json_encode($client_response->requestoclient),
+                    //         "response" => json_encode($client_response),
+                    //         "log_type" => "client_details",
                     //         "transaction_detail" => "success",
                     //     ]
                     // ];
-                    // ProviderHelper::queTransactionLogs($createGameTransactionGeneralDetails);
+                    // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
 
                     if($check_bet_round != 'false'){
                         $pay_amount = $existing_bet_details->pay_amount + $win_amount;
@@ -712,17 +703,6 @@ class KAGamingController extends Controller
                 ]
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
-            $createGameTransactionClientDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($client_response->requestoclient),
-                    "response" => json_encode($client_response),
-                    "log_type" => "client_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
         }else{ // Unknown Response Code
             $response = ["status" => "Not Enough Balance", "statusCode" =>  200];
             $updateTransactionEXt = array(
@@ -746,17 +726,6 @@ class KAGamingController extends Controller
                 ]
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
-            $createGameTransactionClientDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($client_response->requestoclient),
-                    "response" => json_encode($client_response),
-                    "log_type" => "client_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
         }  
         return $response;
     }
@@ -1184,17 +1153,19 @@ class KAGamingController extends Controller
                 'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-            $createGameTransactionClientDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($client_response->requestoclient),
-                    "response" => json_encode($client_response),
-                    "log_type" => "client_details",
-                    "transaction_detail" => "success",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
+
+            # Already have in ClientRequestHelper
+            // $createGameTransactionClientDetails = [
+            //     "connection_name" => $client_details->connection_name,
+            //     "column" =>[
+            //         "game_trans_ext_id" => $game_transextension,
+            //         "request" => json_encode($client_response->requestoclient),
+            //         "response" => json_encode($client_response),
+            //         "log_type" => "client_details",
+            //         "transaction_detail" => "success",
+            //     ]
+            // ];
+            // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
             $createGameTransactionProviderDetails = [
                 "connection_name" => $client_details->connection_name,
                 "column" =>[
@@ -1224,17 +1195,19 @@ class KAGamingController extends Controller
                 'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-            $createGameTransactionClientDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($client_response->requestoclient),
-                    "response" => json_encode($client_response),
-                    "log_type" => "client_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
+
+            # Already have in ClientRequestHelper
+            // $createGameTransactionClientDetails = [
+            //     "connection_name" => $client_details->connection_name,
+            //     "column" =>[
+            //         "game_trans_ext_id" => $game_transextension,
+            //         "request" => json_encode($client_response->requestoclient),
+            //         "response" => json_encode($client_response),
+            //         "log_type" => "client_details",
+            //         "transaction_detail" => "FAILED",
+            //     ]
+            // ];
+            // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
             $createGameTransactionProviderDetails = [
                 "connection_name" => $client_details->connection_name,
                 "column" =>[
@@ -1263,17 +1236,19 @@ class KAGamingController extends Controller
                 'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-            $createGameTransactionClientDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($client_response->requestoclient),
-                    "response" => json_encode($client_response),
-                    "log_type" => "client_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
+
+            # Already have in ClientRequestHelper
+            // $createGameTransactionClientDetails = [
+            //     "connection_name" => $client_details->connection_name,
+            //     "column" =>[
+            //         "game_trans_ext_id" => $game_transextension,
+            //         "request" => json_encode($client_response->requestoclient),
+            //         "response" => json_encode($client_response),
+            //         "log_type" => "client_details",
+            //         "transaction_detail" => "FAILED",
+            //     ]
+            // ];
+            // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
             $createGameTransactionProviderDetails = [
                 "connection_name" => $client_details->connection_name,
                 "column" =>[
