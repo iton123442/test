@@ -84,6 +84,8 @@ class BoomingGamingController extends Controller
         }
    
         $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+        $game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
         if($game_details == null){
             return   $response = ['error' => '2010','message' => 'Unsupported parameters provided'];
         }
@@ -105,7 +107,8 @@ class BoomingGamingController extends Controller
                 "income" => $income,
                 "entry_id" => $entry_id,
             ); 
-            $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+            // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+            GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transaction_id,$client_details); //create game_transaction
             $gameTransactionEXTData= array(
                 "game_trans_id" => $game_transaction_id,
                 "provider_trans_id" => $provider_trans_id,
@@ -114,7 +117,8 @@ class BoomingGamingController extends Controller
                 "game_transaction_type"=> 1,
                 "provider_request" =>json_encode($request->all()),
                 );
-             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+             GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
             
             //requesttosend, and responsetoclient client side
             $fund_extra_data = [
@@ -127,14 +131,25 @@ class BoomingGamingController extends Controller
                     'error' => '2099',
                     'message' => 'Generic validation error'
                 );
-		        $updateTransactionEXt = array(
-		            "mw_response" => json_encode($response),
-		            'mw_request' => $client_response,
-		            'client_response' => $client_response,
-		            "transaction_detail" => "FATAL",
-					"general_details" =>$e->getMessage(),
-		        );
-		        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+		   //      $updateTransactionEXt = array(
+		   //          "mw_response" => json_encode($response),
+		   //          'mw_request' => $client_response,
+		   //          'client_response' => $client_response,
+		   //          "transaction_detail" => "FATAL",
+					// "general_details" =>$e->getMessage(),
+		   //      );
+		   //      GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $game_trans_ext_id,
+                              "request" => json_encode($data),
+                              "response" => json_encode($response),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "FATAL",
+                          ]
+                      ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
 				$updateGameTransaction = [
 	                "win" => 2
 	            ];
@@ -150,14 +165,25 @@ class BoomingGamingController extends Controller
                             "balance" => (string)$client_response->fundtransferresponse->balance
                         ];
                         
-                        $updateTransactionEXt = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"success",
-							"general_details" => "success",
-						);
-                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+      //                   $updateTransactionEXt = array(
+						// 	"mw_response" =>json_encode($response),
+						// 	"mw_request"=>json_encode($client_response->requestoclient),
+						// 	"client_response" =>json_encode($client_response->fundtransferresponse),
+						// 	"transaction_detail" =>"success",
+						// 	"general_details" => "success",
+						// );
+      //                   GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                        $createGameTransactionLog = [
+                                  "connection_name" => $client_details->connection_name,
+                                  "column" =>[
+                                      "game_trans_ext_id" => $game_trans_ext_id,
+                                      "request" => json_encode($data),
+                                      "response" => json_encode($response),
+                                      "log_type" => "provider_details",
+                                      "transaction_detail" => "success",
+                                  ]
+                              ];
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                         break;
                     
                     default:
@@ -169,14 +195,25 @@ class BoomingGamingController extends Controller
                             'error' => 'low_balance',
                             'message' => 'You have insufficient balance to place a bet'
                         );
-                        $updateTransactionEXt = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"402",
-							"general_details" => "FAILED",
-						);
-                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+      //                   $updateTransactionEXt = array(
+						// 	"mw_response" =>json_encode($response),
+						// 	"mw_request"=>json_encode($client_response->requestoclient),
+						// 	"client_response" =>json_encode($client_response->fundtransferresponse),
+						// 	"transaction_detail" =>"402",
+						// 	"general_details" => "FAILED",
+						// );
+      //                   GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                        $createGameTransactionLog = [
+                                  "connection_name" => $client_details->connection_name,
+                                  "column" =>[
+                                      "game_trans_ext_id" => $game_trans_ext_id,
+                                      "request" => json_encode($client_response->requestoclient),
+                                      "response" => json_encode($client_response->fundtransferresponse),
+                                      "log_type" => "provider_details",
+                                      "transaction_detail" => "FAILED",
+                                  ]
+                              ];
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                         return json_encode($response, JSON_FORCE_OBJECT); 
                         break;
                 }
@@ -185,6 +222,7 @@ class BoomingGamingController extends Controller
         // WIN PROCESS
         $balance = $client_response->fundtransferresponse->balance + $pay_amount;
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
         $response =  [
             "balance" => (string)$balance
         ];
@@ -194,12 +232,13 @@ class BoomingGamingController extends Controller
             "round_id" =>  $round_id,
             "amount" => $pay_amount,
             "game_transaction_type"=> 2,
-            "provider_request" =>json_encode($request->all()),
-            "mw_response" =>json_encode($response),
-            "transaction_detail" =>"success",
-            "general_details" => "success",
+            // "provider_request" =>json_encode($request->all()),
+            // "mw_response" =>json_encode($response),
+            // "transaction_detail" =>"success",
+            // "general_details" => "success",
         );
-        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
+        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
         $body_details = [
             "type" => "credit",
             "win" => $win_or_lost,
