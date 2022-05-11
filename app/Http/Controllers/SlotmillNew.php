@@ -63,12 +63,16 @@ class SlotmillNew extends Controller
         $playersid = explode('_', $request['playerid']);
         $client_details = ProviderHelper::getClientDetails('player_id',$playersid[1]);
         $game_trans_id = ProviderHelper::idGenerate($client_details->connection_name, 1);
-		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);   
+		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2); 
+        $game_code = $request["cat5"];  
         $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_code);
         $fund_extra_data = [];
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ]; 
+        $bet_amount = $request["amount"];
+        $provider_trans_id = $request["reference"];
+        $bet_id = $request["subreference"];
         if ($client_details == null) {
             $response = [
                 "code" => 1008,
@@ -78,7 +82,7 @@ class SlotmillNew extends Controller
             return response($response,200)->header('Content-Type', 'application/json');
         }
 
-        $game_code = $request["cat5"];
+     
         try{
             ProviderHelper::idenpotencyTable($this->prefix.'_'.$request["reference"]);
         }catch(\Exception $e){
@@ -136,9 +140,6 @@ class SlotmillNew extends Controller
             return response($response,200)
             ->header('Content-Type', 'application/json');
         }
-        $bet_amount = $request["amount"];
-        $provider_trans_id = $request["reference"];
-        $bet_id = $request["subreference"];
         if (isset($client_response->fundtransferresponse->status->code)) {
 
             switch ($client_response->fundtransferresponse->status->code) {
@@ -167,7 +168,7 @@ class SlotmillNew extends Controller
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
-                            "game_trans_ext_id" => $game_transid_ext,
+                            "game_trans_ext_id" => $game_trans_ext_id,
                             "request" => json_encode($client_response->requestoclient),
                             "response" => json_encode($client_response->fundtransferresponse),
                             "log_type" => "client_details",
@@ -216,7 +217,7 @@ class SlotmillNew extends Controller
       $createGameTransactionLog = [
         "connection_name" => $client_details->connection_name,
         "column" =>[
-            "game_trans_ext_id" => $game_transid_ext,
+            "game_trans_ext_id" => $game_trans_ext_id,
             "request" => json_encode($request->all()),
             "response" => json_encode($response),
             "log_type" => "provider_details",
@@ -492,7 +493,7 @@ class SlotmillNew extends Controller
         $createGameTransactionLog = [
             "connection_name" => $client_details->connection_name,
             "column" =>[
-                "game_trans_ext_id" => $game_transid_ext,
+                "game_trans_ext_id" => $game_trans_ext_id,
                 "request" => json_encode($request->all()),
                 "response" => json_encode($response),
                 "log_type" => "provider_details",
