@@ -97,7 +97,11 @@ class BOTAController extends Controller{
             }catch(\Exception $e){//if bet exist
                 $cancelBetRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
                 $betHistory = BOTAHelper::getBettingList($client_details,$this->dateToday);
-                $myRoundID = $betHistory->result_value[0]->c_shoe_idx.$betHistory->result_value[0]->c_game_idx;
+                if($betHistory->result_count != 0){
+                    $myRoundID = $betHistory->result_value[0]->c_shoe_idx.$betHistory->result_value[0]->c_game_idx;
+                }else{
+                    $myRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
+                }
                 $cancelbetExt = GameTransactionMDB::findBOTAGameExt($cancelBetRoundID,'round_id',3,$client_details);
                 if($cancelbetExt == 'false'){
                     if($myRoundID == $cancelBetRoundID){//IF bet already exist
