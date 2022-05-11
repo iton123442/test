@@ -430,11 +430,22 @@ class VivoController extends Controller
 	                      "request" => json_encode($data),
 	                      "response" => json_encode($response),
 	                      "log_type" => "provider_details",
-	                      "transaction_detail" => "FAILED",
+	                      "transaction_detail" => "Success",
 	                  ]
 	                ];
 	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
 	        } catch (\Exception $e) {
+	        	$createGameTransactionLog = [
+	                  "connection_name" => $client_details->connection_name,
+	                  "column" =>[
+	                      "game_trans_ext_id" => $gen_game_extid,
+	                      "request" => json_encode($data),
+	                      "response" => json_encode($response),
+	                      "log_type" => "provider_details",
+	                      "transaction_detail" => "FAILED",
+	                  ]
+	                ];
+	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
 	        	Helper::saveLog('Vivo Gaming WIN ERROR CATCHED', 34,json_encode($data), json_encode($response));
 	        }
 	       
