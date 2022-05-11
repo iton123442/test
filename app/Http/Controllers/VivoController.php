@@ -284,7 +284,7 @@ class VivoController extends Controller
         GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
         try {
 			$fund_extra_data = [
-	            'provider_name' => $game_details->provider_name
+	            'provider_name' => $game_details->sub_provider_name
 	        ];
 	        Helper::saveLog('Vivo Gaming BET prio fundTransfer', 34,json_encode($data), $client_details->balance - $data["Amount"]);
 	       
