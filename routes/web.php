@@ -330,14 +330,14 @@ $app->post('/public/api/betrnk/lotto', 'BetrnkController@getUrl');
 
 // TIDY
 // $app->post('/public/tidy/api/auth', 'TidyController@conecteccc');
-$app->post('/public/tidy/api/game/outside/link', 'TidyController@getGameUrl'); // CENTRALIZED
-$app->post('/public/tidy/api/checkplayer', 'TidyController@autPlayer');
-$app->post('/public/tidy/api/gamelist', 'TidyController@getGamelist');
-$app->post('/public/tidy/api/gameurl', 'TidyController@gameUrl');
-$app->post('/public/tidy/api/transaction/bet', 'TidyController@gameBet');
-$app->post('/public/tidy/api/transaction/rollback', 'TidyController@gameRollback');
-$app->post('/public/tidy/api/transaction/win', 'TidyController@gameWin');
-$app->post('/public/tidy/api/user/balance', 'TidyController@checkBalance');
+$app->post('/public/tidy/api/game/outside/link', 'FTGControllerNew@getGameUrl'); // CENTRALIZED
+$app->post('/public/tidy/api/checkplayer', 'FTGControllerNew@autPlayer');
+$app->post('/public/tidy/api/gamelist', 'FTGControllerNew@getGamelist');
+$app->post('/public/tidy/api/gameurl', 'FTGControllerNew@gameUrl');
+$app->post('/public/tidy/api/transaction/bet', 'FTGControllerNew@gameBet');
+$app->post('/public/tidy/api/transaction/rollback', 'FTGControllerNew@gameRollback');
+$app->post('/public/tidy/api/transaction/win', 'FTGControllerNew@gameWin');
+$app->post('/public/tidy/api/user/balance', 'FTGControllerNew@checkBalance');
 
 //TGG
 $app->post('/public/api/tgg/gamelist', 'TGGController@getGamelist'); // launch game 
@@ -586,13 +586,13 @@ $app->post('/public/tigergames/fundtransfer-timeout','FundtransferProcessorContr
 
 
 // SLOTMILL
-$app->post('/public/api/slotmill/playerinfo.json','SlotMillController@playerinfo');
-$app->post('/public/api/slotmill/wager.json','SlotMillController@wager'); // bet 
-$app->post('/public/api/slotmill/cancelwager.json','SlotMillController@cancelwager');
-$app->post('/public/api/slotmill/appendwagerresult.json','SlotMillController@appendwagerresult'); //bonus
-$app->post('/public/api/slotmill/appendwagergoods.json','SlotMillController@appendwagergoods'); //bonus
-$app->post('/public/api/slotmill/endwager.json','SlotMillController@endwager'); // win 
-$app->post('/public/api/slotmill/reverse.json','SlotMillController@reverse');
+$app->post('/public/api/slotmill/playerinfo.json','SlotmillNew@playerinfo');
+$app->post('/public/api/slotmill/wager.json','SlotmillNew@wager'); // bet 
+$app->post('/public/api/slotmill/cancelwager.json','SlotmillNew@cancelwager');
+$app->post('/public/api/slotmill/appendwagerresult.json','SlotmillNew@appendwagerresult'); //bonus
+$app->post('/public/api/slotmill/appendwagergoods.json','SlotmillNew@appendwagergoods'); //bonus
+$app->post('/public/api/slotmill/endwager.json','SlotmillNew@endwager'); // win 
+$app->post('/public/api/slotmill/reverse.json','SlotmillNew@reverse');
 
 
 //PGVIRTUAL

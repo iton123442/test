@@ -386,10 +386,10 @@ class BNGController extends Controller
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
-            $dataToUpdate = array(
-                "mw_response" => json_encode($response)
-            );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
+            // $dataToUpdate = array(
+            //     "mw_response" => json_encode($response)
+            // );
+            // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
             //Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             $winStart =  microtime(true);
             //$this->_setExtParameter($this->_getExtParameter()+1);
@@ -411,7 +411,7 @@ class BNGController extends Controller
                 // "mw_response" => json_encode($response)
             );
             // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$wingen_game_extid,$client_details); //create game_transaction
+            GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$wingen_game_extid,$client_details); //create game_transaction
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($wingen_game_extid), "");
 
             $action_payload = [
