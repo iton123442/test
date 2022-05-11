@@ -250,7 +250,7 @@ public function gameBet($request, $client_details){
                                                   "connection_name" => $client_details->connection_name,
                                                   "column" =>[
                                                       "game_trans_ext_id" => $gen_game_extid,
-                                                      "request" => json_encode($request),
+                                                      "request" => json_encode($payload),
                                                       "response" => json_encode($response),
                                                       "log_type" => "provider_details",
                                                       "transaction_detail" => "SUCCESS",
@@ -281,7 +281,7 @@ public function gameBet($request, $client_details){
                                                   "connection_name" => $client_details->connection_name,
                                                   "column" =>[
                                                       "game_trans_ext_id" => $gen_game_extid,
-                                                      "request" => json_encode($request),
+                                                      "request" => json_encode($payload),
                                                       "response" => json_encode($response),
                                                       "log_type" => "provider_details",
                                                       "transaction_detail" => "SUCCESS",
@@ -308,7 +308,7 @@ public function gameBet($request, $client_details){
                                                   "connection_name" => $client_details->connection_name,
                                                   "column" =>[
                                                       "game_trans_ext_id" => $gen_game_extid,
-                                                      "request" => json_encode($request),
+                                                      "request" => json_encode($payload),
                                                       "response" => json_encode($response),
                                                       "log_type" => "provider_details",
                                                       "transaction_detail" => "SUCCESS",
@@ -372,7 +372,7 @@ public function gameBet($request, $client_details){
                                                               "connection_name" => $client_details->connection_name,
                                                               "column" =>[
                                                                   "game_trans_ext_id" => $gen_game_extid,
-                                                                  "request" => json_encode($request),
+                                                                  "request" => json_encode($payload),
                                                                   "response" => json_encode($response),
                                                                   "log_type" => "provider_details",
                                                                   "transaction_detail" => "SUCCESS",
@@ -409,7 +409,7 @@ public function gameBet($request, $client_details){
                                                       "connection_name" => $client_details->connection_name,
                                                       "column" =>[
                                                           "game_trans_ext_id" => $gen_game_extid,
-                                                          "request" => json_encode($request),
+                                                          "request" => json_encode($payload),
                                                           "response" => json_encode($response),
                                                           "log_type" => "provider_details",
                                                           "transaction_detail" => "SUCCESS",
@@ -420,7 +420,7 @@ public function gameBet($request, $client_details){
                                                  Helper::saveLog('BG 200 Debit Success', $this->provider_db_id, json_encode($request), $response);	
                                         }//end else payload finished true      
                                     }//end action if
-				             return $response;
+				                    return $response;
                                     break;
                                 case '402':
                                     // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
@@ -446,7 +446,7 @@ public function gameBet($request, $client_details){
                                       "connection_name" => $client_details->connection_name,
                                       "column" =>[
                                           "game_trans_ext_id" => $gen_game_extid,
-                                          "request" => json_encode($request),
+                                          "request" => json_encode($payload),
                                           "response" => json_encode($response),
                                           "log_type" => "provider_details",
                                           "transaction_detail" => "FAILED",
