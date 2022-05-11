@@ -586,13 +586,13 @@ $app->post('/public/tigergames/fundtransfer-timeout','FundtransferProcessorContr
 
 
 // SLOTMILL
-$app->post('/public/api/slotmill/playerinfo.json','SlotMillController@playerinfo');
-$app->post('/public/api/slotmill/wager.json','SlotMillController@wager'); // bet 
-$app->post('/public/api/slotmill/cancelwager.json','SlotMillController@cancelwager');
-$app->post('/public/api/slotmill/appendwagerresult.json','SlotMillController@appendwagerresult'); //bonus
-$app->post('/public/api/slotmill/appendwagergoods.json','SlotMillController@appendwagergoods'); //bonus
-$app->post('/public/api/slotmill/endwager.json','SlotMillController@endwager'); // win 
-$app->post('/public/api/slotmill/reverse.json','SlotMillController@reverse');
+$app->post('/public/api/slotmill/playerinfo.json','SlotmillNew@playerinfo');
+$app->post('/public/api/slotmill/wager.json','SlotmillNew@wager'); // bet 
+$app->post('/public/api/slotmill/cancelwager.json','SlotmillNew@cancelwager');
+$app->post('/public/api/slotmill/appendwagerresult.json','SlotmillNew@appendwagerresult'); //bonus
+$app->post('/public/api/slotmill/appendwagergoods.json','SlotmillNew@appendwagergoods'); //bonus
+$app->post('/public/api/slotmill/endwager.json','SlotmillNew@endwager'); // win 
+$app->post('/public/api/slotmill/reverse.json','SlotmillNew@reverse');
 
 
 //PGVIRTUAL
