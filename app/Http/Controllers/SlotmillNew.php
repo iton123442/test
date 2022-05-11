@@ -168,7 +168,7 @@ class SlotmillNew extends Controller
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
-                            "game_trans_ext_id" => $game_transid_ext,
+                            "game_trans_ext_id" => $game_trans_ext_id,
                             "request" => json_encode($client_response->requestoclient),
                             "response" => json_encode($client_response->fundtransferresponse),
                             "log_type" => "client_details",
@@ -217,7 +217,7 @@ class SlotmillNew extends Controller
       $createGameTransactionLog = [
         "connection_name" => $client_details->connection_name,
         "column" =>[
-            "game_trans_ext_id" => $game_transid_ext,
+            "game_trans_ext_id" => $game_trans_ext_id,
             "request" => json_encode($request->all()),
             "response" => json_encode($response),
             "log_type" => "provider_details",
@@ -493,7 +493,7 @@ class SlotmillNew extends Controller
         $createGameTransactionLog = [
             "connection_name" => $client_details->connection_name,
             "column" =>[
-                "game_trans_ext_id" => $game_transid_ext,
+                "game_trans_ext_id" => $game_trans_ext_id,
                 "request" => json_encode($request->all()),
                 "response" => json_encode($response),
                 "log_type" => "provider_details",
