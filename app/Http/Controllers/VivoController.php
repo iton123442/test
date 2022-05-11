@@ -448,7 +448,7 @@ class VivoController extends Controller
 	                      "transaction_detail" => "FAILED",
 	                  ]
 	                ];
-	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
+	            ProviderHelper::queTransactionLogs($createGameTransactionLog);
 	        	Helper::saveLog('Vivo Gaming WIN ERROR CATCHED', 34,json_encode($data), json_encode($response));
 	        }
 	       

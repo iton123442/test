@@ -246,6 +246,17 @@ public function gameBet($request, $client_details){
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                               ],
                                             ];
+                                            $createGameTransactionLog = [
+                                                  "connection_name" => $client_details->connection_name,
+                                                  "column" =>[
+                                                      "game_trans_ext_id" => $gen_game_extid,
+                                                      "request" => json_encode($request),
+                                                      "response" => json_encode($response),
+                                                      "log_type" => "provider_details",
+                                                      "transaction_detail" => "SUCCESS",
+                                                  ]
+                                                ];
+                                             ProviderHelper::queTransactionLogs($createGameTransactionLog); 
                                     }elseif(isset($payload['actions'][1]['action']) && $payload['actions'][1]['action'] == 'bet'){
                                         $http_status = 200;
                                         $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
@@ -266,6 +277,17 @@ public function gameBet($request, $client_details){
                                             ],
                                            ],
                                           ];
+                                          $createGameTransactionLog = [
+                                                  "connection_name" => $client_details->connection_name,
+                                                  "column" =>[
+                                                      "game_trans_ext_id" => $gen_game_extid,
+                                                      "request" => json_encode($request),
+                                                      "response" => json_encode($response),
+                                                      "log_type" => "provider_details",
+                                                      "transaction_detail" => "SUCCESS",
+                                                  ]
+                                                ];
+                                             ProviderHelper::queTransactionLogs($createGameTransactionLog); 
                                           return $response;
                                     }else{
                                         $http_status = 200;
@@ -282,6 +304,17 @@ public function gameBet($request, $client_details){
                                             ],
                                            ],
                                           ];
+                                          $createGameTransactionLog = [
+                                                  "connection_name" => $client_details->connection_name,
+                                                  "column" =>[
+                                                      "game_trans_ext_id" => $gen_game_extid,
+                                                      "request" => json_encode($request),
+                                                      "response" => json_encode($response),
+                                                      "log_type" => "provider_details",
+                                                      "transaction_detail" => "SUCCESS",
+                                                  ]
+                                                ];
+                                             ProviderHelper::queTransactionLogs($createGameTransactionLog);
                                     }
                                     if(!isset($payload['actions'][1])){
                                             if($payload['finished'] == true){
