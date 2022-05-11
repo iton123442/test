@@ -484,7 +484,7 @@ class VivoController extends Controller
 			$action_payload = [
 	            "type" => "custom", #genreral,custom :D # REQUIRED!
 	            "custom" => [
-	            	"win_or_lost" => $win_or_lost,
+	            	"win_or_lost" => 0,
 	                "provider" => 'VivoGaming',
 	                "game_transaction_ext_id" => $gen_game_extid,
 	        		"client_connection_name" => $client_details->connection_name
