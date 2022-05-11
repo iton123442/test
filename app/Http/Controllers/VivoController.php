@@ -233,7 +233,11 @@ class VivoController extends Controller
 	}
 	public function betProcess($data,$client_details)
 	{
-		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+		if(isset($data['gameId'])){
+			$game_details = Game::find($data['gameId'], $this->provider_db_id);
+		}else{
+			$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+		}
 		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 
@@ -353,7 +357,11 @@ class VivoController extends Controller
 	}
 
 	public function winProcess($data,$client_details){
-		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+		if(isset($data['gameId'])){
+			$game_details = Game::find($data['gameId'], $this->provider_db_id);
+		}else{
+			$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+		}
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 		Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), "ENDPOINTHIT");
 		if($data["Amount"] < 0) {
