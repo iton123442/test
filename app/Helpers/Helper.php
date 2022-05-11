@@ -267,7 +267,7 @@ class Helper
 		FROM `player_game_rounds` `pgr` 
 		INNER JOIN `games` `g` USING ( `game_id` )
 		INNER JOIN `providers` `pr` USING (`provider_id`) 
-		INNER JOIN `sub_providers` `sp` USING (`provider_id`) 
+		INNER JOIN `sub_providers` `sp` USING (`sub_provider_id`) 
 		WHERE `player_token` = "'.$player_token.'" ORDER BY round_id desc LIMIT 1 ');
 		$client_details = count($query);
 		return $client_details > 0 ? $query[0] : false;
