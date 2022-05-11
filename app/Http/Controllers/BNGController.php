@@ -391,6 +391,17 @@ class BNGController extends Controller
             // );
             // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
             //Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($data),
+                          "response" => json_encode($response),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "success",
+                      ]
+                  ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             $winStart =  microtime(true);
             //$this->_setExtParameter($this->_getExtParameter()+1);
             $response =array(
@@ -450,6 +461,17 @@ class BNGController extends Controller
                     ),
                 );
                 //Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+                $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($data),
+                          "response" => json_encode($response),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "success",
+                          ]
+                      ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $endWin = microtime(true) - $winStart;
                 Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "WinTime" ,"Time" => $endWin]), "");
                 return response($response,200)
@@ -578,6 +600,17 @@ class BNGController extends Controller
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );
+                $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($data),
+                          "response" => json_encode($response),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "success",
+                      ]
+                  ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 //Helper::updateBNGGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$response,$client_response);
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
@@ -636,10 +669,10 @@ class BNGController extends Controller
                 ),
             );
             //$this->_setExtParameter($this->_getExtParameter()+1);
-            $dataToUpdate = array(
-                "mw_response" => json_encode($response)
-            );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
+            // $dataToUpdate = array(
+            //     "mw_response" => json_encode($response)
+            // );
+            // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
             $createGameTransactionLog = [
                   "connection_name" => $client_details->connection_name,
                   "column" =>[
