@@ -70,6 +70,9 @@ class SlotmillNew extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ]; 
+        $bet_amount = $request["amount"];
+        $provider_trans_id = $request["reference"];
+        $bet_id = $request["subreference"];
         if ($client_details == null) {
             $response = [
                 "code" => 1008,
@@ -137,9 +140,6 @@ class SlotmillNew extends Controller
             return response($response,200)
             ->header('Content-Type', 'application/json');
         }
-        $bet_amount = $request["amount"];
-        $provider_trans_id = $request["reference"];
-        $bet_id = $request["subreference"];
         if (isset($client_response->fundtransferresponse->status->code)) {
 
             switch ($client_response->fundtransferresponse->status->code) {
