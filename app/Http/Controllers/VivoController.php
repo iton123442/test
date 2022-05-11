@@ -480,13 +480,13 @@ class VivoController extends Controller
 	            // "general_details" => $data["History"],
 	        );		                
 			// $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
-			GameTransactionMDB::createGameTransactionExtV2($win_game_transaction_ext,$game_trans_ext_id,$client_details); //create extension
+			GameTransactionMDB::createGameTransactionExtV2($win_game_transaction_ext,$gen_game_extid,$client_details); //create extension
 			$action_payload = [
 	            "type" => "custom", #genreral,custom :D # REQUIRED!
 	            "custom" => [
 	            	"win_or_lost" => $win_or_lost,
 	                "provider" => 'VivoGaming',
-	                "game_transaction_ext_id" => $game_trans_ext_id,
+	                "game_transaction_ext_id" => $gen_game_extid,
 	        		"client_connection_name" => $client_details->connection_name
 	            ],
 	            "provider" => [
@@ -509,7 +509,7 @@ class VivoController extends Controller
 	        	$createGameTransactionLog = [
 	                  "connection_name" => $client_details->connection_name,
 	                  "column" =>[
-	                      "game_trans_ext_id" => $game_trans_ext_id,
+	                      "game_trans_ext_id" => $gen_game_extid,
 	                      "request" => json_encode($data),
 	                      "response" => json_encode($response),
 	                      "log_type" => "provider_details",
