@@ -179,6 +179,15 @@ class TidyHelper{
 			case 'kLAK':
 				$code = '10013';
 				break;
+			case 'TWD':
+				$code = '901';
+				break;
+			case 'INR':
+				$code = '356';
+				break;
+			case 'GBP':
+				$code = '826';
+				break;	
 
 	 	}
 

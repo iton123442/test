@@ -221,6 +221,9 @@ return [
             'LAK'  => '223f24ab',
             'MMK'  => '89853cff',
             'KHR'  => 'd264b6ad',
+            'TWD'  => '7eaa51c7',
+            'INR'  => 'ccc1956b',
+            'GBP'  => 'e68d2044',
         ],
         'support_1to1_denomination_prefixK' => [188,142,185], //THIS IS THE CLIENT ID THAT SUPPOR PREFIX K OR 1:1 EXAMPLE currency LAK concant for kLAK
         'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
@@ -743,7 +746,7 @@ return [
         'Org' => 'TIGERGAMES002',
         'topOrg' => 'TigerGamesGroup',
         'key' => 'yGdqhLKv7E5WUf3ThmW',
-        'provider_db_id' => 70,
+        'provider_db_id' => 38,
     ],
     'bota'=>[
         'api_key' => '6659fc8266bf70ac08933e3ba794422be56ad036a4f2db56514b59fcf8536594',

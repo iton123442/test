@@ -623,6 +623,7 @@ class IDNPokerController extends Controller
                         if (isset($provider_response["message"])) {
                             $message = $provider_response["message"];
                         }
+                        $message = "ポーカーポーカーがマルチウォレットに reflection されるまで1 minute trip かかります. しばらくおちください.";
                         $msg = array("status" => "error", "message" => $message);
                         Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
                         return response($msg, 200)->header('Content-Type', 'application/json');
