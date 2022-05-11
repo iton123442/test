@@ -418,7 +418,7 @@ class VivoController extends Controller
 	                "provider_request" => $data, #R
 	                "provider_trans_id"=> $data["TransactionID"], #R
 	                "provider_round_id"=> $data["roundId"], #R
-	                "provider_name"=> $game_details->provider_name
+	                "provider_name"=> $game_details->sub_provider_name
 	            ],
 	            "mwapi" => [
 	                "roundId"=>$bet_transaction->game_trans_id, #R
