@@ -673,6 +673,7 @@ class IDNPokerController extends Controller
                                     } elseif ($value["status"] == "Win") {
                                         // $bet_amount = ($value["r_bet"] / $rate);
                                         // $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
+                                        // $bet_amount = $value["curr_bet"];
                                         $bet_amount = 0;
                                         $pay_amount = $value["curr_amount"];
                                         $win = 1;
