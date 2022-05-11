@@ -96,14 +96,14 @@ class BOTAController extends Controller{
                 ProviderHelper::idenpotencyTable($this->prefix.$data['detail']['gameNo'].'_'.$data['detail']['shoeNo'].'_1');
             }catch(\Exception $e){//if bet exist
                 $cancelBetRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
-                $betHistory = BOTAHelper::getBettingList($client_details,$this->dateToday);
-                if($betHistory->result_count != 0){
-                    $myRoundID = $betHistory->result_value[0]->c_shoe_idx.$betHistory->result_value[0]->c_game_idx;
-                }else{
-                    $myRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
-                }
                 $cancelbetExt = GameTransactionMDB::findBOTAGameExt($cancelBetRoundID,'round_id',3,$client_details);
                 if($cancelbetExt == 'false'){
+                    $betHistory = BOTAHelper::getBettingList($client_details,$this->dateToday);
+                    if($betHistory->result_count != 0){
+                        $myRoundID = $betHistory->result_value[0]->c_shoe_idx.$betHistory->result_value[0]->c_game_idx;
+                    }else {
+                        $myRoundID = 'false';
+                    }
                     if($myRoundID == $cancelBetRoundID){//IF bet already exist
                         $result = $this->_newBetProcess($data,$client_details);//double bet
                         Helper::saveLog('BOTA DOUBLEBET',$this->provider_db_id, json_encode($result), 'DOUBLEBET HIT');
