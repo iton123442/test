@@ -233,11 +233,7 @@ class VivoController extends Controller
 	}
 	public function betProcess($data,$client_details)
 	{
-		if(isset($data['gameId'])){
-			$game_details = Game::find($data['gameId'], $this->provider_db_id);
-		}else{
-			$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
-		}
+		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 
@@ -284,7 +280,7 @@ class VivoController extends Controller
         GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
         try {
 			$fund_extra_data = [
-	            'provider_name' => $game_details->sub_provider_name
+	            'provider_name' => $game_details->provider_name
 	        ];
 	        Helper::saveLog('Vivo Gaming BET prio fundTransfer', 34,json_encode($data), $client_details->balance - $data["Amount"]);
 	       
@@ -357,11 +353,7 @@ class VivoController extends Controller
 	}
 
 	public function winProcess($data,$client_details){
-		if(isset($data['gameId'])){
-			$game_details = Game::find($data['gameId'], $this->provider_db_id);
-		}else{
-			$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
-		}
+		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 		Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), "ENDPOINTHIT");
 		if($data["Amount"] < 0) {
@@ -418,7 +410,7 @@ class VivoController extends Controller
 	                "provider_request" => $data, #R
 	                "provider_trans_id"=> $data["TransactionID"], #R
 	                "provider_round_id"=> $data["roundId"], #R
-	                "provider_name"=> $game_details->sub_provider_name
+	                "provider_name"=> $game_details->provider_name
 	            ],
 	            "mwapi" => [
 	                "roundId"=>$bet_transaction->game_trans_id, #R
