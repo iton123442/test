@@ -837,6 +837,7 @@ class BOTAController extends Controller{
                 ->header('Content-Type', 'application/json');
             }
             $gameExt = GameTransactionMDB::findGameTransactionDetails($this->prefix.'_'.$data['detail']['shoeNo'].$data['detail']['gameNo'], 'transaction_id',false, $client_details);
+            Helper::saveLog('Cancel Processing', $this->provider_db_id, json_encode($gameExt), 'GAMEEXT Initialized!');
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'BOTA');
             if($gameExt==null){
                 $msg = array(
@@ -851,8 +852,8 @@ class BOTAController extends Controller{
             // $data['detail']['shoeNo'].$data['detail']['gameNo'] = $gameExt->round_id;
             $updateGameTransaction = array(
                 "win" => 4,
-                "pay_amount" => round($data['price'], 2),
-                "income" => $gameExt->bet_amount - round($data['price'], 2),
+                "pay_amount" => round($data['price'],2),
+                "income" => $gameExt->bet_amount - round($data['price'],2),
                 "entry_id" => 2
             );
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $gameExt->game_trans_id, $client_details);
@@ -860,7 +861,7 @@ class BOTAController extends Controller{
                 "game_trans_id" => $gameExt->game_trans_id,
                 "provider_trans_id" => $data['idx'],
                 "round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'],
-                "amount" => round($data['price'], 2),
+                "amount" => round($data['price'],2),
                 "game_transaction_type" => 3,
                 "provider_request" => json_encode($data),
             );
