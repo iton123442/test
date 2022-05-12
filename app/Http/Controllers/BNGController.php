@@ -866,9 +866,10 @@ class BNGController extends Controller
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
+                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["args"]["round_id"], 'round_id',false, $client_details);
                 $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],3);
                 if(!$game_transaction){
-                    $transactionId=Helper::createBNGGameTransactionExt($gametransactionid,$data,null,null,null,3);
+                    $transactionId=Helper::createBNGGameTransactionExt($bet_transaction->game_trans_id,$data,null,null,null,3);
                 }else{
                     $response =array(
                         "uid"=>$data["uid"],
@@ -892,7 +893,6 @@ class BNGController extends Controller
                 // );
                 
                 $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
-                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["args"]["round_id"], 'round_id',false, $client_details);
                 if($bet_transaction != 'false'){
                     $updateGameTransaction = [
                         'win' => 4,
