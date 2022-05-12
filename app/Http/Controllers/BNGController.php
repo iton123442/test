@@ -674,6 +674,7 @@ class BNGController extends Controller
         GameTransactionMDB::createGametransactionV2($dataToSave,$gen_game_trans_id,$client_details); //create game_transaction
         $betgametransactionext = array(
             "game_trans_id" => $gen_game_trans_id,
+            "provider_trans_id" => $data["uid"],
             "round_id" =>$data["args"]["round_id"],
             "amount" =>$data["args"]["bet"],
             "game_transaction_type"=>1,
@@ -898,7 +899,7 @@ class BNGController extends Controller
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
-                            "value" =>$refund_amount,
+                            "value" =>$balance,
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
                     );
