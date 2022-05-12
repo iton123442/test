@@ -866,7 +866,7 @@ class BNGController extends Controller
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
-                $game_transaction = Helper::checkGameTransaction($data["args"]["uid"],$data["args"]["round_id"],3);
+                $game_transaction = Helper::checkGameTransaction($data["args"]["transaction_uid"],$data["args"]["round_id"],3);
                 $refund_amount = $game_transaction ? 0 : round($data["args"]["bet"],2);
                 $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
                 $win = $data["args"]["win"] == 0 ? 0 : 1;
@@ -881,9 +881,9 @@ class BNGController extends Controller
                     $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
                 }
                 else{
-                    GameTransactionMDB::updateGametransaction($json_data,$game_transaction->game_trans_id,$client_details);
+                    GameTransactionMDB::updateGametransaction($json_data,$rollbackchecker->game_trans_id,$client_details);
                     // $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"refund");
-                    $gametransactionid = $game[0]->game_trans_id;
+                    $gametransactionid = $rollbackchecker->game_trans_id;
                 }
                 //$this->_setExtParameter($this->_getExtParameter()+1);
                 if(!$game_transaction){
