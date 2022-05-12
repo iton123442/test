@@ -184,6 +184,17 @@ class BoomingGamingController extends Controller
                                   ]
                               ];
                         ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                        $createGameTransactionLog = [
+                                  "connection_name" => $client_details->connection_name,
+                                  "column" =>[
+                                      "game_trans_ext_id" => $game_trans_ext_id,
+                                      "request" => json_encode($client_response->requestoclient),
+                                      "response" => json_encode($client_response->fundtransferresponse),
+                                      "log_type" => "provider_details",
+                                      "transaction_detail" => "success",
+                                  ]
+                              ];
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                         break;
                     
                     default:
