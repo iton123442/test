@@ -674,7 +674,7 @@ class BNGController extends Controller
         GameTransactionMDB::createGametransactionV2($dataToSave,$gen_game_trans_id,$client_details); //create game_transaction
         $betgametransactionext = array(
             "game_trans_id" => $gen_game_trans_id,
-            "provider_trans_id" => $data["uid"],
+            // "provider_trans_id" => $data["uid"],
             "round_id" =>$data["args"]["round_id"],
             "amount" =>$data["args"]["bet"],
             "game_transaction_type"=>1,
