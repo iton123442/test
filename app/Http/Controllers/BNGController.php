@@ -873,7 +873,7 @@ class BNGController extends Controller
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
                 $json_data = array(
                     "transid" => $data["uid"],
-                    "amount" => number_format(Helper::getBalance($client_details),2,'.', '')-round($refund_amount,2),
+                    "amount" => round($refund_amount,2),
                     "roundid" => $data["args"]["round_id"],
                 );
                 $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
