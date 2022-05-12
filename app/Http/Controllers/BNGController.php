@@ -873,7 +873,7 @@ class BNGController extends Controller
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
                 $json_data = array(
                     "transid" => $data["uid"],
-                    "amount" => round($refund_amount,2),
+                    "amount" => number_format(Helper::getBalance($client_details),2,'.', '')-round($refund_amount,2),
                     "roundid" => $data["args"]["round_id"],
                 );
                 $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
@@ -881,7 +881,8 @@ class BNGController extends Controller
                     $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
                 }
                 else{
-                    $gameupdate = TransactionHelper::updateGameTransaction($game,json_decode($json_data, true),"refund");
+                    GameTransactionMDB::updateGametransaction($json_data,$game->game_trans_id,$client_details);
+                    // $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"refund");
                     $gametransactionid = $game[0]->game_trans_id;
                 }
                 //$this->_setExtParameter($this->_getExtParameter()+1);
