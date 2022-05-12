@@ -743,11 +743,6 @@ class BOTAController extends Controller{
             );
             GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
             //for game Extension
-            $response = array(
-                "user" => $data['user'],
-                "balance" =>(int) round($client_details->balance,2),
-                "confirm" => "ok"
-            );
             $winTransactionExt = array(
                 "game_trans_id" => $game->game_trans_id,
                 "provider_trans_id"=>$data['idx'],
@@ -755,7 +750,6 @@ class BOTAController extends Controller{
                 "amount"=>$data['price'],
                 "game_transaction_type"=> 2,
                 "provider_request"=> json_encode($data),
-                "mw_response"=>json_encode($response),
             );
             $winTransactionExtID = GameTransactionMDB::createGameTransactionExt($winTransactionExt, $client_details);
             $updateGameTransaction = [

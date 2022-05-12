@@ -108,7 +108,7 @@ class FundtransferProcessorController extends Controller
             else if ($payload->action->custom->provider == "PlayNGo") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }
-            else if ($payload->action->custom->provider == "bota") {
+            else if ($payload->action->custom->provider == "BOTA") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }
             else{
@@ -656,7 +656,7 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 Helper::saveLog("Amuse Gaming Success Client Request", 65, json_encode($requesttocient), json_encode($client_response));
                             }
-                            elseif ($payload->action->custom->provider == 'bota') {
+                            elseif ($payload->action->custom->provider == 'BOTA') {
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
