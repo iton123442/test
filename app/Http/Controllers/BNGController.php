@@ -898,7 +898,7 @@ class BNGController extends Controller
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
-                            "value" =>$balance + $refund_amount,
+                            "value" =>$refund_amount,
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
                     );
