@@ -190,7 +190,7 @@ class BoomingGamingController extends Controller
                                       "game_trans_ext_id" => $game_trans_ext_id,
                                       "request" => json_encode($client_response->requestoclient),
                                       "response" => json_encode($client_response->fundtransferresponse),
-                                      "log_type" => "provider_details",
+                                      "log_type" => "client_details",
                                       "transaction_detail" => "success",
                                   ]
                               ];

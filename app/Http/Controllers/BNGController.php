@@ -192,13 +192,20 @@ class BNGController extends Controller
                             $response =array(
                                 "uid"=>$data["uid"],
                                 "balance" => array(
-                                    "value" => "0.00",
+                                    "value" => $client_details->balance,
                                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                                 ),
-                                "error" => array(
-                                    "code"=> "OTHER_EXCEED",
-                                )
                             );
+                            // $response =array(
+                            //     "uid"=>$data["uid"],
+                            //     "balance" => array(
+                            //         "value" => "0.00",
+                            //         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                            //     ),
+                            //     "error" => array(
+                            //         "code"=> "OTHER_EXCEED",
+                            //     )
+                            // );
                             $failedData = array(
                                 "provider_transaction" => $data["uid"],
                                 "round_id" => $data["args"]["round_id"],
@@ -215,13 +222,20 @@ class BNGController extends Controller
                         $response =array(
                             "uid"=>$data["uid"],
                             "balance" => array(
-                                "value" => "0.00",
+                                "value" => $client_details->balance,
                                 "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                             ),
-                            "error" => array(
-                                "code"=> "OTHER_EXCEED",
-                            )
                         );
+                        // $response =array(
+                        //     "uid"=>$data["uid"],
+                        //     "balance" => array(
+                        //         "value" => "0.00",
+                        //         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                        //     ),
+                        //     "error" => array(
+                        //         "code"=> "OTHER_EXCEED",
+                        //     )
+                        // );
                         $failedData = array(
                             "provider_transaction" => $data["uid"],
                             "round_id" => $data["args"]["round_id"],
@@ -237,13 +251,20 @@ class BNGController extends Controller
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
-                            "value" => "0.00",
+                            "value" => $client_details->balance,
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
-                        "error" => array(
-                            "code"=> "OTHER_EXCEED",
-                        )
                     );
+                    // $response =array(
+                    //     "uid"=>$data["uid"],
+                    //     "balance" => array(
+                    //         "value" => "0.00",
+                    //         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                    //     ),
+                    //     "error" => array(
+                    //         "code"=> "OTHER_EXCEED",
+                    //     )
+                    // );
                     $failedData = array(
                         "provider_transaction" => $data["uid"],
                         "round_id" => $data["args"]["round_id"],
