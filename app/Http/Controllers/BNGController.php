@@ -866,13 +866,13 @@ class BNGController extends Controller
                         ->header('Content-Type', 'application/json');
                 }
                 $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],3);
-                $refund_amount = $game_transaction ? 0 : $data["args"]["bet"];
+                $refund_amount = $game_transaction ? 0 : round($data["args"]["bet"],2);
                 $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
                 $win = $data["args"]["win"] == 0 ? 0 : 1;
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
                 $json_data = array(
                     "transid" => $data["uid"],
-                    "amount" => $refund_amount,
+                    "amount" => round($refund_amount,2),
                     "roundid" => $data["args"]["round_id"],
                 );
                 $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
@@ -890,15 +890,15 @@ class BNGController extends Controller
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];
-                $client_response = ClientRequestHelper::fundTransfer($client_details,$refund_amount,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true,$fund_extra_data);
-                $balance = $client_response->fundtransferresponse->balance;
+                $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true,$fund_extra_data);
+                $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
-                            "value" =>$balance,
+                            "value" =>$balance + $refund_amount,
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
                     );
