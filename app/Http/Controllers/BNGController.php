@@ -881,7 +881,7 @@ class BNGController extends Controller
                     $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
                 }
                 else{
-                    $gameupdate = TransactionHelper::updateGameTransaction($game,json_encode($json_data),"refund");
+                    $gameupdate = TransactionHelper::updateGameTransaction($game,json_decode($json_data, true),"refund");
                     $gametransactionid = $game[0]->game_trans_id;
                 }
                 //$this->_setExtParameter($this->_getExtParameter()+1);
