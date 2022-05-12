@@ -448,7 +448,7 @@ class VivoController extends Controller
 	                      "transaction_detail" => "FAILED",
 	                  ]
 	                ];
-	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
+	            ProviderHelper::queTransactionLogs($createGameTransactionLog);
 	        	Helper::saveLog('Vivo Gaming WIN ERROR CATCHED', 34,json_encode($data), json_encode($response));
 	        }
 	       
@@ -505,7 +505,7 @@ class VivoController extends Controller
 	        ];
 	        try {
         	 	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
-	        	Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), json_encode($response));
+	        	Helper::saveLog('Vivo Gaming LOSE', 34,json_encode($data), json_encode($response));
 	        	$createGameTransactionLog = [
 	                  "connection_name" => $client_details->connection_name,
 	                  "column" =>[
@@ -529,7 +529,7 @@ class VivoController extends Controller
 	                  ]
 	                ];
 	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
-	        	Helper::saveLog('Vivo Gaming WIN ERROR CATCHED', 34,json_encode($data), json_encode($response));
+	        	Helper::saveLog('Vivo Gaming LOSE ERROR CATCHED', 34,json_encode($data), json_encode($response));
 	        }
 	        header("Content-type: text/xml; charset=utf-8");
 			$final_response =  '<?xml version="1.0" encoding="utf-8"?>';

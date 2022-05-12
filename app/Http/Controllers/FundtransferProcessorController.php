@@ -1178,8 +1178,10 @@ class FundtransferProcessorController extends Controller
                                 "connection_name" => $client_details->connection_name,
                                 "column" =>[
                                     "game_trans_ext_id" => $game_trans_ext_id,
-                                    'mw_request' => json_encode($client_response->requestoclient),
-                                    'client_response' => json_encode($client_response->fundtransferresponse),
+                                    // 'mw_request' => json_encode($client_response->requestoclient),
+                                    'request' => json_encode($client_response->requestoclient),
+                                    'response' => json_encode($client_response->fundtransferresponse),
+                                    // 'client_response' => json_encode($client_response->fundtransferresponse),
                                     "log_type" => "client_details",
                                     "transaction_detail" => "success",
                                  ]
