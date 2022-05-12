@@ -891,7 +891,7 @@ class BNGController extends Controller
                     'provider_name' => $game_details->provider_name
                 ];
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($refund_amount,2),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit",true,$fund_extra_data);
-                $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+                $balance = $client_response->fundtransferresponse->balance;
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
