@@ -866,7 +866,21 @@ class BNGController extends Controller
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
-                $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],4);
+                $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],3);
+                if(!$game_transaction){
+                    $transactionId=Helper::createBNGGameTransactionExt($gametransactionid,$data,null,null,null,3);
+                }else{
+                    $response =array(
+                        "uid"=>$data["uid"],
+                        "balance" => array(
+                            "value" =>number_format(Helper::getBalance($client_details),2,'.', ''),
+                            "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                        ),
+                    );
+                    //$this->_setExtParameter($this->_getExtParameter()+1);
+                    return response($response,200)
+                        ->header('Content-Type', 'application/json');
+                }
                 $refund_amount = $game_transaction ? 0 : round($data["args"]["bet"],2);
                 $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
                 $win = $data["args"]["win"] == 0 ? 0 : 1;
@@ -897,9 +911,7 @@ class BNGController extends Controller
                 //     $gametransactionid = $bet_transaction->game_trans_id;
                 // }
                 //$this->_setExtParameter($this->_getExtParameter()+1);
-                if(!$game_transaction){
-                    $transactionId=Helper::createBNGGameTransactionExt($gametransactionid,$data,null,null,null,3);
-                }
+
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];
