@@ -871,15 +871,21 @@ class BNGController extends Controller
                 $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
                 $win = $data["args"]["win"] == 0 ? 0 : 1;
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
-                $json_data = array(
-                    "transid" => $data["uid"],
-                    "amount" => round($refund_amount,2),
-                    "roundid" => $data["args"]["round_id"],
-                );
+                // $json_data = array(
+                //     "transid" => $data["uid"],
+                //     "amount" => round($refund_amount,2),
+                //     "roundid" => $data["args"]["round_id"],
+                // );
+                
                 $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["args"]["round_id"], 'round_id',false, $client_details);
                 if($bet_transaction != 'false'){
-                    GameTransactionMDB::updateGametransaction($json_data,$bet_transaction->game_trans_id,$client_details);
+                    $updateGameTransaction = [
+                        'win' => 4,
+                        'pay_amount' => round($refund_amount,2),
+                        'entry_id' => 3,
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                     $gametransactionid = $bet_transaction->game_trans_id;
                 }
                 // if(!$game_transaction){
