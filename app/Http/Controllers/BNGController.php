@@ -866,14 +866,13 @@ class BNGController extends Controller
                         ->header('Content-Type', 'application/json');
                 }
                 $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],3);
-                $refund_amount = $game_transaction ? 0 : round($data["args"]["bet"],2);
-                dd($refund_amount);
+                $refund_amount = $game_transaction ? 0 : $data["args"]["bet"];
                 $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
                 $win = $data["args"]["win"] == 0 ? 0 : 1;
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
                 $json_data = array(
                     "transid" => $data["uid"],
-                    "amount" => round($refund_amount,2),
+                    "amount" => $refund_amount,
                     "roundid" => $data["args"]["round_id"],
                 );
                 $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
