@@ -189,7 +189,7 @@ class FCController extends Controller
             }
             $sendtoclient =  microtime(true);
             $client_response = ClientRequestHelper::fundTransfer($client_details,$win_amount,$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"credit");
-            Helper::saveLog('win fcc intro', 2, $client_response, "maincontroller win intro hit");
+            // Helper::saveLog('win fcc intro', 2, $client_response, "maincontroller win intro hit");
             $client_response_time = microtime(true) - $sendtoclient;
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
             
