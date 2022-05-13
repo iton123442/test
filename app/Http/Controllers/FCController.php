@@ -200,7 +200,18 @@ class FCController extends Controller
                     "MainPoints" => $balance,
                 );
                 $updateFCGameTransactionExtinit =  microtime(true);
-                $this->updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response,$client_details);
+                $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $gen_game_extid,
+                          "request" => json_encode($data),
+                          "response" => json_encode($response),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "success",
+                          ]
+                      ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                // $this->updateFCGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response,$client_details);
                 $endupdateFCGameTransaction = microtime(true) - $updateFCGameTransactionExtinit;
                 // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"winsuccess","stating"=>$this->startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $this->startTime,"clientresponse"=>$client_response_time,"checkGameTransaction"=>$endcheckGameTransaction,"findgamedetails" =>$endfindGameDetailsinit,"getGameTransaction"=>$endgetGameTransaction,"updateGameTransaction"=>$endupdateGameTransaction,"udpateGamtransactionExt"=>$endupdateFCGameTransaction]);
                 return response($response,200)
