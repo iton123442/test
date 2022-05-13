@@ -688,7 +688,12 @@ class BNGController extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"debit",false,$fund_extra_data);
+        if($data["args"]["bonus"] != null){
+            $betAmount = 0;
+        }else{
+            $betAmount = round($data["args"]["bet"],2);
+        }
+        $client_response = ClientRequestHelper::fundTransfer($client_details,$betAmount,$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"debit",false,$fund_extra_data);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
