@@ -464,7 +464,7 @@ class FCController extends Controller
                         WHERE player_token = '".$player_token."' and round_id = '".$game_round."'");
         return $game;
     }
-    private function createFCGameTransactionExt($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type, $gametransactionext,$client_details){
+    private function createFCGameTransactionExt($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type, $gametransaction_ext,$client_details){
         $gametransactionext = array(
             "provider_trans_id" => $provider_request["BankID"],
             "game_trans_id" => $gametransaction_id,
@@ -479,7 +479,7 @@ class FCController extends Controller
         // $gamestransaction_ext_ID = DB::table("game_transaction_ext")->insertGetId($gametransactionext);
         // $gamestransaction_ext_ID = GameTransactionMDB::createGameTransactionExt($gametransactionext,$client_details);
         // return $gamestransaction_ext_ID;
-        GameTransactionMDB::createGameTransactionExtV2($gametransactionext,$gametransactionext,$client_details); //create game_transaction
+        GameTransactionMDB::createGameTransactionExtV2($gametransactionext,$gametransaction_ext,$client_details); //create game_transaction
     }
     private function updateGameTransaction($existingdata,$request_data,$type,$client_details){
         switch ($type) {
