@@ -97,7 +97,7 @@ class FCController extends Controller
                 $gametransactionid= $game->game_trans_id;
             }
             if($game_transaction == 'false'){
-                $transactionId=$this->createFCGameTransactionExt($gametransactionid,$data,null,null,null,1,$gen_game_extid,$client_details);
+                $transactionId=$this->createFCGameTransactionExt($gen_game_trans_id,$data,null,null,null,1,$gen_game_extid,$client_details);
             }
             $endcreateGameTransaction = microtime(true) - $createGameTransactioninit;
             $sendtoclient =  microtime(true);
