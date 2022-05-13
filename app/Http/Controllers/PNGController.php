@@ -190,7 +190,7 @@ class PNGController extends Controller
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametransactionid, $client_details);
                     }
                     $array_data = array(
-                        "statusCode" => 10,
+                        "statusCode" => 7,
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
