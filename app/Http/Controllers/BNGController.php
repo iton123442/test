@@ -400,8 +400,11 @@ class BNGController extends Controller
                 );
                 FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
             }
+            $betAmount = 0;
+        }else{
+            $betAmount = round($data["args"]["bet"],2);
         }
-        $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["args"]["bet"],2),$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"debit",false,$body_details);
+        $client_response = ClientRequestHelper::fundTransfer($client_details,$betAmount,$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"debit",false,$body_details);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
@@ -435,7 +438,7 @@ class BNGController extends Controller
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
-                    "value" =>$client_details->balance +$data["args"]["win"],
+                    "value" =>$client_details->balance + $data["args"]["win"],
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
