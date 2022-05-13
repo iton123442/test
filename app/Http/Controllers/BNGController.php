@@ -520,8 +520,8 @@ class BNGController extends Controller
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
                 "error" => array(
-                    // "code"=> "FUNDS_EXCEED",
-                    "code" => "OTHER_EXCEED"
+                    "code"=> "FUNDS_EXCEED",
+                    // "code" => "OTHER_EXCEED"
                 )
             );
             //$this->_setExtParameter($this->_getExtParameter()+1);
