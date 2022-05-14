@@ -324,7 +324,7 @@ class PlaytechControllerNew extends Controller
             "game_transaction_type"=> 1,
             // "provider_request" =>json_encode($data),
         );
-      GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_trans_ext_id,$client_details);
+      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
         #NEGATIVE AMOUNT
         if($request["amount"] < 0 ){
             $response = [
