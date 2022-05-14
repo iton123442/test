@@ -11,7 +11,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
 
 
-class PlayTechController extends Controller
+class PlaytechControllerNew extends Controller
 {
 
     public function __construct()
@@ -249,6 +249,8 @@ class PlayTechController extends Controller
 
     private static function betProcess($request,$client_details,$game_details,$requestId, $data){
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request["roundId"], 'round_id',false, $client_details);
+        $game_trans_id = ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
+        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
         if ($bet_transaction != 'false' && $request["endRound"] == 1) {
             $response = [
                 "requestId" => $requestId,
@@ -259,6 +261,36 @@ class PlayTechController extends Controller
 			return $response;
 		}
         $failed = 2;
+        $fund_extra_data = [
+            'provider_name' => $game_details->provider_name
+        ];
+        try {
+            $client_response = ClientRequestHelper::fundTransferFunta($client_details,$request["amount"],$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
+        } catch (\Exception $e) {
+            $response = [
+                "requestId" => $requestId,
+                "error" => "T_04",
+                "message" => "Bet limit was exceeded"
+            ];
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_trans_ext_id,
+                    "request" => json_encode("FAILED"),
+                    "response" => json_encode($response),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "Failed",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
+            $updateGameTransaction = [
+                "win" => $failed,
+                'trans_status' => 5
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+            // Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
+            return $response;
+        }
         if ($bet_transaction != 'false' ) {
             $failed = 5;
             $updateGameTransaction = [
@@ -282,19 +314,17 @@ class PlayTechController extends Controller
                 "client_id" => $client_details->client_id,
                 "player_id" => $client_details->player_id,
             );
-            $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+          GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details);
         }
-
-        
         $gameTransactionEXTData = array(
             "game_trans_id" => $game_trans_id,
             "provider_trans_id" => $request["transId"],
             "round_id" => $request["roundId"],
             "amount" => $request["amount"],
             "game_transaction_type"=> 1,
-            "provider_request" =>json_encode($data),
+            // "provider_request" =>json_encode($data),
         );
-        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+      GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_trans_ext_id,$client_details);
         #NEGATIVE AMOUNT
         if($request["amount"] < 0 ){
             $response = [
@@ -302,33 +332,6 @@ class PlayTechController extends Controller
                 "error" => "P_01",
                 "message" => "Invalid request. This error can be returned if required parameters are missing or they have incorrect format"
             ];
-            $updateGameTransaction = [
-                "win" => $failed,
-                'trans_status' => 5
-            ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-            // Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
-            return $response;
-        }
-        $fund_extra_data = [
-            'provider_name' => $game_details->provider_name
-        ];
-        try {
-            $client_response = ClientRequestHelper::fundTransferFunta($client_details,$request["amount"],$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
-        } catch (\Exception $e) {
-            $response = [
-                "requestId" => $requestId,
-                "error" => "T_04",
-                "message" => "Bet limit was exceeded"
-            ];
-            $updateTransactionEXt = array(
-                "mw_response" => json_encode($response),
-                'mw_request' => json_encode("FAILED"),
-                'client_response' => json_encode("FAILED"),
-                "transaction_detail" => "FAILED",
-                "general_details" =>"FAILED",
-            );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
             $updateGameTransaction = [
                 "win" => $failed,
                 'trans_status' => 5
@@ -349,14 +352,17 @@ class PlayTechController extends Controller
                         "error" => "0",
                         "message" => "success"
                     ];
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" =>"success",
-                        "general_details" => "success",
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_trans_ext_id,
+                            "request" => json_encode($client_response->requestoclient),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     break;
                 case "402":
                     $response = [
@@ -364,14 +370,17 @@ class PlayTechController extends Controller
                         "error" => "T_01",
                         "message" => "Player Insufficient Funds"
                     ];
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" => "FAILED",
-                        "general_details" => "FAILED",
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_trans_ext_id,
+                            "request" => json_encode("FAILED"),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "Failed",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     $updateGameTransaction = [
                         "win" => $failed,
                         'trans_status' => 5
@@ -385,14 +394,17 @@ class PlayTechController extends Controller
                         "error" => "T_04",
                         "message" => "Bet limit was exceeded"
                     ];
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" => "FAILED",
-                        "general_details" => "FAILED",
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_trans_ext_id,
+                            "request" => json_encode("FAILED"),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "Failed",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     $updateGameTransaction = [
                         "win" => $failed,
                         'trans_status' => 5
@@ -403,9 +415,9 @@ class PlayTechController extends Controller
         // Helper::saveLog('PlayTech transaction BET', $this->provider_db_id, json_encode($response),  "response" );
         return $response;
     }
-
     private static function winProcess($request,$client_details,$game_details,$requestId, $data){
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request["roundId"], 'round_id',false, $client_details);
+        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
         if ($bet_transaction == 'false') {
             $response = [
                 "requestId" => $requestId,
@@ -431,10 +443,11 @@ class PlayTechController extends Controller
             "round_id" => $request["roundId"],
             "amount" => $request["amount"],
             "game_transaction_type"=> 2,
-            "provider_request" => json_encode($data),
-            "mw_response" => json_encode($response)
+            // "provider_request" => json_encode($data),
+            // "mw_response" => json_encode($response)
         );
-        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+      GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_id,$client_details);
+        
         $win_or_lost = $bet_transaction->pay_amount + $request["amount"] > 0 ?  1 : 0;
         $entry_id =$bet_transaction->pay_amount + $request["amount"] > 0 ?  2 : 1;
         $income = $bet_transaction->bet_amount - ($bet_transaction->pay_amount + $request["amount"]) ;
@@ -446,6 +459,17 @@ class PlayTechController extends Controller
             'trans_status' => 2
         ];
         GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+        $createGameTransactionLog = [
+			"connection_name" => $client_details->connection_name,
+			"column" =>[
+				"game_trans_ext_id" => $game_trans_ext_id,
+				"request" => json_encode($data),
+				"response" => json_encode($response),
+				"log_type" => "provider_details",
+				"transaction_detail" => "success",
+			 ]
+		];
+		ProviderHelper::queTransactionLogs($createGameTransactionLog);
         $body_details = [
             "type" => "credit",
             "win" => $win_or_lost,
