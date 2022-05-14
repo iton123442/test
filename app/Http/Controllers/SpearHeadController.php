@@ -343,7 +343,7 @@ public function CreditProcess($req){
         Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
         // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);// not generated game trans id
         GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //generated game trans id
-        $game_transaction_id = $gen_game_trans_id;
+        
         $income = 0;
         $gameTransactionEXTData = array(
             "game_trans_id" => json_encode($game_transaction_id),
@@ -394,7 +394,7 @@ public function CreditProcess($req){
               "Message" => 'Success',
               "Details" => null,
       ];
-      $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $gen_game_extid, $game_transaction_id, 'debit');
+      $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $gen_game_extid2, $game_transaction_id, 'debit');
       if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
           switch ($client_response->fundtransferresponse->status->code) {
@@ -409,21 +409,21 @@ public function CreditProcess($req){
                    //  );
                    // Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                $createGameTransactionLog = [
-                          "connection_name" => $client_details->connection_name,
-                          "column" =>[
-                              "game_trans_ext_id" => $gen_game_extid,
-                              "request" => json_encode($data),
-                              "response" => json_encode($msg),
-                              "log_type" => "provider_details",
-                              "transaction_detail" => "success",
-                          ]
-                      ];
-                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                // $createGameTransactionLog = [
+                //           "connection_name" => $client_details->connection_name,
+                //           "column" =>[
+                //               "game_trans_ext_id" => $gen_game_extid,
+                //               "request" => json_encode($data),
+                //               "response" => json_encode($msg),
+                //               "log_type" => "provider_details",
+                //               "transaction_detail" => "success",
+                //           ]
+                //       ];
+                // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 break;
           }
       }
-      
+      $game_transaction_id = $gen_game_trans_id;
     }else{
       $client_details->connection_name = $bet_transaction->connection_name;
       $income = $bet_transaction->bet_amount - $pay_amount;
