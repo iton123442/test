@@ -343,7 +343,7 @@ public function CreditProcess($req){
         Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
         // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);// not generated game trans id
         GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //generated game trans id
-        
+        $game_transaction_id = $gen_game_trans_id;
         $income = 0;
         $gameTransactionEXTData = array(
             "game_trans_id" => json_encode($game_transaction_id),
@@ -423,7 +423,6 @@ public function CreditProcess($req){
                 break;
           }
       }
-      $game_transaction_id = $gen_game_trans_id;
     }else{
       $client_details->connection_name = $bet_transaction->connection_name;
       $income = $bet_transaction->bet_amount - $pay_amount;
