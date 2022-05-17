@@ -365,7 +365,7 @@ class BNGController extends Controller
             "round_id" => $data["args"]["round_id"],
             "amount" => $data["args"]["bet"],
             "game_transaction_type"=>1,
-            "provider_request" =>json_encode($data),
+            // "provider_request" =>json_encode($data),
         );
         $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
         $body_details = [
@@ -433,8 +433,8 @@ class BNGController extends Controller
                 "round_id" => $data["args"]["round_id"],
                 "amount" => $data["args"]["win"],
                 "game_transaction_type"=>2,
-                "provider_request" =>json_encode($data),
-                "mw_response" => json_encode($response)
+                // "provider_request" =>json_encode($data),
+                // "mw_response" => json_encode($response)
             );
             $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
