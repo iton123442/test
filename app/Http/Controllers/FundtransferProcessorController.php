@@ -45,7 +45,7 @@ class FundtransferProcessorController extends Controller
             }else if ($payload->action->custom->provider == "tpp") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "ygg") {
-                $gteid = $payload->action->custom->game_trans_ext_id;
+                $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "AmuseGaming") {
                 $gteid = $payload->action->custom->game_trans_ext_id;
             }else if ($payload->action->custom->provider == "OnlyPlay") {
@@ -348,8 +348,8 @@ class FundtransferProcessorController extends Controller
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
                                 // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
-                                //$gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                $gteid = ClientRequestHelper::updateGTEID($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                                 // ProviderHelper::updateGameTransactionFlowStatus($payload->action->mwapi->roundId, 3);
                             }
                             elseif($payload->action->custom->provider == 'wazdan'){
@@ -637,13 +637,18 @@ class FundtransferProcessorController extends Controller
                                 Helper::saveLog("Pragmatic Play Success Client Request", 26, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif($payload->action->custom->provider == 'ygg' ){
-                                $ext_data = array(
-                                    "mw_request"=>json_encode($requesttocient),
-                                    "client_response" =>json_encode($client_response),
-                                    "transaction_detail" =>json_encode("success"),
-                                    "general_details" =>json_encode("success")
-                                );
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                // $ext_data = array(
+                                //     "mw_request"=>json_encode($requesttocient),
+                                //     "client_response" =>json_encode($client_response),
+                                //     "transaction_detail" =>json_encode("success"),
+                                //     "general_details" =>json_encode("success")
+                                // );
+                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                                 Helper::saveLog("Yggdrasil Direct Success Client Request", 38, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif($payload->action->custom->provider == 'AmuseGaming' ){
@@ -661,7 +666,8 @@ class FundtransferProcessorController extends Controller
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                         }else{
                             # Normal/general Update Game Transaction if you need to update your gametransaction you can add new param to the action payload!

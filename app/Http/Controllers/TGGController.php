@@ -201,7 +201,7 @@ class TGGController extends Controller
 				$createGameTransactionLog = [
 					"connection_name" => $client_details->connection_name,
 					"column" =>[
-						"game_trans_ext_id" => $game_transid_ext,
+						"game_trans_ext_id" => $game_trans_ext_id,
 						"request" => json_encode($string_to_obj),
 						"response" => json_encode($response),
 						"log_type" => "provider_details",
@@ -443,6 +443,34 @@ class TGGController extends Controller
 			            'trans_status' => 2
 			        ];
 		        	GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
+					if(isset($string_to_obj->extrabonus_bypass->promoCode)) {
+						$freeroundID = $string_to_obj->extrabonus_bypass->promoCode;
+						$getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+						Helper::saveLog('TGG FreeRound', $this->provider_db_id, json_encode($request),'FREEROUND HIT!');
+						if($getFreespin){
+							$getOrignalfreeroundID = explode("_",$freeroundID);
+							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+							$updateFreespinData = [
+								"status" => $status,
+								"win" => $getFreespin->win + $amount,
+								"spin_remaining" => $getFreespin->spin_remaining - 1
+							];
+							FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+							if($status == 2 ){
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+							} else {
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+							}
+							//create transction 
+							$createFreeRoundTransaction = array(
+								"game_trans_id" => $existing_bet->game_trans_id,
+								'freespin_id' => $getFreespin->freespin_id
+							);
+							FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+						}
+					}
+
 					try{
 						$createGameTransactionLog = [
 							"connection_name" => $client_details->connection_name,

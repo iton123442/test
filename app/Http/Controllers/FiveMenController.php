@@ -11,6 +11,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
 use Carbon\Carbon;
+use App\Helpers\FreeSpinHelper;
 use DB;
 use App\Jobs\UpdateGametransactionJobs;
 use App\Jobs\CreateGameTransactionLog;
@@ -181,7 +182,7 @@ public function gameBet($request, $client_details)
 	                "win" => 2,
 	                'trans_status' => 5,
 	            ];
-	            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+	            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transid_gen, $client_details);
 				Helper::saveLog('5Men BET FATAL ERROR', $this->provider_db_id, json_encode($request), $response);
 			    return $response;
 	        }
@@ -357,7 +358,7 @@ public function gameBet($request, $client_details)
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		if (isset($string_to_obj->game->action)) {
 
-			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double') {
+			if ($string_to_obj->game->action == 'spin' || $string_to_obj->game->action == 'double' || $string_to_obj->game->action == 'extrabonusspin') {
 				if ($existing_bet != 'false') {
 					$client_details->connection_name = $existing_bet->connection_name;
 					$amount = $request['data']['amount'];
@@ -393,6 +394,34 @@ public function gameBet($request, $client_details)
 			            'trans_status' => 2
 			        ];
 		        	GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
+					if(isset($string_to_obj->extrabonus_bypass->promoCode)) {
+						$freeroundID = $string_to_obj->extrabonus_bypass->promoCode;
+						$getFreespin = FreeSpinHelper::getFreeSpinDetails($freeroundID, "provider_trans_id" );
+						Helper::saveLog('5Men FreeRound', $this->provider_db_id, json_encode($request),'FREEROUND HIT!');
+						if($getFreespin){
+							$getOrignalfreeroundID = explode("_",$freeroundID);
+							$body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+							$status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+							$updateFreespinData = [
+								"status" => $status,
+								"win" => $getFreespin->win + $amount,
+								"spin_remaining" => $getFreespin->spin_remaining - 1
+							];
+							$updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+							if($status == 2 ){
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+							} else {
+								$body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+							}
+							//create transction 
+							$createFreeRoundTransaction = array(
+								"game_trans_id" => $existing_bet->game_trans_id,
+								'freespin_id' => $getFreespin->freespin_id
+							);
+							FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+						}
+					}
+
 					try{
 						$createGameTransactionLog = [
 							"connection_name" => $client_details->connection_name,
