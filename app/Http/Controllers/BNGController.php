@@ -1,6 +1,5 @@
 <?php
 namespace App\Http\Controllers;
-git config --global user.name erickson
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
