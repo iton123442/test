@@ -1228,7 +1228,7 @@ class FreeSpinHelper{
     }
 
     public static function createFreeRoundTGG($player_details,$data, $sub_provder_id,$freeround_id){
-        Helper::saveLog('TGG Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        Helper::saveLog('TGG Freeround', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
         if($game_details){
             try{
@@ -1341,7 +1341,7 @@ class FreeSpinHelper{
     }
 
     public static function createFreeRound5Men($player_details,$data, $sub_provder_id,$freeround_id){
-        Helper::saveLog('5Men Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        Helper::saveLog('5Men Freeround', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
         if($game_details){
             try{
