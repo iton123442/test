@@ -420,7 +420,7 @@ class BNGController extends Controller
             $dataToUpdate = array(
                 "mw_response" => json_encode($response)
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             // $createGameTransactionLog = [
             //           "connection_name" => $client_details->connection_name,
