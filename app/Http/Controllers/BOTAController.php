@@ -190,7 +190,7 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response = array(
+                $msg = array(
                     "status" => [
                         "code" => $client_response->fundtransferresponse->status->code,
                         "stauts" => $client_response->fundtransferresponse->status->status,
@@ -199,13 +199,17 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );//error response
+                $reponse = [
+                    "result_code" => "5",
+                    "result_message" => "User Insufficient amount"
+                ];
                 try{
                     $datatosend = array(
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($response)
+                        "mw_response" => json_encode($msg)
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
@@ -225,7 +229,7 @@ class BOTAController extends Controller{
                 $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',3,$client_details);
                 if(count($checkRefundCount) == 2 || $checkRefundCount != false){//if canceled 2 times
                     try{
-                        $newProvTransID = $this->prefix.'R_'.$betDetails->result_value[0]->c_idx;//last round's bet idx
+                        $newProvTransID = $this->prefix.'R_'.$betDetails->result_value[0]->c_idx;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_44');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -240,7 +244,7 @@ class BOTAController extends Controller{
                 }
                 else{
                     try{
-                        $newProvTransID = $this->prefix.'_'.$betDetails->result_value[0]->c_idx;//last round's bet idx
+                        $newProvTransID = $this->prefix.'_'.$betDetails->result_value[0]->c_idx;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_4');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -260,7 +264,7 @@ class BOTAController extends Controller{
                 $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',3,$client_details);
                 if(count($checkRefundCount) == 2){//if canceled 2 times
                     try{
-                        $newProvTransID = $this->prefix.'R_'.$refundRoundID;//last round's bet idx
+                        $newProvTransID = $this->prefix.'R_'.$refundRoundID;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_44R');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -275,7 +279,7 @@ class BOTAController extends Controller{
                 }
                 else{
                     try{
-                        $newProvTransID = $refundRoundID;//last round's bet idx
+                        $newProvTransID = $refundRoundID;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_4R');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -400,7 +404,7 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response = array(
+                $msg = array(
                     "status" => [
                         "code" => $client_response->fundtransferresponse->status->code,
                         "stauts" => $client_response->fundtransferresponse->status->status,
@@ -409,17 +413,21 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );//error response
+                $reponse = [
+                    "result_code" => "5",
+                    "result_message" => "User Insufficient amount"
+                ];
                 try{
                     $datatosend = array(
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($response)
+                        "mw_response" => json_encode($msg)
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
-                // Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
+                Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
                 return response($response, 200)->header('Content-Type', 'application/json');
             }
@@ -444,7 +452,7 @@ class BOTAController extends Controller{
                 $checkBetTransaction = GameTransactionMDB::findBOTAGameExt($betRoundID,'transaction_id',1,$client_details);
                 if($checkBetTransaction != 'false' && $checkBetTransaction[0]->round_id == $myRoundID){//if bet 2 times
                     try{
-                        $newProvTransID = $this->prefix.'D_'.$betDetails->result_value[0]->c_idx;//last round's bet idx
+                        $newProvTransID = $this->prefix.'D_'.$betDetails->result_value[0]->c_idx;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_55');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -459,7 +467,7 @@ class BOTAController extends Controller{
                 }
                 else{
                     try{
-                        $newProvTransID = $this->prefix.'_'.$betDetails->result_value[0]->c_idx;//last round's bet idx
+                        $newProvTransID = $this->prefix.'_'.$betDetails->result_value[0]->c_idx;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_5');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -479,7 +487,7 @@ class BOTAController extends Controller{
                 $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',3,$client_details);
                 if(count($checkRefundCount) == 2){//if canceled 2 times
                     try{
-                        $newProvTransID = $this->prefix.'D_'.$refundRoundID;//last round's bet idx
+                        $newProvTransID = $this->prefix.'D_'.$refundRoundID;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_55D');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -494,7 +502,7 @@ class BOTAController extends Controller{
                 }
                 else{
                     try{
-                        $newProvTransID = $refundRoundID;//last round's bet idx
+                        $newProvTransID = $refundRoundID;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_5D');//rebet
                     }catch(\Exception $e){//if bet exist
                         $msg = array(
@@ -619,7 +627,7 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response = array(
+                $msg = array(
                     "status" => [
                         "code" => $client_response->fundtransferresponse->status->code,
                         "stauts" => $client_response->fundtransferresponse->status->status,
@@ -628,17 +636,21 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );//error response
+                $reponse = [
+                    "result_code" => "5",
+                    "result_message" => "User Insufficient amount"
+                ];
                 try{
                     $datatosend = array(
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($response)
+                        "mw_response" => json_encode($msg)
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
-                // Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
+                Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
                 return response($response, 200)->header('Content-Type', 'application/json');
             }
@@ -749,7 +761,6 @@ class BOTAController extends Controller{
                 "round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount"=>$data['price'],
                 "game_transaction_type"=> 2,
-                "provider_request"=> json_encode($data),
             );
             $winTransactionExtID = GameTransactionMDB::createGameTransactionExt($winTransactionExt, $client_details);
             $updateGameTransaction = [
@@ -787,7 +798,7 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response = array(
+                $msg = array(
                     "status" => [
                         "code" => $client_response->fundtransferresponse->status->code,
                         "status" => $client_response->fundtransferresponse->status->status,
@@ -796,13 +807,17 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );
+                $response = array(
+                    "result_code" => "",
+                    "result_message" => "Agent Timeout during balance",
+                );
                 try{
                     $datatosend = array(
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($response)
+                        "mw_response" => json_encode($msg)
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
@@ -905,7 +920,7 @@ class BOTAController extends Controller{
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
-                $response = array(
+                $msg = array(
                     "status" => [
                         "code" => $client_response->fundtransferresponse->status->code,
                         "status" => $client_response->fundtransferresponse->status->status,
@@ -914,13 +929,17 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );
+                $response = [
+                    "result_code" => "",
+                    "result_message" = "Agent Timeout during balance",
+                ];
                 try{
                     $datatosend = array(
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$gameExt->game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($response)
+                        "mw_response" => json_encode($msg)
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $game_trans_ext_id, $client_details);
                 }catch(\Exception $e){
