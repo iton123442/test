@@ -418,7 +418,7 @@ class BNGController extends Controller
             $dataToUpdate = array(
                 "mw_response" => json_encode($response)
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             //Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             // $createGameTransactionLog = [
             //           "connection_name" => $client_details->connection_name,
@@ -440,7 +440,7 @@ class BNGController extends Controller
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
-            $wingen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+            // $wingen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
             $wingametransactionext = array(
                 "game_trans_id" => $game_transactionid,
                 "provider_trans_id" => $data["uid"],
