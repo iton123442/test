@@ -400,7 +400,7 @@ class BNGController extends Controller
         }else{
             $betAmount = round($data["args"]["bet"],2);
         }
-        $client_response = ClientRequestHelper::fundTransfer($client_details,$betAmount,$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$body_details);
+        $client_response = ClientRequestHelper::fundTransferTimoutError($client_details,$betAmount,$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$body_details);
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
@@ -420,12 +420,10 @@ class BNGController extends Controller
             Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             $winStart =  microtime(true);
             //$this->_setExtParameter($this->_getExtParameter()+1);
-            $winValue = number_format($client_details->balance,2,'.', '') + $data["args"]["win"];
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
                     "value" =>$client_details->balance + $data["args"]["win"],
-                    // "value" => $winValue,
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
@@ -656,7 +654,7 @@ class BNGController extends Controller
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
-            $this->_setExtParameter($this->_getExtParameter()+1);
+            // $this->_setExtParameter($this->_getExtParameter()+1);
             $dataToUpdate = array(
                 "mw_response" => json_encode($response)
             );
