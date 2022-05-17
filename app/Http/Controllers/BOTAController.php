@@ -478,7 +478,7 @@ class BOTAController extends Controller{
             $betDetails = BOTAHelper::getBettingList($client_details,$this->dateToday);
             if($betDetails->result_count != 0){//check if bet history is not null
                 $betRoundID = $this->prefix.'_'.$betDetails->result_value[0]->c_idx;
-                $myRoundID = $betDetails->result_value[1]->c_shoe_idx.$betDetails->result_value[1]->c_game_idx;
+                $myRoundID = $betDetails->result_value[0]->c_shoe_idx.$betDetails->result_value[0]->c_game_idx;
                 $checkBetTransaction = GameTransactionMDB::findBOTAGameExt($betRoundID,'transaction_id',1,$client_details);
                 if($checkBetTransaction != 'false' && $checkBetTransaction[0]->round_id == $myRoundID){//if bet 2 times
                     try{
