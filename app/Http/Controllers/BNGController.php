@@ -452,7 +452,7 @@ class BNGController extends Controller
             );
             $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
             // GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$wingen_game_extid,$client_details); //create game_transaction
-            Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($wingen_game_extid), "");
+            Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
 
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
