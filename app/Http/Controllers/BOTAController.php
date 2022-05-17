@@ -824,9 +824,10 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );
-                $response = array(
-                    "result_message" => "Please check your network status",
-                );
+                $response = [
+                    "result_code" => "5",
+                    "result_message" => "User Insufficient amount"
+                ];
                 try{
                     $datatosend = array(
                     "win" => 2
@@ -950,7 +951,8 @@ class BOTAController extends Controller{
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );
                 $response = [
-                    "result_message" => "Please check your network status",
+                    "result_code" => "5",
+                    "result_message" => "User Insufficient amount"
                 ];
                 try{
                     $datatosend = array(
