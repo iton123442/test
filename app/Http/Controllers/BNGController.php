@@ -476,6 +476,11 @@ class BNGController extends Controller
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );
+                $dataToUpdate = array(
+                    "provider_request" =>json_encode($data),
+                    "mw_response" => json_encode($response)
+                );
+                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$winGametransactionExtId,$client_details);
                 // Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
                 $endWin = microtime(true) - $winStart;
                 Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "WinTime" ,"Time" => $endWin]), "");
