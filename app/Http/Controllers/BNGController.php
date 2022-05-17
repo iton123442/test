@@ -424,8 +424,8 @@ class BNGController extends Controller
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
-                    // "value" =>$client_details->balance + $data["args"]["win"],
-                    "value" => $winValue,
+                    "value" =>$client_details->balance + $data["args"]["win"],
+                    // "value" => $winValue,
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
@@ -435,8 +435,8 @@ class BNGController extends Controller
                 "round_id" => $data["args"]["round_id"],
                 "amount" => $data["args"]["win"],
                 "game_transaction_type"=>2,
-                "provider_request" =>json_encode($data),
-                "mw_response" => json_encode($response)
+                // "provider_request" =>json_encode($data),
+                // "mw_response" => json_encode($response)
             );
             $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
@@ -476,7 +476,7 @@ class BNGController extends Controller
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );
-                //Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+                // Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
                 $endWin = microtime(true) - $winStart;
                 Helper::saveLog('BNGTIMELOG(BNG)', 12, json_encode(["method" => "WinTime" ,"Time" => $endWin]), "");
                 return response($response,200)
