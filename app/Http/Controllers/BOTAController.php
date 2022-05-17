@@ -159,7 +159,7 @@ class BOTAController extends Controller{
                 "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 1,
-                "provider_request" => json_encode($data),
+                // "provider_request" => json_encode($data),
             );
             $bettransactionExtId = GameTransactionMDB::createGameTransactionExt($bettransactionExt, $client_details);
             $fund_extra_data = [
@@ -175,6 +175,10 @@ class BOTAController extends Controller{
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
+                // $dataToUpdate =[
+                //     "mw_response" => $response,
+                // ];
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -199,7 +203,7 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );//error response
-                $reponse = [
+                $response = [
                     "result_code" => "5",
                     "result_message" => "User Insufficient amount"
                 ];
@@ -208,10 +212,10 @@ class BOTAController extends Controller{
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
                 Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
@@ -345,10 +349,10 @@ class BOTAController extends Controller{
                         "balance" =>(int) $balance,
                         "confirm" => "ok"
                     );
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
                     return response($msg, 200)->header('Content-type', 'application/json');
                 }
             }
@@ -363,7 +367,7 @@ class BOTAController extends Controller{
                 "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 1,
-                "provider_request" => json_encode($data),
+                // "provider_request" => json_encode($data),
             );
             $bettransactionExtId = GameTransactionMDB::createGameTransactionExt($bettransactionExt, $client_details);
             $updateGameTransaction = [
@@ -388,6 +392,10 @@ class BOTAController extends Controller{
                 $updateBet = [
                     "bet_amount" => round($newBet,2)
                 ];
+                // $dataToUpdate =[
+                //     "mw_response" => $response,
+                // ];
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $game->game_trans_id, $client_details); 
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
@@ -413,7 +421,7 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );//error response
-                $reponse = [
+                $response = [
                     "result_code" => "5",
                     "result_message" => "User Insufficient amount"
                 ];
@@ -422,10 +430,10 @@ class BOTAController extends Controller{
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
                 Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
@@ -552,7 +560,7 @@ class BOTAController extends Controller{
                     "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                     "amount" => round($data['price'],2),
                     "game_transaction_type" => 1,
-                    "provider_request" => json_encode($data),
+                    // "provider_request" => json_encode($data),
                 );
                 $bettransactionExtId = GameTransactionMDB::createGameTransactionExt($bettransactionExt, $client_details);
                 $fund_extra_data = [
@@ -568,10 +576,10 @@ class BOTAController extends Controller{
                         "balance" =>(int) $balance,
                         "confirm" => "ok"
                     );
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
                     return response($msg, 200)->header('Content-type', 'application/json');
                 }
             }
@@ -586,7 +594,7 @@ class BOTAController extends Controller{
                 "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 1,
-                "provider_request" => json_encode($data),
+                // "provider_request" => json_encode($data),
             );
             $bettransactionExtId = GameTransactionMDB::createGameTransactionExt($bettransactionExt, $client_details);
             $updateGameTransaction = [
@@ -611,6 +619,10 @@ class BOTAController extends Controller{
                 $updateBet = [
                     "bet_amount" => round($newBet,2)
                 ];
+                // $dataToUpdate =[
+                //     "mw_response" => $response,
+                // ];
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $game->game_trans_id, $client_details); 
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
@@ -636,7 +648,7 @@ class BOTAController extends Controller{
                     "balance" => round($client_response->fundtransferresponse->balance, 2),
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );//error response
-                $reponse = [
+                $response = [
                     "result_code" => "5",
                     "result_message" => "User Insufficient amount"
                 ];
@@ -645,10 +657,10 @@ class BOTAController extends Controller{
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
                 Helper::savelog('Insuficient Bet(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
@@ -723,7 +735,7 @@ class BOTAController extends Controller{
                     "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                     "amount" => round($data['price'],2),
                     "game_transaction_type" => 1,
-                    "provider_request" => json_encode($data),
+                    // "provider_request" => json_encode($data),
                 );
                 $bettransactionExtId = GameTransactionMDB::createGameTransactionExt($bettransactionExt, $client_details);
                 $fund_extra_data = [
@@ -739,10 +751,10 @@ class BOTAController extends Controller{
                         "balance" =>(int) $balance,
                         "confirm" => "ok"
                     );
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData,$bettransactionExtId, $client_details);
                     return response($msg, 200)->header('Content-type', 'application/json');
                 }
             }
@@ -761,6 +773,7 @@ class BOTAController extends Controller{
                 "round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount"=>$data['price'],
                 "game_transaction_type"=> 2,
+                // "provider_request" => json_encode($data),
             );
             $winTransactionExtID = GameTransactionMDB::createGameTransactionExt($winTransactionExt, $client_details);
             $updateGameTransaction = [
@@ -781,6 +794,10 @@ class BOTAController extends Controller{
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
                 );
+                // $dataToUpdate =[
+                //     "mw_response" => $response,
+                // ];
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$winTransactionExtID, $client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -808,18 +825,17 @@ class BOTAController extends Controller{
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );
                 $response = array(
-                    "result_code" => "",
-                    "result_message" => "Agent Timeout during balance",
+                    "result_message" => "Please check your network status",
                 );
                 try{
                     $datatosend = array(
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData, $winTransactionExtID, $client_details);
                 }catch(\Exception $e){
                 Helper::savelog('WIN FAILED(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
@@ -878,7 +894,7 @@ class BOTAController extends Controller{
                 "round_id"=>$data['detail']['shoeNo'].$data['detail']['gameNo'],
                 "amount" => round($data['price'],2),
                 "game_transaction_type" => 3,
-                "provider_request" => json_encode($data),
+                // "provider_request" => json_encode($data),
             );
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($refundgametransExt, $client_details);
             $response = array(
@@ -902,6 +918,10 @@ class BOTAController extends Controller{
                 $updateBet = [
                     "bet_amount" => round($newBet,2)
                 ];
+                // $dataToUpdate =[
+                //     "mw_response" => $response,
+                // ];
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $gameExt->game_trans_id, $client_details); 
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
@@ -930,18 +950,17 @@ class BOTAController extends Controller{
                     "currencycode" => $client_response->fundtransferresponse->currencycode
                 );
                 $response = [
-                    "result_code" => "",
-                    "result_message" = "Agent Timeout during balance",
+                    "result_message" => "Please check your network status",
                 ];
                 try{
                     $datatosend = array(
                     "win" => 2
                     );
                     GameTransactionMDB::updateGametransaction($datatosend,$gameExt->game_trans_id,$client_details);
-                    $updateData = array(
-                        "mw_response" => json_encode($msg)
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateData, $game_trans_ext_id, $client_details);
+                    // $updateData = array(
+                    //     "mw_response" => json_encode($msg)
+                    // );
+                    // GameTransactionMDB::updateGametransactionEXT($updateData, $game_trans_ext_id, $client_details);
                 }catch(\Exception $e){
                     Helper::savelog('REFUND FAILED(BOTA)', $this->provider_db_id, json_encode($e->getMessage(),$client_response->fundtransferresponse->status->message));
                 }
