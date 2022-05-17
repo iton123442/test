@@ -179,7 +179,7 @@ class BNGController extends Controller
                                 $response =array(
                                     "uid"=>$data["uid"],
                                     "balance" => array(
-                                        "value" => number_format($client_details->balance,2,'.', ''),
+                                        "value" => (string)$client_details->balance,
                                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                                     ),
                                 );
@@ -192,7 +192,7 @@ class BNGController extends Controller
                             $response =array(
                                 "uid"=>$data["uid"],
                                 "balance" => array(
-                                    "value" => number_format($client_details->balance,2,'.', ''),
+                                    "value" => (string)$client_details->balance,
                                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                                 ),
                             );
@@ -222,7 +222,7 @@ class BNGController extends Controller
                         $response =array(
                             "uid"=>$data["uid"],
                             "balance" => array(
-                                "value" => number_format($client_details->balance,2,'.', ''),
+                                "value" => (string)$client_details->balance,
                                 "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                             ),
                         );
@@ -251,7 +251,7 @@ class BNGController extends Controller
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
-                            "value" => number_format($client_details->balance,2,'.', ''),
+                            "value" => (string)$client_details->balance,
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
                     );
@@ -286,7 +286,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" => number_format($client_details->balance,2,'.', ''),
+                        "value" => (string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );
@@ -296,7 +296,7 @@ class BNGController extends Controller
                 $response =array(
                     "uid"=>$data["uid"],
                     "balance" => array(
-                        "value" => number_format($client_details->balance,2,'.', ''),
+                        "value" => (string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
                 );              
