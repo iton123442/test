@@ -11,6 +11,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
 use App\Helpers\Game;
 use Carbon\Carbon;
+use App\Helpers\FreeSpinHelper;
 use DB;
 use App\Jobs\UpdateGametransactionJobs;
 use App\Jobs\CreateGameTransactionLog;
