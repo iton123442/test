@@ -425,7 +425,7 @@ class BNGController extends Controller
                 "uid"=>$data["uid"],
                 "balance" => array(
                     // "value" =>$client_details->balance + $data["args"]["win"],
-                    "value" = $winValue;
+                    "value" = $winValue,
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
