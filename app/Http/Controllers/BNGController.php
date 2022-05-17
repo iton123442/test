@@ -461,7 +461,7 @@ class BNGController extends Controller
                 "custom" => [
                     "provider" => 'bng',
                     "isUpdate" => false,
-                    "game_transaction_ext_id" => $wingametransactionext,
+                    "game_transaction_ext_id" => $winGametransactionExtId,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => $win_or_lost,
                 ],
