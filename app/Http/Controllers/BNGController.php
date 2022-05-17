@@ -674,7 +674,7 @@ class BNGController extends Controller
         $game_transactionid = GameTransactionMDB::createGametransaction($dataToSave,$client_details);
         // GameTransactionMDB::createGametransactionV2($dataToSave,$gen_game_trans_id,$client_details); //create game_transaction
         $betgametransactionext = array(
-            "game_trans_id" => $gen_game_trans_id,
+            "game_trans_id" => $game_transactionid,
             "provider_trans_id" => $data["uid"],
             "round_id" =>$data["args"]["round_id"],
             "amount" =>$data["args"]["bet"],
@@ -707,7 +707,7 @@ class BNGController extends Controller
             $dataToUpdate = array(
                 "mw_response" => json_encode($response)
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             // $createGameTransactionLog = [
             //       "connection_name" => $client_details->connection_name,
             //       "column" =>[
@@ -739,7 +739,7 @@ class BNGController extends Controller
                 $dataToSave = array(
                     "win"=>2
                 );
-                GameTransactionMDB::updateGametransaction($dataToSave,$gen_game_trans_id,$client_details);
+                GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
              //    $createGameTransactionLog = [
              //      "connection_name" => $client_details->connection_name,
              //      "column" =>[
