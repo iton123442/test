@@ -10,7 +10,7 @@ use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
 use App\Models\GameTransactionMDB;
-use App\Helpers\FreeSpinHelper;
+// use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransaction;
 use DB;
 class BNGController extends Controller
@@ -373,29 +373,29 @@ class BNGController extends Controller
             'connection_timeout' => 1,
         ];
         if($data["args"]["bonus"] != null){
-            $campaignId = $data['args']['bonus']['campaign'];
-            $getFreespin = FreeSpinHelper::getFreeSpinDetails($campaignId, "provider_trans_id" );
-            if($getFreespin){
-                $getOrignalfreeroundID = explode("_",$campaignId);
-                $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
-                $status = 2;
-                $updateFreespinData = [
-                    "status" => $status,
-                    "win" => $getFreespin->win + $data["args"]["win"],
-                    "spin_remaining" => $getFreespin->spin_remaining - $getFreespin->spin_remaining
-                ];
-                $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                if($status == 2 ){
-                    $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
-                } else {
-                    $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-                }
-                $createFreeRoundTransaction = array(
-                    "game_trans_id" => $game_transactionid,
-                    'freespin_id' => $getFreespin->freespin_id
-                );
-                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-            }
+            // $campaignId = $data['args']['bonus']['campaign'];
+            // $getFreespin = FreeSpinHelper::getFreeSpinDetails($campaignId, "provider_trans_id" );
+            // if($getFreespin){
+            //     $getOrignalfreeroundID = explode("_",$campaignId);
+            //     $body_details["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1];
+            //     $status = 2;
+            //     $updateFreespinData = [
+            //         "status" => $status,
+            //         "win" => $getFreespin->win + $data["args"]["win"],
+            //         "spin_remaining" => $getFreespin->spin_remaining - $getFreespin->spin_remaining
+            //     ];
+            //     $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+            //     if($status == 2 ){
+            //         $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+            //     } else {
+            //         $body_details["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+            //     }
+            //     $createFreeRoundTransaction = array(
+            //         "game_trans_id" => $game_transactionid,
+            //         'freespin_id' => $getFreespin->freespin_id
+            //     );
+            //     FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+            // }
             $betAmount = 0;
         }else{
             $betAmount = round($data["args"]["bet"],2);
