@@ -653,7 +653,7 @@ class BNGController extends Controller
             $dataToUpdate = array(
                 "mw_response" => json_encode($response)
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$gen_game_extid,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             return response($response,200)
                         ->header('Content-Type', 'application/json');
         }
