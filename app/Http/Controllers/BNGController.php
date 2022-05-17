@@ -365,7 +365,7 @@ class BNGController extends Controller
             "round_id" => $data["args"]["round_id"],
             "amount" => $data["args"]["bet"],
             "game_transaction_type"=>1,
-            // "provider_request" =>json_encode($data),
+            "provider_request" =>json_encode($data),
         );
         $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
         $body_details = [
@@ -433,8 +433,8 @@ class BNGController extends Controller
                 "round_id" => $data["args"]["round_id"],
                 "amount" => $data["args"]["win"],
                 "game_transaction_type"=>2,
-                // "provider_request" =>json_encode($data),
-                // "mw_response" => json_encode($response)
+                "provider_request" =>json_encode($data),
+                "mw_response" => json_encode($response)
             );
             $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
@@ -816,12 +816,6 @@ class BNGController extends Controller
                 $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
                 $win = $data["args"]["win"] == 0 ? 0 : 1;
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
-                // $json_data = array(
-                //     "transid" => $data["uid"],
-                //     "amount" => round($refund_amount,2),
-                //     "roundid" => $data["args"]["round_id"],
-                // );
-                
                 $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
                 if($bet_transaction != 'false'){
                     $updateGameTransaction = [
@@ -832,15 +826,6 @@ class BNGController extends Controller
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                     $gametransactionid = $bet_transaction->game_trans_id;
                 }
-                // if(!$game_transaction){
-                //     $gametransactionid=Helper::createGameTransaction('refund', $json_data, $game_details, $client_details); 
-                // }
-                // else{
-                //     GameTransactionMDB::updateGametransaction($json_data,$bet_transaction->game_trans_id,$client_details);
-                //     // $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"refund");
-                //     $gametransactionid = $bet_transaction->game_trans_id;
-                // }
-                //$this->_setExtParameter($this->_getExtParameter()+1);
 
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
