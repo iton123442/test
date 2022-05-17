@@ -176,7 +176,7 @@ class BOTAController extends Controller{
                     "confirm" => "ok"
                 );
                 $dataToUpdate =[
-                    "mw_response" => $response,
+                    "mw_response" =>json_encode($response),
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 // $createGameTransactionLog = [
@@ -404,7 +404,7 @@ class BOTAController extends Controller{
                     "bet_amount" => round($newBet,2)
                 ];
                 $dataToUpdate =[
-                    "mw_response" => $response,
+                    "mw_response" =>json_encode($response),
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $game->game_trans_id, $client_details); 
@@ -642,7 +642,7 @@ class BOTAController extends Controller{
                     "bet_amount" => round($newBet,2)
                 ];
                 $dataToUpdate =[
-                    "mw_response" => $response,
+                    "mw_response" =>json_encode($response),
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $game->game_trans_id, $client_details); 
@@ -828,7 +828,7 @@ class BOTAController extends Controller{
                     "confirm" => "ok"
                 );
                 $dataToUpdate =[
-                    "mw_response" => $response,
+                    "mw_response" =>json_encode($response),
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$winTransactionExtID, $client_details);
                 // $createGameTransactionLog = [
@@ -964,7 +964,7 @@ class BOTAController extends Controller{
                     "bet_amount" => round($newBet,2)
                 ];
                 $dataToUpdate =[
-                    "mw_response" => $response,
+                    "mw_response" =>json_encode($response),
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $gameExt->game_trans_id, $client_details); 
