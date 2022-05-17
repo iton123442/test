@@ -375,6 +375,7 @@ class WazdanControllerNew extends Controller
                 //ryy
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
                 $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
+                $game_transactionGenID = ProviderHelper::idGenerate($client_details->connection_name, 1);
                 $WinGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name, 2);
                 if($game==null){
                     if(isset( $datadecoded['freeRoundInfo']['txId'] )) {
@@ -396,7 +397,7 @@ class WazdanControllerNew extends Controller
                         );
                      GameTransactionMDB::createGametransactionV2($gameTransactionData,$BetNullGametransactionId,$client_details);
                         $betgametransactionext = array(
-                            "game_trans_id" => $game_transactionid,
+                            "game_trans_id" => $game_transactionGenID,
                             "provider_trans_id" => $datadecoded["transactionId"],
                             "round_id" => $datadecoded["roundId"],
                             "amount" => 0,
@@ -407,7 +408,7 @@ class WazdanControllerNew extends Controller
                         $fund_extra_data = [
                             'provider_name' => $game_details->provider_name
                         ];  
-                        $client_response = ClientRequestHelper::fundTransfer($client_details, 0,$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+                        $client_response = ClientRequestHelper::fundTransfer($client_details, 0,$game_details->game_code,$game_details->game_name,$WinGametransactionExtId,$game_transactionGenID,"debit",false,$fund_extra_data);
                         if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
                             $balance = round($client_response->fundtransferresponse->balance,2);
