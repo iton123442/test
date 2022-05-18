@@ -70,12 +70,15 @@ class BOTAController extends Controller{
                 }
                 return response($data,200)->header('Content-Type', 'application/json');
             }
-        }$msg = [
-            "result_code" => "1",
-            "result_msg" =>(string) "(no account)"
-        ];
-        return response($msg,200)->header('Content-Type', 'application/json');
-        Helper::saveLog('BOTA TG FOUND CLIENT DETAILS',$this->provider_db_id, json_encode($msg), $data);
+        }
+        else{
+            $msg = [
+                "result_code" => "1",
+                "result_msg" =>(string) "(no account)"
+            ];
+            return response($msg,200)->header('Content-Type', 'application/json');
+            Helper::saveLog('BOTA TG NOTFOUND CLIENT DETAILS',$this->provider_db_id, json_encode($msg), $data);
+        }
     }
 
     public function _getBalance($data,$client_details){
@@ -451,7 +454,7 @@ class BOTAController extends Controller{
                     //     ]
                     // ];
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                    GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
+                    GameTransactionMDB::updateGametransaction($datatosend,$game->game_trans_id,$client_details);
                     $updateData = array(
                         "mw_response" => json_encode($msg)
                     );
@@ -689,7 +692,7 @@ class BOTAController extends Controller{
                     //     ]
                     // ];
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                    GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
+                    GameTransactionMDB::updateGametransaction($datatosend,$game->game_trans_id,$client_details);
                     $updateData = array(
                         "mw_response" => json_encode($msg)
                     );
@@ -876,7 +879,7 @@ class BOTAController extends Controller{
                     //     ]
                     // ];
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                    GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
+                    GameTransactionMDB::updateGametransaction($datatosend,$game->game_trans_id,$client_details);
                     $updateData = array(
                         "mw_response" => json_encode($msg)
                     );
