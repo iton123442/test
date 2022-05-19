@@ -11,7 +11,7 @@ use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
 
-class YGG002Controller extends Controller
+class YGG002ControllerNEW extends Controller
 {
     public $provider_id;
     public $org;
