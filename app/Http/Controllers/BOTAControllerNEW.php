@@ -16,7 +16,7 @@ use DB;
 use Exception;
 
 class BOTAControllerNEW extends Controller{
-// THIS IS BOTA NEW FLOW!
+
     protected $startTime;
     public function __construct() {
         $this->startTime = microtime(true);
@@ -143,7 +143,7 @@ class BOTAControllerNEW extends Controller{
                     'entry_id' => 1,
                     'trans_status' => 1
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
             }
             else{
             $gameTransactionData = array(
