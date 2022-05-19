@@ -489,8 +489,8 @@ class BNGController extends Controller
         }
         elseif(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "402"){
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
-            $client_details->balance = $balance;
+            // $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+            $balance = $client_details->balance;
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
