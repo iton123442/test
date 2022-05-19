@@ -348,7 +348,7 @@ class TransferWalletController extends Controller
     		$this->withdrawAllExpiredWallet();
     		SessionWalletHelper::saveLog('TW updateSession', 1223, json_encode(['msg'=>'success']), 1223);
     	} catch (\Exception $e) {
-    		SessionWalletHelper::saveLog('TW updateSession Failed', 1223, json_encode(['msg'=>$e->getMesage()]), 1223);
+    		SessionWalletHelper::saveLog('TW updateSession Failed', 1223, json_encode(['msg'=>$e->getMessage()]), 1223);
     	}
     }
 
