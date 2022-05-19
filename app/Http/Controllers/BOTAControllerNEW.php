@@ -387,7 +387,7 @@ class BOTAControllerNEW extends Controller{
                         ]
                     ];
                     ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                    return response($msg, 200)->header('Content-type', 'application/json');
+                    return response($response, 200)->header('Content-type', 'application/json');
                 }
             }
             $bettransactionExtId = ProviderHelper::idGenerate($client_details->connection_name, 2);
@@ -413,7 +413,7 @@ class BOTAControllerNEW extends Controller{
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                $msg = array(
+                $response = array(
                     "user" => $data['user'],
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
@@ -438,7 +438,7 @@ class BOTAControllerNEW extends Controller{
                     ]
                 ];
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                return response($msg, 200)->header('Content-type', 'application/json');
+                return response($response, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
@@ -630,7 +630,7 @@ class BOTAControllerNEW extends Controller{
                         ]
                     ];
                     ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                    return response($msg, 200)->header('Content-type', 'application/json');
+                    return response($response, 200)->header('Content-type', 'application/json');
                 }
             }
             $bettransactionExtId = ProviderHelper::idGenerate($client_details->connection_name, 2);
@@ -656,7 +656,7 @@ class BOTAControllerNEW extends Controller{
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                $msg = array(
+                $response = array(
                     "user" => $data['user'],
                     "balance" =>(int) $balance,
                     "confirm" => "ok"
@@ -681,7 +681,7 @@ class BOTAControllerNEW extends Controller{
                     ]
                 ];
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                return response($msg, 200)->header('Content-type', 'application/json');
+                return response($response, 200)->header('Content-type', 'application/json');
             }
             elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
@@ -821,7 +821,7 @@ class BOTAControllerNEW extends Controller{
                         ]
                     ];
                     ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                    return response($msg, 200)->header('Content-type', 'application/json');
+                    return response($response, 200)->header('Content-type', 'application/json');
                 }
             }
             $win_or_lost = $data["price"] == 0 && $game->pay_amount == 0 ? 0 : 1;
