@@ -123,6 +123,8 @@ class YGG002ControllerNEW extends Controller
             Helper::saveLog("YGG 002 wager balance response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
+        $game_trans = ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
+        $game_transextension = ProviderHelper::idGenerate($client_details->connection_name, 2);
         $gameTransactionData = array(
             "provider_trans_id" => $provider_trans_id,
             "token_id" => $tokenId,
@@ -135,7 +137,7 @@ class YGG002ControllerNEW extends Controller
             "entry_id" =>1,
             "trans_status" =>1,
         );
-        $game_trans = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+        GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans ,$client_details);
         $gameTransactionEXTData = array(
             "game_trans_id" => $game_trans,
             "provider_trans_id" => $provider_trans_id,
@@ -143,7 +145,7 @@ class YGG002ControllerNEW extends Controller
             "amount" => $bet_amount,
             "game_transaction_type"=> 1,
         );
-        $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
         
         try{
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
@@ -204,7 +206,7 @@ class YGG002ControllerNEW extends Controller
                     "win" => 2,
                     'trans_status' => 5
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);
                 Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }else{
@@ -227,7 +229,7 @@ class YGG002ControllerNEW extends Controller
                     "win" => 2,
                     'trans_status' => 5
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);
                 Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }
@@ -256,7 +258,7 @@ class YGG002ControllerNEW extends Controller
                 "win" => 2,
                 'trans_status' => 5
             ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);
             Helper::saveLog('YGG 002 wager error', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
             return json_encode($response, JSON_FORCE_OBJECT); 
         }
@@ -318,6 +320,7 @@ class YGG002ControllerNEW extends Controller
                     "currency" => $client_details->default_currency
                 )
             );
+            $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->connection_name, 2);
             $create_gametransactionext = array(
                 "game_trans_id" => $checkTrans->game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
@@ -325,7 +328,7 @@ class YGG002ControllerNEW extends Controller
                 "amount" => $checkTrans->bet_amount,
                 "game_transaction_type"=> 3,
             );
-            $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
@@ -366,7 +369,7 @@ class YGG002ControllerNEW extends Controller
                 ]
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionLog);
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
             Helper::saveLog('YGG 002 cancelwager response', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
@@ -453,6 +456,7 @@ class YGG002ControllerNEW extends Controller
                         "playerId" => "TG002_".$client_details->player_id
                     ),
                 );
+                $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->connection_name, 2);
                 $create_gametransactionext = array(
                     "game_trans_id" => $checkTrans->game_trans_id,
                     "provider_trans_id" => $provider_trans_id,
@@ -460,7 +464,7 @@ class YGG002ControllerNEW extends Controller
                     "amount" => $bonusamount,
                     "game_transaction_type"=> 2,
                 );
-                $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
                 $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
@@ -489,7 +493,7 @@ class YGG002ControllerNEW extends Controller
                     'entry_id' => $entry_id,
                     'trans_status' => 2
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
                 ClientRequestHelper::fundTransfer_TG($client_details, $bonusamount, $game_details->game_code, $game_details->game_name, $checkTrans->game_trans_id, 'credit', false, $action_payload);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
@@ -603,6 +607,7 @@ class YGG002ControllerNEW extends Controller
                         "playerId" => "TG002_".$client_details->player_id
                     ),
                 );
+                $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->connection_name, 2);
                 $create_gametransactionext = array(
                     "game_trans_id" => $checkTrans->game_trans_id,
                     "provider_trans_id" => $provider_trans_id,
@@ -610,7 +615,7 @@ class YGG002ControllerNEW extends Controller
                     "amount" => $win_amount,
                     "game_transaction_type"=> 2,
                 );
-                $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+                $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
                 $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
@@ -639,7 +644,7 @@ class YGG002ControllerNEW extends Controller
                     'entry_id' => $entry_id,
                     'trans_status' => 2
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
                 ClientRequestHelper::fundTransfer_TG($client_details, $win_amount, $game_details->game_code, $game_details->game_name, $checkTrans->game_trans_id, 'credit', false, $action_payload);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
@@ -723,6 +728,8 @@ class YGG002ControllerNEW extends Controller
             Helper::saveLog("YGG 002 campaignpayout dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
+        $game_trans = ProviderHelper::idGenerate($client_details->connection_name, 1);
+        $game_transextension = ProviderHelper::idGenerate($client_details->connection_name, 2);
         $gameTransactionData = array(
             "provider_trans_id" => $provider_trans_id,
             "token_id" => $tokenId,
@@ -735,7 +742,7 @@ class YGG002ControllerNEW extends Controller
             "entry_id" => 2,
             "trans_status" => 1,
         );
-        $game_trans = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+        GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans,$client_details);
         $gameTransactionEXTData = array(
             "game_trans_id" => $game_trans,
             "provider_trans_id" => $provider_trans_id,
@@ -743,7 +750,7 @@ class YGG002ControllerNEW extends Controller
             "amount" => $bonusamount,
             "game_transaction_type"=> 2,
         );
-        $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
         
         try{
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bonusamount ,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit');
@@ -804,7 +811,7 @@ class YGG002ControllerNEW extends Controller
                     "win" => 2,
                     'trans_status' => 5
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);
                 Helper::saveLog("YGG 002 campaignpayout response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }else{
@@ -827,7 +834,7 @@ class YGG002ControllerNEW extends Controller
                     "win" => 2,
                     'trans_status' => 5
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);
                 Helper::saveLog("YGG 002 campaignpayout response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }
@@ -856,7 +863,7 @@ class YGG002ControllerNEW extends Controller
                 "win" => 2,
                 'trans_status' => 5
             ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);
             Helper::saveLog('YGG 002 campaignpayout error', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
             return json_encode($response, JSON_FORCE_OBJECT); 
         }
