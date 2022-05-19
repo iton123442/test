@@ -15,7 +15,7 @@ use App\Models\GameTransaction;
 use DB;
 use Exception;
 
-class BOTAController extends Controller{
+class BOTAControllerNEW extends Controller{
 // THIS IS BOTA NEW FLOW!
     protected $startTime;
     public function __construct() {
