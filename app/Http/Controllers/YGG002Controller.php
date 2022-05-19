@@ -311,7 +311,7 @@ class YGG002Controller extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'ygg',
-                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "game_transaction_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
@@ -436,7 +436,7 @@ class YGG002Controller extends Controller
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
                         "provider" => 'ygg',
-                        "game_trans_ext_id" => $game_trans_ext_v2,
+                        "game_transaction_ext_id" => $game_trans_ext_v2,
                         "client_connection_name" => $client_details->connection_name,
                     ],
                     "provider" => [
@@ -576,7 +576,7 @@ class YGG002Controller extends Controller
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
                         "provider" => 'ygg',
-                        "game_trans_ext_id" => $game_trans_ext_v2,
+                        "game_transaction_ext_id" => $game_trans_ext_v2,
                         "client_connection_name" => $client_details->connection_name,
                     ],
                     "provider" => [
