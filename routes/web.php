@@ -770,40 +770,40 @@ $app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']]
 
 
 // Yggdrasil 
-// $app->get('/public/playerinfo.json','YGG002Controller@playerinfo');
-// $app->get('/public/wager.json','YGG002Controller@wager');
-// $app->get('/public/cancelwager.json','YGG002Controller@cancelwager');
-// $app->get('/public/appendwagerresult.json','YGG002Controller@appendwagerresult');
-// $app->get('/public/endwager.json','YGG002Controller@endwager');
-// $app->get('/public/campaignpayout.json','YGG002Controller@campaignpayout');
-// $app->get('/public/getbalance.json','YGG002Controller@getbalance');
-// // ygg local
-// $app->post('/public/playerinfo/test','YGG002Controller@playerinfo');
-// $app->post('/public/wager/test','YGG002Controller@wager');
-// $app->post('/public/cancelwager/test','YGG002Controller@cancelwager');
-// $app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult');
-// $app->post('/public/endwager/test','YGG002Controller@endwager');
-// $app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
-// $app->post('/public/getbalance/test','YGG002Controller@getbalance');
+$app->get('/public/playerinfo.json','YGG002Controller@playerinfo');
+$app->get('/public/wager.json','YGG002Controller@wager');
+$app->get('/public/cancelwager.json','YGG002Controller@cancelwager');
+$app->get('/public/appendwagerresult.json','YGG002Controller@appendwagerresult');
+$app->get('/public/endwager.json','YGG002Controller@endwager');
+$app->get('/public/campaignpayout.json','YGG002Controller@campaignpayout');
+$app->get('/public/getbalance.json','YGG002Controller@getbalance');
+// ygg local
+$app->post('/public/playerinfo/test','YGG002Controller@playerinfo');
+$app->post('/public/wager/test','YGG002Controller@wager');
+$app->post('/public/cancelwager/test','YGG002Controller@cancelwager');
+$app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult');
+$app->post('/public/endwager/test','YGG002Controller@endwager');
+$app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
+$app->post('/public/getbalance/test','YGG002Controller@getbalance');
 
 // Yggdrasil NEWLOW
-$app->get('/public/playerinfo.json','YGG002ControllerNEW@playerinfo');
-$app->get('/public/wager.json','YGG002ControllerNEW@wager');
-$app->get('/public/cancelwager.json','YGG002ControllerNEW@cancelwager');
-$app->get('/public/appendwagerresult.json','YGG002ControllerNEW@appendwagerresult');
-$app->get('/public/endwager.json','YGG002ControllerNEW@endwager');
-$app->get('/public/campaignpayout.json','YGG002ControllerNEW@campaignpayout');
-$app->get('/public/getbalance.json','YGG002ControllerNEW@getbalance');
-// ygg local NEWFLOW
-$app->post('/public/playerinfo/test','YGG002ControllerNEW@playerinfo');
-$app->post('/public/wager/test','YGG002ControllerNEW@wager');
-$app->post('/public/cancelwager/test','YGG002ControllerNEW@cancelwager');
-$app->post('/public/appendwagerresult/test','YGG002ControllerNEW@appendwagerresult');
-$app->post('/public/endwager/test','YGG002ControllerNEW@endwager');
-$app->post('/public/campaignpayout/test','YGG002ControllerNEW@campaignpayout');
-$app->post('/public/getbalance/test','YGG002ControllerNEW@getbalance');
+// $app->get('/public/playerinfo.json','YGG002ControllerNEW@playerinfo');
+// $app->get('/public/wager.json','YGG002ControllerNEW@wager');
+// $app->get('/public/cancelwager.json','YGG002ControllerNEW@cancelwager');
+// $app->get('/public/appendwagerresult.json','YGG002ControllerNEW@appendwagerresult');
+// $app->get('/public/endwager.json','YGG002ControllerNEW@endwager');
+// $app->get('/public/campaignpayout.json','YGG002ControllerNEW@campaignpayout');
+// $app->get('/public/getbalance.json','YGG002ControllerNEW@getbalance');
+// // ygg local NEWFLOW
+// $app->post('/public/playerinfo/test','YGG002ControllerNEW@playerinfo');
+// $app->post('/public/wager/test','YGG002ControllerNEW@wager');
+// $app->post('/public/cancelwager/test','YGG002ControllerNEW@cancelwager');
+// $app->post('/public/appendwagerresult/test','YGG002ControllerNEW@appendwagerresult');
+// $app->post('/public/endwager/test','YGG002ControllerNEW@endwager');
+// $app->post('/public/campaignpayout/test','YGG002ControllerNEW@campaignpayout');
+// $app->post('/public/getbalance/test','YGG002ControllerNEW@getbalance');
 
 //BOTA
 // $app->post('/public/api/bota', 'BOTAController@index');
-// $app->post('/public/api/bota/callbackBalance', 'BOTAControllerNEW@index');
-$app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
+$app->post('/public/api/bota/callbackBalance', 'BOTAControllerNEW@index');
+// $app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
