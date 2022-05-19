@@ -313,6 +313,7 @@ class YGG002Controller extends Controller
                     "provider" => 'ygg',
                     "game_transaction_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
+                    "win_or_lost" => 4,
                 ],
                 "provider" => [
                     "provider_request" => $request->all(),
@@ -438,6 +439,7 @@ class YGG002Controller extends Controller
                         "provider" => 'ygg',
                         "game_transaction_ext_id" => $game_trans_ext_v2,
                         "client_connection_name" => $client_details->connection_name,
+                        "win_or_lost" => $win,
                     ],
                     "provider" => [
                         "provider_request" => $request->all(),
@@ -578,6 +580,7 @@ class YGG002Controller extends Controller
                         "provider" => 'ygg',
                         "game_transaction_ext_id" => $game_trans_ext_v2,
                         "client_connection_name" => $client_details->connection_name,
+                        "win_or_lost" => $win,
                     ],
                     "provider" => [
                         "provider_request" => $request->all(),
