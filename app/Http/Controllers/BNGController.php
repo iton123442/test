@@ -11,7 +11,6 @@ use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
 use App\Models\GameTransactionMDB;
 use App\Helpers\FreeSpinHelper;
-use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransaction;
 use DB;
 class BNGController extends Controller
