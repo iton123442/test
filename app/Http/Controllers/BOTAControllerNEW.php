@@ -170,7 +170,7 @@ class BOTAControllerNEW extends Controller{
             $fund_extra_data = [
                 'provider_name' => $gamedetails->provider_name
             ]; 
-            Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($bettransactionExtId), $game_trans_id);
+            // Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($bettransactionExtId), $game_trans_id);
             $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$bettransactionExtId,$game_trans_id,'debit',false,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "200"){
@@ -367,7 +367,7 @@ class BOTAControllerNEW extends Controller{
                     'provider_name' => $gamedetails->provider_name
                 ]; 
                 
-                Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($bettransactionExtId), $game_trans_id);
+                // Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($bettransactionExtId), $game_trans_id);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,'debit',false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "200"){
@@ -611,7 +611,7 @@ class BOTAControllerNEW extends Controller{
                 $fund_extra_data = [
                     'provider_name' => $gamedetails->provider_name
                 ]; 
-                Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($bettransactionExtId), $game_trans_id);
+                // Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($bettransactionExtId), $game_trans_id);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,$bettransactionExtId,'debit',false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "200"){
@@ -879,7 +879,7 @@ class BOTAControllerNEW extends Controller{
                     "mw_response" => json_encode($response),
                 ]
             ];
-            Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($action_payload), $winTransactionExtID);
+            // Helper::saveLog('BOTA CREATEGAMETRANS', $this->provider_db_id, json_encode($action_payload), $winTransactionExtID);
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details, $game->bet_amount, $gamedetails->game_code, $gamedetails->game_name, $game->game_trans_id, 'credit', false, $action_payload);
             // $client_response = ClientRequestHelper::fundtransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$winTransactionExtID,$game->game_trans_id,'credit');
             if(isset($client_response->fundtransferresponse->status->code) 
@@ -1031,7 +1031,7 @@ class BOTAControllerNEW extends Controller{
             ];
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details, $gameExt->bet_amount, $gamedetails->game_code, $gamedetails->game_name, $gameExt->game_trans_id, 'credit', true, $action_payload);
             // $client_response = ClientRequestHelper::fundTransfer($client_details,round($data["price"],2),$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$gameExt->game_trans_id,'credit',true);
-            Helper::saveLog('BOTA CANCEL HIT FUNDTRANSFER', $this->provider_db_id, json_encode($gameExt), $game_trans_ext_id);
+            // Helper::saveLog('BOTA CANCEL HIT FUNDTRANSFER', $this->provider_db_id, json_encode($gameExt), $game_trans_ext_id);
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance,2);
