@@ -256,7 +256,7 @@ class BOTAController extends Controller{
             if($betDetails->result_count != 0){//check if bet history is not null
                 $refundRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
                 $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',3,$client_details);
-                if(count($checkRefundCount) == 2 || $checkRefundCount != 'false'){//if canceled 2 times
+                if(count($checkRefundCount) > 1 && $checkRefundCount != 'false'){//if canceled 2 times
                     try{
                         $newProvTransID = $this->prefix.'R_'.$betDetails->result_value[0]->c_idx;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_44');//rebet
@@ -291,7 +291,7 @@ class BOTAController extends Controller{
             else{//if no bet history
                 $refundRoundID = $data['detail']['shoeNo'].$data['detail']['gameNo'];
                 $checkRefundCount = GameTransactionMDB::findBOTAGameExt($refundRoundID,'round_id',3,$client_details);
-                if(count($checkRefundCount) == 2 || $checkRefundCount != 'false'){//if canceled 2 times
+                if(count($checkRefundCount) > 1 && $checkRefundCount != 'false'){//if canceled 2 times
                     try{
                         $newProvTransID = $this->prefix.'R_'.$refundRoundID;//last bet idx
                         ProviderHelper::idenpotencyTable($newProvTransID.'_44R');//rebet
