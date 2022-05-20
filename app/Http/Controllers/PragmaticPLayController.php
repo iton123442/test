@@ -475,7 +475,7 @@ class PragmaticPLayController extends Controller
                 "error" => 0,
                 "description" => "Success",
             );
-            AWSHelper::saveLog('TPP result ext not found', $this->provider_id, json_encode($data), $response);
+            AWSHelper::saveLog('TPP result ext not found', $this->provider_id, json_encode($data), $response_log);
             return $response_log;
         }
         
