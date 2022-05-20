@@ -281,6 +281,17 @@ class EDPController extends Controller
                           // "provider_request" =>json_encode($req),
                       );
                      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$transactionId,$client_details); //create extension
+                     $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $transactionId,
+                              "request" => json_encode($request),
+                              "response" => json_encode($response),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "success",
+                          ]
+                      ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     // $this->updateGameTransactionExt($transactionId,$client_response->requestoclient,$sessions,$client_response,null,$client_details);
                     Helper::saveLog('responseTime(EDP)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                     return response($sessions,200)
@@ -293,7 +304,18 @@ class EDPController extends Controller
                         "message"=>"Player has insufficient funds"
 
                     );
-                    $this->createGameTransactionExt($gametransactionid,$request,$client_response->requestoclient,$response,$client_response,1,$client_details);
+                    $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $transactionId,
+                              "request" => json_encode($request),
+                              "response" => json_encode($response),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "FAILED",
+                          ]
+                      ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                    // $this->createGameTransactionExt($gametransactionid,$request,$client_response->requestoclient,$response,$client_response,1,$client_details);
                     return response($response,402)
                     ->header('Content-Type', 'application/json');
                 }
