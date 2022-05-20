@@ -421,7 +421,7 @@ class EDPController extends Controller
                         "type"=>2, #R
                         "game_id" => $game_details->game_id, #R
                         "player_id" => $client_details->player_id, #R
-                        "mw_response" => $response, #R
+                        "mw_response" => $sessions, #R
                     ]
                 ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,number_format($win_amount/1000,2, '.', ''),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
