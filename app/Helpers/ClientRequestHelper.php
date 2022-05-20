@@ -401,7 +401,13 @@ class ClientRequestHelper{
             $custom_operator = config('clientcustom.data_type.transaction.string');
             if(in_array($client_details->operator_id, $custom_operator)){
                 // ProviderHelper::mandatorySaveLog($requesttocient["action"]['custom']['game_transaction_ext_id'], 123, "GG", 'TG_PROCESS');
-                $requesttocient["action"]['custom']['game_transaction_ext_id'] = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
+                if(isset($requesttocient["action"]['custom']['game_transaction_ext_id'])){
+                    $ext_id = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
+                }else{
+                    $ext_id = (string)$requesttocient["action"]['custom']['game_trans_ext_id'];
+                }
+                // $requesttocient["action"]['custom']['game_transaction_ext_id'] = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
+                $requesttocient["action"]['custom']['game_transaction_ext_id'] = $ext_id;
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'] = (string)$requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'];
                 // ProviderHelper::mandatorySaveLog($requesttocient["action"]['custom']['game_transaction_ext_id'], 123, json_encode($requesttocient), 'NO ERROR 2');
             }
