@@ -411,7 +411,7 @@ class EDPController extends Controller
                         "win_or_lost" => $win_or_lost,
                     ],
                     "provider" => [
-                        "provider_request" => $data, #R
+                        "provider_request" => json_encode($request->all()), #R
                         "provider_trans_id"=>$trans_id, #R
                         "provider_round_id"=>$round_id, #R
                         'provider_name' => $game_details->provider_name
