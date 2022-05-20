@@ -387,6 +387,7 @@ class EDPController extends Controller
                 // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                 GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$transactionId,$client_details); //create game_transaction
                 $sendtoclient =  microtime(true);
+                $win_or_lost = $request->amount == 0 ? 0 : 1;
                 if($request->has("bonusId")){
                     $freespin = FreeSpinHelper::getFreeSpinBalanceByFreespinId($request->bonusId);
                     $sessions =array(
