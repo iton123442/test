@@ -365,17 +365,26 @@ class EDPController extends Controller
                 $game = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
                 // $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($request->token,$request->gameId,$client_details);
                 if($game == 'false'){
-                    // $gametransactionid=$this->createGameTransaction('credit', $json_data, $game_details, $client_details);   
-                    $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);    
-                    $gametransactionid = $gen_game_trans_id;
+                    $response = array(
+                        "code"=>"ACCESS_DENIED",
+                        "message"=> "request is invalid/missing a required input"
+                    );
+                    return response($response,200)
+                       ->header('Content-Type', 'application/json');
                 }
-                else{
-                    $client_details->connection_name = $game->connection_name;
-                    $gameupdate = $this->updateGameTransaction($game,$json_data,"credit",$client_details);
-                    $gametransactionid = $game->game_trans_id;aw
-                }
+                $client_details->connection_name = $game->connection_name;
+                $gameupdate = $this->updateGameTransaction($game,$json_data,"credit",$client_details);
+                $gametransactionid = $game->game_trans_id;
                 // $transactionId=$this->createGameTransactionExt($gametransactionid,null,null,null,null,2,$client_details);
-                $this->createGameTransactionExt($gametransactionid,null,null,null,null,2,$client_details);
+                $wingametransactionext = array(
+                    "game_trans_id" => $gametransactionid,
+                    "provider_trans_id" => $trans_id,
+                    "round_id" =>$round_id,
+                    "amount" =>$request->amount / 1000,
+                    "game_transaction_type"=>2,
+                );
+                // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create game_transaction
                 $transactionId = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $sendtoclient =  microtime(true);
                 if($request->has("bonusId")){
