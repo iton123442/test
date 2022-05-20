@@ -372,6 +372,7 @@ class EDPController extends Controller
                     return response($response,200)
                        ->header('Content-Type', 'application/json');
                 }
+                $transactionId = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $client_details->connection_name = $game->connection_name;
                 $gameupdate = $this->updateGameTransaction($game,$json_data,"credit",$client_details);
                 $gametransactionid = $game->game_trans_id;
@@ -384,8 +385,7 @@ class EDPController extends Controller
                     "game_transaction_type"=>2,
                 );
                 // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
-                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$gen_game_extid,$client_details); //create game_transaction
-                $transactionId = ProviderHelper::idGenerate($client_details->connection_name,2);
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$transactionId,$client_details); //create game_transaction
                 $sendtoclient =  microtime(true);
                 if($request->has("bonusId")){
                     $freespin = FreeSpinHelper::getFreeSpinBalanceByFreespinId($request->bonusId);
