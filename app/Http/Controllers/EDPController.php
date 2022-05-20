@@ -469,7 +469,7 @@ class EDPController extends Controller
                       "column" =>[
                           "game_trans_ext_id" => $transactionId,
                           "request" => json_encode($request),
-                          "response" => json_encode($response),
+                          "response" => json_encode($sessions),
                           "log_type" => "provider_details",
                           "transaction_detail" => "success",
                       ]
