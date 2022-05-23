@@ -377,7 +377,7 @@ class OryxGamingMDBController extends Controller
                         "entry_id" => $entry_id,
                         "pay_amount" => $pay_amount,
                         "income" => $income,
-                        "game_trans_ext_id" => $game_trans_ext_id
+                        "game_transaction_ext_id" => $game_trans_ext_id
                     ],
                     "provider" => [
                         "provider_request" => json_encode($payload), #R
