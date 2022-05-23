@@ -659,7 +659,8 @@ class FundtransferProcessorController extends Controller
                                     "transaction_detail" =>json_encode("success"),
                                     "general_details" =>json_encode("success")
                                 );
-                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                //ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                                 Helper::saveLog("Amuse Gaming Success Client Request", 65, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif ($payload->action->custom->provider == 'BOTA') {
