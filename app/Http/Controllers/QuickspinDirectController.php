@@ -248,7 +248,7 @@ class QuickspinDirectController extends Controller
             ];
             return $res;
         }
-        $formatBal = $balance = str_replace(".","", $client_details->balance);
+        $formatBal = str_replace(".","", $client_details->balance);
         $formattedBal = (int) $formatBal;
         $trans_type = $req['txtype'];//transaction type wether its free spin or normal
         try {
