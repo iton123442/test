@@ -273,7 +273,7 @@ class QuickspinDirectController extends Controller
         
         $game_details = Game::find($game_code, config('providerlinks.quickspinDirect.provider_db_id'));
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
-        $winBalance = $formattedBal + $pay_amount;
+        $winBalance = $formattedBal + $req['amount'];
         $win_or_lost = $pay_amount > 0 ?  1 : 0;
         $entry_id = $pay_amount > 0 ?  2 : 1;
 
