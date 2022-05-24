@@ -196,7 +196,7 @@ class AmuseGamingNew extends Controller
                 "round_id" => $provider_round_id,
                 "amount" => $provider_bet_amount,
                 "game_transaction_type"=> 1,
-                "provider_request" =>json_encode($request),
+                // "provider_request" =>json_encode($request),
             );
            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
             if(isset($client_response->fundtransferresponse->status->code) 
