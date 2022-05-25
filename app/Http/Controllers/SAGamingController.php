@@ -409,7 +409,7 @@ class SAGamingController extends Controller
                     "game_transaction_type"=> $game_transaction_type,
                     // "provider_request" =>json_encode($data),
                 );
-              GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_transextension,$client_details);
+              GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
