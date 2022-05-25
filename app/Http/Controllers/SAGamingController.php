@@ -501,6 +501,7 @@ class SAGamingController extends Controller
             $round_id = $data['gameid']; // gameId is unique per table click
 
             $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
+            $game_transextension = ProviderHelper::idGenerate($client_details->connection_name, 2);
             if($client_details == null){
                 $data_response = ["username" => $username,"error" => 1005]; // 1000
                 ProviderHelper::saveLogWithExeption('SA PlayerLost - Client Error', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
@@ -539,14 +540,24 @@ class SAGamingController extends Controller
                 "round_id" => $round_id,
                 "amount" => 0,
                 "game_transaction_type"=> 0,
-                "provider_request" =>json_encode($data),
+                // "provider_request" =>json_encode($data),
             );
-            $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
+           GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
+           $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($data),
+                        "response" => json_encode($data_response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                     ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
-                    "game_transaction_ext_id" => $game_transextension,
+                    "game_trans_ext_id" => $game_transextension,
                     "client_connection_name" => $client_details->connection_name,
                     "provider" => 'sagaming',
                     "win_or_lost" => 0,
