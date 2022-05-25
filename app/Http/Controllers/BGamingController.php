@@ -401,7 +401,7 @@ public function gameBet($request, $client_details){
                                                                   "game_trans_ext_id" => $gen_game_extid2,
                                                                   "request" => json_encode($client_response->requestoclient),
                                                                   "response" => json_encode($client_response->fundtransferresponse),
-                                                                  "log_type" => "provider_details",
+                                                                  "log_type" => "client_details",
                                                                   "transaction_detail" => "SUCCESS",
                                                               ]
                                                             ];
