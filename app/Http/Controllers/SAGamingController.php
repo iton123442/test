@@ -255,13 +255,17 @@ class SAGamingController extends Controller
                         "amount" => $client_response->fundtransferresponse->balance,
                         "error" => 0
                     ];
-                    $updateTransactionEXt = array(
-                        "mw_response" => json_encode($data_response),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response),
-                        'transaction_detail' => json_encode($data_response),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transextension,
+                            "request" => json_encode($data),
+                            "response" => json_encode($data_response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "success",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
                     if($game_trans_ext == 'false'){
@@ -269,22 +273,30 @@ class SAGamingController extends Controller
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
                     }
                     $data_response = ["username" => $username,"currency" => $currency, "amount" => $client_details->balance, "error" => 1004];  // Low Balance1
-                    $updateTransactionEXt = array(
-                        "mw_response" => json_encode($data_response),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response),
-                        'transaction_detail' => 'FAILED',
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transextension,
+                            "request" => json_encode($client_response->requestoclient),
+                            "response" => json_encode($client_response),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "FAILED",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 }else{
                     $data_response = ["username" => $username,"error" => 1005];
-                    $updateTransactionEXt = array(
-                        "mw_response" => json_encode($data_response),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response),
-                        'transaction_detail' => 'FAILED',
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transextension,
+                            "request" => json_encode($data_response),
+                            "response" => json_encode($client_response),
+                            "log_type" => "client_details",
+                            "transaction_detail" => "FAILED",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     ProviderHelper::saveLogWithExeption('SA PlaceBet - FATAL ERROR', config('providerlinks.sagaming.pdbid'), json_encode($data), 'UNKNOWN STATUS CODE');
                 }
                 ProviderHelper::saveLogWithExeption('SA PlaceBet', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
@@ -319,6 +331,7 @@ class SAGamingController extends Controller
         $round_id = $data['gameid']; // gameId is unique per table click
 
         $client_details = ProviderHelper::getClientDetails('player_id',$playersid);
+        $game_transextension = ProviderHelper::idGenerate($client_details->connection_name, 2);
         if($client_details == null){
             $data_response = ["username" => $username, "error" => 1005]; // 1000
             ProviderHelper::saveLogWithExeption('SA PlayerWin - client_details Failed', config('providerlinks.sagaming.pdbid'), json_encode($data), $data_response);
@@ -394,14 +407,24 @@ class SAGamingController extends Controller
                     "round_id" => $round_id,
                     "amount" => $pay_amount,
                     "game_transaction_type"=> $game_transaction_type,
-                    "provider_request" =>json_encode($data),
+                    // "provider_request" =>json_encode($data),
                 );
-                $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
+              GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_transextension,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($data),
+                        "response" => json_encode($data_response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                     ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
-                        "game_transaction_ext_id" => $game_transextension,
+                        "game_trans_ext_id" => $game_transextension,
                         "client_connection_name" => $client_details->connection_name,
                         "provider" => 'sagaming',
                         "win_or_lost" => $win_or_lost,
