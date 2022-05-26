@@ -413,7 +413,7 @@ class WalletDetailsController extends Controller
                 //     return response()->json($details); 
                 // }
               
-                if($client_details->operator_id == 11){
+                if($client_details->operator_id == 11 ||$client_details->operator_id == 37 ){
                     $total_data = DB::connection( $connection["connection_name"] )->select("
                     select 
                     count(game_trans_id) total
