@@ -281,6 +281,17 @@ class EDPController extends Controller
                           // "provider_request" =>json_encode($req),
                       );
                      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$transactionId,$client_details); //create extension
+                     $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $transactionId,
+                              "request" => json_encode($request),
+                              "response" => json_encode($sessions),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "FAILED",
+                          ]
+                      ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     // $this->updateGameTransactionExt($transactionId,$client_response->requestoclient,$sessions,$client_response,null,$client_details);
                     Helper::saveLog('responseTime(EDP)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                     return response($sessions,200)
@@ -293,7 +304,18 @@ class EDPController extends Controller
                         "message"=>"Player has insufficient funds"
 
                     );
-                    $this->createGameTransactionExt($gametransactionid,$request,$client_response->requestoclient,$response,$client_response,1,$client_details);
+                    $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $transactionId,
+                              "request" => json_encode($request),
+                              "response" => json_encode($response),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "FAILED",
+                          ]
+                      ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                    // $this->createGameTransactionExt($gametransactionid,$request,$client_response->requestoclient,$response,$client_response,1,$client_details);
                     return response($response,402)
                     ->header('Content-Type', 'application/json');
                 }
@@ -365,34 +387,95 @@ class EDPController extends Controller
                 $game = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
                 // $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($request->token,$request->gameId,$client_details);
                 if($game == 'false'){
-                    $gametransactionid=$this->createGameTransaction('credit', $json_data, $game_details, $client_details);        
+                    $response = array(
+                        "code"=>"ACCESS_DENIED",
+                        "message"=> "request is invalid/missing a required input"
+                    );
+                    return response($response,200)
+                       ->header('Content-Type', 'application/json');
+                }
+                $transactionId = ProviderHelper::idGenerate($client_details->connection_name,2);
+                $client_details->connection_name = $game->connection_name;
+                $gameupdate = $this->updateGameTransaction($game,$json_data,"credit",$client_details);
+                $gametransactionid = $game->game_trans_id;
+                // $transactionId=$this->createGameTransactionExt($gametransactionid,null,null,null,null,2,$client_details);
+                $wingametransactionext = array(
+                    "game_trans_id" => $gametransactionid,
+                    "provider_trans_id" => $trans_id,
+                    "round_id" =>$round_id,
+                    "amount" =>$request->amount / 1000,
+                    "game_transaction_type"=>2,
+                );
+                // $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$transactionId,$client_details); //create game_transaction
+                $sendtoclient =  microtime(true);
+                $win_or_lost = $request->amount == 0 ? 0 : 1;
+                if($request->has("bonusId")){
+                    $freespin = FreeSpinHelper::getFreeSpinBalanceByFreespinId($request->bonusId);
+                    $sessions =array(
+                        "transactionId" => $trans_id,
+                        "balance"=>round($client_details->balance * 1000,2) + number_format($win_amount/1000,2, '.', ''),
+                        "spins" => $freespin
+                    );
                 }
                 else{
-                    $client_details->connection_name = $game->connection_name;
-                    $gameupdate = $this->updateGameTransaction($game,$json_data,"credit",$client_details);
-                    $gametransactionid = $game->game_trans_id;
-                }
-                $transactionId=$this->createGameTransactionExt($gametransactionid,$request,null,null,null,2,$client_details);
-                $sendtoclient =  microtime(true);
-                $client_response = ClientRequestHelper::fundTransfer($client_details,number_format($win_amount/1000,2, '.', ''),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
+                    $sessions =array(
+                    "transactionId" => $trans_id,
+                    "balance"=>round($client_details->balance * 1000,2) + number_format($win_amount/1000,2, '.', '')
+                    );
+                } 
+                $action_payload = [
+                    "type" => "custom", #genreral,custom :D # REQUIRED!
+                    "custom" => [
+                        "provider" => 'EDP',
+                        "game_transaction_ext_id" => $transactionId,
+                        "client_connection_name" => $client_details->connection_name,
+                        "win_or_lost" => $win_or_lost,
+                    ],
+                    "provider" => [
+                        "provider_request" => json_encode($request->all()), #R
+                        "provider_trans_id"=>$trans_id, #R
+                        "provider_round_id"=>$round_id, #R
+                        'provider_name' => $game_details->provider_name
+                    ],
+                    "mwapi" => [
+                        "roundId"=>$game->game_trans_id, #R
+                        "type"=>2, #R
+                        "game_id" => $game_details->game_id, #R
+                        "player_id" => $client_details->player_id, #R
+                        "mw_response" => $sessions, #R
+                    ]
+                ];
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,number_format($win_amount/1000,2, '.', ''),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"credit");
                 $client_response_time = microtime(true) - $sendtoclient;
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
-                    if($request->has("bonusId")){
-                        $freespin = FreeSpinHelper::getFreeSpinBalanceByFreespinId($request->bonusId);
-                        $sessions =array(
-                            "transactionId" => $trans_id,
-                            "balance"=>round($client_response->fundtransferresponse->balance * 1000,2),
-                            "spins" => $freespin
-                        );
-                    }
-                    else{
-                        $sessions =array(
-                        "transactionId" => $trans_id,
-                        "balance"=>round($client_response->fundtransferresponse->balance * 1000,2)
-                        );
-                    } 
-                $this->updateGameTransactionExt($transactionId,$client_response->requestoclient,$sessions,$client_response,null,$client_details);
+                    // if($request->has("bonusId")){
+                    //     $freespin = FreeSpinHelper::getFreeSpinBalanceByFreespinId($request->bonusId);
+                    //     $sessions =array(
+                    //         "transactionId" => $trans_id,
+                    //         "balance"=>round($client_response->fundtransferresponse->balance * 1000,2),
+                    //         "spins" => $freespin
+                    //     );
+                    // }
+                    // else{
+                    //     $sessions =array(
+                    //     "transactionId" => $trans_id,
+                    //     "balance"=>round($client_response->fundtransferresponse->balance * 1000,2)
+                    //     );
+                    // } 
+                $createGameTransactionLog = [
+                      "connection_name" => $client_details->connection_name,
+                      "column" =>[
+                          "game_trans_ext_id" => $transactionId,
+                          "request" => json_encode($request),
+                          "response" => json_encode($sessions),
+                          "log_type" => "provider_details",
+                          "transaction_detail" => "success",
+                      ]
+                  ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                // $this->updateGameTransactionExt($transactionId,$client_response->requestoclient,$sessions,$client_response,null,$client_details);
                 Helper::saveLog('responseTime(EDP)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                 return response($sessions,200)
                        ->header('Content-Type', 'application/json');
