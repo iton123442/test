@@ -10,7 +10,7 @@ use App\Models\GameTransactionMDB;
 use App\Helpers\AmuseGamingHelper;
 use DB;
 use SimpleXMLElement;
-class AmuseGamingController extends Controller
+class AmuseGamingNew extends Controller
 {   
     public $provider_db_id;
     public function __construct(){
@@ -138,6 +138,8 @@ class AmuseGamingController extends Controller
     public function debit($request){
         Helper::saveLog("AmuseGaming Withdraw Transactions Recieved", $this->provider_db_id, json_encode($request), "Recieved");
         $client_details = ProviderHelper::getClientDetails('player_id', $request->UserId);
+        $game_trans = ProviderHelper::idGenerate($client_details->connection_name, 1);
+		$game_transextension = ProviderHelper::idGenerate($client_details->connection_name, 2);
         if(config('providerlinks.amusegaming.modetype') == 'TEST'){
             $currency = 'TEST';
         }else{
@@ -172,31 +174,31 @@ class AmuseGamingController extends Controller
             // return response($response,200)
             //         ->header('Content-Type', 'application/xml');
         }
-        $gameTransactionData = array(
-            "provider_trans_id" => $provider_trans_id,
-            "token_id" => $player_tokenID,
-            "game_id" => $game_details->game_id,
-            "round_id" => $provider_round_id,
-            "bet_amount" => $provider_bet_amount,
-            "win" => 5,
-            "pay_amount" => 0,
-            "income" => 0,
-            "entry_id" =>1,
-            "trans_status" =>1,
-        );
-        $game_trans = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
-        $gameTransactionEXTData = array(
-            "game_trans_id" => $game_trans,
-            "provider_trans_id" => $provider_trans_id,
-            "round_id" => $provider_round_id,
-            "amount" => $provider_bet_amount,
-            "game_transaction_type"=> 1,
-            "provider_request" =>json_encode($request),
-        );
-        $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         try{
             // Helper::saveLog("AmuseGaming Withdraw Transactions Recieved", $this->provider_db_id, json_encode($provider_bet_amount), json_decode($provider_bet_amount));
             $client_response = ClientRequestHelper::fundTransfer($client_details, $provider_bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
+            $gameTransactionData = array(
+                "provider_trans_id" => $provider_trans_id,
+                "token_id" => $player_tokenID,
+                "game_id" => $game_details->game_id,
+                "round_id" => $provider_round_id,
+                "bet_amount" => $provider_bet_amount,
+                "win" => 5,
+                "pay_amount" => 0,
+                "income" => 0,
+                "entry_id" =>1,
+                "trans_status" =>1,
+            );
+           GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans,$client_details);
+            $gameTransactionEXTData = array(
+                "game_trans_id" => $game_trans,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $provider_round_id,
+                "amount" => $provider_bet_amount,
+                "game_transaction_type"=> 1,
+                // "provider_request" =>json_encode($request),
+            );
+           GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
             if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
                 $array_data = array(
@@ -204,14 +206,17 @@ class AmuseGamingController extends Controller
                     "balance" => $client_details->balance
                 );
                 $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
-                $update_gametransactionext = array(
-                    "mw_response" =>json_encode($response),
-                    "mw_request"=>json_encode($client_response->requestoclient),
-                    "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("success"),
-                    "general_details" =>json_encode("success"),
-                );
-                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($client_response->requestoclient),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $save_bal = DB::table("player_session_tokens")->where("token_id","=",$player_tokenID)->update(["balance" => $client_response->fundtransferresponse->balance]);
                 Helper::saveLog("AmuseGaming Withdraw Transactions Success", $this->provider_db_id, json_encode($response), "RESPONSE");
                 return $response;
@@ -221,13 +226,17 @@ class AmuseGamingController extends Controller
                     "status" => "INSUFFICIENT_BALANCE"
                 );
                 $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
-                $update_gametransactionext = array(
-                    "mw_response" =>json_encode($response),
-                    "mw_request"=>json_encode($client_response->requestoclient),
-                    "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("402"),
-                );
-                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($client_response->requestoclient),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "Failed",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $updateGameTransaction = [
                     "win" => 2,
                     'trans_status' => 5
@@ -242,13 +251,17 @@ class AmuseGamingController extends Controller
                     "status" => "INSUFFICIENT_BALANCE"
                 );
                 $response =  AmuseGamingHelper::arrayToXml($array_data,"<Response/>");
-                $update_gametransactionext = array(
-                    "mw_response" =>json_encode($response),
-                    "mw_request"=>json_encode($client_response->requestoclient),
-                    "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("402"),
-                );
-                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($client_response->requestoclient),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "Failed",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $updateGameTransaction = [
                     "win" => 2,
                     'trans_status' => 5
@@ -277,6 +290,17 @@ class AmuseGamingController extends Controller
                 "general_details" =>json_encode("FAILED")
             );
             GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_transextension,
+                    "request" => json_encode("Failed"),
+                    "response" => json_encode($msg),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "Failed",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             $updateGameTransaction = [
                 "win" => 2,
                 'trans_status' => 5
@@ -287,6 +311,8 @@ class AmuseGamingController extends Controller
             // return response($response,200)
             //         ->header('Content-Type', 'application/xml');
         }
+
+
     }
 
     public function credit($request,$freespin=false){
@@ -313,6 +339,7 @@ class AmuseGamingController extends Controller
         $provider_trans_id = json_decode($request->TransactionId);
         $provider_game_code = json_decode($request->GameId);
         $provider_game_brand = $request->GameBrand;
+        $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->connection_name, 2);
         $checkTrans = GameTransactionMDB::findGameTransactionDetails($provider_round_id,'round_id',false,$client_details);
         Helper::saveLog("AmuseGaming Deposit Transactions findGameTransactionDetails", $this->provider_db_id, json_encode($checkTrans), "bet details");
         if($freespin == false){
@@ -349,16 +376,27 @@ class AmuseGamingController extends Controller
             "round_id" => $provider_round_id,
             "amount" => $provider_win_amount,
             "game_transaction_type"=> 2,
-            "provider_request" => json_encode($request),
-            "mw_response" => json_encode($response)
+            // "provider_request" => json_encode($request),
+            // "mw_response" => json_encode($response)
         );
-        $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+      GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
+      $createGameTransactionLog = [
+        "connection_name" => $client_details->connection_name,
+        "column" =>[
+            "game_trans_ext_id" => $game_trans_ext_v2,
+            "request" => json_encode($request),
+            "response" => json_encode($response),
+            "log_type" => "provider_details",
+            "transaction_detail" => "success",
+         ]
+    ];
+     ProviderHelper::queTransactionLogs($createGameTransactionLog);
         try{
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'AmuseGaming',
-                    "game_transaction_ext_id" => $game_trans_ext_v2,
+                    "game_trans_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [

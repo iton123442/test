@@ -475,7 +475,7 @@ class PragmaticPLayController extends Controller
                 "error" => 0,
                 "description" => "Success",
             );
-            AWSHelper::saveLog('TPP result ext not found', $this->provider_id, json_encode($data), $response);
+            AWSHelper::saveLog('TPP result ext not found', $this->provider_id, json_encode($data), $response_log);
             return $response_log;
         }
         
@@ -513,7 +513,7 @@ class PragmaticPLayController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'tpp',
-                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "game_transaction_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
@@ -624,7 +624,7 @@ class PragmaticPLayController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'tpp',
-                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "game_transaction_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
@@ -778,7 +778,7 @@ class PragmaticPLayController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'tpp',
-                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "game_transaction_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [

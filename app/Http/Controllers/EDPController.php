@@ -191,6 +191,8 @@ class EDPController extends Controller
             }
             if($client_details){
                 // $game_transaction = Helper::checkGameTransaction($request->id);
+                $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+                $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $game_transaction = GameTransactionMDB::checkGameTransactionExist($request->id,false,false,$client_details);
                 $bet_amount = $game_transaction ? 0 : $request->amount;
                 $bet_amount = $bet_amount < 0 ? 0 :$bet_amount;
@@ -206,11 +208,24 @@ class EDPController extends Controller
                 // $checkrefundid = Helper::checkGameTransaction($request->id,$request->gameId,3);
                 $checkrefundid = GameTransactionMDB::checkGameTransactionExist($request->id,$round_id,3,$client_details);
                 if($game == null && $checkrefundid == false){
-                    if($request->has('bonusId')){
-                        $gametransactionid=$this->createGameTransaction('debit', $json_data, $game_details, $client_details, $is_freespin=1);
-                    }else{
-                        $gametransactionid=$this->createGameTransaction('debit', $json_data, $game_details, $client_details);
-                    } 
+                    // if($request->has('bonusId')){
+                    //     $gametransactionid=$this->createGameTransaction('debit', $json_data, $game_details, $client_details, $is_freespin=1);
+                    // }else{
+                    //     $gametransactionid=$this->createGameTransaction('debit', $json_data, $game_details, $client_details);
+                    // } 
+                    $gameTransactionData = array(
+                          "provider_trans_id" => $request->id,
+                          "token_id" => $client_details->token_id,
+                          "game_id" => $game_details->game_id,
+                          "round_id" => $round_id,
+                          "bet_amount" => $request->amount / 1000,
+                          "win" => 5,
+                          "pay_amount" => 0,
+                          "income" => 0,
+                          "entry_id" => 1,
+                      );
+                     GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+                     $gametransactionid = $gen_game_trans_id;
                 }
                 elseif($checkrefundid != false){
                     $gametransactionid = 0;
@@ -218,7 +233,8 @@ class EDPController extends Controller
                 else{
                     $gametransactionid = $game->game_trans_id;
                 }
-                $transactionId=$this->createGameTransactionExt($gametransactionid,$request,null,null,null,1,$client_details);
+                // $transactionId=$this->createGameTransactionExt($gametransactionid,$request,null,null,null,1,$client_details);
+                $transactionId = $gen_game_extid;
                 $sendtoclient =  microtime(true);
                 if($request->has('bonusId')){
                     $client_response = ClientRequestHelper::fundTransfer($client_details,number_format(0  ,2, '.', ''),$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit");
@@ -256,7 +272,16 @@ class EDPController extends Controller
                             "balance"=>round($client_response->fundtransferresponse->balance * 1000,2)
                         );
                     }
-                    $this->updateGameTransactionExt($transactionId,$client_response->requestoclient,$sessions,$client_response,null,$client_details);
+                    $gameTransactionEXTData = array(
+                          "game_trans_id" => $gen_game_trans_id,
+                          "provider_trans_id" => $request->id,
+                          "round_id" => $round_id,
+                          "amount" => $bet_amount/1000,
+                          "game_transaction_type"=> 1,
+                          // "provider_request" =>json_encode($req),
+                      );
+                     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$transactionId,$client_details); //create extension
+                    // $this->updateGameTransactionExt($transactionId,$client_response->requestoclient,$sessions,$client_response,null,$client_details);
                     Helper::saveLog('responseTime(EDP)', 12, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
                     return response($sessions,200)
                         ->header('Content-Type', 'application/json');

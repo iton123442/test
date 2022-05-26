@@ -705,9 +705,9 @@ $app->post('/public/api/dragongaming/refund', 'DragonGamingController@rollbackTr
 
 
 // PlayTech
-$app->post('/public/api/playtech/auth', 'PlayTechController@auth');
-$app->post('/public/api/playtech/balance', 'PlayTechController@getBalance');
-$app->post('/public/api/playtech/transaction', 'PlayTechController@transaction');
+$app->post('/public/api/playtech/auth', 'PlaytechControllerNew@auth');
+$app->post('/public/api/playtech/balance', 'PlaytechControllerNew@getBalance');
+$app->post('/public/api/playtech/transaction', 'PlaytechControllerNew@transaction');
 // FunkyGames
 $app->post('/public/FunkyGames/GetGameList', 'FunkyGamesController@gameList');
 $app->post('/public/Funky/User/GetBalance','FunkyGamesController@GetBalance');
@@ -717,10 +717,10 @@ $app->post('/public/Funky/Bet/SettleBet','FunkyGamesController@SettleBet');
 $app->post('/public/Funky/Bet/CancelBet','FunkyGamesController@CancelBet');
 
 // Amuse Gaming
-$app->post('/public/GetPlayerBalance', 'AmuseGamingController@GetPlayerBalance');
-$app->post('/public/WithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDeposit');
-$app->post('/public/Cancel', 'AmuseGamingController@Cancel');
-$app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGamelist');
+$app->post('/public/GetPlayerBalance', 'AmuseGamingNew@GetPlayerBalance');
+$app->post('/public/WithdrawAndDeposit', 'AmuseGamingNew@WithdrawAndDeposit');
+$app->post('/public/Cancel', 'AmuseGamingNew@Cancel');
+$app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingNew@getGamelist');
 //FREGAME OR FREEROUND BY PROVIDER
 $app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
 $app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
@@ -785,6 +785,27 @@ $app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult'
 $app->post('/public/endwager/test','YGG002Controller@endwager');
 $app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
 $app->post('/public/getbalance/test','YGG002Controller@getbalance');
+
+// Yggdrasil NEWLOW
+// $app->get('/public/playerinfo.json','YGG002ControllerNEW@playerinfo');
+// $app->get('/public/wager.json','YGG002ControllerNEW@wager');
+// $app->get('/public/cancelwager.json','YGG002ControllerNEW@cancelwager');
+// $app->get('/public/appendwagerresult.json','YGG002ControllerNEW@appendwagerresult');
+// $app->get('/public/endwager.json','YGG002ControllerNEW@endwager');
+// $app->get('/public/campaignpayout.json','YGG002ControllerNEW@campaignpayout');
+// $app->get('/public/getbalance.json','YGG002ControllerNEW@getbalance');
+// // ygg local NEWFLOW
+// $app->post('/public/playerinfo/test','YGG002ControllerNEW@playerinfo');
+// $app->post('/public/wager/test','YGG002ControllerNEW@wager');
+// $app->post('/public/cancelwager/test','YGG002ControllerNEW@cancelwager');
+// $app->post('/public/appendwagerresult/test','YGG002ControllerNEW@appendwagerresult');
+// $app->post('/public/endwager/test','YGG002ControllerNEW@endwager');
+// $app->post('/public/campaignpayout/test','YGG002ControllerNEW@campaignpayout');
+// $app->post('/public/getbalance/test','YGG002ControllerNEW@getbalance');
+
 //BOTA
-$app->post('/public/api/bota', 'BOTAController@index');
+// $app->post('/public/api/bota', 'BOTAController@index');
+// $app->post('/public/api/bota/callbackBalance', 'BOTAControllerNEW@index');
 $app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
+//DOWINN
+// $app->post('/public/api/dowinn', 'DOWINNController@index');
