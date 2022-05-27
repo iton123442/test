@@ -678,20 +678,28 @@ return [
         'prefix' => "TGTW",
         'type' => "staging",// [production, staging]
         "agent" => [
-            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
+            // "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
             "DSPAA" => "b972d12c42bd31d56fd1bd5cc", // testing Staging and production USD
-            "9" => [
-                "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA JPY
-                "122" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
+            "37" => [
+                "211" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
+                // "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA JPY
+                // "122" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
+            ],
+            "1" => [
+                // "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA JPY
+                "92" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
             ],
         ],
+        //pulling data
         "keys" => [
             "b972d12c42bd31d56fd1bd5cc", // testing Staging and production USD
-            "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
+            // "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
             // "5e2c5dc120e4ae6aeeae4000e", 
             // "3457bde6440cb38837da65b3c", 
             // "b391abaf172c2dbc1046965c8"
         ],
+        "b972d12c42bd31d56fd1bd5cc" => [211,92], //ga suppor aning mga client pag pull ni sa data 
+
    ],  
    'funkygames' => [
         'provider_db_id'=> 63,
