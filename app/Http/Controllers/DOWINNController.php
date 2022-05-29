@@ -31,8 +31,8 @@ class DOWINNController extends Controller{
     public function index(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('DOWINN Auth INDEX', 139, json_encode($data), 'INDEX HIT!');
-        $originalPlayerID = explode('_', $data["user"]);
-        $client_details = ProviderHelper::getClientDetails('player_id', $originalPlayerID[1]);
+        // $originalPlayerID = explode('_', $data["user"]);
+        $client_details = ProviderHelper::getClientDetails('token', $data[token]);
         if($client_details){
             $msg = array(
                 "status" =>'OK',

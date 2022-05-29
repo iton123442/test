@@ -30,6 +30,7 @@ class DOWINNHelper{
         $response = $client->post(config('providerlinks.dowinn.api_url').'/login.do',
         ['form_params' => $dataToSend,]);
         $response = json_decode($response->getBody(),TRUE);
+        Helper::saveLog('DOWINN Auth INDEX', 139, json_encode($response), 'LOGIN HIT!');
         return($response);
     }
 
