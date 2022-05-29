@@ -337,7 +337,7 @@ class PGSoftNewFController extends Controller
             );
             // GameTransactionMDB
             // $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-            GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transaction_id,$client_details); //create game_transaction
+            GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details); //create game_transaction
 
             $gameTransactionEXTData = array(
                 "game_trans_id" => $game_trans_id,
