@@ -756,6 +756,13 @@ return [
         'provider_db_id' => 135,
         'gamelaunch_url' => 'https://seam.go-65.com/token/',
     ],
+    'dowinn' =>[
+        'api_url' => 'https://t-agent.sbet56789.com/cash',
+        'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
+        'user_agent' => 'kapi0006',
+        'prefix' => 'TG',
+        'provider_db_id' => 139,
+    ],
 ];
 
 ?>
