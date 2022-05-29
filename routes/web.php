@@ -353,6 +353,11 @@ $app->post('/public/api/pgsoft/VerifySession', 'PGSoftController@verifySession')
 $app->post('/public/api/pgsoft/Cash/Get', 'PGSoftController@cashGet');
 $app->post('/public/api/pgsoft/Cash/TransferOut', 'PGSoftController@transferOut');
 $app->post('/public/api/pgsoft/Cash/TransferIn', 'PGSoftController@transferIn');
+// PGSoft new flow
+$app->post('/public/api/pgsoft/VerifySession', 'PGSoftNewFController@verifySession');
+$app->post('/public/api/pgsoft/Cash/Get', 'PGSoftNewFController@cashGet');
+$app->post('/public/api/pgsoft/Cash/TransferOut', 'PGSoftNewFController@transferOut');
+$app->post('/public/api/pgsoft/Cash/TransferIn', 'PGSoftNewFController@transferIn');
 
 //Booming Games
 $app->post('/public/api/booming/gamelist','BoomingGamingController@gameList');
