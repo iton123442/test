@@ -12,7 +12,7 @@ use App\Models\GameTransactionMDB;
 use Carbon\Carbon;
 use DB;
 
-class PGSoftController extends Controller
+class PGSoftNewFController extends Controller
 {
     //
     public $provider_db_id = 31;
