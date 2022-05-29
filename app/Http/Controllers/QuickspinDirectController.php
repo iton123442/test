@@ -248,7 +248,7 @@ class QuickspinDirectController extends Controller
             ];
             return $res;
         }
-        $formatBal = $balance = str_replace(".","", $client_details->balance);
+        $formatBal = str_replace(".","", $client_details->balance);
         $formattedBal = (int) $formatBal;
         $trans_type = $req['txtype'];//transaction type wether its free spin or normal
         try {
@@ -273,7 +273,7 @@ class QuickspinDirectController extends Controller
         
         $game_details = Game::find($game_code, config('providerlinks.quickspinDirect.provider_db_id'));
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
-        $winBalance = $formattedBal + $pay_amount;
+        $winBalance = $formattedBal + $req['amount'];
         $win_or_lost = $pay_amount > 0 ?  1 : 0;
         $entry_id = $pay_amount > 0 ?  2 : 1;
 

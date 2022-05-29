@@ -321,8 +321,8 @@ public function CreditProcess($req){
         return $res;
     }
     $game_details = Game::find($game_code, $this->provider_db_id);
-    // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
-    $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
+    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
+    // $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
     $winBalance = $client_details->balance + $pay_amount;
     $win_or_lost = $pay_amount > 0 ?  1 : 0;
     $entry_id = $pay_amount > 0 ?  2 : 1;
@@ -355,10 +355,9 @@ public function CreditProcess($req){
         );
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid2,$client_details);
-        if(isset($data['AdditionalData']['BonusId'])){
+    if(isset($data['AdditionalData']['BonusId'])){
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
-        // $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);// not generated game trans id ext
-        $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);//generated game trans id ext
+        $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);// not generated game trans id ext
             if($getFreespin){
                 //update transaction
                 $status = 2;
@@ -409,17 +408,17 @@ public function CreditProcess($req){
                    //  );
                    // Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                // $createGameTransactionLog = [
-                //           "connection_name" => $client_details->connection_name,
-                //           "column" =>[
-                //               "game_trans_ext_id" => $gen_game_extid,
-                //               "request" => json_encode($data),
-                //               "response" => json_encode($msg),
-                //               "log_type" => "provider_details",
-                //               "transaction_detail" => "success",
-                //           ]
-                //       ];
-                // ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $gen_game_extid2,
+                              "request" => json_encode($data),
+                              "response" => json_encode($msg),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "success",
+                          ]
+                      ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 break;
           }
       }
@@ -450,7 +449,7 @@ public function CreditProcess($req){
     // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
     GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction_id, $client_details);
     $gameTransactionEXTData = array(
-              "game_trans_id" => json_encode($game_transaction_id),
+              "game_trans_id" => $game_transaction_id,
               "provider_trans_id" => $provider_trans_id,
               "round_id" => $round_id,
               "amount" => $pay_amount,
@@ -473,7 +472,7 @@ public function CreditProcess($req){
               "game_transaction_ext_id" => $gen_game_extid
           ],
           "provider" => [
-              "provider_request" => json_encode($req), #R
+              "provider_request" => json_encode($data), #R
               "provider_trans_id"=> $provider_trans_id, #R
               "provider_round_id"=> $round_id, #R
           ],
