@@ -267,7 +267,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $bet_amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -549,7 +552,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $total_amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -569,7 +575,10 @@ class CQ9NEWController extends Controller
 			//     $mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
 			// 	// ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $mw_response, 'FAILED', $e->getMessage(), 'FAILED', 'FAILED');
 			// 	$updateTransactionEXt = array(
+<<<<<<< HEAD
 			// 		"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			// 		"mw_response" => json_encode($mw_response),
 			// 		'client_response' => $e->getMessage().' '.$e->getLine().' '.$e->getFile(),
 			// 		'transaction_detail' => 'FAILED',
@@ -834,7 +843,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $amount,
 				"game_transaction_type"=> 3,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -1097,7 +1109,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $amount,
 				"game_transaction_type"=> 3,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -1357,7 +1372,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $bet_amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -1606,7 +1624,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -1870,7 +1891,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -2140,7 +2164,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => 0,
 				"game_transaction_type"=> 1,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 			$round_tracer = [
@@ -2184,7 +2211,10 @@ class CQ9NEWController extends Controller
 					"round_id" => $roundid,
 					"amount" => $amount,
 					"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 					"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 				);
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension2,$client_details);
 
@@ -2450,7 +2480,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $roundid,
 				"amount" => $bet_amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -2519,7 +2552,10 @@ class CQ9NEWController extends Controller
 					"round_id" => $roundid,
 					"amount" => $amount,
 					"game_transaction_type"=> 2,
+<<<<<<< HEAD
 					"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 				);
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension_credit,$client_details);
 
@@ -2718,7 +2754,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $provider_trans_id,
 				"amount" => $amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request)
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 			$round_tracer = [
@@ -3158,7 +3197,10 @@ class CQ9NEWController extends Controller
 					"round_id" => $roundid,
 					"amount" => $data->amount,
 					"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 					"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 				);
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 
@@ -3528,7 +3570,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $provider_trans_id,
 				"amount" => $amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 	 	    array_push($gametrans_ext_bag_id, $game_transextension); // # MULTI EVENT
@@ -3952,7 +3997,10 @@ class CQ9NEWController extends Controller
 				"round_id" => $provider_trans_id,
 				"amount" => $amount,
 				"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 				"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 			);
 			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 	 	    // $game_transextension = ProviderHelper::createGameTransExtV2($find_mtcode->game_trans_id,$provider_trans_id, $provider_trans_id, $amount, $game_transaction_type);
@@ -4349,7 +4397,10 @@ class CQ9NEWController extends Controller
 							"round_id" => $roundid,
 							"amount" => $amount,
 							"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 							"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 						);
 						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 						$round_tracer = [
@@ -4722,7 +4773,10 @@ class CQ9NEWController extends Controller
 							"round_id" => $roundid,
 							"amount" => $amount,
 							"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 							"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 						);
 						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 						$round_tracer = [
@@ -5141,7 +5195,10 @@ class CQ9NEWController extends Controller
 					"round_id" => $roundid,
 					"amount" => $amount,
 					"game_transaction_type"=> $game_transaction_type,
+<<<<<<< HEAD
 					"provider_request" =>json_encode($provider_request),
+=======
+>>>>>>> d38ef77cd173062ca3da49633371dcc19daea666
 				);
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 				$round_tracer = [
