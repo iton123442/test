@@ -345,7 +345,7 @@ class PGSoftNewFController extends Controller
                 "round_id" => $data["parent_bet_id"],
                 "amount" => $bet_amount,
                 "game_transaction_type"=> $game_transaction_type,
-                "provider_request" =>json_encode($data),
+                // "provider_request" =>json_encode($data),
                 );
             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
             GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
