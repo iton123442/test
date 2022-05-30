@@ -179,10 +179,10 @@ $app->post('/public/api/ia/searchorder', 'IAESportsController@seamlessSearchOrde
 $app->post('/public/api/ia/debugg', 'IAESportsController@userlaunch');
 $app->post('/public/api/ia/settleround', 'IAESportsController@SettleRounds');
 // Bole Gaming Endpoints
-$app->post('/public/api/bole/register', 'BoleGamingController@playerRegister');
-$app->post('/public/api/bole/logout', 'BoleGamingController@playerLogout');
-$app->post('/public/api/bole/wallet/player/cost', 'BoleGamingController@playerWalletCost');
-$app->post('/public/api/bole/wallet/player/balance', 'BoleGamingController@playerWalletBalance');
+$app->post('/public/api/bole/register', 'BoleGamingControllerNew@playerRegister');
+$app->post('/public/api/bole/logout', 'BoleGamingControllerNew@playerLogout');
+$app->post('/public/api/bole/wallet/player/cost', 'BoleGamingControllerNew@playerWalletCost');
+$app->post('/public/api/bole/wallet/player/balance', 'BoleGamingControllerNew@playerWalletBalance');
 // AWS PROVIDER BACKOFFICE ROUTE
 $app->post('/public/api/aws/register', 'AWSController@playerRegister');
 $app->post('/public/api/aws/launchgame', 'AWSController@launchGame');
@@ -229,34 +229,64 @@ $app->post('/public/api/skywind/api/get_free_bet', 'SkyWindController@getFreeBet
 //Report API
 
 // CQ9 Gaming
-$app->post('/public/api/cq9/transaction/game/bet','CQ9Controller@playerBet'); //
-$app->post('/public/api/cq9/transaction/game/endround','CQ9Controller@playrEndround'); //
-$app->post('/public/api/cq9/transaction/game/rollout','CQ9Controller@playerRollout'); //
-$app->post('/public/api/cq9/transaction/game/takeall','CQ9Controller@playerTakeall');
-$app->post('/public/api/cq9/transaction/game/rollin','CQ9Controller@playerRollin'); //
-$app->post('/public/api/cq9/transaction/game/debit','CQ9Controller@playerDebit');
-$app->post('/public/api/cq9/transaction/game/credit','CQ9Controller@playerCredit');
-$app->post('/public/api/cq9/transaction/game/bonus','CQ9Controller@playerBonus');
-$app->post('/public/api/cq9/transaction/user/payoff','CQ9Controller@playerPayoff');
-$app->post('/public/api/cq9/transaction/game/refund','CQ9Controller@playerRefund');
-$app->get('/public/api/cq9/transaction/record/{mtcode}','CQ9Controller@playerRecord'); 
+// $app->post('/public/api/cq9/transaction/game/bet','CQ9Controller@playerBet'); //
+// $app->post('/public/api/cq9/transaction/game/endround','CQ9Controller@playrEndround'); //
+// $app->post('/public/api/cq9/transaction/game/rollout','CQ9Controller@playerRollout'); //
+// $app->post('/public/api/cq9/transaction/game/takeall','CQ9Controller@playerTakeall');
+// $app->post('/public/api/cq9/transaction/game/rollin','CQ9Controller@playerRollin'); //
+// $app->post('/public/api/cq9/transaction/game/debit','CQ9Controller@playerDebit');
+// $app->post('/public/api/cq9/transaction/game/credit','CQ9Controller@playerCredit');
+// $app->post('/public/api/cq9/transaction/game/bonus','CQ9Controller@playerBonus');
+// $app->post('/public/api/cq9/transaction/user/payoff','CQ9Controller@playerPayoff');
+// $app->post('/public/api/cq9/transaction/game/refund','CQ9Controller@playerRefund');
+// $app->get('/public/api/cq9/transaction/record/{mtcode}','CQ9Controller@playerRecord'); 
 
-$app->post('/public/api/cq9/transaction/game/bets','CQ9Controller@playerBets');
-$app->post('/public/api/cq9/transaction/game/refunds','CQ9Controller@playerRefunds');
-$app->post('/public/api/cq9/transaction/game/cancel','CQ9Controller@playerCancel');
-$app->post('/public/api/cq9/transaction/game/amend','CQ9Controller@playerAmend');
-$app->post('/public/api/cq9/transaction/game/wins','CQ9Controller@playerWins');
-$app->post('/public/api/cq9/transaction/game/amends','CQ9Controller@playerAmends');
+// $app->post('/public/api/cq9/transaction/game/bets','CQ9Controller@playerBets');
+// $app->post('/public/api/cq9/transaction/game/refunds','CQ9Controller@playerRefunds');
+// $app->post('/public/api/cq9/transaction/game/cancel','CQ9Controller@playerCancel');
+// $app->post('/public/api/cq9/transaction/game/amend','CQ9Controller@playerAmend');
+// $app->post('/public/api/cq9/transaction/game/wins','CQ9Controller@playerWins');
+// $app->post('/public/api/cq9/transaction/game/amends','CQ9Controller@playerAmends');
 
-$app->get('/public/api/cq9/transaction/balance/{account}','CQ9Controller@CheckBalance');
-$app->get('/public/api/cq9/gameboy/player/lotto/balance/{account}','CQ9Controller@CheckBalanceLotto'); // New
-$app->get('/public/api/cq9/player/check/{account}','CQ9Controller@CheckPlayer');
-$app->post('/public/api/cq9/player/check','CQ9Controller@noRouteParamPassed'); // TEST
-$app->post('/public/api/cq9/transaction/record','CQ9Controller@noRouteParamPassed');  // TEST
-$app->post('/public/api/cq9/transaction/balance','CQ9Controller@noRouteParamPassed'); // TEST
+// $app->get('/public/api/cq9/transaction/balance/{account}','CQ9Controller@CheckBalance');
+// $app->get('/public/api/cq9/gameboy/player/lotto/balance/{account}','CQ9Controller@CheckBalanceLotto'); // New
+// $app->get('/public/api/cq9/player/check/{account}','CQ9Controller@CheckPlayer');
+// $app->post('/public/api/cq9/player/check','CQ9Controller@noRouteParamPassed'); // TEST
+// $app->post('/public/api/cq9/transaction/record','CQ9Controller@noRouteParamPassed');  // TEST
+// $app->post('/public/api/cq9/transaction/balance','CQ9Controller@noRouteParamPassed'); // TEST
 
-$app->post('/public/api/cq9/mw/getlist','CQ9Controller@getGameList');
-$app->post('/public/api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
+// $app->post('/public/api/cq9/mw/getlist','CQ9Controller@getGameList');
+// $app->post('/public/api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
+//CQ9 NEWFLOW
+$app->post('/public/api/cq9/transaction/game/bet','CQ9NEWController@playerBet'); //
+$app->post('/public/api/cq9/transaction/game/endround','CQ9NEWController@playrEndround'); //
+$app->post('/public/api/cq9/transaction/game/rollout','CQ9NEWController@playerRollout'); //
+$app->post('/public/api/cq9/transaction/game/takeall','CQ9NEWController@playerTakeall');
+$app->post('/public/api/cq9/transaction/game/rollin','CQ9NEWController@playerRollin'); //
+$app->post('/public/api/cq9/transaction/game/debit','CQ9NEWController@playerDebit');
+$app->post('/public/api/cq9/transaction/game/credit','CQ9NEWController@playerCredit');
+$app->post('/public/api/cq9/transaction/game/bonus','CQ9NEWController@playerBonus');
+$app->post('/public/api/cq9/transaction/user/payoff','CQ9NEWController@playerPayoff');
+$app->post('/public/api/cq9/transaction/game/refund','CQ9NEWController@playerRefund');
+$app->get('/public/api/cq9/transaction/record/{mtcode}','CQ9NEWController@playerRecord'); 
+
+$app->post('/public/api/cq9/transaction/game/bets','CQ9NEWController@playerBets');
+$app->post('/public/api/cq9/transaction/game/refunds','CQ9NEWController@playerRefunds');
+$app->post('/public/api/cq9/transaction/game/cancel','CQ9NEWController@playerCancel');
+$app->post('/public/api/cq9/transaction/game/amend','CQ9NEWController@playerAmend');
+$app->post('/public/api/cq9/transaction/game/wins','CQ9NEWController@playerWins');
+$app->post('/public/api/cq9/transaction/game/amends','CQ9NEWController@playerAmends');
+
+$app->get('/public/api/cq9/transaction/balance/{account}','CQ9NEWController@CheckBalance');
+$app->get('/public/api/cq9/gameboy/player/lotto/balance/{account}','CQ9NEWController@CheckBalanceLotto'); // New
+$app->get('/public/api/cq9/player/check/{account}','CQ9NEWController@CheckPlayer');
+$app->post('/public/api/cq9/player/check','CQ9NEWController@noRouteParamPassed'); // TEST
+$app->post('/public/api/cq9/transaction/record','CQ9NEWController@noRouteParamPassed');  // TEST
+$app->post('/public/api/cq9/transaction/balance','CQ9NEWController@noRouteParamPassed'); // TEST
+
+$app->post('/public/api/cq9/mw/getlist','CQ9NEWController@getGameList');
+$app->post('/public/api/cq9/mw/gamelaunch','CQ9NEWController@gameLaunch');
+
 
 
 //SAGaming 
