@@ -179,10 +179,10 @@ $app->post('/public/api/ia/searchorder', 'IAESportsController@seamlessSearchOrde
 $app->post('/public/api/ia/debugg', 'IAESportsController@userlaunch');
 $app->post('/public/api/ia/settleround', 'IAESportsController@SettleRounds');
 // Bole Gaming Endpoints
-$app->post('/public/api/bole/register', 'BoleGamingControllerNew@playerRegister');
-$app->post('/public/api/bole/logout', 'BoleGamingControllerNew@playerLogout');
-$app->post('/public/api/bole/wallet/player/cost', 'BoleGamingControllerNew@playerWalletCost');
-$app->post('/public/api/bole/wallet/player/balance', 'BoleGamingControllerNew@playerWalletBalance');
+$app->post('/public/api/bole/register', 'BoleGamingController@playerRegister');
+$app->post('/public/api/bole/logout', 'BoleGamingController@playerLogout');
+$app->post('/public/api/bole/wallet/player/cost', 'BoleGamingController@playerWalletCost');
+$app->post('/public/api/bole/wallet/player/balance', 'BoleGamingController@playerWalletBalance');
 // AWS PROVIDER BACKOFFICE ROUTE
 $app->post('/public/api/aws/register', 'AWSController@playerRegister');
 $app->post('/public/api/aws/launchgame', 'AWSController@launchGame');
