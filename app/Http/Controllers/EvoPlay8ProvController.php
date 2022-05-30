@@ -652,7 +652,7 @@ class EvoPlay8ProvController extends Controller
 				                          "connection_name" => $client_details->connection_name,
 				                          "column" =>[
 				                              "game_trans_ext_id" => $game_transextension,
-				                              "request" => json_encode($msg),
+				                              "request" => json_encode($data),
 				                              "response" => json_encode($response),
 				                              "log_type" => "provider_details",
 				                              "transaction_detail" => json_encode($client_response),
