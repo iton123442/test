@@ -365,6 +365,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "success",
                     ]
                 ];
