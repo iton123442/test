@@ -349,11 +349,6 @@ class CQ9NEWController extends Controller
 		    	];
 
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -379,11 +374,6 @@ class CQ9NEWController extends Controller
 		    		"status" => ["code" => "1005","message" => 'Insufficient Balance',"datetime" => date(DATE_RFC3339)]
 		    	];
 		    	Helper::saveLog('CQ9 playerBet', $this->provider_db_id, json_encode($provider_request), $mw_response);
-
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -391,6 +381,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
@@ -399,10 +390,6 @@ class CQ9NEWController extends Controller
 			}else{ // Unknown Response Code
 
 				$mw_response = ["data" => [],"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -410,6 +397,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
@@ -663,10 +651,6 @@ class CQ9NEWController extends Controller
 				// ];
 
 				$general_details["client"]["after_balance"] = $this->amountToFloat4DG($client_details->balance)+$data->amount;
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -674,6 +658,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "success",
                     ]
                 ];
@@ -684,10 +669,6 @@ class CQ9NEWController extends Controller
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
 				Helper::saveLog('CQ9 playrEndround Failed', $this->provider_db_id, json_encode($request->all()), $mw_response);
 				$general_details["client"]["after_balance"] = $this->amountToFloat4DG($client_response->fundtransferresponse->balance);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -695,6 +676,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
@@ -945,11 +927,6 @@ class CQ9NEWController extends Controller
 				// ProviderHelper::updateGametransactionV2($game_transaction->game_trans_id, $pay_amount, $income, $win_or_lost, $entry_id);
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 				// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
-
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -957,6 +934,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "success",
                     ]
                 ];
@@ -965,10 +943,6 @@ class CQ9NEWController extends Controller
 				$general_details["client"]["after_balance"] = $this->amountToFloat4DG($client_response->fundtransferresponse->balance);
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
 				// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, 'FAILED' ,$general_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -976,6 +950,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
@@ -1180,10 +1155,6 @@ class CQ9NEWController extends Controller
 
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 		    	// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -1191,6 +1162,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
@@ -1204,16 +1176,13 @@ class CQ9NEWController extends Controller
 					"status" => ["code" => "1005","message" => 'Insufficient Balance',"datetime" => date(DATE_RFC3339)]
 				];
 				// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, 'FAILED',$general_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -1222,16 +1191,13 @@ class CQ9NEWController extends Controller
 			}else{ // Unknown Response Code
 				$general_details["client"]["after_balance"] = $this->amountToFloat4DG($client_response->fundtransferresponse->balance);
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
-				$updateTransactionEXt = array(
-					"general_details" => json_encode($general_details)
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -1431,10 +1397,6 @@ class CQ9NEWController extends Controller
 				
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 		    	// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -1442,6 +1404,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "success",
                     ]
                 ];
@@ -1456,16 +1419,13 @@ class CQ9NEWController extends Controller
 				"data" => null,
 					"status" => ["code" => "1005","message" => 'Insufficient Balance',"datetime" => date(DATE_RFC3339)]
 				];
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -1477,16 +1437,13 @@ class CQ9NEWController extends Controller
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
 				$updateGameTransaction = ["win" => 2];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -1681,16 +1638,13 @@ class CQ9NEWController extends Controller
 
 			ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 			// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
-			$updateTransactionEXt = array(
-				'general_details' => json_encode($general_details),
-			);
-			GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
             $createGameTransactionLog = [
                 "connection_name" => $client_details->connection_name,
                 "column" =>[
                     "game_trans_ext_id" => $game_transextension,
                     "request" => json_encode($provider_request),
                     "response" => json_encode($mw_response),
+                    "general_details" => json_encode($general_details),
                     "log_type" => "provider_details",
                     "transaction_detail" => "success",
                 ]
@@ -1708,10 +1662,6 @@ class CQ9NEWController extends Controller
 				
 				$updateGameTransaction = ["win" => 2];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -1719,6 +1669,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
@@ -1730,16 +1681,13 @@ class CQ9NEWController extends Controller
 				// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, 'FAILED',$general_details);
 				$updateGameTransaction = ["win" => 2];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -1965,11 +1913,6 @@ class CQ9NEWController extends Controller
 		    		],
 		    		"status" => ["code" => "0","message" => 'Success',"datetime" => date(DATE_RFC3339)]
 		    	];
-			
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details)
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -1977,6 +1920,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "success",
                     ]
                 ];
@@ -1989,16 +1933,13 @@ class CQ9NEWController extends Controller
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
 				$updateGameTransaction = ["win" => 2];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_ext_check->game_trans_id, $client_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -2267,32 +2208,26 @@ class CQ9NEWController extends Controller
 			    	// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
 
 					// First EXT Here
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension1,$client_details);
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension1,
                             "request" => json_encode($provider_request),
                             "response" => json_encode($mw_response),
+                            "general_details" => json_encode($general_details),
                             "log_type" => "provider_details",
                             "transaction_detail" => "success",
                         ]
                     ];
                     ProviderHelper::queTransactionLogs($createGameTransactionLog);
 					// 2nd Ext
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension2,$client_details);
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension2,
                             "request" => json_encode($provider_request),
                             "response" => json_encode($mw_response),
+                            "general_details" => json_encode($general_details),
                             "log_type" => "provider_details",
                             "transaction_detail" => "success",
                         ]
@@ -2306,10 +2241,6 @@ class CQ9NEWController extends Controller
 				ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 6);
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
 				// ProviderHelper::updatecreateGameTransExt($game_transextension1, $provider_request, $mw_response, $client_response->requestoclient, $client_response, 'FAILED',$general_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details)
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension1,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -2317,6 +2248,7 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
@@ -2571,30 +2503,24 @@ class CQ9NEWController extends Controller
 						// ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 						// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
 						// ProviderHelper::updatecreateGameTransExt($game_transextension1, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
-						$updateTransactionEXt = array(
-							'general_details' => json_encode($general_details),
-						);
-						GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                         $createGameTransactionLog = [
                             "connection_name" => $client_details->connection_name,
                             "column" =>[
                                 "game_trans_ext_id" => $game_transextension,
                                 "request" => json_encode($provider_request),
                                 "response" => json_encode($mw_response),
+                                "general_details" => json_encode($general_details),
                                 "log_type" => "provider_details",
                                 "transaction_detail" => "success",
                             ]
                         ];
                         ProviderHelper::queTransactionLogs($createGameTransactionLog);
-						$updateTransactionEXt1 = array(
-							'general_details' => json_encode($general_details),
-						);
-						GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt1,$game_transextension_credit,$client_details);
                         $createGameTransactionLog = [
                             "connection_name" => $client_details->connection_name,
                             "column" =>[
                                 "game_trans_ext_id" => $game_transextension_credit,
                                 "request" => json_encode($provider_request),
+                                "general_details" => json_encode($general_details),
                                 "response" => json_encode($mw_response),
                                 "log_type" => "provider_details",
                                 "transaction_detail" => "failed",
@@ -2609,16 +2535,13 @@ class CQ9NEWController extends Controller
 				$updateGameTransaction = ["win" => 2];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -2774,10 +2697,6 @@ class CQ9NEWController extends Controller
 					"entry_id" => $entry_id
 				];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction->game_trans_id, $client_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details)
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
@@ -2785,20 +2704,18 @@ class CQ9NEWController extends Controller
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
                         "log_type" => "provider_details",
+                        "general_details" => json_encode($general_details),
                         "transaction_detail" => "failed",
                     ]
                 ];
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
-				$updateTransactionEXt2 = array(
-					'general_details' => json_encode($general_details_bag)
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt2,$find_mtcode->game_trans_ext_id,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $find_mtcode->game_trans_ext_id,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -2811,16 +2728,13 @@ class CQ9NEWController extends Controller
 				"data" => null,
 					"status" => ["code" => "1005","message" => 'Insufficient Balance',"datetime" => date(DATE_RFC3339)]
 				];
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -2828,16 +2742,13 @@ class CQ9NEWController extends Controller
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
 			}else{ // Unknown Response Code
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -3243,15 +3154,12 @@ class CQ9NEWController extends Controller
 					
 					ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 			 	    // ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, $mw_response,$general_details);
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension,
                             "request" => json_encode($provider_request),
+                            "general_details" => json_encode($general_details),
                             "response" => json_encode($mw_response),
                             "log_type" => "provider_details",
                             "transaction_detail" => "success",
@@ -3270,16 +3178,13 @@ class CQ9NEWController extends Controller
 
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension,
                             "request" => json_encode($provider_request),
                             "response" => json_encode($mw_response),
+                            "general_details" => json_encode($general_details),
                             "log_type" => "provider_details",
                             "transaction_detail" => "failed",
                         ]
@@ -3295,14 +3200,11 @@ class CQ9NEWController extends Controller
 					$general_details["client"]["after_balance"] = $this->amountToFloat4DG($client_response->fundtransferresponse->balance);
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension,
+                            "general_details" => json_encode($general_details),
                             "request" => json_encode($provider_request),
                             "response" => json_encode($mw_response),
                             "log_type" => "provider_details",
@@ -3663,16 +3565,13 @@ class CQ9NEWController extends Controller
 					"entry_id" => $entry_id,
 				];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction->game_trans_id, $client_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "success",
                     ]
@@ -3690,16 +3589,13 @@ class CQ9NEWController extends Controller
 				$mw_response = [
 		    		"data" => null,"status" => ["code" => "1005","message" => 'Insufficient Balance',"datetime" => date(DATE_RFC3339)]
 		    	];
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -4028,10 +3924,18 @@ class CQ9NEWController extends Controller
 				$general_details_bag->client->before_balance = $this->amountToFloat4DG($client_details->balance);
 			    $general_details_bag->client->after_balance = $this->amountToFloat4DG($client_response->fundtransferresponse->balance);
 				// $this->updatecreateGameTransExtGD($find_mtcode->game_trans_ext_id, $general_details_bag);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details_bag)
-				);
-		    	GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$find_mtcode->game_trans_ext_id,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $find_mtcode->game_trans_ext_id,
+                        "request" => json_encode($provider_request),
+                        "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "success",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
 	  	    	// $general_details = [
 	  	    	// 	"multi_event" => true,
@@ -4084,16 +3988,13 @@ class CQ9NEWController extends Controller
 					"entry_id" => $entry_id,
 				];
 				GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction->game_trans_id, $client_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "success",
                     ]
@@ -4108,16 +4009,13 @@ class CQ9NEWController extends Controller
 		    		"data" => null,"status" => ["code" => "1005","message" => 'Insufficient Balance',"datetime" => date(DATE_RFC3339)]
 		    	];
 		    	// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, 'FAILED' ,$general_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -4128,16 +4026,13 @@ class CQ9NEWController extends Controller
 				$general_details["client"]["after_balance"] = $this->amountToFloat4DG($client_response->fundtransferresponse->balance);
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
 				// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, 'FAILED' ,$general_details);
-				$updateTransactionEXt = array(
-					'general_details' => json_encode($general_details),
-				);
-				GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                 $createGameTransactionLog = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($provider_request),
                         "response" => json_encode($mw_response),
+                        "general_details" => json_encode($general_details),
                         "log_type" => "provider_details",
                         "transaction_detail" => "failed",
                     ]
@@ -4468,16 +4363,13 @@ class CQ9NEWController extends Controller
 								"entry_id" => $entry_id,
 							];
 							GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction->game_trans_id, $client_details);
-							$updateTransactionEXt = array(
-								'general_details' => json_encode($general_details),
-							);
-							GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                             $createGameTransactionLog = [
                                 "connection_name" => $client_details->connection_name,
                                 "column" =>[
                                     "game_trans_ext_id" => $game_transextension,
                                     "request" => json_encode($provider_request),
                                     "response" => json_encode($mw_response),
+                                    "general_details" => json_encode($general_details),
                                     "log_type" => "provider_details",
                                     "transaction_detail" => "success",
                                 ]
@@ -4489,16 +4381,13 @@ class CQ9NEWController extends Controller
 
 						}else{ // Unknown Response Code
 							$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
-							$updateTransactionEXt = array(
-								'general_details' => json_encode($general_details),
-							);
-							GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                             $createGameTransactionLog = [
                                 "connection_name" => $client_details->connection_name,
                                 "column" =>[
                                     "game_trans_ext_id" => $game_transextension,
                                     "request" => json_encode($provider_request),
                                     "response" => json_encode($mw_response),
+                                    "general_details" => json_encode($general_details),
                                     "log_type" => "provider_details",
                                     "transaction_detail" => "failed",
                                 ]
@@ -4833,10 +4722,6 @@ class CQ9NEWController extends Controller
 								"entry_id" => $entry_id,
 							];
 							GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction->game_trans_id, $client_details);
-							$updateTransactionEXt = array(
-								'general_details' => json_encode($general_details),
-							);
-							GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
 							$success = ["account" => $account,"balance" =>$this->amountToFloat4DG($client_response->fundtransferresponse->balance),"currency" => $client_details->default_currency,"ucode" => $ucode];
 						    array_push($success_item[$i], $success);
                             $createGameTransactionLog = [
@@ -4845,6 +4730,7 @@ class CQ9NEWController extends Controller
                                     "game_trans_ext_id" => $game_transextension,
                                     "request" => json_encode($provider_request),
                                     "response" => json_encode($success),
+                                    "general_details" => json_encode($general_details),
                                     "log_type" => "provider_details",
                                     "transaction_detail" => "success",
                                 ]
@@ -4858,10 +4744,6 @@ class CQ9NEWController extends Controller
 							$failed = ["account" => $account,"code" =>"1005","message" =>"Insufficient Balance","ucode" => $ucode];
 			    			array_push($response['data']['failed'], $failed);
 							// ProviderHelper::updatecreateGameTransExt($game_transextension, $provider_request, $mw_response, $client_response->requestoclient, $client_response, 'FAILED',$general_details);
-							$updateTransactionEXt = array(
-								'general_details' => json_encode($general_details),
-							);
-							GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                             
                             $createGameTransactionLog = [
                                 "connection_name" => $client_details->connection_name,
@@ -4870,6 +4752,7 @@ class CQ9NEWController extends Controller
                                     "request" => json_encode($provider_request),
                                     "response" => json_encode($failed),
                                     "log_type" => "provider_details",
+                                    "general_details" => json_encode($general_details),
                                     "transaction_detail" => "failed",
                                 ]
                             ];
@@ -5258,16 +5141,13 @@ class CQ9NEWController extends Controller
 						"entry_id" => $entry_id,
 					];
 					GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction->game_trans_id, $client_details);
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension,
                             "request" => json_encode($provider_request),
                             "response" => json_encode($mw_response),
+                            "general_details" => json_encode($general_details),
                             "log_type" => "provider_details",
                             "transaction_detail" => "failed",
                         ]
@@ -5282,10 +5162,6 @@ class CQ9NEWController extends Controller
 					"data" => null,
 						"status" => ["code" => "1005","message" => 'Insufficient Balance',"datetime" => date(DATE_RFC3339)]
 					];
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
@@ -5293,6 +5169,7 @@ class CQ9NEWController extends Controller
                             "request" => json_encode($provider_request),
                             "response" => json_encode($mw_response),
                             "log_type" => "provider_details",
+                            "general_details" => json_encode($general_details),
                             "transaction_detail" => "failed",
                         ]
                     ];
@@ -5301,16 +5178,13 @@ class CQ9NEWController extends Controller
 
 				}else{ // Unknown Response Code
 					$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
-					$updateTransactionEXt = array(
-						'general_details' => json_encode($general_details),
-					);
-					GameTransactionMDB::updateGametransactionEXTV2($updateTransactionEXt,$game_transextension,$client_details);	
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension,
                             "request" => json_encode($provider_request),
                             "response" => json_encode($mw_response),
+                            "general_details" => json_encode($general_details),
                             "log_type" => "provider_details",
                             "transaction_detail" => "failed",
                         ]
