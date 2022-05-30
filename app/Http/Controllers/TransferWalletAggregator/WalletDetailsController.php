@@ -487,7 +487,7 @@ class WalletDetailsController extends Controller
                 }
 
                 $data = array();//this is to add data and reformat the $table object to datatables standard array
-                if($client_details->operator_id == 11){
+                if($client_details->operator_id == 11 || $client_details->operator_id == 37 ){
                     foreach($details as $datas){
                         $datatopass['game_trans_id']=$datas->game_trans_id;
                         $datatopass['client_name']=$datas->client_name;
