@@ -648,6 +648,17 @@ class EvoPlay8ProvController extends Controller
 											'currency' => $client_details->default_currency,
 										],
 									);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($msg),
+				                              "response" => json_encode($response),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => json_encode($client_response),
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									# ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response);
 								}else{
 									$response = array(
