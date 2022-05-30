@@ -456,7 +456,7 @@ class EvoPlay8ProvController extends Controller
 									"round_id" => $round_id,
 									"amount" => $data['data']['amount'],
 									"game_transaction_type"=> $method,
-									"provider_request" =>json_encode($data),
+									// "provider_request" =>json_encode($data),
 								);
 								// $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 								GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
