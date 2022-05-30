@@ -31,60 +31,14 @@ class DOWINNController extends Controller{
     public function index(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('DOWINN Auth INDEX', 139, json_encode($data), 'INDEX HIT!');
-        // $originalPlayerID = explode('_', $data["user"]);
-        $client_details = ProviderHelper::getClientDetails('token', $data[token]);
+        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         if($client_details){
             $msg = array(
                 "status" =>'OK',
-                "balance"=>(int) number_format($client_details->balance,2,'.', ''),
+                "balance"=> number_format($client_details->balance,2,'.', ''),
                 "uuid" => $data['uuid'],
             );
             return response($msg,200)->header('Content-Type', 'application/json');
-        //     $playerChecker = DOWINNHelper::DOWINNPlayerChecker($client_details,'Verify');//Auth
-        //     if(isset($playerChecker->result_code) && $playerChecker->result_code == 1){
-        //         $msg = [
-        //             "result_code" => "1",
-        //             "result_msg" =>(string) "(no account)"
-        //         ];
-        //         return response($msg,200)->header('Content-Type', 'application/json');
-        //         Helper::saveLog('DOWINN NOT FOUND PLAYER',$this->provider_db_id, json_encode($msg), $data);
-                    
-        //     }else{
-        //         //flow structure
-        //         if($data['types'] == "balance") {
-        //             $result = $this->_getBalance($data,$client_details);
-        //             Helper::saveLog('DOWINN Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
-        //             return $result;
-        //         }
-        //         elseif($data['types'] == "bet") {
-        //                 $result = $this->_betProcess($data,$client_details);
-        //                 Helper::saveLog('DOWINN BET',$this->provider_db_id, json_encode($result), 'BET HIT');
-        //                 return $result;
-        //         }
-        //         elseif($data['types'] == "win") {
-        //             $result = $this->_winProcess($data,$client_details);
-        //             Helper::saveLog('DOWINN WIN', $this->provider_db_id, json_encode($result), 'WIN HIT');
-        //             return $result;
-        //         }
-        //         elseif($data['types'] == "cancel") {
-        //             $result = $this->_cancelProcess($data,$client_details);
-        //             Helper::saveLog('DOWINN CANCEL', $this->provider_db_id, json_encode($result), 'CANCEL HIT');
-        //             return $result;
-        //         }
-        //         else {
-        //             exit;
-        //         }
-        //         return response($data,200)->header('Content-Type', 'application/json');
-        //     }
-        // }
-        // else{
-        //     $msg = [
-        //         "result_code" => "1",
-        //         "result_msg" =>(string) "(no account)"
-        //     ];
-        //     return response($msg,200)->header('Content-Type', 'application/json');
-        //     Helper::saveLog('DOWINN TG NOTFOUND CLIENT DETAILS',$this->provider_db_id, json_encode($msg), $data);
-        // }
         }
     }
 
