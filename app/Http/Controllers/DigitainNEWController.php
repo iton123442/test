@@ -1806,7 +1806,7 @@ class DigitainNEWController extends Controller
 					"amount" => abs($key['winAmount']),
 					"game_transaction_type"=> 2,
 				);
-				GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_transextension,$client_details);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 
 				try {
 					$client_response = ClientRequestHelper::fundTransfer($client_details, abs($key['winAmount']), $game_details->game_code, $game_details->game_name, $game_transextension, $datatrans->game_trans_id, 'credit');
@@ -2201,7 +2201,7 @@ class DigitainNEWController extends Controller
 					"income" =>  $income,
 					"entry_id" =>$method
 				);
-				GameTransactionMDB::createGametransaction($gameTransactionData,$game_trans ,$client_details);
+				GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans ,$client_details);
 				$gameTransactionEXTData = array(
 					"game_trans_id" => $game_trans,
 					"provider_trans_id" => $provider_trans_id,
@@ -2209,7 +2209,7 @@ class DigitainNEWController extends Controller
 					"amount" => abs($key['betAmount']),
 					"game_transaction_type"=> 1,
 				);
-				GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_transextension,$client_details);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 
 				$fund_extra_data = [
 		            'provider_name' => 'digitain'
@@ -2226,7 +2226,7 @@ class DigitainNEWController extends Controller
 
 					if(isset($game_trans)){
 						$updateGameTransaction = ["win" => 2];
-						GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);  
+						GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);  
 						$createGameTransactionLog = [
                             "connection_name" => $client_details->connection_name,
                             "column" =>[
@@ -2296,14 +2296,18 @@ class DigitainNEWController extends Controller
 							"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 						];	
 
-						$updateTransactionEXt = array(
-							"mw_response" => json_encode($items_array),
-							'mw_request' => isset($client_response2->requestoclient) ? json_encode($client_response2->requestoclient) : 'FAILED',
-							'client_response' => json_encode($client_response2),
-							'transaction_detail' => 'FAILED',
-							'general_details' => json_encode($general_details2)
-						);
-						GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension2,$client_details);
+						$createGameTransactionLog = [
+                            "connection_name" => $client_details->connection_name,
+                                "column" =>[
+                                    "game_trans_ext_id" => $game_transextension2,
+                                    "request" => json_encode($json_data),
+                                    "response" => json_encode($items_array),
+                                    "log_type" => "provider_details",
+                                    "transaction_detail" => "FAILED",
+                                    "general_details" => json_encode($general_details),
+                                ]
+                            ];
+                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
 					}else{
 						ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response2->fundtransferresponse->balance);
@@ -2382,7 +2386,7 @@ class DigitainNEWController extends Controller
 				            && $client_response->fundtransferresponse->status->code == "402"){
 
 					$updateGameTransaction = ['win' => $win];
-					GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details); 
+					GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details); 
 
 					$general_details['client']['afterbalance'] = $this->formatBalance($client_response->fundtransferresponse->balance);
 					$general_details['aggregator']['externalTxId'] = $game_transextension;
@@ -2884,7 +2888,7 @@ class DigitainNEWController extends Controller
 					// endif;
 
 					$updateGameTransaction = ['win' => $win];
-					GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details); 
+					GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details); 
 
 					$general_details['client']['afterbalance'] = $this->formatBalance($client_response->fundtransferresponse->balance);
 					$general_details['aggregator']['externalTxId'] = $game_transextension;
@@ -3318,7 +3322,7 @@ class DigitainNEWController extends Controller
 						"amount" => abs($amount),
 						"game_transaction_type"=> 3,
 					);
-					GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_transextension,$client_details);
+					GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 					
 					$fund_extra_data = [
 			            'provider_name' => 'digitain'
@@ -4509,7 +4513,7 @@ class DigitainNEWController extends Controller
 					      'win' => $win, 
 					      'entry_id' => $entry_id,
 					];
-					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametransaction_details->game_trans_id, $client_details); 
+					GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gametransaction_details->game_trans_id, $client_details); 
 				}
 
 				$items_array[] = [
@@ -4966,7 +4970,7 @@ class DigitainNEWController extends Controller
 					"amount" => abs($amount),
 					"game_transaction_type"=> 3,
 				);
-				GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$game_transextension,$client_details);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 
 				$fund_extra_data = [
 		            'provider_name' => 'digitain'
@@ -5246,7 +5250,7 @@ class DigitainNEWController extends Controller
 				 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
 		    ]; 
 			$updateGameTransaction = ["win" => 2];
-			GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);  
+			GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans, $client_details);  
 			$createGameTransactionLog = [
                 "connection_name" => $client_details->connection_name,
                     "column" =>[
