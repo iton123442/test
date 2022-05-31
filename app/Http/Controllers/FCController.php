@@ -188,17 +188,42 @@ class FCController extends Controller
                 $transactionId=$this->createFCGameTransactionExt($gametransactionid,$data,null,null,null,2,$gen_game_extid,$client_details);
             }
             $sendtoclient =  microtime(true);
-            $client_response = ClientRequestHelper::fundTransfer($client_details,$win_amount,$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"credit");
+            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '') + $win_amount;
+            $response =array(
+                "Result"=>0,
+                "MainPoints" => $balance,
+            );
+            $action_payload = [
+                "type" => "custom", #genreral,custom :D # REQUIRED!
+                "custom" => [
+                    "provider" => 'Fachai',
+                    "game_transaction_ext_id" => $gen_game_extid,
+                    "win_or_lost" => $win_or_lost,
+                    "client_connection_name" => $client_details->connection_name
+                ],
+                "provider" => [
+                    "provider_request" => $data, #R
+                    "provider_trans_id"=> $data['BankID'], #R
+                    "provider_round_id"=> $data['RecordID'], #R
+                    "provider_name"=> $game_details->provider_name
+                ],
+                "mwapi" => [
+                    "roundId"=>$gametransactionid, #R
+                    "type"=>2, #R
+                    "game_id" => $game_details->game_id, #R
+                    "player_id" => $client_details->player_id, #R
+                    "mw_response" => $response, #R
+                ]
+            ];
+            // $client_response = ClientRequestHelper::fundTransfer($client_details,$win_amount,$game_details->game_code,$game_details->game_name,$gen_game_extid,$gen_game_trans_id,"credit");
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$win_amount,$game_details->game_code,$game_details->game_name,$gen_game_trans_id,'credit',false,$action_payload);
             // Helper::saveLog('win fcc intro', 2, $client_response, "maincontroller win intro hit");
             $client_response_time = microtime(true) - $sendtoclient;
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
             
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
-                $response =array(
-                    "Result"=>0,
-                    "MainPoints" => $balance,
-                );
+                
                 $updateFCGameTransactionExtinit =  microtime(true);
                 $createGameTransactionLog = [
                       "connection_name" => $client_details->connection_name,
