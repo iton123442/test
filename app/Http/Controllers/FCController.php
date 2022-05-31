@@ -198,7 +198,7 @@ class FCController extends Controller
                 "custom" => [
                     "provider" => 'Fachai',
                     "game_transaction_ext_id" => $gen_game_extid,
-                    "win_or_lost" => $win_or_lost,
+                    "win_or_lost" => $win,
                     "client_connection_name" => $client_details->connection_name
                 ],
                 "provider" => [
