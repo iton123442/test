@@ -188,7 +188,7 @@ class FCController extends Controller
                 $transactionId=$this->createFCGameTransactionExt($gametransactionid,$data,null,null,null,2,$gen_game_extid,$client_details);
             }
             $sendtoclient =  microtime(true);
-            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '') + $win_amount;
+            $balance = number_format($client_details->balance,2,'.', '') + $win_amount;
             $response =array(
                 "Result"=>0,
                 "MainPoints" => $balance,
