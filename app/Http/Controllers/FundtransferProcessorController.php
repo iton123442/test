@@ -114,6 +114,9 @@ class FundtransferProcessorController extends Controller
             else if ($payload->action->custom->provider == "EDP") {
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }
+            else if ($payload->action->custom->provider == "Fachai") {
+                $gteid = $payload->action->custom->game_transaction_ext_id;
+            }
             else{
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
@@ -680,6 +683,14 @@ class FundtransferProcessorController extends Controller
                                 // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                             elseif ($payload->action->custom->provider == 'EDP') {
+                                $updateGameTransaction = [
+                                    "win" => $payload->action->custom->win_or_lost,
+                                ];
+                                ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
+                                // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                            }
+                            elseif ($payload->action->custom->provider == 'Fachai') {
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
