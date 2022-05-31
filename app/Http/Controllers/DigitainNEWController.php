@@ -612,7 +612,7 @@ class DigitainNEWController extends Controller
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension,
                             "request" => json_encode($json_data),
-                            "response" => json_encode($response),
+                            "response" => json_encode($items_array),
                             "log_type" => "provider_details",
                             "transaction_detail" => "FAILED",
                         ]
@@ -642,7 +642,7 @@ class DigitainNEWController extends Controller
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
                         "request" => json_encode($json_data),
-                        "response" => json_encode($response),
+                        "response" => json_encode($items_array),
                         "log_type" => "provider_details",
                         "transaction_detail" => "SUCCESS",
                         "general_details" => json_encode($general_details),
