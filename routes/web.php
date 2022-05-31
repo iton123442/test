@@ -415,6 +415,13 @@ $app->post('/public/api/spade/getBetCost','SpadeController@getBetCost');
 $app->post('/public/api/spade/getBalance','SpadeController@getBalance');
 $app->post('/public/api/spade/transfer','SpadeController@makeTransfer');
 $app->post('/public/api/spade/getgame','SpadeController@getGameList');
+// Spade GamingNEWFLOW
+$app->post('/public/api/spade','SpadeControllerNEW@index');//single route
+$app->post('/public/api/spade/authorize','SpadeControllerNEW@authorize');
+$app->post('/public/api/spade/getBetCost','SpadeControllerNEW@getBetCost');
+$app->post('/public/api/spade/getBalance','SpadeControllerNEW@getBalance');
+$app->post('/public/api/spade/transfer','SpadeControllerNEW@makeTransfer');
+$app->post('/public/api/spade/getgame','SpadeControllerNEW@getGameList');
 
 //MajaGames
 $app->post('/public/api/mj/seamless/bet','MajaGamesController@bet');
