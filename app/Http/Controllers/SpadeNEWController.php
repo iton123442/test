@@ -670,18 +670,17 @@ class SpadeNEWController extends Controller
 			"client_id" => $client_details->client_id,
 			"player_id" => $client_details->player_id,
 		);
-		$game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+        $game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
+		GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id ,$client_details);
 		$gameTransactionEXTData = array(
 			"game_trans_id" => $game_trans_id,
 			"provider_trans_id" => $provider_trans_id,
 			"round_id" => $bet_id,
 			"amount" => $bet_amount,
 			"game_transaction_type"=> 1,
-			"provider_request" =>json_encode($details),
-			'transaction_detail' => 'FAILED',
-			'general_details' => 'FAILED',
 		);
-		$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+		GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
 		$fund_extra_data = [
 			'fundtransferrequest' => [
 				'fundinfo' => [
@@ -704,14 +703,6 @@ class SpadeNEWController extends Controller
 						"code" => 0,
 						"serialNo" => $details->serialNo,
 					];
-					$updateTransactionEXt = array(
-						"mw_response" => json_encode($response),
-						'mw_request' => json_encode($client_response->requestoclient),
-						'client_response' => json_encode($client_response->fundtransferresponse),
-						'transaction_detail' => 'success',
-						'general_details' => 'success',
-					);
-					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
 					$balance = $client_response->fundtransferresponse->balance + $details->amount;
 					ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
 					$response = [
@@ -729,12 +720,20 @@ class SpadeNEWController extends Controller
 						"round_id" => $details->ticketId,
 						"amount" => $details->amount,
 						"game_transaction_type"=> 2,
-						"provider_request" =>json_encode($details),
-						"mw_response" => json_encode($response),
-						'transaction_detail' => 'success',
-						'general_details' => 'success',
 					);
-					$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+					GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
+					$createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_trans_ext_id,
+                            "request" => json_encode($details),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "success",
+                            "general_details" => "success",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 					//Initialize data to pass
 					$win = $win_amount > 0  ?  1 : 0;  /// 1win 0lost
 					$body_details = [
