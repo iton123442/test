@@ -2221,7 +2221,7 @@ class CQ9NEWController extends Controller
                     ];
                     ProviderHelper::queTransactionLogs($createGameTransactionLog);
 					// 2nd Ext
-                    $createGameTransactionLog = [
+                    $createGameTransactionLog1 = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
                             "game_trans_ext_id" => $game_transextension2,
@@ -2232,7 +2232,7 @@ class CQ9NEWController extends Controller
                             "transaction_detail" => "success",
                         ]
                     ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog1);
 
 			    }
 
@@ -2515,7 +2515,7 @@ class CQ9NEWController extends Controller
                             ]
                         ];
                         ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                        $createGameTransactionLog = [
+                        $createGameTransactionLog1 = [
                             "connection_name" => $client_details->connection_name,
                             "column" =>[
                                 "game_trans_ext_id" => $game_transextension_credit,
@@ -2526,7 +2526,7 @@ class CQ9NEWController extends Controller
                                 "transaction_detail" => "failed",
                             ]
                         ];
-                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog1);
 						ProviderHelper::_insertOrUpdate($client_details->token_id, $client_details->balance+abs($amount));
 					}
 		    
@@ -2709,7 +2709,7 @@ class CQ9NEWController extends Controller
                     ]
                 ];
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                $createGameTransactionLog = [
+                $createGameTransactionLog1 = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $find_mtcode->game_trans_ext_id,
@@ -2720,7 +2720,7 @@ class CQ9NEWController extends Controller
                         "transaction_detail" => "failed",
                     ]
                 ];
-                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                ProviderHelper::queTransactionLogs($createGameTransactionLog1);
 
 			}elseif(isset($client_response->fundtransferresponse->status->code) 
 			            && $client_response->fundtransferresponse->status->code == "402"){
@@ -2742,7 +2742,7 @@ class CQ9NEWController extends Controller
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
 			}else{ // Unknown Response Code
 				$mw_response = ["data" => null,"status" => ["code" => "1100","message" => 'Server error.',"datetime" => date(DATE_RFC3339)]];
-                $createGameTransactionLog = [
+                $createGameTransactionLog1 = [
                     "connection_name" => $client_details->connection_name,
                     "column" =>[
                         "game_trans_ext_id" => $game_transextension,
@@ -2753,7 +2753,7 @@ class CQ9NEWController extends Controller
                         "transaction_detail" => "failed",
                     ]
                 ];
-                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                ProviderHelper::queTransactionLogs($createGameTransactionLog1);
 			}    
 
 			return $mw_response;
