@@ -417,7 +417,7 @@ class TTGController extends Controller
                   // );
                   // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
                 $createGameTransactionLog = [
-                          "connection_name" => $client_details->connection_name,
+                          "connection_name" => $get_client_details->connection_name,
                           "column" =>[
                               "game_trans_ext_id" => $gen_game_extid,
                               "request" => json_encode($data),
