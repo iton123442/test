@@ -416,7 +416,17 @@ class TTGController extends Controller
                   //         'general_details' => 'success',
                   // );
                   // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$get_client_details);
-                  
+                $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $gen_game_extid,
+                              "request" => json_encode($data),
+                              "response" => json_encode($response),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "success",
+                          ]
+                      ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                   Helper::saveLog('TTGaming credit', $this->provider_db_id, $data, $response);
                   return response($response,200) 
                     ->header('Content-Type', 'application/xml');
