@@ -22,7 +22,7 @@ class DOWINNHelper{
             "ip" => $player_details->player_ip_address,
             "wallet" => json_encode($walletData),
         ];
-        Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
+        // Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
         $client = new Client([
             'headers' => [
                 'Content-Type' => 'x-www-form-urlencoded' 
@@ -46,7 +46,7 @@ class DOWINNHelper{
             "child" => $prefix.'_'.$player_details->player_id,
             "wallet" => json_encode($walletData),
         ];
-        Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
+        // Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
         $client = new Client([
             'headers' => [
                 'Content-Type' => 'x-www-form-urlencoded' 
