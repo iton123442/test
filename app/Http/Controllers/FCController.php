@@ -270,7 +270,14 @@ class FCController extends Controller
                     // $game = $this->getGameTransactionupdate($client_details->player_token,$data["BankID"]);
                     $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($client_details->player_token, $data["BankID"], $client_details);
                     if($game == null){
-                        $gametransactionid=$this->createGameTransaction('refund', $json_data, $game_details, $client_details); 
+                        // $gametransactionid=$this->createGameTransaction('refund', $json_data, $game_details, $client_details);
+                        $response =array(
+                            "Result"=>221,
+                            "ErrorText" => "BankID does not exist.",
+                        );
+                        // Helper::saveLog('responseTime(FC)', 12, json_encode(["type"=>"refundBankIdnotexist","stating"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                        return response($response,200)
+                            ->header('Content-Type', 'application/json'); 
                     }
                     else{
                         $gameupdate = $this->updateGameTransaction($game,$json_data,"refund",$client_details);
