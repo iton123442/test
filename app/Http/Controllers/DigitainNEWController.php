@@ -1388,7 +1388,7 @@ class DigitainNEWController extends Controller
 					$createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[
-                            "game_trans_ext_id" => $datatrans->game_trans_ext_id,
+                            "game_trans_ext_id" => $game_transextension,
                             "request" => json_encode($json_data),
                             "response" => json_encode($items_array),
                             "log_type" => "provider_details",
