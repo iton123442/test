@@ -999,7 +999,7 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==135){
-                    Helper::saveLog('BOTA Gameluanch', 135, json_encode($request->all()), "Gamelaunch response");
+                    Helper::saveLog('BOTA Gamelaunch', 135, json_encode($request->all()), "Gamelaunch response");
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::botaLaunchUrl($request->all()), 
@@ -1009,7 +1009,7 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==139){
-                    Helper::saveLog('DOWINN Gameluanch', 139, json_encode($request->all()), "Gamelaunch response");
+                    Helper::saveLog('DOWINN Gamelaunch', 139, json_encode($request->all()), "Gamelaunch response");
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::dowinnLaunchUrl($request->all()), 
