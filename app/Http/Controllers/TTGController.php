@@ -427,7 +427,7 @@ class TTGController extends Controller
                           ]
                       ];
                 ProviderHelper::queTransactionLogs($createGameTransactionLog);
-                  Helper::saveLog('TTGaming credit', $this->provider_db_id, $data, $response);
+                  Helper::saveLog('TTGaming credit', $this->provider_db_id, json_encode($data), $response);
                   return response($response,200) 
                     ->header('Content-Type', 'application/xml');
 
