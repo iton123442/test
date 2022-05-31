@@ -261,7 +261,7 @@ class SpadeNEWController extends Controller
 		}
 		try{
             $game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
-            $game_trans_ext_id = ProviderHelper::idGenerate($client_details->conenction_name,2);
+            $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
 			$bet_amount = $details->amount;
 			$provider_trans_id = $details->transferId;
 			$bet_id = $details->serialNo;
