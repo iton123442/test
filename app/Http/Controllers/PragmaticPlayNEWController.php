@@ -525,7 +525,7 @@ class PragmaticPlayNEWController extends Controller
             }
             $income = $game_trans->bet_amount - $data->amount;
             $balance = $client_details->balance + $data->amount;
-            $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->conenction_name,2);
+            $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->connection_name,2);
             $create_gametransactionext = array(
                 "game_trans_id" =>$game_trans->game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
@@ -1111,7 +1111,7 @@ class PragmaticPlayNEWController extends Controller
             "win" => true,
             "response" => $response
             );
-            
+
         $create_gametransactionext = array(
             "game_trans_id" =>$game_trans[0]->game_trans_id,
             "provider_trans_id" => $game_trans[0]->provider_trans_id,
