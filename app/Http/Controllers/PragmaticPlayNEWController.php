@@ -13,7 +13,7 @@ use App\Helpers\AWSHelper;
 use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 
-class PragmaticPLayController extends Controller
+class PragmaticPLayNEWController extends Controller
 {
     public $key;
     public $provider_id = 26; //26 
@@ -194,15 +194,15 @@ class PragmaticPLayController extends Controller
             }
             $amount = $checkDoubleBet->bet_amount + $data->amount;
             // $game_transextension = ProviderHelper::createGameTransExtV2($checkDoubleBet->game_trans_id,$provider_trans_id, $roundId, $data->amount, 1);
+            $game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
             $gameTransactionEXTData = array(
                 "game_trans_id" => $checkDoubleBet->game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $roundId,
                 "amount" => $data->amount,
                 "game_transaction_type"=> 1,
-                "provider_request" =>json_encode($data),
             );
-            $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
              try {
                 $client_response = ClientRequestHelper::fundTransfer($client_details, $data->amount,$game_details->game_code,$game_details->game_name,$game_transextension,$checkDoubleBet->game_trans_id,'debit');
                 $updateDoubleBet = DB::table('game_transactions')->where('game_trans_id','=',$checkDoubleBet->game_trans_id)->update(["bet_amount" => $amount, "transaction_reason" => "Double Bet"]);
@@ -233,14 +233,18 @@ class PragmaticPLayController extends Controller
                         "error" => 0,
                         "description" => "Success"
                     );
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" =>json_encode("success"),
-                        "general_details" =>json_encode("success"),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transextension,
+                            "request" => json_encode($data),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "success",
+                            "general_details" => "success",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     Helper::saveLog('PP bet additional', $this->provider_id,json_encode($data) , $response);
                     return $response;
                 }elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -251,19 +255,23 @@ class PragmaticPLayController extends Controller
                             "description" => "Not Enough Balance"
                         );
                         Helper::saveLog('PP bet not enough balance', $this->provider_id,json_encode($data) , $response);
-                        $update_gametransactionext = array(
-                            "mw_response" =>json_encode($response),
-                            "mw_request"=>json_encode($client_response->requestoclient),
-                            "client_response" =>json_encode($client_response->fundtransferresponse),
-                            "transaction_detail" =>json_encode("FAILED"),
-                            "general_details" =>json_encode("FAILED")
-                        );
-                        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                        $createGameTransactionLog = [
+                            "connection_name" => $client_details->connection_name,
+                            "column" =>[
+                                "game_trans_ext_id" => $game_transextension,
+                                "request" => json_encode($data),
+                                "response" => json_encode($response),
+                                "log_type" => "provider_details",
+                                "transaction_detail" => "FAILED",
+                                "general_details" => "FAILED",
+                            ]
+                        ];
+                        ProviderHelper::queTransactionLogs($createGameTransactionLog);
                         $updateGameTransaction = [
                             "win" => 2,
                             'trans_status' => 5
                         ];
-                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkDoubleBet->game_trans_id, $client_details);
+                        GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $checkDoubleBet->game_trans_id, $client_details);
                         return $response;
                 }else{
                     $response = array(
@@ -272,19 +280,23 @@ class PragmaticPLayController extends Controller
                         "description" => "Not Enough Balance"
                     );
                     Helper::saveLog('PP bet not enough balance', $this->provider_id,json_encode($data) , $response);
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" =>json_encode("FAILED"),
-                        "general_details" =>json_encode("FAILED")
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transextension,
+                            "request" => json_encode($data),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "FAILED",
+                            "general_details" => "FAILED",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     $updateGameTransaction = [
                         "win" => 2,
                         'trans_status' => 5
                     ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkDoubleBet->game_trans_id, $client_details);
+                    GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $checkDoubleBet->game_trans_id, $client_details);
                     return $response;
                 }
             } catch (\Exception $e) {
@@ -294,23 +306,29 @@ class PragmaticPLayController extends Controller
                     "description" => "Internal server error."
                 );
                 $msg = array("status" => 'error',"message" => $e->getMessage());
-                $update_gametransactionext = array(
-                    "mw_response" =>json_encode($response),
-                    "mw_request"=> $msg,
-                    "client_response" => $msg,
-                    "transaction_detail" =>json_encode("FAILED"),
-                    "general_details" =>json_encode("FATAL FAILED")
-                );
-                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($data),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "FAILED",
+                        "general_details" => "FAILED",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $updateGameTransaction = [
                     "win" => 2,
                     'trans_status' => 5
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $checkDoubleBet->game_trans_id, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $checkDoubleBet->game_trans_id, $client_details);
                 Helper::saveLog('PP bet - FATAL ERROR', $this->provider_id, json_encode($data), Helper::datesent());
                 return $response;
             }
         }
+        $gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
+        $game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
         $gameTransactionData = array(
             "provider_trans_id" => $provider_trans_id,
             "token_id" => $tokenId,
@@ -323,16 +341,15 @@ class PragmaticPLayController extends Controller
             "entry_id" =>1,
             "trans_status" =>1,
         );
-        $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
+        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details);
         $gameTransactionEXTData = array(
             "game_trans_id" => $gamerecord,
             "provider_trans_id" => $provider_trans_id,
             "round_id" => $roundId,
             "amount" => $data->amount,
             "game_transaction_type"=> 1,
-            "provider_request" =>json_encode($data),
         );
-        $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 
         try {
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$gamerecord,'debit');
@@ -347,14 +364,18 @@ class PragmaticPLayController extends Controller
                     "error" => 0,
                     "description" => "Success"
                 );
-                $update_gametransactionext = array(
-                    "mw_response" =>json_encode($response),
-                    "mw_request"=>json_encode($client_response->requestoclient),
-                    "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("success"),
-                    "general_details" =>json_encode("success"),
-                );
-                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($data),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "Success",
+                        "general_details" => "Success",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $client_response->fundtransferresponse->balance]);
                 AWSHelper::saveLog('TPP bet response', $this->provider_id, json_encode($data), "response");
                 return $response;
@@ -365,19 +386,23 @@ class PragmaticPLayController extends Controller
                         "error" => 1,
                         "description" => "Not Enough Balance"
                     );
-                    $update_gametransactionext = array(
-                        "mw_response" =>json_encode($response),
-                        "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
-                        "transaction_detail" =>json_encode("FAILED"),
-                        "general_details" =>json_encode("FAILED")
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                    $createGameTransactionLog = [
+                        "connection_name" => $client_details->connection_name,
+                        "column" =>[
+                            "game_trans_ext_id" => $game_transextension,
+                            "request" => json_encode($data),
+                            "response" => json_encode($response),
+                            "log_type" => "provider_details",
+                            "transaction_detail" => "FAILED",
+                            "general_details" => "FAILED",
+                        ]
+                    ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     $updateGameTransaction = [
                         "win" => 2,
                         'trans_status' => 5
                     ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                    GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
                     Helper::saveLog('PP bet not enough balance', $this->provider_id,json_encode($data) , $response);
                     return $response;
             }else{
@@ -386,19 +411,23 @@ class PragmaticPLayController extends Controller
                     "error" => 1,
                     "description" => "Not Enough Balance"
                 );
-                $update_gametransactionext = array(
-                    "mw_response" =>json_encode($response),
-                    "mw_request"=>json_encode($client_response->requestoclient),
-                    "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("FAILED"),
-                    "general_details" =>json_encode("FAILED")
-                );
-                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_transextension,
+                        "request" => json_encode($data),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "FAILED",
+                        "general_details" => "FAILED",
+                    ]
+                ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 $updateGameTransaction = [
                     "win" => 2,
                     'trans_status' => 5
                 ];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
                 Helper::saveLog('PP bet not enough balance', $this->provider_id,json_encode($data) , $response);
                 return $response;
             }
@@ -411,19 +440,23 @@ class PragmaticPLayController extends Controller
                 "description" => "Internal server error."
             );
             $msg = array("status" => 'error',"message" => $e->getMessage());
-            $update_gametransactionext = array(
-                "mw_response" =>json_encode($response),
-                "mw_request"=>$msg,
-                "client_response" =>$msg,
-                "transaction_detail" =>json_encode("FAILED - FATAL"),
-                "general_details" =>json_encode("FAILED")
-            );
-            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_transextension,
+                    "request" => json_encode($data),
+                    "response" => json_encode($response),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "FAILED - FATAL",
+                    "general_details" => "FAILED",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             $updateGameTransaction = [
                 "win" => 2,
                 'trans_status' => 5
             ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $gamerecord, $client_details);
             Helper::saveLog('PP bet - FATAL ERROR', $this->provider_id, json_encode($data), Helper::datesent());
             return $response;
         }

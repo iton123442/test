@@ -542,17 +542,31 @@ $app->post('/public/hbn/api/query','HabaneroController@queryrequest');
 
 
 // Pragmatic PLay
-$app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
-$app->post('/public/api/pp/balance','PragmaticPLayController@balance');
-$app->post('/public/api/pp/bet','PragmaticPLayController@bet');
-$app->post('/public/api/pp/result','PragmaticPLayController@result');
-$app->post('/public/api/pp/refund','PragmaticPLayController@refund');
-$app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
-$app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
-$app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
-$app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
-$app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
-$app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+// $app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
+// $app->post('/public/api/pp/balance','PragmaticPLayController@balance');
+// $app->post('/public/api/pp/bet','PragmaticPLayController@bet');
+// $app->post('/public/api/pp/result','PragmaticPLayController@result');
+// $app->post('/public/api/pp/refund','PragmaticPLayController@refund');
+// $app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
+// $app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
+// $app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
+// $app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
+// $app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
+// $app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+//NEWFLOW PRAGMATIOC PLAY
+// Pragmatic PLay
+$app->post('/public/api/pp/authenticate','PragmaticPLayNEWController@authenticate');
+$app->post('/public/api/pp/balance','PragmaticPLayNEWController@balance');
+$app->post('/public/api/pp/bet','PragmaticPLayNEWController@bet');
+$app->post('/public/api/pp/result','PragmaticPLayNEWController@result');
+$app->post('/public/api/pp/refund','PragmaticPLayNEWController@refund');
+$app->post('/public/api/pp/bonusWin','PragmaticPLayNEWController@bonusWin');
+$app->post('/public/api/pp/jackpotWin','PragmaticPLayNEWController@jackpotWin');
+$app->post('/public/api/pp/promoWin','PragmaticPLayNEWController@promoWin');
+$app->post('/public/api/pp/endRound','PragmaticPLayNEWController@endRound');
+$app->post('/public/api/pp/getBalancePerGame','PragmaticPLayNEWController@getBalancePerGame');
+$app->post('/public/api/pp/session/expired','PragmaticPLayNEWController@sessionExpired');
+
 
 
 
