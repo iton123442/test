@@ -11,6 +11,7 @@ use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\AWSHelper;
 use App\Helpers\FreeSpinHelper;
+use App\Helpers\Game;
 use App\Models\GameTransactionMDB;
 
 class PragmaticPlayNEWController extends Controller
@@ -524,16 +525,15 @@ class PragmaticPlayNEWController extends Controller
             }
             $income = $game_trans->bet_amount - $data->amount;
             $balance = $client_details->balance + $data->amount;
-           
+            $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->conenction_name,2);
             $create_gametransactionext = array(
                 "game_trans_id" =>$game_trans->game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $round_id,
                 "amount" => $data->amount,
                 "game_transaction_type"=> 2,
-                "provider_request" => json_encode($data)
             );
-            $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
             $response = array(
                 "transactionId" => $game_trans_ext_v2,
                 "currency" => $client_details->default_currency,
@@ -570,11 +570,19 @@ class PragmaticPlayNEWController extends Controller
                 'entry_id' => $entry_id,
                 'trans_status' => 2
             ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans->game_trans_id, $client_details);
-            $update_gametransactionext = array(
-                "mw_response" =>json_encode($response),
-            );
-            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans->game_trans_id, $client_details);
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "request" => json_encode($data),
+                    "response" => json_encode($response),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             $save_bal = DB::table("player_session_tokens")->where("token_id","=",$token_id)->update(["balance" => $balance]);
             AWSHelper::saveLog('TPP result response', $this->provider_id, json_encode($data), "response");
             return $response;
@@ -591,7 +599,7 @@ class PragmaticPlayNEWController extends Controller
                 "win" => 2,
                 'trans_status' => 5
             ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans->game_trans_id, $client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans->game_trans_id, $client_details);
             return $msg;
         }
     }
@@ -644,9 +652,9 @@ class PragmaticPlayNEWController extends Controller
                 "round_id" => $round_id,
                 "amount" => $bet_amount,
                 "game_transaction_type"=> 2,
-                "provider_request" => json_encode($data)
             );
-            $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+            $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->connection_name,2);
+            GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
             $response = array(
                 "cash" => floatval(number_format($balance, 2, '.', '')),
                 "bonus" => 0,
@@ -680,18 +688,37 @@ class PragmaticPlayNEWController extends Controller
                 'trans_status' => 2
             ];
             ClientRequestHelper::fundTransfer_TG($client_details, $bet_amount, $game_code, $game_name, $game_trans->game_trans_id, 'credit', false, $action_payload);
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans->game_trans_id, $client_details);
-            $update_gametransactionext = array(
-                "mw_response" =>json_encode($response),
-            );
-            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans->game_trans_id, $client_details);
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "request" => json_encode($data),
+                    "response" => json_encode($response),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             $save_bal = DB::table("player_session_tokens")->where("token_id","=",$token_id)->update(["balance" => $balance]);
             AWSHelper::saveLog('TPP endRound response', $this->provider_id, json_encode($data), $response);
             return $response;
 
         } catch (\Exception $e) {
             $msg = array("status" => 'error',"message" => $e->getMessage());
-            ProviderHelper::updatecreateGameTransExt($game_trans->game_trans_id, 'FAILED', $msg, 'FAILED', $e->getMessage(), 'FAILED', 'FAILED');
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "request" => json_encode($data),
+                    "response" => json_encode($msg),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "failed",
+                    "general_details" => "failed",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             Helper::saveLog('PP endRound - FATAL ERROR', $this->provider_id, json_encode($data), $msg);
             return $msg;
         }
@@ -801,7 +828,8 @@ class PragmaticPlayNEWController extends Controller
                 "game_transaction_type"=> 3,
                 "provider_request" => json_encode($data)
             );
-            $game_trans_ext_v2 = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+            $game_trans_ext_v2 = ProviderHelper::idGenerate($client_details->connection_name,2);
+            GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
             $response = array(
                 "transactionId" => $game_trans_ext_v2,
                 "error" => 0,
@@ -835,11 +863,19 @@ class PragmaticPlayNEWController extends Controller
                 'entry_id' => 2,
                 'trans_status' => 2
             ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans->game_trans_id, $client_details);
-            $update_gametransactionext = array(
-                "mw_response" =>json_encode($response),
-            );
-            GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_trans->game_trans_id, $client_details);
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_trans_ext_v2,
+                    "request" => json_encode($data),
+                    "response" => json_encode($response),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             Helper::saveLog('PP refund request', $this->provider_id, json_encode($data) , $response);
             return $response;
         }else{
@@ -958,8 +994,21 @@ class PragmaticPlayNEWController extends Controller
         // vs25pyramid
         // Pyramid King
         $responseDetails = $this->responsetosend($client_details->client_access_token, $client_details->client_api_key, "vs25pyramid", "Pyramid King", $client_details->client_player_id, $client_details->player_token, $data->amount, $client, $client_details->fund_transfer_url, "credit",$client_details->default_currency);
-
-        $gametrans = ProviderHelper::createGameTransaction($tokenId, $game_details->game_id, 0.00, $data->amount, 2, 1, "Tournament", "Promo Win ", 0- $data->amount, $data->reference, $roundId);
+        $game_trans_data = array(
+            "provider_trans_id" => $data->reference,
+            "token_id" => $tokenId,
+            "game_id" => $game_details->game_id,
+            "round_id" => $roundId,
+            "bet_amount" => 0,
+            "win" => 1,
+            "pay_amount" =>round($data->amount,2),
+            "income" => 0 - round($data->amount,2),
+            "entry_id" =>2,
+            "trans_status" =>2,
+        );
+        $gametrans = ProviderHelper::idGenerate($client_details->connection_name,1);
+        GameTransactionMDB::createGametransactionV2($game_trans_data,$gametrans,$client_details);
+        // $gametrans = ProviderHelper::createGameTransaction($tokenId, $game_details->game_id, 0.00,round( $data->amount,2), 2, 1, "Tournament", "Promo Win ", 0-round( $data->amount,2), $data->reference, $roundId);
         
         $response_log = array(
             "transactionId" => $gametrans,
@@ -969,9 +1018,15 @@ class PragmaticPlayNEWController extends Controller
             "error" => 0,
             "description" => "Success",
         );
-
-        $game_trans_ext = ProviderHelper::createGameTransExt( $gametrans, $data->reference, $roundId, $data->amount, 2, $data, $response_log, $responseDetails['requesttosend'], $responseDetails['client_response'], "Promo Win Tournament");
-        
+        $create_gametransactionext = array(
+            "game_trans_id" =>$gametrans,
+            "provider_trans_id" => $data->reference,
+            "round_id" => $roundId,
+            "amount" =>round($data->amount,2),
+            "game_transaction_type"=> 2,
+        );
+        $game_trans_ext = ProviderHelper::idGenerate($client_details->connection_name,2);
+        GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext,$client_details);
         $response = array(
             "transactionId" => $game_trans_ext,
             "currency" => $client_details->default_currency,
@@ -1056,9 +1111,16 @@ class PragmaticPlayNEWController extends Controller
             "win" => true,
             "response" => $response
             );
-
-        $game_trans_ext = ProviderHelper::createGameTransExt($game_trans[0]->game_trans_id, $game_trans[0]->provider_trans_id, $game_trans[0]->round_id, $data->amount, 2, $data, $response, $responseDetails['requesttosend'], $responseDetails['client_response'], $trans_details);
-
+            
+        $create_gametransactionext = array(
+            "game_trans_id" =>$game_trans[0]->game_trans_id,
+            "provider_trans_id" => $game_trans[0]->provider_trans_id,
+            "round_id" => $game_trans[0]->round_id,
+            "amount" =>round($data->amount,2),
+            "game_transaction_type"=> 2,
+        );
+        $game_trans_ext = ProviderHelper::idGenerate($client_details->connection_name,2);
+        GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext,$client_details);
         return $response;
 
     }
