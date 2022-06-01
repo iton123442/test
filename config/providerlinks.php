@@ -767,7 +767,7 @@ return [
     'dowinn' =>[
         'api_url' => 'https://t-agent.sbet56789.com/cash',
         'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
-        'user_agent' => 'kapi0006',
+        'user_agent' => 'kapi0006s',
         'prefix' => 'TG',
         'provider_db_id' => 139,
     ],
