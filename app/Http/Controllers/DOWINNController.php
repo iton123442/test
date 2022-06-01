@@ -161,8 +161,79 @@ class DOWINNController extends Controller{
                     }
                 }
             }//END OF DOUBLE BET
-            $gameTransactionDatas = [];
+            $betAmount = round($data['transaction']['amount'],2);
+            $gameTransactionDatas = [
+                "provider_trans_id" => $transId,
+                "token_id" => $client_details->token_id,
+                "game_id" => $gamedetails->game_id,
+                "round_id" => $roundId,
+                "bet_amount" => betAmount,
+                "pay_amount" => 0,
+                "win" => 5,
+                "income" => 0,
+                "entry_id" => 1
+            ];
             $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
+            $gameExtensionData = [
+                "game_trans_id" => $game_trans_id,
+                "provider_trans_id" => $transId,
+                "round_id" => $roundId,
+                "amount" => $betAmount,
+                "game_transaction_type" => 1,
+                "provider_request" => json_encode($data),
+            ];
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+            $fund_extra_data = [
+                'provider_name' => $gamedetails->provider_name
+            ];
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$betAmount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,debit,false,$fund_extra_data);
+            if(isset($client_response->fundtransferresponse->status->code)
+            && $client_response->fundtransferresponse->status->code == "200"){
+                $balance = round($client_response->fundtransferresponse->balance, 2);
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                //SUCCESS FUNDTRANSFER
+                $updateTransData = [
+                    "win" => 5,
+                    "bet_amount" => $bet_transaction->bet_amount + $data['transaction']['amount'],
+                ];
+                GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
+                $response = [
+                    "status" => 'OK',
+                    "balance" => $balance,
+                    "uuid" => $data['uuid'],
+                ];
+                $extensionData = [
+                    "mw_response" =>json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "transaction_details" => "Success",
+                    "general_details" => "Success",
+                ];
+                GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
+                return response($response,200)->header('Content-Type', 'application/json');
+            }elseif(isset($client_response->fundtransferresponse->status->code)
+            && $client_response->fundtransferresponse->status->code == "402"){
+                try{    
+                    $updateTrans = [
+                        "win" => 2,
+                        "trans_status" => 5
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
+                    $response = [
+                        "code" => 51,
+                        "extra" => "Invalid Request"
+                    ];
+                    $updateExt = [
+                        "mw_response" =>json_encode($response),
+                        "client_response" => json_encode($client_response),
+                        "transaction_details" => "FAILED",
+                        "general_details" => "FAILED",
+                    ];
+                    GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }catch(\Exception $e){
+                Helper::saveLog("FAILED BET", 139,json_encode($client_response),"FAILED HIT!");
+                }
+            }
         }
     }
 
