@@ -13,7 +13,7 @@ use App\Helpers\AWSHelper;
 use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 
-class PragmaticPLayNEWController extends Controller
+class PragmaticPlayNEWController extends Controller
 {
     public $key;
     public $provider_id = 26; //26 

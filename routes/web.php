@@ -555,17 +555,17 @@ $app->post('/public/hbn/api/query','HabaneroController@queryrequest');
 // $app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
 //NEWFLOW PRAGMATIOC PLAY
 // Pragmatic PLay
-$app->post('/public/api/pp/authenticate','PragmaticPLayNEWController@authenticate');
-$app->post('/public/api/pp/balance','PragmaticPLayNEWController@balance');
-$app->post('/public/api/pp/bet','PragmaticPLayNEWController@bet');
-$app->post('/public/api/pp/result','PragmaticPLayNEWController@result');
-$app->post('/public/api/pp/refund','PragmaticPLayNEWController@refund');
-$app->post('/public/api/pp/bonusWin','PragmaticPLayNEWController@bonusWin');
-$app->post('/public/api/pp/jackpotWin','PragmaticPLayNEWController@jackpotWin');
-$app->post('/public/api/pp/promoWin','PragmaticPLayNEWController@promoWin');
-$app->post('/public/api/pp/endRound','PragmaticPLayNEWController@endRound');
-$app->post('/public/api/pp/getBalancePerGame','PragmaticPLayNEWController@getBalancePerGame');
-$app->post('/public/api/pp/session/expired','PragmaticPLayNEWController@sessionExpired');
+$app->post('/public/api/pp/authenticate','PragmaticPlayNEWController@authenticate');
+$app->post('/public/api/pp/balance','PragmaticPlayNEWController@balance');
+$app->post('/public/api/pp/bet','PragmaticPlayNEWController@bet');
+$app->post('/public/api/pp/result','PragmaticPlayNEWController@result');
+$app->post('/public/api/pp/refund','PragmaticPlayNEWController@refund');
+$app->post('/public/api/pp/bonusWin','PragmaticPlayNEWController@bonusWin');
+$app->post('/public/api/pp/jackpotWin','PragmaticPlayNEWController@jackpotWin');
+$app->post('/public/api/pp/promoWin','PragmaticPlayNEWController@promoWin');
+$app->post('/public/api/pp/endRound','PragmaticPlayNEWController@endRound');
+$app->post('/public/api/pp/getBalancePerGame','PragmaticPlayNEWController@getBalancePerGame');
+$app->post('/public/api/pp/session/expired','PragmaticPlayNEWController@sessionExpired');
 
 
 
