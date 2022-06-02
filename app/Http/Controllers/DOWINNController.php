@@ -130,7 +130,7 @@ class DOWINNController extends Controller{
                             "mw_request" => json_encode($data),
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
-                            "transaction_details" => "Success",
+                            "transaction_detail" => "Success",
                             "general_details" => "Success",
                         ];
                         GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
@@ -150,7 +150,7 @@ class DOWINNController extends Controller{
                             $updateExt = [
                                 "mw_response" =>json_encode($response),
                                 "client_response" => json_encode($client_response),
-                                "transaction_details" => "FAILED",
+                                "transaction_detail" => "FAILED",
                                 "general_details" => "FAILED",
                             ];
                             GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
@@ -204,7 +204,7 @@ class DOWINNController extends Controller{
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
                         "mw_request" => json_encode($data),
-                        "transaction_details" => "Success",
+                        "transaction_detail" => "Success",
                         "general_details" => "Success",
                     ];
                     GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
@@ -225,7 +225,7 @@ class DOWINNController extends Controller{
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
                             "mw_request" => json_encode($data),
-                            "transaction_details" => "FAILED",
+                            "transaction_detail" => "FAILED",
                             "general_details" => "FAILED",
                         ];
                         GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
@@ -306,7 +306,7 @@ class DOWINNController extends Controller{
                             "mw_response" =>json_encode($response),
                             "mw_request" => json_encode($data),
                             "client_response" => json_encode($client_response),
-                            "transaction_details" => "Success",
+                            "transaction_detail" => "Success",
                             "general_details" => "Success",
                         ];
                         GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
@@ -327,7 +327,7 @@ class DOWINNController extends Controller{
                                 "mw_response" =>json_encode($response),
                                 "mw_request" => json_encode($data),
                                 "client_response" => json_encode($client_response),
-                                "transaction_details" => "FAILED",
+                                "transaction_detail" => "FAILED",
                                 "general_details" => "FAILED",
                             ];
                             GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
@@ -400,7 +400,7 @@ class DOWINNController extends Controller{
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
                         "mw_request" => json_encode($data),
-                        "transaction_details" => "Success",
+                        "transaction_detail" => "Success",
                         "general_details" => "Success",
                     ];
                     GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
@@ -481,7 +481,7 @@ class DOWINNController extends Controller{
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
                             "mw_request" => json_encode($data),
-                            "transaction_details" => "Success",
+                            "transaction_detail" => "Success",
                             "general_details" => "Success",
                         ];
                         GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
@@ -502,7 +502,7 @@ class DOWINNController extends Controller{
                                 "mw_response" =>json_encode($response),
                                 "client_response" => json_encode($client_response),
                                 "mw_request" => json_encode($data),
-                                "transaction_details" => "FAILED",
+                                "transaction_detail" => "FAILED",
                                 "general_details" => "FAILED",
                             ];
                             GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
@@ -574,7 +574,7 @@ class DOWINNController extends Controller{
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
                         "mw_request" => json_encode($data),
-                        "transaction_details" => "Success",
+                        "transaction_detail" => "Success",
                         "general_details" => "Success",
                     ];
                     GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
