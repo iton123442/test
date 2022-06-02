@@ -127,6 +127,7 @@ class DOWINNController extends Controller{
                             "uuid" => $data['uuid'],
                         ];
                         $extensionData = [
+                            "mw_request" => json_encode($data),
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
                             "transaction_details" => "Success",
@@ -202,6 +203,7 @@ class DOWINNController extends Controller{
                     $extensionData = [
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($data),
                         "transaction_details" => "Success",
                         "general_details" => "Success",
                     ];
@@ -222,6 +224,7 @@ class DOWINNController extends Controller{
                         $updateExt = [
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
+                            "mw_request" => json_encode($data),
                             "transaction_details" => "FAILED",
                             "general_details" => "FAILED",
                         ];
@@ -278,6 +281,7 @@ class DOWINNController extends Controller{
                         "amount" => $winAmount,
                         "game_transaction_type" => 1,
                         "provider_request" => json_encode($data),
+                        "mw_request" => json_encode($data),
                     ];
                     $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
                     $fund_extra_data = [
@@ -300,6 +304,7 @@ class DOWINNController extends Controller{
                         ];
                         $extensionData = [
                             "mw_response" =>json_encode($response),
+                            "mw_request" => json_encode($data),
                             "client_response" => json_encode($client_response),
                             "transaction_details" => "Success",
                             "general_details" => "Success",
@@ -320,6 +325,7 @@ class DOWINNController extends Controller{
                             ];
                             $updateExt = [
                                 "mw_response" =>json_encode($response),
+                                "mw_request" => json_encode($data),
                                 "client_response" => json_encode($client_response),
                                 "transaction_details" => "FAILED",
                                 "general_details" => "FAILED",
@@ -393,6 +399,7 @@ class DOWINNController extends Controller{
                     $extensionData = [
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($data),
                         "transaction_details" => "Success",
                         "general_details" => "Success",
                     ];
@@ -473,6 +480,7 @@ class DOWINNController extends Controller{
                         $extensionData = [
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
+                            "mw_request" => json_encode($data),
                             "transaction_details" => "Success",
                             "general_details" => "Success",
                         ];
@@ -493,6 +501,7 @@ class DOWINNController extends Controller{
                             $updateExt = [
                                 "mw_response" =>json_encode($response),
                                 "client_response" => json_encode($client_response),
+                                "mw_request" => json_encode($data),
                                 "transaction_details" => "FAILED",
                                 "general_details" => "FAILED",
                             ];
@@ -564,6 +573,7 @@ class DOWINNController extends Controller{
                     $extensionData = [
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($data),
                         "transaction_details" => "Success",
                         "general_details" => "Success",
                     ];
