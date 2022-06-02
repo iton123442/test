@@ -40,7 +40,7 @@ class DOWINNController extends Controller{
                     return $result;
                 }
                 elseif($data['transaction']['type'] == 'award'){
-                    $result = $this->win($data,$client_details);
+                    $result = $this->payment($data,$client_details);
                     Helper::saveLog('DOWINN WIN',$this->provider_db_id, json_encode($result), 'WIN HIT');
                     return $result;
                 }
