@@ -602,5 +602,3 @@ class FCController extends Controller
     }
 
 }
-
-
