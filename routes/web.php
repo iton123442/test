@@ -892,4 +892,4 @@ $app->post('/public/getbalance/test','YGG002Controller@getbalance');
 // $app->post('/public/api/bota/callbackBalance', 'BOTAControllerNEW@index');
 $app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
 //DOWINN
-$app->post('/public/api/dowinn', 'DOWINNController@index');
+$app->post('/public/api/dowinn/balance', 'DOWINNController@index');
