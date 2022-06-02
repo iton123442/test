@@ -31,7 +31,7 @@ class DOWINNHelper{
         $response = $client->post(config('providerlinks.dowinn.api_url').'/login.do',
         ['form_params' => $dataToSend,]);
         $response = json_decode($response->getBody(),TRUE);
-        Helper::saveLog('DOWINN LOGIN/AUTH', 139, json_encode($response), 'LOGIN HIT!');
+        // Helper::saveLog('DOWINN LOGIN/AUTH', 139, json_encode($response), 'LOGIN HIT!');
         return($response);
     }
     //CHECK PLAYER STATUS AND BALANCE
@@ -46,7 +46,7 @@ class DOWINNHelper{
             "child" => $prefix.'_'.$player_details->player_id,
             "wallet" => json_encode($walletData),
         ];
-        // Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
+        Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
         $client = new Client([
             'headers' => [
                 'Content-Type' => 'x-www-form-urlencoded' 

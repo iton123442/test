@@ -81,7 +81,7 @@ class DOWINNController extends Controller{
             $playerChecker = DOWINNHelper::checkBalanceAndStatus($token,$guid,$this->prefix,$client_details);//this is authentication
             if($playerChecker->code == 0 && $playerChecker->ingame != 'false'){
                 try{
-                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['id'].'_1');
+                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['roundId'].'_1');
                 }catch(\Exception $e){
                     $response = array(
                         "code" =>'210',
@@ -243,7 +243,7 @@ class DOWINNController extends Controller{
             $playerChecker = DOWINNHelper::checkBalanceAndStatus($token,$guid,$this->prefix,$client_details);//this is authentication
             if($playerChecker->code == 0 && $playerChecker->ingame != 'false'){
                 try{
-                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['id'].'_2');
+                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['roundId'].'_2');
                 }catch(\Exception $e){
                     $response = array(
                         "status" =>'OK',
@@ -407,7 +407,7 @@ class DOWINNController extends Controller{
         }
     }
 
-    public function cancellation($data,$client_details){
+    public function cancel($data,$client_details){
         Helper::saveLog("CANCEL PROCESS", 139,json_encode($data),"CANCEL ON PROCESSING!");
         if($client_details){
             $token = $client_details->player_token;
@@ -415,7 +415,7 @@ class DOWINNController extends Controller{
             $playerChecker = DOWINNHelper::checkBalanceAndStatus($token,$guid,$this->prefix,$client_details);//this is authentication
             if($playerChecker->code == 0 && $playerChecker->ingame != 'false'){
                 try{
-                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['id'].'_2');
+                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['roundId'].'_3');
                 }catch(\Exception $e){
                     $response = array(
                         "status" =>'OK',
@@ -585,7 +585,7 @@ class DOWINNController extends Controller{
             $playerChecker = DOWINNHelper::checkBalanceAndStatus($token,$guid,$this->prefix,$client_details);//this is authentication
             if($playerChecker->code == 0 && $playerChecker->ingame != 'false'){
                 try{
-                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['id'].'_3');
+                    ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['roundId'].'_4');
                 }catch(\Exception $e){
                     $response = array(
                         "status" =>'OK',
