@@ -78,7 +78,7 @@ class DOWINNController extends Controller{
         if($client_details){
             $token = $client_details->player_token;
             $guid = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
-            $playerChecker = DOWINNHelper::checkBalanceAndStatus($token,$guid,$this->prefix,$client_details);//this is authentication
+            $playerChecker = DOWINNHelper::checkBalanceAndStatus($token,$guid,'TG',$client_details);//this is authentication
             if($playerChecker->code == 0 && $playerChecker->ingame != 'false'){
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.$data['uuid'].'_'.$data['transaction']['roundId'].'_1');
