@@ -33,8 +33,7 @@ class DOWINNController extends Controller{
         Helper::saveLog('DOWINN CONTROLLER INDEX', 139, json_encode($data), 'INDEX HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         if($client_details){
-            if($data->has('game')
-            &&$data->has('transaction')){
+            if(isset($data['transaction']) && isset($data['game'])){
                 if($data['transaction']['type'] == 'bet'){
                     $result = $this->bet($data,$client_details);
                     Helper::saveLog('DOWINN BET',$this->provider_db_id, json_encode($result), 'BET HIT');
