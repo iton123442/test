@@ -140,6 +140,22 @@ return [
             'merchant_id' => 'TG',
             'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
         ], 
+        '1SND'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '1VND'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '1MYR'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '1THB'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
     ],
     'cqgames' => [
         "prefix" => "TG",
