@@ -5,6 +5,7 @@ use GuzzleHttp\Client;
 use App\Helpers\Helper;
 use App\Helpers\GameLobby;
 use App\Helpers\ProviderHelper;
+use App\Models\GameTransactionMDB;
 use DB; 
 
 class DOWINNHelper{
@@ -58,5 +59,11 @@ class DOWINNHelper{
         $response = json_decode($response->getBody(),TRUE);
         // Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($response), 'CHECKER HIT!');
         return($response);
+    }
+
+    public static function totalBet($roundId,$client_details){
+        $betTrans = GameTransactionMDB::findDOWINNGameExt($roundId,'notIncluded',1,$client_details,'BET_CANCELED');
+        $betAmount = round($betTrans['0']->amount,2);
+        return $betAmount;
     }
 }

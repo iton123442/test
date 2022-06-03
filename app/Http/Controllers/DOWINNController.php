@@ -259,12 +259,6 @@ class DOWINNController extends Controller{
             }
             $transId = $data['uuid'];
             $roundId = $data['transaction']['roundId'];
-            $cancelTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',3,$client_details,false);
-            if($cancelTransExt['0']->amount != null){
-                $cancelTotal = $cancelTransExt['0']->amount;
-            }else{
-                $cancelTotal = 0;
-            }
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $winAmount = round($data['transaction']['amount'],2);
             $game = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
@@ -346,13 +340,11 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            $realBet = round($game->bet_amount-$cancelTotal,2);
             $updateTransData = [
                 "win" => 5,
                 "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                 "trans_status" => 2,
-                "bet_amount" => $realBet,
-                "income" => $realBet-$winAmount,
+                "income" => $game->bet_amount-$winAmount,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -536,12 +528,19 @@ class DOWINNController extends Controller{
                 }
             }
             $refundedBet = GameTransactionMDB::findDOWINNGameExt($roundId,'refundedbet',1,$client_details,$data['transaction']['id']);
+            $refundedBetId = $refundedBet['0']->game_trans_ext_id;
+            $updateBetTransaction = [
+                "general_details" => "BET_CANCELED",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($updateBetTransaction,$refundedBetId,$client_details);
+            $totalBetThisRound = DOWINNHelper::totalBet($roundId,$client_details);
             $updateTransData = [
                 "win" => 5,
                 "entry_id" => 2,
                 "trans_status" => 2,
                 "pay_amount" => $game->pay_amount+$refundAmount,
                 "income" => round($game->bet_amount-$refundAmount,2),
+                "bet_amount" => $totalBetThisRound,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -649,5 +648,6 @@ class DOWINNController extends Controller{
         // Helper::saveLog('DOWINN LOGIN/AUTH', 139, json_encode($response), 'LOGIN HIT!');
         return($response);
     }
+
 }
 ?>

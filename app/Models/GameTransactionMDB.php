@@ -738,7 +738,12 @@ class GameTransactionMDB
 
         }
         if ($type == 'refundedbet') {
-            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id =
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id IN
+            (select game_trans_ext_id from api_test.game_transaction_ext as gte1 where gte1.general_details = "'.$general_details.'")' ;
+
+        }
+        if ($type == 'notIncluded') {
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id NOT IN
             (select game_trans_ext_id from api_test.game_transaction_ext as gte1 where gte1.general_details = "'.$general_details.'")' ;
 
         }
