@@ -346,11 +346,13 @@ class DOWINNController extends Controller{
                     }
                 }
             }
+            $realBet = round($game->bet_amount-$cancelTotal,2);
             $updateTransData = [
                 "win" => 5,
                 "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                 "trans_status" => 2,
-                "bet_amount" => round($game->bet_amount-$cancelTotal,2),
+                "bet_amount" => $realBet,
+                "income" => $realBet-$winAmount,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -400,7 +402,6 @@ class DOWINNController extends Controller{
                         $updateTransData = [
                             "win" => 1,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
-                            "income" => round($game->bet_amount-$winAmount,2),
                             "pay_amount" => round($winTransExt['0']->amount,2),
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
@@ -409,7 +410,6 @@ class DOWINNController extends Controller{
                         $updateTransData = [
                             "win" => 0,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
-                            "income" => round($game->bet_amount-$winAmount,2),
                             "pay_amount" => round($winTransExt['0']->amount,2),
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
@@ -418,7 +418,6 @@ class DOWINNController extends Controller{
                     $updateTransData = [
                         "win" => $win_or_lost,
                         "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
-                        "income" => round($game->bet_amount-$winAmount,2),
                         "pay_amount" => $game->pay_amount+$winAmount,
                     ];
                     GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
