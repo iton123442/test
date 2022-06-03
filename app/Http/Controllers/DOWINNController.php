@@ -452,7 +452,7 @@ class DOWINNController extends Controller{
                 );
                 return response($response,200)->header('Content-Type', 'application/json');
             }
-            $transId = $data['uuid'];
+            $transId = $data['transaction']['id'];
             $roundId = $data['transaction']['roundId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $refundAmount = round($data['transaction']['amount'],2);
