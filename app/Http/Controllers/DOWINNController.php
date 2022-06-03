@@ -245,7 +245,7 @@ class DOWINNController extends Controller{
 
     public function payment(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('player_id', '562283');
+        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
         if($client_details){
             try{
