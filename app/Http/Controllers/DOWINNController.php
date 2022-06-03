@@ -410,7 +410,7 @@ class DOWINNController extends Controller{
                             "win" => 1,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                             "income" => round($realBetCount-$winAmount,2),
-                            "pay_amount" => $game->pay_amount+$winAmount,
+                            "pay_amount" => round($winTransExt['0']->amount,2),
                             "bet_amount" => round($realBetCount,2),
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
@@ -420,7 +420,7 @@ class DOWINNController extends Controller{
                             "win" => 0,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                             "income" => round($realBetCount-$winAmount,2),
-                            "pay_amount" => $game->pay_amount+$winAmount,
+                            "pay_amount" => round($winTransExt['0']->amount,2),
                             "bet_amount" => round($realBetCount,2),
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
