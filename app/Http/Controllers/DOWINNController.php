@@ -135,7 +135,7 @@ class DOWINNController extends Controller{
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
                             "transaction_detail" => "Success",
-                            "general_details" => "Success",
+                            "general_details" => $data['transaction']['id'],
                         ];
                         GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                         return response($response,200)->header('Content-Type', 'application/json');
@@ -210,7 +210,7 @@ class DOWINNController extends Controller{
                         "client_response" => json_encode($client_response),
                         "mw_request" => json_encode($client_response->requestoclient),
                         "transaction_detail" => "Success",
-                        "general_details" => "Success",
+                        "general_details" => $data['transaction']['id'],
                     ];
                     GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
@@ -259,7 +259,7 @@ class DOWINNController extends Controller{
             }
             $transId = $data['uuid'];
             $roundId = $data['transaction']['roundId'];
-            $cancelTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',3,$client_details);
+            $cancelTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',3,$client_details,false);
             if($cancelTransExt['0']->amount != null){
                 $cancelTotal = $cancelTransExt['0']->amount;
             }else{
@@ -316,7 +316,7 @@ class DOWINNController extends Controller{
                         "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response),
                         "transaction_detail" => "Success",
-                        "general_details" => "Success",
+                        "general_details" => $data['transaction']['id'],
                     ];
                     GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
@@ -393,7 +393,7 @@ class DOWINNController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$winAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
-                $winTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
+                $winTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details,false);
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
@@ -430,7 +430,7 @@ class DOWINNController extends Controller{
                     "client_response" => json_encode($client_response),
                     "mw_request" => json_encode($client_response->requestoclient),
                     "transaction_detail" => "Success",
-                    "general_details" => "Success",
+                    "general_details" => $data['transaction']['id'],
                 ];
                 GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                 return response($response,200)->header('Content-Type', 'application/json');
@@ -452,7 +452,7 @@ class DOWINNController extends Controller{
                 );
                 return response($response,200)->header('Content-Type', 'application/json');
             }
-            $transId = $data['transaction']['id'];
+            $transId = $data['uuid'];
             $roundId = $data['transaction']['roundId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $refundAmount = round($data['transaction']['amount'],2);
@@ -505,7 +505,7 @@ class DOWINNController extends Controller{
                         "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response),
                         "transaction_detail" => "Success",
-                        "general_details" => "Success",
+                        "general_details" => $data['transaction']['id'],
                     ];
                     GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
@@ -535,6 +535,7 @@ class DOWINNController extends Controller{
                     }
                 }
             }
+            $refundedBet = GameTransactionMDB::findDOWINNGameExt($roundId,'refundedbet',1,$client_details,$data['transaction']['id']);
             $updateTransData = [
                 "win" => 5,
                 "entry_id" => 2,
@@ -599,7 +600,7 @@ class DOWINNController extends Controller{
                     "client_response" => json_encode($client_response),
                     "mw_request" => json_encode($client_response->requestoclient),
                     "transaction_detail" => "Success",
-                    "general_details" => "Success",
+                    "general_details" => $data['transaction']['id'],
                 ];
                 GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                 return response($response,200)->header('Content-Type', 'application/json');

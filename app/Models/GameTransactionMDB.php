@@ -715,7 +715,7 @@ class GameTransactionMDB
     }
 
     //DOWINN GAME EXT
-    public  static function findDOWINNGameExt($provider_identifier, $type,$game_transaction_type,$client_details)
+    public  static function findDOWINNGameExt($provider_identifier, $type,$game_transaction_type,$client_details,$general_details)
     {
         $connection_name = $client_details->connection_name;
         if ($type == 'all') {
@@ -737,15 +737,20 @@ class GameTransactionMDB
             $where = 'where gte.game_trans_id = "' . $provider_identifier . '"';
 
         }
+        if ($type == 'refundedbet') {
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id =
+            (select game_trans_ext_id from api_test.game_transaction_ext as gte1 where gte1.general_details = "'.$general_details.'")' ;
+
+        }
         
         try {
             $details = [];
             $connection = self::getAvailableConnection($client_details->connection_name);
             if ($connection != null) {
                 if($type == 'all' || $type == 'allround'){
-                    $details = DB::connection( $connection["connection_name"] )->select('select sum(amount) as amount, game_trans_ext_id, game_trans_id from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                    $details = DB::connection( $connection["connection_name"] )->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                 }else{
-                    $details = DB::connection($connection["connection_name"])->select('select sum(amount) as amount, game_trans_ext_id, game_trans_id from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    $details = DB::connection($connection["connection_name"])->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id, from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                 }
                 $connection_name = $connection["connection_name"];
                 if ( !(count($details) > 0) )  {
@@ -754,9 +759,9 @@ class GameTransactionMDB
                         $connection_default = config("serverlist.server_list.default");
                         if($type == 'all' || $type == 'allround'){
                             // removed limit
-                            $data = DB::connection( $connection_default["connection_name"] )->select('select sum(amount) as amount, game_trans_ext_id, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                            $data = DB::connection( $connection_default["connection_name"] )->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                         }else{
-                            $data = DB::connection($connection_default["connection_name"])->select('select sum(amount) as amount, game_trans_ext_id, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                            $data = DB::connection($connection_default["connection_name"])->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                         }
                         if ( count($data) > 0  ) {
                             $connection_name = "default";
