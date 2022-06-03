@@ -99,7 +99,6 @@ class DOWINNController extends Controller{
                 $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
                 if($bet_transaction != null){
                     //this is double bet
-                    Helper::saveLog("DOUBLE BET HIT", 139, json_encode($bet_transaction), "HIT!");
                     $game_trans_id = $bet_transaction->game_trans_id;
                     $updateTransaction = [
                         "win" => 5,
@@ -115,7 +114,7 @@ class DOWINNController extends Controller{
                         "provider_request" => json_encode($data),
                     ];
                     $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gametransExt_data,$client_details);
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,$data['transaction']['amount'],$gamedetails->game_code,$gamedetails->game_name,$transId,$roundId,'debit');
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$data['transaction']['amount'],$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$bet_transaction->game_trans_id,'debit');
                     if(isset($client_response->fundtransferresponse->status->code)
                     && $client_response->fundtransferresponse->status->code == "200"){
                         $balance = round($client_response->fundtransferresponse->balance, 2);
