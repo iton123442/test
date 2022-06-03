@@ -40,7 +40,7 @@ class DOWINNController extends Controller{
                     return $result;
                 }
                 elseif($data['transaction']['type'] == 'award'){
-                    $result = $this->win($data,$client_details);
+                    $result = $this->payment($data,$client_details);
                     Helper::saveLog('DOWINN WIN',$this->provider_db_id, json_encode($result), 'WIN HIT');
                     return $result;
                 }
@@ -127,7 +127,7 @@ class DOWINNController extends Controller{
                             "uuid" => $data['uuid'],
                         ];
                         $extensionData = [
-                            "mw_request" => json_encode($data),
+                            "mw_request" => json_encode($client_response->requestoclient),
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
                             "transaction_detail" => "Success",
@@ -148,6 +148,7 @@ class DOWINNController extends Controller{
                                 "extra" => "Invalid Request"
                             ];
                             $updateExt = [
+                                "mw_request" => json_encode('FAILED'),
                                 "mw_response" =>json_encode($response),
                                 "client_response" => json_encode($client_response),
                                 "transaction_detail" => "FAILED",
@@ -203,7 +204,7 @@ class DOWINNController extends Controller{
                     $extensionData = [
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
-                        "mw_request" => json_encode($data),
+                        "mw_request" => json_encode($client_response->requestoclient),
                         "transaction_detail" => "Success",
                         "general_details" => "Success",
                     ];
@@ -224,7 +225,7 @@ class DOWINNController extends Controller{
                         $updateExt = [
                             "mw_response" =>json_encode($response),
                             "client_response" => json_encode($client_response),
-                            "mw_request" => json_encode($data),
+                            "mw_request" => json_encode('FAILED'),
                             "transaction_detail" => "FAILED",
                             "general_details" => "FAILED",
                         ];
@@ -243,7 +244,7 @@ class DOWINNController extends Controller{
             $token = $client_details->player_token;
             $guid = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
             $playerChecker = DOWINNHelper::checkBalanceAndStatus($token,$guid,$this->prefix,$client_details);//this is authentication
-            if($playerChecker->code == 0 && $playerChecker->ingame != 'false'){
+            if($playerChecker['code'] == 0 && $playerChecker['ingame'] == true){
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['transaction']['id'].'_2');
                 }catch(\Exception $e){
@@ -281,7 +282,6 @@ class DOWINNController extends Controller{
                         "amount" => $winAmount,
                         "game_transaction_type" => 1,
                         "provider_request" => json_encode($data),
-                        "mw_request" => json_encode($data),
                     ];
                     $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
                     $fund_extra_data = [
@@ -304,7 +304,7 @@ class DOWINNController extends Controller{
                         ];
                         $extensionData = [
                             "mw_response" =>json_encode($response),
-                            "mw_request" => json_encode($data),
+                            "mw_request" => json_encode($client_response->requestoclient),
                             "client_response" => json_encode($client_response),
                             "transaction_detail" => "Success",
                             "general_details" => "Success",
@@ -325,7 +325,7 @@ class DOWINNController extends Controller{
                             ];
                             $updateExt = [
                                 "mw_response" =>json_encode($response),
-                                "mw_request" => json_encode($data),
+                                "mw_request" => json_encode('FAILED'),
                                 "client_response" => json_encode($client_response),
                                 "transaction_detail" => "FAILED",
                                 "general_details" => "FAILED",
@@ -343,9 +343,9 @@ class DOWINNController extends Controller{
                     "trans_status" => 2,
                     "pay_amount" => $winAmount,
                 ];
-                GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
+                GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                 $gameExtensionData = [
-                    "game_trans_id" => $game_trans_id,
+                    "game_trans_id" => $game->game_trans_id,
                     "provider_trans_id" => $transId,
                     "round_id" => $roundId,
                     "amount" => $winAmount,
@@ -390,7 +390,7 @@ class DOWINNController extends Controller{
                         "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                         "income" => round($game->bet_amount-$winAmount,2),
                     ];
-                    GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
+                    GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     $response = [
                         "status" => 'OK',
                         "balance" => $balance,
@@ -399,7 +399,7 @@ class DOWINNController extends Controller{
                     $extensionData = [
                         "mw_response" =>json_encode($response),
                         "client_response" => json_encode($client_response),
-                        "mw_request" => json_encode($data),
+                        "mw_request" => json_encode($client_response->requestoclient),
                         "transaction_detail" => "Success",
                         "general_details" => "Success",
                     ];
