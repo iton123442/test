@@ -458,7 +458,7 @@ class DOWINNController extends Controller{
             $transId = $data['uuid'];
             $roundId = $data['transaction']['roundId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
-            $winAmount = round($data['transaction']['amount'],2);
+            $refundAmount = round($data['transaction']['amount'],2);
             $game = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             $win_or_lost = 4;
             $afterBalance = $data['transaction']['amount'] + $client_details->balance;
@@ -469,7 +469,7 @@ class DOWINNController extends Controller{
                     "token_id" => $client_details->token_id,
                     "game_id" => $gamedetails->game_id,
                     "round_id" => $roundId,
-                    "bet_amount" => $winAmount,
+                    "bet_amount" => $refundAmount,
                     "pay_amount" => 0,
                     "win" => 5,
                     "income" => 0,
@@ -480,7 +480,7 @@ class DOWINNController extends Controller{
                     "game_trans_id" => $game_trans_id,
                     "provider_trans_id" => $transId,
                     "round_id" => $roundId,
-                    "amount" => $winAmount,
+                    "amount" => $refundAmount,
                     "game_transaction_type" => 1,
                     "provider_request" => json_encode($data),
                 ];
@@ -488,7 +488,7 @@ class DOWINNController extends Controller{
                 $fund_extra_data = [
                     'provider_name' => $gamedetails->provider_name
                 ];
-                $client_response = ClientRequestHelper::fundTransfer($client_details,$winAmount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
+                $client_response = ClientRequestHelper::fundTransfer($client_details,$refundAmount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
@@ -542,14 +542,15 @@ class DOWINNController extends Controller{
                 "win" => 5,
                 "entry_id" => 2,
                 "trans_status" => 2,
-                "pay_amount" => $winAmount,
+                "pay_amount" => $refundAmount,
+                "income" => round($game->bet_amount-$refundAmount,2),
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
                 "game_trans_id" => $game->game_trans_id,
                 "provider_trans_id" => $transId,
                 "round_id" => $roundId,
-                "amount" => $winAmount,
+                "amount" => $refundAmount,
                 "game_transaction_type" => 3,
                 "provider_request" => json_encode($data),
             ];
@@ -580,7 +581,7 @@ class DOWINNController extends Controller{
                     "mw_response" => json_encode($response),
                 ]
             ];
-            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$winAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$refundAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
                 Helper::saveLog("CANCEL FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
@@ -590,7 +591,6 @@ class DOWINNController extends Controller{
                 $updateTransData = [
                     "win" => $win_or_lost,
                     "entry_id" => 2,
-                    "income" => round($game->bet_amount-$winAmount,2),
                 ];
                 GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                 $response = [
