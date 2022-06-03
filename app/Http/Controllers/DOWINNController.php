@@ -99,6 +99,7 @@ class DOWINNController extends Controller{
                 $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
                 if($bet_transaction != null){
                     //this is double bet
+                    Helper::saveLog("DOUBLE BET HIT", 139, json_encode($bet_transaction), "HIT!");
                     $game_trans_id = $bet_transaction->game_trans_id;
                     $updateTransaction = [
                         "win" => 5,
