@@ -98,9 +98,8 @@ class PlayStarController extends Controller
                     ];
                     return $response; 
             }
-        try{
-           $game_details = Game::find($data["game_id"], $this->provider_db_id);
-            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_transid_ext, $game_transid_gen, 'debit');
+            $game_details = Game::find($data["game_id"], $this->provider_db_id);
+            $client_response = ClientRequestHelper::fundTransferrr($client_details,$bet_amount, $game_details->game_code, $game_details->game_name, $game_transid_ext, $game_transid_gen, 'debit');
             Helper::saveLog('PlayStar client response', $this->provider_db_id, json_encode($data), $client_response);
                     if (isset($client_response->fundtransferresponse->status->code)) 
                     {
@@ -108,7 +107,6 @@ class PlayStarController extends Controller
                         switch ($client_response->fundtransferresponse->status->code) {
                             case '200':
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                            
                                      $http_status = 200;
                                     $formatBalance = (int) str_replace(".","", $client_details->balance);
                                 $response = [
@@ -123,7 +121,6 @@ class PlayStarController extends Controller
                                     "status_code" => 3,
                                     "message" => "Insufficient Funds",                                 
                                 ];
-
                                 $createGameTransactionLog = [
                                     "connection_name" => $client_details->connection_name,
                                     "column" =>[
@@ -173,14 +170,6 @@ class PlayStarController extends Controller
                     ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
                 return response($response,200)->header('Content-Type', 'application/json');
-        }catch(\Exception $e){
-            $msg = array(
-                'error' => '1',
-                'message' => $e->getMessage(),
-            );
-            Helper::saveLog('Playstar bet error', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
-            return json_encode($msg, JSON_FORCE_OBJECT); 
-        }
     }
     public function getResult(Request $request){
         Helper::saveLog('PlayStar Result for win call', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
