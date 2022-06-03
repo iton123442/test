@@ -341,6 +341,7 @@ class DOWINNController extends Controller{
                 }
             }
             $winTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
+            $betTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
             $cancelExtTrans = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
             if($cancelExtTrans['0']->amount != null && $game->pay_amount != 0 && $cancelExtTrans['0']->amount > 1){
                 $updateTransData = [
@@ -348,6 +349,7 @@ class DOWINNController extends Controller{
                     "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                     "trans_status" => 2,
                     "pay_amount" => 0,
+                    "income" => round($game->bet_amount-$winAmount,2),
                 ];
             }else{
                 $updateTransData = [
@@ -355,6 +357,7 @@ class DOWINNController extends Controller{
                     "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                     "trans_status" => 2,
                     "pay_amount" => $game->pay_amount+$winAmount,
+                    "income" => round($game->bet_amount-$winAmount,2),
                 ];
             }
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
@@ -401,12 +404,14 @@ class DOWINNController extends Controller{
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
                 if($winTransExt['0']->amount != null){
+                    $realBetCount = $betTransExt['0']->amount-$cancelExtTrans['0']->amount;
                     if($winTransExt['0']->amount > 1){
                         $updateTransData = [
                             "win" => 1,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
-                            "income" => round($game->bet_amount-$winAmount,2),
+                            "income" => round($realBetCount-$winAmount,2),
                             "pay_amount" => $game->pay_amount+$winAmount,
+                            "bet_amount" => round($realBetCount,2),
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     }
@@ -414,8 +419,9 @@ class DOWINNController extends Controller{
                         $updateTransData = [
                             "win" => 0,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
-                            "income" => round($game->bet_amount-$winAmount,2),
+                            "income" => round($realBetCount-$winAmount,2),
                             "pay_amount" => $game->pay_amount+$winAmount,
+                            "bet_amount" => round($realBetCount,2),
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     }
@@ -540,7 +546,7 @@ class DOWINNController extends Controller{
                         GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
                         return response($response,200)->header('Content-Type', 'application/json');
                     }catch(\Exception $e){
-                        Helper::saveLog("FAILED WIN", 139,json_encode($client_response),"FAILED HIT!");
+                        Helper::saveLog("FAILED CANCEL", 139,json_encode($client_response),"FAILED HIT!");
                     }
                 }
             }
@@ -589,7 +595,7 @@ class DOWINNController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$winAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
-                Helper::saveLog("WIN FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
+                Helper::saveLog("CANCEL FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
