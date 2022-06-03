@@ -562,6 +562,7 @@ class DOWINNController extends Controller{
                 $updateTransData = [
                     "win" => $win_or_lost,
                     "entry_id" => 2,
+                    "bet_amount" => round($game->bet_amount-$winAmount,2),
                     "income" => round($game->bet_amount-$winAmount,2),
                 ];
                 GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
