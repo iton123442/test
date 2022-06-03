@@ -341,7 +341,7 @@ class DOWINNController extends Controller{
                 }
             }
             $winTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
-            $betTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
+            $betTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',1,$client_details);
             $cancelExtTrans = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
             if($cancelExtTrans['0']->amount != null && $game->pay_amount != 0 && $cancelExtTrans['0']->amount > 1){
                 $updateTransData = [
