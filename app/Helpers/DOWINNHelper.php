@@ -20,6 +20,7 @@ class DOWINNHelper{
             "account" => config('providerlinks.dowinn.user_agent'),
             "child" => $prefix.'_'.$player_details->player_id,
             "ip" => $player_details->player_ip_address,
+            "limiId" => '1',
             "wallet" => json_encode($walletData),
         ];
         // Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');

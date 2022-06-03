@@ -241,15 +241,12 @@ class DOWINNController extends Controller{
 
     public function payment($data,$client_details){
         if($client_details){
-            $token = $client_details->player_token;
-            $guid = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['transaction']['id'].'_2');
             }catch(\Exception $e){
                 $response = array(
-                    "status" =>'OK',
-                    "balance"=>(int) number_format($client_details->balance,2,'.', ''),
-                    "uuid" => $data['uuid'],
+                    "code" =>'210',
+                    "extra"=>'Duplicate Transaction number',
                 );
                 return response($response,200)->header('Content-Type', 'application/json');
             }
@@ -381,6 +378,7 @@ class DOWINNController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$winAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
+                Helper::saveLog("WIN FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
@@ -603,6 +601,23 @@ class DOWINNController extends Controller{
                 //Member offline
             }
         }
+    }
+
+    public function limitList(Request $request){
+        $dataToSend = [
+            "account" => config('providerlinks.dowinn.user_agent'),
+        ];
+        // Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
+        $client = new Client([
+            'headers' => [
+                'Content-Type' => 'x-www-form-urlencoded' 
+            ],
+        ]);
+        $response = $client->post(config('providerlinks.dowinn.api_url').'/limits.do',
+        ['form_params' => $dataToSend,]);
+        $response = json_decode($response->getBody(),TRUE);
+        // Helper::saveLog('DOWINN LOGIN/AUTH', 139, json_encode($response), 'LOGIN HIT!');
+        return($response);
     }
 }
 ?>
