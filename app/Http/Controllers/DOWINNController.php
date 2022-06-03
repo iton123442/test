@@ -340,12 +340,23 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            $updateTransData = [
-                "win" => 5,
-                "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
-                "trans_status" => 2,
-                "pay_amount" => $game->pay_amount+$winAmount,
-            ];
+            $winTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
+            $cancelExtTrans = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details);
+            if($cancelExtTrans['0']->amount != null && $game->pay_amount != 0 && $cancelExtTrans['0']->amount > 1){
+                $updateTransData = [
+                    "win" => 5,
+                    "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
+                    "trans_status" => 2,
+                    "pay_amount" => 0,
+                ];
+            }else{
+                $updateTransData = [
+                    "win" => 5,
+                    "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
+                    "trans_status" => 2,
+                    "pay_amount" => $game->pay_amount+$winAmount,
+                ];
+            }
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
                 "game_trans_id" => $game->game_trans_id,
@@ -389,13 +400,13 @@ class DOWINNController extends Controller{
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
-                $winTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',1,$client_details);
                 if($winTransExt['0']->amount != null){
                     if($winTransExt['0']->amount > 1){
                         $updateTransData = [
                             "win" => 1,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                             "income" => round($game->bet_amount-$winAmount,2),
+                            "pay_amount" => $game->pay_amount+$winAmount,
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     }
@@ -404,6 +415,7 @@ class DOWINNController extends Controller{
                             "win" => 0,
                             "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                             "income" => round($game->bet_amount-$winAmount,2),
+                            "pay_amount" => $game->pay_amount+$winAmount,
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     }
@@ -412,6 +424,7 @@ class DOWINNController extends Controller{
                         "win" => $win_or_lost,
                         "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                         "income" => round($game->bet_amount-$winAmount,2),
+                        "pay_amount" => $game->pay_amount+$winAmount,
                     ];
                     GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
 
@@ -536,7 +549,6 @@ class DOWINNController extends Controller{
                 "entry_id" => 2,
                 "trans_status" => 2,
                 "bet_amount" => round($game->bet_amount-$winAmount,2),
-                "pay_amount" => $winAmount,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
