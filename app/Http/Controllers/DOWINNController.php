@@ -93,11 +93,11 @@ class DOWINNController extends Controller{
                     );
                     return response($response,200)->header('Content-Type', 'application/json');
                 }
-                $transId = $data['transaction']['id'];
+                $transId = $data['uuid'];
                 $roundId = $data['transaction']['roundId'];
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
-                $bet_transaction = GameTransactionMDB::findGameTransactionDetails($transId, 'transaction_id',false, $client_details);
-                if($bet_transaction != 'false'){
+                $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
+                if($bet_transaction != null){
                     //this is double bet
                     $game_trans_id = $bet_transaction->game_trans_id;
                     $updateTransaction = [
@@ -257,7 +257,7 @@ class DOWINNController extends Controller{
                 );
                 return response($response,200)->header('Content-Type', 'application/json');
             }
-            $transId = $data['transaction']['id'];
+            $transId = $data['uuid'];
             $roundId = $data['transaction']['roundId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $winAmount = round($data['transaction']['amount'],2);
@@ -427,7 +427,7 @@ class DOWINNController extends Controller{
                 );
                 return response($response,200)->header('Content-Type', 'application/json');
             }
-            $transId = $data['transaction']['id'];
+            $transId = $data['uuid'];
             $roundId = $data['transaction']['roundId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $winAmount = round($data['transaction']['amount'],2);
