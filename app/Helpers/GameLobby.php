@@ -18,6 +18,7 @@ use App\Helpers\DigitainHelper;
 use App\Helpers\MGHelper;
 use App\Helpers\EVGHelper;
 use App\Helpers\BOTAHelper;
+use App\Helpers\DOWINNHelper;
 use DOMDocument;
 use App\Services\AES;
 use Webpatser\Uuid\Uuid;
@@ -1554,11 +1555,11 @@ class GameLobby{
                 // $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency=USD';
 
                 $url = config("providerlinks.vivo.LEAP_URL").'?tableguid=JHN3978RJH39UR93USDF34&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&mode=real&skinid=37&siteid=1&currency='.$client_details->default_currency.'';
-            break;
+                break;
 
             case 'ArrowsEdge':
-                $url = config("providerlinks.vivo.ArrowsEdge_URL").'?tableguid=JJMCHE34297J22JKDX22&token='.$token.'&OperatorId='.$operator_id.'&language=en&cashierUrl=&homeUrl=&GameID='.$game_code.'&gameMode=real&currency='.$client_details->default_currency.'';
-            break;
+                $url = config("providerlinks.vivo.ArrowsEdge_URL").'?tableguid=JJMCHE34297J22JKDX22&token='.$token.'&OperatorId='.$operator_id.'&homeUrl=&language=en&GameID='.$game_code.'&cashierUrl=&gameMode=real&currency='.$client_details->default_currency.'';
+                break;
             case '7 Mojos':
                 $get_game_type = DragonGamingHelper::getGameType($game_code, config("providerlinks.vivo.PROVIDER_ID"));
                 
@@ -1580,7 +1581,6 @@ class GameLobby{
                 # code...
                 break;
         }
-        
         return $url;
     }
 
@@ -2184,6 +2184,25 @@ class GameLobby{
         Helper::saveLog('bota gamelaunch', 135, json_encode($game_launch_url), 'Initialized');
         $gameurl = isset($game_launch_url) ? $game_launch_url : $exit_url;
         Helper::saveLog('bota gamelaunchfinal', 135, json_encode($gameurl), 'Gamelaunch Success');
+        return $gameurl;  
+    }
+
+    public static function dowinnLaunchUrl($request){
+        $exit_url = $request['exitUrl'];
+        $provider = $request['game_provider'];
+        $token = $request['token'];
+        $game_code = $request['game_code'];
+        $get_player_details = ProviderHelper::getClientDetails('token',$request['token']);
+        $prefix = config('providerlinks.dowinn.prefix');
+        // $logintoken = hash_hmac('sha256', json_encode($request), config("providerlinks.dowinn.user_agent"));
+        $guid = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
+        $responsebod = DOWINNHelper::generateGameToken($token,$guid,$prefix,$get_player_details);
+        // Helper::saveLog('dowinn gametoken', 139, json_encode($get_player_details), json_encode($logintoken));
+        Helper::savePLayerGameRound($game_code,$token,$provider);
+        $game_launch_url = config('providerlinks.dowinn.gamelaunch_url').'?token='.$responsebod['token'].'&p='.$responsebod['p'].'&v='.$responsebod['v'];
+        Helper::saveLog('dowinn gamelaunch', 139, json_encode($game_launch_url), 'Initialized');
+        $gameurl = isset($game_launch_url) ? $game_launch_url : $exit_url;
+        Helper::saveLog('dowinn gamelaunchfinal', 139, json_encode($gameurl), 'Gamelaunch Success');
         return $gameurl;  
     }
 }

@@ -748,15 +748,15 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==60){ 
-                    $msg = array(
-                        "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::yggdrasillaunchUrl($request->all(), $device), //TEST
-                        "game_launch" => true
-                    );
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
-                } 
+                // elseif($provider_code==131){ 
+                //     $msg = array(
+                //         "game_code" => $request->input("game_code"),
+                //         "url" => GameLobby::yggdrasillaunchUrl($request->all(), $device), //TEST
+                //         "game_launch" => true
+                //     );
+                //     return response($msg,200)
+                //     ->header('Content-Type', 'application/json');
+                // } 
                 elseif($provider_code==71){ 
                     $msg = array(
                         "game_code" => $request->input("game_code"),
@@ -766,7 +766,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 } 
-                elseif(in_array($provider_code, [69, 61, 62, 63, 64, 65, 66, 114])){
+                elseif(in_array($provider_code, [69, 61, 62, 63, 64, 65, 66, 114, 138])){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::vivoGamingLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->input('game_provider')), 
@@ -980,7 +980,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code == 131 || $provider_code == 132 || $provider_code == 133 || $provider_code == 134 || $provider_code == 136){
+                elseif($provider_code == 60 || $provider_code == 132 || $provider_code == 133 || $provider_code == 134 || $provider_code == 136){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::ygglaunchUrl($request->all(), $device), 
@@ -999,10 +999,20 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==135){
-                    Helper::saveLog('BOTA Gameluanch', 135, json_encode($request->all()), "Gamelaunch response");
+                    Helper::saveLog('BOTA Gamelaunch', 135, json_encode($request->all()), "Gamelaunch response");
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::botaLaunchUrl($request->all()), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
+                elseif($provider_code==139){
+                    Helper::saveLog('DOWINN Gamelaunch', 139, json_encode($request->all()), "Gamelaunch response");
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::dowinnLaunchUrl($request->all()), 
                         "game_launch" => true
                     );
                     return response($msg,200)

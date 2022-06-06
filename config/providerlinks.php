@@ -135,7 +135,27 @@ return [
         '8USD' => [  // ASK ME USD
             'merchant_id' => 'TG',
             'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
-        ]
+        ],
+        '36IDR'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36SND'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36VND'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36MYR'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36THB'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
     ],
     'cqgames' => [
         "prefix" => "TG",
@@ -221,6 +241,9 @@ return [
             'LAK'  => '223f24ab',
             'MMK'  => '89853cff',
             'KHR'  => 'd264b6ad',
+            'TWD'  => '7eaa51c7',
+            'INR'  => 'ccc1956b',
+            'GBP'  => 'e68d2044',
         ],
         'support_1to1_denomination_prefixK' => [188,142,185], //THIS IS THE CLIENT ID THAT SUPPOR PREFIX K OR 1:1 EXAMPLE currency LAK concant for kLAK
         'SECRET_KEY' => 'f83c8224b07f96f41ca23b3522c56ef1',
@@ -675,20 +698,28 @@ return [
         'prefix' => "TGTW",
         'type' => "staging",// [production, staging]
         "agent" => [
-            "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
+            // "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
             "DSPAA" => "b972d12c42bd31d56fd1bd5cc", // testing Staging and production USD
-            "9" => [
-                "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA JPY
-                "122" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
+            "37" => [
+                "211" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
+                // "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA JPY
+                // "122" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
+            ],
+            "1" => [
+                // "272" => "3457bde6440cb38837da65b3c", // Konibet Production 	JFPKA JPY
+                "92" => "b391abaf172c2dbc1046965c8", // Kuma Gaming Production JFPKB JPY
             ],
         ],
+        //pulling data
         "keys" => [
             "b972d12c42bd31d56fd1bd5cc", // testing Staging and production USD
-            "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
+            // "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
             // "5e2c5dc120e4ae6aeeae4000e", 
             // "3457bde6440cb38837da65b3c", 
             // "b391abaf172c2dbc1046965c8"
         ],
+        "b972d12c42bd31d56fd1bd5cc" => [211,92], //ga suppor aning mga client pag pull ni sa data 
+
    ],  
    'funkygames' => [
         'provider_db_id'=> 63,
@@ -743,15 +774,22 @@ return [
         'Org' => 'TIGERGAMES002',
         'topOrg' => 'TigerGamesGroup',
         'key' => 'yGdqhLKv7E5WUf3ThmW',
-        'provider_db_id' => 70,
+        'provider_db_id' => 38,
     ],
     'bota'=>[
         'api_key' => '6659fc8266bf70ac08933e3ba794422be56ad036a4f2db56514b59fcf8536594',
         'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36',
-        'api_url' => 'http://bota-en.com/api',
+        'api_url' => 'http://bota-cn.com/api',
         'prefix' => 'SPEED',
         'provider_db_id' => 135,
         'gamelaunch_url' => 'https://seam.go-65.com/token/',
+    ],
+    'dowinn' =>[
+        'api_url' => 'https://t-agent.sbet56789.com/cash',
+        'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
+        'user_agent' => 'kapi0006s',
+        'prefix' => 'TG',
+        'provider_db_id' => 139,
     ],
 ];
 

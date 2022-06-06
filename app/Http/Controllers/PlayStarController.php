@@ -174,10 +174,42 @@ class PlayStarController extends Controller
                 Helper::saveLog('PlayStar new trans', $this->provider_db_id, json_encode($data), $response);
                 return response($response,200)->header('Content-Type', 'application/json');
         }catch(\Exception $e){
+            $gameTransactionData = array(
+                "provider_trans_id" => $data['ts'],
+                "token_id" => $client_details->token_id,
+                "game_id" => $game_details->game_id,
+                "round_id" => $data['txn_id'],
+                "bet_amount" => $bet_amount,
+                "win" => 5,
+                "pay_amount" => 0,
+                "income" => 0,
+                "entry_id" => 1,
+            );
+           GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+           $gameTransactionEXTData = array(
+                "game_trans_id" => $game_transid_gen,
+                "provider_trans_id" => $data['ts'],
+                "round_id" => $data['txn_id'],
+                "amount" => $bet_amount,
+                "game_transaction_type"=> 1,
+                //"provider_request" =>json_encode($request->all()),
+            );
+           GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
             $msg = array(
                 'error' => '1',
                 'message' => $e->getMessage(),
             );
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_transid_ext,
+                    "request" => json_encode($data),
+                    "response" => json_encode($msg),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "success",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             Helper::saveLog('Playstar bet error', $this->provider_db_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
             return json_encode($msg, JSON_FORCE_OBJECT); 
         }

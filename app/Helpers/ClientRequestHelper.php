@@ -91,6 +91,7 @@ class ClientRequestHelper{
             # Timeout
             if($type == 'debit'){
                 $timeout = 5; // Used in Auto Retry Call
+                $timeout = 5; // Used in Retry Call
             }else{
                 $timeout = 5;
             }

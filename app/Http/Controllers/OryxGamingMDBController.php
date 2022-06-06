@@ -203,6 +203,8 @@ class OryxGamingMDBController extends Controller
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id,$client_details);
 
                 }else{
+                    $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+                    $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
                     $gameTransactionData = array(
                         "provider_trans_id" => $provider_trans_id,
                         "token_id" => $client_details->token_id,
@@ -214,7 +216,9 @@ class OryxGamingMDBController extends Controller
                         "income" => 0,
                         "entry_id" => 1,
                     ); 
-                    $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+                    // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction version two
+                    $game_transaction_id = $gen_game_trans_id;
 					Helper::saveLog('Oryx create trans', $this->provider_db_id, json_encode($payload),$client_details);
                     $gameTransactionEXTData = array(
                         "game_trans_id" => $game_transaction_id,
@@ -222,9 +226,11 @@ class OryxGamingMDBController extends Controller
                         "round_id" => $round_id,
                         "amount" => $bet_amount,
                         "game_transaction_type"=> 1,
-                        "provider_request" =>json_encode($payload),
+                        // "provider_request" =>json_encode($payload), // version 1
                     );
-                    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
+                    // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); // version 1
+                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension version two
+                    $game_trans_ext_id = $gen_game_extid;
 					Helper::saveLog('Oryx create trans ext', $this->provider_db_id, json_encode($payload),$client_details);
                     $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
                     if(isset($client_response->fundtransferresponse->status->code)){
@@ -238,16 +244,27 @@ class OryxGamingMDBController extends Controller
                                         "responseCode" => "OK",
                                         "balance" => $this->_toPennies($client_response->fundtransferresponse->balance),
                                     ];
-                                    $updateTransactionEXt = array(
-                                        "provider_request" =>json_encode($payload),
-                                        "mw_response" => json_encode($response),
-                                        'mw_request' => json_encode($client_response->requestoclient),
-                                        'client_response' => json_encode($client_response->fundtransferresponse),
-                                        'transaction_detail' => 'success',
-                                        'general_details' => 'success',
+                                    // $updateTransactionEXt = array(
+                                    //     "provider_request" =>json_encode($payload),
+                                    //     "mw_response" => json_encode($response),
+                                    //     'mw_request' => json_encode($client_response->requestoclient),
+                                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                                    //     'transaction_detail' => 'success',
+                                    //     'general_details' => 'success',
                                     
-                                    );
-                                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                    // );
+                                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                    $createGameTransactionLog = [
+                                              "connection_name" => $client_details->connection_name,
+                                              "column" =>[
+                                                  "game_trans_ext_id" => $game_trans_ext_id,
+                                                  "request" => json_encode($payload),
+                                                  "response" => json_encode($response),
+                                                  "log_type" => "provider_details",
+                                                  "transaction_detail" => "SUCCESS",
+                                              ]
+                                          ];
+                                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                                 break;
                                 case '402':
                                    ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
@@ -258,15 +275,26 @@ class OryxGamingMDBController extends Controller
                                         "balance" => $this->_toPennies($client_response->fundtransferresponse->balance)
                                     ];
 
-                                    $updateTransactionEXt = array(
-                                        "provider_request" =>json_encode($payload),
-                                        "mw_response" => json_encode($response),
-                                        'mw_request' => json_encode($client_response->requestoclient),
-                                        'client_response' => json_encode($client_response->fundtransferresponse),
-                                        'transaction_detail' => 'failed',
-                                        'general_details' => 'failed',
-                                    );
-                                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                    // $updateTransactionEXt = array(
+                                    //     "provider_request" =>json_encode($payload),
+                                    //     "mw_response" => json_encode($response),
+                                    //     'mw_request' => json_encode($client_response->requestoclient),
+                                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                                    //     'transaction_detail' => 'failed',
+                                    //     'general_details' => 'failed',
+                                    // );
+                                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                    $createGameTransactionLog = [
+                                              "connection_name" => $client_details->connection_name,
+                                              "column" =>[
+                                                  "game_trans_ext_id" => $game_trans_ext_id,
+                                                  "request" => json_encode($payload),
+                                                  "response" => json_encode($response),
+                                                  "log_type" => "provider_details",
+                                                  "transaction_detail" => "FAILED",
+                                              ]
+                                          ];
+                                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
                                 break;
                             }
 							Helper::saveLog('Oryx Success Bet', $this->provider_db_id, json_encode($payload),$response);
@@ -327,16 +355,19 @@ class OryxGamingMDBController extends Controller
                     'trans_status' => 2
                 ];
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $gameTransactionEXTData = array(
                     "game_trans_id" => $bet_transaction->game_trans_id,
                     "provider_trans_id" => $provider_trans_id,
                     "round_id" => $round_id,
                     "amount" => $pay_amount,
                     "game_transaction_type"=> 2,
-                    "provider_request" =>json_encode($payload),
-                    "mw_response" => json_encode($response),
+                    // "provider_request" =>json_encode($payload),
+                    // "mw_response" => json_encode($response),
                 );
-                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+                // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); // version 1
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension version two
+                $game_trans_ext_id = $gen_game_extid;
                 $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
                     "custom" => [
@@ -346,7 +377,7 @@ class OryxGamingMDBController extends Controller
                         "entry_id" => $entry_id,
                         "pay_amount" => $pay_amount,
                         "income" => $income,
-                        "game_trans_ext_id" => $game_trans_ext_id
+                        "game_transaction_ext_id" => $game_trans_ext_id
                     ],
                     "provider" => [
                         "provider_request" => json_encode($payload), #R
@@ -363,15 +394,26 @@ class OryxGamingMDBController extends Controller
                     ]
                 ];
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-                $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($payload),
-                    "mw_response" => json_encode($response),
-                    'mw_request' => json_encode($client_response->requestoclient),
-                    'client_response' => json_encode($client_response->fundtransferresponse),
-                    'transaction_detail' => 'success',
-                    'general_details' => 'success',
-            );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                // $updateTransactionEXt = array(
+                //         "provider_request" =>json_encode($payload),
+                //         "mw_response" => json_encode($response),
+                //         'mw_request' => json_encode($client_response->requestoclient),
+                //         'client_response' => json_encode($client_response->fundtransferresponse),
+                //         'transaction_detail' => 'success',
+                //         'general_details' => 'success',
+                // );
+                // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                $createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $game_trans_ext_id,
+                              "request" => json_encode($payload),
+                              "response" => json_encode($response),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "Success",
+                          ]
+                      ];
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
             //Helper::saveLog('Oryx Gaming Win success', $this->provider_db_id, $payload, $response);
                 return $response;
             }else{
@@ -491,7 +533,7 @@ class OryxGamingMDBController extends Controller
 		return response()->json($response, $http_status);
 	}
 
-	public function roundFinished(Request $request) 
+	public function roundFinished(Request $request)
 	{
 		Helper::saveLog('roundFinished', 18, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$json_data = json_decode(file_get_contents("php://input"), true);

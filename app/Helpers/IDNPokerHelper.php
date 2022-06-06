@@ -318,10 +318,17 @@ class IDNPokerHelper{
         DB::select('delete from tw_player_restriction '.$where);
     }
 
-    public static function getPlayerID($player_id){
-        $query = DB::select('select * from players where username = "'.$player_id.'"');
+    public static function getPlayerID($client_player_id,$client_ids){
+        $query = DB::select('select * from players where client_player_id = "'.$client_player_id.'"');
+        $player_id = 1;
+        foreach($query as $item){
+            if (in_array($item->client_id, $client_ids)) {
+               $player_id = $item->player_id;
+            }
+        }   
+        // $query = DB::select('select * from players where client_id = '.$client_id.' and client_player_id = "'.$player_id.'"');
         $data = count($query);
-        return $data > 0 ? $query[0] : "false";
+        return $data > 0 ? $player_id : "false";
     }
 
     

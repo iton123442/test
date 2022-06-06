@@ -246,6 +246,17 @@ public function gameBet($request, $client_details){
                                                 "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                                               ],
                                             ];
+                                            $createGameTransactionLog = [
+                                                  "connection_name" => $client_details->connection_name,
+                                                  "column" =>[
+                                                      "game_trans_ext_id" => $gen_game_extid,
+                                                      "request" => json_encode($payload),
+                                                      "response" => json_encode($response),
+                                                      "log_type" => "provider_details",
+                                                      "transaction_detail" => "SUCCESS",
+                                                  ]
+                                                ];
+                                             ProviderHelper::queTransactionLogs($createGameTransactionLog); 
                                     }elseif(isset($payload['actions'][1]['action']) && $payload['actions'][1]['action'] == 'bet'){
                                         $http_status = 200;
                                         $fundtransfer_bal = number_format($client_response->fundtransferresponse->balance,2,'.','');
@@ -266,6 +277,17 @@ public function gameBet($request, $client_details){
                                             ],
                                            ],
                                           ];
+                                          $createGameTransactionLog = [
+                                                  "connection_name" => $client_details->connection_name,
+                                                  "column" =>[
+                                                      "game_trans_ext_id" => $gen_game_extid,
+                                                      "request" => json_encode($payload),
+                                                      "response" => json_encode($response),
+                                                      "log_type" => "provider_details",
+                                                      "transaction_detail" => "SUCCESS",
+                                                  ]
+                                                ];
+                                             ProviderHelper::queTransactionLogs($createGameTransactionLog); 
                                           return $response;
                                     }else{
                                         $http_status = 200;
@@ -282,10 +304,21 @@ public function gameBet($request, $client_details){
                                             ],
                                            ],
                                           ];
+                                          $createGameTransactionLog = [
+                                                  "connection_name" => $client_details->connection_name,
+                                                  "column" =>[
+                                                      "game_trans_ext_id" => $gen_game_extid,
+                                                      "request" => json_encode($payload),
+                                                      "response" => json_encode($response),
+                                                      "log_type" => "provider_details",
+                                                      "transaction_detail" => "SUCCESS",
+                                                  ]
+                                                ];
+                                             ProviderHelper::queTransactionLogs($createGameTransactionLog);
                                     }
                                     if(!isset($payload['actions'][1])){
                                             if($payload['finished'] == true){
-                                                $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+                                                $gen_game_extid2 = ProviderHelper::idGenerate($client_details->connection_name,2);
                                                      $updateGameTransaction = [
                                                                 'win' => 0,
                                                                 'pay_amount' => 0,
@@ -304,7 +337,7 @@ public function gameBet($request, $client_details){
                                                                             "entry_id" => 1,
                                                                             "pay_amount" => 0,
                                                                             "income" => $bet_amount,
-                                                                            "game_transaction_ext_id" => $gen_game_extid
+                                                                            "game_transaction_ext_id" => $gen_game_extid2
                                                                         ],
                                                                         "provider" => [
                                                                             "provider_request" => $payload, #R
@@ -326,27 +359,7 @@ public function gameBet($request, $client_details){
                                                                     ];
                                                           Helper::saveLog('Bg Create Ext.', $this->provider_db_id, json_encode($request),$action_payload);
                                                          $client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
-                                                        //  $updateTransactionEXt = array(
-                                                        //     "provider_request" =>json_encode($request),
-                                                        //     "mw_response" => json_encode($response),
-                                                        //     'mw_request' => json_encode($client_response->requestoclient),
-                                                        //     'client_response' => json_encode($client_response->fundtransferresponse),
-                                                        //     'transaction_detail' => 'progressing',
-                                                        //     'general_details' => 'progressing',
-                                                        // );
-                                                        // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-                                                         $createGameTransactionLog = [
-                                                              "connection_name" => $client_details->connection_name,
-                                                              "column" =>[
-                                                                  "game_trans_ext_id" => $gen_game_extid,
-                                                                  "request" => json_encode($request),
-                                                                  "response" => json_encode($response),
-                                                                  "log_type" => "provider_details",
-                                                                  "transaction_detail" => "SUCCESS",
-                                                              ]
-                                                            ];
-                                                         ProviderHelper::queTransactionLogs($createGameTransactionLog); 
-                                                        $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+                                                        $gen_game_extid2 = ProviderHelper::idGenerate($client_details->connection_name,2);
                                                         $gameTransactionEXTDataLose = array(
                                                             "game_trans_id" => $game_transaction_id,
                                                             "provider_trans_id" => $provider_trans_id,
@@ -361,7 +374,39 @@ public function gameBet($request, $client_details){
                                                             // 'general_details' => 'success',
                                                             );
                                                         // GameTransactionMDB::createGameTransactionExt($gameTransactionEXTDataLose,$client_details);
-                                                        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTDataLose,$gen_game_extid,$client_details); //create extension
+                                                        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTDataLose,$gen_game_extid2,$client_details); //create extension
+                                                        //  $updateTransactionEXt = array(
+                                                        //     "provider_request" =>json_encode($request),
+                                                        //     "mw_response" => json_encode($response),
+                                                        //     'mw_request' => json_encode($client_response->requestoclient),
+                                                        //     'client_response' => json_encode($client_response->fundtransferresponse),
+                                                        //     'transaction_detail' => 'progressing',
+                                                        //     'general_details' => 'progressing',
+                                                        // );
+                                                        // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                                         $createGameTransactionLog = [
+                                                              "connection_name" => $client_details->connection_name,
+                                                              "column" =>[
+                                                                  "game_trans_ext_id" => $gen_game_extid2,
+                                                                  "request" => json_encode($payload),
+                                                                  "response" => json_encode($response),
+                                                                  "log_type" => "provider_details",
+                                                                  "transaction_detail" => "SUCCESS",
+                                                              ]
+                                                            ];
+                                                         ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                                                         $createGameTransactionLogCl = [
+                                                              "connection_name" => $client_details->connection_name,
+                                                              "column" =>[
+                                                                  "game_trans_ext_id" => $gen_game_extid2,
+                                                                  "request" => json_encode($client_response->requestoclient),
+                                                                  "response" => json_encode($client_response->fundtransferresponse),
+                                                                  "log_type" => "client_details",
+                                                                  "transaction_detail" => "SUCCESS",
+                                                              ]
+                                                            ];
+                                                         ProviderHelper::queTransactionLogs($createGameTransactionLogCl);  
+                                                        
                                             }else{
                                                 //     $updateTransactionEXt = array(
                                                 //         "provider_request" =>json_encode($request),
@@ -376,7 +421,7 @@ public function gameBet($request, $client_details){
                                                       "connection_name" => $client_details->connection_name,
                                                       "column" =>[
                                                           "game_trans_ext_id" => $gen_game_extid,
-                                                          "request" => json_encode($request),
+                                                          "request" => json_encode($payload),
                                                           "response" => json_encode($response),
                                                           "log_type" => "provider_details",
                                                           "transaction_detail" => "SUCCESS",
@@ -387,7 +432,7 @@ public function gameBet($request, $client_details){
                                                  Helper::saveLog('BG 200 Debit Success', $this->provider_db_id, json_encode($request), $response);	
                                         }//end else payload finished true      
                                     }//end action if
-				             return $response;
+				                    return $response;
                                     break;
                                 case '402':
                                     // ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
@@ -413,7 +458,7 @@ public function gameBet($request, $client_details){
                                       "connection_name" => $client_details->connection_name,
                                       "column" =>[
                                           "game_trans_ext_id" => $gen_game_extid,
-                                          "request" => json_encode($request),
+                                          "request" => json_encode($payload),
                                           "response" => json_encode($response),
                                           "log_type" => "provider_details",
                                           "transaction_detail" => "FAILED",

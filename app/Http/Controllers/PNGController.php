@@ -92,20 +92,21 @@ class PNGController extends Controller
                     ProviderHelper::idenpotencyTable($this->prefix.$xmlparser->transactionId);
                 }catch(\Exception $e){
                     $bet_transaction = GameTransactionMDB::findGameExt($xmlparser->transactionId, 1,'transaction_id', $client_details);
-                    if ($bet_transaction != 'false' && $bet_transaction->general_details != 'failed') {
-                        $array_data = array(
-                            "real" => round($client_details->balance,2),
-                            "statusCode" => 0,
-                        );
-                        Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
-                        return PNGHelper::arrayToXml($array_data,"<reserve/>");   
-                    } else {
-                        $array_data = array(
-                            "statusCode" => 7,
-                        );
-                        Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
-                        return PNGHelper::arrayToXml($array_data,"<reserve/>");
+                    if ($bet_transaction != 'false') {
+                        if( $bet_transaction->transaction_detail == "SUCCESS" ){
+                            $array_data = array(
+                                "real" => round($client_details->balance,2),
+                                "statusCode" => 0,
+                            );
+                            Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
+                            return PNGHelper::arrayToXml($array_data,"<reserve/>"); 
+                        }
                     } 
+                    $array_data = array(
+                        "statusCode" => 7,
+                    );
+                    Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
+                    return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
                 $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
                 $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
@@ -140,7 +141,8 @@ class PNGController extends Controller
                     "amount" =>(float)$xmlparser->real,
                     "game_transaction_type"=>1,
                     "provider_request" => json_encode($xmlparser),
-                    "mw_response" => 'null'
+                    "mw_response" => 'null',
+                    "transaction_detail" => "FAILED"
                 );
                 $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
@@ -157,6 +159,7 @@ class PNGController extends Controller
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
+                        "transaction_detail" => "SUCCESS"
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
@@ -187,7 +190,7 @@ class PNGController extends Controller
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametransactionid, $client_details);
                     }
                     $array_data = array(
-                        "statusCode" => 10,
+                        "statusCode" => 7,
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),

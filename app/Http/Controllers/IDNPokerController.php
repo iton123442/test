@@ -623,6 +623,7 @@ class IDNPokerController extends Controller
                         if (isset($provider_response["message"])) {
                             $message = $provider_response["message"];
                         }
+                        $message = "ポーカーポーカーがマルチウォレットに reflection されるまで1 minute trip かかります. しばらくおちください.";
                         $msg = array("status" => "error", "message" => $message);
                         Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
                         return response($msg, 200)->header('Content-Type', 'application/json');
@@ -657,8 +658,8 @@ class IDNPokerController extends Controller
                                 ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"]);
                                 $gameDetails = self::getSubGameDetails(config('providerlinks.idnpoker.PROVIDER_ID'), $value["game"]);
                                 // $playerID = substr($value["userid"],4);
-                                $playerDetails = IDNPokerHelper::getPlayerID($value["userid"]); //TESTINGn); // check balance
-                                $getClientDetails = ProviderHelper::getClientDetails("player_id", $playerDetails->player_id);
+                                $playerDetails = IDNPokerHelper::getPlayerID($value["userid"],config('providerlinks.idnpoker')[$keyVal] ); //TESTINGn); // check balance
+                                $getClientDetails = ProviderHelper::getClientDetails("player_id", $playerDetails);
                                 if($getClientDetails != null){
                                     $pay_amount = 0;
                                     $bet_amount = 0;
@@ -673,6 +674,7 @@ class IDNPokerController extends Controller
                                         // $bet_amount = ($value["r_bet"] / $rate);
                                         // $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
                                         $bet_amount = $value["curr_bet"];
+                                        // $bet_amount = 0;
                                         $pay_amount = $value["curr_amount"];
                                         $win = 1;
                                     } elseif ($value["status"] == "Win Global Jackpot" ) {

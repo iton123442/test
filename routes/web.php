@@ -149,18 +149,32 @@ $app->post('/public/api/marriott/authenticate', 'MarriottController@authPlayer')
 $app->post('/public/api/marriott/balance', 'MarriottController@getBalance'); #/
 $app->post('/public/api/marriott/debit', 'MarriottController@debitProcess'); #/
 // RGS Gaming Endpoints
-$app->post('/public/rgs/authenticate', 'DigitainController@authenticate');
-// $app->post('/public/rgs/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
-$app->post('/public/rgs/getbalance', 'DigitainController@getbalance');
-$app->post('/public/rgs/refreshtoken', 'DigitainController@refreshtoken');
-$app->post('/public/rgs/bet', 'DigitainController@bet');
-$app->post('/public/rgs/win', 'DigitainController@win');
-$app->post('/public/rgs/betwin', 'DigitainController@betwin');
-$app->post('/public/rgs/refund', 'DigitainController@refund');
-$app->post('/public/rgs/amend', 'DigitainController@amend');
-$app->post('/public/rgs/promowin', 'DigitainController@PromoWin');
-$app->post('/public/rgs/charge', 'DigitainController@makeCharge');
-$app->post('/public/rgs/checktxstatus', 'DigitainController@CheckTxStatus');
+// $app->post('/public/rgs/authenticate', 'DigitainController@authenticate');
+// // $app->post('/public/rgs/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
+// $app->post('/public/rgs/getbalance', 'DigitainController@getbalance');
+// $app->post('/public/rgs/refreshtoken', 'DigitainController@refreshtoken');
+// $app->post('/public/rgs/bet', 'DigitainController@bet');
+// $app->post('/public/rgs/win', 'DigitainController@win');
+// $app->post('/public/rgs/betwin', 'DigitainController@betwin');
+// $app->post('/public/rgs/refund', 'DigitainController@refund');
+// $app->post('/public/rgs/amend', 'DigitainController@amend');
+// $app->post('/public/rgs/promowin', 'DigitainController@PromoWin');
+// $app->post('/public/rgs/charge', 'DigitainController@makeCharge');
+// $app->post('/public/rgs/checktxstatus', 'DigitainController@CheckTxStatus');
+
+//newflowforDigitain
+$app->post('/public/rgs/authenticate', 'DigitainNEWController@authenticate');
+// $app->post('/public/rgs/creategamesession', 'DigitainNEWController@createGameSession'); // DONT NEED!
+$app->post('/public/rgs/getbalance', 'DigitainNEWController@getbalance');
+$app->post('/public/rgs/refreshtoken', 'DigitainNEWController@refreshtoken');
+$app->post('/public/rgs/bet', 'DigitainNEWController@bet');
+$app->post('/public/rgs/win', 'DigitainNEWController@win');
+$app->post('/public/rgs/betwin', 'DigitainNEWController@betwin');
+$app->post('/public/rgs/refund', 'DigitainNEWController@refund');
+$app->post('/public/rgs/amend', 'DigitainNEWController@amend');
+$app->post('/public/rgs/promowin', 'DigitainNEWController@PromoWin');
+$app->post('/public/rgs/charge', 'DigitainNEWController@makeCharge');
+$app->post('/public/rgs/checktxstatus', 'DigitainNEWController@CheckTxStatus');
 // IA SPORTS
 $app->post('/public/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
 $app->post('/public/api/ia/lunch', 'IAESportsController@userlunch');// DEPRECATED
@@ -229,34 +243,64 @@ $app->post('/public/api/skywind/api/get_free_bet', 'SkyWindController@getFreeBet
 //Report API
 
 // CQ9 Gaming
-$app->post('/public/api/cq9/transaction/game/bet','CQ9Controller@playerBet'); //
-$app->post('/public/api/cq9/transaction/game/endround','CQ9Controller@playrEndround'); //
-$app->post('/public/api/cq9/transaction/game/rollout','CQ9Controller@playerRollout'); //
-$app->post('/public/api/cq9/transaction/game/takeall','CQ9Controller@playerTakeall');
-$app->post('/public/api/cq9/transaction/game/rollin','CQ9Controller@playerRollin'); //
-$app->post('/public/api/cq9/transaction/game/debit','CQ9Controller@playerDebit');
-$app->post('/public/api/cq9/transaction/game/credit','CQ9Controller@playerCredit');
-$app->post('/public/api/cq9/transaction/game/bonus','CQ9Controller@playerBonus');
-$app->post('/public/api/cq9/transaction/user/payoff','CQ9Controller@playerPayoff');
-$app->post('/public/api/cq9/transaction/game/refund','CQ9Controller@playerRefund');
-$app->get('/public/api/cq9/transaction/record/{mtcode}','CQ9Controller@playerRecord'); 
+// $app->post('/public/api/cq9/transaction/game/bet','CQ9Controller@playerBet'); //
+// $app->post('/public/api/cq9/transaction/game/endround','CQ9Controller@playrEndround'); //
+// $app->post('/public/api/cq9/transaction/game/rollout','CQ9Controller@playerRollout'); //
+// $app->post('/public/api/cq9/transaction/game/takeall','CQ9Controller@playerTakeall');
+// $app->post('/public/api/cq9/transaction/game/rollin','CQ9Controller@playerRollin'); //
+// $app->post('/public/api/cq9/transaction/game/debit','CQ9Controller@playerDebit');
+// $app->post('/public/api/cq9/transaction/game/credit','CQ9Controller@playerCredit');
+// $app->post('/public/api/cq9/transaction/game/bonus','CQ9Controller@playerBonus');
+// $app->post('/public/api/cq9/transaction/user/payoff','CQ9Controller@playerPayoff');
+// $app->post('/public/api/cq9/transaction/game/refund','CQ9Controller@playerRefund');
+// $app->get('/public/api/cq9/transaction/record/{mtcode}','CQ9Controller@playerRecord'); 
 
-$app->post('/public/api/cq9/transaction/game/bets','CQ9Controller@playerBets');
-$app->post('/public/api/cq9/transaction/game/refunds','CQ9Controller@playerRefunds');
-$app->post('/public/api/cq9/transaction/game/cancel','CQ9Controller@playerCancel');
-$app->post('/public/api/cq9/transaction/game/amend','CQ9Controller@playerAmend');
-$app->post('/public/api/cq9/transaction/game/wins','CQ9Controller@playerWins');
-$app->post('/public/api/cq9/transaction/game/amends','CQ9Controller@playerAmends');
+// $app->post('/public/api/cq9/transaction/game/bets','CQ9Controller@playerBets');
+// $app->post('/public/api/cq9/transaction/game/refunds','CQ9Controller@playerRefunds');
+// $app->post('/public/api/cq9/transaction/game/cancel','CQ9Controller@playerCancel');
+// $app->post('/public/api/cq9/transaction/game/amend','CQ9Controller@playerAmend');
+// $app->post('/public/api/cq9/transaction/game/wins','CQ9Controller@playerWins');
+// $app->post('/public/api/cq9/transaction/game/amends','CQ9Controller@playerAmends');
 
-$app->get('/public/api/cq9/transaction/balance/{account}','CQ9Controller@CheckBalance');
-$app->get('/public/api/cq9/gameboy/player/lotto/balance/{account}','CQ9Controller@CheckBalanceLotto'); // New
-$app->get('/public/api/cq9/player/check/{account}','CQ9Controller@CheckPlayer');
-$app->post('/public/api/cq9/player/check','CQ9Controller@noRouteParamPassed'); // TEST
-$app->post('/public/api/cq9/transaction/record','CQ9Controller@noRouteParamPassed');  // TEST
-$app->post('/public/api/cq9/transaction/balance','CQ9Controller@noRouteParamPassed'); // TEST
+// $app->get('/public/api/cq9/transaction/balance/{account}','CQ9Controller@CheckBalance');
+// $app->get('/public/api/cq9/gameboy/player/lotto/balance/{account}','CQ9Controller@CheckBalanceLotto'); // New
+// $app->get('/public/api/cq9/player/check/{account}','CQ9Controller@CheckPlayer');
+// $app->post('/public/api/cq9/player/check','CQ9Controller@noRouteParamPassed'); // TEST
+// $app->post('/public/api/cq9/transaction/record','CQ9Controller@noRouteParamPassed');  // TEST
+// $app->post('/public/api/cq9/transaction/balance','CQ9Controller@noRouteParamPassed'); // TEST
 
-$app->post('/public/api/cq9/mw/getlist','CQ9Controller@getGameList');
-$app->post('/public/api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
+// $app->post('/public/api/cq9/mw/getlist','CQ9Controller@getGameList');
+// $app->post('/public/api/cq9/mw/gamelaunch','CQ9Controller@gameLaunch');
+//CQ9 NEWFLOW
+$app->post('/public/api/cq9/transaction/game/bet','CQ9NEWController@playerBet'); //
+$app->post('/public/api/cq9/transaction/game/endround','CQ9NEWController@playrEndround'); //
+$app->post('/public/api/cq9/transaction/game/rollout','CQ9NEWController@playerRollout'); //
+$app->post('/public/api/cq9/transaction/game/takeall','CQ9NEWController@playerTakeall');
+$app->post('/public/api/cq9/transaction/game/rollin','CQ9NEWController@playerRollin'); //
+$app->post('/public/api/cq9/transaction/game/debit','CQ9NEWController@playerDebit');
+$app->post('/public/api/cq9/transaction/game/credit','CQ9NEWController@playerCredit');
+$app->post('/public/api/cq9/transaction/game/bonus','CQ9NEWController@playerBonus');
+$app->post('/public/api/cq9/transaction/user/payoff','CQ9NEWController@playerPayoff');
+$app->post('/public/api/cq9/transaction/game/refund','CQ9NEWController@playerRefund');
+$app->get('/public/api/cq9/transaction/record/{mtcode}','CQ9NEWController@playerRecord'); 
+
+$app->post('/public/api/cq9/transaction/game/bets','CQ9NEWController@playerBets');
+$app->post('/public/api/cq9/transaction/game/refunds','CQ9NEWController@playerRefunds');
+$app->post('/public/api/cq9/transaction/game/cancel','CQ9NEWController@playerCancel');
+$app->post('/public/api/cq9/transaction/game/amend','CQ9NEWController@playerAmend');
+$app->post('/public/api/cq9/transaction/game/wins','CQ9NEWController@playerWins');
+$app->post('/public/api/cq9/transaction/game/amends','CQ9NEWController@playerAmends');
+
+$app->get('/public/api/cq9/transaction/balance/{account}','CQ9NEWController@CheckBalance');
+$app->get('/public/api/cq9/gameboy/player/lotto/balance/{account}','CQ9NEWController@CheckBalanceLotto'); // New
+$app->get('/public/api/cq9/player/check/{account}','CQ9NEWController@CheckPlayer');
+$app->post('/public/api/cq9/player/check','CQ9NEWController@noRouteParamPassed'); // TEST
+$app->post('/public/api/cq9/transaction/record','CQ9NEWController@noRouteParamPassed');  // TEST
+$app->post('/public/api/cq9/transaction/balance','CQ9NEWController@noRouteParamPassed'); // TEST
+
+$app->post('/public/api/cq9/mw/getlist','CQ9NEWController@getGameList');
+$app->post('/public/api/cq9/mw/gamelaunch','CQ9NEWController@gameLaunch');
+
 
 
 //SAGaming 
@@ -292,6 +336,20 @@ $app->post('/public/api/eightprovider/win', 'EightProviderController@gameWin'); 
 $app->post('/public/api/eightprovider/refund', 'EightProviderController@gameRefund'); // DEPRECATED
 $app->post('/public/api/eightprovider/deposit', 'EightProviderController@gameDeposit'); // DEPRECATED
 $app->post('/public/api/eightprovider/withdrawal', 'EightProviderController@gameWithdrawal'); // DEPRECATED
+$app->post('/public/api/gettransaction', 'AlController@testTransaction');
+
+$app->post('/public/api/eightprovider', 'EvoPlay8ProvController@index'); // Single Route
+
+$app->post('/public/api/eightprovider/test', 'EvoPlay8ProvController@testcall'); // TEST
+$app->post('/public/api/eightprovider/getlist', 'EvoPlay8ProvController@getGames');
+$app->post('/public/api/eightprovider/geturl', 'EvoPlay8ProvController@gameUrl'); // DEPRECATED
+$app->post('/public/api/eightprovider/registerbunos', 'EvoPlay8ProvController@registerBunos'); // DEPRECATED
+$app->post('/public/api/eightprovider/init', 'EvoPlay8ProvController@gameInit'); // DEPRECATED
+$app->post('/public/api/eightprovider/bet', 'EvoPlay8ProvController@gameBet'); // DEPRECATED
+$app->post('/public/api/eightprovider/win', 'EvoPlay8ProvController@gameWin'); // DEPRECATED
+$app->post('/public/api/eightprovider/refund', 'EvoPlay8ProvController@gameRefund'); // DEPRECATED
+$app->post('/public/api/eightprovider/deposit', 'EvoPlay8ProvController@gameDeposit'); // DEPRECATED
+$app->post('/public/api/eightprovider/withdrawal', 'EvoPlay8ProvController@gameWithdrawal'); // DEPRECATED
 $app->post('/public/api/gettransaction', 'AlController@testTransaction');
 
 //BNG Endpoints
@@ -353,6 +411,11 @@ $app->post('/public/api/pgsoft/VerifySession', 'PGSoftController@verifySession')
 $app->post('/public/api/pgsoft/Cash/Get', 'PGSoftController@cashGet');
 $app->post('/public/api/pgsoft/Cash/TransferOut', 'PGSoftController@transferOut');
 $app->post('/public/api/pgsoft/Cash/TransferIn', 'PGSoftController@transferIn');
+// PGSoft new flow
+$app->post('/public/api/pgsoft/VerifySession', 'PGSoftNewFController@verifySession');
+$app->post('/public/api/pgsoft/Cash/Get', 'PGSoftNewFController@cashGet');
+$app->post('/public/api/pgsoft/Cash/TransferOut', 'PGSoftNewFController@transferOut');
+$app->post('/public/api/pgsoft/Cash/TransferIn', 'PGSoftNewFController@transferIn');
 
 //Booming Games
 $app->post('/public/api/booming/gamelist','BoomingGamingController@gameList');
@@ -360,12 +423,19 @@ $app->post('/public/api/booming/callback','BoomingGamingController@callBack');
 $app->post('/public/api/booming/rollback','BoomingGamingController@rollBack');
 
 // Spade Gaming
-$app->post('/public/api/spade','SpadeController@index');//single route
-$app->post('/public/api/spade/authorize','SpadeController@authorize');
-$app->post('/public/api/spade/getBetCost','SpadeController@getBetCost');
-$app->post('/public/api/spade/getBalance','SpadeController@getBalance');
-$app->post('/public/api/spade/transfer','SpadeController@makeTransfer');
-$app->post('/public/api/spade/getgame','SpadeController@getGameList');
+// $app->post('/public/api/spade','SpadeController@index');//single route
+// $app->post('/public/api/spade/authorize','SpadeController@authorize');
+// $app->post('/public/api/spade/getBetCost','SpadeController@getBetCost');
+// $app->post('/public/api/spade/getBalance','SpadeController@getBalance');
+// $app->post('/public/api/spade/transfer','SpadeController@makeTransfer');
+// $app->post('/public/api/spade/getgame','SpadeController@getGameList');
+// Spade GamingNEWFLOW
+$app->post('/public/api/spade','SpadeNEWController@index');//single route
+$app->post('/public/api/spade/authorize','SpadeNEWController@authorize');
+$app->post('/public/api/spade/getBetCost','SpadeNEWController@getBetCost');
+$app->post('/public/api/spade/getBalance','SpadeNEWController@getBalance');
+$app->post('/public/api/spade/transfer','SpadeNEWController@makeTransfer');
+$app->post('/public/api/spade/getgame','SpadeNEWController@getGameList');
 
 //MajaGames
 $app->post('/public/api/mj/seamless/bet','MajaGamesController@bet');
@@ -472,17 +542,31 @@ $app->post('/public/hbn/api/query','HabaneroController@queryrequest');
 
 
 // Pragmatic PLay
-$app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
-$app->post('/public/api/pp/balance','PragmaticPLayController@balance');
-$app->post('/public/api/pp/bet','PragmaticPLayController@bet');
-$app->post('/public/api/pp/result','PragmaticPLayController@result');
-$app->post('/public/api/pp/refund','PragmaticPLayController@refund');
-$app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
-$app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
-$app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
-$app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
-$app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
-$app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+// $app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
+// $app->post('/public/api/pp/balance','PragmaticPLayController@balance');
+// $app->post('/public/api/pp/bet','PragmaticPLayController@bet');
+// $app->post('/public/api/pp/result','PragmaticPLayController@result');
+// $app->post('/public/api/pp/refund','PragmaticPLayController@refund');
+// $app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
+// $app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
+// $app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
+// $app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
+// $app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
+// $app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+//NEWFLOW PRAGMATIOC PLAY
+// Pragmatic PLay
+$app->post('/public/api/pp/authenticate','PragmaticPlayNEWController@authenticate');
+$app->post('/public/api/pp/balance','PragmaticPlayNEWController@balance');
+$app->post('/public/api/pp/bet','PragmaticPlayNEWController@bet');
+$app->post('/public/api/pp/result','PragmaticPlayNEWController@result');
+$app->post('/public/api/pp/refund','PragmaticPlayNEWController@refund');
+$app->post('/public/api/pp/bonusWin','PragmaticPlayNEWController@bonusWin');
+$app->post('/public/api/pp/jackpotWin','PragmaticPlayNEWController@jackpotWin');
+$app->post('/public/api/pp/promoWin','PragmaticPlayNEWController@promoWin');
+$app->post('/public/api/pp/endRound','PragmaticPlayNEWController@endRound');
+$app->post('/public/api/pp/getBalancePerGame','PragmaticPlayNEWController@getBalancePerGame');
+$app->post('/public/api/pp/session/expired','PragmaticPlayNEWController@sessionExpired');
+
 
 
 
@@ -586,13 +670,13 @@ $app->post('/public/tigergames/fundtransfer-timeout','FundtransferProcessorContr
 
 
 // SLOTMILL
-$app->post('/public/api/slotmill/playerinfo.json','SlotMillController@playerinfo');
-$app->post('/public/api/slotmill/wager.json','SlotMillController@wager'); // bet 
-$app->post('/public/api/slotmill/cancelwager.json','SlotMillController@cancelwager');
-$app->post('/public/api/slotmill/appendwagerresult.json','SlotMillController@appendwagerresult'); //bonus
-$app->post('/public/api/slotmill/appendwagergoods.json','SlotMillController@appendwagergoods'); //bonus
-$app->post('/public/api/slotmill/endwager.json','SlotMillController@endwager'); // win 
-$app->post('/public/api/slotmill/reverse.json','SlotMillController@reverse');
+$app->post('/public/api/slotmill/playerinfo.json','SlotmillNew@playerinfo');
+$app->post('/public/api/slotmill/wager.json','SlotmillNew@wager'); // bet 
+$app->post('/public/api/slotmill/cancelwager.json','SlotmillNew@cancelwager');
+$app->post('/public/api/slotmill/appendwagerresult.json','SlotmillNew@appendwagerresult'); //bonus
+$app->post('/public/api/slotmill/appendwagergoods.json','SlotmillNew@appendwagergoods'); //bonus
+$app->post('/public/api/slotmill/endwager.json','SlotmillNew@endwager'); // win 
+$app->post('/public/api/slotmill/reverse.json','SlotmillNew@reverse');
 
 
 //PGVIRTUAL
@@ -705,9 +789,9 @@ $app->post('/public/api/dragongaming/refund', 'DragonGamingController@rollbackTr
 
 
 // PlayTech
-$app->post('/public/api/playtech/auth', 'PlayTechController@auth');
-$app->post('/public/api/playtech/balance', 'PlayTechController@getBalance');
-$app->post('/public/api/playtech/transaction', 'PlayTechController@transaction');
+$app->post('/public/api/playtech/auth', 'PlaytechControllerNew@auth');
+$app->post('/public/api/playtech/balance', 'PlaytechControllerNew@getBalance');
+$app->post('/public/api/playtech/transaction', 'PlaytechControllerNew@transaction');
 // FunkyGames
 $app->post('/public/FunkyGames/GetGameList', 'FunkyGamesController@gameList');
 $app->post('/public/Funky/User/GetBalance','FunkyGamesController@GetBalance');
@@ -717,10 +801,10 @@ $app->post('/public/Funky/Bet/SettleBet','FunkyGamesController@SettleBet');
 $app->post('/public/Funky/Bet/CancelBet','FunkyGamesController@CancelBet');
 
 // Amuse Gaming
-$app->post('/public/GetPlayerBalance', 'AmuseGamingController@GetPlayerBalance');
-$app->post('/public/WithdrawAndDeposit', 'AmuseGamingController@WithdrawAndDeposit');
-$app->post('/public/Cancel', 'AmuseGamingController@Cancel');
-$app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingController@getGamelist');
+$app->post('/public/GetPlayerBalance', 'AmuseGamingNew@GetPlayerBalance');
+$app->post('/public/WithdrawAndDeposit', 'AmuseGamingNew@WithdrawAndDeposit');
+$app->post('/public/Cancel', 'AmuseGamingNew@Cancel');
+$app->post('/public/api/AmuseGaming/getGamelist', 'AmuseGamingNew@getGamelist');
 //FREGAME OR FREEROUND BY PROVIDER
 $app->post('/public/game/freeround/give','FreeRound\FreeRoundController@freeRoundController');
 $app->post('/public/game/freeround/getQuery','FreeRound\FreeRoundController@getQuery');
@@ -785,6 +869,33 @@ $app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult'
 $app->post('/public/endwager/test','YGG002Controller@endwager');
 $app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
 $app->post('/public/getbalance/test','YGG002Controller@getbalance');
+
+// Yggdrasil NEWLOW
+// $app->get('/public/playerinfo.json','YGG002ControllerNEW@playerinfo');
+// $app->get('/public/wager.json','YGG002ControllerNEW@wager');
+// $app->get('/public/cancelwager.json','YGG002ControllerNEW@cancelwager');
+// $app->get('/public/appendwagerresult.json','YGG002ControllerNEW@appendwagerresult');
+// $app->get('/public/endwager.json','YGG002ControllerNEW@endwager');
+// $app->get('/public/campaignpayout.json','YGG002ControllerNEW@campaignpayout');
+// $app->get('/public/getbalance.json','YGG002ControllerNEW@getbalance');
+// // ygg local NEWFLOW
+// $app->post('/public/playerinfo/test','YGG002ControllerNEW@playerinfo');
+// $app->post('/public/wager/test','YGG002ControllerNEW@wager');
+// $app->post('/public/cancelwager/test','YGG002ControllerNEW@cancelwager');
+// $app->post('/public/appendwagerresult/test','YGG002ControllerNEW@appendwagerresult');
+// $app->post('/public/endwager/test','YGG002ControllerNEW@endwager');
+// $app->post('/public/campaignpayout/test','YGG002ControllerNEW@campaignpayout');
+// $app->post('/public/getbalance/test','YGG002ControllerNEW@getbalance');
+
 //BOTA
-$app->post('/public/api/bota', 'BOTAController@index');
+// $app->post('/public/api/bota', 'BOTAController@index');
+// $app->post('/public/api/bota/callbackBalance', 'BOTAControllerNEW@index');
 $app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
+//DOWINN
+$app->post('/public/api/dowinn', 'DOWINNController@index');//SINGLE END POINT
+$app->post('/public/api/dowinn/balance', 'DOWINNController@balance');
+$app->post('/public/api/dowinn/debit', 'DOWINNController@bet');
+$app->post('/public/api/dowinn/credit', 'DOWINNController@payment');
+$app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
+$app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
+$app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');

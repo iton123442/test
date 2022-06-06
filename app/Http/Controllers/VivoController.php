@@ -310,6 +310,9 @@ class VivoController extends Controller
 	                      ]
 	                    ];
                      ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                     if($data['isRoundFinished'] == "true"){
+                     	return $this->loseTransaction($data,$game_transaction_id,$gen_game_extid,$client_details);
+                     }
 					break;
 				case '402':
 					
@@ -426,15 +429,26 @@ class VivoController extends Controller
 	        	$createGameTransactionLog = [
 	                  "connection_name" => $client_details->connection_name,
 	                  "column" =>[
-	                      "game_transaction_ext_id" => $gen_game_extid,
+	                      "game_trans_ext_id" => $gen_game_extid,
+	                      "request" => json_encode($data),
+	                      "response" => json_encode($response),
+	                      "log_type" => "provider_details",
+	                      "transaction_detail" => "Success",
+	                  ]
+	                ];
+	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
+	        } catch (\Exception $e) {
+	        	$createGameTransactionLog = [
+	                  "connection_name" => $client_details->connection_name,
+	                  "column" =>[
+	                      "game_trans_ext_id" => $gen_game_extid,
 	                      "request" => json_encode($data),
 	                      "response" => json_encode($response),
 	                      "log_type" => "provider_details",
 	                      "transaction_detail" => "FAILED",
 	                  ]
 	                ];
-	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
-	        } catch (\Exception $e) {
+	            ProviderHelper::queTransactionLogs($createGameTransactionLog);
 	        	Helper::saveLog('Vivo Gaming WIN ERROR CATCHED', 34,json_encode($data), json_encode($response));
 	        }
 	       
@@ -444,7 +458,84 @@ class VivoController extends Controller
 			$final_response .= $response;
 			return $final_response;
 	}
-
+	public function loseTransaction($data,$game_trans_id,$game_trans_ext_id,$client_details){
+			$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
+			$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+			Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), "ENDPOINTHIT");
+			if($data["Amount"] < 0) {
+				$response = [
+					"errorCode" =>  10201,
+					"message" => "Warning value must not be less 0.",
+				];
+			}
+			$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID>'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$game_trans_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_details->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
+			$win_game_transaction_ext = array(
+	            "game_trans_id" => $game_trans_id,
+	            "provider_trans_id" => $data["TransactionID"],
+	            "round_id" => $data["roundId"],
+	            "amount" => 0,
+	            "game_transaction_type"=> 2,
+	            // "provider_request" =>json_encode($data),
+	            // "mw_response" => json_encode($response),
+	            // "general_details" => $data["History"],
+	        );		                
+			// $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
+			GameTransactionMDB::createGameTransactionExtV2($win_game_transaction_ext,$gen_game_extid,$client_details); //create extension
+			$action_payload = [
+	            "type" => "custom", #genreral,custom :D # REQUIRED!
+	            "custom" => [
+	            	"win_or_lost" => 0,
+	                "provider" => 'VivoGaming',
+	                "game_transaction_ext_id" => $gen_game_extid,
+	        		"client_connection_name" => $client_details->connection_name
+	            ],
+	            "provider" => [
+	                "provider_request" => $data, #R
+	                "provider_trans_id"=> $data["TransactionID"], #R
+	                "provider_round_id"=> $data["roundId"], #R
+	                "provider_name"=> $game_details->provider_name
+	            ],
+	            "mwapi" => [
+	                "roundId"=>$game_trans_id, #R
+	                "type"=>2, #R
+	                "game_id" => $game_details->game_id, #R
+	                "player_id" => $client_details->player_id, #R
+	                "mw_response" => $response, #R
+	            ]
+	        ];
+	        try {
+        	 	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
+	        	Helper::saveLog('Vivo Gaming LOSE', 34,json_encode($data), json_encode($response));
+	        	$createGameTransactionLog = [
+	                  "connection_name" => $client_details->connection_name,
+	                  "column" =>[
+	                      "game_trans_ext_id" => $gen_game_extid,
+	                      "request" => json_encode($data),
+	                      "response" => json_encode($response),
+	                      "log_type" => "provider_details",
+	                      "transaction_detail" => "Success",
+	                  ]
+	                ];
+	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
+	        } catch (\Exception $e) {
+	        	$createGameTransactionLog = [
+	                  "connection_name" => $client_details->connection_name,
+	                  "column" =>[
+	                      "game_trans_ext_id" => $game_trans_ext_id,
+	                      "request" => json_encode($data),
+	                      "response" => json_encode($response),
+	                      "log_type" => "provider_details",
+	                      "transaction_detail" => "FAILED",
+	                  ]
+	                ];
+	             ProviderHelper::queTransactionLogs($createGameTransactionLog);
+	        	Helper::saveLog('Vivo Gaming LOSE ERROR CATCHED', 34,json_encode($data), json_encode($response));
+	        }
+	        header("Content-type: text/xml; charset=utf-8");
+			$final_response =  '<?xml version="1.0" encoding="utf-8"?>';
+			$final_response .= $response;
+			return $final_response;
+	}
 	public function transactionStatus(Request $request) 
 	{
 		$json_data = json_decode(file_get_contents("php://input"), true);
