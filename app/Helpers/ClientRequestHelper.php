@@ -90,15 +90,7 @@ class ClientRequestHelper{
 
             # Timeout
             if($type == 'debit'){
-<<<<<<< HEAD
-<<<<<<< HEAD
                 $timeout = 5; // Used in Retry Call
-=======
-                $timeout = 5; // Used in Auto Retry Call
->>>>>>> 4bf0b3b16fd767a8b8f0fcac5e5b9ecaaf6afe55
-=======
-                $timeout = 5; // Used in Auto Retry Call
->>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
             }else{
                 $timeout = 5;
             }
@@ -206,17 +198,9 @@ class ClientRequestHelper{
 
                 # Add Refund Queue
                 if($type == 'debit'){
-<<<<<<< HEAD
-<<<<<<< HEAD
                     $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming", "Booongo"];
-=======
 
                     # Provider List Moved to top!
->>>>>>> 4bf0b3b16fd767a8b8f0fcac5e5b9ecaaf6afe55
-=======
-
-                    # Provider List Moved to top!
->>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
                     $bol = true;
 
                     # Exclude Provider
@@ -431,25 +415,11 @@ class ClientRequestHelper{
             // Client Custom Data Type
             $custom_operator = config('clientcustom.data_type.transaction.string');
             if(in_array($client_details->operator_id, $custom_operator)){
-<<<<<<< HEAD
-<<<<<<< HEAD
-                // ProviderHelper::mandatorySaveLog($requesttocient["action"]['custom']['game_transaction_ext_id'], 123, "GG", 'TG_PROCESS');
-=======
->>>>>>> 4bf0b3b16fd767a8b8f0fcac5e5b9ecaaf6afe55
-=======
->>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
                 if(isset($requesttocient["action"]['custom']['game_transaction_ext_id'])){
                     $ext_id = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
                 }else{
                     $ext_id = (string)$requesttocient["action"]['custom']['game_trans_ext_id'];
                 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-                // $requesttocient["action"]['custom']['game_transaction_ext_id'] = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
-=======
->>>>>>> 4bf0b3b16fd767a8b8f0fcac5e5b9ecaaf6afe55
-=======
->>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
                 $requesttocient["action"]['custom']['game_transaction_ext_id'] = $ext_id;
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'] = (string)$requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'];
             }
