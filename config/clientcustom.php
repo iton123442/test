@@ -3,11 +3,12 @@
 return [
     'data_type' => [
         'transaction' => [
-
-        	 // Client Operator Id
-        	'string' => [1,6,32] 
-
-        	
+        	'string' => [1,6,32]  // Client Operator Id
         ]
+    ],
+    'auto_refund' => [
+    	'exclude' => [
+    		'operator_id' => [17] // Client Operator Id
+    	]
     ]
 ];
