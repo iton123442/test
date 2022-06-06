@@ -40,7 +40,7 @@ class FundtransferProcessorController extends Controller
         }
         // sleep(10);
         try{
-            $providers = ["hbn","tpp","ygg","AmuseGaming","OnlyPlay","Nolimit City","BGaming","SpearHead","Smartsoft Gaming","kagaming","allwayspin","evoplay","sagaming","cqgames","evolution","bng","icg","wazdan","TopTrendGaming","MannaPlay","VivoGaming","MancalaGaming","Quickspin","PlayNGo","bota","digitain",
+            $providers = ["hbn","tpp","ygg","AmuseGaming","OnlyPlay","Nolimit City","BGaming","SpearHead","Smartsoft Gaming","kagaming","allwayspin","evoplay","sagaming","cqgames","evolution","bng","icg","wazdan","TopTrendGaming","MannaPlay","VivoGaming","MancalaGaming","Quickspin","PlayNGo","BOTA","DOWINN","digitain",
 
                 "PlayStar Gaming","Ozashiki","SG","SimplePlay","Oryx Gaming","FunkyGames"
             ];
