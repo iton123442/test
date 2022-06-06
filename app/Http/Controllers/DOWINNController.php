@@ -555,7 +555,7 @@ class DOWINNController extends Controller{
             //     "general_details" => "BET_CANCELED",
             // ];
             // GameTransactionMDB::updateGametransactionEXT($updateBetTransaction,$refundedBetId,$client_details);
-            $totalBetThisRound = DOWINNHelper::totalBet($roundId,$client_details);
+            // $totalBetThisRound = DOWINNHelper::totalBet($roundId,$client_details);
             $updateTransData = [
                 "win" => 5,
                 "entry_id" => 2,
@@ -627,11 +627,11 @@ class DOWINNController extends Controller{
                     "bet_amount" => round($sumOfBet,2),
                 ];
                 GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
-                $updateTransData = [
-                    "win" => $win_or_lost,
-                    "bet_amount" => $totalBetThisRound,
-                ];
-                GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
+                // $updateTransData = [
+                //     "win" => $win_or_lost,
+                //     "bet_amount" => $totalBetThisRound,
+                // ];
+                // GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                 $response = [
                     "status" => 'OK',
                     "balance" => $balance,
