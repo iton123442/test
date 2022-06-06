@@ -420,18 +420,20 @@ class DOWINNController extends Controller{
                 if($countSumTrans != 'false'){
                     if($countSumTrans > 2){
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
+                        $sumOfWin = $sumOfTransactions['1']->amount;
                     }
                     elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
+                        $sumOfWin = 0;
                     }
                     else{
                         $sumOfBet = $sumOfTransactions['0']->amount;
-
-                    }
+                        $sumOfWin = $winAmount;                    }
                 }
                 $finalUpdateDatas = [
                     "win" => $win_or_lost,
                     "bet_amount" => round($sumOfBet,2),
+                    "pay_amount" => round($sumOfWin,2),
                 ];
                 GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 $response = [
@@ -549,12 +551,12 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            // $refundedBet = GameTransactionMDB::getGameTransactionByGeneralDetails($data['transaction']['id'],$client_details);
-            // $refundedBetId = $refundedBet->game_trans_ext_id;
-            // $updateBetTransaction = [
-            //     "general_details" => "BET_CANCELED",
-            // ];
-            // GameTransactionMDB::updateGametransactionEXT($updateBetTransaction,$refundedBetId,$client_details);
+            $refundedBet = GameTransactionMDB::getGameTransactionByGeneralDetailsEXT($data['transaction']['id'],$client_details);
+            $refundedBetId = $refundedBet->game_trans_ext_id;
+            $updateBetTransaction = [
+                "general_details" => "BET_CANCELED",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($updateBetTransaction,$refundedBetId,$client_details);
             // $totalBetThisRound = DOWINNHelper::totalBet($roundId,$client_details);
             $updateTransData = [
                 "win" => 5,

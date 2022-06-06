@@ -132,7 +132,7 @@ class GameTransactionMDB
         }
     }
 
-    public static function getGameTransactionByGeneralDetails($general_details,$client_details){
+    public static function getGameTransactionByGeneralDetailsEXT($general_details,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
             // $game = DB::connection($connection["connection_name"])->select("SELECT
@@ -141,9 +141,9 @@ class GameTransactionMDB
             //                 WHERE  round_id = '".$general_details."'");
             // $cnt = count($game);
             // return $cnt > 0? $game[0]: null;
-            $select = "SELECT entry_id,bet_amount,game_trans_ext_id,game_trans_id,pay_amount,income FROM ";
-            $db = "{$connection['db_list'][1]}.game_transactions g ";
-            $where = "WHERE  g.game_trans_id = (select game_trans_id from {$connection['db_list'][1]}.game_transaction_ext gte where general_details = '{$general_details}'";
+            $select = "SELECT game_trans_ext_id FROM ";
+            $db = "{$connection['db_list'][1]}.game_transaction_ext gt ";
+            $where = "WHERE game_trans_id = (select game_trans_id from {$connection['db_list'][1]}.game_transaction_ext gte where general_details = '{$general_details}');";
             $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
