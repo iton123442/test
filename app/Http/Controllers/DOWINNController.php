@@ -628,29 +628,26 @@ class DOWINNController extends Controller{
                 if($countSumTrans != 'false'){
                     if($countSumTrans > 2){
                         $sumOfRefund = $sumOfTransactions['2']->amount;
-                        $sumOfBet = $sumOfTransactions['0']->amount;
                         $finalUpdateDatas = [
                             "win" => $win_or_lost,
                             "pay_amount" => round($sumOfRefund,2),
-                            "bet_amount" => round($sumOfBet,2),
+                            "bet_amount" => round($sumOfRefund,2),
                         ];
                     }
                     elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
                         $sumOfRefund = $sumOfTransactions['1']->amount;
-                        $sumOfBet = $sumOfTransactions['0']->amount;
                         $finalUpdateDatas = [
                             "win" => $win_or_lost,
                             "pay_amount" => round($sumOfRefund,2),
-                            "bet_amount" => round($sumOfBet,2),
+                            "bet_amount" => round($sumOfRefund,2),
                         ];
                     }
                     else{
-                        $sumOfBet = $sumOfTransactions['0']->amount;
                         $sumOfRefund = $game->pay_amount+$refundAmount;
                         $finalUpdateDatas = [
                             "win" => $win_or_lost,
                             "pay_amount" => round($sumOfRefund,2),
-                            "bet_amount" => round($sumOfBet,2),
+                            "bet_amount" => round($sumOfRefund,2),
                         ];
 
                     }
