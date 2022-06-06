@@ -114,7 +114,6 @@ class EvoPlay8ProvController extends Controller
 		}elseif($request->name == 'bet'){
 
 			$client_details = ProviderHelper::getClientDetails('token', $data['token']);
-
 			// $game_ext = $this->checkTransactionExist($data['callback_id'], 1);
 			$game_ext = GameTransactionMDB::findGameTransactionDetails($data['callback_id'], 'transaction_id',1, $client_details);
 			if($game_ext == 'false'): // NO BET
@@ -125,14 +124,14 @@ class EvoPlay8ProvController extends Controller
 				// $client_details = ProviderHelper::getClientDetails('token', $data['token']); // Moved Upper Part
 
 				# Check Game Restricted
-				$restricted_player = ProviderHelper::checkGameRestricted($game_details->game_id, $client_details->player_id);
-				if($restricted_player){
-					$msg = array(
-						"status" => 'error',
-						"error" => ["scope" => "user", "no_refund" => 1, "message" => "Not enough money"]
-					);
-					return $msg;
-				}
+				// $restricted_player = ProviderHelper::checkGameRestricted($game_details->game_id, $client_details->player_id);
+				// if($restricted_player){
+				// 	$msg = array(
+				// 		"status" => 'error',
+				// 		"error" => ["scope" => "user", "no_refund" => 1, "message" => "Not enough money"]
+				// 	);
+				// 	return $msg;
+				// }
 
 				// $player_details = $this->playerDetailsCall($client_details);
 				// if ($player_details->playerdetailsresponse->balance < $data['data']['amount']) :
@@ -461,8 +460,17 @@ class EvoPlay8ProvController extends Controller
 								// $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 								GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
 
+								# Check if data is already finished
+								$final_action = $string_to_obj->final_action;
+								$endround = $final_action == 1 || $final_action == true ? true : false;
+
+								$action = [
+									"provider_name" => "evoplay",
+									"endround" => $endround
+								];
+
 								try {
-									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit');
+									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit',$action);
 								    ProviderHelper::saveLog('8Provider Win Freespin CRID = '.$round_id, $this->provider_db_id, json_encode($data), $client_response);
 								} catch (\Exception $e) {
 									// $msg = array("status" => 'error',"message" => $e->getMessage());
@@ -596,6 +604,11 @@ class EvoPlay8ProvController extends Controller
 								// $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 								GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
 								
+								# Check if data is already finished
+								$final_action = $string_to_obj->final_action;
+								$endround = $final_action == 1 || $final_action == true ? true : false;
+
+
 								// $this->updateBetTransaction($existing_bet->game_trans_id, $amount, $income, $win, $entry_id);
 								$action_payload = [
 									"type" => "custom", #genreral,custom :D # REQUIRED!
@@ -607,6 +620,7 @@ class EvoPlay8ProvController extends Controller
 										"entry_id" => $entry_id,
 										"pay_amount" => $existing_bet->pay_amount + $amount,
 										"income" => $existing_bet->bet_amount - ($existing_bet->pay_amount + $amount),
+										"endround" => $endround,
 									],
 									"provider" => [
 										"provider_request" => $data, #R
@@ -778,8 +792,17 @@ class EvoPlay8ProvController extends Controller
 								$game_transextension = ProviderHelper::idGenerate($client_details->connection_name,1);
 								GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 
+								# Check if data is already finished
+								$final_action = $string_to_obj->final_action;
+								$endround = $final_action == 1 || $final_action == true ? true : false;
+
+								$action = [
+									"provider_name" => "evoplay",
+									"endround" => $endround
+								];
+
 								try {
-									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit');
+									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit',$action);
 								    ProviderHelper::saveLog('8Provider Win Freespin CRID = '.$round_id, $this->provider_db_id, json_encode($data), $client_response);
 								} catch (\Exception $e) {
 									$msg = array(
@@ -992,8 +1015,17 @@ class EvoPlay8ProvController extends Controller
 					);
 					$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+					# Check if data is already finished
+					$final_action = $string_to_obj->final_action;
+					$endround = $final_action == 1 || $final_action == true ? true : false;
+
+					$action = [
+						"provider_name" => "evoplay",
+						"endround" => $endround
+					];
+
 					try {
-						$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$existing_transaction->game_trans_id, $transaction_type);
+						$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$existing_transaction->game_trans_id, $transaction_type,$action);
 						ProviderHelper::saveLog('8Provider Refund CRID '.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $client_response);
 					} catch (\Exception $e) {
 						$msg = array("status" => 'error',"message" => $e->getMessage().' '.$e->getFile().' '.$e->getLine());
