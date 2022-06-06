@@ -344,7 +344,6 @@ class DOWINNController extends Controller{
                 "win" => 5,
                 "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                 "trans_status" => 2,
-                "income" => $game->bet_amount-$winAmount,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -421,20 +420,34 @@ class DOWINNController extends Controller{
                     if($countSumTrans > 2){
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
                         $sumOfWin = $sumOfTransactions['1']->amount;
+                        $finalUpdateDatas = [
+                            "win" => $win_or_lost,
+                            "bet_amount" => round($sumOfBet,2),
+                            "pay_amount" => round($sumOfWin,2),
+                            "income" => round($sumOfBet-$sumOfWin,2),
+                        ];
                     }
                     elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
-                        $sumOfWin = 0;
+                        $sumOfWin = $game->pay_amount+$winAmount;
+                        $finalUpdateDatas = [
+                            "win" => $win_or_lost,
+                            "bet_amount" => round($sumOfBet,2),
+                            "pay_amount" => round($sumOfWin,2),
+                            "income" => round($sumOfBet-$sumOfWin,2),
+                        ];
                     }
                     else{
                         $sumOfBet = $sumOfTransactions['0']->amount;
-                        $sumOfWin = $winAmount;                    }
+                        $sumOfWin = $game->pay_amount+$winAmount;
+                        $finalUpdateDatas = [
+                            "win" => $win_or_lost,
+                            "bet_amount" => round($sumOfBet,2),
+                            "pay_amount" => round($sumOfWin,2),
+                            "income" => round($sumOfBet-$sumOfWin,2),
+                        ];
+                    }
                 }
-                $finalUpdateDatas = [
-                    "win" => $win_or_lost,
-                    "bet_amount" => round($sumOfBet,2),
-                    "pay_amount" => round($sumOfWin,2),
-                ];
                 GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 $response = [
                     "status" => 'OK',
