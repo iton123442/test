@@ -143,7 +143,7 @@ class GameTransactionMDB
             // return $cnt > 0? $game[0]: null;
             $select = "SELECT entry_id,bet_amount,game_trans_ext_id,game_trans_id,pay_amount,income FROM ";
             $db = "{$connection['db_list'][1]}.game_transactions g ";
-            $where = "WHERE  (select game_trans_id from {$connection['db_list'][1]}.game_trans_ext_id gte where general_details = '{$general_details}'";
+            $where = "WHERE  g.game_trans_id = (select game_trans_id from {$connection['db_list'][1]}.game_trans_ext_id gte where general_details = '{$general_details}'";
             $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
