@@ -527,8 +527,8 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            $refundedBet = GameTransactionMDB::findDOWINNGameExt($roundId,'refundedbet',1,$client_details,$data['transaction']['id']);
-            $refundedBetId = $refundedBet['0']->game_trans_ext_id;
+            $refundedBet = ProviderHelper::getGameTransactionByGeneralDetails($data['transaction']['id'],$client_details);
+            $refundedBetId = $refundedBet->game_trans_ext_id;
             $updateBetTransaction = [
                 "general_details" => "BET_CANCELED",
             ];
