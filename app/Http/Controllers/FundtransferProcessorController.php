@@ -41,6 +41,7 @@ class FundtransferProcessorController extends Controller
         // sleep(10);
         try{
 <<<<<<< HEAD
+<<<<<<< HEAD
             if ($payload->action->custom->provider == 'hbn'){
                 $gteid = $payload->action->custom->game_transaction_ext_id;
             }else if ($payload->action->custom->provider == "tpp") {
@@ -123,6 +124,8 @@ class FundtransferProcessorController extends Controller
             }
             else{
 =======
+=======
+>>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
 
             $providers = ["hbn","tpp","ygg","AmuseGaming","OnlyPlay","Nolimit City","BGaming","SpearHead","Smartsoft Gaming","kagaming","allwayspin","evoplay","sagaming","cqgames","evolution","bng","icg","wazdan","TopTrendGaming","MannaPlay","VivoGaming","MancalaGaming","Quickspin","PlayNGo","bota","digitain",
 
@@ -136,7 +139,10 @@ class FundtransferProcessorController extends Controller
                     $gteid = $payload->action->custom->game_transaction_ext_id;
                  }
             }else{
+<<<<<<< HEAD
 >>>>>>> 4bf0b3b16fd767a8b8f0fcac5e5b9ecaaf6afe55
+=======
+>>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
                 $gteid = ClientRequestHelper::generateGTEID(
                     $payload->request_body->fundtransferrequest->fundinfo->roundId,
                     $payload->action->provider->provider_trans_id, 
@@ -303,10 +309,13 @@ class FundtransferProcessorController extends Controller
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 // $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
                                 // ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                                 ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
 =======
+=======
+>>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
                                 $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                                  ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
@@ -326,7 +335,13 @@ class FundtransferProcessorController extends Controller
                                 }
                                 $ext_Data = ['client_response' => json_encode($client_response)];
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+<<<<<<< HEAD
 >>>>>>> 4bf0b3b16fd767a8b8f0fcac5e5b9ecaaf6afe55
+=======
+                                // $ext_Data = ['mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
+                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
+                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+>>>>>>> cdfda9e5d59543a87dfc452dc6d3f37d7762a208
                             }
                             elseif($payload->action->custom->provider == 'cqgames'){
                                 $updateGameTransaction = [
