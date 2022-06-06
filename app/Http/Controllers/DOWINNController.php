@@ -458,7 +458,6 @@ class DOWINNController extends Controller{
                     "token_id" => $client_details->token_id,
                     "game_id" => $gamedetails->game_id,
                     "round_id" => $roundId,
-                    "bet_amount" => $refundAmount,
                     "pay_amount" => 0,
                     "win" => 5,
                     "income" => 0,
@@ -485,6 +484,7 @@ class DOWINNController extends Controller{
                     //SUCCESS FUNDTRANSFER
                     $updateTransData = [
                         "win" => 5,
+                    "bet_amount" => $refundAmount,
                     ];
                     GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
                     $response = [
@@ -540,7 +540,6 @@ class DOWINNController extends Controller{
                 "trans_status" => 2,
                 "pay_amount" => $game->pay_amount+$refundAmount,
                 "income" => round($game->bet_amount-$refundAmount,2),
-                "bet_amount" => $totalBetThisRound,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -587,6 +586,7 @@ class DOWINNController extends Controller{
                 //SUCCESS FUNDTRANSFER
                 $updateTransData = [
                     "win" => $win_or_lost,
+                    "bet_amount" => $totalBetThisRound,
                 ];
                 GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                 $response = [
