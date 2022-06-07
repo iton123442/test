@@ -414,14 +414,14 @@ class DOWINNController extends Controller{
                 
                 $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
                 $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
-                WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl;");
+                WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
                 $countSumTrans = count($sumOfTransactions);
                 if($countSumTrans != 'false'){
                     if($countSumTrans > 2){
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
                         $sumOfWin = $sumOfTransactions['1']->amount;
                         $finalUpdateDatas = [
-                            "win" => $win_or_lost,
+                            "win" => $sumOfWin == 0 ? 0 : 1,
                             "bet_amount" => round($sumOfBet,2),
                             "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
@@ -431,7 +431,7 @@ class DOWINNController extends Controller{
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
                         $sumOfWin = $game->pay_amount+$winAmount;
                         $finalUpdateDatas = [
-                            "win" => $win_or_lost,
+                            "win" => $sumOfWin == 0 ? 0 : 1,
                             "bet_amount" => round($sumOfBet,2),
                             "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
@@ -441,7 +441,7 @@ class DOWINNController extends Controller{
                         $sumOfBet = $sumOfTransactions['0']->amount;
                         $sumOfWin = $game->pay_amount+$winAmount;
                         $finalUpdateDatas = [
-                            "win" => $win_or_lost,
+                            "win" => $sumOfWin == 0 ? 0 : 1,
                             "bet_amount" => round($sumOfBet,2),
                             "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
@@ -623,7 +623,7 @@ class DOWINNController extends Controller{
                 
                 $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
                 $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
-                WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl;");
+                WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
                 $countSumTrans = count($sumOfTransactions);
                 if($countSumTrans != 'false'){
                     if($countSumTrans > 2){
