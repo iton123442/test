@@ -41,9 +41,6 @@ class ClientRequestHelper{
     }
     public static function fundTransfer($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
 
-            # Exclude Provider From Auto Refund! (Static)
-            $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming", "Booongo"];
-
             $sendtoclient =  microtime(true);
             $client = new Client([
                 'headers' => [ 

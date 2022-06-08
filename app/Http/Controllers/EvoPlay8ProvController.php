@@ -115,7 +115,8 @@ class EvoPlay8ProvController extends Controller
 
 			$client_details = ProviderHelper::getClientDetails('token', $data['token']);
 			// $game_ext = $this->checkTransactionExist($data['callback_id'], 1);
-			$game_ext = GameTransactionMDB::findGameTransactionDetails($data['callback_id'], 'transaction_id',1, $client_details);
+			// $game_ext = GameTransactionMDB::findGameTransactionDetails($data['callback_id'], 'transaction_id',1, $client_details);
+			$game_ext = GameTransactionMDB::findGameExt($data['callback_id'], 1,'transaction_id', $client_details);
 			if($game_ext == 'false'): // NO BET
 				$string_to_obj = json_decode($data['data']['details']);
 			    $game_id = $string_to_obj->game->game_id;
@@ -461,7 +462,8 @@ class EvoPlay8ProvController extends Controller
 								GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
 
 								# Check if data is already finished
-								$final_action = $string_to_obj->final_action;
+								// $final_action = $string_to_obj->final_action;
+								$final_action = $data['data']['final_action'];
 								$endround = $final_action == 1 || $final_action == true ? true : false;
 
 								$action = [
@@ -605,7 +607,9 @@ class EvoPlay8ProvController extends Controller
 								GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
 								
 								# Check if data is already finished
-								$final_action = $string_to_obj->final_action;
+								// $final_action = $string_to_obj->final_action;
+								$final_action = $data['data']['final_action'];
+								$final_action = $data['data']['final_action'];
 								$endround = $final_action == 1 || $final_action == true ? true : false;
 
 
@@ -793,7 +797,8 @@ class EvoPlay8ProvController extends Controller
 								GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 
 								# Check if data is already finished
-								$final_action = $string_to_obj->final_action;
+								// $final_action = $string_to_obj->final_action;
+								$final_action = $data['data']['final_action'];
 								$endround = $final_action == 1 || $final_action == true ? true : false;
 
 								$action = [
@@ -1016,7 +1021,8 @@ class EvoPlay8ProvController extends Controller
 					$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
 					# Check if data is already finished
-					$final_action = $string_to_obj->final_action;
+					// $final_action = $string_to_obj->final_action;
+					$final_action = isset($data['data']['final_action']) ? $data['data']['final_action'] : true;
 					$endround = $final_action == 1 || $final_action == true ? true : false;
 
 					$action = [
