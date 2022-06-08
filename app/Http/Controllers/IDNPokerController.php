@@ -682,7 +682,7 @@ class IDNPokerController extends Controller
                                         $pay_amount = $value["curr_amount"];
                                         $win = 1;
                                     } elseif ($value["status"] == "Draw" || $value["status"] == "Refund" ) {
-                                        $bet_amount =  $value["curr_amount"]; // already calculated from IDN system
+                                        $bet_amount =  $value["curr_bet"]; // already calculated from IDN system
                                         $pay_amount =  $value["curr_amount"];
                                         $win = 1;
                                     }
