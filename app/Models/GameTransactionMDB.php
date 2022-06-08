@@ -714,6 +714,99 @@ class GameTransactionMDB
 
     }
 
+    //DOWINN GAME EXT
+    public  static function findDOWINNGameExt($provider_identifier, $type,$game_transaction_type,$client_details,$general_details)
+    {
+        $connection_name = $client_details->connection_name;
+        if ($type == 'all') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier  . '" AND gte.transaction_detail != "FAILED"';
+        }
+        if ($type == 'allround') {
+            $where = 'where gte.round_id = "' . $provider_identifier  . '" AND gte.transaction_detail != "FAILED"';
+        }
+        if ($type == 'transaction_id') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
+        }
+        if ($type == 'round_id') {
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '"';
+        }
+        if ($type == 'game_transaction_ext_id') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '"';
+        }
+        if ($type == 'game_trans_id') {
+            $where = 'where gte.game_trans_id = "' . $provider_identifier . '"';
+
+        }
+        if ($type == 'refundedbet') {
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id IN
+            (select game_trans_ext_id from api_test.game_transaction_ext as gte1 where gte1.general_details = "'.$general_details.'")' ;
+
+        }
+        if ($type == 'notIncluded') {
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id NOT IN
+            (select game_trans_ext_id from api_test.game_transaction_ext as gte1 where gte1.general_details = "'.$general_details.'")' ;
+
+        }
+        
+        try {
+            $details = [];
+            $connection = self::getAvailableConnection($client_details->connection_name);
+            if ($connection != null) {
+                if($type == 'all' || $type == 'allround'){
+                    $details = DB::connection( $connection["connection_name"] )->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                }else{
+                    $details = DB::connection($connection["connection_name"])->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id, from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                }
+                $connection_name = $connection["connection_name"];
+                if ( !(count($details) > 0) )  {
+
+                    if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
+                        $connection_default = config("serverlist.server_list.default");
+                        if($type == 'all' || $type == 'allround'){
+                            // removed limit
+                            $data = DB::connection( $connection_default["connection_name"] )->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                        }else{
+                            $data = DB::connection($connection_default["connection_name"])->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                        }
+                        if ( count($data) > 0  ) {
+                            $connection_name = "default";
+                            $details = $data;
+                        }
+                        
+                    } 
+
+                    // $connection_list = config("serverlist.server_list");
+                    // foreach($connection_list as $connection){
+                    //     $status = self::checkDBConnection($connection["connection_name"]);
+                    //     if($status && $connection_name != $connection["connection_name"]){
+                    //         if($type == 'all'){
+                    //             // removed limit
+                    //             $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                    //         }else{
+                    //             $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    //         }
+                    //         if ( count($data) > 0  ) {
+                    //             $connection_name = $connection["connection_name"];
+                    //             $details = $data;
+                    //             break;
+                    //         }
+                    //     }
+                    // }
+                }
+
+                $count = count($details);
+                if ($count > 0) {
+                    $details[0]->connection_name = $connection_name;
+                }
+                return $count > 0 ? $details : 'false';
+            }
+            return 'false';
+        } catch (\Exception $e) {
+           return 'false';
+        }
+
+    }
+
     public  static function GoldenFfindGameExt($provider_identifier, $game_transaction_type=false, $type,$client_details)
     {
         $game_trans_type = '';

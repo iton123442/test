@@ -114,7 +114,6 @@ class EightProviderController extends Controller
 		}elseif($request->name == 'bet'){
 
 			$client_details = ProviderHelper::getClientDetails('token', $data['token']);
-
 			// $game_ext = $this->checkTransactionExist($data['callback_id'], 1);
 			$game_ext = GameTransactionMDB::findGameTransactionDetails($data['callback_id'], 'transaction_id',1, $client_details);
 			if($game_ext == 'false'): // NO BET
@@ -125,14 +124,14 @@ class EightProviderController extends Controller
 				// $client_details = ProviderHelper::getClientDetails('token', $data['token']); // Moved Upper Part
 
 				# Check Game Restricted
-				$restricted_player = ProviderHelper::checkGameRestricted($game_details->game_id, $client_details->player_id);
-				if($restricted_player){
-					$msg = array(
-						"status" => 'error',
-						"error" => ["scope" => "user", "no_refund" => 1, "message" => "Not enough money"]
-					);
-					return $msg;
-				}
+				// $restricted_player = ProviderHelper::checkGameRestricted($game_details->game_id, $client_details->player_id);
+				// if($restricted_player){
+				// 	$msg = array(
+				// 		"status" => 'error',
+				// 		"error" => ["scope" => "user", "no_refund" => 1, "message" => "Not enough money"]
+				// 	);
+				// 	return $msg;
+				// }
 
 				// $player_details = $this->playerDetailsCall($client_details);
 				// if ($player_details->playerdetailsresponse->balance < $data['data']['amount']) :
@@ -169,7 +168,8 @@ class EightProviderController extends Controller
 					// 	$game_transextension = ProviderHelper::createGameTransExtV2($game_trans, $provider_trans_id, $round_id, $data['data']['amount'], 1);
 					// }
 
-					
+					$game_trans = ProviderHelper::idGenerate($client_details->connection_name,1);
+            		$game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
 					$check_round_exist = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
 					if ($check_round_exist == 'false') {
 						$gameTransactionData = array(
@@ -183,17 +183,18 @@ class EightProviderController extends Controller
 							"income" =>  $income,
 							"entry_id" =>$method,
 						);
-						$game_trans = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+						GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans,$client_details);
 						$gameTransactionEXTData = array(
 							"game_trans_id" => $game_trans,
 							"provider_trans_id" => $provider_trans_id,
 							"round_id" => $round_id,
 							"amount" => $data['data']['amount'],
 							"game_transaction_type"=> 1,
-							"provider_request" =>json_encode($data),
+							// "provider_request" =>json_encode($data),
 						);
-						$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 					} else {
+						$game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
 						$game_transaction = GameTransactionMDB::findGameTransactionDetails($check_round_exist->game_trans_id, 'game_transaction',false, $client_details);
 						$bet_amount = $game_transaction->bet_amount + $data['data']['amount'];
 						$game_trans = $check_round_exist->game_trans_id;
@@ -203,9 +204,9 @@ class EightProviderController extends Controller
 							"round_id" => $round_id,
 							"amount" => $data['data']['amount'],
 							"game_transaction_type"=> 1,
-							"provider_request" =>json_encode($data),
+							// "provider_request" =>json_encode($data),
 						);
-						$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
 					}
 
 
@@ -220,13 +221,24 @@ class EightProviderController extends Controller
 						// return $msg;
 						$updateGameTransaction = ["win" => 2,'trans_status' => 5];
 						GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
-						$updateTransactionEXt = array(
-							"provider_request" =>json_encode($data),
-							"mw_response" => json_encode($msg),
-							"client_response" => json_encode($client_response),
-							// 'client_response' => $e->getMessage(),
-						);
-						GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+						// $updateTransactionEXt = array(
+						// 	"provider_request" =>json_encode($data),
+						// 	"mw_response" => json_encode($msg),
+						// 	"client_response" => json_encode($client_response),
+						// 	// 'client_response' => $e->getMessage(),
+						// );
+						// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+						$createGameTransactionLog = [
+	                          "connection_name" => $client_details->connection_name,
+	                          "column" =>[
+	                              "game_trans_ext_id" => $game_transextension,
+	                              "request" => json_encode($data),
+	                              "response" => json_encode($e->getMessage()),
+	                              "log_type" => "provider_details",
+	                              "transaction_detail" => "FAILED",
+	                          ]
+	                        ];
+	                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 						return $msg;
 					}
 
@@ -246,6 +258,7 @@ class EightProviderController extends Controller
 								"entry_id" => $game_transaction->entry_id,
 							];
 							GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+
 						}			
 
 						ProviderHelper::saveLog('8Provider gameBet 2', $this->provider_db_id, json_encode($data), 2);
@@ -256,14 +269,25 @@ class EightProviderController extends Controller
 								'currency' => $client_details->default_currency,
 							],
 					 	);
-						$updateTransactionEXt = array(
-							"provider_request" =>json_encode($data),
-							"mw_response" => json_encode($response),
-							'mw_request' => json_encode($client_response->requestoclient),
-							'client_response' => json_encode($client_response),
-							'transaction_detail' => json_encode($response),
-						);
-						GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+						// $updateTransactionEXt = array(
+						// 	"provider_request" =>json_encode($data),
+						// 	"mw_response" => json_encode($response),
+						// 	'mw_request' => json_encode($client_response->requestoclient),
+						// 	'client_response' => json_encode($client_response),
+						// 	'transaction_detail' => json_encode($response),
+						// );
+						// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+						$createGameTransactionLog = [
+		                          "connection_name" => $client_details->connection_name,
+		                          "column" =>[
+		                              "game_trans_ext_id" => $game_transextension,
+		                              "request" => json_encode($data),
+		                              "response" => json_encode($response),
+		                              "log_type" => "provider_details",
+		                              "transaction_detail" => "Success",
+		                          ]
+		                        ];
+		                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 
 					}elseif(isset($client_response->fundtransferresponse->status->code) 
 					            && $client_response->fundtransferresponse->status->code == "402"){
@@ -273,12 +297,23 @@ class EightProviderController extends Controller
 							"status" => 'error',
 							"error" => ["scope" => "user","no_refund" => 1,"message" => "Not enough money"]
 						);
-						$updateTransactionEXt = array(
-							"provider_request" =>json_encode($data),
-							"mw_response" => json_encode($response),
-							"client_response" => json_encode($client_response),
-						);
-						GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+						// $updateTransactionEXt = array(
+						// 	"provider_request" =>json_encode($data),
+						// 	"mw_response" => json_encode($response),
+						// 	"client_response" => json_encode($client_response),
+						// );
+						// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+						$createGameTransactionLog = [
+	                          "connection_name" => $client_details->connection_name,
+	                          "column" =>[
+	                              "game_trans_ext_id" => $game_transextension,
+	                              "request" => json_encode($data),
+	                              "response" => json_encode($response),
+	                              "log_type" => "provider_details",
+	                              "transaction_detail" => "FAILED",
+	                          ]
+	                        ];
+	                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 					}
 			   		// $trans_ext = $this->create8PTransactionExt($game_trans, $data, $requesttosend, $client_response, $client_response,$data, 1, $data['data']['amount'], $provider_trans_id,$round_id);
 			   		ProviderHelper::saveLog('8Provider gameBet', $this->provider_db_id, json_encode($data), $response);
@@ -288,12 +323,23 @@ class EightProviderController extends Controller
 						"status" => 'error',
 						"error" => ["scope" => "user","no_refund" => 1,"message" =>  $e->getMessage().' '.$e->getLine()]
 					);
-					$updateTransactionEXt = array(
-						"provider_request" =>json_encode($data),
-						"mw_response" => json_encode($msg),
-						'client_response' => $e->getMessage(),
-					);
-					GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+					// $updateTransactionEXt = array(
+					// 	"provider_request" =>json_encode($data),
+					// 	"mw_response" => json_encode($msg),
+					// 	'client_response' => $e->getMessage(),
+					// );
+					// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+					$createGameTransactionLog = [
+                          "connection_name" => $client_details->connection_name,
+                          "column" =>[
+                              "game_trans_ext_id" => $game_transextension,
+                              "request" => json_encode($data),
+                              "response" => json_encode($response),
+                              "log_type" => "provider_details",
+                              "transaction_detail" => "FAILED",
+                          ]
+                        ];
+                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 					return $msg;
 				}
 		    else:
@@ -383,6 +429,7 @@ class EightProviderController extends Controller
 										];
 										GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
 									}else{
+										$gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
 										// $game_trans = ProviderHelper::createGameTransaction($token_id, $game_details->game_id, 0, $data['data']['amount'], $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
 										$gameTransactionData = array(
 											"provider_trans_id" => $provider_trans_id,
@@ -395,11 +442,12 @@ class EightProviderController extends Controller
 											"income" =>  $income,
 											"entry_id" =>$method,
 										);
-										$gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+										// $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+										GameTransactionMDB::createGametransactionv2($gameTransactionData,$gamerecord,$client_details);
 									}
 									
 								}
-						 	    
+						 	    $game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
 								// $game_transextension = ProviderHelper::createGameTransExtV2($game_trans,$provider_trans_id, $round_id, $data['data']['amount'], $method); // method 5 freespin?
 								$gameTransactionEXTData = array(
 									"game_trans_id" => $game_trans,
@@ -407,12 +455,22 @@ class EightProviderController extends Controller
 									"round_id" => $round_id,
 									"amount" => $data['data']['amount'],
 									"game_transaction_type"=> $method,
-									"provider_request" =>json_encode($data),
+									// "provider_request" =>json_encode($data),
 								);
-								$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+								// $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+								GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
+
+								# Check if data is already finished
+								$final_action = $string_to_obj->final_action;
+								$endround = $final_action == 1 || $final_action == true ? true : false;
+
+								$action = [
+									"provider_name" => "evoplay",
+									"endround" => $endround
+								];
 
 								try {
-									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit');
+									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit',$action);
 								    ProviderHelper::saveLog('8Provider Win Freespin CRID = '.$round_id, $this->provider_db_id, json_encode($data), $client_response);
 								} catch (\Exception $e) {
 									// $msg = array("status" => 'error',"message" => $e->getMessage());
@@ -422,12 +480,23 @@ class EightProviderController extends Controller
 									$msg = array("status" => 'error',"message" => $e->getMessage().' '.$e->getFile().' '.$e->getLine());
 									$updateGameTransaction = ["win" => 2,'trans_status' => 5];
 									GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
-									$updateTransactionEXt = array(
-										"provider_request" =>json_encode($data),
-										"mw_response" => json_encode($msg),
-										"client_response" => json_encode($client_response),
-									);
-									GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									// $updateTransactionEXt = array(
+									// 	"provider_request" =>json_encode($data),
+									// 	"mw_response" => json_encode($msg),
+									// 	"client_response" => json_encode($client_response),
+									// );
+									// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($data),
+				                              "response" => json_encode($msg),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => "FAILED",
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									return $msg;
 								}
 
@@ -443,13 +512,24 @@ class EightProviderController extends Controller
 								 	 );
 
 									// ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response);
-									$updateTransactionEXt = array(
-										"provider_request" =>json_encode($data),
-										"mw_response" => json_encode($response),
-										'mw_request' => json_encode($client_response->requestoclient),
-										"client_response" => json_encode($client_response),
-									);
-									GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									// $updateTransactionEXt = array(
+									// 	"provider_request" =>json_encode($data),
+									// 	"mw_response" => json_encode($response),
+									// 	'mw_request' => json_encode($client_response->requestoclient),
+									// 	"client_response" => json_encode($client_response),
+									// );
+									// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($data),
+				                              "response" => json_encode($response),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => "SUCCESS",
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									ProviderHelper::saveLog('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
 							  		return $response;
 								}else{
@@ -457,13 +537,24 @@ class EightProviderController extends Controller
 										"status" => 'error',
 										"error" => ["scope" => "user","no_refund" => 1,"message" => 'Client Down']
 								 	);
-									$updateTransactionEXt = array(
-										"provider_request" =>json_encode($data),
-										"mw_response" => json_encode($msg),
-										'mw_request' => json_encode($client_response->requestoclient),
-										"client_response" => json_encode($client_response),
-									);
-									GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									// $updateTransactionEXt = array(
+									// 	"provider_request" =>json_encode($data),
+									// 	"mw_response" => json_encode($msg),
+									// 	'mw_request' => json_encode($client_response->requestoclient),
+									// 	"client_response" => json_encode($client_response),
+									// );
+									// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($client_response->requestoclient),
+				                              "response" => json_encode($msg),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => "ERROR",
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									ProviderHelper::saveLog('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
 							  		return $response;
 								}
@@ -501,17 +592,23 @@ class EightProviderController extends Controller
 										'currency' => $client_details->default_currency,
 									],
 								);
-
+								$game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
 								$gameTransactionEXTData = array(
 									"game_trans_id" => $existing_bet->game_trans_id,
 									"provider_trans_id" => $data['callback_id'],
 									"round_id" => $round_id,
 									"amount" => ProviderHelper::amountToFloat($data['data']['amount']),
 									"game_transaction_type"=> 2,
-									"provider_request" =>json_encode($data),
+									// "provider_request" =>json_encode($data),
 								);
-								$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+								// $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+								GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
 								
+								# Check if data is already finished
+								$final_action = $string_to_obj->final_action;
+								$endround = $final_action == 1 || $final_action == true ? true : false;
+
+
 								// $this->updateBetTransaction($existing_bet->game_trans_id, $amount, $income, $win, $entry_id);
 								$action_payload = [
 									"type" => "custom", #genreral,custom :D # REQUIRED!
@@ -523,6 +620,7 @@ class EightProviderController extends Controller
 										"entry_id" => $entry_id,
 										"pay_amount" => $existing_bet->pay_amount + $amount,
 										"income" => $existing_bet->bet_amount - ($existing_bet->pay_amount + $amount),
+										"endround" => $endround,
 									],
 									"provider" => [
 										"provider_request" => $data, #R
@@ -564,19 +662,41 @@ class EightProviderController extends Controller
 											'currency' => $client_details->default_currency,
 										],
 									);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($data),
+				                              "response" => json_encode($response),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => json_encode($client_response),
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									# ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response);
 								}else{
 									$response = array(
 										"status" => 'error',
 										"error" => ["scope" => "user","no_refund" => 1,"message" => 'Client Down']
 								 	);
-									$updateTransactionEXt = array(
-										"provider_request" =>json_encode($data),
-										"mw_response" => json_encode($msg),
-										'mw_request' => json_encode($client_response->requestoclient),
-										"client_response" => json_encode($client_response),
-									);
-									GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									// $updateTransactionEXt = array(
+									// 	"provider_request" =>json_encode($data),
+									// 	"mw_response" => json_encode($msg),
+									// 	'mw_request' => json_encode($client_response->requestoclient),
+									// 	"client_response" => json_encode($client_response),
+									// );
+									// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($client_response->requestoclient),
+				                              "response" => json_encode($msg),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => json_encode($client_response),
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									ProviderHelper::saveLog('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
 							  		return $response;
 								}
@@ -654,7 +774,9 @@ class EightProviderController extends Controller
 											 "income" =>  $income,
 											 "entry_id" =>$method,
 										 );
-										 $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+										 // $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+										 $gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
+			     						 GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
 									 }
 									 
 								 }
@@ -665,12 +787,22 @@ class EightProviderController extends Controller
 									"round_id" => $round_id,
 									"amount" => $data['data']['amount'],
 									"game_transaction_type"=> $method,
-									"provider_request" =>json_encode($data),
+									// "provider_request" =>json_encode($data),
 								);
-								$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+								$game_transextension = ProviderHelper::idGenerate($client_details->connection_name,1);
+								GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
+
+								# Check if data is already finished
+								$final_action = $string_to_obj->final_action;
+								$endround = $final_action == 1 || $final_action == true ? true : false;
+
+								$action = [
+									"provider_name" => "evoplay",
+									"endround" => $endround
+								];
 
 								try {
-									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit');
+									$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit',$action);
 								    ProviderHelper::saveLog('8Provider Win Freespin CRID = '.$round_id, $this->provider_db_id, json_encode($data), $client_response);
 								} catch (\Exception $e) {
 									$msg = array(
@@ -679,12 +811,23 @@ class EightProviderController extends Controller
 									);
 									$updateGameTransaction = ["win" => 2,'trans_status' => 5];
 									GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
-									$updateTransactionEXt = array(
-										"provider_request" =>json_encode($data),
-										"mw_response" => json_encode($msg),
-										"client_response" => json_encode($client_response),
-									);
-									GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									// $updateTransactionEXt = array(
+									// 	"provider_request" =>json_encode($data),
+									// 	"mw_response" => json_encode($msg),
+									// 	"client_response" => json_encode($client_response),
+									// );
+									// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($data),
+				                              "response" => json_encode($msg),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => "FAILED",
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									return $msg;
 								}
 
@@ -700,13 +843,24 @@ class EightProviderController extends Controller
 								 	);
 
 									// ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response);
-									$updateTransactionEXt = array(
-										"provider_request" =>json_encode($data),
-										"mw_response" => json_encode($response),
-										'mw_request' => json_encode($client_response->requestoclient),
-										"client_response" => json_encode($client_response),
-									);
-									GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									// $updateTransactionEXt = array(
+									// 	"provider_request" =>json_encode($data),
+									// 	"mw_response" => json_encode($response),
+									// 	'mw_request' => json_encode($client_response->requestoclient),
+									// 	"client_response" => json_encode($client_response),
+									// );
+									// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($client_response->requestoclient),
+				                              "response" => json_encode($response),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => json_encode($client_response),
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									ProviderHelper::saveLog('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
 							  		return $response;
 								}else{
@@ -714,13 +868,24 @@ class EightProviderController extends Controller
 										"status" => 'error',
 										"error" => ["scope" => "user","no_refund" => 1,"message" => 'Client Down']
 								 	);
-									$updateTransactionEXt = array(
-										"provider_request" =>json_encode($data),
-										"mw_response" => json_encode($msg),
-										'mw_request' => json_encode($client_response->requestoclient),
-										"client_response" => json_encode($client_response),
-									);
-									GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									// $updateTransactionEXt = array(
+									// 	"provider_request" =>json_encode($data),
+									// 	"mw_response" => json_encode($msg),
+									// 	'mw_request' => json_encode($client_response->requestoclient),
+									// 	"client_response" => json_encode($client_response),
+									// );
+									// GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+									$createGameTransactionLog = [
+				                          "connection_name" => $client_details->connection_name,
+				                          "column" =>[
+				                              "game_trans_ext_id" => $game_transextension,
+				                              "request" => json_encode($client_response->requestoclient),
+				                              "response" => json_encode($response),
+				                              "log_type" => "provider_details",
+				                              "transaction_detail" => json_encode($client_response),
+				                          ]
+				                        ];
+				                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
 									ProviderHelper::saveLog('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
 							  		return $response;
 								}
@@ -850,8 +1015,17 @@ class EightProviderController extends Controller
 					);
 					$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
+					# Check if data is already finished
+					$final_action = $string_to_obj->final_action;
+					$endround = $final_action == 1 || $final_action == true ? true : false;
+
+					$action = [
+						"provider_name" => "evoplay",
+						"endround" => $endround
+					];
+
 					try {
-						$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$existing_transaction->game_trans_id, $transaction_type);
+						$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$existing_transaction->game_trans_id, $transaction_type,$action);
 						ProviderHelper::saveLog('8Provider Refund CRID '.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $client_response);
 					} catch (\Exception $e) {
 						$msg = array("status" => 'error',"message" => $e->getMessage().' '.$e->getFile().' '.$e->getLine());

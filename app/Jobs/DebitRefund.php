@@ -44,8 +44,16 @@ class DebitRefund extends Job implements ShouldQueue
         $client_details = $payload['client_details'];
         $client_callback_url = $client_details->fund_transfer_url;
         $client_access_token = $client_details->client_access_token;
-        $transaction_id = $payload['transaction_id'];
-        $round_id = $payload['payload']['fundtransferrequest']['fundinfo']['roundId'];
+
+        # Operator with custom data type!
+        $custom_operator = config('clientcustom.data_type.transaction.string');
+        if(isset($client_details->operator_id) && in_array($client_details->operator_id, $custom_operator)){
+            $transaction_id = (string)$payload['transaction_id'];
+            $round_id = (string)$payload['payload']['fundtransferrequest']['fundinfo']['roundId'];
+        }else{
+            $transaction_id = $payload['transaction_id'];
+            $round_id = $payload['payload']['fundtransferrequest']['fundinfo']['roundId'];
+        }
 
         // Modify the payload use the generated extension
         $payload['payload']['fundtransferrequest']['fundinfo']['transactionId'] = $transaction_id; // use the same generated game ext id every call
