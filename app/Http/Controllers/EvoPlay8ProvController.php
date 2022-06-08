@@ -1091,7 +1091,7 @@ class EvoPlay8ProvController extends Controller
 				$response = array(
 					'status' => 'ok',
 					'data' => [
-						'balance' => (string)$client_details->playerdetailsresponse->balance,
+						'balance' => (string)$client_details->balance,
 						// 'balance' => (string)$player_details->playerdetailsresponse->balance,
 						'currency' => $client_details->default_currency,
 					],
@@ -1106,7 +1106,7 @@ class EvoPlay8ProvController extends Controller
 				$response = array(
 					'status' => 'ok',
 					'data' => [
-						'balance' => (string)$client_details->playerdetailsresponse->balance,
+						'balance' => (string)$client_details->balance,
 						// 'balance' => (string)$player_details->playerdetailsresponse->balance,
 						'currency' => $client_details->default_currency,
 					],
