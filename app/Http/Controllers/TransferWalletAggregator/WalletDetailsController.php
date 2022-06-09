@@ -456,6 +456,7 @@ class WalletDetailsController extends Controller
                     $query = "
                         select 
                         game_trans_id,
+                        c.round_id as round_id,
                         (select client_name from ".$connection["TG_ClientInfo"].".clients where client_id = c.client_id) as client_name,
                         (select client_player_id from ".$connection["TG_PlayerInfo"].".players where player_id = c.player_id) as client_player_id,
                         (select sub_provider_name from ".$connection["TG_GameInfo"].".sub_providers where sub_provider_id = (SELECT sub_provider_id FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) ) as provider_name,
@@ -511,6 +512,7 @@ class WalletDetailsController extends Controller
                 } else {
                     foreach($details as $datas){
                         $datatopass['game_trans_id']=$datas->game_trans_id;
+                        $datatopass['round_id']=$datas->round_id;
                         $datatopass['client_name']=$datas->client_name;
                         $datatopass['client_player_id']=$datas->client_player_id;
                         $datatopass['provider_name']=$datas->provider_name;
