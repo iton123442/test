@@ -76,9 +76,32 @@ class DOWINNController extends Controller{
     }
 
     public function bet(Request $request){
-        sleep(0.5);
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+        $explodedorderId = explode("-", $data['transaction']['orderId']);
+        if($explodedorderId['1'] == 1){
+            sleep(0.30);
+            $result = $this->betProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }elseif($explodedorderId['1'] == 2){
+            sleep(0.70);
+            $result = $this->betProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }elseif($explodedorderId['1'] > 2){
+            sleep(1);
+            $result = $this->betProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }else{
+            $result = $this->betProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }
+    }
+
+    public function betProcessor($data, $client_details){
         Helper::saveLog("BET PROCESS", 139,json_encode($data),"BET ON PROCESSING!");
         if($client_details){
             $token = $client_details->player_token;
@@ -245,9 +268,32 @@ class DOWINNController extends Controller{
     }
 
     public function payment(Request $request){
-        sleep(0.5);
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+        $explodedorderId = explode("-", $data['transaction']['orderId']);
+        if($explodedorderId['1'] == 1){
+            sleep(0.30);
+            $result = $this->paymentProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }elseif($explodedorderId['1'] == 2){
+            sleep(0.70);
+            $result = $this->paymentProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }elseif($explodedorderId['1'] > 2){
+            sleep(1);
+            $result = $this->paymentProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }else{
+            $result = $this->paymentProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }
+    }
+
+    public function paymentProcessor($data,$client_details){
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
         if($client_details){
             try{
@@ -471,9 +517,32 @@ class DOWINNController extends Controller{
     }
 
     public function cancel(Request $request){
-        sleep(0.5);
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+        $explodedorderId = explode("-", $data['transaction']['orderId']);
+        if($explodedorderId['1'] == 1){
+            sleep(0.30);
+            $result = $this->cancelProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }elseif($explodedorderId['1'] == 2){
+            sleep(0.70);
+            $result = $this->cancelProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }elseif($explodedorderId['1'] > 2){
+            sleep(1);
+            $result = $this->cancelProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }else{
+            $result = $this->cancelProcessor($data,$client_details);
+            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
+            return $result;
+        }
+    }
+
+    public function cancelProcessor($data,$client_details){
         Helper::saveLog("CANCEL PROCESS", 139,json_encode($data),"CANCEL ON PROCESSING!");
         if($client_details){
             try{
