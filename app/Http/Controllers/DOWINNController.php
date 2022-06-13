@@ -695,7 +695,7 @@ class DOWINNController extends Controller{
                     return response($response,200)->header('Content-Type', 'application/json');
                 }
                 $transId = $data['uuid'];
-                $roundId = $data['transaction']['roundId'];
+                $roundId = $data['transaction']['id'];
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
                 $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
                 if($bet_transaction != null){
@@ -722,8 +722,8 @@ class DOWINNController extends Controller{
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         //SUCCESS FUNDTRANSFER
                         $updateTransData = [
-                            "win" => 1,
-                            "bet_amount" => $bet_transaction->bet_amount + $data['transaction']['amount'],
+                            "win" => 0,
+                            "bet_amount" => $bet_transaction->bet_amount - $data['transaction']['amount'],
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
                         $response = [
@@ -774,7 +774,7 @@ class DOWINNController extends Controller{
                     "round_id" => $roundId,
                     "bet_amount" => $betAmount,
                     "pay_amount" => 0,
-                    "win" => 1,
+                    "win" => 0,
                     "income" => 0,
                     "entry_id" => 1
                 ];
@@ -798,7 +798,7 @@ class DOWINNController extends Controller{
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
                     $updateTransData = [
-                        "win" => 1,
+                        "win" => 0,
                     ];
                     GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
                     $response = [
