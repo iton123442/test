@@ -76,6 +76,7 @@ class DOWINNController extends Controller{
     }
 
     public function bet(Request $request){
+        sleep(0.5);
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         Helper::saveLog("BET PROCESS", 139,json_encode($data),"BET ON PROCESSING!");
@@ -244,6 +245,7 @@ class DOWINNController extends Controller{
     }
 
     public function payment(Request $request){
+        sleep(0.5);
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
@@ -469,6 +471,7 @@ class DOWINNController extends Controller{
     }
 
     public function cancel(Request $request){
+        sleep(0.5);
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         Helper::saveLog("CANCEL PROCESS", 139,json_encode($data),"CANCEL ON PROCESSING!");
