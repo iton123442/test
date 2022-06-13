@@ -465,7 +465,7 @@ class DOWINNController extends Controller{
                 $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
                 WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
                 $countSumTrans = count($sumOfTransactions);
-                if($countSumTrans != 'false'){
+                if($countSumTrans == 'false'){
                     if($countSumTrans == 3){
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
                         $sumOfWin = $sumOfTransactions['1']->amount;
@@ -496,6 +496,12 @@ class DOWINNController extends Controller{
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
+                } else{
+                    $bet = $game->bet_amount;
+                    $finalUpdateDatas = [
+                        "win" => $game->pay_amount == 0 ? 0 : 1,
+                        "income" => $bet-$game->pay_amount,
+                    ];
                 }
                 GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 $response = [
@@ -703,7 +709,6 @@ class DOWINNController extends Controller{
                         $sumOfRefund = $sumOfTransactions['2']->amount;
                         $finalUpdateDatas = [
                             "win" => $win_or_lost,
-                            "pay_amount" => round($sumOfRefund,2),
                             "bet_amount" => round($sumOfRefund,2),
                         ];
                     }
@@ -711,7 +716,6 @@ class DOWINNController extends Controller{
                         $sumOfRefund = $sumOfTransactions['1']->amount;
                         $finalUpdateDatas = [
                             "win" => $win_or_lost,
-                            "pay_amount" => round($sumOfRefund,2),
                             "bet_amount" => round($sumOfRefund,2),
                         ];
                     }
@@ -719,7 +723,6 @@ class DOWINNController extends Controller{
                         $sumOfRefund = $game->pay_amount+$refundAmount;
                         $finalUpdateDatas = [
                             "win" => $win_or_lost,
-                            "pay_amount" => round($sumOfRefund,2),
                             "bet_amount" => round($sumOfRefund,2),
                         ];
 
