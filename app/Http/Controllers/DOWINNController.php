@@ -269,23 +269,23 @@ class DOWINNController extends Controller{
         $explodedorderId = explode("-", $data['transaction']['orderId']);
         if($explodedorderId['1'] == 1){
             sleep(0.10);
-            $result = $this->paymentProcessor($data,$client_details);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             return $result;
         }elseif($explodedorderId['1'] == 2){
             sleep(0.30);
-            $result = $this->paymentProcessor($data,$client_details);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             return $result;
         }elseif($explodedorderId['1'] > 2){
             sleep(0.50);
-            $result = $this->paymentProcessor($data,$client_details);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             return $result;
         }elseif($explodedorderId['1'] == 0){
-            $result = $this->paymentProcessor($data,$client_details);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             return $result;
         }
     }
 
-    public function paymentProcessor($data,$client_details){
+    public function paymentProcessor($data,$client_details, $explodedorderId){
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
         if($client_details){
             try{
@@ -380,10 +380,16 @@ class DOWINNController extends Controller{
                     }
                 }
             }
+            if($explodedorderId['2'] >= 2){
+                $payAmount = $game->pay_amount+$winAmount;
+            }else{
+                $payAmount = $winAmount;
+            }
             $updateTransData = [
                 "win" => 5,
                 "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                 "trans_status" => 2,
+                "pay_amount" => round($payAmount,2),
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -463,7 +469,7 @@ class DOWINNController extends Controller{
                         $finalUpdateDatas = [
                             "win" => 1,
                             "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
+                            // "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
@@ -473,7 +479,7 @@ class DOWINNController extends Controller{
                         $finalUpdateDatas = [
                             "win" => 1,
                             "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
+                            // "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
@@ -483,7 +489,7 @@ class DOWINNController extends Controller{
                         $finalUpdateDatas = [
                             "win" => $game->pay_amount == 0 ? 0 : 1,
                             "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
+                            // "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
