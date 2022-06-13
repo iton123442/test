@@ -344,6 +344,7 @@ class DOWINNController extends Controller{
                 "win" => 5,
                 "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                 "trans_status" => 2,
+                "pay_amount" => $winAmount+$game->pay_amount,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -775,7 +776,7 @@ class DOWINNController extends Controller{
                     "bet_amount" => $betAmount,
                     "pay_amount" => 0,
                     "win" => 0,
-                    "income" => 0,
+                    "income" => $betAmount,
                     "entry_id" => 1
                 ];
                 $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
