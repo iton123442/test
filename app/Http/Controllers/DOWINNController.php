@@ -82,21 +82,17 @@ class DOWINNController extends Controller{
         if($explodedorderId['1'] == 1){
             sleep(0.10);
             $result = $this->betProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] == 2){
             sleep(0.30);
             $result = $this->betProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] > 2){
             sleep(0.50);
             $result = $this->betProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }else{
             $result = $this->betProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }
     }
@@ -274,21 +270,17 @@ class DOWINNController extends Controller{
         if($explodedorderId['1'] == 1){
             sleep(0.10);
             $result = $this->paymentProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] == 2){
             sleep(0.30);
             $result = $this->paymentProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] > 2){
             sleep(0.50);
             $result = $this->paymentProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
-        }else{
+        }elseif($explodedorderId['1'] == 0){
             $result = $this->paymentProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }
     }
@@ -522,21 +514,17 @@ class DOWINNController extends Controller{
         if($explodedorderId['1'] == 1){
             sleep(0.10);
             $result = $this->cancelProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] == 2){
             sleep(0.30);
             $result = $this->cancelProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] > 2){
             sleep(0.50);
             $result = $this->cancelProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }else{
             $result = $this->cancelProcessor($data,$client_details);
-            Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }
     }
