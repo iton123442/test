@@ -344,6 +344,7 @@ class DOWINNController extends Controller{
                 "win" => 5,
                 "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
                 "trans_status" => 2,
+                "pay_amount" => $winAmount+$game->pay_amount,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
@@ -417,13 +418,13 @@ class DOWINNController extends Controller{
                 WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
                 $countSumTrans = count($sumOfTransactions);
                 if($countSumTrans != 'false'){
-                    if($countSumTrans > 2){
+                    if($countSumTrans == 3){
                         $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
                         $sumOfWin = $sumOfTransactions['1']->amount;
                         $finalUpdateDatas = [
                             "win" => 1,
                             "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => $sumOfWin,
+                            "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
@@ -433,7 +434,7 @@ class DOWINNController extends Controller{
                         $finalUpdateDatas = [
                             "win" => 1,
                             "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => $sumOfWin,
+                            "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
