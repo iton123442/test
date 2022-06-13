@@ -423,7 +423,7 @@ class DOWINNController extends Controller{
                         $finalUpdateDatas = [
                             "win" => 1,
                             "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
+                            "pay_amount" => $sumOfWin,
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
@@ -433,7 +433,7 @@ class DOWINNController extends Controller{
                         $finalUpdateDatas = [
                             "win" => 1,
                             "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
+                            "pay_amount" => $sumOfWin,
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
