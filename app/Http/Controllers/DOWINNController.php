@@ -464,59 +464,78 @@ class DOWINNController extends Controller{
                 $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
                 WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
                 $countSumTrans = count($sumOfTransactions);
-                if($countSumTrans != 'false'){
-                    if($countSumTrans == 3){
-                        $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
-                        $sumOfWin = $sumOfTransactions['1']->amount;
-                        $finalUpdateDatas = [
-                            "win" => 1,
-                            "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
-                            "income" => round($sumOfBet-$sumOfWin,2),
-                        ];
+                try{
+                    if($countSumTrans != 'false'){
+                        if($countSumTrans == 3){
+                            $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
+                            $sumOfWin = $sumOfTransactions['1']->amount;
+                            $finalUpdateDatas = [
+                                "win" => 1,
+                                "bet_amount" => round($sumOfBet,2),
+                                "pay_amount" => round($sumOfWin,2),
+                                "income" => round($sumOfBet-$sumOfWin,2),
+                            ];
+                        }
+                        elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
+                            $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
+                            $sumOfWin = $game->pay_amount+$winAmount;
+                            $finalUpdateDatas = [
+                                "win" => 1,
+                                "bet_amount" => round($sumOfBet,2),
+                                "pay_amount" => round($sumOfWin,2),
+                                "income" => round($sumOfBet-$sumOfWin,2),
+                            ];
+                        }
+                        else{
+                            $sumOfBet = $sumOfTransactions['0']->amount;
+                            $sumOfWin = $game->pay_amount+$winAmount;
+                            $finalUpdateDatas = [
+                                "win" => $game->pay_amount == 0 ? 0 : 1,
+                                "bet_amount" => round($sumOfBet,2),
+                                "pay_amount" => round($sumOfWin,2),
+                                "income" => round($sumOfBet-$sumOfWin,2),
+                            ];
+                        }
                     }
-                    elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
-                        $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
-                        $sumOfWin = $game->pay_amount+$winAmount;
-                        $finalUpdateDatas = [
-                            "win" => 1,
-                            "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
-                            "income" => round($sumOfBet-$sumOfWin,2),
-                        ];
+                    GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
+                    $response = [
+                        "status" => 'OK',
+                        "balance" => $balance,
+                        "uuid" => $data['uuid'],
+                    ];
+                    $extensionData = [
+                        "mw_response" =>json_encode($response),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => "Success",
+                        "general_details" => $data['transaction']['id'],
+                    ];
+                    GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
+                    return response($response,200)->header('Content-Type', 'application/json');
                     }
-                    else{
-                        $sumOfBet = $sumOfTransactions['0']->amount;
-                        $sumOfWin = $game->pay_amount+$winAmount;
-                        $finalUpdateDatas = [
-                            "win" => $game->pay_amount == 0 ? 0 : 1,
-                            "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
-                            "income" => round($sumOfBet-$sumOfWin,2),
-                        ];
-                    }
-                } else{
+                catch(\Exception $e){
                     $bet = $game->bet_amount;
                     $finalUpdateDatas = [
                         "win" => $game->pay_amount == 0 ? 0 : 1,
                         "income" => $bet-$game->pay_amount,
+                        "pay_amount" =>$winAmount+$game->pay_amount,
                     ];
+                    GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
+                    $response = [
+                        "status" => 'OK',
+                        "balance" => $balance,
+                        "uuid" => $data['uuid'],
+                    ];
+                    $extensionData = [
+                        "mw_response" =>json_encode($response),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => "Success",
+                        "general_details" => $data['transaction']['id'],
+                    ];
+                    GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
+                    return response($response,200)->header('Content-Type', 'application/json');
                 }
-                GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
-                $response = [
-                    "status" => 'OK',
-                    "balance" => $balance,
-                    "uuid" => $data['uuid'],
-                ];
-                $extensionData = [
-                    "mw_response" =>json_encode($response),
-                    "client_response" => json_encode($client_response),
-                    "mw_request" => json_encode($client_response->requestoclient),
-                    "transaction_detail" => "Success",
-                    "general_details" => $data['transaction']['id'],
-                ];
-                GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
-                return response($response,200)->header('Content-Type', 'application/json');
             }
         }
     }
