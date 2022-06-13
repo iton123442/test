@@ -80,17 +80,17 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedorderId = explode("-", $data['transaction']['orderId']);
         if($explodedorderId['1'] == 1){
-            sleep(0.30);
+            sleep(0.25);
             $result = $this->betProcessor($data,$client_details);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] == 2){
-            sleep(0.70);
+            sleep(0.50);
             $result = $this->betProcessor($data,$client_details);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] > 2){
-            sleep(1);
+            sleep(0.75);
             $result = $this->betProcessor($data,$client_details);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
@@ -272,28 +272,28 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedorderId = explode("-", $data['transaction']['orderId']);
         if($explodedorderId['1'] == 1){
-            sleep(0.30);
-            $result = $this->paymentProcessor($data,$client_details);
+            sleep(0.25);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] == 2){
-            sleep(0.70);
-            $result = $this->paymentProcessor($data,$client_details);
+            sleep(0.50);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] > 2){
-            sleep(1);
-            $result = $this->paymentProcessor($data,$client_details);
+            sleep(0.75);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }else{
-            $result = $this->paymentProcessor($data,$client_details);
+            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }
     }
 
-    public function paymentProcessor($data,$client_details){
+    public function paymentProcessor($data,$client_details,$explodedorderId){
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
         if($client_details){
             try{
@@ -459,6 +459,15 @@ class DOWINNController extends Controller{
                 //     GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
 
                 // }
+                if($explodedorderId['1'] == 1){
+                    sleep(0.20);
+                }elseif($explodedorderId['1'] == 2){
+                    sleep(0.30);
+                }elseif($explodedorderId['1'] > 2){
+                    sleep(0.40);
+                }else{
+                    sleep(0.10);
+                }
                 
                 $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
                 $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
@@ -512,8 +521,7 @@ class DOWINNController extends Controller{
                     ];
                     GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
-                    }
-                catch(\Exception $e){
+                }catch(\Exception $e){
                     $bet = $game->bet_amount;
                     $finalUpdateDatas = [
                         "win" => $game->pay_amount == 0 ? 0 : 1,
@@ -545,17 +553,17 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedorderId = explode("-", $data['transaction']['orderId']);
         if($explodedorderId['1'] == 1){
-            sleep(0.30);
+            sleep(0.25);
             $result = $this->cancelProcessor($data,$client_details);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] == 2){
-            sleep(0.70);
+            sleep(0.50);
             $result = $this->cancelProcessor($data,$client_details);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
         }elseif($explodedorderId['1'] > 2){
-            sleep(1);
+            sleep(0.75);
             $result = $this->cancelProcessor($data,$client_details);
             Helper::saveLog('BOTA Balance', $this->provider_db_id, json_encode($result), 'BALANCE HIT!');
             return $result;
