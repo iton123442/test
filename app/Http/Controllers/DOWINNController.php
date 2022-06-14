@@ -268,11 +268,11 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
-            sleep(0.10);
+            sleep(0.25);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
-            sleep(0.30);
+            sleep(0.35);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
@@ -383,15 +383,8 @@ class DOWINNController extends Controller{
             if($explodedOrderId['2'] >= 2 || $explodedOrderId['1'] > 0){
                 $payAmount = $game->pay_amount+$winAmount;
             }
-            elseif($explodedOrderId['2'] == 1 || $explodedOrderId['1'] == 1){
-                if($game->pay_amount == 0){
-                    $payAmount = $winAmount;
-                }else{
-                    $payAmount = $game->pay_amount+$winAmount;
-                }
-            }
             else{
-                if($game->pay_amount == 0){
+                if($game->pay_amount > 0){
                     $payAmount = $winAmount;
                 }else{
                     $payAmount = $game->pay_amount+$winAmount;
@@ -470,16 +463,23 @@ class DOWINNController extends Controller{
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
-                    else{
+                    elseif($countSumTrans == 1){
                         $sumOfBet = $sumOfTransactions['0']->amount;
                         $sumOfWin = $game->pay_amount+$winAmount;
                         $finalUpdateDatas = [
                             "win" => $sumOfWin == 0 ? 0 : 1,
                             "bet_amount" => round($sumOfBet,2),
-                            // "pay_amount" => round($sumOfWin,2),
+                            "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
+                }else{
+                    $sumOfWin = $game->pay_amount+$winAmount;
+                        $finalUpdateDatas = [
+                            "win" => $sumOfWin == 0 ? 0 : 1,
+                            // "pay_amount" => round($sumOfWin,2),
+                            "income" => round($game->bet_amount-$winAmount,2),
+                        ];
                 }
                 GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 $response = [
