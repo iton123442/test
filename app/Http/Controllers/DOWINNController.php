@@ -462,7 +462,7 @@ class DOWINNController extends Controller{
                         $sumOfBet = $sumOfTransactions['0']->amount;
                         $sumOfWin = $game->pay_amount+$winAmount;
                         $finalUpdateDatas = [
-                            "win" => $game->pay_amount == 0 ? 0 : 1,
+                            "win" => $sumOfWin == 0 ? 0 : 1,
                             "bet_amount" => round($sumOfBet,2),
                             // "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
