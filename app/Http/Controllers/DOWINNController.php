@@ -380,7 +380,7 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            if($explodedOrderId['2'] >= 2){
+            if($explodedOrderId['2'] >= 2 || $explodedOrderId['1'] >= 1){
                 $payAmount = $game->pay_amount+$winAmount;
             }else{
                 $payAmount = $winAmount;
@@ -430,34 +430,9 @@ class DOWINNController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$winAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
-                // $winTransExt = GameTransactionMDB::findDOWINNGameExt($roundId,'round_id',2,$client_details,false);
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
-                // if($winTransExt['0']->amount != null){
-                //     if($winTransExt['0']->amount > 1){
-                //         $updateTransData = [
-                //             "win" => 1,
-                //             "pay_amount" => round($winTransExt['0']->amount,2),
-                //         ];
-                //         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
-                //     }
-                //     else{
-                //         $updateTransData = [
-                //             "win" => 0,
-                //             "pay_amount" => round($winTransExt['0']->amount,2),
-                //         ];
-                //         GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
-                //     }
-                // }else{
-                //     $updateTransData = [
-                //         "win" => $win_or_lost,
-                //         "pay_amount" => $game->pay_amount+$winAmount,
-                //     ];
-                //     GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
-
-                // }
-                
                 $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
                 $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
                 WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
