@@ -382,7 +382,15 @@ class DOWINNController extends Controller{
             }
             if($explodedOrderId['2'] >= 2 || $explodedOrderId['1'] > 0){
                 $payAmount = $game->pay_amount+$winAmount;
-            }else{
+            }
+            elseif($explodedOrderId['2'] == 1 || $explodedOrderId['1'] == 1){
+                if($game->pay_amount == 0){
+                    $payAmount = $winAmount;
+                }else{
+                    $payAmount = $game->pay_amount+$winAmount;
+                }
+            }
+            else{
                 if($game->pay_amount == 0){
                     $payAmount = $winAmount;
                 }else{
