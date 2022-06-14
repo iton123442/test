@@ -477,7 +477,7 @@ class DOWINNController extends Controller{
                             $finalUpdateDatas = [
                                 "win" => $sumOfWin == 0 ? 0 : 1,
                                 // "pay_amount" => round($sumOfWin,2),
-                                "income" => round($game->bet_amount-$winAmount,2),
+                                "income" => round($game->bet_amount-$sumOfWin,2),
                             ];
                     }
                 }else{
@@ -485,7 +485,7 @@ class DOWINNController extends Controller{
                         $finalUpdateDatas = [
                             "win" => $sumOfWin == 0 ? 0 : 1,
                             // "pay_amount" => round($sumOfWin,2),
-                            "income" => round($game->bet_amount-$winAmount,2),
+                            "income" => round($game->bet_amount-$sumOfWin,2),
                         ];
                 }
                 GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
