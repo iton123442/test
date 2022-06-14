@@ -122,7 +122,8 @@ class DOWINNController extends Controller{
                     $game_trans_id = $bet_transaction->game_trans_id;
                     $updateTransaction = [
                         "win" => 5,
-                        "trans_status" => 1
+                        "trans_status" => 1,
+                        "bet_amount" => $bet_transaction->bet_amount+$data['transaction']['amount'],
                     ];
                     GameTransactionMDB::updateGametransaction($updateTransaction,$game_trans_id,$client_details);
                     $gametransExt_data = [
@@ -142,7 +143,6 @@ class DOWINNController extends Controller{
                         //SUCCESS FUNDTRANSFER
                         $updateTransData = [
                             "win" => 5,
-                            "bet_amount" => $bet_transaction->bet_amount + $data['transaction']['amount'],
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
                         $response = [
