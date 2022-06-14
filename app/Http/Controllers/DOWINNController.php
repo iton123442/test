@@ -687,34 +687,38 @@ class DOWINNController extends Controller{
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
                 
-                $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
-                $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
-                WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
-                $countSumTrans = count($sumOfTransactions);
-                if($countSumTrans != 'false'){
-                    if($countSumTrans > 2){
-                        $sumOfRefund = $sumOfTransactions['2']->amount;
-                        $finalUpdateDatas = [
-                            "win" => $win_or_lost,
-                            "bet_amount" => round($sumOfRefund,2),
-                        ];
-                    }
-                    elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
-                        $sumOfRefund = $sumOfTransactions['1']->amount;
-                        $finalUpdateDatas = [
-                            "win" => $win_or_lost,
-                            "bet_amount" => round($sumOfRefund,2),
-                        ];
-                    }
-                    else{
-                        $sumOfRefund = $game->pay_amount+$refundAmount;
-                        $finalUpdateDatas = [
-                            "win" => $win_or_lost,
-                            "bet_amount" => round($sumOfRefund,2),
-                        ];
+                // $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+                // $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
+                // WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
+                // $countSumTrans = count($sumOfTransactions);
+                // if($countSumTrans != 'false'){
+                //     if($countSumTrans > 2){
+                //         $sumOfRefund = $sumOfTransactions['2']->amount;
+                //         $finalUpdateDatas = [
+                //             "win" => $win_or_lost,
+                //             "bet_amount" => round($sumOfRefund,2),
+                //         ];
+                //     }
+                //     elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
+                //         $sumOfRefund = $sumOfTransactions['1']->amount;
+                //         $finalUpdateDatas = [
+                //             "win" => $win_or_lost,
+                //             "bet_amount" => round($sumOfRefund,2),
+                //         ];
+                //     }
+                //     else{
+                //         $sumOfRefund = $game->pay_amount+$refundAmount;
+                //         $finalUpdateDatas = [
+                //             "win" => $win_or_lost,
+                //             "bet_amount" => round($sumOfRefund,2),
+                //         ];
 
-                    }
-                }
+                //     }
+                // }
+                $finalUpdateDatas = [
+                    "win" => $win_or_lost,
+                    "bet_amount" => 0,
+                ];
                 GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 // $updateTransData = [
                 //     "win" => $win_or_lost,
