@@ -380,7 +380,7 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            if($explodedOrderId['2'] >= 2 || $explodedOrderId['1'] >= 1){
+            if($explodedOrderId['2'] >= 2 || $explodedOrderId['1'] > 0){
                 $payAmount = $game->pay_amount+$winAmount;
             }else{
                 $payAmount = $winAmount;
@@ -458,7 +458,7 @@ class DOWINNController extends Controller{
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
                     }
-                    elseif($countSumTrans == 1){
+                    else{
                         $sumOfBet = $sumOfTransactions['0']->amount;
                         $sumOfWin = $game->pay_amount+$winAmount;
                         $finalUpdateDatas = [
