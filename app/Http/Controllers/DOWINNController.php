@@ -384,11 +384,7 @@ class DOWINNController extends Controller{
                 $payAmount = $game->pay_amount+$winAmount;
             }
             else{
-                if($game->pay_amount > 0){
-                    $payAmount = $winAmount;
-                }else{
-                    $payAmount = $game->pay_amount+$winAmount;
-                }
+                $payAmount = $game->pay_amount+$winAmount;
             }
             $updateTransData = [
                 "win" => 5,
