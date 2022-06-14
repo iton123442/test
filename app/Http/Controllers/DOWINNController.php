@@ -268,11 +268,11 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
-            sleep(0.25);
+            sleep(0.10);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
-            sleep(0.35);
+            sleep(0.30);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
@@ -472,6 +472,13 @@ class DOWINNController extends Controller{
                             "pay_amount" => round($sumOfWin,2),
                             "income" => round($sumOfBet-$sumOfWin,2),
                         ];
+                    }else{
+                        $sumOfWin = $game->pay_amount+$winAmount;
+                            $finalUpdateDatas = [
+                                "win" => $sumOfWin == 0 ? 0 : 1,
+                                // "pay_amount" => round($sumOfWin,2),
+                                "income" => round($game->bet_amount-$winAmount,2),
+                            ];
                     }
                 }else{
                     $sumOfWin = $game->pay_amount+$winAmount;
