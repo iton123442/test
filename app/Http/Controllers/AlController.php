@@ -462,6 +462,91 @@ class AlController extends Controller
 
 
     public function tapulan(Request $request){
+      $file = $request->file('file');
+      $filename = $file->getClientOriginalName();
+      $extension = $file->getClientOriginalExtension();
+      $tempPath = $file->getRealPath();
+      $fileSize = $file->getSize();
+      $mimeType = $file->getMimeType();
+
+      // Valid File Extensions
+      $valid_extension = array("csv","xlsx");
+
+      // 2MB in Bytes
+      // $maxFileSize = 2097152; 
+
+      $maxFileSize = 9999999999999; 
+
+
+      // Check file extension
+      if(in_array(strtolower($extension),$valid_extension)){
+
+        // Check file size
+        if($fileSize <= $maxFileSize){
+
+          // File upload location
+          $location = 'uploads';
+
+          // Upload file
+          $file->move($location,$filename);
+          // Import CSV to Database
+          $filepath = public_path($location."/".$filename);
+          // Reading file
+          $file = fopen($filepath,"r");
+          $importData_arr = array();
+          $i = 0;
+
+          while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+             $num = count($filedata );
+             
+             // Skip first row (Remove below comment if you want to skip the first row)
+             /*if($i == 0){
+                $i++;
+                continue; 
+             }*/
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+             $i++;
+          }
+          fclose($file);
+
+          // Insert to MySQL database
+          $i = 1;
+          foreach($importData_arr as $importData){
+            if($i != 1){
+              if($importData[8] == 'Lose'){
+                $status = 0;
+                $payAmount = 0;
+              }else{
+                $status = 1;
+                $payAmount = $importData[7];
+              }
+              $gameTransactionData = array(
+                  "provider_trans_id" => $importData[10],
+                  "token_id" => 9999999,
+                  "game_id" => 999999,
+                  "round_id" => $importData[1],
+                  "bet_amount" => $importData[6],
+                  "pay_amount" => $payAmount,
+                  "win" => $status,
+                  "entry_id" =>2,
+                  "created_at" => $importData[0],
+                  "updated_at" => $importData[0],
+              );
+              dd($gameTransactionData);
+             // DB::table('game_transactions_ftg')->insertGetId($gameTransactionData);
+           }
+          $i++;
+          }
+          return 'Import Successful.';
+        }else{
+          return 'File too large. File must be less than 2MB.';
+        }
+
+      }else{
+         return 'Invalid File Extension.';
+      }
 
 
 
