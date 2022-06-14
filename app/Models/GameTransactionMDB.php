@@ -132,6 +132,30 @@ class GameTransactionMDB
         }
     }
 
+    public static function getGameTransactionByGeneralDetailsEXT($general_details,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            // $game = DB::connection($connection["connection_name"])->select("SELECT
+            //                 entry_id,bet_amount,game_trans_id,pay_amount,income
+            //                 FROM {$connection['db_list'][1]}.game_transactions g
+            //                 WHERE  round_id = '".$general_details."'");
+            // $cnt = count($game);
+            // return $cnt > 0? $game[0]: null;
+            $select = "SELECT game_trans_ext_id FROM ";
+            $db = "{$connection['db_list'][1]}.game_transaction_ext gt ";
+            $where = "WHERE game_trans_id = (select game_trans_id from {$connection['db_list'][1]}.game_transaction_ext gte where general_details = '{$general_details}');";
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
+            $cnt = count($game);
+            if ($cnt > 0){
+                return $game[0];
+            }else{
+                return self::checkAndGetFromOtherServer($select,$where,$connection["connection_name"],'gt');
+            }
+        }else{
+            return null;
+        }
+    }
+
     public static function getGameTransactionByRoundIdVivo($game_round,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
@@ -738,7 +762,7 @@ class GameTransactionMDB
 
         }
         if ($type == 'refundedbet') {
-            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id IN
+            $where = 'where gte.round_id = "' . $provider_identifier . '" AND gte.game_transaction_type = "'. $game_transaction_type. '" AND gte.game_trans_ext_id =
             (select game_trans_ext_id from api_test.game_transaction_ext as gte1 where gte1.general_details = "'.$general_details.'")' ;
 
         }
