@@ -78,16 +78,16 @@ class DOWINNController extends Controller{
     public function bet(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        $explodedorderId = explode("-", $data['transaction']['orderId']);
-        if($explodedorderId['1'] == 1){
+        $explodedOrderId = explode("-", $data['transaction']['orderId']);
+        if($explodedOrderId['1'] == 1){
             sleep(0.10);
             $result = $this->betProcessor($data,$client_details);
             return $result;
-        }elseif($explodedorderId['1'] == 2){
+        }elseif($explodedOrderId['1'] == 2){
             sleep(0.30);
             $result = $this->betProcessor($data,$client_details);
             return $result;
-        }elseif($explodedorderId['1'] > 2){
+        }elseif($explodedOrderId['1'] > 2){
             sleep(0.50);
             $result = $this->betProcessor($data,$client_details);
             return $result;
@@ -266,26 +266,26 @@ class DOWINNController extends Controller{
     public function payment(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        $explodedorderId = explode("-", $data['transaction']['orderId']);
-        if($explodedorderId['1'] == 1){
+        $explodedOrderId = explode("-", $data['transaction']['orderId']);
+        if($explodedOrderId['1'] == 1){
             sleep(0.10);
-            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
+            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
-        }elseif($explodedorderId['1'] == 2){
+        }elseif($explodedOrderId['1'] == 2){
             sleep(0.30);
-            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
+            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
-        }elseif($explodedorderId['1'] > 2){
+        }elseif($explodedOrderId['1'] > 2){
             sleep(0.50);
-            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
+            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
-        }elseif($explodedorderId['1'] == 0){
-            $result = $this->paymentProcessor($data,$client_details, $explodedorderId);
+        }elseif($explodedOrderId['1'] == 0){
+            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }
     }
 
-    public function paymentProcessor($data,$client_details, $explodedorderId){
+    public function paymentProcessor($data,$client_details, $explodedOrderId){
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
         if($client_details){
             try{
@@ -380,7 +380,7 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            if($explodedorderId['2'] >= 2){
+            if($explodedOrderId['2'] >= 2){
                 $payAmount = $game->pay_amount+$winAmount;
             }else{
                 $payAmount = $winAmount;
@@ -516,16 +516,16 @@ class DOWINNController extends Controller{
     public function cancel(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        $explodedorderId = explode("-", $data['transaction']['orderId']);
-        if($explodedorderId['1'] == 1){
+        $explodedOrderId = explode("-", $data['transaction']['orderId']);
+        if($explodedOrderId['1'] == 1){
             sleep(0.10);
             $result = $this->cancelProcessor($data,$client_details);
             return $result;
-        }elseif($explodedorderId['1'] == 2){
+        }elseif($explodedOrderId['1'] == 2){
             sleep(0.30);
             $result = $this->cancelProcessor($data,$client_details);
             return $result;
-        }elseif($explodedorderId['1'] > 2){
+        }elseif($explodedOrderId['1'] > 2){
             sleep(0.50);
             $result = $this->cancelProcessor($data,$client_details);
             return $result;
@@ -760,75 +760,6 @@ class DOWINNController extends Controller{
                 $transId = $data['uuid'];
                 $roundId = $data['transaction']['id'];
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
-                $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
-                if($bet_transaction != null){
-                    //this is double bet
-                    $game_trans_id = $bet_transaction->game_trans_id;
-                    $updateTransaction = [
-                        "win" => 5,
-                        "trans_status" => 1
-                    ];
-                    GameTransactionMDB::updateGametransaction($updateTransaction,$game_trans_id,$client_details);
-                    $gametransExt_data = [
-                        "game_trans_id" => $game_trans_id,
-                        "provider_trans_id" => $transId,
-                        "round_id" => $roundId,
-                        "amount" => $data['transaction']['amount'],
-                        "game_transaction_type" => 4,
-                        "provider_request" => json_encode($data),
-                    ];
-                    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gametransExt_data,$client_details);
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,$data['transaction']['amount'],$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$bet_transaction->game_trans_id,'debit');
-                    if(isset($client_response->fundtransferresponse->status->code)
-                    && $client_response->fundtransferresponse->status->code == "200"){
-                        $balance = round($client_response->fundtransferresponse->balance, 2);
-                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                        //SUCCESS FUNDTRANSFER
-                        $updateTransData = [
-                            "win" => 0,
-                            "bet_amount" => $bet_transaction->bet_amount - $data['transaction']['amount'],
-                        ];
-                        GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
-                        $response = [
-                            "status" => 'OK',
-                            "balance" => $balance,
-                            "uuid" => $data['uuid'],
-                        ];
-                        $extensionData = [
-                            "mw_request" => json_encode($client_response->requestoclient),
-                            "mw_response" =>json_encode($response),
-                            "client_response" => json_encode($client_response),
-                            "transaction_detail" => "Success",
-                            "general_details" => $data['transaction']['id'],
-                        ];
-                        GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
-                        return response($response,200)->header('Content-Type', 'application/json');
-                    }elseif(isset($client_response->fundtransferresponse->status->code)
-                    && $client_response->fundtransferresponse->status->code == "402"){
-                        try{    
-                            $updateTrans = [
-                                "win" => 2,
-                                "trans_status" => 5
-                            ];
-                            GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
-                            $response = [
-                                "code" => 51,
-                                "extra" => "Invalid Request"
-                            ];
-                            $updateExt = [
-                                "mw_request" => json_encode('FAILED'),
-                                "mw_response" =>json_encode($response),
-                                "client_response" => json_encode($client_response),
-                                "transaction_detail" => "FAILED",
-                                "general_details" => "FAILED",
-                            ];
-                            GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
-                            return response($response,200)->header('Content-Type', 'application/json');
-                        }catch(\Exception $e){
-                        Helper::saveLog("FAILED BET", 139,json_encode($client_response),"FAILED HIT!");
-                        }
-                    }
-                }//END OF DOUBLE BET
                 $betAmount = round($data['transaction']['amount'],2);
                 $gameTransactionDatas = [
                     "provider_trans_id" => $transId,
