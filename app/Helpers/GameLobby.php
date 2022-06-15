@@ -2198,11 +2198,11 @@ class GameLobby{
         $guid = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
         $responsebod = DOWINNHelper::generateGameToken($token,$guid,$prefix,$get_player_details);
         // Helper::saveLog('dowinn gametoken', 139, json_encode($get_player_details), json_encode($logintoken));
-        Helper::savePLayerGameRound($game_code,$token,$provider);
+        // Helper::savePLayerGameRound($game_code,$token,$provider);
         $game_launch_url = config('providerlinks.dowinn.gamelaunch_url').'?token='.$responsebod['token'].'&p='.$responsebod['p'].'&v='.$responsebod['v'];
-        Helper::saveLog('dowinn gamelaunch', 139, json_encode($game_launch_url), 'Initialized');
+        // Helper::saveLog('dowinn gamelaunch', 139, json_encode($game_launch_url), 'Initialized');
         $gameurl = isset($game_launch_url) ? $game_launch_url : $exit_url;
-        Helper::saveLog('dowinn gamelaunchfinal', 139, json_encode($gameurl), 'Gamelaunch Success');
+        // Helper::saveLog('dowinn gamelaunchfinal', 139, json_encode($gameurl), 'Gamelaunch Success');
         return $gameurl;  
     }
 }
