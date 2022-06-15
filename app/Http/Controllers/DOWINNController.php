@@ -81,17 +81,21 @@ class DOWINNController extends Controller{
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
             sleep(0.10);
+            Helper::saveLog("BET 1", 139,json_encode($data),$this->startTime);
             $result = $this->betProcessor($data,$client_details);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
             sleep(0.30);
+            Helper::saveLog("BET 2", 139,json_encode($data),$this->startTime);
             $result = $this->betProcessor($data,$client_details);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
             sleep(0.50);
+            Helper::saveLog("BET >=3", 139,json_encode($data),$this->startTime);
             $result = $this->betProcessor($data,$client_details);
             return $result;
         }else{
+            Helper::saveLog("BET 0", 139,json_encode($data),$this->startTime);
             $result = $this->betProcessor($data,$client_details);
             return $result;
         }
@@ -269,17 +273,21 @@ class DOWINNController extends Controller{
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
             sleep(0.20);
+            Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
             sleep(0.35);
+            Helper::saveLog("WIN 2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
             sleep(0.50);
+            Helper::saveLog("WIN >2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] == 0){
+            Helper::saveLog("WIN 0", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }
