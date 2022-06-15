@@ -380,12 +380,7 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            if($explodedOrderId['2'] >= 2 || $explodedOrderId['1'] > 0){
-                $payAmount = $game->pay_amount+$winAmount;
-            }
-            else{
-                $payAmount = $game->pay_amount+$winAmount;
-            }
+            $payAmount = $game->pay_amount+$winAmount;
             $updateTransData = [
                 "win" => 5,
                 "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
@@ -439,43 +434,103 @@ class DOWINNController extends Controller{
                 WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
                 $countSumTrans = count($sumOfTransactions);
                 if($countSumTrans != 'false'){
-                    if($countSumTrans == 3){
-                        $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
-                        $sumOfWin = $sumOfTransactions['1']->amount;
-                        $finalUpdateDatas = [
-                            "win" => 1,
-                            "bet_amount" => round($sumOfBet,2),
-                            // "pay_amount" => round($sumOfWin,2),
-                            "income" => round($sumOfBet-$sumOfWin,2),
-                        ];
-                    }
-                    elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
-                        $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
-                        $sumOfWin = $game->pay_amount+$winAmount;
-                        $finalUpdateDatas = [
-                            "win" => 1,
-                            "bet_amount" => round($sumOfBet,2),
-                            // "pay_amount" => round($sumOfWin,2),
-                            "income" => round($sumOfBet-$sumOfWin,2),
-                        ];
-                    }
-                    elseif($countSumTrans == 1){
-                        $sumOfBet = $sumOfTransactions['0']->amount;
-                        $sumOfWin = $game->pay_amount+$winAmount;
-                        $finalUpdateDatas = [
-                            "win" => $sumOfWin == 0 ? 0 : 1,
-                            "bet_amount" => round($sumOfBet,2),
-                            "pay_amount" => round($sumOfWin,2),
-                            "income" => round($sumOfBet-$sumOfWin,2),
-                        ];
-                    }else{
-                        $sumOfWin = $game->pay_amount+$winAmount;
+                    switch($countSumTrans){
+                        case '3':
+                            $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
+                            $sumOfWin = $sumOfTransactions['1']->amount;
+                            $finalUpdateDatas = [
+                                "win" => 1,
+                                "bet_amount" => round($sumOfBet,2),
+                                // "pay_amount" => round($sumOfWin,2),
+                                "income" => round($sumOfBet-$sumOfWin,2),
+                            ];
+                        break;
+                        case '2':
+                            if($sumOfTransactions['1']->game_transaction_type == 3){
+                                $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
+                                $sumOfWin = $game->pay_amount+$winAmount;
+                                $finalUpdateDatas = [
+                                    "win" => 1,
+                                    "bet_amount" => round($sumOfBet,2),
+                                    // "pay_amount" => round($sumOfWin,2),
+                                    "income" => round($sumOfBet-$sumOfWin,2),
+                                ];
+
+                            }
+                            else{
+                                $sumOfWin = $game->pay_amount+$winAmount;
+                                $finalUpdateDatas = [
+                                    "win" => 1,
+                                    "pay_amount" => round($sumOfWin,2),
+                                    "income" => round($sumOfBet-$sumOfWin,2),
+                                ];
+                            }
+                        break;
+                        case '1':
+                            $sumOfBet = $sumOfTransactions['0']->amount;
+                            $sumOfWin = $game->pay_amount+$winAmount;
+                            $finalUpdateDatas = [
+                                "win" => $sumOfWin == 0 ? 0 : 1,
+                                "bet_amount" => round($sumOfBet,2),
+                                "pay_amount" => round($sumOfWin,2),
+                                "income" => round($sumOfBet-$sumOfWin,2),
+                            ];
+                        break;
+                        default:
+                            $sumOfWin = $game->pay_amount+$winAmount;
                             $finalUpdateDatas = [
                                 "win" => $sumOfWin == 0 ? 0 : 1,
                                 "pay_amount" => round($sumOfWin,2),
                                 "income" => round($game->bet_amount-$sumOfWin,2),
                             ];
                     }
+                    // if($countSumTrans == 3){
+                    //     $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
+                    //     $sumOfWin = $sumOfTransactions['1']->amount;
+                    //     $finalUpdateDatas = [
+                    //         "win" => 1,
+                    //         "bet_amount" => round($sumOfBet,2),
+                    //         // "pay_amount" => round($sumOfWin,2),
+                    //         "income" => round($sumOfBet-$sumOfWin,2),
+                    //     ];
+                    // }
+                    // elseif($countSumTrans == 2 && $sumOfTransactions['1']->game_transaction_type == 3){
+                    //     $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
+                    //     $sumOfWin = $game->pay_amount+$winAmount;
+                    //     $finalUpdateDatas = [
+                    //         "win" => 1,
+                    //         "bet_amount" => round($sumOfBet,2),
+                    //         // "pay_amount" => round($sumOfWin,2),
+                    //         "income" => round($sumOfBet-$sumOfWin,2),
+                    //     ];
+                    // }
+                    // elseif($explodedOrderId['1'] > 2){
+                    //     $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
+                    //     $sumOfWin = $game->pay_amount+$winAmount;
+                    //     $finalUpdateDatas = [
+                    //         "win" => 1,
+                    //         "bet_amount" => round($sumOfBet,2),
+                    //         "pay_amount" => round($sumOfWin,2),
+                    //         "income" => round($sumOfBet-$sumOfWin,2),
+                    //     ];
+                    // }
+                    // elseif($countSumTrans == 1){
+                    //     $sumOfBet = $sumOfTransactions['0']->amount;
+                    //     $sumOfWin = $game->pay_amount+$winAmount;
+                    //     $finalUpdateDatas = [
+                    //         "win" => $sumOfWin == 0 ? 0 : 1,
+                    //         "bet_amount" => round($sumOfBet,2),
+                    //         "pay_amount" => round($sumOfWin,2),
+                    //         "income" => round($sumOfBet-$sumOfWin,2),
+                    //     ];
+                    // }else{
+                    //     $sumOfWin = $game->pay_amount+$winAmount;
+                    //         $finalUpdateDatas = [
+                    //             "win" => $sumOfWin == 0 ? 0 : 1,
+                    //             "pay_amount" => round($sumOfWin,2),
+                    //             "income" => round($game->bet_amount-$sumOfWin,2),
+                    //         ];
+                    // }
                 }else{
                     $sumOfWin = $game->pay_amount+$winAmount;
                         $finalUpdateDatas = [
