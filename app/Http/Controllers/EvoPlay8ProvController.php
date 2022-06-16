@@ -360,13 +360,14 @@ class EvoPlay8ProvController extends Controller
 				    if(isset($string_to_obj->game->action) && $string_to_obj->game->action == 'freespin'):
 							try {
 								# Freespin
+								$amount = $data['data']['amount'];
 								$payout_reason = 'Free Spin';
 						 		$win_or_lost = 1; // 0 Lost, 1 win, 3 draw, 4 refund, 5 processing
 						 		$method = 2; // 1 bet, 2 win
 						 	    $token_id = $client_details->token_id;
 						 	    $provider_trans_id = $data['callback_id'];
 						 	    $round_id = $data['data']['round_id'];
-						
+
 						 	    $bet_payout = 0; // Bet always 0 payout!
 						 	    $income = '-'.$data['data']['amount']; // NEgative
 
@@ -374,14 +375,14 @@ class EvoPlay8ProvController extends Controller
 								$game_ext = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
 								if($game_ext != 'false'){
 									$game_trans = $game_ext->game_trans_id;
-									$payout = $existing_bet->pay_amount+$data['data']['amount'];
-									$updateGameTransaction = [
-										"pay_amount" => $payout,
-										"income" =>  $existing_bet->bet_amount-$payout,
-										"win" => $existing_bet->win,
-										"entry_id" => $existing_bet->entry_id,
-									];
-									GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+									// $payout = $existing_bet->pay_amount+$data['data']['amount'];
+									// $updateGameTransaction = [
+									// 	"pay_amount" => $payout,
+									// 	"income" =>  $existing_bet->bet_amount-$payout,
+									// 	"win" => $existing_bet->win,
+									// 	"entry_id" => $existing_bet->entry_id,
+									// ];
+									// GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
 								}else{
 									$game_ext = GameTransactionMDB::findGameExt($round_id, 2,'round_id', $client_details);
 									if($game_ext != 'false'){
@@ -435,6 +436,8 @@ class EvoPlay8ProvController extends Controller
 								// 	"endround" => $endround
 								// ];
 
+								$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
+
 								$action_payload = [
 									"type" => "custom", #genreral,custom :D # REQUIRED!
 									"custom" => [
@@ -442,7 +445,7 @@ class EvoPlay8ProvController extends Controller
 										"client_connection_name" => $client_details->connection_name,
 										"provider" => 'evoplay',
 										"win_or_lost" => $win,
-										"entry_id" => $entry_id,
+										"entry_id" => $existing_bet->entry_id,
 										"pay_amount" => $existing_bet->pay_amount + $amount,
 										"income" => $existing_bet->bet_amount - ($existing_bet->pay_amount + $amount),
 										"endround" => $endround,
@@ -701,14 +704,14 @@ class EvoPlay8ProvController extends Controller
 								 $game_ext = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
 								 if($game_ext != 'false'){
 									 $game_trans = $game_ext->game_trans_id;
-									 $payout = $existing_bet->pay_amount+$data['data']['amount'];
-									 $updateGameTransaction = [
-										 "pay_amount" => $payout,
-										 "income" =>  $existing_bet->bet_amount-$payout,
-										 "win" => $existing_bet->win,
-										 "entry_id" => $existing_bet->entry_id,
-									 ];
-									 GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
+									 // $payout = $existing_bet->pay_amount+$data['data']['amount'];
+									 // $updateGameTransaction = [
+										//  "pay_amount" => $payout,
+										//  "income" =>  $existing_bet->bet_amount-$payout,
+										//  "win" => $existing_bet->win,
+										//  "entry_id" => $existing_bet->entry_id,
+									 // ];
+									 // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans, $client_details);
 								 }else{
 									 // $game_ext = ProviderHelper::findGameExt($round_id, 2, 'round_id');
 									 $game_ext = GameTransactionMDB::findGameExt($round_id, 2,'round_id', $client_details);
@@ -763,6 +766,8 @@ class EvoPlay8ProvController extends Controller
 								// 	"endround" => $endround
 								// ];
 
+								$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
+
 								$action_payload = [
 									"type" => "custom", #genreral,custom :D # REQUIRED!
 									"custom" => [
@@ -770,7 +775,7 @@ class EvoPlay8ProvController extends Controller
 										"client_connection_name" => $client_details->connection_name,
 										"provider" => 'evoplay',
 										"win_or_lost" => $win,
-										"entry_id" => $entry_id,
+										"entry_id" => $existing_bet->entry_id,
 										"pay_amount" => $existing_bet->pay_amount + $amount,
 										"income" => $existing_bet->bet_amount - ($existing_bet->pay_amount + $amount),
 										"endround" => $endround,
