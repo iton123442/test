@@ -474,7 +474,7 @@ class EvoPlay8ProvController extends Controller
 
 								try {
 									// $client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit',false,$action);
-									$client_response = ClientRequestHelper::fundTransfer_TG($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_trans,'credit', false, $action_payload);
+									$client_response = ClientRequestHelper::fundTransfer_TG($client_details,ProviderHelper::amountToFloat($amount),$game_details->game_code,$game_details->game_name,$game_trans,'credit', false, $action_payload);
 								} catch (\Exception $e) {
 									$msg = array("status" => 'error',"message" => $e->getMessage().' '.$e->getFile().' '.$e->getLine());
 									$updateGameTransaction = ["win" => 2,'trans_status' => 5];
@@ -811,7 +811,7 @@ class EvoPlay8ProvController extends Controller
 								];
 
 								try {
-									$client_response = ClientRequestHelper::fundTransfer_TG($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_trans,'credit', false, $action_payload);
+									$client_response = ClientRequestHelper::fundTransfer_TG($client_details,ProviderHelper::amountToFloat($amount),$game_details->game_code,$game_details->game_name,$game_trans,'credit', false, $action_payload);
 
 									// $client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'credit',false,$action);
 								} catch (\Exception $e) {
