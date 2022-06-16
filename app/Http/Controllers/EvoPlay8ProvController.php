@@ -436,6 +436,14 @@ class EvoPlay8ProvController extends Controller
 								// 	"endround" => $endround
 								// ];
 
+								$response = array(
+									'status' => 'ok',
+									'data' => [
+										'balance' => (string)$client_details->balance+$amount,
+										'currency' => $client_details->default_currency,
+									],
+							 	);
+
 								$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
 
 								$action_payload = [
@@ -765,6 +773,14 @@ class EvoPlay8ProvController extends Controller
 								// 	"provider_name" => "evoplay",
 								// 	"endround" => $endround
 								// ];
+
+								$response = array(
+									'status' => 'ok',
+									'data' => [
+										'balance' => (string)$client_details->balance+$amount,
+										'currency' => $client_details->default_currency,
+									],
+							 	);
 
 								$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
 
