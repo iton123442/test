@@ -984,7 +984,7 @@ class EvoPlay8ProvController extends Controller
 					$totalBetCount = [];
 					$allRoundCount = GameTransactionMDB::findGameExtAll($data['data']['refund_round_id'],'allround', $client_details);
 					if(count($allRoundCount) != 0){
-						foreach ($all_round as $key) {
+						foreach ($allRoundCount as $key) {
 		                    if($key->game_transaction_type == 1){
 		                        array_push($totalBetCount, $key->amount);
 		                    }
