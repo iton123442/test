@@ -912,5 +912,30 @@ class DOWINNController extends Controller{
         return($response);
     }
 
+    public function viewHistory(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        // ($player_id, $startTime,$endTime)
+        // $dataToSend = [
+        //     "account" => config('providerlinks.dowinn.user_agent'),
+        //     "beginTime" => $startTime,
+        //     "endTime" => $endTime,
+        //     "child" => $this->prefix.'_'.$player_id,
+        // ];
+        $dataToSend = [
+            "account" => config('providerlinks.dowinn.user_agent'),
+            "beginTime" => $data['Stime'],
+            "endTime" => $data['Etime'],
+            "child" => $this->prefix.'_'.$data['player_id'],
+        ];
+        $client = new Client([
+            'headers' => [
+                'Content-Type' => 'x-www-form-urlencoded'
+            ],
+        ]);
+        $response = $client->post(config('providerlinks.dowinn.api_url'),'/history2.do',
+         ['form_params' => $dataToSend]);
+         $res = json_decode($response->getBody(),TRUE);
+         return $res;
+    }
 }
 ?>
