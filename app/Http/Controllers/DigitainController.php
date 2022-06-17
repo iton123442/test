@@ -123,9 +123,9 @@ class DigitainController extends Controller
 		if($json_data['operatorId'] != $this->operator_id){
 			return $this->wrongOperatorID();
 		}
-		// if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
-		// 	return $this->authError();
-		// }
+		if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
+			return $this->authError();
+		}
 		$client_details = ProviderHelper::getClientDetails('token', $json_data["token"]);	
 		if ($client_details == null || $client_details == 'false'){
 			$response = [
@@ -366,9 +366,9 @@ class DigitainController extends Controller
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
 			return $this->wrongOperatorID();
 		}
-		// if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
-		// 	return $this->authError();
-		// }
+		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
+			return $this->authError();
+		}
 
 		$items_array = array(); // ITEMS INFO
 
@@ -1111,9 +1111,9 @@ class DigitainController extends Controller
 		if($json_data['operatorId'] != $this->operator_id){
 			return $this->wrongOperatorID();
 		}
-		// if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
-		// 	return $this->authError();
-		// }
+		if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
+			return $this->authError();
+		}
 
 		$items_array = array(); // ITEMS INFO
 	
@@ -2048,9 +2048,9 @@ class DigitainController extends Controller
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
 			return $this->wrongOperatorID();
 		}
-		// if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
-		// 	return $this->authError();
-		// }
+		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
+			return $this->authError();
+		}
 		
 		$items_array = array();
 		$duplicate_txid_request = array();
@@ -3007,9 +3007,9 @@ class DigitainController extends Controller
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
 			return $this->wrongOperatorID();
 		}
-		// if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
-		// 	return $this->authError();
-		// }
+		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
+			return $this->authError();
+		}
 
 		# Missing Parameters
 		if(!isset($json_data['items']) || !isset($json_data['operatorId']) || !isset($json_data['timestamp']) || !isset($json_data['signature']) || !isset($json_data['allOrNone']) || !isset($json_data['providerId'])){
@@ -4193,9 +4193,9 @@ class DigitainController extends Controller
 		if($json_data == null){
 			return $this->noBody();
 		}
-		// if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
-		// 	return $this->authError();
-		// }
+		if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
+			return $this->authError();
+		}
 		if($json_data['operatorId'] != $this->operator_id){
 			return $this->wrongOperatorID();
 		}
@@ -5128,9 +5128,9 @@ class DigitainController extends Controller
 		if($json_data == null){
 			return $this->noBody();
 		}
-		// if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
-		// 	return $this->authError();
-		// }
+		if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
+			return $this->authError();
+		}
 		if($json_data['operatorId'] != $this->operator_id){
 			return $this->wrongOperatorID();
 		}
@@ -5444,9 +5444,9 @@ class DigitainController extends Controller
 		if($json_data == null){
 			return $this->noBody();
 		}
-		// if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
-		// 	return $this->authError();
-		// }
+		if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
+			return $this->authError();
+		}
 		if($json_data['operatorId'] != $this->operator_id){
 			return $this->wrongOperatorID();
 		}
@@ -5759,9 +5759,9 @@ class DigitainController extends Controller
 		if($json_data['operatorId'] != $this->operator_id){
 			return $this->wrongOperatorID();
 		}
-		// if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
-		// 	return $this->authError();
-		// }
+		if (!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){
+			return $this->authError();
+		}
 		# Missing Parameters
 		if(isset($json_data['externalTxId']) && $json_data['externalTxId'] == ""){
 			if(isset($json_data['providerTxId']) && $json_data['providerTxId'] == ""){
