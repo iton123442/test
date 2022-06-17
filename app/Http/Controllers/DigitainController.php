@@ -357,7 +357,6 @@ class DigitainController extends Controller
 	 * 
 	 */
 	 public function bet(Request $request){
-
 	 	ProviderHelper::saveLogWithExeption('RSG bet - EH', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$json_data = json_decode(file_get_contents("php://input"), true);
 		
@@ -586,7 +585,7 @@ class DigitainController extends Controller
 				"game_transaction_type"=> 1,
 				"provider_request" =>json_encode($request->all()),
 			);
-			$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 
 			# Custom Configs
@@ -988,7 +987,7 @@ class DigitainController extends Controller
 					"game_transaction_type"=> 1,
 					"provider_request" =>json_encode($json_data),
 				);
-				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 
 				# Change Fund Amount to 0 when changeBalance is false
@@ -1314,7 +1313,7 @@ class DigitainController extends Controller
 					"game_transaction_type"=> 2,
 					"provider_request" =>json_encode($request->all()),
 				);
-				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 				try {
 
@@ -1819,7 +1818,7 @@ class DigitainController extends Controller
 					"game_transaction_type"=> 2,
 					"provider_request" =>json_encode($json_data),
 				);
-				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 				
 
 				try {
@@ -2237,7 +2236,7 @@ class DigitainController extends Controller
 					"game_transaction_type"=> 1,
 					"provider_request" =>json_encode($request->all()),
 				);
-				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 
 				# Change Fund Amount to 0 when changeBalance is false
@@ -2302,7 +2301,7 @@ class DigitainController extends Controller
 						"game_transaction_type"=> 2,
 						"provider_request" =>json_encode($request->all()),
 					);
-					$game_transextension2 = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+					$game_transextension2 = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 					// $client_response2 = ClientRequestHelper::fundTransfer($client_details,abs($key['winAmount']),$game_details->game_code,$game_details->game_name,$game_transextension2,$game_trans,'credit');
 
@@ -2744,7 +2743,7 @@ class DigitainController extends Controller
 					"game_transaction_type"=> 1,
 					"provider_request" =>json_encode($json_data),
 				);
-				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 
 				# Change Fund Amount to 0 when changeBalance is false
@@ -2810,7 +2809,7 @@ class DigitainController extends Controller
 						"game_transaction_type"=> 2,
 						"provider_request" =>json_encode($json_data),
 					);
-					$game_transextension2 = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+					$game_transextension2 = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 
 					$pay_amount = abs($key['winAmount']);
@@ -3385,7 +3384,7 @@ class DigitainController extends Controller
 						"game_transaction_type"=> 3,
 						"provider_request" =>json_encode($request->all()),
 					);
-					$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+					$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 					
 					$fund_extra_data = [
 			            'provider_name' => 'digitain'
@@ -4064,7 +4063,7 @@ class DigitainController extends Controller
 						"game_transaction_type"=> 3,
 						"provider_request" =>json_encode($json_data),
 					);
-					$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+					$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 						
 					$fund_extra_data = [
 			            'provider_name' => 'digitain'
@@ -4491,7 +4490,7 @@ class DigitainController extends Controller
 				"game_transaction_type"=> 3,
 				"provider_request" =>json_encode($request->all()),
 			);
-			$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 			$fund_extra_data = [
 	            'provider_name' => 'digitain'
@@ -4999,7 +4998,7 @@ class DigitainController extends Controller
 					"game_transaction_type"=> 3,
 					"provider_request" =>json_encode($json_data),
 				);
-				$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+				$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 				$fund_extra_data = [
 		            'provider_name' => 'digitain'
@@ -5246,7 +5245,7 @@ class DigitainController extends Controller
 			"game_transaction_type"=> 1,
 			"provider_request" =>json_encode($request->all()),
 		);
-		$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+		$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 		$fund_extra_data = [
             'provider_name' => 'digitain'
@@ -5289,7 +5288,7 @@ class DigitainController extends Controller
 				"game_transaction_type"=> 2,
 				"provider_request" =>json_encode($request->all()),
 			);
-			$game_transextension2 = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			$game_transextension2 = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 			$pay_amount = $promo_amount;
             $income = $bet_amount - $pay_amount;
@@ -5574,7 +5573,7 @@ class DigitainController extends Controller
 			"game_transaction_type"=> 1,
 			"provider_request" =>json_encode($request->all()),
 		);
-		$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+		$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 		# Custom Configs
 		# Change Fund Amount to 0 when changeBalance is false
@@ -5624,7 +5623,7 @@ class DigitainController extends Controller
 				"game_transaction_type"=> 2,
 				"provider_request" =>json_encode($request->all()),
 			);
-			$game_transextension2 = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+			$game_transextension2 = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 			# Old Version 1 Direct call
 			// $client_response2 = ClientRequestHelper::fundTransfer($client_details,0,$game_details->game_code,$game_details->game_name,$game_transextension2,$game_trans,'credit');
@@ -5764,8 +5763,8 @@ class DigitainController extends Controller
 		// 	return $this->authError();
 		// }
 		# Missing Parameters
-		if(!isset($json_data['externalTxId'])){
-			if(!isset($json_data['providerTxId'])){
+		if(isset($json_data['externalTxId']) && $json_data['externalTxId'] == ""){
+			if(isset($json_data['providerTxId']) && $json_data['providerTxId'] == ""){
 				$response = array(
 							"timestamp" => date('YmdHisms'),
 							"signature" => $this->createSignature(date('YmdHisms')),
@@ -5774,8 +5773,8 @@ class DigitainController extends Controller
 					);	
 				return $response;
 			}
-		}elseif(!isset($json_data['providerTxId'])){
-			if(!isset($json_data['externalTxId'])){
+		}elseif(isset($json_data['providerTxId']) && $json_data['providerTxId'] == ""){
+			if(isset($json_data['externalTxId']) && $json_data['externalTxId'] == ""){
 				$response = array(
 							"timestamp" => date('YmdHisms'),
 							"signature" => $this->createSignature(date('YmdHisms')),
@@ -5786,15 +5785,41 @@ class DigitainController extends Controller
 			}
 		}
 
+
+		if(isset($json_data['externalTxId']) && $json_data['externalTxId'] != ""){
+			$query = DB::Select("SELECT * FROM digitain_transactions WHERE tiger_game_ext_id = '" . $json_data['externalTxId']. "' limit 1");
+			$result = count($query);
+			if($result <= 0){
+				 $response = [
+					"timestamp" => date('YmdHisms'),
+					"signature" => $this->createSignature(date('YmdHisms')),
+					"errorCode" => 7 // error code
+				];
+				return $response;
+			}
+		}else if(isset($json_data['providerTxId']) && $json_data['providerTxId'] != ""){
+			$query = DB::Select("SELECT * FROM digitain_transactions WHERE provider_transaction_id = '" . $json_data['providerTxId']. "' limit 1");
+			$result = count($query);
+			if($result <= 0){
+				 $response = [
+					"timestamp" => date('YmdHisms'),
+					"signature" => $this->createSignature(date('YmdHisms')),
+					"errorCode" => 7 // error code
+				];
+				return $response;
+			}
+		}
+
+		$client_details = ProviderHelper::getClientDetails('player_id', $query[0]->player_id);	
+
+
 		// if no externalTxId find the provider TxId instead
 		if(isset($json_data['externalTxId']) && $json_data['externalTxId'] != null){
-			// $transaction_general_details = $this->findTransactionRefund($json_data['externalTxId'], 'game_trans_ext_id');
-			$transaction_general_details = GameTransactionMDB::findGameExt($json_data['externalTxId'], 1,'game_trans_ext_id', $client_details);
+			$transaction_general_details = GameTransactionMDB::findGameExt($json_data['externalTxId'], 1,'game_transaction_ext_id', $client_details);
 		}else{
-			// return $json_data['providerTxId'];
-			// $transaction_general_details = $this->findTransactionRefund($json_data['providerTxId'], 'transaction_id');
 			$transaction_general_details = GameTransactionMDB::findGameExt($json_data['providerTxId'], 1,'transaction_id', $client_details);
 		}
+
 	    if($transaction_general_details != false){
 	    	$general_details = json_decode($transaction_general_details->general_details);
 			$txStatus = $general_details->aggregator->transaction_status == 'SUCCESS' ? true : false;
@@ -6354,6 +6379,24 @@ class DigitainController extends Controller
 			return false;
 		}
 	
+	}
+
+	/**
+	 * Create Game Transaction Log
+	 */
+	public function CreateGameLog($gameTransactionEXTData, $client_details){
+		# Game Game Transaction Ext
+		$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+
+		# Digitian Transaction Log
+		$digitain_transaction_log = array(
+			"provider_round_id" => $gameTransactionEXTData['round_id'],
+			"provider_transaction_id" => $gameTransactionEXTData['provider_trans_id'],
+			"tiger_game_ext_id" => $game_transextension,
+			"player_id" => $client_details->player_id
+		);
+		DB::table("digitain_transactions")->insert($digitain_transaction_log);
+		return $game_transextension;
 	}
 
 }
