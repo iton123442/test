@@ -899,3 +899,4 @@ $app->post('/public/api/dowinn/credit', 'DOWINNController@payment');
 $app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
 $app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
 $app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');
+$app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
