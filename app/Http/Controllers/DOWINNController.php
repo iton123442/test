@@ -444,9 +444,9 @@ class DOWINNController extends Controller{
                 if($countSumTrans != 'false'){
                     switch($countSumTrans){
                         case '3':
-                            Helper::saveLog("CASE 1", 139,json_encode($data),$this->startTime);
                             $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
                             $sumOfWin = $sumOfTransactions['1']->amount;
+                            Helper::saveLog("CASE 1", 139,json_encode($sumOfWin),$this->startTime);
                             $finalUpdateDatas = [
                                 "win" => 1,
                                 "bet_amount" => round($sumOfBet,2),
@@ -468,8 +468,9 @@ class DOWINNController extends Controller{
 
                             }
                             else{
-                                Helper::saveLog("CASE 3", 139,json_encode($data),$this->startTime);
+                                $sumOfBet = $game->bet_amount;
                                 $sumOfWin = $sumOfTransactions['1']->amount;
+                                Helper::saveLog("CASE 3", 139,json_encode($sumOfWin),$this->startTime);
                                 $finalUpdateDatas = [
                                     "pay_amount" => round($sumOfWin,2),
                                     "win" => $sumOfWin == 0 ? 0 : 1,
