@@ -469,10 +469,11 @@ class DOWINNController extends Controller{
                             }
                             else{
                                 Helper::saveLog("CASE 3", 139,json_encode($data),$this->startTime);
-                                $sumOfWin = $game->pay_amount+$winAmount;
+                                $sumOfWin = $sumOfTransactions['1']->amount;
                                 $finalUpdateDatas = [
                                     "win" => 1,
                                     "pay_amount" => round($sumOfWin,2),
+                                    "win" => $sumOfWin == 0 ? 0 : 1,
                                     "income" => round($sumOfBet-$sumOfWin,2),
                                 ];
                             }
