@@ -444,6 +444,7 @@ class DOWINNController extends Controller{
                 if($countSumTrans != 'false'){
                     switch($countSumTrans){
                         case '3':
+                            Helper::saveLog("CASE 1", 139,json_encode($data),$this->startTime);
                             $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
                             $sumOfWin = $sumOfTransactions['1']->amount;
                             $finalUpdateDatas = [
@@ -454,6 +455,7 @@ class DOWINNController extends Controller{
                             ];
                         break;
                         case '2':
+                            Helper::saveLog("CASE 2", 139,json_encode($data),$this->startTime);
                             if($sumOfTransactions['1']->game_transaction_type == 3){
                                 $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
                                 $sumOfWin = $game->pay_amount+$winAmount;
@@ -466,15 +468,17 @@ class DOWINNController extends Controller{
 
                             }
                             else{
+                                Helper::saveLog("CASE 3", 139,json_encode($data),$this->startTime);
                                 $sumOfWin = $game->pay_amount+$winAmount;
                                 $finalUpdateDatas = [
                                     "win" => 1,
-                                    "pay_amount" => round($sumOfWin,2),
+                                    // "pay_amount" => round($sumOfWin,2),
                                     "income" => round($sumOfBet-$sumOfWin,2),
                                 ];
                             }
                         break;
                         case '1':
+                            Helper::saveLog("CASE 4", 139,json_encode($data),$this->startTime);
                             $sumOfBet = $sumOfTransactions['0']->amount;
                             $sumOfWin = $game->pay_amount+$winAmount;
                             $finalUpdateDatas = [
@@ -485,6 +489,7 @@ class DOWINNController extends Controller{
                             ];
                         break;
                         default:
+                        Helper::saveLog("DEFAULT", 139,json_encode($data),$this->startTime);
                             $sumOfWin = $game->pay_amount+$winAmount;
                             $finalUpdateDatas = [
                                 "win" => $sumOfWin == 0 ? 0 : 1,
@@ -540,6 +545,7 @@ class DOWINNController extends Controller{
                     //         ];
                     // }
                 }else{
+                    Helper::saveLog("NEUTRAL", 139,json_encode($data),$this->startTime);
                     $sumOfWin = $game->pay_amount+$winAmount;
                         $finalUpdateDatas = [
                             "win" => $sumOfWin == 0 ? 0 : 1,
