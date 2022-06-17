@@ -471,7 +471,6 @@ class DOWINNController extends Controller{
                                 Helper::saveLog("CASE 3", 139,json_encode($data),$this->startTime);
                                 $sumOfWin = $sumOfTransactions['1']->amount;
                                 $finalUpdateDatas = [
-                                    "win" => 1,
                                     "pay_amount" => round($sumOfWin,2),
                                     "win" => $sumOfWin == 0 ? 0 : 1,
                                     "income" => round($sumOfBet-$sumOfWin,2),
