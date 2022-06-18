@@ -324,32 +324,17 @@ $app->post('/public/api/ka/revoke','KAGamingController@gameRevoke');
 
 
 // 8PROVIDERS
-$app->post('/public/api/eightprovider', 'EightProviderController@index'); // Single Route
-
-$app->post('/public/api/eightprovider/test', 'EightProviderController@testcall'); // TEST
-$app->post('/public/api/eightprovider/getlist', 'EightProviderController@getGames');
-$app->post('/public/api/eightprovider/geturl', 'EightProviderController@gameUrl'); // DEPRECATED
-$app->post('/public/api/eightprovider/registerbunos', 'EightProviderController@registerBunos'); // DEPRECATED
-$app->post('/public/api/eightprovider/init', 'EightProviderController@gameInit'); // DEPRECATED
-$app->post('/public/api/eightprovider/bet', 'EightProviderController@gameBet'); // DEPRECATED
-$app->post('/public/api/eightprovider/win', 'EightProviderController@gameWin'); // DEPRECATED
-$app->post('/public/api/eightprovider/refund', 'EightProviderController@gameRefund'); // DEPRECATED
-$app->post('/public/api/eightprovider/deposit', 'EightProviderController@gameDeposit'); // DEPRECATED
-$app->post('/public/api/eightprovider/withdrawal', 'EightProviderController@gameWithdrawal'); // DEPRECATED
-$app->post('/public/api/gettransaction', 'AlController@testTransaction');
-
-$app->post('/public/api/eightprovider', 'EvoPlay8ProvController@index'); // Single Route
-
-$app->post('/public/api/eightprovider/test', 'EvoPlay8ProvController@testcall'); // TEST
-$app->post('/public/api/eightprovider/getlist', 'EvoPlay8ProvController@getGames');
-$app->post('/public/api/eightprovider/geturl', 'EvoPlay8ProvController@gameUrl'); // DEPRECATED
-$app->post('/public/api/eightprovider/registerbunos', 'EvoPlay8ProvController@registerBunos'); // DEPRECATED
-$app->post('/public/api/eightprovider/init', 'EvoPlay8ProvController@gameInit'); // DEPRECATED
-$app->post('/public/api/eightprovider/bet', 'EvoPlay8ProvController@gameBet'); // DEPRECATED
-$app->post('/public/api/eightprovider/win', 'EvoPlay8ProvController@gameWin'); // DEPRECATED
-$app->post('/public/api/eightprovider/refund', 'EvoPlay8ProvController@gameRefund'); // DEPRECATED
-$app->post('/public/api/eightprovider/deposit', 'EvoPlay8ProvController@gameDeposit'); // DEPRECATED
-$app->post('/public/api/eightprovider/withdrawal', 'EvoPlay8ProvController@gameWithdrawal'); // DEPRECATED
+$app->post('/public/api/eightprovider', 'EightProviderControllerV2@index'); // Single Route
+$app->post('/public/api/eightprovider/test', 'EightProviderControllerV2@testcall'); // TEST
+$app->post('/public/api/eightprovider/getlist', 'EightProviderControllerV2@getGames');
+$app->post('/public/api/eightprovider/geturl', 'EightProviderControllerV2@gameUrl'); // DEPRECATED
+$app->post('/public/api/eightprovider/registerbunos', 'EightProviderControllerV2@registerBunos'); // DEPRECATED
+$app->post('/public/api/eightprovider/init', 'EightProviderControllerV2@gameInit'); // DEPRECATED
+$app->post('/public/api/eightprovider/bet', 'EightProviderControllerV2@gameBet'); // DEPRECATED
+$app->post('/public/api/eightprovider/win', 'EightProviderControllerV2@gameWin'); // DEPRECATED
+$app->post('/public/api/eightprovider/refund', 'EightProviderControllerV2@gameRefund'); // DEPRECATED
+$app->post('/public/api/eightprovider/deposit', 'EightProviderControllerV2@gameDeposit'); // DEPRECATED
+$app->post('/public/api/eightprovider/withdrawal', 'EightProviderControllerV2@gameWithdrawal'); // DEPRECATED
 $app->post('/public/api/gettransaction', 'AlController@testTransaction');
 
 //BNG Endpoints
