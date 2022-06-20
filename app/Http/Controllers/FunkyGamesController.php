@@ -184,7 +184,7 @@ public function CheckBet(Request $req){
             return $response;
         }
 	 	try{ 
-			$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+			
  			if($client_details != null ){
 				Helper::saveLog('FunkyG Check CLient Deatails', $this->provider_db_id, json_encode($req->all()),$client_details);
 		      	$find_bet = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
@@ -224,7 +224,7 @@ public function CheckBet(Request $req){
 					            // "provider_request" =>json_encode($req->all()),
 				            );
 					      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); 
-					        
+				 $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');	        
 				if(isset($client_response->fundtransferresponse->status->code)){
 							        	$playerBal = sprintf('%.2f', $client_response->fundtransferresponse->balance);
 							        	ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);

@@ -149,32 +149,32 @@ $app->post('/public/api/marriott/authenticate', 'MarriottController@authPlayer')
 $app->post('/public/api/marriott/balance', 'MarriottController@getBalance'); #/
 $app->post('/public/api/marriott/debit', 'MarriottController@debitProcess'); #/
 // RGS Gaming Endpoints
-// $app->post('/public/rgs/authenticate', 'DigitainController@authenticate');
-// // $app->post('/public/rgs/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
-// $app->post('/public/rgs/getbalance', 'DigitainController@getbalance');
-// $app->post('/public/rgs/refreshtoken', 'DigitainController@refreshtoken');
-// $app->post('/public/rgs/bet', 'DigitainController@bet');
-// $app->post('/public/rgs/win', 'DigitainController@win');
-// $app->post('/public/rgs/betwin', 'DigitainController@betwin');
-// $app->post('/public/rgs/refund', 'DigitainController@refund');
-// $app->post('/public/rgs/amend', 'DigitainController@amend');
-// $app->post('/public/rgs/promowin', 'DigitainController@PromoWin');
-// $app->post('/public/rgs/charge', 'DigitainController@makeCharge');
-// $app->post('/public/rgs/checktxstatus', 'DigitainController@CheckTxStatus');
+$app->post('/public/rgs/authenticate', 'DigitainController@authenticate');
+// $app->post('/public/rgs/creategamesession', 'DigitainController@createGameSession'); // DONT NEED!
+$app->post('/public/rgs/getbalance', 'DigitainController@getbalance');
+$app->post('/public/rgs/refreshtoken', 'DigitainController@refreshtoken');
+$app->post('/public/rgs/bet', 'DigitainController@bet');
+$app->post('/public/rgs/win', 'DigitainController@win');
+$app->post('/public/rgs/betwin', 'DigitainController@betwin');
+$app->post('/public/rgs/refund', 'DigitainController@refund');
+$app->post('/public/rgs/amend', 'DigitainController@amend');
+$app->post('/public/rgs/promowin', 'DigitainController@PromoWin');
+$app->post('/public/rgs/charge', 'DigitainController@makeCharge');
+$app->post('/public/rgs/checktxstatus', 'DigitainController@CheckTxStatus');
 
 //newflowforDigitain
-$app->post('/public/rgs/authenticate', 'DigitainNEWController@authenticate');
-// $app->post('/public/rgs/creategamesession', 'DigitainNEWController@createGameSession'); // DONT NEED!
-$app->post('/public/rgs/getbalance', 'DigitainNEWController@getbalance');
-$app->post('/public/rgs/refreshtoken', 'DigitainNEWController@refreshtoken');
-$app->post('/public/rgs/bet', 'DigitainNEWController@bet');
-$app->post('/public/rgs/win', 'DigitainNEWController@win');
-$app->post('/public/rgs/betwin', 'DigitainNEWController@betwin');
-$app->post('/public/rgs/refund', 'DigitainNEWController@refund');
-$app->post('/public/rgs/amend', 'DigitainNEWController@amend');
-$app->post('/public/rgs/promowin', 'DigitainNEWController@PromoWin');
-$app->post('/public/rgs/charge', 'DigitainNEWController@makeCharge');
-$app->post('/public/rgs/checktxstatus', 'DigitainNEWController@CheckTxStatus');
+// $app->post('/public/rgs/authenticate', 'DigitainNEWController@authenticate');
+// // $app->post('/public/rgs/creategamesession', 'DigitainNEWController@createGameSession'); // DONT NEED!
+// $app->post('/public/rgs/getbalance', 'DigitainNEWController@getbalance');
+// $app->post('/public/rgs/refreshtoken', 'DigitainNEWController@refreshtoken');
+// $app->post('/public/rgs/bet', 'DigitainNEWController@bet');
+// $app->post('/public/rgs/win', 'DigitainNEWController@win');
+// $app->post('/public/rgs/betwin', 'DigitainNEWController@betwin');
+// $app->post('/public/rgs/refund', 'DigitainNEWController@refund');
+// $app->post('/public/rgs/amend', 'DigitainNEWController@amend');
+// $app->post('/public/rgs/promowin', 'DigitainNEWController@PromoWin');
+// $app->post('/public/rgs/charge', 'DigitainNEWController@makeCharge');
+// $app->post('/public/rgs/checktxstatus', 'DigitainNEWController@CheckTxStatus');
 // IA SPORTS
 $app->post('/public/api/ia/hash', 'IAESportsController@hashen'); // DEPRECATED
 $app->post('/public/api/ia/lunch', 'IAESportsController@userlunch');// DEPRECATED
@@ -324,32 +324,17 @@ $app->post('/public/api/ka/revoke','KAGamingController@gameRevoke');
 
 
 // 8PROVIDERS
-$app->post('/public/api/eightprovider', 'EightProviderController@index'); // Single Route
-
-$app->post('/public/api/eightprovider/test', 'EightProviderController@testcall'); // TEST
-$app->post('/public/api/eightprovider/getlist', 'EightProviderController@getGames');
-$app->post('/public/api/eightprovider/geturl', 'EightProviderController@gameUrl'); // DEPRECATED
-$app->post('/public/api/eightprovider/registerbunos', 'EightProviderController@registerBunos'); // DEPRECATED
-$app->post('/public/api/eightprovider/init', 'EightProviderController@gameInit'); // DEPRECATED
-$app->post('/public/api/eightprovider/bet', 'EightProviderController@gameBet'); // DEPRECATED
-$app->post('/public/api/eightprovider/win', 'EightProviderController@gameWin'); // DEPRECATED
-$app->post('/public/api/eightprovider/refund', 'EightProviderController@gameRefund'); // DEPRECATED
-$app->post('/public/api/eightprovider/deposit', 'EightProviderController@gameDeposit'); // DEPRECATED
-$app->post('/public/api/eightprovider/withdrawal', 'EightProviderController@gameWithdrawal'); // DEPRECATED
-$app->post('/public/api/gettransaction', 'AlController@testTransaction');
-
-$app->post('/public/api/eightprovider', 'EvoPlay8ProvController@index'); // Single Route
-
-$app->post('/public/api/eightprovider/test', 'EvoPlay8ProvController@testcall'); // TEST
-$app->post('/public/api/eightprovider/getlist', 'EvoPlay8ProvController@getGames');
-$app->post('/public/api/eightprovider/geturl', 'EvoPlay8ProvController@gameUrl'); // DEPRECATED
-$app->post('/public/api/eightprovider/registerbunos', 'EvoPlay8ProvController@registerBunos'); // DEPRECATED
-$app->post('/public/api/eightprovider/init', 'EvoPlay8ProvController@gameInit'); // DEPRECATED
-$app->post('/public/api/eightprovider/bet', 'EvoPlay8ProvController@gameBet'); // DEPRECATED
-$app->post('/public/api/eightprovider/win', 'EvoPlay8ProvController@gameWin'); // DEPRECATED
-$app->post('/public/api/eightprovider/refund', 'EvoPlay8ProvController@gameRefund'); // DEPRECATED
-$app->post('/public/api/eightprovider/deposit', 'EvoPlay8ProvController@gameDeposit'); // DEPRECATED
-$app->post('/public/api/eightprovider/withdrawal', 'EvoPlay8ProvController@gameWithdrawal'); // DEPRECATED
+$app->post('/public/api/eightprovider', 'EightProviderControllerV2@index'); // Single Route
+$app->post('/public/api/eightprovider/test', 'EightProviderControllerV2@testcall'); // TEST
+$app->post('/public/api/eightprovider/getlist', 'EightProviderControllerV2@getGames');
+$app->post('/public/api/eightprovider/geturl', 'EightProviderControllerV2@gameUrl'); // DEPRECATED
+$app->post('/public/api/eightprovider/registerbunos', 'EightProviderControllerV2@registerBunos'); // DEPRECATED
+$app->post('/public/api/eightprovider/init', 'EightProviderControllerV2@gameInit'); // DEPRECATED
+$app->post('/public/api/eightprovider/bet', 'EightProviderControllerV2@gameBet'); // DEPRECATED
+$app->post('/public/api/eightprovider/win', 'EightProviderControllerV2@gameWin'); // DEPRECATED
+$app->post('/public/api/eightprovider/refund', 'EightProviderControllerV2@gameRefund'); // DEPRECATED
+$app->post('/public/api/eightprovider/deposit', 'EightProviderControllerV2@gameDeposit'); // DEPRECATED
+$app->post('/public/api/eightprovider/withdrawal', 'EightProviderControllerV2@gameWithdrawal'); // DEPRECATED
 $app->post('/public/api/gettransaction', 'AlController@testTransaction');
 
 //BNG Endpoints
@@ -542,17 +527,31 @@ $app->post('/public/hbn/api/query','HabaneroController@queryrequest');
 
 
 // Pragmatic PLay
-$app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
-$app->post('/public/api/pp/balance','PragmaticPLayController@balance');
-$app->post('/public/api/pp/bet','PragmaticPLayController@bet');
-$app->post('/public/api/pp/result','PragmaticPLayController@result');
-$app->post('/public/api/pp/refund','PragmaticPLayController@refund');
-$app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
-$app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
-$app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
-$app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
-$app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
-$app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+// $app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
+// $app->post('/public/api/pp/balance','PragmaticPLayController@balance');
+// $app->post('/public/api/pp/bet','PragmaticPLayController@bet');
+// $app->post('/public/api/pp/result','PragmaticPLayController@result');
+// $app->post('/public/api/pp/refund','PragmaticPLayController@refund');
+// $app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
+// $app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
+// $app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
+// $app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
+// $app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
+// $app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+//NEWFLOW PRAGMATIOC PLAY
+// Pragmatic PLay
+$app->post('/public/api/pp/authenticate','PragmaticPlayNEWController@authenticate');
+$app->post('/public/api/pp/balance','PragmaticPlayNEWController@balance');
+$app->post('/public/api/pp/bet','PragmaticPlayNEWController@bet');
+$app->post('/public/api/pp/result','PragmaticPlayNEWController@result');
+$app->post('/public/api/pp/refund','PragmaticPlayNEWController@refund');
+$app->post('/public/api/pp/bonusWin','PragmaticPlayNEWController@bonusWin');
+$app->post('/public/api/pp/jackpotWin','PragmaticPlayNEWController@jackpotWin');
+$app->post('/public/api/pp/promoWin','PragmaticPlayNEWController@promoWin');
+$app->post('/public/api/pp/endRound','PragmaticPlayNEWController@endRound');
+$app->post('/public/api/pp/getBalancePerGame','PragmaticPlayNEWController@getBalancePerGame');
+$app->post('/public/api/pp/session/expired','PragmaticPlayNEWController@sessionExpired');
+
 
 
 
@@ -878,5 +877,13 @@ $app->post('/public/getbalance/test','YGG002Controller@getbalance');
 // $app->post('/public/api/bota/callbackBalance', 'BOTAControllerNEW@index');
 $app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
 //DOWINN
-$app->post('/public/api/dowinn', 'DOWINNController@index');
 
+
+$app->post('/public/api/dowinn', 'DOWINNController@index');//SINGLE END POINT
+$app->post('/public/api/dowinn/balance', 'DOWINNController@balance');
+$app->post('/public/api/dowinn/debit', 'DOWINNController@bet');
+$app->post('/public/api/dowinn/credit', 'DOWINNController@payment');
+$app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
+$app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
+$app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');
+$app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');

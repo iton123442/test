@@ -40,6 +40,7 @@ class ClientRequestHelper{
         return $data;
     }
     public static function fundTransfer($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
+
             $sendtoclient =  microtime(true);
             $client = new Client([
                 'headers' => [ 
@@ -49,6 +50,7 @@ class ClientRequestHelper{
             ]);
 
 
+            # Operator with custom data type!
             $custom_operator = config('clientcustom.data_type.transaction.string');
             if(in_array($client_details->operator_id, $custom_operator)){
                 $roundId = (string)$roundId;
@@ -83,9 +85,9 @@ class ClientRequestHelper{
                 ]   
             ];
 
-            // Timeout
+            # Timeout
             if($type == 'debit'){
-                $timeout = 2; // Used in Retry Call
+                $timeout = 5; // Used in Retry Call
             }else{
                 $timeout = 5;
             }
@@ -93,6 +95,11 @@ class ClientRequestHelper{
             if(count($action) > 0){
                 // $requesttocient["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
                 if(isset($action['provider_name'])){
+                    $requesttocient["gamedetails"]['provider_name'] = $action['provider_name'];
+                }
+
+                # Endround
+                if(isset($action['endround'])){
                     $requesttocient["gamedetails"]['provider_name'] = $action['provider_name'];
                 }
 
@@ -186,15 +193,30 @@ class ClientRequestHelper{
                     )
                 );
 
-                // Add Refund Queue
+                # Add Refund Queue
                 if($type == 'debit'){
                     $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming", "Booongo"];
+
+                    # Provider List Moved to top!
                     $bol = true;
+
+                    # Exclude Provider
                     if(isset($action['provider_name'])){
                         if (in_array($action["provider_name"], $exclude_provider)) {
                             $bol =  false;
                         }
                     }
+
+                    # Exclude selected operator
+                    if (in_array($client_details->operator_id,config('clientcustom.auto_refund.exclude.operator_id'))) {
+                        $bol =  false;
+                    }
+
+                    # Exclude rollback calls
+                    if($rollback == true){
+                        $bol =  false;
+                    }
+
 
                     if ($bol) {
                         $game_trans_ext_data = GameTransactionMDB::findGameExt($transactionId, 1,'game_transaction_ext_id', $client_details);   
@@ -226,16 +248,6 @@ class ClientRequestHelper{
                     }
                 }
 
-                // try{
-                //     $dataToUpdate = array(
-                //         "client_response" => json_encode($e->getMessage().' '.$e->getLine()),
-                //         "mw_request" => json_encode($requesttocient),
-                //     );
-                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
-                // }catch(\Exception $e){
-                //     Providerhelper::mandatorySaveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),$requesttocient);
-                // }
-                
                 $client_reponse = json_decode(json_encode($response));
                 $client_reponse->requestoclient = $requesttocient;
 
@@ -400,18 +412,19 @@ class ClientRequestHelper{
             // Client Custom Data Type
             $custom_operator = config('clientcustom.data_type.transaction.string');
             if(in_array($client_details->operator_id, $custom_operator)){
-                // ProviderHelper::mandatorySaveLog($requesttocient["action"]['custom']['game_transaction_ext_id'], 123, "GG", 'TG_PROCESS');
                 if(isset($requesttocient["action"]['custom']['game_transaction_ext_id'])){
                     $ext_id = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
                 }else{
                     $ext_id = (string)$requesttocient["action"]['custom']['game_trans_ext_id'];
                 }
-                // $requesttocient["action"]['custom']['game_transaction_ext_id'] = (string)$requesttocient["action"]['custom']['game_transaction_ext_id'];
                 $requesttocient["action"]['custom']['game_transaction_ext_id'] = $ext_id;
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'] = (string)$requesttocient['request_body']["fundtransferrequest"]['fundinfo']['roundId'];
-                // ProviderHelper::mandatorySaveLog($requesttocient["action"]['custom']['game_transaction_ext_id'], 123, json_encode($requesttocient), 'NO ERROR 2');
             }
-
+            
+            # Endround
+            if(isset($action['custom']['endround'])){
+                $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['endround'] = $action['custom']['endround'];
+            }
             if(isset($action['fundtransferrequest']['fundinfo']['freespin'])){
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freespin'] = $action['fundtransferrequest']['fundinfo']['freespin'];
             }
@@ -421,6 +434,7 @@ class ClientRequestHelper{
             if(isset($action['fundtransferrequest']['fundinfo']['freeroundend'])){
                 $requesttocient['request_body']["fundtransferrequest"]['fundinfo']['freeroundend'] = $action['fundtransferrequest']['fundinfo']['freeroundend'];
             }
+
         }
        
         try{

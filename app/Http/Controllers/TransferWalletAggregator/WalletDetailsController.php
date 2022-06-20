@@ -424,6 +424,8 @@ class WalletDetailsController extends Controller
                     $query = "
                         select 
                         game_trans_id,
+                        transaction_no,
+                        periode,
                         (select client_name from ".$connection["TG_ClientInfo"].".clients where client_id = c.client_id) as client_name,
                         (select client_player_id from ".$connection["TG_PlayerInfo"].".players where player_id = c.player_id) as client_player_id,
                         (select sub_provider_name from ".$connection["TG_GameInfo"].".sub_providers where sub_provider_id = (SELECT sub_provider_id FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) ) as provider_name,
@@ -439,6 +441,13 @@ class WalletDetailsController extends Controller
                         curr_amount,
                         amount,
                         total,
+                        format(
+                            (case 
+                                when (select game_type_id from ".$connection["TG_GameInfo"].".games where game_id = c.game_id) = 3 then bet_amount * 0.03
+                                when (select game_type_id from ".$connection["TG_GameInfo"].".games where game_id = c.game_id) = 33 then bet_amount * 0.015 
+                                end )
+                        ,4) ggr, 
+                        (select default_currency from api_test.clients where client_id = c.client_id) as currency,
                         convert_tz(c.created_at,'+00:00', '+08:00') created_at
                         from ".$connection["db_list"][1].".game_transactions c 
                         inner join ".$connection["db_list"][1].".idn_transaction_list using (game_trans_id)
@@ -456,6 +465,7 @@ class WalletDetailsController extends Controller
                     $query = "
                         select 
                         game_trans_id,
+                        c.round_id as round_id,
                         (select client_name from ".$connection["TG_ClientInfo"].".clients where client_id = c.client_id) as client_name,
                         (select client_player_id from ".$connection["TG_PlayerInfo"].".players where player_id = c.player_id) as client_player_id,
                         (select sub_provider_name from ".$connection["TG_GameInfo"].".sub_providers where sub_provider_id = (SELECT sub_provider_id FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) ) as provider_name,
@@ -490,6 +500,8 @@ class WalletDetailsController extends Controller
                 if($client_details->operator_id == 11 || $client_details->operator_id == 37 ){
                     foreach($details as $datas){
                         $datatopass['game_trans_id']=$datas->game_trans_id;
+                        $datatopass['transaction_no']=$datas->transaction_no;
+                        $datatopass['periode']=$datas->periode;
                         $datatopass['client_name']=$datas->client_name;
                         $datatopass['client_player_id']=$datas->client_player_id;
                         $datatopass['provider_name']=$datas->provider_name;
@@ -505,12 +517,15 @@ class WalletDetailsController extends Controller
                         $datatopass['curr_amount']=$datas->curr_amount;
                         $datatopass['amount']=$datas->amount;
                         $datatopass['total']=$datas->total;
+                        $datatopass['currency']=$datas->currency;
+                        $datatopass['ggr']=$datas->ggr;
                         $datatopass['created_at']=$datas->created_at;
                         $data[]=$datatopass;
                     }
                 } else {
                     foreach($details as $datas){
                         $datatopass['game_trans_id']=$datas->game_trans_id;
+                        $datatopass['round_id']=$datas->round_id;
                         $datatopass['client_name']=$datas->client_name;
                         $datatopass['client_player_id']=$datas->client_player_id;
                         $datatopass['provider_name']=$datas->provider_name;

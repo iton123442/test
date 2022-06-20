@@ -135,7 +135,27 @@ return [
         '8USD' => [  // ASK ME USD
             'merchant_id' => 'TG',
             'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
-        ]
+        ],
+        '36IDR'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36SND'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36VND'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36MYR'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
+        '36THB'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
     ],
     'cqgames' => [
         "prefix" => "TG",
@@ -759,7 +779,7 @@ return [
     'bota'=>[
         'api_key' => '6659fc8266bf70ac08933e3ba794422be56ad036a4f2db56514b59fcf8536594',
         'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36',
-        'api_url' => 'http://bota-en.com/api',
+        'api_url' => 'http://bota-cn.com/api',
         'prefix' => 'SPEED',
         'provider_db_id' => 135,
         'gamelaunch_url' => 'https://seam.go-65.com/token/',
@@ -767,7 +787,7 @@ return [
     'dowinn' =>[
         'api_url' => 'https://t-agent.sbet56789.com/cash',
         'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
-        'user_agent' => 'kapi0006',
+        'user_agent' => 'kapi0006s',
         'prefix' => 'TG',
         'provider_db_id' => 139,
     ],

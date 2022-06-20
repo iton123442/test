@@ -462,6 +462,473 @@ class AlController extends Controller
 
 
     public function tapulan(Request $request){
+      $file = $request->file('file');
+      $filename = $file->getClientOriginalName();
+      $extension = $file->getClientOriginalExtension();
+      $tempPath = $file->getRealPath();
+      $fileSize = $file->getSize();
+      $mimeType = $file->getMimeType();
+
+      // Valid File Extensions
+      $valid_extension = array("csv","xlsx");
+
+      // 2MB in Bytes
+      // $maxFileSize = 2097152; 
+
+      $maxFileSize = 9999999999999; 
+
+
+      // Check file extension
+      if(in_array(strtolower($extension),$valid_extension)){
+
+        // Check file size
+        if($fileSize <= $maxFileSize){
+
+          // File upload location
+          $location = 'uploads';
+
+          // Upload file
+          $file->move($location,$filename);
+          // Import CSV to Database
+          $filepath = public_path($location."/".$filename);
+          // Reading file
+          $file = fopen($filepath,"r");
+          $importData_arr = array();
+          $i = 0;
+
+          while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+             $num = count($filedata );
+             
+             // Skip first row (Remove below comment if you want to skip the first row)
+             /*if($i == 0){
+                $i++;
+                continue; 
+             }*/
+             for ($c=0; $c < $num; $c++) {
+                $importData_arr[$i][] = $filedata [$c];
+             }
+             $i++;
+          }
+          fclose($file);
+
+          // Insert to MySQL database
+          $i = 1;
+          foreach($importData_arr as $importData){
+            if($i != 1){
+              if($importData[8] == 'Lose'){
+                $status = 0;
+                $payAmount = 0;
+              }else{
+                $status = 1;
+                $payAmount = $importData[7];
+              }
+              $gameTransactionData = array(
+                  "provider_trans_id" => $importData[10],
+                  "token_id" => 9999999,
+                  "game_id" => 999999,
+                  "round_id" => $importData[1],
+                  "bet_amount" => $importData[6],
+                  "pay_amount" => $payAmount,
+                  "win" => $status,
+                  "entry_id" =>2,
+                  "created_at" => $importData[0],
+                  "updated_at" => $importData[0],
+              );
+              dd($gameTransactionData);
+             // DB::table('game_transactions_ftg')->insertGetId($gameTransactionData);
+           }
+          $i++;
+          }
+          return 'Import Successful.';
+        }else{
+          return 'File too large. File must be less than 2MB.';
+        }
+
+      }else{
+         return 'Invalid File Extension.';
+      }
+
+
+
+      # Json to CSV then CSV to JSON!
+      // $request_data = json_decode(json_encode($request->all()));
+      // $i = 1;
+      // $round_ids = array();
+      // foreach ($request_data as $data){
+      //     $convert_data = json_decode($data->data);
+
+      //     $data = [
+      //         'player_id' => $convert_data->fundtransferrequest->playerinfo->client_player_id,
+      //         'amount' => $convert_data->fundtransferrequest->fundinfo->amount,
+      //         'roundId' => '_'.$convert_data->fundtransferrequest->fundinfo->roundId,
+      //         'transactionId' => '_'.$convert_data->fundtransferrequest->fundinfo->transactionId,
+      //         'gameId' => $convert_data->gamedetails->gameid,
+      //     ];
+
+      //     array_push($round_ids, $data);
+      // }
+      // echo json_encode($round_ids);
+      // return;
+      // dd($round_ids);
+      // dd("FORMEDIAGATE");
+
+
+
+      $success_list = array();
+        $error_list = array();
+        $notfound_list = array();
+        $data_arr = "";
+        try {
+          $request_data = json_decode(json_encode($request->all()));
+          // $reqBody = json_decode($request->getContent(),true);
+          $i = 1;
+          foreach ($request_data as $data){
+              
+              $data = json_decode($data->data);
+              $date = $data->datetsent;
+              $fixed = date('Y-m-d h:m:i', strtotime($date));
+
+              $game_details = DB::select("select * from games where sub_provider_id IN (56) and game_code = '".$data->gamedetails->gameid."' ");
+
+              $playerDetails = DB::select("select * from players_mediagate inner join clients using (client_id) where client_player_id = '".$data->fundtransferrequest->playerinfo->player_username."'");
+
+              $game_trans_id = $data->fundtransferrequest->fundinfo->roundId;
+              $game_trans_ext_id = $data->fundtransferrequest->fundinfo->transactionId;
+              $type = $data->fundtransferrequest->fundinfo->transactiontype;
+              $amount = $data->fundtransferrequest->fundinfo->amount;
+              $game_id = $game_details[0]->game_id;
+              $player_id = $playerDetails[0]->player_id;
+              $client_id = $playerDetails[0]->client_id;
+              $operator_id = $playerDetails[0]->operator_id;
+              $wintype = 0;
+              $entryid = $type == 'debit' ? 1 : 2;
+              if($type == 'credit'){
+                  $bet_amount = 0;
+                  $payamount = $data->fundtransferrequest->fundinfo->amount;
+                  $wintype = $amount > 0 ? 1 : 0;
+              }elseif($type == 'debit'){
+                  $bet_amount = $data->fundtransferrequest->fundinfo->amount;
+                  $payamount = 0;
+              }
+              if($i == 1){
+                  $data_arr .= "INSERT INTO api_test.game_transactions_mediagate(game_trans_id,provider_trans_id,token_id,game_id,win,bet_amount,pay_amount,player_id,client_id,operator_id,entry_id,created_at) VALUES";
+                  $data_arr .="('$game_trans_id','$game_trans_ext_id',0,'$game_id','$wintype','$bet_amount','$payamount','$player_id','$client_id','$operator_id','$entryid','$fixed'),";
+              }else if($i == 1000){
+                  $data_arr .="('$game_trans_id','$game_trans_ext_id',0,'$game_id','$wintype','$bet_amount','$payamount','$player_id','$client_id','$operator_id','$entryid','$fixed');\n";
+                  $i = 0;
+              }else{
+                  $data_arr .="('$game_trans_id','$game_trans_ext_id',0,'$game_id','$wintype','$bet_amount','$payamount','$player_id','$client_id','$operator_id','$entryid','$fixed'),";
+              }
+              $i++;
+              
+          }
+          echo $data_arr;
+          return;
+        }catch (\Exception $e){
+          dd($data);
+          $msg = $e->getMessage().' '.$e->getLine().' '.$e->getFile();
+          dd($msg);
+        } 
+
+
+      # Same transaction id      
+      // $client_details = Providerhelper::getClientDetails('player_id', 10210);
+      // $check_revoked = GameTransactionMDB::findGameExt(2125506494, false,'game_transaction_ext_id', $client_details);
+
+      // if(isset($check_revoked->general_details) && $check_revoked->general_details != ''){
+      //     $checkIfJson = json_decode($check_revoked->general_details);
+
+      //     if($checkIfJson == null){ // not empty and string type
+      //       $newGeneralDetails = [
+      //         'existing' => $check_revoked->general_details,
+      //         'new_append_data' => 'GG NESO'
+      //       ];
+      //       dd($newGeneralDetails);
+      //     }else{
+      //       $checkIfJson->new_Data = 'gg';
+      //     }
+      //     dd($checkIfJson);
+      // }else{
+      //    dd('WALA LAMANA');
+      // }
+
+      dd($check_revoked);
+
+
+      // Kuma
+      $request_data = json_decode(json_encode($request->all()));
+      $i = 1;
+
+      $round_ids = array();
+      foreach ($request_data as $data){
+          $convert_data = json_decode($data->detail);
+
+          $data = [
+              'amount' => $convert_data->fundTransferReqInfo->fundInfo->amount,
+              'roundId' => '_'.$convert_data->fundTransferReqInfo->fundInfo->roundId,
+              'transactionId' => '_'.$convert_data->fundTransferReqInfo->fundInfo->transactionId,
+              'gameId' => $convert_data->gameDetails->gameId,
+          ];
+
+          array_push($round_ids, $data);
+      }
+      echo json_encode($round_ids);
+      return;
+      dd($round_ids);
+      dd("FORKUMA");
+
+      
+      // dd($fixed);
+      // # EM data restoration
+      // transaction type  1 bet | 2 wun
+
+
+      // is exist round
+      //   is amount 0
+      //     its a win udpate payout
+      //         update payamount
+      //   else amount != 0
+      //         update bet amount
+
+      // not exist
+      //     is amount 0
+      //       savelog why no bet for this round!
+      //     else
+      //       insert transaction (win 5)
+      // dd(10000);
+
+        // dd("GO");
+        // b2c superslot
+        $success_list = array();
+        $error_list = array();
+        $notfound_list = array();
+        $data_arr = "";
+        try {
+          $request_data = json_decode(json_encode($request->all()));
+          // $reqBody = json_decode($request->getContent(),true);
+          $i = 1;
+          foreach ($request_data as $data){
+
+              $date = $data->betTime;
+              $fixed = date('Y-m-d h:m:i', strtotime($date));
+
+              // $convert_data = json_decode($data->detail);
+              // $game_details = DB::select("select * from tg_clientinfo.games where sub_provider_id IN (105,90,56,38) and game_code = '".$convert_data->gameDetails->gameId."' ");
+              $playerDetails = DB::select("select * from players_b2c_selected where client_player_id = '".$data->playerID."' ");
+              $game_trans_id = $data->roundID;
+              $game_trans_ext_id = $data->refProvider."_".$data->provider;
+              $type = $data->amount == 0 ? "credit" : "debit";
+              $amount = $data->amount;
+              $game_id = 0;
+              $player_id = $playerDetails[0]->player_id;
+              $client_id = $playerDetails[0]->client_id;
+              $operator_id = 0;
+              $wintype = 0;
+              $entryid = $type == 'debit' ? 1 : 2;
+              if($type == 'credit'){
+                  $bet_amount = 0;
+                  $payamount = $data->payout;
+                  $wintype = $amount > 0 ? 1 : 0;
+              }elseif($type == 'debit'){
+                  $bet_amount = $amount;
+                  $payamount = 0;
+              }
+              if($i == 1){
+                  $data_arr .= "INSERT INTO api_test.game_transactions_superslot_ii(game_trans_id,provider_trans_id,token_id,game_id,win,bet_amount,pay_amount,player_id,client_id,operator_id,entry_id,created_at) VALUES";
+                  $data_arr .="('$game_trans_id','$game_trans_ext_id',0,'$game_id','$wintype','$bet_amount','$payamount','$player_id','$client_id','$operator_id','$entryid','$fixed'),";
+              }else if($i == 1000){
+                  $data_arr .="('$game_trans_id','$game_trans_ext_id',0,'$game_id','$wintype','$bet_amount','$payamount','$player_id','$client_id','$operator_id','$entryid','$fixed');\n";
+                  $i = 0;
+              }else{
+                  $data_arr .="('$game_trans_id','$game_trans_ext_id',0,'$game_id','$wintype','$bet_amount','$payamount','$player_id','$client_id','$operator_id','$entryid','$fixed'),";
+              }
+              $i++;
+              
+          }
+          echo $data_arr;
+          return;
+        }catch (\Exception $e){
+          $msg = $e->getMessage().' '.$e->getLine().' '.$e->getFile();
+          dd($msg);
+        } 
+        // $result = array(
+        //   "success_list" => $success_list,
+        //   "error_list" =>$error_list,
+        //   "notfound_list" =>$notfound_list
+        // );
+        // return $result;
+
+
+
+
+
+
+
+
+
+
+
+      ini_set ('max_execution_time', -1); //unlimit
+      // dd("10000_PROCESSING");
+      $reqBody = json_decode($request->getContent(),true);
+      $dates = [];
+      foreach ($reqBody as $key => $value) {
+          Helper::saveLog('LAST LOOP!', 12, json_encode($value), $value['roundID']);
+          $query = DB::Select("SELECT * FROM game_transactions_superslot WHERE game_trans_id = '" . $value['roundID'] . "' limit 1");
+          $result = count($query); 
+          if($result > 0){
+             // Existing round
+             if($value['amount'] == 0){
+                // win type
+                $win = $value['payout'] > 0 ? 1 : 0;
+                DB::select('UPDATE game_transactions_superslot SET pay_amount = '.$value['payout'].', income = bet_amount-pay_amount,trans_status = trans_status+1, entry_id = 1, win = '.$win.' where game_trans_id = '.$value['roundID'].''); 
+             }else{
+                // bet type
+                Helper::saveLog('BDOUBLE BET!', 999, json_encode($value), Helper::datesent());
+                $win = $value['payout'] > 0 ? 1 : 0;
+                DB::select('UPDATE game_transactions_superslot SET bet_amount = bet_amount+'.$value['amount'].', income = bet_amount-pay_amount, entry_id = 1, win = '.$win.' where game_trans_id = '.$value['roundID'].''); 
+             }
+          }else{
+             // Create Transaction
+
+              if($value['amount'] == 0){
+                // win type
+                Helper::saveLog('BET WITH NO AMOUNT!', 999, json_encode($value), $value['roundID']);
+              }else{
+                // bet type
+                $queryPlayer = DB::Select("SELECT * FROM players_b2c_selected WHERE client_player_id = '" . $value['playerID'] . "' limit 1");
+                $resultPlayer = count($queryPlayer); 
+
+                if($resultPlayer > 0){
+                  $date = $value['betTime'];
+                  $fixed = date('Y-m-d h:m:i', strtotime($date));
+
+                  $data = [
+                    "game_trans_id" => $value['roundID'],
+                    "provider_trans_id" => $value['refProvider']."_".$value['provider'],
+                    "token_id" => 0,
+                    "game_id" => 0,
+                    "round_id" => $value['roundID'],
+                    "bet_amount" => $value['amount'],
+                    "win" => 5,
+                    "pay_amount" => 0,
+                    "income" => 0,
+                    "entry_id" => 0,
+                    "created_at" => $fixed,
+                    "operator_id" => 0,
+                    "trans_status" => 0,
+                    "client_id" => $queryPlayer[0]->client_id,
+                    "player_id" => $queryPlayer[0]->player_id,
+                  ];
+                  DB::table('game_transactions_superslot')->insert($data);
+                }else{
+                  Helper::saveLog('NO PLAYER!', 999, json_encode($value), $value['roundID']);
+                }
+              }
+          }
+      }
+
+
+     dd("10000_PROCESSING_DONE");
+      # EveryMatrix
+      // if existing
+
+      //   update gamerounds/gametransid
+      //   win type
+      //     if transaction type 1 bet (update bet amount)
+      //     if transaction type 2
+      //       amount = 0 (lost)
+      //         pay amount 0
+      //       amount > 0 (win)
+      //         pay amount is amount
+
+
+      // if not existing
+        
+      //   insert roundId
+      //   win type progressing
+        
+      $em_data = DB::table('game_transactions')->get();
+
+      foreach ($em_data as $key => $value) {
+        // $call_logs = DB::Select("SELECT * FROM call_logs_em WHERE client_response LIKE '%" . $value->game_trans_id  . "%' LIMIT 1");
+        $game_info = DB::Select("SELECT game_id FROM games WHERE game_code = '".$value->transaction_reason."' LIMIT 1");
+        // DB::select('UPDATE game_transactions SET  game_id = '.$game_info[0]->game_id.' where game_trans_id = '.$value->game_trans_id.''); 
+
+
+        DB::select('UPDATE game_transactions SET  game_id = '.$game_info[0]->game_id.' where game_trans_id = '.$value->game_trans_id.''); 
+      }
+
+
+      dd("DONE");
+
+      $em_data = DB::table('game_rounds_em')->get();
+      foreach ($em_data as $key => $value) {
+           $query = DB::Select("SELECT * FROM game_transactions WHERE game_trans_id = '" . $value->tg_round_id . "'");
+           $result = count($query);
+           if($result > 0){
+              // $update = DB::table('game_transactions')
+              //       ->where('game_trans_id',$value->tg_round_id)
+              //       ->update(['pay_amount' => $value->amount, 
+              //       'income' =>  $value->amount,
+              //       'win' => $value->amount > 0 ? 1 : 0, 
+              //       'entry_id' => 1,
+              // ]);
+              $win = $value->amount > 0 ? 1 : 0;
+              DB::select('UPDATE game_transactions SET pay_amount = '.$value->amount.', income = bet_amount-pay_amount, entry_id = 1, win = '.$win.' where game_trans_id = '.$value->tg_round_id.'');   
+
+           }else{
+
+              $data = [
+                "game_trans_id" => $value->tg_round_id,
+                "provider_trans_id" => $value->tg_transaction_id,
+                "token_id" => 0,
+                "game_id" => 0,
+                "round_id" => $value->tg_round_id,
+                "bet_amount" => $value->amount,
+                "win" => 5,
+                "pay_amount" => 0,
+                "income" => 0,
+                "entry_id" => 0,
+                "created_at" => $value->created_at,
+                "operator_id" => 11,
+                "client_id" => 199,
+                "player_id" => $value->player_token_id,
+              ];
+              DB::table('game_transactions')->insert($data);
+           }
+      }
+
+      dd(1);
+
+      // $data = [
+      //     "method_name" => $method,
+      //     "provider_id" => $provider_id,
+      //     "request_data" => json_encode(json_decode($request_data)),
+      //     "response_data" => json_encode($response_data)
+      //   ];
+      //   return DB::connection('savelog')->table('seamless_request_logs')->insert($data);
+
+
+      $update = DB::table('game_transaction_ext')
+            ->where('game_trans_ext_id', $game_trans_ext_id)
+            ->update([
+          'provider_request' => json_encode($provider_request), 
+          'mw_response' => json_encode($mw_response), 
+      ]);
+      dd($em_data);
+
+
+      
+
+      /*ENDDDDDDDDDDDDDDDDd*/
+
+      if (in_array(2,config('clientcustom.auto_refund.exclude.operator_id'))) {
+          dd('meron');
+      }
+
+      dd('wala');
+ 
       $debitRefund = ["payload" => "AWIT"];
       Queue::push(new DebitRefund($debitRefund));
 

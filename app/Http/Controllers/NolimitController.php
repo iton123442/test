@@ -201,7 +201,28 @@ class NolimitController extends Controller
                     return $response;
                 }
             try{
-                $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);   
+                $gameTransactionData = array(
+                    "provider_trans_id" => $provider_trans_id,
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $round_id,
+                    "bet_amount" => $bet_amount,
+                    "win" => 5,
+                    "pay_amount" => 0,
+                    "income" => 0,
+                    "entry_id" => 1,
+                 );
+                 GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+               $gameTransactionEXTData = array(
+                    "game_trans_id" => $game_transid_gen,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" => $round_id,
+                    "amount" => $bet_amount,
+                    "game_transaction_type"=> 1,
+
+                 );
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name
                 ];
@@ -290,28 +311,6 @@ class NolimitController extends Controller
                                     ];                             
                             }
                         }
-
-                    $gameTransactionData = array(
-                        "provider_trans_id" => $provider_trans_id,
-                        "token_id" => $client_details->token_id,
-                        "game_id" => $game_details->game_id,
-                        "round_id" => $round_id,
-                        "bet_amount" => $bet_amount,
-                        "win" => 5,
-                        "pay_amount" => 0,
-                        "income" => 0,
-                        "entry_id" => 1,
-                    );
-                   GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
-                         $gameTransactionEXTData = array(
-                            "game_trans_id" => $game_transid_gen,
-                            "provider_trans_id" => $provider_trans_id,
-                            "round_id" => $round_id,
-                            "amount" => $bet_amount,
-                            "game_transaction_type"=> 1,
-            
-                        );
-                   GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
                     $createGameTransactionLog = [
                         "connection_name" => $client_details->connection_name,
                         "column" =>[

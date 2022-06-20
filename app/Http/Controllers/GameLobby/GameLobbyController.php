@@ -1009,7 +1009,7 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code==139){
-                    Helper::saveLog('DOWINN Gamelaunch', 139, json_encode($request->all()), "Gamelaunch response");
+                    // Helper::saveLog('DOWINN Gamelaunch', 139, json_encode($request->all()), "Gamelaunch response");
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::dowinnLaunchUrl($request->all()), 
