@@ -445,7 +445,7 @@ class DOWINNController extends Controller{
                     switch($countSumTrans){
                         case '3':
                             $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
-                            $sumOfWin = $sumOfTransactions['1']->amount;
+                            $sumOfWin = $sumOfTransactions['1']->amount == 0 ? 0 : $sumOfTransactions['1']->amount+$winAmount;
                             Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions),$game_trans_ext_id);
                             $finalUpdateDatas = [
                                 "win" => 1,
