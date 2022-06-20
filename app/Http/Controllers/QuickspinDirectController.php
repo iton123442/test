@@ -321,6 +321,9 @@ class QuickspinDirectController extends Controller
             );
             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
             GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
+            $fund_extra_data = [
+                'provider_name' => $game_details->provider_name
+            ];
             $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit', false, $fund_extra_data);
 
             $game_trans_id = $gen_game_trans_id;
