@@ -95,7 +95,40 @@ class QuickspinDirectController extends Controller
         $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
         $game_details = Game::find($game_code, config('providerlinks.quickspinDirect.provider_db_id'));
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
-
+        if($bet_transaction != 'false'){
+                $client_details->connection_name = $bet_transaction->connection_name;
+                $amount = $bet_transaction->bet_amount + $bet_amount;
+                $updateGameTransaction = [
+                    'win' => 5,
+                    'bet_amount' => $amount,
+                    'entry_id' => 1,
+                    'trans_status' => 1
+                ];
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                $game_transaction_id = $bet_transaction->game_trans_id;
+            }else{
+                $gameTransactionData = array(
+                    "provider_trans_id" => $provider_trans_id,
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $round_id,
+                    "bet_amount" => $bet_amount,
+                    "win" => 5,
+                    "pay_amount" => 0,
+                    "income" => 0,
+                    "entry_id" => 1,
+                ); 
+                 GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id, $client_details);
+                $gameTransactionEXTData = array(
+                    "game_trans_id" => $gen_game_trans_id,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" => $round_id,
+                    "amount" => $bet_amount,
+                    "game_transaction_type"=> 1,
+                    // "provider_request" =>json_encode($req->all()),
+                );
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
+            }//end bet transaction swf_oncondition(transition)
             $fund_extra_data = [
                 'provider_name' => $game_details->provider_name
             ];
@@ -197,40 +230,7 @@ class QuickspinDirectController extends Controller
                                     // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                         }
                     }
-                    if($bet_transaction != 'false'){
-                        $client_details->connection_name = $bet_transaction->connection_name;
-                        $amount = $bet_transaction->bet_amount + $bet_amount;
-                        $updateGameTransaction = [
-                            'win' => 5,
-                            'bet_amount' => $amount,
-                            'entry_id' => 1,
-                            'trans_status' => 1
-                        ];
-                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-                        $game_transaction_id = $bet_transaction->game_trans_id;
-                    }else{
-                        $gameTransactionData = array(
-                            "provider_trans_id" => $provider_trans_id,
-                            "token_id" => $client_details->token_id,
-                            "game_id" => $game_details->game_id,
-                            "round_id" => $round_id,
-                            "bet_amount" => $bet_amount,
-                            "win" => 5,
-                            "pay_amount" => 0,
-                            "income" => 0,
-                            "entry_id" => 1,
-                        ); 
-                         GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id, $client_details);
-                        $gameTransactionEXTData = array(
-                            "game_trans_id" => $gen_game_trans_id,
-                            "provider_trans_id" => $provider_trans_id,
-                            "round_id" => $round_id,
-                            "amount" => $bet_amount,
-                            "game_transaction_type"=> 1,
-                            // "provider_request" =>json_encode($req->all()),
-                        );
-                        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid, $client_details);
-                    }//end bet transaction swf_oncondition(transition)
+                    
                     Helper::saveLog('QuickSpin Debit success', config("providerlinks.quickspinDirect.provider_db_id"), json_encode($req->all()), $res);
                     return response()->json($res, $http_status);
     }// end function bet process
