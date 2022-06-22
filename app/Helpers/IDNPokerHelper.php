@@ -344,4 +344,48 @@ class IDNPokerHelper{
         $data_saved = DB::table('idn_transaction_list')->insertGetId($data);
         return $data_saved;
     }
+
+    public static function updateCurrencyRate(){
+        try {
+            $url = config('providerlinks.idnpoker.URL');
+            $auth = config('providerlinks.idnpoker.rate_auth');
+            $client = new Client();
+
+            $details = DB::select('select * from currencies');
+            foreach($details as $datas){
+                sleep(3);
+                $guzzle_response = $client->post($url,[
+                    'body' => '
+                            <request>
+                                <secret_key>'.$auth.'</secret_key>
+                                <id>9</id>
+                                <currency>'.$datas->code.'</currency>
+                            </request>'
+                ]
+                );
+                $details = $guzzle_response->getBody();
+                $json = json_encode(simplexml_load_string($details));
+                $currency_rate = json_decode($json,true);
+                if(isset($currency_rate["rate"])){
+                    $rate = $currency_rate["rate"]; 
+                    $getCurrency = DB::select('select * from idn_currency_rate where currency_code = "'.$datas->code.'" ');
+                    if (count($getCurrency) > 0) {
+                        DB::table('idn_currency_rate')->where('id', $getCurrency[0]->id)->update(['rate' => $rate]);
+                    } else {
+                        $insert_data = [
+                            "currency_code" => $datas->code,
+                            "rate" => $rate
+                        ];
+                        DB::table('idn_currency_rate')->insertGetId($insert_data);
+                    }
+                }
+            }
+            Helper::saveLog('IDNPOKER updateRATE', 110, json_encode(["update"]),  "CHECK RESPONSE updateRATE" );
+            return "false";
+        } catch (\Exception $e) {
+            Helper::saveLog('IDNPOKER updateRATE', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getRate ERROR" );
+            return "false";
+        }
+    }
+
 }

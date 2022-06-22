@@ -1032,4 +1032,14 @@ class IDNPokerController extends Controller
     	// SessionWalletHelper::saveLog('TW updateSession', 1223, json_encode($data), 1223);
     	return $response;
     }
+
+
+    /**
+	 * Transfer Waller and Semi Transfer Wallet
+	 * [updateSession - deduct all session time with $time_deduction]
+	 * 
+	 */
+    public static function updateCurrencyRate(){
+    	IDNPokerHelper::updateCurrencyRate();
+    }
 }

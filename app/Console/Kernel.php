@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\UpdateCurrency',    
         'App\Console\Commands\TransferWallet',    
         'App\Console\Commands\playerRestrictionWallet',        
+        'App\Console\Commands\UpdateCurrencyIDN',    
     ];
 
     /**
