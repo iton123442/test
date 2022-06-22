@@ -114,7 +114,7 @@ class ClientRequestHelper{
                     $requesttocient["fundtransferrequest"]['fundinfo']['freeroundend'] = $action["fundtransferrequest"]['fundinfo']['freeroundend'];
                 }
                 if(isset($action["connection_timeout"] )) {
-                    $connection_timeout = $action["connection_timeout"]; //set by provider
+                    $timeout = $action["connection_timeout"]; //set by provider
                 }
 
                 // if(isset($action["provider_request"] )) {
