@@ -195,9 +195,6 @@ class BNGController extends Controller
                                     "value" => (string)$client_details->balance,
                                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                                 ),
-                                    "error" => array(
-                                    "code"=> "OTHER_EXCEED",
-                                )
                             );
                             // $response =array(
                             //     "uid"=>$data["uid"],
@@ -228,9 +225,6 @@ class BNGController extends Controller
                                 "value" => (string)$client_details->balance,
                                 "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                             ),
-                                "error" => array(
-                                "code"=> "OTHER_EXCEED",
-                            )
                         );
                         // $response =array(
                         //     "uid"=>$data["uid"],
@@ -260,9 +254,6 @@ class BNGController extends Controller
                             "value" => (string)$client_details->balance,
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
-                        "error" => array(
-                            "code"=> "OTHER_EXCEED",
-                        )
                     );
                     // $response =array(
                     //     "uid"=>$data["uid"],
@@ -308,9 +299,6 @@ class BNGController extends Controller
                         "value" => (string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
-                    "error" => array(
-                        "code"=> "OTHER_EXCEED",
-                    )
                 );              
                 // $response =array(
                 //     "uid"=>$data["uid"],
