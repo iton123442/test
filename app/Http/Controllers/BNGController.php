@@ -513,7 +513,9 @@ class BNGController extends Controller
                 GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
                 // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                 $dataToUpdate = array(
-                    "mw_response" => json_encode($response)
+                    "mw_response" => json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             }catch(\Exception $e){
@@ -681,7 +683,9 @@ class BNGController extends Controller
                 );
                 GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
                 $dataToUpdate = array(
-                    "mw_response" => json_encode($response)
+                    "mw_response" => json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             }catch(\Exception $e){
