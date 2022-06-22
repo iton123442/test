@@ -195,6 +195,9 @@ class BNGController extends Controller
                                     "value" => (string)$client_details->balance,
                                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                                 ),
+                                    "error" => array(
+                                    "code"=> "OTHER_EXCEED",
+                                )
                             );
                             // $response =array(
                             //     "uid"=>$data["uid"],
@@ -225,6 +228,9 @@ class BNGController extends Controller
                                 "value" => (string)$client_details->balance,
                                 "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                             ),
+                                "error" => array(
+                                "code"=> "OTHER_EXCEED",
+                            )
                         );
                         // $response =array(
                         //     "uid"=>$data["uid"],
@@ -254,6 +260,9 @@ class BNGController extends Controller
                             "value" => (string)$client_details->balance,
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
+                        "error" => array(
+                            "code"=> "OTHER_EXCEED",
+                        )
                     );
                     // $response =array(
                     //     "uid"=>$data["uid"],
@@ -299,6 +308,9 @@ class BNGController extends Controller
                         "value" => (string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
+                    "error" => array(
+                        "code"=> "OTHER_EXCEED",
+                    )
                 );              
                 // $response =array(
                 //     "uid"=>$data["uid"],
@@ -417,7 +429,7 @@ class BNGController extends Controller
                 "mw_response" => json_encode($response)
             );
             GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
-            Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
             $winStart =  microtime(true);
             //$this->_setExtParameter($this->_getExtParameter()+1);
             $response =array(
