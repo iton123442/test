@@ -195,7 +195,7 @@ class ClientRequestHelper{
 
                 # Add Refund Queue
                 if($type == 'debit'){
-                    $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming", "Booongo"];
+                    $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming"];
 
                     # Provider List Moved to top!
                     $bol = true;
