@@ -272,17 +272,17 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
-            sleep(0.20);
+            // sleep(0.20);
             Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
-            sleep(0.45);
+            // sleep(0.45);
             Helper::saveLog("WIN 2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
-            sleep(1);
+            // sleep(1);
             Helper::saveLog("WIN >2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
@@ -448,7 +448,7 @@ class DOWINNController extends Controller{
                             $sumOfWin = $sumOfTransactions['1']->amount == 0 ? 0 : $sumOfTransactions['1']->amount+$winAmount;
                             Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions),$game_trans_ext_id);
                             $finalUpdateDatas = [
-                                "win" => 1,
+                                "win" => $sumOfWin == 0 ? 0 : 1,
                                 "bet_amount" => round($sumOfBet,2),
                                 "pay_amount" => round($sumOfWin,2),
                                 "income" => round($sumOfBet-$sumOfWin,2),
@@ -460,7 +460,7 @@ class DOWINNController extends Controller{
                                 $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
                                 $sumOfWin = $game->pay_amount+$winAmount;
                                 $finalUpdateDatas = [
-                                    "win" => 1,
+                                    "win" => $sumOfWin == 0 ? 0 : 1,
                                     "bet_amount" => round($sumOfBet,2),
                                     "pay_amount" => round($sumOfWin,2),
                                     "income" => round($sumOfBet-$sumOfWin,2),
