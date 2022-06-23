@@ -155,6 +155,28 @@ public function gameBet($request, $client_details)
 			//Create GameTransaction, GameExtension
 			$game_transid_gen = ProviderHelper::idGenerate($client_details->connection_name, 1);// ID generator
 			$game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
+			$gameTransactionData = array(
+				"provider_trans_id" => $provider_trans_id,
+				"token_id" => $client_details->token_id,
+				"game_id" => $game_details->game_id,
+				"round_id" => $round_id,
+				"bet_amount" => $bet_amount,
+				"win" => 5,
+				"pay_amount" => 0,
+				"income" => 0,
+				"entry_id" =>1,
+			);
+	
+			GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+			$gameTransactionEXTData = array(
+				"game_trans_id" => $game_transid_gen,
+				"provider_trans_id" => $provider_trans_id,
+				"round_id" => $round_xt,
+				"amount" => $bet_amount,
+				"game_transaction_type"=> 1,
+				// "provider_request" =>json_encode($request),
+			);
+			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
 			try {
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_transid_ext,$game_transid_gen,"debit",false);
 	        } catch (\Exception $e) {
@@ -198,28 +220,6 @@ public function gameBet($request, $client_details)
 							],
 					  	);
 				        Helper::saveLog('5Men success BET PROCESS ', $this->provider_db_id, json_encode($request), $response);
-						$gameTransactionData = array(
-							"provider_trans_id" => $provider_trans_id,
-							"token_id" => $client_details->token_id,
-							"game_id" => $game_details->game_id,
-							"round_id" => $round_id,
-							"bet_amount" => $bet_amount,
-							"win" => 5,
-							"pay_amount" => 0,
-							"income" => 0,
-							"entry_id" =>1,
-						);
-	
-						GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
-						$gameTransactionEXTData = array(
-							"game_trans_id" => $game_transid_gen,
-							"provider_trans_id" => $provider_trans_id,
-							"round_id" => $round_xt,
-							"amount" => $bet_amount,
-							"game_transaction_type"=> 1,
-							// "provider_request" =>json_encode($request),
-						);
-						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
 						$createGameTransactionLog = [
 							"connection_name" => $client_details->connection_name,
 							"column" =>[

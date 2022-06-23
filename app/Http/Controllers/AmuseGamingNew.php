@@ -176,7 +176,7 @@ class AmuseGamingNew extends Controller
         }
         try{
             // Helper::saveLog("AmuseGaming Withdraw Transactions Recieved", $this->provider_db_id, json_encode($provider_bet_amount), json_decode($provider_bet_amount));
-            $client_response = ClientRequestHelper::fundTransfer($client_details, $provider_bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
+     
             $gameTransactionData = array(
                 "provider_trans_id" => $provider_trans_id,
                 "token_id" => $player_tokenID,
@@ -199,6 +199,7 @@ class AmuseGamingNew extends Controller
                 // "provider_request" =>json_encode($request),
             );
            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
+            $client_response = ClientRequestHelper::fundTransfer($client_details, $provider_bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
             if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
                 $array_data = array(

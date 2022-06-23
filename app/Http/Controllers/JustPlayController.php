@@ -75,8 +75,6 @@ class JustPlayController extends Controller
             try {
                 $type = "debit";
                 $rollback = false;
-                $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$type,$rollback);
-                 Helper::saveLog("Justplay client_response", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 $gameTransactionData = array(
                     "provider_trans_id" => $data['id_stat'],
@@ -112,7 +110,8 @@ class JustPlayController extends Controller
                 Helper::saveLog('JustPlay FATAL ERROR', $this->provider_db_id, json_encode($request->all(), JSON_FORCE_OBJECT),  $response);
                 return json_encode($response, JSON_FORCE_OBJECT); 
             }
-
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_transaction_id,$type,$rollback);
+                 Helper::saveLog("Justplay client_response", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
             if (isset($client_response->fundtransferresponse->status->code)) {
 
                 switch ($client_response->fundtransferresponse->status->code) {
