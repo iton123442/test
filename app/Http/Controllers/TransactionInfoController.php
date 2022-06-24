@@ -71,8 +71,8 @@ class TransactionInfoController extends Controller
         $isExist = false;
         $stop = false;
         # First Check Current Connection
-        // $checkTransaction = GameTransactionMDB::findGameExt($request->transactionId, 1,'game_transaction_ext_id', $client_details);
-        $checkTransaction = GameTransactionMDB::findGameTransactionDetails($request->roundId,'game_transaction', 1, $client_details);
+        $checkTransaction = GameTransactionMDB::findGameExt($request->transactionId, 1,'game_transaction_ext_id', $client_details);
+        // $checkTransaction = GameTransactionMDB::findGameTransactionDetails($request->roundId,'game_transaction', 1, $client_details);
         if($checkTransaction == "false"){
 
             # Unset the server first used
@@ -85,26 +85,30 @@ class TransactionInfoController extends Controller
             # Loop server
             foreach ($serverName as $key) {
                 $client_details->connection_name = $key.'-'.$clientConnection[$connectionNameOffset];
-                // $checkTransaction = GameTransactionMDB::findGameExt($request->transactionId, 1,'game_transaction_ext_id', $client_details);
-                $checkTransaction = GameTransactionMDB::findGameTransactionDetails($request->roundId, 'game_transaction',1, $client_details);
+                $checkTransaction = GameTransactionMDB::findGameExt($request->transactionId, 1,'game_transaction_ext_id', $client_details);
+                // $checkTransaction = GameTransactionMDB::findGameTransactionDetails($request->roundId, 'game_transaction',1, $client_details);
                 if ($checkTransaction == 'false'){
                     continue;
                 }else{
-                    $canRequest = $this->winFilter($checkTransaction->win);
+                    $checkTransactionRound = GameTransactionMDB::findGameTransactionDetails($request->roundId, 'game_transaction',1, $client_details);
+                    $canRequest = $this->winFilter($checkTransactionRound->win);
                     if($canRequest != 200){
                         $mw_response = ["data" => null,"status" => ["code" => $canRequest,"message" => TransactionInfo::TransactionErrorCode($canRequest)]];
                         return $mw_response;
                     }
+                    $checkTransaction->game_id = $checkTransactionRound->game_id;
                     $process = TransactionInfo::TransactionGet($client_details, $request->all(), $checkTransaction,$sub_provider_id);
                     return $process;
                 }
             }
         }else{
-            $canRequest = $this->winFilter($checkTransaction->win);
+            $checkTransactionRound = GameTransactionMDB::findGameTransactionDetails($request->roundId, 'game_transaction',1, $client_details);
+            $canRequest = $this->winFilter($checkTransactionRound->win);
             if($canRequest != 200){
                 $mw_response = ["data" => null,"status" => ["code" => $canRequest,"message" => 'Contact Service Provider']];
                 return $mw_response;
             }
+            $checkTransaction->game_id = $checkTransactionRound->game_id;
             $process = TransactionInfo::TransactionGet($client_details, $request->all(), $checkTransaction,$sub_provider_id);
             return $process;
         }
