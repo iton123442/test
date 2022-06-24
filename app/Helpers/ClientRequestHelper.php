@@ -42,6 +42,9 @@ class ClientRequestHelper{
     public static function fundTransfer($client_details,$amount,$game_code,$game_name,$transactionId,$roundId,$type,$rollback=false,$action=array()){
 
             $sendtoclient =  microtime(true);
+
+            $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming"];
+
             $client = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json',
@@ -87,9 +90,30 @@ class ClientRequestHelper{
 
             # Timeout
             if($type == 'debit'){
-                $timeout = 5; // Used in Retry Call
+               
+                # Exclude selected operator
+                try {
+
+                    $timeout = 3;
+                    
+                    # Exclude Provider
+                    if(isset($action['provider_name'])){
+                        if (in_array($action["provider_name"], $exclude_provider)) {
+                            $timeout =  10;
+                        }
+                    }
+
+                    # Exclude selected operator
+                    if (in_array($client_details->operator_id,config('clientcustom.auto_refund.exclude.operator_id'))) {
+                        $timeout =  10;
+                    }
+
+                } catch (\Exception $e) {
+                    $timeout = 3; // Used in Retry Call
+                }
+
             }else{
-                $timeout = 5;
+                $timeout = 10;
             }
          
             if(count($action) > 0){
@@ -114,7 +138,7 @@ class ClientRequestHelper{
                     $requesttocient["fundtransferrequest"]['fundinfo']['freeroundend'] = $action["fundtransferrequest"]['fundinfo']['freeroundend'];
                 }
                 if(isset($action["connection_timeout"] )) {
-                    $connection_timeout = $action["connection_timeout"]; //set by provider
+                    $timeout = $action["connection_timeout"]; //set by provider
                 }
 
                 // if(isset($action["provider_request"] )) {
@@ -195,7 +219,7 @@ class ClientRequestHelper{
 
                 # Add Refund Queue
                 if($type == 'debit'){
-                    $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming", "Booongo"];
+                    
 
                     # Provider List Moved to top!
                     $bol = true;
@@ -226,7 +250,7 @@ class ClientRequestHelper{
                                     "provider_trans_id" => $transactionId,
                                     "round_id" => $roundId,
                                     "amount" => $amount,
-                                    "game_transaction_type"=> 3, // refund change
+                                    "game_transaction_type"=> 33, // refund change
                                     "provider_request" =>json_encode($requesttocient),
                                     "mw_response" => json_encode(['retry' => 'jobs']),
                             );
@@ -237,7 +261,7 @@ class ClientRequestHelper{
                                     "provider_trans_id" => $game_trans_ext_data->provider_trans_id,
                                     "round_id" => $game_trans_ext_data->round_id,
                                     "amount" => $amount,
-                                    "game_transaction_type"=> 3, // refund change
+                                    "game_transaction_type"=> 33, // refund change
                                     "provider_request" =>json_encode($requesttocient),
                                     "mw_response" => json_encode(['retry' => 'jobs']),
                             );

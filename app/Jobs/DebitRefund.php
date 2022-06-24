@@ -69,6 +69,9 @@ class DebitRefund extends Job implements ShouldQueue
         // ];
         // DB::connection('savelog')->table('seamless_request_logs')->insert($data);
 
+
+        sleep(1); // Let the client process things for 1 second then request again!
+
         try {
             $sendtoclient =  microtime(true);
             $client = new Client([
@@ -105,6 +108,44 @@ class DebitRefund extends Job implements ShouldQueue
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }else if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 402){
+
+
+                try {
+
+                    if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TRANSACTION_NOT_FOUND'){
+
+                        sleep(1);
+
+                        $datatosend = [
+                            "access_token" => $client_details->client_access_token,
+                            "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+                            "player_username"=>$client_details->username,
+                            "client_player_id" => $client_details->client_player_id,
+                            "transactionId" => $transaction_id,
+                            "roundId" =>  $round_id
+                        ];
+
+                        $guzzle_response = $client->post($client_details->transaction_checker_url,
+                            [
+                                'body' => json_encode($datatosend),
+                            ]
+                        );
+                        $client_checker_response = json_decode($guzzle_response->getBody()->getContents());
+                        if (isset($client_checker_response->code)) {
+                            $is_success = 2;
+                            if ($client_checker_response->code == '200' || $client_checker_response->code == '403') {
+                               # Not found refund but progressing need to add back to jobs table!
+                               throw new \ErrorException('RESEND_TRANSACTION');
+                            } 
+                        }
+
+                    }
+                    
+                } catch (\Exception $e) {
+                    throw new \ErrorException('TRANSACTION_CHECKER_FAILED');
+                }
+
+
                 $updateTransactionEXt = array(
                     // "provider_request" =>json_encode($payload),
                     "mw_response" => json_encode(['retry' => 'jobs']),
@@ -113,7 +154,7 @@ class DebitRefund extends Job implements ShouldQueue
                     'transaction_detail' => 'NOT_ENOUGH_FUNDS',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
-                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
+                // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }else{
                 $updateTransactionEXt = array(
@@ -125,8 +166,8 @@ class DebitRefund extends Job implements ShouldQueue
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
-                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'UNKNOWN_STATUS_CODE');
-                throw new ModelNotFoundException('UNKNOWN_ERROR');
+                // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'UNKNOWN_STATUS_CODE');
+                throw new \ErrorException('UNKNOWN_ERROR');
             }
 
         } catch (\Exception $e) {
@@ -139,8 +180,8 @@ class DebitRefund extends Job implements ShouldQueue
                 'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
-            ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($updateTransactionEXt), 'FAILED_EXCEPTION');
-            throw new ModelNotFoundException($e->getMessage());
+            // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($updateTransactionEXt), 'FAILED_EXCEPTION');
+            throw new \ErrorException($e->getMessage());
 
         }
 
