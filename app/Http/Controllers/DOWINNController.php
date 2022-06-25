@@ -453,7 +453,6 @@ class DOWINNController extends Controller{
                                 "pay_amount" => round($sumOfWin,2),
                                 "income" => round($sumOfBet-$sumOfWin,2),
                             ];
-                        GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                         break;
                         case '2':
                             if($sumOfTransactions['1']->game_transaction_type == 3){
@@ -478,7 +477,6 @@ class DOWINNController extends Controller{
                                     "income" => round($sumOfBet-$sumOfWin,2),
                                 ];
                             }
-                            GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                         break;
                         case '1':
                             Helper::saveLog("CASE 4", 139,json_encode($sumOfTransactions),$game_trans_ext_id);
@@ -490,7 +488,6 @@ class DOWINNController extends Controller{
                                 "pay_amount" => round($sumOfWin,2),
                                 "income" => round($sumOfBet-$sumOfWin,2),
                             ];
-                        GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                         break;
                         default:
                         Helper::saveLog("DEFAULT", 139,json_encode($sumOfTransactions),$game_trans_ext_id);
@@ -500,7 +497,6 @@ class DOWINNController extends Controller{
                                 "pay_amount" => round($sumOfWin,2),
                                 "income" => round($game->bet_amount-$sumOfWin,2),
                             ];
-                        GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                     }
                     // if($countSumTrans == 3){
                     //     $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
@@ -557,8 +553,8 @@ class DOWINNController extends Controller{
                             "pay_amount" => round($sumOfWin,2),
                             "income" => round($game->bet_amount-$sumOfWin,2),
                         ];
-                    GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 }
+                GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 $response = [
                     "status" => 'OK',
                     "balance" => $balance,
@@ -746,7 +742,7 @@ class DOWINNController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$refundAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
-                Helper::saveLog("CANCEL FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
+                // Helper::saveLog("CANCEL FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
