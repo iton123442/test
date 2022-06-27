@@ -54,10 +54,21 @@ class NolimitCityController extends Controller
                 ->header('Content-Type', 'application/json');
         }
         if($method == 'wallet.validate-token'){
-
             $response = $this->Auth($request->all(), $client_details);
 			return response($response,200)
                 ->header('Content-Type', 'application/json');	   
+        }if($method == 'wallet.balance'){
+            $response = $this->Balance($request->all(), $client_details);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');   
+        }if($method == 'wallet.withdraw'){
+             $response = $this->Withdraw($request->all(), $client_details);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');   
+        }if($method == 'wallet.deposit'){
+             $response = $this->Deposit($request->all(), $client_details);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');   
         }
 
    }//End Function
@@ -95,5 +106,26 @@ class NolimitCityController extends Controller
     ProviderHelper::saveLogWithExeption('Nolimit validate end', $this->provider_db_id, json_encode($data), $response );
     return $response;
    }// Validate function
+    public function Balance($request, $client_details){
+      $data = $request; 
+      ProviderHelper::saveLogWithExeption('Nolimit getbalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
+      $response = [
+                    "jsonrpc" => "2.0",
+                    "result" => [
+                        "balance" => [
+                            "amount" => $client_details->balance,
+                            "currency" => $client_details->default_currency,
+                        ],
+                    ],
+                "id" => $data['id']
+            ];
+            return $response;   
+    }//End of Balance
+     public function Withdraw($request, $client_details){
 
+     }//End Bet
+
+      public function Balance($request, $client_details){
+
+      }// End Win
 }//End Class controller
