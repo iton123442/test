@@ -33,9 +33,67 @@ class NolimitCityController extends Controller
       }
     public function index(Request $request)
     {
-        
-         
-   }//End Function
+        $data = $request->all();
+        $method = $data['method'];
+        $client_details = ProviderHelper::getClientDetails('token', $data['params']['token']);
+        if($client_details == null){
+            $response = [
+                "jsonrpc" =>  '2.0',
+                "error" => [
+                        'code' => '',
+                        'message' => 'Server Error',
+                        'data' => [
+                            'code' => 15001,
+                            'message' => 'Authentication failed',
+                        ],
+                    ],
+                "id" => $data['id'],
+            ];
+            ProviderHelper::saveLogWithExeption('Nolimit Gameluanch client details error', $this->provider_db_id, json_encode($data), $response );
+            return response($response,200)
+                ->header('Content-Type', 'application/json');
+        }
+        if($method == 'wallet.validate-token'){
 
+            $response = $this->Auth($request->all(), $client_details);
+			return response($response,200)
+                ->header('Content-Type', 'application/json');	   
+        }
+
+   }//End Function
+   public function Auth($request, $client_details)
+   {
+    $data = $request;
+    if($this->operator_key != $data['params']['identification']['key']){
+        $response = [
+            "jsonrpc" =>  '2.0',
+            "error" => [
+                    'code' => '',
+                    'message' => 'Server Error',
+                    'data' => [
+                        'code' => 15001,
+                        'message' => 'Authentication failed',
+                    ],
+                ],
+            "id" => $data['id'],
+        ];
+        ProviderHelper::saveLogWithExeption('Nolimit Gameluanch operator key error', $this->provider_db_id, json_encode($data), $response );
+        return $response;
+    }
+    $response = [
+        "jsonrpc" => "2.0",
+        "result" => [
+            "userId" => $client_details->player_id,
+            "username" => $client_details->username,
+            "balance" => [
+                "amount" => $client_details->balance,
+                "currency" => $client_details->default_currency,
+            ],
+        ],
+        "id" => $data['id']
+    ];   
+    ProviderHelper::saveLogWithExeption('Nolimit validate end', $this->provider_db_id, json_encode($data), $response );
+    return $response;
+   }// Validate function
 
 }//End Class controller
