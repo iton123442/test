@@ -304,7 +304,7 @@ class NolimitCityController extends Controller
 
     public function Deposit($request, $client_details){
         $data = $request;
-        ProviderHelper::saveLogWithExeption('NOLIMIT credit process', $this->provider_db_id, json_encode($data,"ENDPOINTHIT WIN");
+        ProviderHelper::saveLogWithExeption('NOLIMIT credit process', $this->provider_db_id, json_encode($data),"ENDPOINTHIT WIN");
         $pay_amount = $data['params']['deposit']['amount'];
         $provider_trans_id = $data['params']['information']['uniqueReference'];
         $round_id = $data['params']['information']['gameRoundId'];
@@ -434,7 +434,7 @@ class NolimitCityController extends Controller
             }
         }
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-            ProviderHelper::saveLogWithExeption('Nolimit Win Result', $this->provider_db_id, json_encode($request->all()),$response);
+            ProviderHelper::saveLogWithExeption('Nolimit Win Result', $this->provider_db_id, json_encode($data),$response);
             return $response;
 
         }catch(\Exception $e){
@@ -494,7 +494,7 @@ class NolimitCityController extends Controller
                 'id'=>$data['id']
             );
             } 
-            ProviderHelper::saveLogWithExeption('Nolimit bet found 1 ', $this->provider_db_id, json_encode($request), $response);
+            ProviderHelper::saveLogWithExeption('Nolimit bet found 1 ', $this->provider_db_id, json_encode($data), $response);
             return $response;
              } // End catch error
             $existing_bet = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
