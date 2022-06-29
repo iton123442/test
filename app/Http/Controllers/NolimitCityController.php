@@ -35,7 +35,13 @@ class NolimitCityController extends Controller
     {
         $data = $request->all();
         $method = $data['method'];
-        $client_details = ProviderHelper::getClientDetails('token', $data['params']['token']);
+        if(isset($data['params']['token']){
+            $token = $data['params']['token'];
+            $client_details = ProviderHelper::getClientDetails('token', $token);
+        }else{
+            $player_id = $data['params']['userId'];
+            $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+        }
         if($client_details == null){
             $response = [
                 "jsonrpc" =>  '2.0',
