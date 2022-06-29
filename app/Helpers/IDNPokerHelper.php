@@ -101,6 +101,7 @@ class IDNPokerHelper{
             if (isset($data["device"])) {
                $mobile = $data["device"] == 'desktop' ? 1 : 0;
             }
+            $mobile = 1;
             $client = new Client();
             $request = '
             <request>
