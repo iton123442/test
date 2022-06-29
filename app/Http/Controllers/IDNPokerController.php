@@ -992,7 +992,7 @@ class IDNPokerController extends Controller
                     'form_params' => [
                         'player_id'=> $item->player_id,
                     ],
-                    'timeout' => '0.50',
+                    'timeout' => '2.50',
                     'headers' =>[
                         'Accept'     => 'application/json'
                     ]
@@ -1000,11 +1000,11 @@ class IDNPokerController extends Controller
                 $iframe_data = json_decode((string) $response->getBody(), true);
                 Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode($iframe_data),  json_encode($iframe_data) );
                 if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
-                    return "false";
+                    // return "false";
                 }
             } catch (\Exception $e) {
                 Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
-                return "false";
+                // return "false";
             }
         }
     }
