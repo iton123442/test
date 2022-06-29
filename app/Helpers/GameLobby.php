@@ -1982,7 +1982,7 @@ class GameLobby{
             $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
 
             $default_frame = config('providerlinks.play_tigergames');
-            if ($client_details->operator_id == 11) {
+            if ($client_details->operator_id == 37) {
                 $default_frame = 'https://kbpoker.69master.cc';
             }
             /***************************************************************
