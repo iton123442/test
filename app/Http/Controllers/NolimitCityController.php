@@ -35,7 +35,7 @@ class NolimitCityController extends Controller
     {
         $data = $request->all();
         $method = $data['method'];
-        if(isset($data['params']['token']){
+        if(isset($data['params']['token'])){
             $token = $data['params']['token'];
             $client_details = ProviderHelper::getClientDetails('token', $token);
         }else{
