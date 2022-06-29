@@ -79,7 +79,7 @@ class NolimitCityController extends Controller
             $response = $this->Rollback($request->all(), $client_details);
            return response($response,200)
                ->header('Content-Type', 'application/json');   
-       }
+        }
 
    }//End Function
    public function Auth($request, $client_details){
@@ -296,15 +296,15 @@ class NolimitCityController extends Controller
                                     ],
                                 ],
                     ];
-            ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($request->all()),  $e->getMessage() . ' ' . $e->getLine());
+            ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
             return json_encode($response, JSON_FORCE_OBJECT); 
         }// End Catch
 
      }//End Bet
 
     public function Deposit($request, $client_details){
-        ProviderHelper::saveLogWithExeption('NOLIMIT credit process', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
         $data = $request;
+        ProviderHelper::saveLogWithExeption('NOLIMIT credit process', $this->provider_db_id, json_encode($data,"ENDPOINTHIT WIN");
         $pay_amount = $data['params']['deposit']['amount'];
         $provider_trans_id = $data['params']['information']['uniqueReference'];
         $round_id = $data['params']['information']['gameRoundId'];
@@ -328,7 +328,7 @@ class NolimitCityController extends Controller
         }
         try{
         $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
-            ProviderHelper::saveLogWithExeption('NOLIMIT find game_detailss', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
+            ProviderHelper::saveLogWithExeption('NOLIMIT find game_detailss', $this->provider_db_id, json_encode($data),"ENDPOINTHIT WIN");
         $client_details->connection_name = $bet_transaction->connection_name;
         $winbBalance = $balance + $pay_amount; 
         ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance);
@@ -447,14 +447,14 @@ class NolimitCityController extends Controller
                                 ],
                             ],
                         ];    
-    ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($request->all()),  $e->getMessage() . ' ' . $e->getLine());
+    ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
     return $response;
 
         }// End of Catch 
     }// End Win
     public function Rollback($request, $client_details){
-        ProviderHelper::saveLogWithExeption('Nolimit refund', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT refund");
         $data = $request;
+        ProviderHelper::saveLogWithExeption('Nolimit refund', $this->provider_db_id, json_encode($data),"ENDPOINTHIT refund");
         $provider_trans_id = $data['params']['information']['uniqueReference'];
         $round_id = $data['params']['information']['gameRoundId'];
         $game_code = $data['params']['information']['game'];
@@ -542,7 +542,6 @@ class NolimitCityController extends Controller
                 "mw_response" =>json_encode($response),
             );
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            
             $win_or_lost = 4;
             $entry_id = 2;
             $income = 0 ;
@@ -580,7 +579,7 @@ class NolimitCityController extends Controller
                 ProviderHelper::saveLogWithExeption("Success Nolimit Refund", $this->provider_db_id, json_encode($data), $response);
                 return $response;
             } catch (\Exception $e) {
-                ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($request->all()),  $e->getMessage() . ' ' . $e->getLine());
+                ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
                 return $response;
             }
                 }else{
@@ -598,8 +597,8 @@ class NolimitCityController extends Controller
 
                         "id" => $data['id']
                     );
-                     ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($request->all()),  $e->getMessage() . ' ' . $e->getLine());
-                   return response($response,200)->header('Content-Type', 'application/json');
+                     ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
+                   return $response;
 
                 }
     }//End of Rollback
