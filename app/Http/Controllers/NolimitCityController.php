@@ -72,9 +72,7 @@ class NolimitCityController extends Controller
             return response($response,200)
                 ->header('Content-Type', 'application/json');   
         }if($method == 'wallet.deposit'){
-            if(isset( $data['params']['promoName'] )){
-                $response = $this->Freespin($request->all(), $client_details); 
-            }$response = $this->Deposit($request->all(), $client_details);
+             $response = $this->Deposit($request->all(), $client_details);
             return response($response,200)
                 ->header('Content-Type', 'application/json');   
         }if($method == 'wallet.rollback'){
@@ -216,7 +214,7 @@ class NolimitCityController extends Controller
                  ProviderHelper::saveLogWithExeption('after  client_response', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');                    
                 if (isset($client_response->fundtransferresponse->status->code)) {
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);       
-                switch ($client_response->fundtransferresponse->status->code) {
+                switch ($client_response->fundtransferresponse->status->code){
                     case '200':          
                         $http_status = 200;
                         $response = [
@@ -362,7 +360,6 @@ class NolimitCityController extends Controller
             'trans_status' => 2
             ];
         GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-
         $gameTransactionEXTData = array(
             "game_trans_id" => $bet_transaction->game_trans_id,
             "provider_trans_id" => $provider_trans_id,
@@ -384,7 +381,7 @@ class NolimitCityController extends Controller
                     ];
                     ProviderHelper::queTransactionLogs($createGameTransactionLog);
             }catch(\Exception $e){
-                Helper::saveLog("Playstar Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Playstar Failed Quieing");
+                Helper::saveLog("Nolimit Queue", 504, json_encode($e->getMessage().' '.$e->getLine()),"Nolimit Failed Quieing");
         }
         $action_payload = [
             "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -411,6 +408,31 @@ class NolimitCityController extends Controller
                 "mw_response" => $response, #R
             ]
         ];  
+        if(isset( $data['params']['promoName'] )) {
+            $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['params']['promoName'], "provider_trans_id" );
+            if($getFreespin){
+                $getOrignalfreeroundID = explode("_",$data['params']['promoName']);
+                $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+                //update transaction
+                $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                $updateFreespinData = [
+                    "status" => $status,
+                    "spin_remaining" => $getFreespin->spin_remaining - 1
+                ];
+               FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+               if($status == 2 ){
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                } else {
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                }
+                //create transction 
+                $createFreeRoundTransaction = array(
+                    "game_trans_id" => $bet_transaction->game_trans_id,
+                    'freespin_id' => $getFreespin->freespin_id
+                );
+                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+            }
+        }
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
             ProviderHelper::saveLogWithExeption('Nolimit Win Result', $this->provider_db_id, json_encode($request->all()),$response);
             return $response;
