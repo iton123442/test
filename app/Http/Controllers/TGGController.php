@@ -158,7 +158,28 @@ class TGGController extends Controller
 			$round_xt = $request['callback_id']; // PROVIDER TRANS ID MW
 			$game_trans_id = ProviderHelper::idGenerate($client_details->connection_name, 1);// ID generator
 			$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
+			$gameTransactionData = array(
+				"provider_trans_id" => $provider_trans_id,
+				"token_id" => $client_details->token_id,
+				"game_id" => $game_details->game_id,
+				"round_id" => $round_id,
+				"bet_amount" => $bet_amount,
+				"win" => 5,
+				"pay_amount" => 0,
+				"income" => 0,
+				"entry_id" =>1,
+			);
 
+			GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details); //create game_transaction
+			$gameTransactionEXTData = array(
+				"game_trans_id" => $game_trans_id,
+				"provider_trans_id" => $provider_trans_id,
+				"round_id" => $round_xt,
+				"amount" => $bet_amount,
+				"game_transaction_type"=> 1,
+				// "provider_request" =>json_encode($request),
+			);
+			GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
 			// $gameTransactionData = array(
 	        //     "provider_trans_id" => $provider_trans_id,
 	        //     "token_id" => $client_details->token_id,
@@ -230,28 +251,7 @@ class TGGController extends Controller
 								'currency' => $client_details->default_currency,
 							],
 					  	);
-						  $gameTransactionData = array(
-							"provider_trans_id" => $provider_trans_id,
-							"token_id" => $client_details->token_id,
-							"game_id" => $game_details->game_id,
-							"round_id" => $round_id,
-							"bet_amount" => $bet_amount,
-							"win" => 5,
-							"pay_amount" => 0,
-							"income" => 0,
-							"entry_id" =>1,
-						);
-	
-						GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details); //create game_transaction
-						$gameTransactionEXTData = array(
-							"game_trans_id" => $game_trans_id,
-							"provider_trans_id" => $provider_trans_id,
-							"round_id" => $round_xt,
-							"amount" => $bet_amount,
-							"game_transaction_type"=> 1,
-							// "provider_request" =>json_encode($request),
-						);
-						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
+			
 						$createGameTransactionLog = [
 							"connection_name" => $client_details->connection_name,
 							"column" =>[

@@ -177,29 +177,6 @@ class SAGamingController extends Controller
                 $payout_reason = 'Bet';
                 $provider_trans_id = $txnid;
                 $round_id = $round_id;  // gameId is unique per table click
-                try {
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_details->game_code,$game_details->game_name,$game_transextension,$gamerecord,$transaction_type);
-                    ProviderHelper::saveLogWithExeption('SA PlaceBet CRID = '.$provider_trans_id, config('providerlinks.sagaming.pdbid'), json_encode($data), $client_response);
-                } catch (\Exception $e) {
-                    if(isset($gamerecord)){
-                        if($game_trans_ext == 'false'){
-                            $updateGameTransaction = [
-                                "win" => 2,
-                                'trans_status' => 5
-                            ];
-                            GameTransactionMDB::updateGametransaction($updateGameTransaction,$gamerecord,$client_details);
-                        }
-                    }
-                    $data_response = ["username" => $username,"error" => 1005];
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($data),
-                        "mw_response" => json_encode($data_response),
-                        'client_response' => $e->getMessage().' '.$e->getLine().' '.$e->getFile(),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-                    echo $this->makeArrayXML($data_response);
-                    return;
-                }
                 $game_trans_ext = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
                 if($game_trans_ext == 'false'){
                     $gameTransactionData = array(
@@ -236,6 +213,29 @@ class SAGamingController extends Controller
                         // "provider_request" =>json_encode($data),
                     );
                   GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
+                }
+                try {
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_details->game_code,$game_details->game_name,$game_transextension,$gamerecord,$transaction_type);
+                    ProviderHelper::saveLogWithExeption('SA PlaceBet CRID = '.$provider_trans_id, config('providerlinks.sagaming.pdbid'), json_encode($data), $client_response);
+                } catch (\Exception $e) {
+                    if(isset($gamerecord)){
+                        if($game_trans_ext == 'false'){
+                            $updateGameTransaction = [
+                                "win" => 2,
+                                'trans_status' => 5
+                            ];
+                            GameTransactionMDB::updateGametransaction($updateGameTransaction,$gamerecord,$client_details);
+                        }
+                    }
+                    $data_response = ["username" => $username,"error" => 1005];
+                    $updateTransactionEXt = array(
+                        "provider_request" =>json_encode($data),
+                        "mw_response" => json_encode($data_response),
+                        'client_response' => $e->getMessage().' '.$e->getLine().' '.$e->getFile(),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+                    echo $this->makeArrayXML($data_response);
+                    return;
                 }
                 if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
