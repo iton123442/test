@@ -237,7 +237,7 @@ class IDNPokerController extends Controller
                     ]; 
                     $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $balance, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false,$fund_extra_data);
                     if(isset($clientFunds_response->fundtransferresponse->status->code) 
-                        && $clientFunds_response->fundtransferresponse->status->code == "2001"){
+                        && $clientFunds_response->fundtransferresponse->status->code == "200"){
                         $msg = array(
                             "status" => "ok",
                             "message" => "Transaction success",
