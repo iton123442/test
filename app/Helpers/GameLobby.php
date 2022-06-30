@@ -2047,7 +2047,6 @@ class GameLobby{
                                             return "false";
                                             // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                                         }
-                                        return $data["lobby_url"];
                                         $data_to_send_play = array(
                                             "url" => $data["lobby_url"],
                                             "token" => $client_details->player_token,
