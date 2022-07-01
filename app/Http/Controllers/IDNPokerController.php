@@ -233,7 +233,7 @@ class IDNPokerController extends Controller
                     ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "FUNDSTRANSFER HIT");
                     $fund_extra_data = [
                         'provider_name' => $game_details->provider_name,
-                        'connection_timeout' => 0.2,
+                        'connection_timeout' => 1,
                     ]; 
                     $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $balance, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false,$fund_extra_data);
                     if(isset($clientFunds_response->fundtransferresponse->status->code) 
