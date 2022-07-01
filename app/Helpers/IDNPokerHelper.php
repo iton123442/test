@@ -179,7 +179,7 @@ class IDNPokerHelper{
                             <secret_key>'.$auth.'</secret_key>
                             <id>4</id>
                             <userid>'.$data["player_id"].'</userid>
-                            <id_transaction>'.$data["transaction_id"].'</id_transaction>
+                            <id_transaction>123213123123</id_transaction>
                             <withdraw>'.$data["amount"].'</withdraw>
                         </request>'
             ]
