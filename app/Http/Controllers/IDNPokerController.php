@@ -596,7 +596,7 @@ class IDNPokerController extends Controller
                                 $clientFundsCredit_response = ClientRequestHelper::fundTransfer($client_details, $amount_to_withdraw, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $checkPlayerRestricted->game_trans_id, "credit", false,$fund_extra_data);
                                 ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($clientFundsCredit_response), "clientFundsCredit_response");
                                 if (isset($clientFundsCredit_response->fundtransferresponse->status->code) 
-                                    && $clientFundsCredit_response->fundtransferresponse->status->code == "2010"){
+                                    && $clientFundsCredit_response->fundtransferresponse->status->code == "200"){
                                         $account_data = [
                                             "status" => 1
                                         ];
@@ -645,7 +645,7 @@ class IDNPokerController extends Controller
                                         $log_data = [
                                             "client_request" => json_encode($clientFundsCredit_response->requestoclient),
                                             "mw_response" =>  json_encode($clientFundsCredit_response->fundtransferresponse),
-                                            "status_code" => "20022",
+                                            "status_code" => "403",
                                             "general_details" => json_encode($msg)
                                         ];
                                         TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
