@@ -153,7 +153,7 @@ class IDNPokerHelper{
                             <id>3</id>
                             <userid>'.$data["player_id"].'</userid>
                             <id_transaction>'.$data["transaction_id"].'</id_transaction>
-                            <deposit>0</deposit>
+                            <deposit>'.$data["amount"].'</deposit>
                         </request>'
             ]
             );
