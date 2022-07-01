@@ -495,16 +495,16 @@ class IDNPokerController extends Controller
                         "action" => 2,
                         "player_id" =>  $player_id,
                     ];
-                    // $client_transaction_id_provider = IDNPokerHelper::getCheckTransactionIDAvailable($transactionChecker,$auth_token);
-                    // if(!$client_transaction_id_provider){
-                    //     $msg = array(
-                    //         "status" => "error",
-                    //         "message" => "Id transaction already exist!"
-                    //     );
-                    //     ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
-                    //     return response($msg, 200)->header('Content-Type', 'application/json');
-                    // }
-                    $client_transaction_id_provider = '123213123123';
+                    $client_transaction_id_provider = IDNPokerHelper::getCheckTransactionIDAvailable($transactionChecker,$auth_token);
+                    if(!$client_transaction_id_provider){
+                        $msg = array(
+                            "status" => "error",
+                            "message" => "Id transaction already exist!"
+                        );
+                        ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                        return response($msg, 200)->header('Content-Type', 'application/json');
+                    }
+                    // $client_transaction_id_provider = '123213123123';
                     $client_transaction_id =  $client_details->client_id."_".$client_transaction_id_provider;   
                   
                     // $client_transaction_id_provider = Uuid::generate()->string; // USE FOR THE PROVIDER MAX 36
