@@ -357,6 +357,7 @@ class GameLobby{
             'user_id'=> $client_player_details->player_id,
             'language'=> $lang,
             'https' => true,
+            'exit_url' => isset($exit_url) ? $exit_url : ""
           ],
           "denomination" => '1', // game to be launched with values like 1.0, 1, default
           "currency" => $client_player_details->default_currency,
