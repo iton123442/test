@@ -22,10 +22,10 @@ class IDNPokerController extends Controller
     }
 
     public static function getPlayerBalance(Request $request) {
-        Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), 'HIT');
+        ProviderHelper::saveLogGameLaunch('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), 'HIT');
         if (!$request->has("token")) {
             $msg = array("status" => "error", "message" => "Token Invalid");
-            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
@@ -33,7 +33,7 @@ class IDNPokerController extends Controller
         
         if ($client_details == null || $client_details == 'false') {
             $msg = array("status" => "error", "message" => "Token Invalid");
-            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
@@ -47,7 +47,7 @@ class IDNPokerController extends Controller
                     "balance" => $balance
                 );
 
-                Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
+                ProviderHelper::saveLogGameLaunch('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
                 return response($msg, 200)->header('Content-Type', 'application/json');
             } 
 
@@ -56,7 +56,7 @@ class IDNPokerController extends Controller
                 "message" => "Player Not found",
                 "balance" => "0.00"
             );
-            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
             
         } catch (\Exception $e) {
@@ -65,7 +65,7 @@ class IDNPokerController extends Controller
                 "message" => $e->getMessage(),
                 "balance" => 0.00
             );
-            Helper::saveLog('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN TW GetPlayerBalance', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
     }
@@ -73,18 +73,18 @@ class IDNPokerController extends Controller
 
     public function getPlayerWalletBalance(Request $request)
     {
-        Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), "HIT");
+        ProviderHelper::saveLogGameLaunch('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), "HIT");
         $client_details = ProviderHelper::getClientDetails('token', $request->token);
         if ($client_details == 'false') {
             $msg = array("status" => "error", "message" => "Token Invalid");
-            Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
         $game_details = Helper::getInfoPlayerGameRound($request->token);
         if ($game_details == false) {
             $msg = array("status" => "error", "message" => "Game Not Found");
-            Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
@@ -98,7 +98,7 @@ class IDNPokerController extends Controller
                 "status" => "success",
                 "balance" => $data["balance"],
             );
-            Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
 
         }
@@ -106,13 +106,13 @@ class IDNPokerController extends Controller
             "status" => "error",
             "balance" => "0.00",
         );
-        Helper::saveLog('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
+        ProviderHelper::saveLogGameLaunch('IDN getPlayerWalletBalance', $this->provider_db_id, json_encode($request->all()), $msg);
         return response($msg, 200)->header('Content-Type', 'application/json');
         
     }
 
     public function makeDeposit(Request $request){
-        Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
+        ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
         // $msg = array(
         //     "status" => "ok",
         //     "message" => "Transaction success",
@@ -121,7 +121,7 @@ class IDNPokerController extends Controller
         // return response($msg, 200)->header('Content-Type', 'application/json');
         if (!$request->has("token") || !$request->has("player_id") || !$request->has("amount")) {
             $msg = array("status" => "error", "message" => "Missing Required Fields!");
-            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
         /**
@@ -132,7 +132,7 @@ class IDNPokerController extends Controller
         $client_details = ProviderHelper::getClientDetails('token', $request->token);
         if ($client_details == null) {
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
-            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
          /**
@@ -145,7 +145,7 @@ class IDNPokerController extends Controller
                 "status" => "error",
                 "message" => "Undefined Amount!"
             );
-            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
@@ -160,7 +160,7 @@ class IDNPokerController extends Controller
                 "message" => "Transaction success",
                 "balance" => "0.00"
             );
-            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
          /**
@@ -176,12 +176,13 @@ class IDNPokerController extends Controller
              * -----------------------------------------------
              */
             // --------------------------------------
-            $client_response = Providerhelper::playerDetailsCall($client_details->player_token);
-            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $client_response);
+            $client_response = Providerhelper::clientPlayerDetailsCall($client_details);
+            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $client_response);
             if($client_response != "false"){
                 if(isset($client_response->playerdetailsresponse->status->code) && $client_response->playerdetailsresponse->status->code == 200){
                     $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
                     // $player_id = config('providerlinks.idnpoker.prefix').$client_details->player_id;
+                    $balance = $client_response->playerdetailsresponse->balance;
                     $player_id = $client_details->username;
                     $transactionChecker = [
                         "action" => 1,
@@ -193,7 +194,7 @@ class IDNPokerController extends Controller
                             "status" => "error",
                             "message" => "Id transaction already exist!"
                         );
-                        Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                        ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
                         return response($msg, 200)->header('Content-Type', 'application/json');
                     }
                     // $client_transaction_id_provider = Uuid::generate()->string;
@@ -211,7 +212,7 @@ class IDNPokerController extends Controller
                             "client_id" => $client_details->client_id,
                             "operator_id" => $client_details->operator_id,
                             "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
-                            "status" => 1,
+                            "status" => 5,
                         ];
                         $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
                     } catch (\Exception $e) {
@@ -219,8 +220,9 @@ class IDNPokerController extends Controller
                             "status" => "error",
                             "message" => "Transaction Id Already Exist",
                         );
-                        return $msg;
+                        return response($msg, 200)->header('Content-Type', 'application/json');
                     }
+                    
                     $data = [
                         "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                         "wallet_type" => 1, // DEPOSIT
@@ -228,35 +230,14 @@ class IDNPokerController extends Controller
                     ];
                     $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($data);
                     
-                    Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "FUNDSTRANSFER HIT");
+                    ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "FUNDSTRANSFER HIT");
                     $fund_extra_data = [
                         'provider_name' => $game_details->provider_name,
                         'connection_timeout' => 30,
                     ]; 
-                    $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false,$fund_extra_data);
-                    $transactionDetails = [
-                        "game_trans_ext_id" => $game_trans_ext_id,
-                        "game_trans_id" => $game_trans_id
-                    ];
-                    $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
-                    if(!$checkTransaction){
-                        $msg = array("status" => "error", "message" => "Deposit Failed");
-                        $account_data = [
-                            "status" => 2
-                        ];
-                        TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
-                        $log_data = [
-                            "client_request" => json_encode($clientFunds_response->requestoclient),
-                            "mw_response" =>  json_encode($clientFunds_response->fundtransferresponse),
-                            "status_code" => "404",
-                            "general_details" => json_encode($msg)
-                        ];
-                        TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
-                        Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "FAILED NOT SET");
-                        return response($msg, 200)->header('Content-Type', 'application/json');
-                    }
-                    Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($clientFunds_response), "FUNDSTRANSFER RESPONSE");
-                    if (isset($clientFunds_response->fundtransferresponse->status->code)) {
+                    $clientFunds_response = ClientRequestHelper::fundTransfer($client_details, $balance, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "debit",false,$fund_extra_data);
+                    if(isset($clientFunds_response->fundtransferresponse->status->code) 
+                        && $clientFunds_response->fundtransferresponse->status->code == "200"){
                         $msg = array(
                             "status" => "ok",
                             "message" => "Transaction success",
@@ -269,8 +250,9 @@ class IDNPokerController extends Controller
                             "general_details" => json_encode($msg)
                         ];
                         TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
+                        
                         $data_deposit = [
-                            "amount" => $request->amount,
+                            "amount" => $balance,
                             "transaction_id" => $client_transaction_id_provider,
                             "player_id" => $player_id
                         ];
@@ -296,12 +278,21 @@ class IDNPokerController extends Controller
                                     // "client_transaction_id" => $client_transaction_id_provider,
                                 ];
                                 IDNPokerHelper::createPlayerRestricted($createRestricted);
+                                /**
+                                 * -----------------------------------------------
+                                 *  RETURN RESPONSE
+                                 * -----------------------------------------------
+                                 */   
+                                $account_data = [
+                                    "status" => 1
+                                ];
+                                TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
                                  /**
                                  * -----------------------------------------------
                                  *  RETURN RESPONSE
                                  * -----------------------------------------------
                                  */   
-                                Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                                ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
                                 return response($msg, 200)->header('Content-Type', 'application/json');
                             }
                             $message = "Deposit Failed";
@@ -320,7 +311,7 @@ class IDNPokerController extends Controller
                             "status_code" => "404",
                             "general_details" => json_encode($message),
                         ];
-                        $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($data);
+                        TWHelpers::createTWPlayerAccountsRequestLogs($data);
                         $data = [
                             "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
                             "wallet_type" => 1,
@@ -332,47 +323,14 @@ class IDNPokerController extends Controller
                          *  IF NOT SUCCESS ROLLBACK TRANSACTION
                          * -----------------------------------------------
                          */   
-                        Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "ROLLBACK HIT");
+                        ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "ROLLBACK HIT");
                         $fund_extra_data = [
                             'provider_name' => $game_details->provider_name,
                             'connection_timeout' => 30,
                         ]; 
-                        $clientFundsRollback_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", true,$fund_extra_data);
-                        $transactionDetails = [
-                            "game_trans_ext_id" => $game_trans_ext_id,
-                            "game_trans_id" => $game_trans_id
-                        ];
-                        $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
-                        if(!$checkTransaction){
-                            $clientFundsRollback_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", true,$fund_extra_data);
-                            $transactionDetails = [
-                                "game_trans_ext_id" => $game_trans_ext_id,
-                                "game_trans_id" => $game_trans_id
-                            ];
-                            $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
-                            if(!$checkTransaction){
-                                $msg = array("status" => "error", "message" => "Deposit Failed");
-                                $log_data = [
-                                    "client_request" => json_encode($clientFundsRollback_response->requestoclient),
-                                    "mw_response" =>  json_encode($clientFundsRollback_response->fundtransferresponse),
-                                    "status_code" => "404",
-                                    "general_details" => json_encode($msg)
-                                ];
-                                TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
-                                $account_data = [
-                                    "status" => 5 // nee to sent to client
-                                ];
-                                TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
-                                /**
-                                 * -----------------------------------------------
-                                 *  RETURN RESPONSE
-                                 * -----------------------------------------------
-                                 */   
-                                Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
-                                return response($msg, 200)->header('Content-Type', 'application/json');
-                            }
-                        }
-                        if (isset($clientFundsRollback_response->fundtransferresponse->status->code)) {
+                        $clientFundsRollback_response = ClientRequestHelper::fundTransfer($client_details, $balance, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", true,$fund_extra_data);
+                        if (isset($clientFundsRollback_response->fundtransferresponse->status->code) 
+                            && $clientFundsRollback_response->fundtransferresponse->status->code == "200"){
                             $msg = array("status" => "error", "message" => $message);
                             $account_data = [
                                 "status" => 2
@@ -390,28 +348,106 @@ class IDNPokerController extends Controller
                              *  RETURN RESPONSE
                              * -----------------------------------------------
                              */   
-                            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                            return response($msg, 200)->header('Content-Type', 'application/json');
+                        } else {
+                            $log_data = [
+                                "client_request" => json_encode($clientFundsRollback_response->requestoclient),
+                                "mw_response" =>  json_encode($clientFundsRollback_response->fundtransferresponse),
+                                "status_code" => "404",
+                                "general_details" => json_encode("INITIATE REFUND")
+                            ];
+                            TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
+                            $transactionDetails = [
+                                "game_trans_ext_id" => $game_trans_ext_id,
+                                "game_trans_id" => $game_trans_id
+                            ];
+                            $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
+                            if(!$checkTransaction){
+                                $account_data = [
+                                    "status" => 5 // nee to sent to client
+                                ];
+                                TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                                // $clientFundsRollback_response = ClientRequestHelper::fundTransfer($client_details, $balance, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_trans_id, "credit", true,$fund_extra_data);
+                                // $transactionDetails = [
+                                //     "game_trans_ext_id" => $game_trans_ext_id,
+                                //     "game_trans_id" => $game_trans_id
+                                // ];
+                                // $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
+                                // if(!$checkTransaction){
+                                //     $msg = array("status" => "error", "message" => "Deposit Failed");
+                                //     $log_data = [
+                                //         "client_request" => json_encode($clientFundsRollback_response->requestoclient),
+                                //         "mw_response" =>  json_encode($clientFundsRollback_response->fundtransferresponse),
+                                //         "status_code" => "404",
+                                //         "general_details" => json_encode($msg)
+                                //     ];
+                                //     TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
+                                //     $account_data = [
+                                //         "status" => 5 // nee to sent to client
+                                //     ];
+                                //     TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                                //     /**
+                                //      * -----------------------------------------------
+                                //      *  RETURN RESPONSE
+                                //      * -----------------------------------------------
+                                //      */   
+                                //     ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                                //     return response($msg, 200)->header('Content-Type', 'application/json');
+                                // }
+                            }
+                            $account_data = [
+                                "status" => 2 // nee to sent to client
+                            ];
+                            TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                        }
+                    } else {
+                        $log_data = [
+                            "client_request" => json_encode($clientFunds_response->requestoclient),
+                            "mw_response" =>  json_encode($clientFunds_response->fundtransferresponse),
+                            "status_code" => "402",
+                            "general_details" => json_encode("FAILED RESPONSE")
+                        ];
+                        TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
+                        $transactionDetails = [
+                            "game_trans_ext_id" => $game_trans_ext_id,
+                            "game_trans_id" => $game_trans_id
+                        ];
+                        
+                        $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
+                        if(!$checkTransaction){
+                            $msg = array("status" => "error", "message" => "Deposit Failed");
+                            $account_data = [
+                                "status" => 5
+                            ];
+                            TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), "FAILED NOT SET");
                             return response($msg, 200)->header('Content-Type', 'application/json');
                         }
-                    } 
+                        ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($clientFunds_response), "FUNDSTRANSFER RESPONSE");
+                        $account_data = [
+                            "status" => 2 // nee to sent to client
+                        ];
+                        TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                    }
                 } 
             }
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
-            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         } else {
             $msg = array("status" => "error", "message" => "Invalid Token or Game not found");
-            Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
     }
 
     public function makeWithdraw(Request $request)
     {
-        Helper::saveLog('IDN WITHDRAW ', $this->provider_db_id, json_encode($request->all()), "HIT WITHDRAW");
+        ProviderHelper::saveLogGameLaunch('IDN WITHDRAW ', $this->provider_db_id, json_encode($request->all()), "HIT WITHDRAW");
         if (!$request->has("token") || !$request->has("player_id") ) {
             $msg = array("status" => "error", "message" => "Missing Required Fields!");
-            Helper::saveLog('IDN WITHDRAW Missing Fields', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW Missing Fields', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
         /**
@@ -422,7 +458,7 @@ class IDNPokerController extends Controller
         $client_details = ProviderHelper::getClientDetails('token', $request->token);
         if ($client_details == null) {
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
-            Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
          /**
@@ -433,7 +469,7 @@ class IDNPokerController extends Controller
         $checkPlayerRestricted = IDNPokerHelper::checkPlayerRestricted($client_details->player_id);
         if($checkPlayerRestricted == "false"){
             $msg = array("status" => "error", "message" => "Please retry again!");
-            Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
         /**
@@ -443,8 +479,8 @@ class IDNPokerController extends Controller
          */  
         $game_details = Helper::getInfoPlayerGameRound($request->token);
         if ($game_details) {
-            $client_response = Providerhelper::playerDetailsCall($client_details->player_token);
-            Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $client_response);
+            $client_response = Providerhelper::clientPlayerDetailsCall($client_details);
+            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $client_response);
             if($client_response != "false"){
                 if(isset($client_response->playerdetailsresponse->status->code) && $client_response->playerdetailsresponse->status->code == 200){
                     /**
@@ -465,17 +501,19 @@ class IDNPokerController extends Controller
                             "status" => "error",
                             "message" => "Id transaction already exist!"
                         );
-                        Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                        ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
                         return response($msg, 200)->header('Content-Type', 'application/json');
                     }
+                    // $client_transaction_id_provider = '123213123123';
                     $client_transaction_id =  $client_details->client_id."_".$client_transaction_id_provider;   
+                  
                     // $client_transaction_id_provider = Uuid::generate()->string; // USE FOR THE PROVIDER MAX 36
                     // $client_transaction_id =  $client_details->client_id."_".$client_transaction_id_provider; // USE ACCOUNT AND LOGS TABLE NAME client_transaction_id
                     // try{
                     //     ProviderHelper::idenpotencyTable($client_transaction_id);
                     // }catch(\Exception $e){
                     //     $msg = array("status" => "error", "message" => "Please retry again!");
-                    //     Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
+                    //     ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
                     //     return response($msg, 200)->header('Content-Type', 'application/json');
                     // }
                     /**
@@ -499,6 +537,24 @@ class IDNPokerController extends Controller
                             "transaction_id" => $client_transaction_id_provider,
                             "player_id" => $player_id
                         ];
+
+                        /**
+                         * -----------------------------------------------
+                         *  CREATE ACCOUNT AND LOGS
+                         * -----------------------------------------------
+                         */   
+                        $wallet_type = 2;// withdraw 
+                        $data_accounts = [
+                            "player_id" => $client_details->player_id,
+                            "type" => $wallet_type,
+                            "amount" => $amount_to_withdraw,
+                            "client_id" => $client_details->client_id,
+                            "operator_id" => $client_details->operator_id,
+                            "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
+                            "status" => 5,
+                        ];
+                        $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
+
                         if($data["balance"] == 0 || $data["balance"] == "0") {
                             $provider_response = [];
                         } else {
@@ -506,28 +562,6 @@ class IDNPokerController extends Controller
                         } 
                         if($provider_response != "false"){
                             if (!isset($provider_response["error"])) {
-                                /**
-                                 * -----------------------------------------------
-                                 *  DELETE PLAYER RESTRICTED
-                                 * -----------------------------------------------
-                                 */   
-                                IDNPokerHelper::deletePlayerRestricted($checkPlayerRestricted->idtw_player_restriction);
-                                /**
-                                 * -----------------------------------------------
-                                 *  CREATE ACCOUNT AND LOGS
-                                 * -----------------------------------------------
-                                 */   
-                                $wallet_type = 2;// withdraw 
-                                $data_accounts = [
-                                    "player_id" => $client_details->player_id,
-                                    "type" => $wallet_type,
-                                    "amount" => $amount_to_withdraw,
-                                    "client_id" => $client_details->client_id,
-                                    "operator_id" => $client_details->operator_id,
-                                    "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
-                                    "status" => 5,
-                                ];
-                                $game_trans_id = TWHelpers::createTWPlayerAccounts($data_accounts);
                                 $log_data = [
                                     "client_request" => json_encode($data_deposit),
                                     "mw_response" =>  json_encode($provider_response),
@@ -549,46 +583,75 @@ class IDNPokerController extends Controller
                                     "tw_account_id" => $checkPlayerRestricted->game_trans_id,
                                 ];
                                 $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($log_data);
+                                /**
+                                 * -----------------------------------------------
+                                 *  DELETE PLAYER RESTRICTED
+                                 * -----------------------------------------------
+                                 */   
+                                IDNPokerHelper::deletePlayerRestricted($checkPlayerRestricted->idtw_player_restriction);
                                 $fund_extra_data = [
                                     'provider_name' => $game_details->provider_name,
                                     'connection_timeout' => 30,
                                 ]; 
                                 $clientFundsCredit_response = ClientRequestHelper::fundTransfer($client_details, $amount_to_withdraw, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $checkPlayerRestricted->game_trans_id, "credit", false,$fund_extra_data);
-                                Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($clientFundsCredit_response), "clientFundsCredit_response");
-                                $transactionDetails = [
-                                    "game_trans_ext_id" => $game_trans_ext_id,
-                                    "game_trans_id" => $checkPlayerRestricted->game_trans_id
-                                ];
-                                $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
-                                if(!$checkTransaction){
-                                    /**
-                                     * -----------------------------------------------
-                                     *  RETRY ONE TIME TO CLIENT
-                                     * -----------------------------------------------
-                                     */   
-                                    $clientFundsCredit_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $checkPlayerRestricted->game_trans_id, "credit", false,$fund_extra_data);
+                                ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($clientFundsCredit_response), "clientFundsCredit_response");
+                                if (isset($clientFundsCredit_response->fundtransferresponse->status->code) 
+                                    && $clientFundsCredit_response->fundtransferresponse->status->code == "200"){
+                                        $account_data = [
+                                            "status" => 1
+                                        ];
+                                        TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                                        $msg = array(
+                                            "status" => "ok",
+                                            "message" => "Transaction success",
+                                            "balance" => $clientFundsCredit_response->fundtransferresponse->balance
+                                        );
+                                        $log_data = [
+                                            "client_request" => json_encode($clientFundsCredit_response->requestoclient),
+                                            "mw_response" =>  json_encode($clientFundsCredit_response->fundtransferresponse),
+                                            "status_code" => "200",
+                                            "general_details" => json_encode($msg)
+                                        ];
+                                        TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
+                                        ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
+                                        return response($msg, 200)->header('Content-Type', 'application/json');
+
+                                }else{
+                                    $transactionDetails = [
+                                        "game_trans_ext_id" => $game_trans_ext_id,
+                                        "game_trans_id" => $checkPlayerRestricted->game_trans_id
+                                    ];
                                     $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
-                                }
-                                
-                                if (isset($clientFundsCredit_response->fundtransferresponse->status->code) && $checkTransaction) {
-                                    $account_data = [
-                                        "status" => 1
-                                    ];
-                                    TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
-                                    $msg = array(
-                                        "status" => "ok",
-                                        "message" => "Transaction success",
-                                        "balance" => $clientFundsCredit_response->fundtransferresponse->balance
-                                    );
-                                    $log_data = [
-                                        "client_request" => json_encode($clientFundsCredit_response->requestoclient),
-                                        "mw_response" =>  json_encode($clientFundsCredit_response->fundtransferresponse),
-                                        "status_code" => "200",
-                                        "general_details" => json_encode($msg)
-                                    ];
-                                    TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
-                                    Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
-                                    return response($msg, 200)->header('Content-Type', 'application/json');
+                                    if(!$checkTransaction){
+                                        /**
+                                         * -----------------------------------------------
+                                         *  RETRY ONE TIME TO CLIENT
+                                         * -----------------------------------------------
+                                         */   
+                                        $clientFundsCredit_response = ClientRequestHelper::fundTransfer($client_details, $request->amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $checkPlayerRestricted->game_trans_id, "credit", false,$fund_extra_data);
+                                        $checkTransaction =  ClientRequestHelper::CheckerTransactionRequest($client_details, $transactionDetails);
+                                    }
+
+                                    if($checkTransaction){
+                                        $account_data = [
+                                            "status" => 1
+                                        ];
+                                        TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                                        $msg = array(
+                                            "status" => "ok",
+                                            "message" => "Transaction success",
+                                            "balance" => $clientFundsCredit_response->fundtransferresponse->balance
+                                        );
+                                        $log_data = [
+                                            "client_request" => json_encode($clientFundsCredit_response->requestoclient),
+                                            "mw_response" =>  json_encode($clientFundsCredit_response->fundtransferresponse),
+                                            "status_code" => "403",
+                                            "general_details" => json_encode($msg)
+                                        ];
+                                        TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
+                                        ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
+                                        return response($msg, 200)->header('Content-Type', 'application/json');
+                                    }
                                 }
                                 /**
                                  * -----------------------------------------------
@@ -603,43 +666,45 @@ class IDNPokerController extends Controller
                                     "general_details" => json_encode($msg)
                                 ];
                                 TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
-                                Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
-                                
+                                ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
                                 return response($msg, 200)->header('Content-Type', 'application/json');
                             } 
                         }
-                        /***************************************************************
-                        *
-                        * FALED TO WITHDRAW CREATE PLAYER RESTRICTION
-                        *
-                        ****************************************************************/
-                        // $createRestricted = [
-                        //     "player_id" => $client_details->player_id,
-                        //     "status" => 5,
-                        //     "client_transaction_id" => $client_transaction_id_provider,
-                        // ];
-                        // IDNPokerHelper::createPlayerRestricted($createRestricted);
                         $message = "Transaction failed to withdraw";
                         if (isset($provider_response["message"])) {
                             $message = $provider_response["message"];
                         }
                         $message = "ポーカーポーカーがマルチウォレットに reflection されるまで1 minute trip かかります. しばらくおちください.";
                         $msg = array("status" => "error", "message" => $message);
-                        Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
+                        $log_data = [
+                            "client_request" => json_encode($data_deposit),
+                            "mw_response" =>  json_encode($provider_response),
+                            "wallet_type" => $wallet_type,
+                            "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
+                            "tw_account_id" => $game_trans_id,
+                            "status_code" => "402",
+                            "general_details" => json_encode($msg)
+                        ];
+                        TWHelpers::createTWPlayerAccountsRequestLogs($log_data);
+                        $account_data = [
+                            "status" => 2
+                        ];
+                        TWHelpers::updatePlayerAccount($account_data, $game_trans_id);
+                        ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
                         return response($msg, 200)->header('Content-Type', 'application/json');
                     }
                 }
             }
         }
         $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
-        Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
+        ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
         return response($msg, 200)->header('Content-Type', 'application/json');
     }
 
     public static function getTransactionHistory(Request $request) {
-        Helper::saveLog('IDN TW getTransactionHistory', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), 'getTransactionHistory');
-        $getTime = DB::select('SELECT DATE_FORMAT(SUBTIME(now(), "- 06:55:00"),"%m/%d/%Y")    as date ,DATE_FORMAT(SUBTIME(now(), "- 06:55:00"),"%H:%i") time');
-        $time = "00:00";  //$getTime[0]->getTime 
+        ProviderHelper::saveLogGameLaunch('IDN TW getTransactionHistory', config('providerlinks.idnpoker.PROVIDER_ID'), json_encode($request->all()), 'getTransactionHistory');
+        $getTime = DB::select('SELECT now(), convert_tz(now(), "+00:00", "+07:00" ) "GMT +7",  DATE_FORMAT(SUBTIME(convert_tz(now(), "+00:00", "+07:00" ), "01:59:59"),"%m/%d/%Y")  as "date", DATE_FORMAT(SUBTIME(convert_tz(now(), "+00:00", "+07:00" ), "01:59:59"),"%H:%i")  as "getTime"');
+        $time = $getTime[0]->getTime; 
         $date = $getTime[0]->date; //$getTime[0]->date
         $data = [
             "start_time" => $time,
@@ -759,7 +824,7 @@ class IDNPokerController extends Controller
                 }
             }
 
-            return 1;
+            // return 1;
         }
     }
 
@@ -782,10 +847,10 @@ class IDNPokerController extends Controller
      */
     public function retryWithdrawalRestriction(Request $request)
     {
-        Helper::saveLog('IDN WITHDRAW RETRY ', $this->provider_db_id, json_encode($request->all()), "HIT WITHDRAW");
+        ProviderHelper::saveLogGameLaunch('IDN WITHDRAW RETRY ', $this->provider_db_id, json_encode($request->all()), "HIT WITHDRAW");
         if (!$request->has("player_id") ) {
             $msg = array("status" => "error", "message" => "Missing Required Fields!");
-            Helper::saveLog('IDN WITHDRAW Missing Fields', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW Missing Fields', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
         /**
@@ -796,7 +861,7 @@ class IDNPokerController extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id', $request->player_id);
         if ($client_details == null) {
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
-            Helper::saveLog('IDN WITHDRAW RETRY', $this->provider_db_id, json_encode($request->all()), $msg);
+            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW RETRY', $this->provider_db_id, json_encode($request->all()), $msg);
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
         /**
@@ -834,7 +899,7 @@ class IDNPokerController extends Controller
                         "status" => "error",
                         "message" => "Id transaction already exist!"
                     );
-                    Helper::saveLog('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
+                    ProviderHelper::saveLogGameLaunch('IDN DEPOSIT', $this->provider_db_id, json_encode($request->all()), $msg);
                     return response($msg, 200)->header('Content-Type', 'application/json');
                 }
                 $client_transaction_id =  $client_details->client_id."_".$client_transaction_id_provider;
@@ -852,7 +917,7 @@ class IDNPokerController extends Controller
                     //         "message" => "Transaction success",
                     //         "balance" => 0.00
                     //     );
-                    //     Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
+                    //     ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), $msg);
                     //     return response($msg, 200)->header('Content-Type', 'application/json');
                     // } 
                     /**
@@ -900,29 +965,32 @@ class IDNPokerController extends Controller
                                 "general_details" => json_encode("Provider Success Response")
                             ];
                             TWHelpers::createTWPlayerAccountsRequestLogs($log_data);
+                            
+                            /**
+                             * -----------------------------------------------
+                             *  TO CLIENT PROCESS
+                             * -----------------------------------------------
+                             */   
+                            $log_data1 = [
+                                "wallet_type" => $wallet_type,
+                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
+                                "tw_account_id" => $checkPlayerRestricted->game_trans_id,
+                            ];
+                            $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($log_data1);
+                            $fund_extra_data = [
+                                'provider_name' => $game_details->provider_name,
+                                'connection_timeout' => 30,
+                            ]; 
+
                             /**
                              * -----------------------------------------------
                              *  DELETE PLAYER RESTRICTED
                              * -----------------------------------------------
                              */   
                             IDNPokerHelper::deletePlayerRestricted($checkPlayerRestricted->idtw_player_restriction);
-                            /**
-                             * -----------------------------------------------
-                             *  TO CLIENT PROCESS
-                             * -----------------------------------------------
-                             */   
-                            $log_data = [
-                                "wallet_type" => $wallet_type,
-                                "client_transaction_id" => $client_transaction_id, //UNIQUE TRANSACTION
-                                "tw_account_id" => $checkPlayerRestricted->game_trans_id,
-                            ];
-                            $game_trans_ext_id = TWHelpers::createTWPlayerAccountsRequestLogs($log_data);
-                            $fund_extra_data = [
-                                'provider_name' => $game_details->provider_name,
-                                'connection_timeout' => 30,
-                            ]; 
+
                             $clientFundsCredit_response = ClientRequestHelper::fundTransfer($client_details, $amount_to_withdraw, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $checkPlayerRestricted->game_trans_id, "credit", false,$fund_extra_data);
-                            Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($clientFundsCredit_response), "clientFundsCredit_response");
+                            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($clientFundsCredit_response), "clientFundsCredit_response");
                             $transactionDetails = [
                                 "game_trans_ext_id" => $game_trans_ext_id,
                                 "game_trans_id" => $checkPlayerRestricted->game_trans_id,
@@ -947,14 +1015,14 @@ class IDNPokerController extends Controller
                                     "message" => "Transaction success",
                                     "balance" => $clientFundsCredit_response->fundtransferresponse->balance
                                 );
-                                $log_data = [
+                                $log_data2 = [
                                     "client_request" => json_encode($clientFundsCredit_response->requestoclient),
                                     "mw_response" =>  json_encode($clientFundsCredit_response->fundtransferresponse),
                                     "status_code" => "200",
                                     "general_details" => json_encode($msg)
                                 ];
-                                TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
-                                Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
+                                TWHelpers::updateTWPlayerAccountsRequestLogs($log_data2, $game_trans_ext_id);
+                                ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
                                 return response($msg, 200)->header('Content-Type', 'application/json');
                             }
                             /**
@@ -963,14 +1031,14 @@ class IDNPokerController extends Controller
                             * -----------------------------------------------
                             */   
                             $msg = array("status" => "error", "message" => "Fundstransfer Error!");
-                            $log_data = [
+                            $log_data3 = [
                                 "client_request" => json_encode($clientFundsCredit_response->requestoclient),
                                 "mw_response" =>  json_encode($clientFundsCredit_response->fundtransferresponse),
                                 "status_code" => "500",
                                 "general_details" => json_encode($msg)
                             ];
-                            TWHelpers::updateTWPlayerAccountsRequestLogs($log_data, $game_trans_ext_id);
-                            Helper::saveLog('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
+                            TWHelpers::updateTWPlayerAccountsRequestLogs($log_data3, $game_trans_ext_id);
+                            ProviderHelper::saveLogGameLaunch('IDN WITHDRAW', $this->provider_db_id, json_encode($request->all()), "DONE UPDATE SUCCESS");
                             return response($msg, 200)->header('Content-Type', 'application/json');
                         } 
                     }
@@ -978,12 +1046,12 @@ class IDNPokerController extends Controller
             }
         }
         $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
-        Helper::saveLog('IDN WITHDRAW RETRY', $this->provider_db_id, json_encode($request->all()), $msg);
+        ProviderHelper::saveLogGameLaunch('IDN WITHDRAW RETRY', $this->provider_db_id, json_encode($request->all()), $msg);
         return response($msg, 200)->header('Content-Type', 'application/json');
     }
 
     public static function callRetryPlayerRestricted() {
-        $getRestricted = DB::select('SELECT * FROM api_test.tw_player_restriction where (DATE_SUB(now(), INTERVAL 1 MINUTE)) > updated_at'); // get all interval 1minute then sent
+        $getRestricted = DB::select('SELECT * FROM tw_player_restriction where (DATE_SUB(now(), INTERVAL 1 MINUTE)) > updated_at'); // get all interval 1minute then sent
         foreach($getRestricted as $item)
         {
             try {
@@ -998,12 +1066,12 @@ class IDNPokerController extends Controller
                     ]
                 ]);
                 $iframe_data = json_decode((string) $response->getBody(), true);
-                Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode($iframe_data),  json_encode($iframe_data) );
+                ProviderHelper::saveLogGameLaunch('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode($iframe_data),  json_encode($iframe_data) );
                 if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
                     // return "false";
                 }
             } catch (\Exception $e) {
-                Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
+                ProviderHelper::saveLogGameLaunch('IDNPOKER GAMELUANCH MAKEDEPOSIT RETRY', 110, json_encode("error"),  $e->getMessage() );
                 // return "false";
             }
         }
@@ -1017,7 +1085,7 @@ class IDNPokerController extends Controller
 	 */
     public function renewSession(Request $request){
     	// $data = $request->all();
-        Helper::saveLog('IDNPOKER RENEWSESSION', 110, json_encode($request->all()),  "renewSession");
+        ProviderHelper::saveLogGameLaunch('IDNPOKER RENEWSESSION', 110, json_encode($request->all()),  "renewSession");
     	if($request->has('token') && $request->has('player_id')){
            
             $checkPlayerRestricted = IDNPokerHelper::checkPlayerRestricted($request->player_id);
@@ -1029,7 +1097,7 @@ class IDNPokerController extends Controller
             }
     	}
     	$response = ["status" => "error", 'message' => 'Success Renew!'];
-    	// SessionWalletHelper::saveLog('TW updateSession', 1223, json_encode($data), 1223);
+    	// SessionWalletProviderHelper::saveLogGameLaunch('TW updateSession', 1223, json_encode($data), 1223);
     	return $response;
     }
 

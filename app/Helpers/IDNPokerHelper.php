@@ -19,7 +19,7 @@ class IDNPokerHelper{
                 <id>10</id>
                 <userid>'.$player_id.'</userid>
             </request>';
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK PLAYER DETAILS REQUEST" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK PLAYER DETAILS REQUEST" );
             $client = new Client();
             $guzzle_response = $client->post($url,[
                 'body' => '
@@ -33,10 +33,10 @@ class IDNPokerHelper{
             $player_details = $guzzle_response->getBody();
             $json = json_encode(simplexml_load_string($player_details));
             $array = json_decode($json,true);
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($array),  "CHECK RESPONSE PLAYER DETAILS" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($array),  "CHECK RESPONSE PLAYER DETAILS" );
             return $array;
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($e->getMessage()),  "CHECK RESPONSE PLAYER DETAILS ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($e->getMessage()),  "CHECK RESPONSE PLAYER DETAILS ERROR" );
             return "false";
         }
         
@@ -54,7 +54,7 @@ class IDNPokerHelper{
                 <confirm_password>'.$player_id.'</confirm_password>
                 <username>'.$player_id.'</username>
             </request>';
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK REGISTER REQUEST" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK REGISTER REQUEST" );
             $client = new Client();
             $guzzle_response = $client->post($url,[
                 'body' => '
@@ -71,10 +71,10 @@ class IDNPokerHelper{
             $player_details = $guzzle_response->getBody();
             $json = json_encode(simplexml_load_string($player_details));
             $array = json_decode($json,true);
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($array),  "CHECK RESPONSE REGISTER PLAYER" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($array),  "CHECK RESPONSE REGISTER PLAYER" );
             return $array;
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($e->getMessage()),  "CHECK RESPONSE REGISTER PLAYER ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($e->getMessage()),  "CHECK RESPONSE REGISTER PLAYER ERROR" );
             return "false";
         }
         
@@ -115,7 +115,7 @@ class IDNPokerHelper{
                 <game>'.$data['game_code'].'</game>
                 <lang>'.$lang.'</lang>
             </request>';
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK LOGIN REQUEST" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($request),  "CHECK LOGIN REQUEST" );
             $guzzle_response = $client->post($url,[
                 'body' => '
                         <request>
@@ -134,10 +134,10 @@ class IDNPokerHelper{
             $player_details = $guzzle_response->getBody();
             $json = json_encode(simplexml_load_string($player_details));
             $array = json_decode($json,true);
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($array),  "CHECK RESPONSE LOGIN" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($array),  "CHECK RESPONSE LOGIN" );
             return $array;
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER GAMELUANCH', 110, json_encode($e->getMessage()),  "CHECK RESPONSE LOGIN ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER GAMELUANCH', 110, json_encode($e->getMessage()),  "CHECK RESPONSE LOGIN ERROR" );
             return "false";
         }
     }
@@ -160,10 +160,10 @@ class IDNPokerHelper{
             $details = $guzzle_response->getBody();
             $json = json_encode(simplexml_load_string($details));
             $array = json_decode($json,true);
-            Helper::saveLog('IDNPOKER DEPOSIT', 110, json_encode($array),  "CHECK RESPONSE DEPOSIT" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER DEPOSIT', 110, json_encode($array),  "CHECK RESPONSE DEPOSIT" );
             return $array;
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER DEPOSIT', 110, json_encode($e->getMessage()),  "CHECK RESPONSE DEPOSIT ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER DEPOSIT', 110, json_encode($e->getMessage()),  "CHECK RESPONSE DEPOSIT ERROR" );
             return "false";
         }
         
@@ -187,10 +187,10 @@ class IDNPokerHelper{
             $details = $guzzle_response->getBody();
             $json = json_encode(simplexml_load_string($details));
             $array = json_decode($json,true);
-            Helper::saveLog('IDNPOKER WITHDRAW', 110, json_encode($array),  "CHECK RESPONSE WITHDRAW" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER WITHDRAW', 110, json_encode($array),  "CHECK RESPONSE WITHDRAW" );
             return $array;
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER WITHDRAW', 110, json_encode($e->getMessage()),  "CHECK RESPONSE WITHDRAW ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER WITHDRAW', 110, json_encode($e->getMessage()),  "CHECK RESPONSE WITHDRAW ERROR" );
             return "false";
         }
         
@@ -231,10 +231,10 @@ class IDNPokerHelper{
                 $rate = $currency_rate["rate"]; 
                 return $rate;
             }
-            Helper::saveLog('IDNPOKER getRate', 110, json_encode($currency_rate),  "CHECK RESPONSE getRate" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER getRate', 110, json_encode($currency_rate),  "CHECK RESPONSE getRate" );
             return "false";
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER getRate', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getRate ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER getRate', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getRate ERROR" );
             return "false";
         }
     }
@@ -260,10 +260,10 @@ class IDNPokerHelper{
             if(isset($response["numrow"]) && $response["numrow"] > 0 ){
                 return $response;
             }
-            Helper::saveLog('IDNPOKER getTransactionHistory', 110, json_encode($response),  "CHECK RESPONSE getTransactionHistory" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER getTransactionHistory', 110, json_encode($response),  "CHECK RESPONSE getTransactionHistory" );
             return "false";
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER getTransactionHistory', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getTransactionHistory ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER getTransactionHistory', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getTransactionHistory ERROR" );
             return "false";
         }
     }
@@ -290,13 +290,13 @@ class IDNPokerHelper{
                 $details = $guzzle_response->getBody();
                 $json = json_encode(simplexml_load_string($details));
                 $response = json_decode($json,true);
-                if(isset($response["status"])  && $response["status"] == 0){
+                if(isset($response["status"])  && $response["status"] == 0 && isset($response["id_transaction"]) ){
                     $id_transaction = $response["id_transaction"]; 
                     $x = 6;
                 }
-                Helper::saveLog('IDNPOKER checkTransactionID', 110, json_encode($response),  "CHECK RESPONSE checkTransactionID" );
+                ProviderHelper::saveLogWithExeption('IDNPOKER checkTransactionID', 110, json_encode($response),  "CHECK RESPONSE checkTransactionID" );
             } catch (\Exception $e) {
-                Helper::saveLog('IDNPOKER DEPOSIT', 110, json_encode($e->getMessage()),  "CHECK RESPONSE DEPOSIT ERROR" );
+                ProviderHelper::saveLogWithExeption('IDNPOKER DEPOSIT', 110, json_encode($e->getMessage()),  "CHECK RESPONSE DEPOSIT ERROR" );
             }
             $x++;
         } while ($x <= 5);
@@ -315,12 +315,17 @@ class IDNPokerHelper{
     }
 
     public static function deletePlayerRestricted($identifier){
-        $where = 'where idtw_player_restriction = '.$identifier;
-        DB::select('delete from tw_player_restriction '.$where);
+        try {
+            $where = 'where idtw_player_restriction = '.$identifier;
+            DB::select('delete from tw_player_restriction '.$where);
+        } catch (\Exception $e) {
+            // ProviderHelper::saveLogWithExeption('IDNPOKER getRate', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getRate ERROR" );
+            return "false";
+        }
     }
 
     public static function getPlayerID($client_player_id,$client_ids){
-        $query = DB::select('select * from players where client_player_id = "'.$client_player_id.'"');
+        $query = DB::select('select * from players where username = "'.$client_player_id.'"');
         $player_id = 1;
         foreach($query as $item){
             if (in_array($item->client_id, $client_ids)) {
@@ -381,10 +386,10 @@ class IDNPokerHelper{
                     }
                 }
             }
-            Helper::saveLog('IDNPOKER updateRATE', 110, json_encode(["update"]),  "CHECK RESPONSE updateRATE" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER updateRATE', 110, json_encode(["update"]),  "CHECK RESPONSE updateRATE" );
             return "false";
         } catch (\Exception $e) {
-            Helper::saveLog('IDNPOKER updateRATE', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getRate ERROR" );
+            ProviderHelper::saveLogWithExeption('IDNPOKER updateRATE', 110, json_encode($e->getMessage()),  "CHECK RESPONSE getRate ERROR" );
             return "false";
         }
     }
