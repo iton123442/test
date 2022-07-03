@@ -272,17 +272,17 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
-            // sleep(0.20);
+            sleep(0.20);
             Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
-            // sleep(0.45);
+            sleep(0.45);
             Helper::saveLog("WIN 2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
-            // sleep(1);
+            sleep(1);
             Helper::saveLog("WIN >2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
