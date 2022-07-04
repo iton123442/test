@@ -73,6 +73,35 @@ class SlotmillNew extends Controller
         $bet_amount = $request["amount"];
         $provider_trans_id = $request["reference"];
         $bet_id = $request["subreference"];
+        $gameTransactionData = array(
+            "provider_trans_id" => $bet_id,
+            "token_id" => $client_details->token_id,
+            "game_id" => $game_details->game_id,
+            "round_id" => $provider_trans_id,
+            "bet_amount" => $bet_amount,
+            "win" => 5,
+            "pay_amount" => 0,
+            "income" => 0,
+            "entry_id" =>1,
+            "trans_status" =>1,
+            "operator_id" => $client_details->operator_id,
+            "client_id" => $client_details->client_id,
+            "player_id" => $client_details->player_id,
+        );
+       GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details);
+
+        $round_id = $provider_trans_id;
+        $game_type = 1;
+
+        $gameTransactionEXTData = array(
+            "game_trans_id" => $game_trans_id,
+            "provider_trans_id" => $bet_id,
+            "round_id" => $round_id,
+            "amount" => $bet_amount,
+            "game_transaction_type"=> 1,
+            // "provider_request" =>json_encode($request->all()),
+        );
+      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
         if ($client_details == null) {
             $response = [
                 "code" => 1008,
@@ -185,35 +214,7 @@ class SlotmillNew extends Controller
             }
         }   
         //Create GameTransaction, GameExtension
-        $gameTransactionData = array(
-            "provider_trans_id" => $bet_id,
-            "token_id" => $client_details->token_id,
-            "game_id" => $game_details->game_id,
-            "round_id" => $provider_trans_id,
-            "bet_amount" => $bet_amount,
-            "win" => 5,
-            "pay_amount" => 0,
-            "income" => 0,
-            "entry_id" =>1,
-            "trans_status" =>1,
-            "operator_id" => $client_details->operator_id,
-            "client_id" => $client_details->client_id,
-            "player_id" => $client_details->player_id,
-        );
-       GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_trans_id,$client_details);
-
-        $round_id = $provider_trans_id;
-        $game_type = 1;
-
-        $gameTransactionEXTData = array(
-            "game_trans_id" => $game_trans_id,
-            "provider_trans_id" => $bet_id,
-            "round_id" => $round_id,
-            "amount" => $bet_amount,
-            "game_transaction_type"=> 1,
-            // "provider_request" =>json_encode($request->all()),
-        );
-      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
+  
       $createGameTransactionLog = [
         "connection_name" => $client_details->connection_name,
         "column" =>[

@@ -697,6 +697,7 @@ return [
         'URL' => 'https://scr.idngame.com:2800/',
         'prefix' => "TGTW",
         'type' => "staging",// [production, staging]
+        'rate_auth' => "b972d12c42bd31d56fd1bd5cc",
         "agent" => [
             // "JFPAA" => "5e2c5dc120e4ae6aeeae4000e", // testing Staging and production JPY 
             "DSPAA" => "b972d12c42bd31d56fd1bd5cc", // testing Staging and production USD

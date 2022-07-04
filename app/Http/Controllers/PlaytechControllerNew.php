@@ -264,33 +264,6 @@ class PlaytechControllerNew extends Controller
         $fund_extra_data = [
             'provider_name' => $game_details->provider_name
         ];
-        try {
-            $client_response = ClientRequestHelper::fundTransferFunta($client_details,$request["amount"],$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
-        } catch (\Exception $e) {
-            $response = [
-                "requestId" => $requestId,
-                "error" => "T_04",
-                "message" => "Bet limit was exceeded"
-            ];
-            $createGameTransactionLog = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_trans_ext_id,
-                    "request" => json_encode("FAILED"),
-                    "response" => json_encode($response),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "Failed",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionLog);
-            $updateGameTransaction = [
-                "win" => $failed,
-                'trans_status' => 5
-            ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-            // Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
-            return $response;
-        }
         if ($bet_transaction != 'false' ) {
             $failed = 5;
             $updateGameTransaction = [
@@ -332,6 +305,33 @@ class PlaytechControllerNew extends Controller
                 "error" => "P_01",
                 "message" => "Invalid request. This error can be returned if required parameters are missing or they have incorrect format"
             ];
+            $updateGameTransaction = [
+                "win" => $failed,
+                'trans_status' => 5
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+            // Helper::saveLog('PlayTech transaction FARAL ERROR BET', $this->provider_db_id, json_encode($response),  "response" );
+            return $response;
+        }
+        try {
+            $client_response = ClientRequestHelper::fundTransferFunta($client_details,$request["amount"],$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
+        } catch (\Exception $e) {
+            $response = [
+                "requestId" => $requestId,
+                "error" => "T_04",
+                "message" => "Bet limit was exceeded"
+            ];
+            $createGameTransactionLog = [
+                "connection_name" => $client_details->connection_name,
+                "column" =>[
+                    "game_trans_ext_id" => $game_trans_ext_id,
+                    "request" => json_encode("FAILED"),
+                    "response" => json_encode($response),
+                    "log_type" => "provider_details",
+                    "transaction_detail" => "Failed",
+                ]
+            ];
+            ProviderHelper::queTransactionLogs($createGameTransactionLog);
             $updateGameTransaction = [
                 "win" => $failed,
                 'trans_status' => 5

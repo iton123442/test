@@ -1982,7 +1982,7 @@ class GameLobby{
             $auth_token = IDNPokerHelper::getAuthPerOperator($client_details, config('providerlinks.idnpoker.type')); 
 
             $default_frame = config('providerlinks.play_tigergames');
-            if ($client_details->operator_id == 11) {
+            if ($client_details->operator_id == 37) {
                 $default_frame = 'https://kbpoker.69master.cc';
             }
             /***************************************************************
@@ -2017,8 +2017,8 @@ class GameLobby{
                         $data = IDNPokerHelper::gameLaunchURLLogin($request, $player_id, $client_details,$auth_token);
                         if(isset($data["lobby_url"])){
                             // do deposit
-                            $player_details = ProviderHelper::playerDetailsCall($request['token']);
-                            if(isset($player_details->playerdetailsresponse->status->code) && $player_details->playerdetailsresponse->status->code == 200){
+                            // $player_details = ProviderHelper::playerDetailsCall($request['token']);
+                            // if(isset($player_details->playerdetailsresponse->status->code) && $player_details->playerdetailsresponse->status->code == 200){
                                 // ProviderHelper::_insertOrUpdate($client_details->token_id,$player_details->playerdetailsresponse->balance);                            
                                 switch($client_details->wallet_type){
                                     case 1: 
@@ -2030,32 +2030,33 @@ class GameLobby{
                                                 'form_params' => [
                                                     'token' => $request['token'],
                                                     'player_id'=> $client_details->player_id,
-                                                    'amount' => $player_details->playerdetailsresponse->balance,
+                                                    'amount' => $client_details->balance,
                                                 ],
                                                 'headers' =>[
                                                     'Accept'     => 'application/json'
                                                 ]
                                             ]);
                                             $iframe_data = json_decode((string) $response->getBody(), true);
-                                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  json_encode($player_details) );
+                                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT', 110, json_encode($iframe_data),  $client_details );
                                             if (isset($iframe_data['status']) && $iframe_data['status'] != 'ok' ) {
                                                 return "false";
                                                 // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                                             }
+
+                                            $data_to_send_play = array(
+                                                "url" => $data["lobby_url"],
+                                                "token" => $client_details->player_token,
+                                                "player_id" => $client_details->player_id,
+                                                "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
+                                            );
+                                            $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
+                                            // return urlencode($encoded_data);
+                                            return $default_frame . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
                                         } catch (\Exception $e) {
-                                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, json_encode($player_details),  $e->getMessage() );
+                                            Helper::saveLog('IDNPOKER GAMELUANCH MAKEDEPOSIT ERROR', 110, $client_details,  $e->getMessage() );
                                             return "false";
-                                            // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                                         }
-                                        $data_to_send_play = array(
-                                            "url" => $data["lobby_url"],
-                                            "token" => $client_details->player_token,
-                                            "player_id" => $client_details->player_id,
-                                            "exitUrl" => isset($request['exitUrl']) ? $request['exitUrl'] : '',
-                                        );
-                                        $encoded_data = $aes->AESencode(json_encode($data_to_send_play));
-                                        // return urlencode($encoded_data);
-                                        return $default_frame . "/loadgame/idnpoker?param=" . urlencode($encoded_data);
+                                       
                                     case 2:
                                         //TRANSFER WALLET CLIENT
                                         //TRANSFER WALLET SA PROIVDER
@@ -2064,10 +2065,10 @@ class GameLobby{
                                         return "false";
                                         // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
                                 }
-                            }else{
-                                return "false";
-                                // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
-                            }
+                            // }else{
+                            //     return "false";
+                            //     // return config('providerlinks.play_tigergames').'/online-poker?msg=Something went wrong please contact Tiger Games!';
+                            // }
                             
                         }
                     } else {

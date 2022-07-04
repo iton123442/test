@@ -69,6 +69,9 @@ class DebitRefund extends Job implements ShouldQueue
         // ];
         // DB::connection('savelog')->table('seamless_request_logs')->insert($data);
 
+
+        sleep(1); // Let the client process things for 1 second then request again!
+
         try {
             $sendtoclient =  microtime(true);
             $client = new Client([
@@ -77,22 +80,44 @@ class DebitRefund extends Job implements ShouldQueue
                     'Authorization' => 'Bearer '.$client_access_token
                 ]
             ]);
-            $guzzle_response = $client->post($client_callback_url,
-                [
-                    'on_stats' => function (TransferStats $stats) use ($requesttocient){
-                        $data = [
-                            'http_body' => $stats->getHandlerStats(),
-                            'request_body' => $requesttocient
-                        ];
-                        ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
-                    },
-                    // 'timeout' => 2, # 2 seconds
-                    'body' => json_encode($requesttocient)
-                ],
-                ['defaults' => [ 'exceptions' => false ]]
-            );
-            $client_response = json_decode($guzzle_response->getBody()->getContents());
-            $client_response_time = microtime(true) - $sendtoclient;
+
+            $retryCount = 0;
+            $canProceed = false;
+            do {
+                $guzzle_response = $client->post($client_callback_url,
+                    [
+                        'on_stats' => function (TransferStats $stats) use ($requesttocient){
+                            $data = [
+                                'http_body' => $stats->getHandlerStats(),
+                                'request_body' => $requesttocient
+                            ];
+                            ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
+                        },
+                        // 'timeout' => 2, # 2 seconds
+                        'body' => json_encode($requesttocient)
+                    ],
+                    ['defaults' => [ 'exceptions' => false ]]
+                );
+                $client_response = json_decode($guzzle_response->getBody()->getContents());
+                $client_response_time = microtime(true) - $sendtoclient;
+
+                if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 200){
+                    $canProceed = true;
+                    continue;
+                }else if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TRANSACTION_NOT_FOUND'){
+                    sleep(3);
+                    $retryCount++;
+                }else{
+                    sleep(3);
+                    $retryCount++;
+                }
+
+                if($retryCount == 2){ 
+                    $canProceed = true;
+                }
+
+            } while (!$canProceed);
+
 
             if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 200){
                 $updateTransactionEXt = array(
@@ -110,11 +135,124 @@ class DebitRefund extends Job implements ShouldQueue
                     "mw_response" => json_encode(['retry' => 'jobs']),
                     'mw_request' => json_encode($requesttocient),
                     'client_response' => json_encode($client_response),
-                    'transaction_detail' => 'NOT_ENOUGH_FUNDS',
+                    'transaction_detail' => 'TRANSACTION_NOT_FOUND',
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
-                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
+                // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+
+                // try {
+
+                //     if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TRANSACTION_NOT_FOUND'){
+
+                //         sleep(2);
+
+                //         $datatosend = [
+                //             "access_token" => $client_details->client_access_token,
+                //             "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+                //             "player_username"=>$client_details->username,
+                //             "client_player_id" => $client_details->client_player_id,
+                //             "transactionId" => $transaction_id,
+                //             "roundId" =>  $round_id
+                //         ];
+
+                //         $guzzle_response = $client->post($client_details->transaction_checker_url,
+                //             [
+                //                 'body' => json_encode($datatosend),
+                //             ]
+                //         );
+                //         $client_checker_response = json_decode($guzzle_response->getBody()->getContents());
+                //         if (isset($client_checker_response->code)) {
+                //             $is_success = 2;
+                //             if ($client_checker_response->code == '200' || $client_checker_response->code == '403') {
+                //                 # Not found refund but progressing need to add back to jobs table!
+                //                 $updateTransactionEXt = array(
+                //                     // "provider_request" =>json_encode($payload),
+                //                     "mw_response" => json_encode(['retry' => 'jobs']),
+                //                     'mw_request' => json_encode($requesttocient),
+                //                     'client_response' => json_encode($client_response),
+                //                     'transaction_detail' => 'RESEND_TRANSACTION',
+                //                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                //                 );
+                //                 // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
+                //                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                //                throw new \ErrorException('RESEND_TRANSACTION');
+                //             }else{
+                //                 $updateTransactionEXt = array(
+                //                     // "provider_request" =>json_encode($payload),
+                //                     "mw_response" => json_encode(['retry' => 'jobs']),
+                //                     'mw_request' => json_encode($requesttocient),
+                //                     'client_response' => json_encode($client_response),
+                //                     'transaction_detail' => 'CHECK_NOT_FOUND',
+                //                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                //                 );
+                //                 // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
+                //                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                //                 // throw new \ErrorException('CHECK_NOT_FOUND');
+
+                //                 try {
+                //                     if ($this->attempts() == 1){
+                //                        return $this->release(10);
+                //                     }
+                //                 } catch (\Exception $e) {
+                //                     ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'ATTEMPT_NOT_FOUND_FAILED');
+                //                 }
+
+                //                 // else{
+                //                 //     try {
+                //                 //         $data = [
+                //                 //             "round_id" => $round_id,
+                //                 //             "player_id" => $client_details->player_id,
+                //                 //             "connection_name" => $client_details->connection_name
+                //                 //         ];
+                //                 //         $data_saved = DB::table('retry_not_found')->insert($data);
+                //                 //     } catch (\Exception $e) {
+                //                 //        throw new \ErrorException('retry_not_found');
+                //                 //     }
+                //                 // }
+
+                //             } 
+                //         }else{
+                //             $updateTransactionEXt = array(
+                //                 // "provider_request" =>json_encode($payload),
+                //                 "mw_response" => json_encode(['retry' => 'jobs']),
+                //                 'mw_request' => json_encode($requesttocient),
+                //                 'client_response' => json_encode($client_response),
+                //                 'transaction_detail' => 'FAILED_CHECK',
+                //                 'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                //             );
+                //             // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
+                //             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                //            throw new \ErrorException('FAILED_CHECK');
+                //         }
+
+                //     }else{
+                //         $updateTransactionEXt = array(
+                //             // "provider_request" =>json_encode($payload),
+                //             "mw_response" => json_encode(['retry' => 'jobs']),
+                //             'mw_request' => json_encode($requesttocient),
+                //             'client_response' => json_encode($client_response),
+                //             'transaction_detail' => 'TRANSACTION_NOT_FOUND',
+                //             'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                //         );
+                //         // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
+                //         GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                //     }
+                    
+                // } catch (\Exception $e) {
+                //     $updateTransactionEXt = array(
+                //         // "provider_request" =>json_encode($payload),
+                //         "mw_response" => json_encode(['retry' => 'jobs']),
+                //         'mw_request' => json_encode($requesttocient),
+                //         'client_response' => json_encode($e->getMessage().' '.$e->getLine()),
+                //         'transaction_detail' => 'FAILED_EXCEPTION',
+                //         'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                //     );
+                //     // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
+                //     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                //     throw new \ErrorException('FAILED_EXCEPTION');
+                // }
+
             }else{
                 $updateTransactionEXt = array(
                     // "provider_request" =>json_encode($payload),
@@ -125,8 +263,8 @@ class DebitRefund extends Job implements ShouldQueue
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
-                ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'UNKNOWN_STATUS_CODE');
-                throw new ModelNotFoundException('UNKNOWN_ERROR');
+                // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'UNKNOWN_STATUS_CODE');
+                throw new \ErrorException('UNKNOWN_ERROR');
             }
 
         } catch (\Exception $e) {
@@ -139,8 +277,8 @@ class DebitRefund extends Job implements ShouldQueue
                 'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
-            ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($updateTransactionEXt), 'FAILED_EXCEPTION');
-            throw new ModelNotFoundException($e->getMessage());
+            // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($updateTransactionEXt), 'FAILED_EXCEPTION');
+            throw new \ErrorException($e->getMessage());
 
         }
 

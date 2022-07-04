@@ -222,30 +222,7 @@ class FTGControllerNew extends Controller
             $fund_extra_data = [
 	            'provider_name' => $game_details->provider_name
 	        ];
-            try {
-            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
-            } catch (\Exception $e) {
-            $response = array(
-                'error_code' 	=> '99-005',
-                'error_msg'  	=> 'system is busy',
-                'request_uuid'	=> $request_uuid
-            );
-            $updateTransactionEXt = array(
-                "mw_response" => json_encode($response),
-                'mw_request' => json_encode("FAILED"),
-                'client_response' => json_encode("FAILED"),
-                "transaction_detail" => "FAILED",
-                "general_details" =>"FAILED",
-            );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-            $updateGameTransaction = [
-                "win" => 2,
-                'trans_status' => 5
-            ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-            Helper::saveLog('Tidy BET FATAL ERROR', $this->provider_db_id, json_encode($request->all()), $response);
-            return $response;
-        }if (array_key_exists('reference_transaction_uuid', $key_param)) {
+   			if (array_key_exists('reference_transaction_uuid', $key_param)) {
 				$bet_id = $data->reference_transaction_uuid;
 				// $bet_transaction = TidyHelper::findGameTransaction($bet_id, 'transaction_id',1);
 				$bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_id, 'transaction_id',1, $client_details);
@@ -285,7 +262,31 @@ class FTGControllerNew extends Controller
 	            "game_transaction_type"=> 1,
 	            // "provider_request" =>json_encode($request->all()),
 	        );
-	     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);		
+	     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);	
+	      try {
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
+            } catch (\Exception $e) {
+            $response = array(
+                'error_code' 	=> '99-005',
+                'error_msg'  	=> 'system is busy',
+                'request_uuid'	=> $request_uuid
+            );
+            $updateTransactionEXt = array(
+                "mw_response" => json_encode($response),
+                'mw_request' => json_encode("FAILED"),
+                'client_response' => json_encode("FAILED"),
+                "transaction_detail" => "FAILED",
+                "general_details" =>"FAILED",
+            );
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            $updateGameTransaction = [
+                "win" => 2,
+                'trans_status' => 5
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+            Helper::saveLog('Tidy BET FATAL ERROR', $this->provider_db_id, json_encode($request->all()), $response);
+            return $response;
+            }	
 	        if (isset($client_response->fundtransferresponse->status->code)) {
 	        	switch ($client_response->fundtransferresponse->status->code) {
 					case "200":

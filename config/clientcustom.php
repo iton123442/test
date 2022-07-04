@@ -3,7 +3,7 @@
 return [
     'data_type' => [
         'transaction' => [
-        	'string' => [1,6,32]  // Client Operator Id
+        	'string' => [1,13,6,32]  // Client Operator Id
         ]
     ],
     'auto_refund' => [

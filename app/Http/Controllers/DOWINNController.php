@@ -445,10 +445,10 @@ class DOWINNController extends Controller{
                     switch($countSumTrans){
                         case '3':
                             $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['2']->amount;
-                            $sumOfWin = $sumOfTransactions['1']->amount == 0 ? 0 : $sumOfTransactions['1']->amount+$winAmount;
+                            $sumOfWin = $sumOfTransactions['1']->amount == 0 ? $sumOfTransactions['1']->amount+$winAmount : $sumOfTransactions['1']->amount;
                             Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions),$game_trans_ext_id);
                             $finalUpdateDatas = [
-                                "win" => 1,
+                                "win" => $sumOfWin == 0 ? 0 : 1,
                                 "bet_amount" => round($sumOfBet,2),
                                 "pay_amount" => round($sumOfWin,2),
                                 "income" => round($sumOfBet-$sumOfWin,2),
@@ -460,7 +460,7 @@ class DOWINNController extends Controller{
                                 $sumOfBet = $sumOfTransactions['0']->amount - $sumOfTransactions['1']->amount;
                                 $sumOfWin = $game->pay_amount+$winAmount;
                                 $finalUpdateDatas = [
-                                    "win" => 1,
+                                    "win" => $sumOfWin == 0 ? 0 : 1,
                                     "bet_amount" => round($sumOfBet,2),
                                     "pay_amount" => round($sumOfWin,2),
                                     "income" => round($sumOfBet-$sumOfWin,2),
@@ -469,7 +469,7 @@ class DOWINNController extends Controller{
                             }
                             else{
                                 $sumOfBet = $game->bet_amount;
-                                $sumOfWin = $sumOfTransactions['1']->amount == 0 ? 0 : $sumOfTransactions['1']->amount+$winAmount;
+                                $sumOfWin = $sumOfTransactions['1']->amount == 0 ? $sumOfTransactions['1']->amount+$winAmount : $sumOfTransactions['1']->amount;
                                 Helper::saveLog("CASE 3", 139,json_encode($sumOfTransactions),$game_trans_ext_id);
                                 $finalUpdateDatas = [
                                     "pay_amount" => round($sumOfWin,2),
@@ -742,7 +742,7 @@ class DOWINNController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$refundAmount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
-                Helper::saveLog("CANCEL FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
+                // Helper::saveLog("CANCEL FUNDTRANSFER", 139,json_encode($client_response),"FUNDTRANSFER SUCCESS!");
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER

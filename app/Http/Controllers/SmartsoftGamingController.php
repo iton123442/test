@@ -109,7 +109,6 @@ class SmartsoftGamingController extends Controller
             }
                $game_details = Game::find($game_code, $this->provider_db_id);
        try{
-        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_transid_ext, $game_transid_gen, 'debit');
          $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
          if ($bet_transaction != 'false') {
                 $client_details->connection_name = $bet_transaction->connection_name;
@@ -148,7 +147,8 @@ class SmartsoftGamingController extends Controller
                     );
 
                  Helper::saveLog(' smartsoft after  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); 
+                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details);
+                $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_transid_ext, $game_transid_gen, 'debit'); 
                 if($client_response == false){
 
                     $response = [
