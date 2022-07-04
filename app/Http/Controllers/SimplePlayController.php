@@ -352,10 +352,11 @@ class SimplePlayController extends Controller
               "connection_name" => $client_details->connection_name,
               "column" =>[
                   "game_trans_ext_id" => $gen_game_extid,
-                  "request" => json_encode($string),
+                  "request" => json_encode($request_params),
                   "response" => json_encode($response),
                   "log_type" => "provider_details",
                   "transaction_detail" => "Success",
+                  "general_details" => json_encode($string),
               ]
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionLog);
@@ -493,6 +494,7 @@ class SimplePlayController extends Controller
                   "response" => json_encode($response),
                   "log_type" => "provider_details",
                   "transaction_detail" => "Lose Round",
+                  "general_details" => json_encode($string),
               ]
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionLog);
