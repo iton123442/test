@@ -5490,18 +5490,18 @@ class DigitainController extends Controller
 
 		}else{
 			$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
+		}
 
-			$token_check = DigitainHelper::tokenCheck($json_data["token"]);
-			if($token_check != true){
-				$response = [
-					"timestamp" => date('YmdHisms'),
-					"signature" => $this->createSignature(date('YmdHisms')),
-					"balance" => $client_details->balance,
-					"errorCode" => 3 // SessionExpired!
-				];
-				ProviderHelper::saveLogWithExeption('RSG authenticate', $this->provider_db_id, file_get_contents("php://input"), $response);
-				return $response;
-			}
+		$token_check = DigitainHelper::tokenCheck($json_data["token"]);
+		if($token_check != true){
+			$response = [
+				"timestamp" => date('YmdHisms'),
+				"signature" => $this->createSignature(date('YmdHisms')),
+				"balance" => $client_details->balance,
+				"errorCode" => 3 // SessionExpired!
+			];
+			ProviderHelper::saveLogWithExeption('RSG authenticate', $this->provider_db_id, file_get_contents("php://input"), $response);
+			return $response;
 		}
 
 		if($client_details->player_id != $json_data['playerId']){
