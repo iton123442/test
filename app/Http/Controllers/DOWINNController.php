@@ -473,7 +473,7 @@ class DOWINNController extends Controller{
                                 "win" => $winTotal == 0 ? 0 : 1,
                                 "bet_amount" => round($betTotal,2),
                                 "pay_amount" => round($winTotal,2),
-                                "income" => round($sumOfBet-$winTotal,2),
+                                "income" => round($betTotal-$winTotal,2),
                             ];
                         }
                         // switch($sumOfTransactions){
