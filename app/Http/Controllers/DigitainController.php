@@ -5460,13 +5460,22 @@ class DigitainController extends Controller
    			);	
 			return $response;
 		}
-		$client_details = ProviderHelper::getClientDetails('token', $json_data['token']);
+
+
+
+		if(isset($json_data['token']) && $json_data['token'] != ""){
+			$client_details = ProviderHelper::getClientDetails('token', $json_data['token']);
+		}else{
+			$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
+		}
+
 		if($client_details == null || $client_details == 'false'){
 			$response = [
 				 "timestamp" => date('YmdHisms'),
 				 "signature" => $this->createSignature(date('YmdHisms')),
 				//  "info" => $json_data['info'], // Info from RSG, MW Should Return it back!
 				 "errorCode" => 2, //The playerId was not found
+				 "balance" => $client_details->balance,
 				 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
     	    ];  
 			return $response;
@@ -5476,6 +5485,7 @@ class DigitainController extends Controller
 			$response = [
 				"timestamp" => date('YmdHisms'),
 				"signature" => $this->createSignature(date('YmdHisms')),
+				"balance" => $client_details->balance,
 				"errorCode" => 3 // SessionExpired!
 			];
 			ProviderHelper::saveLogWithExeption('RSG authenticate', $this->provider_db_id, file_get_contents("php://input"), $response);
