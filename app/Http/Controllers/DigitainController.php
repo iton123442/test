@@ -5485,9 +5485,6 @@ class DigitainController extends Controller
 					 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
 	    	    ];  
 
-	    	    if($identifier == "player_id"){
-					$response["balance"] = $client_details->balance, //The playerId was not found
-	    	    }
 				return $response;
 			}
 
