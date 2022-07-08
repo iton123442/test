@@ -5464,9 +5464,9 @@ class DigitainController extends Controller
 
 
 		if(isset($json_data['token']) && $json_data['token'] != ""){
-			$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
-		}else{
 			$client_details = ProviderHelper::getClientDetails('token', $json_data['token']);
+		}else{
+			$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
 		}
 
 		if($client_details == null || $client_details == 'false'){
