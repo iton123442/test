@@ -105,14 +105,34 @@ class DebitRefund extends Job implements ShouldQueue
                     $canProceed = true;
                     continue;
                 }else if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TRANSACTION_NOT_FOUND'){
-                    sleep(3);
+                    // sleep(3);
+                    if($this->attempts() == 1){
+                        $this->release(120); //  = 30minutes = 1800seconds
+                        $canProceed = true;
+                    }else{
+                        try {
+                            $data = [
+                                "round_id" => $round_id,
+                                "player_id" => $client_details->player_id,
+                                "connection_name" => $client_details->connection_name
+                            ];
+                            $data_saved = DB::table('retry_not_found')->insert($data);
+                        } catch (\Exception $e) {
+                           throw new \ErrorException('retry_not_found');
+                        }
+                        $canProceed = true;
+                    }
                     $retryCount++;
                 }else{
-                    sleep(3);
+                    // sleep(3);
+                    $canProceed = true;
                     $retryCount++;
                 }
 
                 if($retryCount == 2){ 
+                    // $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $transaction_id];
+                    // ProviderHelper::resendDebitNotFound($debitRefund);
+                    // $this->release(60);
                     $canProceed = true;
                 }
 
@@ -271,7 +291,7 @@ class DebitRefund extends Job implements ShouldQueue
 
             $updateTransactionEXt = array(
                 // "provider_request" =>json_encode(['gg' => 'gg']),
-                'mw_request' => json_encode(['retry' => 'jobs']),
+                'mw_request' => json_encode($requesttocient),
                 'client_response' => json_encode($e->getMessage().' '.$e->getLine()),
                 'transaction_detail' => 'FAILED_EXCEPTION',
                 'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
