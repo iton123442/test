@@ -5472,7 +5472,7 @@ class DigitainController extends Controller
 						 "timestamp" => date('YmdHisms'),
 						 "signature" => $this->createSignature(date('YmdHisms')),
 						 "balance" => $client_details->balance,
-						 "errorCode" => 2 // SessionExpired!
+						 "errorCode" => 2, // SessionExpired!
 						 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
 		    	    ];  
 	    	    	return $response;
@@ -5481,7 +5481,7 @@ class DigitainController extends Controller
 				$response = [
 					 "timestamp" => date('YmdHisms'),
 					 "signature" => $this->createSignature(date('YmdHisms')),
-					 "errorCode" => 2 // SessionExpired!
+					 "errorCode" => 2, // SessionExpired!
 					 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
 	    	    ];  
 
