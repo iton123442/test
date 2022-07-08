@@ -414,7 +414,7 @@ class DOWINNController extends Controller{
                     
                     $sumOfBet = $betTotal - $refundTotal;
                     Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions),$this->startTime);
-                    $finalUpdateDatas = [
+                    $updateTransData = [
                         "win" => 5,
                         "bet_amount" => round($sumOfBet,2),
                         "pay_amount" => round($winTotal,2),
@@ -425,7 +425,7 @@ class DOWINNController extends Controller{
                     $winTotal = $sumOfTransactions[0]->win;
                     
                     Helper::saveLog("CASE 2", 139,json_encode($sumOfTransactions),$this->startTime);
-                    $finalUpdateDatas = [
+                    $updateTransData = [
                         "win" => 5,
                         "bet_amount" => round($betTotal,2),
                         "pay_amount" => round($winTotal,2),
@@ -435,7 +435,7 @@ class DOWINNController extends Controller{
             }else{
                 Helper::saveLog("NEUTRAL", 139,json_encode($data),$this->startTime);
                 $winTotal = $game->pay_amount+$winAmount;
-                    $finalUpdateDatas = [
+                    $updateTransData = [
                         "win" => 5,
                         "pay_amount" => round($winTotal,2),
                         "income" => round($game->bet_amount-$winTotal,2),
