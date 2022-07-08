@@ -80,17 +80,17 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
-            sleep(0.10);
+            // sleep(0.10);
             Helper::saveLog("BET 1", 139,json_encode($data),$this->startTime);
             $result = $this->betProcessor($data,$client_details);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
-            sleep(0.30);
+            // sleep(0.30);
             Helper::saveLog("BET 2", 139,json_encode($data),$this->startTime);
             $result = $this->betProcessor($data,$client_details);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
-            sleep(0.50);
+            // sleep(0.50);
             Helper::saveLog("BET >=3", 139,json_encode($data),$this->startTime);
             $result = $this->betProcessor($data,$client_details);
             return $result;
@@ -118,7 +118,7 @@ class DOWINNController extends Controller{
                     return response($response,200)->header('Content-Type', 'application/json');
                 }
                 $transId = $data['uuid'];
-                $roundId = $data['transaction']['roundId'];
+                $roundId = $data['transaction']['orderId'];
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
                 $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
                 if($bet_transaction != null){
@@ -306,7 +306,7 @@ class DOWINNController extends Controller{
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             $transId = $data['uuid'];
-            $roundId = $data['transaction']['roundId'];
+            $roundId = $data['transaction']['orderId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $winAmount = round($data['transaction']['amount'],2);
             $game = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
@@ -483,15 +483,15 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
-            sleep(0.10);
+            // sleep(0.10);
             $result = $this->cancelProcessor($data,$client_details);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
-            sleep(0.30);
+            // sleep(0.30);
             $result = $this->cancelProcessor($data,$client_details);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
-            sleep(0.50);
+            // sleep(0.50);
             $result = $this->cancelProcessor($data,$client_details);
             return $result;
         }else{
@@ -513,7 +513,7 @@ class DOWINNController extends Controller{
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             $transId = $data['uuid'];
-            $roundId = $data['transaction']['roundId'];
+            $roundId = $data['transaction']['orderId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $refundAmount = round($data['transaction']['amount'],2);
             $game = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
