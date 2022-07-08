@@ -127,12 +127,11 @@ class VivoController extends Controller
 		switch ($request->TrnType){
 			case "BET":
 				if($getSideBet != false){
-					sleep(0.5);
 					Helper::saveLog('Vivo Gaming BET SideBet', 34,json_encode($request->all()), 'HIT sideBet process');
 					return $this->betProcess($request->all(),$client_details);
 				}
 				if($getSideBetPair != false){
-					sleep(1);
+					sleep(0.5);
 					Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
 					return $this->betProcess($request->all(),$client_details);
 				}
@@ -255,17 +254,17 @@ class VivoController extends Controller
 	        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
 	        $game_transaction_id = $gen_game_trans_id;
 		}catch(\Exception $e){
-			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
-			if($bet_transaction == null){
+			// $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
+			// if($bet_transaction == null){
 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID >'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 				return $response;
-			}
-			$game_transaction_id = $bet_transaction->game_trans_id;
-			$amount = $bet_transaction->bet_amount + $data["Amount"];
-			$updateGameTransaction = [
-            	"bet_amount" => $amount,
-	        ];
-	        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+			// }
+			// $game_transaction_id = $bet_transaction->game_trans_id;
+			// $amount = $bet_transaction->bet_amount + $data["Amount"];
+			// $updateGameTransaction = [
+   //          	"bet_amount" => $amount,
+	  //       ];
+	  //       GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
 		}
 		$bet_game_transaction_ext = array(
 			"game_trans_id" => $game_transaction_id,
@@ -276,8 +275,15 @@ class VivoController extends Controller
 			// "provider_request" => json_encode($data),
 			// "general_details" => $data["History"],
 		);
+		$connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
         GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
+        $bet = DB::select("SELECT sum(amount) as amount FROM {$connection['db_list'][0]}.game_transaction_ext where game_trans_id = '".$game_transaction_id."' and game_transaction_type = 1");
+        $updateGameTransaction = [
+            "bet_amount" => $bet->amount,
+        ];
+        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+
         try {
 			$fund_extra_data = [
 	            'provider_name' => $game_details->provider_name
