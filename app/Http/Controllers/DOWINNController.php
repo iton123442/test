@@ -611,6 +611,7 @@ class DOWINNController extends Controller{
                 "win" => 5,
                 "entry_id" => 2,
                 "trans_status" => 2,
+                "pay_amount" => $refundAmount,
                 "income" => 0,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
@@ -685,11 +686,6 @@ class DOWINNController extends Controller{
 
                 //     }
                 // }
-                $finalUpdateDatas = [
-                    "win" => $win_or_lost,
-                    "bet_amount" => 0,
-                ];
-                GameTransactionMDB::updateGametransaction($finalUpdateDatas,$game->game_trans_id,$client_details);
                 // $updateTransData = [
                 //     "win" => $win_or_lost,
                 //     "bet_amount" => $totalBetThisRound,
