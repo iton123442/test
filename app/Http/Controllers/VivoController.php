@@ -131,7 +131,6 @@ class VivoController extends Controller
 					return $this->betProcess($request->all(),$client_details);
 				}
 				if($getSideBetPair != false){
-					sleep(0.5);
 					Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
 					return $this->betProcess($request->all(),$client_details);
 				}
