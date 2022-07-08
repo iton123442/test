@@ -75,33 +75,33 @@ class DOWINNController extends Controller{
         }
     }
 
-    public function bet(Request $request){
-        $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        $explodedOrderId = explode("-", $data['transaction']['orderId']);
-        if($explodedOrderId['1'] == 1){
-            // sleep(0.10);
-            Helper::saveLog("BET 1", 139,json_encode($data),$this->startTime);
-            $result = $this->betProcessor($data,$client_details);
-            return $result;
-        }elseif($explodedOrderId['1'] == 2){
-            // sleep(0.30);
-            Helper::saveLog("BET 2", 139,json_encode($data),$this->startTime);
-            $result = $this->betProcessor($data,$client_details);
-            return $result;
-        }elseif($explodedOrderId['1'] > 2){
-            // sleep(0.50);
-            Helper::saveLog("BET >=3", 139,json_encode($data),$this->startTime);
-            $result = $this->betProcessor($data,$client_details);
-            return $result;
-        }else{
-            Helper::saveLog("BET 0", 139,json_encode($data),$this->startTime);
-            $result = $this->betProcessor($data,$client_details);
-            return $result;
-        }
-    }
+    // public function bet(Request $request){
+    //     $data = json_decode($request->getContent(),TRUE);
+    //     $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+    //     $explodedOrderId = explode("-", $data['transaction']['orderId']);
+    //     if($explodedOrderId['1'] == 1){
+    //         // sleep(0.10);
+    //         Helper::saveLog("BET 1", 139,json_encode($data),$this->startTime);
+    //         $result = $this->betProcessor($data,$client_details);
+    //         return $result;
+    //     }elseif($explodedOrderId['1'] == 2){
+    //         // sleep(0.30);
+    //         Helper::saveLog("BET 2", 139,json_encode($data),$this->startTime);
+    //         $result = $this->betProcessor($data,$client_details);
+    //         return $result;
+    //     }elseif($explodedOrderId['1'] > 2){
+    //         // sleep(0.50);
+    //         Helper::saveLog("BET >=3", 139,json_encode($data),$this->startTime);
+    //         $result = $this->betProcessor($data,$client_details);
+    //         return $result;
+    //     }else{
+    //         Helper::saveLog("BET 0", 139,json_encode($data),$this->startTime);
+    //         $result = $this->betProcessor($data,$client_details);
+    //         return $result;
+    //     }
+    // }
 
-    public function betProcessor($data, $client_details){
+    public function bet($data, $client_details){
         Helper::saveLog("BET PROCESS", 139,json_encode($data),"BET ON PROCESSING!");
         if($client_details){
             $token = $client_details->player_token;
@@ -267,33 +267,33 @@ class DOWINNController extends Controller{
         }
     }
 
-    public function payment(Request $request){
-        $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        $explodedOrderId = explode("-", $data['transaction']['orderId']);
-        if($explodedOrderId['1'] == 1){
-            // sleep(0.20);
-            Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
-            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
-            return $result;
-        }elseif($explodedOrderId['1'] == 2){
-            // sleep(0.45);
-            Helper::saveLog("WIN 2", 139,json_encode($data),$this->startTime);
-            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
-            return $result;
-        }elseif($explodedOrderId['1'] > 2){
-            // sleep(1);
-            Helper::saveLog("WIN >2", 139,json_encode($data),$this->startTime);
-            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
-            return $result;
-        }elseif($explodedOrderId['1'] == 0){
-            Helper::saveLog("WIN 0", 139,json_encode($data),$this->startTime);
-            $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
-            return $result;
-        }
-    }
+    // public function payment(Request $request){
+    //     $data = json_decode($request->getContent(),TRUE);
+    //     $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+    //     $explodedOrderId = explode("-", $data['transaction']['orderId']);
+    //     if($explodedOrderId['1'] == 1){
+    //         // sleep(0.20);
+    //         Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
+    //         $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
+    //         return $result;
+    //     }elseif($explodedOrderId['1'] == 2){
+    //         // sleep(0.45);
+    //         Helper::saveLog("WIN 2", 139,json_encode($data),$this->startTime);
+    //         $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
+    //         return $result;
+    //     }elseif($explodedOrderId['1'] > 2){
+    //         // sleep(1);
+    //         Helper::saveLog("WIN >2", 139,json_encode($data),$this->startTime);
+    //         $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
+    //         return $result;
+    //     }elseif($explodedOrderId['1'] == 0){
+    //         Helper::saveLog("WIN 0", 139,json_encode($data),$this->startTime);
+    //         $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
+    //         return $result;
+    //     }
+    // }
 
-    public function paymentProcessor($data,$client_details, $explodedOrderId){
+    public function payment($data,$client_details, $explodedOrderId){
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
         if($client_details){
             try{
@@ -483,29 +483,29 @@ class DOWINNController extends Controller{
         }
     }
 
-    public function cancel(Request $request){
-        $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        $explodedOrderId = explode("-", $data['transaction']['orderId']);
-        if($explodedOrderId['1'] == 1){
-            // sleep(0.10);
-            $result = $this->cancelProcessor($data,$client_details);
-            return $result;
-        }elseif($explodedOrderId['1'] == 2){
-            // sleep(0.30);
-            $result = $this->cancelProcessor($data,$client_details);
-            return $result;
-        }elseif($explodedOrderId['1'] > 2){
-            // sleep(0.50);
-            $result = $this->cancelProcessor($data,$client_details);
-            return $result;
-        }else{
-            $result = $this->cancelProcessor($data,$client_details);
-            return $result;
-        }
-    }
+    // public function cancel(Request $request){
+    //     $data = json_decode($request->getContent(),TRUE);
+    //     $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+    //     $explodedOrderId = explode("-", $data['transaction']['orderId']);
+    //     if($explodedOrderId['1'] == 1){
+    //         // sleep(0.10);
+    //         $result = $this->cancelProcessor($data,$client_details);
+    //         return $result;
+    //     }elseif($explodedOrderId['1'] == 2){
+    //         // sleep(0.30);
+    //         $result = $this->cancelProcessor($data,$client_details);
+    //         return $result;
+    //     }elseif($explodedOrderId['1'] > 2){
+    //         // sleep(0.50);
+    //         $result = $this->cancelProcessor($data,$client_details);
+    //         return $result;
+    //     }else{
+    //         $result = $this->cancelProcessor($data,$client_details);
+    //         return $result;
+    //     }
+    // }
 
-    public function cancelProcessor($data,$client_details){
+    public function cancel($data,$client_details){
         Helper::saveLog("CANCEL PROCESS", 139,json_encode($data),"CANCEL ON PROCESSING!");
         if($client_details){
             try{
