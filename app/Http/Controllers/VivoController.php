@@ -277,7 +277,7 @@ class VivoController extends Controller
 		$connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
         GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
-        $bet = DB::select("SELECT sum(amount) as amount FROM {$connection['db_list'][0]}.game_transaction_ext where game_trans_id = '".$game_transaction_id."' and game_transaction_type = 1");
+        $bet = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
         $updateGameTransaction = [
             "bet_amount" => $bet->amount,
         ];
