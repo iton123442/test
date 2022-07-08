@@ -272,17 +272,17 @@ class DOWINNController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
         if($explodedOrderId['1'] == 1){
-            sleep(0.20);
+            // sleep(0.20);
             Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] == 2){
-            sleep(0.45);
+            // sleep(0.45);
             Helper::saveLog("WIN 2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
         }elseif($explodedOrderId['1'] > 2){
-            sleep(1);
+            // sleep(1);
             Helper::saveLog("WIN >2", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
             return $result;
@@ -389,13 +389,6 @@ class DOWINNController extends Controller{
                 }
             }
             $payAmount = $game->pay_amount+$winAmount;
-            $updateTransData = [
-                "win" => 5,
-                "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
-                "trans_status" => 2,
-                // "pay_amount" => round($payAmount,2),
-            ];
-            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
                 "game_trans_id" => $game->game_trans_id,
                 "provider_trans_id" => $transId,
@@ -405,6 +398,13 @@ class DOWINNController extends Controller{
                 "provider_request" => json_encode($data),
             ];
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+            $updateTransData = [
+                "win" => 5,
+                "entry_id" => $winAmount == 0 && $game->pay_amount == 0 ? 1 : 2,
+                "trans_status" => 2,
+                "pay_amount" => round($payAmount,2),
+            ];
+            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $response = [
                 "status" => "OK",
                 "balance" => round($afterBalance,2),
