@@ -5492,10 +5492,11 @@ class DigitainController extends Controller
 		   return $response;
 		}
 		if($json_data['currencyId'] != $client_details->default_currency){
-		$response = [
+			$response = [
 				 "timestamp" => date('YmdHisms'),
 				 "signature" => $this->createSignature(date('YmdHisms')),
 				 "errorCode" => 16, // Currency code dont match!
+				 "balance" => $client_details->balance, 
 				 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
     	    ];   	
 			return $response;
@@ -5524,6 +5525,7 @@ class DigitainController extends Controller
 				"timestamp" => date('YmdHisms'),
 				"signature" => $this->createSignature(date('YmdHisms')),
 				"errorCode" => 11, // Currency code dont match!
+				"balance" => $client_details->balance, 
 				"metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
 		   ];   	
 		   return $response;
@@ -5536,6 +5538,7 @@ class DigitainController extends Controller
 				"timestamp" => date('YmdHisms'),
 				"signature" => $this->createSignature(date('YmdHisms')),
 				"errorCode" => 11, // Currency code dont match!
+				"balance" => $client_details->balance, 
 				"metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
 		   ];   	
 		   return $response;
