@@ -5465,32 +5465,48 @@ class DigitainController extends Controller
 
 		if(isset($json_data['token']) && $json_data['token'] != ""){
 			$client_details = ProviderHelper::getClientDetails('token', $json_data['token']);
+			if($client_details == null || $client_details == 'false'){
+				if(isset($json_data['player_id'] && $json_data['player_id'] != "")){
+					$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
+					$response = [
+						 "timestamp" => date('YmdHisms'),
+						 "signature" => $this->createSignature(date('YmdHisms')),
+						 "balance" => $client_details->balance,
+						 "errorCode" => 2 // SessionExpired!
+						 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
+		    	    ];  
+	    	    	return $response;
+				}
+
+				$response = [
+					 "timestamp" => date('YmdHisms'),
+					 "signature" => $this->createSignature(date('YmdHisms')),
+					 "errorCode" => 2 // SessionExpired!
+					 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
+	    	    ];  
+
+	    	    if($identifier == "player_id"){
+					$response["balance"] = $client_details->balance, //The playerId was not found
+	    	    }
+				return $response;
+			}
+
 		}else{
 			$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
+
+			$token_check = DigitainHelper::tokenCheck($json_data["token"]);
+			if($token_check != true){
+				$response = [
+					"timestamp" => date('YmdHisms'),
+					"signature" => $this->createSignature(date('YmdHisms')),
+					"balance" => $client_details->balance,
+					"errorCode" => 3 // SessionExpired!
+				];
+				ProviderHelper::saveLogWithExeption('RSG authenticate', $this->provider_db_id, file_get_contents("php://input"), $response);
+				return $response;
+			}
 		}
 
-		if($client_details == null || $client_details == 'false'){
-			$response = [
-				 "timestamp" => date('YmdHisms'),
-				 "signature" => $this->createSignature(date('YmdHisms')),
-				//  "info" => $json_data['info'], // Info from RSG, MW Should Return it back!
-				 "errorCode" => 2, //The playerId was not found
-				 "balance" => $client_details->balance,
-				 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
-    	    ];  
-			return $response;
-		}
-		$token_check = DigitainHelper::tokenCheck($json_data["token"]);
-		if($token_check != true){
-			$response = [
-				"timestamp" => date('YmdHisms'),
-				"signature" => $this->createSignature(date('YmdHisms')),
-				"balance" => $client_details->balance,
-				"errorCode" => 3 // SessionExpired!
-			];
-			ProviderHelper::saveLogWithExeption('RSG authenticate', $this->provider_db_id, file_get_contents("php://input"), $response);
-			return $response;
-		}
 		if($client_details->player_id != $json_data['playerId']){
 			$response = [
 				"timestamp" => date('YmdHisms'),
