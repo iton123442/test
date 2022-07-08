@@ -101,7 +101,9 @@ class DOWINNController extends Controller{
     //     }
     // }
 
-    public function bet($data, $client_details){
+    public function bet(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         Helper::saveLog("BET PROCESS", 139,json_encode($data),"BET ON PROCESSING!");
         if($client_details){
             $token = $client_details->player_token;
@@ -293,7 +295,9 @@ class DOWINNController extends Controller{
     //     }
     // }
 
-    public function payment($data,$client_details, $explodedOrderId){
+    public function payment(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         Helper::saveLog("WIN PROCESS", 139,json_encode($data),"WIN ON PROCESSING!");
         if($client_details){
             try{
@@ -505,7 +509,9 @@ class DOWINNController extends Controller{
     //     }
     // }
 
-    public function cancel($data,$client_details){
+    public function cancel(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         Helper::saveLog("CANCEL PROCESS", 139,json_encode($data),"CANCEL ON PROCESSING!");
         if($client_details){
             try{
