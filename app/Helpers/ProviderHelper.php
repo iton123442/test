@@ -8,6 +8,7 @@ use App\Jobs\UpdateGametransactionJobs;
 use App\Jobs\CreateGameTransactionLog;
 use App\Jobs\CreateTransLog;
 use App\Jobs\DebitRefund;
+use App\Jobs\ResendDebitNotFound;
 use App\Helpers\Helper;
 use App\Helpers\AWSHelper;
 use App\Helpers\DESHelper;
@@ -74,6 +75,11 @@ class ProviderHelper{
 	 */
 	public static function queDebitRefund($debitRefund){
 	    $job = (new DebitRefund($debitRefund))->onQueue('debit_refund');
+        dispatch($job);
+	}
+
+	public static function resendDebitNotFound($debitRefund){
+	    $job = (new ResendDebitNotFound($debitRefund))->onQueue('resend_not_found');
         dispatch($job);
 	}
 
