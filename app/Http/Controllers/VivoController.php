@@ -127,10 +127,12 @@ class VivoController extends Controller
 		switch ($request->TrnType){
 			case "BET":
 				if($getSideBet != false){
+					sleep(0.5);
 					Helper::saveLog('Vivo Gaming BET SideBet', 34,json_encode($request->all()), 'HIT sideBet process');
 					return $this->betProcess($request->all(),$client_details);
 				}
 				if($getSideBetPair != false){
+					sleep(1);
 					Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
 					return $this->betProcess($request->all(),$client_details);
 				}
@@ -274,15 +276,8 @@ class VivoController extends Controller
 			// "provider_request" => json_encode($data),
 			// "general_details" => $data["History"],
 		);
-		$connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
         GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
-        $bet = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
-        $updateGameTransaction = [
-            "bet_amount" => $bet->amount,
-        ];
-        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
-
         try {
 			$fund_extra_data = [
 	            'provider_name' => $game_details->provider_name
