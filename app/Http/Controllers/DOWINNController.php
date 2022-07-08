@@ -442,8 +442,14 @@ class DOWINNController extends Controller{
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
                     $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
-                    $sumOfTransactions = DB::select("SELECT * FROM (select game_trans_id, sum(amount) amount, game_transaction_type from {$connection['db_list'][1]}.game_transaction_ext gte 
-                    WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." group by game_transaction_type) tbl order by game_transaction_type;");
+                    $sumOfTransactions = DB::select("SELECT 	
+                    IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
+                    WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 1),0) bet,
+                    IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
+                    WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win,
+                    IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
+                    WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 3),0) refund;");
+                    Helper::saveLog("TEST LOG", 139,json_encode($sumOfTransactions),"HIT!");
                     $countSumTrans = count($sumOfTransactions);
                     if($countSumTrans != 'false'){
                         switch($countSumTrans){
