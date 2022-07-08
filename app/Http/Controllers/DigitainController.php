@@ -5786,6 +5786,17 @@ class DigitainController extends Controller
 		}
 
 
+		if($json_data['providerTxId'] == "" && $json_data['externalTxId'] == ""){
+			$response = array(
+						"timestamp" => date('YmdHisms'),
+						"signature" => $this->createSignature(date('YmdHisms')),
+						"errorCode" => 17,
+						"items" => [],
+				);	
+			return $response;
+		}
+
+
 		if(isset($json_data['externalTxId']) && $json_data['externalTxId'] != ""){
 			$query = DB::Select("SELECT * FROM digitain_transactions WHERE tiger_game_ext_id = '" . $json_data['externalTxId']. "' limit 1");
 			$result = count($query);
