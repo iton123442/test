@@ -268,11 +268,16 @@ class IDNPokerHelper{
         }
     }
 
-    public static function getCheckTransactionIDAvailable($data,$auth){
+    public static function getCheckTransactionIDAvailable($data,$auth, $client_transaction_id = false){
         $x = 1; // limit 5 times retry
         $id_transaction = false;// false or id
         do {
-            $id = Uuid::generate()->string;
+            // $id = Uuid::generate()->string;
+            if($client_transaction_id){
+                $id = $client_transaction_id;
+            }else {
+                $id = Uuid::generate()->string;
+            }
             try {
                 $url = config('providerlinks.idnpoker.URL');
                 $client = new Client();

@@ -107,14 +107,26 @@ class DebitRefund extends Job implements ShouldQueue
                 }else if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TRANSACTION_NOT_FOUND'){
                     // sleep(3);
                     if($this->attempts() == 1){
-                        $this->release(120); //  = 30minutes = 1800seconds
+                        $this->release(1800); // 30minutes in seconds
+                        try {
+                            $data = [
+                                "round_id" => $round_id,
+                                "player_id" => $client_details->player_id,
+                                "connection_name" => $client_details->connection_name,
+                                "metadata" => "30min"
+                            ];
+                            $data_saved = DB::table('retry_not_found')->insert($data);
+                        } catch (\Exception $e) {
+                           throw new \ErrorException('retry_not_found');
+                        }
                         $canProceed = true;
                     }else{
                         try {
                             $data = [
                                 "round_id" => $round_id,
                                 "player_id" => $client_details->player_id,
-                                "connection_name" => $client_details->connection_name
+                                "connection_name" => $client_details->connection_name,
+                                "metadata" => "nomin"
                             ];
                             $data_saved = DB::table('retry_not_found')->insert($data);
                         } catch (\Exception $e) {

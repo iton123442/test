@@ -694,6 +694,7 @@ return [
     ],
     'idnpoker' => [
         'PROVIDER_ID'=> 110,
+        'sub_provider_id'=> 110, // transfer wallet
         'URL' => 'https://scr.idngame.com:2800/',
         'prefix' => "TGTW",
         'type' => "staging",// [production, staging]
@@ -719,7 +720,7 @@ return [
             // "3457bde6440cb38837da65b3c", 
             // "b391abaf172c2dbc1046965c8"
         ],
-        "b972d12c42bd31d56fd1bd5cc" => [211,92], //ga suppor aning mga client pag pull ni sa data 
+        "b972d12c42bd31d56fd1bd5cc" => [211,92,222], //ga suppor aning mga client pag pull ni sa data 
 
    ],  
    'funkygames' => [
