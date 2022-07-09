@@ -5734,8 +5734,9 @@ class DigitainController extends Controller
 				GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt2,$game_transextension2,$client_details);
 			}else{
 
-				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response2->fundtransferresponse->balance);
-				$general_details['client']['afterbalance'] = $this->formatBalance($client_response2->fundtransferresponse->balance);
+				$calculated_balance = $this->formatBalance($client_details->balance-$bet_amount)
+				ProviderHelper::_insertOrUpdate($client_details->token_id, $calculated_balance;
+				$general_details['client']['afterbalance'] = $calculated_balance;
 				$response = [
 					"timestamp"=> date('YmdHisms'),
 					"signature"=> $this->createSignature(date('YmdHisms')),
