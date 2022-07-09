@@ -5735,7 +5735,7 @@ class DigitainController extends Controller
 			}else{
 
 				$calculated_balance = $this->formatBalance($client_details->balance-$bet_amount);
-				ProviderHelper::_insertOrUpdate($client_details->token_id, $calculated_balance;
+				ProviderHelper::_insertOrUpdate($client_details->token_id, $calculated_balance);
 				$general_details['client']['afterbalance'] = $calculated_balance;
 				$response = [
 					"timestamp"=> date('YmdHisms'),
