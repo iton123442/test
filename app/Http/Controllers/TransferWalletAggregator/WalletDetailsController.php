@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Helpers\GameLobby;
 use App\Helpers\IDNPokerHelper;
 use App\Helpers\Helper;
+use App\Http\Controllers\TransferWalletAggregator\ProviderWalletPortal;
 use App\Models\GameTransactionMDB;
 use DB;
 
@@ -15,11 +16,12 @@ class WalletDetailsController extends Controller
 {
     public function __construct(){
 
-        $this->middleware('oauth', ['except' => []]);
+        // $this->middleware('oauth', ['except' => []]);
         /*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
     }
 
     public function createPlayerBalance(Request $request){
+       
         if(!$request->has('access_token') || !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('username')){
             $mw_response = ["data" => null,"status" => ["code" => "404","message" => TWHelpers::getPTW_Message(404)]];
             return $mw_response;
@@ -56,6 +58,38 @@ class WalletDetailsController extends Controller
             ];
         } else {
             $mw_response = ["data" => null,"status" => ["code" => "308" ,"message" => TWHelpers::getPTW_Message(308)]];
+        }
+
+        if($request->has('game_provider')){ 
+            $getPlayerDetails = TWHelpers::getPlayerDetails('ptw' ,$request->client_player_id ,$request->client_id);
+            if($getPlayerDetails != null){
+                $sub_provider_details = GameLobby::checkAndGetProviderId($request->game_provider);
+                if($sub_provider_details){
+                    $response = ProviderWalletPortal::providerCreatePlayer($getPlayerDetails, $sub_provider_details ,"createPlayer" );
+                    if($response["code"] == 200 ){
+                        $mw_response = [
+                            "data" => [
+                                "client_player_id" => $getPlayerDetails->client_player_id,
+                                "balance" => (double)$response["balance"]
+                            ],
+                            "status" => [
+                                "code" => 200,
+                                "message" => TWHelpers::getPTW_Message(200)
+                            ]
+                        ];
+                        Helper::saveLog( $request->client_player_id." TW Logs" , 5 ,  json_encode($mw_response), "CREATE RESPONSE SCUCESSS");
+                        return $mw_response;
+                    } else {
+                        $code = $response["code"];
+                        $mw_response = ["data" => null,"status" => ["code" => $code ,"message" => TWHelpers::getPTW_Message($code)]];
+                        Helper::saveLog( $request->client_player_id." TW Logs" , 5 , json_encode($mw_response), "CREATE RESPONSE SCUCESSS");
+                        return $mw_response;
+                    }
+                    
+                }
+                
+            }
+            $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
         }
         return $mw_response;
     }
@@ -109,10 +143,6 @@ class WalletDetailsController extends Controller
                                 $auth_token = IDNPokerHelper::getAuthPerOperator($playerDetails, config('providerlinks.idnpoker.type')); 
                                 $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
                                 if ($data != "false") {
-                                    $msg = array(
-                                        "status" => "success",
-                                        "balance" => $data["balance"],
-                                    );
                                     $mw_response = [
                                         "data" => [
                                             "client_player_id" => $playerDetails->client_player_id,
@@ -165,62 +195,93 @@ class WalletDetailsController extends Controller
         }
         if (str_contains($request->transaction_id, '_')) {
             $mw_response = ["data" => null,"status" => ["code" => "401","message" => TWHelpers::getPTW_Message(401)]];
-            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         } 
         //create depost accounts
-        try {
-            $data_accounts = [
-                "player_id" => $getPlayerDetails->player_id,
-                "type" => 1,
-                "amount" => $request->amount,
-                "client_id" => $getPlayerDetails->client_id,
-                "operator_id" => $getPlayerDetails->operator_id,
-                "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
-                'status' => 1
+        if($request->has('game_provider')){
+            $sub_provider_details = GameLobby::checkAndGetProviderId($request->game_provider);
+            if($sub_provider_details){
+                $response = ProviderWalletPortal::providerDepositPlayer($getPlayerDetails, $sub_provider_details , $request->all() );
+                if($response["code"] == 200 ){
+                    $mw_response = [
+                        "data" => [
+                            "client_player_id" => $getPlayerDetails->client_player_id,
+                            "balance" => (double)$response["balance"],
+                            "transaction_id" => $request->transaction_id
+                        ],
+                        "status" => [
+                            "code" => 200,
+                            "message" => TWHelpers::getPTW_Message(200)
+                        ]
+                    ];
+                    // Helper::saveLog( $request->client_player_id." TW Logs" , 5 ,  json_encode($mw_response), "CREATE RESPONSE SCUCESSS");
+                    TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+                    return $mw_response;
+                } else {
+                    $code = $response["code"];
+                    $mw_response = ["data" => null,"status" => ["code" => $code ,"message" => TWHelpers::getPTW_Message($code)]];
+                    TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+                    return $mw_response;
+                }
+                
+            }
+            $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
+            return $mw_response;
+        } else {
+            try {
+                $data_accounts = [
+                    "player_id" => $getPlayerDetails->player_id,
+                    "type" => 1,
+                    "amount" => $request->amount,
+                    "client_id" => $getPlayerDetails->client_id,
+                    "operator_id" => $getPlayerDetails->operator_id,
+                    "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
+                    'status' => 1
+                ];
+                $account_id = TWHelpers::createTWPlayerAccountsMDB($data_accounts, $getPlayerDetails);
+            } catch (\Exception $e) {
+                $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
+                TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+                return $mw_response;
+            }
+            $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
+            TWHelpers::updateTWBalance( ($player_balance->balance + $request->amount), $getPlayerDetails->tw_player_bal_id);
+            $balance = $player_balance->balance + $request->amount;
+            $mw_response = [
+                "data" => [
+                    "client_player_id" => $getPlayerDetails->client_player_id,
+                    "balance" => (double)$balance,
+                    "transaction_id" => $request->transaction_id
+                ],
+                "status" => [
+                    "code" => 200,
+                    "message" => TWHelpers::getPTW_Message(200)
+                ]
             ];
-            $account_id = TWHelpers::createTWPlayerAccountsMDB($data_accounts, $getPlayerDetails);
-        } catch (\Exception $e) {
-            $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
+    
+            $general_details = [
+                "data" => [
+                    "client_player_id" => $getPlayerDetails->client_player_id,
+                    "transaction_id" => $request->transaction_id,
+                    "after_balance" =>  $balance,
+                    "before_balance" => $getPlayerDetails->tw_balance,
+                ],
+            ];
+    
+            $data = [
+                "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
+                "client_request" => json_encode($request->all()),
+                "mw_response" => json_encode($mw_response),
+                "wallet_type" => 1,
+                "status_code" => "200",
+                "general_details" => json_encode($general_details),
+                "tw_account_id" => $account_id
+            ];
+            TWHelpers::createTWPlayerAccountsRequestLogsMDB($data, $getPlayerDetails);
             TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
-        $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
-        TWHelpers::updateTWBalance( ($player_balance->balance + $request->amount), $getPlayerDetails->tw_player_bal_id);
-        $balance = $player_balance->balance + $request->amount;
-        $mw_response = [
-            "data" => [
-                "client_player_id" => $getPlayerDetails->client_player_id,
-                "balance" => (double)$balance,
-                "transaction_id" => $request->transaction_id
-            ],
-            "status" => [
-                "code" => 200,
-                "message" => TWHelpers::getPTW_Message(200)
-            ]
-        ];
-
-        $general_details = [
-            "data" => [
-                "client_player_id" => $getPlayerDetails->client_player_id,
-                "transaction_id" => $request->transaction_id,
-                "after_balance" =>  $balance,
-                "before_balance" => $getPlayerDetails->tw_balance,
-            ],
-        ];
-
-        $data = [
-            "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
-            "client_request" => json_encode($request->all()),
-            "mw_response" => json_encode($mw_response),
-            "wallet_type" => 1,
-            "status_code" => "200",
-            "general_details" => json_encode($general_details),
-            "tw_account_id" => $account_id
-        ];
-        TWHelpers::createTWPlayerAccountsRequestLogsMDB($data, $getPlayerDetails);
-        TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
-        return $mw_response;
     }
 
     public function makeTransferWallerWithdraw(Request $request){
@@ -258,68 +319,102 @@ class WalletDetailsController extends Controller
             Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
             return $mw_response;
         } 
-        //if 0 amount then withraw all
-        $amountToWithdraw = $request->amount == 0 ? $getPlayerDetails->tw_balance : $request->amount;
-        if ($amountToWithdraw > $getPlayerDetails->tw_balance ) {
-            $mw_response = ["data" => null,"status" => ["code" => 305 ,"message" => TWHelpers::getPTW_Message(305)]];
-            TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+        
+        //create withdraw accounts
+        if($request->has('game_provider')){
+            $sub_provider_details = GameLobby::checkAndGetProviderId($request->game_provider);
+            if($sub_provider_details){
+                $response = ProviderWalletPortal::providerWithdrawPlayer($getPlayerDetails, $sub_provider_details , $request->all() );
+                if($response["code"] == 200 ){
+                    $mw_response = [
+                        "data" => [
+                            "client_player_id" => $getPlayerDetails->client_player_id,
+                            "balance" => (double)$response["balance"],
+                            "transaction_id" => $request->transaction_id
+                        ],
+                        "status" => [
+                            "code" => 200,
+                            "message" => TWHelpers::getPTW_Message(200)
+                        ]
+                    ];
+                    // Helper::saveLog( $request->client_player_id." TW Logs" , 5 ,  json_encode($mw_response), "CREATE RESPONSE SCUCESSS");
+                    TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+                    return $mw_response;
+                } else {
+                    $code = $response["code"];
+                    $mw_response = ["data" => null,"status" => ["code" => $code ,"message" => TWHelpers::getPTW_Message($code)]];
+                    // Helper::saveLog( $request->client_player_id." TW Logs" , 5 , json_encode($mw_response), "CREATE RESPONSE SCUCESSS");
+                    TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+                    return $mw_response;
+                }
+                
+            }
+            $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
             return $mw_response;
-        }
-         //create withdraw accounts
-        try {
-            $data_accounts = [
-                "player_id" => $getPlayerDetails->player_id,
-                "type" => 2,
-                "amount" => $amountToWithdraw,
-                "client_id" => $getPlayerDetails->client_id,
-                "operator_id" => $getPlayerDetails->operator_id,
-                "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
-                'status' => 1
+        } else {
+            //if 0 amount then withraw all
+            $amountToWithdraw = $request->amount == 0 ? $getPlayerDetails->tw_balance : $request->amount;
+            if ($amountToWithdraw > $getPlayerDetails->tw_balance ) {
+                $mw_response = ["data" => null,"status" => ["code" => 305 ,"message" => TWHelpers::getPTW_Message(305)]];
+                TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+                return $mw_response;
+            }
+
+            try {
+                $data_accounts = [
+                    "player_id" => $getPlayerDetails->player_id,
+                    "type" => 2,
+                    "amount" => $amountToWithdraw,
+                    "client_id" => $getPlayerDetails->client_id,
+                    "operator_id" => $getPlayerDetails->operator_id,
+                    "client_transaction_id" => $getPlayerDetails->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
+                    'status' => 1
+                ];
+                $account_id = TWHelpers::createTWPlayerAccountsMDB($data_accounts, $getPlayerDetails);
+            } catch (\Exception $e) {
+                $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
+                TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
+                return $mw_response;
+            }
+    
+            //update player account balance
+            $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
+            TWHelpers::updateTWBalance( ($player_balance->balance - $amountToWithdraw), $getPlayerDetails->tw_player_bal_id);
+            $balance = $player_balance->balance - $amountToWithdraw;
+            $mw_response = [
+                "data" => [
+                    "client_player_id" => $getPlayerDetails->client_player_id,
+                    "balance" => (double)$balance,
+                    "transaction_id" => $request->transaction_id
+                ],
+                "status" => [
+                    "code" => 200,
+                    "message" => TWHelpers::getPTW_Message(200)
+                ]
             ];
-            $account_id = TWHelpers::createTWPlayerAccountsMDB($data_accounts, $getPlayerDetails);
-        } catch (\Exception $e) {
-            $mw_response = ["data" => null,"status" => ["code" => 406 ,"message" => TWHelpers::getPTW_Message(406)]];
+    
+            $general_details = [
+                "data" => [
+                    "client_player_id" => $getPlayerDetails->client_player_id,
+                    "transaction_id" => $request->transaction_id,
+                    "after_balance" => (double)$balance,
+                    "before_balance" => $getPlayerDetails->tw_balance,
+                ],
+            ];
+    
+            $data = [
+                "client_transaction_id" => $request->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
+                "client_request" => json_encode($request->all()),
+                "mw_response" => json_encode($mw_response),
+                "wallet_type" => 2,
+                "status_code" => "200",
+                "general_details" => json_encode($general_details),
+                "tw_account_id" => $account_id
+            ];
+            TWHelpers::createTWPlayerAccountsRequestLogsMDB($data, $getPlayerDetails);
             TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
             return $mw_response;
         }
-
-        //update player account balance
-        $player_balance = TWHelpers::getPlayerBalanceUsingTwID($getPlayerDetails->tw_player_bal_id);
-        TWHelpers::updateTWBalance( ($player_balance->balance - $amountToWithdraw), $getPlayerDetails->tw_player_bal_id);
-        $balance = $player_balance->balance - $amountToWithdraw;
-        $mw_response = [
-            "data" => [
-                "client_player_id" => $getPlayerDetails->client_player_id,
-                "balance" => (double)$balance,
-                "transaction_id" => $request->transaction_id
-            ],
-            "status" => [
-                "code" => 200,
-                "message" => TWHelpers::getPTW_Message(200)
-            ]
-        ];
-
-        $general_details = [
-            "data" => [
-                "client_player_id" => $getPlayerDetails->client_player_id,
-                "transaction_id" => $request->transaction_id,
-                "after_balance" => (double)$balance,
-                "before_balance" => $getPlayerDetails->tw_balance,
-            ],
-        ];
-
-        $data = [
-            "client_transaction_id" => $request->client_id."_".$request->transaction_id, //UNIQUE TRANSACTION
-            "client_request" => json_encode($request->all()),
-            "mw_response" => json_encode($mw_response),
-            "wallet_type" => 2,
-            "status_code" => "200",
-            "general_details" => json_encode($general_details),
-            "tw_account_id" => $account_id
-        ];
-        TWHelpers::createTWPlayerAccountsRequestLogsMDB($data, $getPlayerDetails);
-        TWHelpers::walletLogsRequest( $request->client_player_id,$request->client_id, json_encode($request->all()), $mw_response);
-        return $mw_response;
     }
 
     // @return
@@ -601,66 +696,43 @@ class WalletDetailsController extends Controller
             Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
             return $mw_response;
         } 
-        
-        // $client_details = DB::select("select * from clients c where client_id = ". $request->client_id)[0];
-        // $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
-        // $status = GameTransactionMDB::checkDBConnection($connection);
-        // if ( ($connection != null) && $status) {
-
-            try {
-                // $connection = config("serverlist.server_list.".$client_details->connection_name);
-                $client_transaction_id = $request->client_id."_".$reference_id;
-
-                // if ($connection["connection_name"] == "mysql" || $connection["connection_name"] == "server1" ) {
-                //     //default
-                //     $connection["TG_GameInfo"] = $connection["db_list"][1];
-                //     $connection["TG_PlayerInfo"] = $connection["db_list"][1];
-                //     $connection["TG_ClientInfo"] = $connection["db_list"][1];
-                // } else {
-                //     $connection["TG_GameInfo"] = "TG_GameInfo";
-                //     $connection["TG_PlayerInfo"] = "TG_PlayerInfo";
-                //     $connection["TG_ClientInfo"] = "TG_ClientInfo";
-                // }
-              
-                $details = TWHelpers::findTransactionWallet( $client_transaction_id, $getPlayerDetails);
-                
-                if ($details == 'false') {
-                    $mw_response = [
-                        "data" => null,
-                        "status" => [
-                            "code" => 407,
-                            "message" => TWHelpers::getPTW_Message(407)
-                        ]
-                    ];
-                    Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
-                    return response()->json($mw_response); 
-                }
-
+        try {
+            $client_transaction_id = $request->client_id."_".$reference_id;
+            $details = TWHelpers::findTransactionWallet( $client_transaction_id, $getPlayerDetails);
+            
+            if ($details == 'false') {
                 $mw_response = [
-                    "data" => [
-                        "client_player_id" => $request->client_player_id,
-                        "username" => $getPlayerDetails->username,
-                        "amount" => (double)$details->amount,
-                        "transaction_id" => $request->reference_id,
-                        "type" => $details->type,
-                        "balance" => $getPlayerDetails->tw_balance
-                    ],
+                    "data" => null,
                     "status" => [
-                        "code" => 200,
-                        "message" => TWHelpers::getPTW_Message(200)
+                        "code" => 407,
+                        "message" => TWHelpers::getPTW_Message(407)
                     ]
                 ];
+                Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
                 return response()->json($mw_response); 
-            } catch (\Exception $e) {
-                $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
-                Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $e->getMessage());
-                return $mw_response;
             }
-        // } else {
-        //     $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
-        //     Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
-        //     return $mw_response;
-        // }
+
+            $mw_response = [
+                "data" => [
+                    "client_player_id" => $request->client_player_id,
+                    "username" => $getPlayerDetails->username,
+                    "amount" => (double)$details->amount,
+                    "transaction_id" => $request->reference_id,
+                    "type" => $details->type,
+                    "status" => $details->status
+                ],
+                "status" => [
+                    "code" => 200,
+                    "message" => TWHelpers::getPTW_Message(200)
+                ]
+            ];
+            return response()->json($mw_response); 
+        } catch (\Exception $e) {
+            $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $e->getMessage());
+            return $mw_response;
+        }
+    
     }
     
 }

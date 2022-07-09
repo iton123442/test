@@ -133,28 +133,33 @@ class TWHelpers {
      */
     public static function getPTW_Message($code) {
         $message = [
-         "200" => 'Success',
-         "201" => 'No Session Found',
-         "202" => 'Client Disabled',
-         "301" => 'Client Not Found',
-         "203" => 'Operator Not Found',
-         "204" => 'Operator Disabled',
-         "302" => 'Access Denied',
-         "303" => 'Player Not Found',
-         "304" => 'Invalid Data',
-         "305" => 'Not Enough Balance',
-         "306" => 'Trace ID Not Found',
-         "307" => 'Game Not Found',
-         "308" => 'Player Already Exist',
-         "309" => 'Invalid Amount',
-         "402" => 'Session Expired',
-         "403" => 'Multiple Session',
-         "404" => 'Parameter Error',
-         "405" => 'Trace Id No Longer Available',
-         "406" => 'Transaction Id Already Exist',
-         "407" => 'Transaction ID Not Found',
-         "400" => 'Services Not Available',
-         "401" => 'Character not allowed!',
+            "200" => 'Success',
+            "201" => 'No Session Found',
+            "202" => 'Client Disabled',
+            "203" => 'Operator Not Found',
+            "204" => 'Operator Disabled',
+            "301" => 'Client Not Found',
+            "302" => 'Access Denied',
+            "303" => 'Player Not Found',
+            "304" => 'Invalid Data',
+            "305" => 'Not Enough Balance',
+            "306" => 'Trace ID Not Found',
+            "307" => 'Game Not Found',
+            "308" => 'Player Already Exist',
+            "309" => 'Invalid Amount',
+            "402" => 'Session Expired',
+            "403" => 'Multiple Session',
+            "404" => 'Parameter Error',
+            "405" => 'Trace Id No Longer Available',
+            "406" => 'Transaction Id Already Exist',
+            "407" => 'Transaction ID Not Found',
+            "400" => 'Services Not Available',
+            "401" => 'Character not allowed!',
+            "410" => 'Dont enter any game. please try again 1 minute later',
+            "411" => 'Credit limit',
+            "412" => 'Player ID has been locked',
+            "413" => 'Deposit rejected',
+            "414" => 'Withdraw rejected',
         ];
         if(array_key_exists($code, $message)){
             return $message[$code];
@@ -398,7 +403,8 @@ class TWHelpers {
                 case 
                     when type = 1 then 'deposit'
                     when type = 2 then 'withdraw'
-                end as type
+                end as type,
+                case when status = 1 then 'SUCCESS' when status = 2 then 'FAILED' when status = 5 then 'PENDING' end  as status
             FROM `".$connection['db_list'][1]."`.`tw_player_accounts`
             where client_transaction_id = '".$identifier."' limit 1; ");
             }
