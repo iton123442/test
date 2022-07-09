@@ -694,6 +694,7 @@ return [
     ],
     'idnpoker' => [
         'PROVIDER_ID'=> 110,
+        'sub_provider_id'=> 110, // transfer wallet
         'URL' => 'https://scr.idngame.com:2800/',
         'prefix' => "TGTW",
         'type' => "staging",// [production, staging]
