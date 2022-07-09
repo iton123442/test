@@ -16,7 +16,7 @@ class WalletDetailsController extends Controller
 {
     public function __construct(){
 
-        // $this->middleware('oauth', ['except' => []]);
+        $this->middleware('oauth', ['except' => []]);
         /*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
     }
 
