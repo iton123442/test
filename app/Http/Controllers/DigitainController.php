@@ -5734,7 +5734,7 @@ class DigitainController extends Controller
 				GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt2,$game_transextension2,$client_details);
 			}else{
 
-				$calculated_balance = $this->formatBalance($client_details->balance-$bet_amount)
+				$calculated_balance = $this->formatBalance($client_details->balance-$bet_amount);
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $calculated_balance;
 				$general_details['client']['afterbalance'] = $calculated_balance;
 				$response = [
