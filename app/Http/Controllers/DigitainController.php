@@ -5639,7 +5639,7 @@ class DigitainController extends Controller
 		if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
 
-			
+			ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 			
 			$gameTransactionEXTData = array(
 				"game_trans_id" => $game_trans,
