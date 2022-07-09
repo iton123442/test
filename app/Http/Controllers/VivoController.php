@@ -279,7 +279,7 @@ class VivoController extends Controller
 		);
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
         GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
-        $blackJack = strpos($request->History, 'BLACKJACK');
+        $blackJack = strpos($data['History'], 'BLACKJACK');
         if($blackJack != false){
 	        $bet = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
 	        $updateGameTransaction = [
