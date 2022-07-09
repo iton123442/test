@@ -5535,7 +5535,7 @@ class DigitainController extends Controller
 				 "timestamp" => date('YmdHisms'),
 				 "signature" => $this->createSignature(date('YmdHisms')),
 				 "errorCode" => 8, // transaction already refunded
-				 "balance" => $general_details_after_balance,
+				 "balance" => $client_details->balance,
 				 "metadata" => isset($json_data['metadata']) ? $json_data['metadata'] : '' // Optional but must be here!
     	    ]; 
 			return $response;
