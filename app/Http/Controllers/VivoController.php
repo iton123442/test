@@ -121,21 +121,21 @@ class VivoController extends Controller
 		if($hash != $request->hash) {
 			$response = '<VGSSYSTEM><REQUEST><USERID>'.$request->userId.'</USERID><AMOUNT>'.$request->Amount.'</AMOUNT><TRANSACTIONID >'.$request->TransactionID.'</TRANSACTIONID><TRNTYPE>'.$request->TrnType.'</TRNTYPE><GAMEID>'.$request->gameId.'</GAMEID><ROUNDID>'.$request->roundId.'</ROUNDID><TRNDESCRIPTION>'.$request->TrnDescription.'</TRNDESCRIPTION><HISTORY>'.$request->History.'</HISTORY><ISROUNDFINISHED>'.$request->isRoundFinished.'</ISROUNDFINISHED><HASH>'.$request->hash.'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>500</CODE></RESPONSE></VGSSYSTEM>';
 		}
-		$getSideBet = strpos($request->History, 'sideBet21');
-		$getSideBetPair = strpos($request->History, 'sideBetPpair');
-		$getSideBetW = strpos($request->History, 'SIDE_BET');
+		// $getSideBet = strpos($request->History, 'sideBet21');
+		// $getSideBetPair = strpos($request->History, 'sideBetPpair');
+		// $getSideBetW = strpos($request->History, 'SIDE_BET');
 		switch ($request->TrnType){
 			case "BET":
-				if($getSideBet != false){
-					sleep(0.5);
-					Helper::saveLog('Vivo Gaming BET SideBet', 34,json_encode($request->all()), 'HIT sideBet process');
-					return $this->betProcess($request->all(),$client_details);
-				}
-				if($getSideBetPair != false){
-					sleep(1);
-					Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
-					return $this->betProcess($request->all(),$client_details);
-				}
+				// if($getSideBet != false){
+				// 	sleep(0.5);
+				// 	Helper::saveLog('Vivo Gaming BET SideBet', 34,json_encode($request->all()), 'HIT sideBet process');
+				// 	return $this->betProcess($request->all(),$client_details);
+				// }
+				// if($getSideBetPair != false){
+				// 	sleep(1);
+				// 	Helper::saveLog('Vivo Gaming BET SideBetPair', 34,json_encode($request->all()), 'HIT sideBetPpair process');
+				// 	return $this->betProcess($request->all(),$client_details);
+				// }
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
@@ -236,15 +236,30 @@ class VivoController extends Controller
 		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
-
+		$remove[] = ":";
+        $remove[] = ';';
+        $remove[] = "\\";
+        $gameHistory = $data["History"];
+        $getChairID = str_replace($remove,' ', $gameHistory);
+        $dataHistory = explode(" ",$getChairID);
+        $getSideBet = strpos($data["History"], 'sideBet');
+        if($data["History"][0] = "BLACKJACK"){
+        	if($getSideBet != false){
+	        	$chairID = $dataHistory[0] ."-sidebet-". $dataHistory[2]."-"
+	        }else{
+	        	$chairID = $dataHistory[0] ."-". $dataHistory[1]."-". $dataHistory[2]."-";
+	        }
+        }else{
+        	$chairID = "";
+        }
 		Helper::saveLog('Vivo Gaming BET', 34,json_encode($data), 'HIT Bet process');
 		try{
-			ProviderHelper::idenpotencyTable('VIVO_'.$data["roundId"]);
+			ProviderHelper::idenpotencyTable($chairID.$data["roundId"]);
 			$gameTransactionData = array(
 	            "provider_trans_id" => $data["TransactionID"],
 	            "token_id" => $client_details->token_id,
 	            "game_id" => $game_details->game_id,
-	            "round_id" => $data["roundId"],
+	            "round_id" => $chairID.$data["roundId"],
 	            "bet_amount" => $data["Amount"],
 	            "win" => 5,
 	            "pay_amount" => 0,
@@ -255,7 +270,7 @@ class VivoController extends Controller
 	        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
 	        $game_transaction_id = $gen_game_trans_id;
 		}catch(\Exception $e){
-			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
+			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($chairID.$data["roundId"], $client_details);
 			if($bet_transaction == null){
 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID >'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 				return $response;
@@ -267,6 +282,7 @@ class VivoController extends Controller
 	        ];
 	        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
 		}
+		
 		$bet_game_transaction_ext = array(
 			"game_trans_id" => $game_transaction_id,
 			"provider_trans_id" => $data["TransactionID"],
@@ -358,6 +374,18 @@ class VivoController extends Controller
 	public function winProcess($data,$client_details){
 		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+		$remove[] = ":";
+        $remove[] = ';';
+        $remove[] = "\\";
+        $gameHistory = $data["History"];
+        $getChairID = str_replace($remove,' ', $gameHistory);
+        $dataHistory = explode(" ",$getChairID);
+        $getSideBetW = strpos($data["History"], 'SIDE_BET');
+        if($getSideBetW != false){
+        	$chairID = $dataHistory[0] ."-"."sideBetPpair"."-". $dataHistory[2]."-";
+        }else{
+        	$chairID = $dataHistory[0] ."-"."BET"."-". $dataHistory[2]."-";
+        }
 		Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), "ENDPOINTHIT");
 		if($data["Amount"] < 0) {
 			$response = [
@@ -365,7 +393,7 @@ class VivoController extends Controller
 				"message" => "Warning value must not be less 0.",
 			];
 		}
-			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
+			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($chairID.$data["roundId"], $client_details);
 			if($bet_transaction == null){
 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID >'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300ss</CODE></RESPONSE></VGSSYSTEM>';
 				return $response;
