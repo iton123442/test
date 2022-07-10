@@ -382,9 +382,9 @@ class VivoController extends Controller
         $dataHistory = explode(" ",$getChairID);
         $getSideBetW = strpos($data["History"], 'SIDE_BET');
         if($getSideBetW != false){
-        	$chairID = $dataHistory[0] ."-"."sideBetPpair"."-". $dataHistory[2]."-";
+        	$chairID = $dataHistory[0] ."-"."SIDE_BET"."-". $dataHistory[2]."-";
         }else{
-        	$chairID = $dataHistory[0] ."-"."BET"."-". $dataHistory[2]."-";
+        	$chairID = $dataHistory[0] ."-"."INITBET"."-". $dataHistory[2]."-";
         }
 		Helper::saveLog('Vivo Gaming WIN', 34,json_encode($data), "ENDPOINTHIT");
 		if($data["Amount"] < 0) {
