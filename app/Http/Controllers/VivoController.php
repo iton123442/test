@@ -139,11 +139,11 @@ class VivoController extends Controller
 				return $this->betProcess($request->all(),$client_details);
 			break;
 			case "WIN":
-				if($getSideBetW != false){
-					sleep(0.5);
-					Helper::saveLog('Vivo Gaming BET getSideBetW', 34,json_encode($request->all()), 'HIT sideBetPpair process');
-					return $this->winProcess($request->all(),$client_details);
-				}
+				// if($getSideBetW != false){
+				// 	sleep(0.5);
+				// 	Helper::saveLog('Vivo Gaming BET getSideBetW', 34,json_encode($request->all()), 'HIT sideBetPpair process');
+				// 	return $this->winProcess($request->all(),$client_details);
+				// }
 				// if(str_contains($request->History,'BLACKJACK:WIN;1')){
 				// 	sleep(0.5);
 				// 	return $this->winProcess($request->all(),$client_details);
@@ -382,7 +382,7 @@ class VivoController extends Controller
         $dataHistory = explode(" ",$getChairID);
         $getSideBetW = strpos($data["History"], 'SIDE_BET');
         if($getSideBetW != false){
-        	$chairID = $dataHistory[0] ."-"."SIDE_BET"."-". $dataHistory[2]."-";
+        	$chairID = $dataHistory[0] ."-"."sideBet"."-". $dataHistory[2]."-";
         }else{
         	$chairID = $dataHistory[0] ."-"."INITBET"."-". $dataHistory[2]."-";
         }
