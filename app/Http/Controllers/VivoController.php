@@ -245,7 +245,7 @@ class VivoController extends Controller
         $getSideBet = strpos($data["History"], 'sideBet');
         if($data["History"][0] = "BLACKJACK"){
         	if($getSideBet != false){
-	        	$chairID = $dataHistory[0] ."-sidebet-". $dataHistory[2]."-"
+	        	$chairID = $dataHistory[0] ."-sidebet-". $dataHistory[2]."-";
 	        }else{
 	        	$chairID = $dataHistory[0] ."-". $dataHistory[1]."-". $dataHistory[2]."-";
 	        }
