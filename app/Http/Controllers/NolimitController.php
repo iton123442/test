@@ -16,7 +16,7 @@ use App\Jobs\UpdateGametransactionJobs;
 use App\Jobs\CreateGameTransactionLog;
 use DB;
 
-class NolimitCityController extends Controller
+class NolimitController extends Controller
 
 {
     
@@ -341,6 +341,22 @@ class NolimitCityController extends Controller
         $balance = $client_details->balance;
         //$game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
+        if($bet_transaction == false || $bet_transaction == null){
+            $response = [      
+                'jsonrpc' => '2.0',
+                'error' => [
+                    'code' => -3200,
+                    'message' => 'Server error',
+                    'data' => [
+
+                        'code' =>14003,
+                        'message'=> "Not found",
+                    ],
+                ],
+                'id' => $data['id']    
+            ];
+            return $response;
+        }
         try{
             ProviderHelper::idenpotencyTable($provider_trans_id);
         }catch(\Exception $e){
