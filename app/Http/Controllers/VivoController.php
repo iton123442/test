@@ -123,7 +123,7 @@ class VivoController extends Controller
 		}
 		// $getSideBet = strpos($request->History, 'sideBet21');
 		// $getSideBetPair = strpos($request->History, 'sideBetPpair');
-		// $getSideBetW = strpos($request->History, 'SIDE_BET');
+		$getSideBetW = strpos($request->History, 'SIDE_BET');
 		switch ($request->TrnType){
 			case "BET":
 				// if($getSideBet != false){
