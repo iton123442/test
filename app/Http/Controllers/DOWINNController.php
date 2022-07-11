@@ -274,7 +274,7 @@ class DOWINNController extends Controller{
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
-        if($explodedOrderId['1'] == 0 || $explodedOrderId['1'] == 2 || $explodedOrderId['1'] == 4){
+        if($explodedOrderId['1'] == 3 || $explodedOrderId['1'] == 2 || $explodedOrderId['1'] == 4){
             // sleep(0.20);
             Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
