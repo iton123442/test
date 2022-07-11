@@ -469,7 +469,7 @@ class NolimitController extends Controller
                 "provider_request" =>json_encode($request->all()),
                 "mw_response" => json_encode($response),
             );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transid_ext,$client_details);
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
             ProviderHelper::saveLogWithExeption('Nolimit Win Result', $this->provider_db_id, json_encode($data),$response);
             return $response;
