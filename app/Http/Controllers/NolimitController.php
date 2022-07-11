@@ -467,7 +467,7 @@ class NolimitController extends Controller
         }
 
             $updateTransactionEXt = array(
-                "provider_request" =>json_encode($request->all()),
+                "provider_request" =>json_encode($data),
                 "mw_response" => json_encode($response),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transid_ext,$client_details);
