@@ -728,7 +728,7 @@ $app->post('/public/api/login','TTGController@privateLogin');
 // $app->post('/public/api/ozashiki/betrollback', 'Ozashiki\MainController@rollbackTransaction');
 
 // NolimitCity Single Controller Endpoints
-$app->post('/public/api/nolimitcity', 'NolimitCityController@index');
+$app->post('/public/api/nolimitcity', 'NolimityController@index');
 $app->post('/public/api/nolimitcity/eldoah', 'NolimitCityController@index');
 $app->post('/public/api/nolimitcity/konibet', 'NolimitCityController@index');
 
