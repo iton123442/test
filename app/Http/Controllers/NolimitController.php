@@ -404,16 +404,17 @@ class NolimitController extends Controller
             'entry_id' => $entry_id,
             'trans_status' => 2
             ];
-        GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
         $gameTransactionEXTData = array(
             "game_trans_id" => $bet_transaction->game_trans_id,
             "provider_trans_id" => $provider_trans_id,
             "round_id" => $round_id,
             "amount" => $pay_amount,
             "game_transaction_type"=> 2,
+            "provider_request" =>json_encode($data),
+            "mw_response" => json_encode($response),
         );
-        $game_transid_ext = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-       
+     $game_transid_ext = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         $action_payload = [
             "type" => "custom", #genreral,custom :D # REQUIRED!
             "custom" => [
