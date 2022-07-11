@@ -728,9 +728,10 @@ $app->post('/public/api/login','TTGController@privateLogin');
 // $app->post('/public/api/ozashiki/betrollback', 'Ozashiki\MainController@rollbackTransaction');
 
 // NolimitCity Single Controller Endpoints
-$app->post('/public/api/nolimitcity', 'NolimitCityController@index');
-$app->post('/public/api/nolimitcity/eldoah', 'NolimitCityController@index');
-$app->post('/public/api/nolimitcity/konibet', 'NolimitCityController@index');
+$app->post('/public/api/nolimitcity', 'NolimitController@index');
+$app->post('/public/api/nolimitcity/eldoah', 'NolimitController@index');
+$app->post('/public/api/nolimitcity/konibet', 'NolimitController@index');
+
 
 //SmartSoft Gaming
 $app->post('/public/api/smartsoft_gaming/ActivateSession', 'SmartsoftGamingController@ActiveSession');
