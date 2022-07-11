@@ -341,7 +341,7 @@ class NolimitController extends Controller
         $balance = $client_details->balance;
         //$game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
-        if($bet_transaction == false || $bet_transaction == null){
+        if($bet_transaction == false || $bet_transaction == null || $bet_transaction == 'false'){
             $response = [      
                 'jsonrpc' => '2.0',
                 'error' => [
@@ -536,7 +536,7 @@ class NolimitController extends Controller
             return $response;
              } // End catch error
             $existing_bet = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
-            if($existing_bet->transaction_detail == 'failed'){
+            if($existing_bet->transaction_detail == 'failed' || $existing_bet->transaction_detail == null){
                 $response = array(
                             "jsonrpc" => '2.0',
                             "error" => [
@@ -617,7 +617,7 @@ class NolimitController extends Controller
                 ProviderHelper::saveLogWithExeption("Success Nolimit Refund", $this->provider_db_id, json_encode($data), $response);
                 return $response;
             } catch (\Exception $e) {
-                ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
+                ProviderHelper::saveLogWithExeption('Nolimit Rollback', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
                 return $response;
             }
                 }else{
@@ -628,14 +628,14 @@ class NolimitController extends Controller
                             "message" => "Server error",
                             "data" => [
 
-                                "code" => 14002,
-                                "message" => "Token error",
+                                "code" => 14003,
+                                "message" => "Not found",
                             ],
                         ],
 
                         "id" => $data['id']
                     );
-                     ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
+                     ProviderHelper::saveLogWithExeption('Nolimit Rollback', $this->provider_db_id, json_encode($data),  $e->getMessage() . ' ' . $e->getLine());
                    return $response;
 
                 }
