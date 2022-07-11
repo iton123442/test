@@ -274,7 +274,7 @@ class DOWINNController extends Controller{
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
         $explodedOrderId = explode("-", $data['transaction']['orderId']);
-        if($explodedOrderId['1'] == 3 || $explodedOrderId['1'] == 2 || $explodedOrderId['1'] == 4){
+        if($explodedOrderId['1'] == 1 || $explodedOrderId['1'] == 2 || $explodedOrderId['1'] == 4){
             // sleep(0.20);
             Helper::saveLog("WIN 1", 139,json_encode($data),$this->startTime);
             $result = $this->paymentProcessor($data,$client_details, $explodedOrderId);
@@ -439,7 +439,7 @@ class DOWINNController extends Controller{
                     IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
                     WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
                     if($sumOfTransactions != 'false'){
-                        $winTotal = $sumOfTransactions[0]->win;
+                        $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
                         Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions[0]),$this->startTime);
                         $updateTransData = [
                             "win" => $winTotal == 0 ? 0 : 1,
