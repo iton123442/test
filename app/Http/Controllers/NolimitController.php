@@ -247,7 +247,7 @@ class NolimitController extends Controller
                                 'general_details' => 'success',
                             );
                              ProviderHelper::saveLogWithExeption('after success updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transid_ext,$client_details);
                         break;
                     case '402':
                         $updateGameTransaction = [
@@ -278,7 +278,7 @@ class NolimitController extends Controller
                                 'general_details' => 'failed',
                             );
                              ProviderHelper::saveLogWithExeption('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                          GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                          GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transid_ext,$client_details);
                         break;
                         default:
                         $updateGameTransaction = [
@@ -310,7 +310,7 @@ class NolimitController extends Controller
                                 'general_details' => 'failed',
                             );
                              ProviderHelper::saveLogWithExeption('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                          GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                          GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transid_ext,$client_details);
                 }
             }
                         ProviderHelper::saveLogWithExeption('Nolimit Debit', $this->provider_db_id, json_encode($data), $response);
