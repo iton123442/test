@@ -612,14 +612,6 @@ class DOWINNController extends Controller{
             // ];
             // GameTransactionMDB::updateGametransactionEXT($updateBetTransaction,$refundedBetId,$client_details);
             // $totalBetThisRound = DOWINNHelper::totalBet($roundId,$client_details);
-            $updateTransData = [
-                "win" => 5,
-                "entry_id" => 2,
-                "trans_status" => 2,
-                "bet_amount" => $game->bet_amount-$refundAmount,
-                "income" => 0,
-            ];
-            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $gameExtensionData = [
                 "game_trans_id" => $game->game_trans_id,
                 "provider_trans_id" => $transId,
@@ -629,6 +621,14 @@ class DOWINNController extends Controller{
                 "provider_request" => json_encode($data),
             ];
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+            $updateTransData = [
+                "win" => 5,
+                "entry_id" => 2,
+                "trans_status" => 2,
+                "bet_amount" => $game->bet_amount-$refundAmount,
+                "income" => 0,
+            ];
+            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $response = [
                 "status" => "OK",
                 "balance" => round($afterBalance,2),
