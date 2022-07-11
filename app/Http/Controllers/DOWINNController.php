@@ -120,7 +120,7 @@ class DOWINNController extends Controller{
                     return response($response,200)->header('Content-Type', 'application/json');
                 }
                 $transId = $data['uuid'];
-                $roundId = $data['transaction']['orderId'];
+                $roundId = $data['transaction']['roundId'];
                 $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
                 $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
                 if($bet_transaction != null){
@@ -310,7 +310,7 @@ class DOWINNController extends Controller{
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             $transId = $data['uuid'];
-            $roundId = $data['transaction']['orderId'];
+            $roundId = $data['transaction']['roundId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $winAmount = round($data['transaction']['amount'],2);
             $game = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
@@ -391,7 +391,6 @@ class DOWINNController extends Controller{
                     }
                 }
             }
-            $payAmount = $game->pay_amount+$winAmount;
             $gameExtensionData = [
                 "game_trans_id" => $game->game_trans_id,
                 "provider_trans_id" => $transId,
@@ -401,13 +400,7 @@ class DOWINNController extends Controller{
                 "provider_request" => json_encode($data),
             ];
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
-            $updateTransData = [
-                "win" => $payAmount == 0 ? 0 : 1,
-                "pay_amount" => round($payAmount,2),
-                "income" => round($game->bet_amount-$payAmount,2),
-            ];
-            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
-            $win_or_lost = $payAmount == 0 ? 0 : 1;
+            $win_or_lost = $winAmount == 0 ? 0 : 1;
             $response = [
                 "status" => "OK",
                 "balance" => round($afterBalance,2),
@@ -443,30 +436,29 @@ class DOWINNController extends Controller{
                 $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
+                    $sumOfTransactions = DB::select("SELECT
+                    IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
+                    WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
+                    if($sumOfTransactions != 'false'){
+                        $winTotal = $sumOfTransactions[0]->win;
+                        Helper::saveLog("CASE 2", 139,json_encode($sumOfTransactions[0]->win),$this->startTime);
+                        $updateTransData = [
+                            "win" => $winTotal == 0 ? 0 : 1,
+                            "pay_amount" => round($winTotal,2),
+                            "income" => round($game->bet_amount-$winTotal,2),
+                        ];
+                    }else{
+                        Helper::saveLog("NEUTRAL", 139,json_encode($data),$this->startTime);
+                        $winTotal = $game->pay_amount+$winAmount;
+                            $updateTransData = [
+                                "win" => $winTotal == 0 ? 0 : 1,
+                                "pay_amount" => round($winTotal,2),
+                                "income" => round($game->bet_amount-$winTotal,2),
+                            ];
+                    }
+                    GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     //SUCCESS FUNDTRANSFER
-                    // $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
-                    // $sumOfTransactions = DB::select("SELECT
-                    // IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
-                    // WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
-                    // if($sumOfTransactions != 'false'){
-                    //     $winTotal = $sumOfTransactions[0]->win;
-                        
-                    //     Helper::saveLog("CASE 2", 139,json_encode($sumOfTransactions),$this->startTime);
-                        // $updateTransData = [
-                        //     "win" => $winTotal == 0 ? 0 : 1,
-                        //     "pay_amount" => round($winTotal,2),
-                        //     "income" => round($game->bet_amount-$winTotal,2),
-                        // ];
-                    // }else{
-                    //     Helper::saveLog("NEUTRAL", 139,json_encode($data),$this->startTime);
-                    //     $winTotal = $game->pay_amount+$winAmount;
-                    //         $updateTransData = [
-                    //             "win" => $winTotal == 0 ? 0 : 1,
-                    //             "pay_amount" => round($winTotal,2),
-                    //             "income" => round($game->bet_amount-$winTotal,2),
-                    //         ];
-                    // }
-                    // GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     $response = [
                         "status" => 'OK',
                         "balance" => $balance,
@@ -524,7 +516,7 @@ class DOWINNController extends Controller{
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             $transId = $data['uuid'];
-            $roundId = $data['transaction']['orderId'];
+            $roundId = $data['transaction']['roundId'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, 'DOWINN');
             $refundAmount = round($data['transaction']['amount'],2);
             $game = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
