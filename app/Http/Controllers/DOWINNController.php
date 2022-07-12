@@ -399,20 +399,19 @@ class DOWINNController extends Controller{
             // ];
             // GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $sumOfTransactions = GameTransactionMDB::findGameExtDowinn($game->game_trans_id,2,$client_details);
-            Helper::saveLog("QUERY", 139,json_encode($sumOfTransactions),$this->startTime);
             if($sumOfTransactions != 'false'){
-                if($sumOfTransactions == 0){
-                    $winTotal = $sumOfTransactions == 0 ? $sumOfTransactions+$winAmount : $sumOfTransactions;
+                if($sumOfTransactions[0]->win == 0){
+                    $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
                     $reCount = GameTransactionMDB::findGameExtDowinn($game->game_trans_id,2,$client_details);
-                    Helper::saveLog("CASE 2", 139,json_encode($reCount),$this->startTime);
+                    Helper::saveLog("CASE 2", 139,json_encode($reCount[0]),$this->startTime);
                     $updateTransData = [
                         "win" => $winTotal == 0 ? 0 : 1,
                         "pay_amount" => round($winTotal,2),
                         "income" => round($game->bet_amount-$winTotal,2),
                     ];
                 }else{
-                    $winTotal = $sumOfTransactions == 0 ? $sumOfTransactions+$winAmount : $sumOfTransactions;
-                    Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions),$this->startTime);
+                    $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
+                    Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions[0]),$this->startTime);
                     $updateTransData = [
                         "win" => $winTotal == 0 ? 0 : 1,
                         "pay_amount" => round($winTotal,2),
@@ -456,7 +455,7 @@ class DOWINNController extends Controller{
                     "mw_response" => json_encode($response),
                 ]
             ];
-            if($game == 4){
+            if($game->win == 4){
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             else{
@@ -624,7 +623,7 @@ class DOWINNController extends Controller{
                     "mw_response" => json_encode($response),
                 ]
             ];
-            if($game == 4){
+            if($game->win == 4){
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             else{
@@ -638,7 +637,7 @@ class DOWINNController extends Controller{
                     // IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
                     // WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
                     // if($sumOfTransactions != 'false'){
-                    //     $winTotal = $sumOfTransactions[0];
+                    //     $winTotal = $sumOfTransactions[0]->win;
                     //     Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions[0]),$this->startTime);
                     //     $updateTransData = [
                     //         "win" => $winTotal == 0 ? 0 : 1,
