@@ -439,13 +439,26 @@ class DOWINNController extends Controller{
                     IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
                     WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
                     if($sumOfTransactions != 'false'){
-                        $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
-                        Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions[0]),$this->startTime);
-                        $updateTransData = [
-                            "win" => $winTotal == 0 ? 0 : 1,
-                            "pay_amount" => round($winTotal,2),
-                            "income" => round($game->bet_amount-$winTotal,2),
-                        ];
+                        if($sumOfTransactions[0]->win == 0){
+                            $reCount = DB::select("SELECT
+                            IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
+                            WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
+                            $winTotal = $reCount[0]->win == 0 ? $reCount[0]->win+$winAmount : $reCount[0]->win;
+                            Helper::saveLog("CASE 1", 139,json_encode($reCount[0]),$this->startTime);
+                            $updateTransData = [
+                                "win" => $winTotal == 0 ? 0 : 1,
+                                "pay_amount" => round($winTotal,2),
+                                "income" => round($game->bet_amount-$winTotal,2),
+                            ];
+                        }else{
+                            $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
+                            Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions[0]),$this->startTime);
+                            $updateTransData = [
+                                "win" => $winTotal == 0 ? 0 : 1,
+                                "pay_amount" => round($winTotal,2),
+                                "income" => round($game->bet_amount-$winTotal,2),
+                            ];
+                        }
                     }else{
                         Helper::saveLog("NEUTRAL", 139,json_encode($data),$this->startTime);
                         $winTotal = $game->pay_amount+$winAmount;
