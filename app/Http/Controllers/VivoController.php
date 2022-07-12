@@ -259,7 +259,7 @@ class VivoController extends Controller
 	            "provider_trans_id" => $data["TransactionID"],
 	            "token_id" => $client_details->token_id,
 	            "game_id" => $game_details->game_id,
-	            "round_id" => $chairID.$data["roundId"],
+	            "round_id" => $data["roundId"],
 	            "bet_amount" => $data["Amount"],
 	            "win" => 5,
 	            "pay_amount" => 0,
@@ -270,7 +270,7 @@ class VivoController extends Controller
 	        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
 	        $game_transaction_id = $gen_game_trans_id;
 		}catch(\Exception $e){
-			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($chairID.$data["roundId"], $client_details);
+			$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 			if($bet_transaction == null){
 				$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID >'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
 				return $response;
