@@ -90,7 +90,7 @@ class GameTransactionMDB
     public static function findGameExtDowinn($game_trans_id,$entry_type,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            $select = "SELECT IFNULL(sum(amount),0) as amount FROM ";
+            $select = "SELECT IFNULL(sum(amount),0) as win FROM ";
             $db = "{$connection['db_list'][0]}.game_transaction_ext gte ";
             $where = "where gte.game_trans_id ='{$game_trans_id}' AND gte.game_transaction_type={$entry_type}";
             $gameTxExt = DB::connection($connection["connection_name"])->select($select.$db.$where);
