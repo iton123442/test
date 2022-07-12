@@ -267,8 +267,6 @@ class VivoController extends Controller
 		        // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 		        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
         	}else{
-        		$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID >'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>FAILED</RESULT><CODE>300</CODE></RESPONSE></VGSSYSTEM>';
-				return $response;
 				$game_transaction_id = $bet_transaction->game_trans_id;
 				$amount = $bet_transaction->bet_amount + $data["Amount"];
 				$updateGameTransaction = [
