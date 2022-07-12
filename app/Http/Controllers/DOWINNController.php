@@ -403,9 +403,9 @@ class DOWINNController extends Controller{
             Helper::saveLog("QUERY", 139,json_encode($sumOfTransactions),$this->startTime);
             if($sumOfTransactions != 'false'){
                 if($sumOfTransactions->win == 0){
-                    $winTotal = $sumOfTransactions->win == 0 ? $sumOfTransactions->win+$winAmount : $sumOfTransactions->win;
                     $reCount = GameTransactionMDB::findGameExtDowinn($game->game_trans_id,2,$client_details);
                     Helper::saveLog("CASE 2", 139,json_encode($reCount),$this->startTime);
+                    $winTotal = $reCount->win == 0 ? $reCount->win+$winAmount : $reCount->win;
                     $updateTransData = [
                         "win" => $winTotal == 0 ? 0 : 1,
                         "pay_amount" => round($winTotal,2),
