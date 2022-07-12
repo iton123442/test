@@ -246,6 +246,7 @@ class VivoController extends Controller
 			// "provider_request" => json_encode($data),
 			// "general_details" => $data["History"],
 		);
+		
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
         GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
         $getGameEXT = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
