@@ -237,6 +237,12 @@ class VivoController extends Controller
 		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 		$game_transaction_id = $gen_game_trans_id;
+		$get_bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
+		if($get_bet_transaction == null){
+			$game_transaction_id = $gen_game_trans_id;
+		}else{
+			$game_transaction_id = $get_bet_transaction->game_trans_id;
+		}
 		$bet_game_transaction_ext = array(
 			"game_trans_id" => $game_transaction_id,
 			"provider_trans_id" => $data["TransactionID"],
