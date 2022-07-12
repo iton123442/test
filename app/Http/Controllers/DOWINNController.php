@@ -392,12 +392,42 @@ class DOWINNController extends Controller{
                 "provider_request" => json_encode($data),
             ];
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
-            $winTotal = $game->pay_amount+$winAmount;
+            // $winTotal = $game->pay_amount+$winAmount;
             // $updateTransData = [
             //     "pay_amount" => round($winTotal,2),
             //     "income" => round($game->bet_amount-$winTotal,2),
             // ];
             // GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
+            $sumOfTransactions = GameTransactionMDB::findGameExtDowinn($game->game_trans_id,2,$client_details);
+            if($sumOfTransactions != 'false'){
+                if($sumOfTransactions[0]->win == 0){
+                    $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
+                    $reCount = GameTransactionMDB::findGameExtDowinn($game->game_trans_id,2,$client_details);
+                    Helper::saveLog("CASE 2", 139,json_encode($reCount[0]),$this->startTime);
+                    $updateTransData = [
+                        "win" => $winTotal == 0 ? 0 : 1,
+                        "pay_amount" => round($winTotal,2),
+                        "income" => round($game->bet_amount-$winTotal,2),
+                    ];
+                }else{
+                    $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
+                    Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions[0]),$this->startTime);
+                    $updateTransData = [
+                        "win" => $winTotal == 0 ? 0 : 1,
+                        "pay_amount" => round($winTotal,2),
+                        "income" => round($game->bet_amount-$winTotal,2),
+                    ];
+                }
+            }else{
+                Helper::saveLog("NEUTRAL", 139,json_encode($data),$this->startTime);
+                $winTotal = $game->pay_amount+$winAmount;
+                    $updateTransData = [
+                        "win" => $winTotal == 0 ? 0 : 1,
+                        "pay_amount" => round($winTotal,2),
+                        "income" => round($game->bet_amount-$winTotal,2),
+                    ];
+            }
+            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $win_or_lost = $winTotal == 0 ? 0 : 1;
             $response = [
                 "status" => "OK",
@@ -434,41 +464,6 @@ class DOWINNController extends Controller{
                 $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                    $connection = GameTransactionMDB::getAvailableConnection($client_details->connection_name);
-                    $sumOfTransactions = DB::select("SELECT
-                    IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
-                    WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
-                    if($sumOfTransactions != 'false'){
-                        if($sumOfTransactions[0]->win == 0){
-                            $reCount = DB::select("SELECT
-                            IFNULL((select sum(amount) amount from {$connection['db_list'][1]}.game_transaction_ext gte 
-                            WHERE transaction_detail = 'Success' AND game_trans_id = ".$game->game_trans_id." AND game_transaction_type = 2),0) win;");
-                            $winTotal = $reCount[0]->win == 0 ? $reCount[0]->win+$winAmount : $reCount[0]->win;
-                            Helper::saveLog("CASE 1", 139,json_encode($reCount[0]),$this->startTime);
-                            $updateTransData = [
-                                "win" => $winTotal == 0 ? 0 : 1,
-                                "pay_amount" => round($winTotal,2),
-                                "income" => round($game->bet_amount-$winTotal,2),
-                            ];
-                        }else{
-                            $winTotal = $sumOfTransactions[0]->win == 0 ? $sumOfTransactions[0]->win+$winAmount : $sumOfTransactions[0]->win;
-                            Helper::saveLog("CASE 1", 139,json_encode($sumOfTransactions[0]),$this->startTime);
-                            $updateTransData = [
-                                "win" => $winTotal == 0 ? 0 : 1,
-                                "pay_amount" => round($winTotal,2),
-                                "income" => round($game->bet_amount-$winTotal,2),
-                            ];
-                        }
-                    }else{
-                        Helper::saveLog("NEUTRAL", 139,json_encode($data),$this->startTime);
-                        $winTotal = $game->pay_amount+$winAmount;
-                            $updateTransData = [
-                                "win" => $winTotal == 0 ? 0 : 1,
-                                "pay_amount" => round($winTotal,2),
-                                "income" => round($game->bet_amount-$winTotal,2),
-                            ];
-                    }
-                    GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
                     //SUCCESS FUNDTRANSFER
                     $response = [
                         "status" => 'OK',
