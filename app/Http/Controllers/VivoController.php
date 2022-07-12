@@ -254,7 +254,7 @@ class VivoController extends Controller
         }
 		Helper::saveLog('Vivo Gaming BET', 34,json_encode($data), 'HIT Bet process');
 		try{
-			ProviderHelper::idenpotencyTable($chairID.$data["roundId"]);
+			ProviderHelper::idenpotencyTable($data["roundId"]);
 			$gameTransactionData = array(
 	            "provider_trans_id" => $data["TransactionID"],
 	            "token_id" => $client_details->token_id,
