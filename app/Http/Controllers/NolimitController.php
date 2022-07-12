@@ -118,21 +118,6 @@ class NolimitController extends Controller
     public function Balance($request, $client_details){
       $data = $request; 
       ProviderHelper::saveLogWithExeption('Nolimit getbalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-      if($client_details->balance = 0){
-        $response = [      
-            'jsonrpc' => '2.0',
-            'error' => [
-                    'code' => -3200,
-                    'message' => 'Server error',
-                    'data' => [
-
-                    'code' =>14001,
-                    'message'=> "Balance too low.",
-                        ],
-                    ],
-                    'id' => $data['id']    
-                ];
-      }else {
       $response = [
                     "jsonrpc" => "2.0",
                     "result" => [
@@ -143,7 +128,6 @@ class NolimitController extends Controller
                     ],
                 "id" => $data['id']
             ];
-        }
             return $response;   
     }//End of Balance
     public function Withdraw($request, $client_details){
