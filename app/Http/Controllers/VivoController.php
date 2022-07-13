@@ -236,13 +236,19 @@ class VivoController extends Controller
 		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
-		$game_transaction_id = $gen_game_trans_id;
-		$get_bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
-		if($get_bet_transaction == null){
+		try{
+			ProviderHelper::idenpotencyTable("bet".$data["roundId"]);
 			$game_transaction_id = $gen_game_trans_id;
-		}else{
+		}catch(\Exception $e){
+			$get_bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 			$game_transaction_id = $get_bet_transaction->game_trans_id;
 		}
+		// $get_bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
+		// if($get_bet_transaction == null){
+		// 	$game_transaction_id = $gen_game_trans_id;
+		// }else{
+		// 	$game_transaction_id = $get_bet_transaction->game_trans_id;
+		// }
 		$bet_game_transaction_ext = array(
 			"game_trans_id" => $game_transaction_id,
 			"provider_trans_id" => $data["TransactionID"],
