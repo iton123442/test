@@ -87,6 +87,25 @@ class GameTransactionMDB
             return null;
         }
     }
+    public static function getGameTransactionByRoundIdVivo($game_round,$client_details){
+            // $game = DB::connection($connection["connection_name"])->select("SELECT
+            //                 entry_id,bet_amount,game_trans_id,pay_amount,income
+            //                 FROM {$connection['db_list'][1]}.game_transactions g
+            //                 WHERE  round_id = '".$game_round."'");
+            // $cnt = count($game);
+            // return $cnt > 0? $game[0]: null;
+            $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,win,income FROM ";
+            $db = "game_transactions g ";
+            $where = "WHERE  round_id = '{$game_round}'";
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
+            $cnt = count($game);
+            if ($cnt > 0){
+                return $game[0];
+            }else{
+                return null;
+            }
+       
+    }
     public static function findGameExtDowinn($game_trans_id,$entry_type,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
