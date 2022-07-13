@@ -97,7 +97,7 @@ class GameTransactionMDB
             $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,win,income FROM ";
             $db = "game_transactions g ";
             $where = "WHERE  round_id = '{$game_round}'";
-            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
+            $game = DB::select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
                 return $game[0];
