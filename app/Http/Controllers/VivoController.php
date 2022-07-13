@@ -243,7 +243,7 @@ class VivoController extends Controller
 			$game_transaction_id = $get_bet_transaction->game_trans_id;
 		}
 		$bet_game_transaction_ext = array(
-			"game_trans_id" => $gen_game_trans_id,
+			"game_trans_id" => $game_transaction_id,
 			"provider_trans_id" => $data["TransactionID"],
 			"round_id" => $data["roundId"],
 			"amount" => $data["Amount"],
