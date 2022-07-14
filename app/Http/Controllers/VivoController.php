@@ -243,7 +243,7 @@ class VivoController extends Controller
 		// 	$game_transaction_id = $get_bet_transaction->game_trans_id;
 		// }
 		$bet_game_transaction_ext = array(
-			// "game_trans_id" => $game_transaction_id,
+			"game_trans_id" => $gen_game_trans_id,
 			"provider_trans_id" => $data["TransactionID"],
 			"round_id" => $data["roundId"],
 			"amount" => $data["Amount"],
@@ -271,6 +271,10 @@ class VivoController extends Controller
 		        );
 		        // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 		        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+		        $game_transaction_ext = array(
+					"game_trans_id" => $bet_transaction->game_trans_id,
+				);
+		        GameTransactionMDB::updateGametransactionEXT($game_transaction_ext,$gen_game_extid,$client_details);
         	}else{
 				$game_transaction_id = $bet_transaction->game_trans_id;
 				$amount = $bet_transaction->bet_amount + $data["Amount"];
@@ -278,12 +282,13 @@ class VivoController extends Controller
 	            	"bet_amount" => $getGameEXT->amount,
 		        ];
 		        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+		        $game_transaction_ext = array(
+					"game_trans_id" => $bet_transaction->game_trans_id,
+				);
+		        GameTransactionMDB::updateGametransactionEXT($game_transaction_ext,$gen_game_extid,$client_details);
         	}
         }
-        $game_transaction_ext = array(
-			"game_trans_id" => $gen_game_trans_id,
-		);
-        GameTransactionMDB::updateGametransactionEXT($game_transaction_ext,$gen_game_extid,$client_details);
+        
         try {
 			$fund_extra_data = [
 	            'provider_name' => $game_details->provider_name
