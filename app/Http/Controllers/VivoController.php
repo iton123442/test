@@ -296,7 +296,7 @@ class VivoController extends Controller
 	        Helper::saveLog('Vivo Gaming BET prio fundTransfer', 34,json_encode($data), $client_details->balance - $data["Amount"]);
 	       
 	        // $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
-	        $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $gen_game_extid, $game_transaction_id, 'debit', false, $fund_extra_data);
+	        $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"], $game_details->game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit', false, $fund_extra_data);
         } catch (\Exception $e) {
         	return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
         }
@@ -304,7 +304,7 @@ class VivoController extends Controller
 			switch ($client_response->fundtransferresponse->status->code) {
 				case '200':
 					ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-					$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID>'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$game_transaction_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
+					$response = '<VGSSYSTEM><REQUEST><USERID>'.$data["userId"].'</USERID><AMOUNT>'.$data["Amount"].'</AMOUNT><TRANSACTIONID>'.$data["TransactionID"].'</TRANSACTIONID><TRNTYPE>'.$data["TrnType"].'</TRNTYPE><GAMEID>'.$data["gameId"].'</GAMEID><ROUNDID>'.$data["roundId"].'</ROUNDID><TRNDESCRIPTION>'.$data["TrnDescription"].'</TRNDESCRIPTION><HISTORY>'.$data["History"].'</HISTORY><ISROUNDFINISHED>'.$data["isRoundFinished"].'</ISROUNDFINISHED><HASH>'.$data["hash"].'</HASH></REQUEST><TIME>'.Helper::datesent().'</TIME><RESPONSE><RESULT>OK</RESULT><ECSYSTEMTRANSACTIONID>'.$gen_game_trans_id.'</ECSYSTEMTRANSACTIONID><BALANCE>'.$client_response->fundtransferresponse->balance.'</BALANCE></RESPONSE></VGSSYSTEM>';
 					// $data_to_update = array(
      //                    "mw_response" => json_encode($response),
      //                    "transaction_detail" => "success"
@@ -322,7 +322,7 @@ class VivoController extends Controller
 	                    ];
                      ProviderHelper::queTransactionLogs($createGameTransactionLog);
                      if($data['isRoundFinished'] == "true"){
-                     	return $this->loseTransaction($data,$game_transaction_id,$gen_game_extid,$client_details);
+                     	return $this->loseTransaction($data,$gen_game_trans_id,$gen_game_extid,$client_details);
                      }
 					break;
 				case '402':
@@ -334,7 +334,7 @@ class VivoController extends Controller
                             "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
                         );
 
-                        GameTransactionMDB::updateGametransaction($datas, $game_transaction_id, $client_details);
+                        GameTransactionMDB::updateGametransaction($datas, $gen_game_trans_id, $client_details);
                         // $data_to_update = array(
                         //     "mw_response" => json_encode($response)
                         // );
