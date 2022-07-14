@@ -272,7 +272,7 @@ class VivoController extends Controller
 		        // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 		        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
 		        $game_transaction_ext = array(
-					"game_trans_id" => $bet_transaction->game_trans_id,
+					"game_trans_id" => $gen_game_trans_id,
 				);
 		        GameTransactionMDB::updateGametransactionEXT($game_transaction_ext,$gen_game_extid,$client_details);
         	}else{
