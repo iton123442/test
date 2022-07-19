@@ -242,18 +242,35 @@ class VivoController extends Controller
 		// }else{
 		// 	$game_transaction_id = $get_bet_transaction->game_trans_id;
 		// }
-		$bet_game_transaction_ext = array(
-			"game_trans_id" => $gen_game_trans_id,
-			"provider_trans_id" => $data["TransactionID"],
-			"round_id" => $data["roundId"],
-			"amount" => $data["Amount"],
-			"game_transaction_type" => 1,
-			// "provider_request" => json_encode($data),
-			// "general_details" => $data["History"],
-		);
+		$getGameTransExt = GameTransactionMDB::findGameExt($data["roundId"], 1, "round_id",$client_details);
+		if($getGameTransExt != "false"){
+			$bet_game_transaction_ext = array(
+				"game_trans_id" => $getGameTransExt->game_trans_id,
+				"provider_trans_id" => $data["TransactionID"],
+				"round_id" => $data["roundId"],
+				"amount" => $data["Amount"],
+				"game_transaction_type" => 1,
+				// "provider_request" => json_encode($data),
+				// "general_details" => $data["History"],
+			);
 
-        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
-        GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
+	        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
+	        GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
+		}else{
+			$bet_game_transaction_ext = array(
+				"game_trans_id" => $gen_game_trans_id,
+				"provider_trans_id" => $data["TransactionID"],
+				"round_id" => $data["roundId"],
+				"amount" => $data["Amount"],
+				"game_transaction_type" => 1,
+				// "provider_request" => json_encode($data),
+				// "general_details" => $data["History"],
+			);
+
+	        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
+	        GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension	
+		}
+		
         $getGameEXT = GameTransactionMDB::findGameExtVivo($gen_game_trans_id,1,$client_details);
         if($getGameEXT != null){
         	$bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
@@ -279,7 +296,7 @@ class VivoController extends Controller
     		 	$game_transaction_ext = array(
 					"game_trans_id" => $bet_transaction->game_trans_id,
 				);
-		        GameTransactionMDB::updateGametransactionEXT($game_transaction_ext,$gen_game_extid,$client_details);
+		        GameTransactionMDB::updateGametransactionEXT($game_transaction_ext,$game_transaction_ext,$client_details);
 		        $bet_transaction2 = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 		        $getGameEXT2 = GameTransactionMDB::findGameExtVivo($bet_transaction2->game_trans_id,1,$client_details);
 				$game_transaction_id = $bet_transaction2->game_trans_id;
@@ -288,7 +305,6 @@ class VivoController extends Controller
 	            	"bet_amount" => $getGameEXT2->amount,
 		        ];
 		        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
-
         	}
         }
         
