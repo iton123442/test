@@ -30,7 +30,7 @@ class GameLobby{
         $client = GameLobby::getClientDetails("token",$token);
         
         $game_list =GameLobby::icgGameUrl($client->default_currency);
-        ProviderHelper::saveLogGameLaunch('GAMELAUNCH ICG', 11, json_encode($game_code), json_encode($game_list));
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH GAMELIST', 11, json_encode($game_code), json_encode($game_list));
         foreach($game_list["data"] as $game){
             if($game["productId"] == $game_code){
                 $lang = GameLobby::getLanguage("Iconic Gaming",$lang);
