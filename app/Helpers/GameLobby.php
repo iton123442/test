@@ -1121,6 +1121,7 @@ class GameLobby{
                 'Accept'     => 'application/json'
             ]
         ]);
+        ProviderHelper::saveLogGameLaunch('GAMELAUNCH AUTH', 11, json_encode($game_code), GameLobby::icgConnect($currency));
         return json_decode((string) $response->getBody(), true);
     }
     public static function icgConnect($currency){
