@@ -349,13 +349,14 @@ class SimplePlayController extends Controller
             // );
             // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
             $createGameTransactionLog = [
-              "connection_name" => $get_client_details->connection_name,
+              "connection_name" => $client_details->connection_name,
               "column" =>[
                   "game_trans_ext_id" => $gen_game_extid,
-                  "request" => json_encode($request->all()),
+                  "request" => json_encode($request_params),
                   "response" => json_encode($response),
                   "log_type" => "provider_details",
-                  "transaction_detail" => "FAILED",
+                  "transaction_detail" => "Success",
+                  "general_details" => json_encode($string),
               ]
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionLog);
@@ -452,50 +453,51 @@ class SimplePlayController extends Controller
                   );
               // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
               GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
-              $createGameTransactionLog = [
+              
+
+              $action_payload = [
+                            "type" => "custom", #genreral,custom :D # REQUIRED!
+                            "custom" => [
+                                "provider" => 'SimplePlay',
+                                "client_connection_name" => $client_details->connection_name,
+                                "win_or_lost" => $win_or_lost,
+                                "entry_id" => $entry_id,
+                                "pay_amount" => $pay_amount,
+                                "income" => $income,
+                                "game_trans_ext_id" => $gen_game_extid
+                            ],
+                            "provider" => [
+                                "provider_request" => $request_params, #R
+                                "provider_trans_id"=> $transaction_id, #R
+                                "provider_round_id"=> $round_id, #R
+                            ],
+                            "mwapi" => [
+                                "roundId"=>$round_id, #R
+                                "type"=>2, #R
+                                "game_id" => $game_details->game_id, #R
+                                "player_id" => $client_details->player_id, #R
+                                "mw_response" => $response, #R
+                            ],
+                            'fundtransferrequest' => [
+                                'fundinfo' => [
+                                    'freespin' => false,
+                                ]
+                            ]
+                        ];
+                  
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+            $createGameTransactionLog = [
               "connection_name" => $client_details->connection_name,
               "column" =>[
                   "game_trans_ext_id" => $gen_game_extid,
-                  "request" => json_encode($request->all()),
+                  "request" => json_encode($request_params),
                   "response" => json_encode($response),
                   "log_type" => "provider_details",
                   "transaction_detail" => "Lose Round",
+                  "general_details" => json_encode($string),
               ]
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionLog);
-
-            //   $action_payload = [
-            //                 "type" => "custom", #genreral,custom :D # REQUIRED!
-            //                 "custom" => [
-            //                     "provider" => 'SimplePlay',
-            //                     "client_connection_name" => $client_details->connection_name,
-            //                     "win_or_lost" => $win_or_lost,
-            //                     "entry_id" => $entry_id,
-            //                     "pay_amount" => $pay_amount,
-            //                     "income" => $income,
-            //                     "game_trans_ext_id" => $game_trans_ext_id
-            //                 ],
-            //                 "provider" => [
-            //                     "provider_request" => $request_params, #R
-            //                     "provider_trans_id"=> $transaction_id, #R
-            //                     "provider_round_id"=> $round_id, #R
-            //                 ],
-            //                 "mwapi" => [
-            //                     "roundId"=>$round_id, #R
-            //                     "type"=>2, #R
-            //                     "game_id" => $game_details->game_id, #R
-            //                     "player_id" => $client_details->player_id, #R
-            //                     "mw_response" => $response, #R
-            //                 ],
-            //                 'fundtransferrequest' => [
-            //                     'fundinfo' => [
-            //                         'freespin' => false,
-            //                     ]
-            //                 ]
-            //             ];
-                  
-            // $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
-
             // $updateTransactionEXt = array(
             //       "provider_request" =>json_encode($request_params),
             //       "mw_response" => json_encode($response),

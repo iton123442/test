@@ -16,7 +16,7 @@ class WalletDetailsController extends Controller
 {
     public function __construct(){
 
-        // $this->middleware('oauth', ['except' => []]);
+        $this->middleware('oauth', ['except' => []]);
         /*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
     }
 
@@ -539,7 +539,7 @@ class WalletDetailsController extends Controller
                         format(
                             (case 
                                 when (select game_type_id from ".$connection["TG_GameInfo"].".games where game_id = c.game_id) = 3 then bet_amount * 0.03
-                                when (select game_type_id from ".$connection["TG_GameInfo"].".games where game_id = c.game_id) = 33 then bet_amount * 0.015 
+                                when (select game_type_id from ".$connection["TG_GameInfo"].".games where game_id = c.game_id) = 33 then bet_amount * 0.03
                                 end )
                         ,4) ggr, 
                         (select default_currency from api_test.clients where client_id = c.client_id) as currency,

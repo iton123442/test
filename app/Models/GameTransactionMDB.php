@@ -87,6 +87,43 @@ class GameTransactionMDB
             return null;
         }
     }
+    public static function getGameTransactionByRoundIdVivo($game_round,$client_details){
+            // $game = DB::connection($connection["connection_name"])->select("SELECT
+            //                 entry_id,bet_amount,game_trans_id,pay_amount,income
+            //                 FROM {$connection['db_list'][1]}.game_transactions g
+            //                 WHERE  round_id = '".$game_round."'");
+            // $cnt = count($game);
+            // return $cnt > 0? $game[0]: null;
+            $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,win,income FROM ";
+            $db = "game_transactions g ";
+            $where = "WHERE  round_id = '{$game_round}'";
+            $game = DB::select($select.$db.$where);
+            $cnt = count($game);
+            if ($cnt > 0){
+                return $game[0];
+            }else{
+                return null;
+            }
+       
+    }
+    public static function findGameExtDowinn($game_trans_id,$entry_type,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            $select = "SELECT IFNULL(sum(amount),0) as win FROM ";
+            $db = "{$connection['db_list'][0]}.game_transaction_ext gte ";
+            $where = "where gte.game_trans_id ='{$game_trans_id}' AND gte.game_transaction_type={$entry_type}";
+            $gameTxExt = DB::connection($connection["connection_name"])->select($select.$db.$where);
+            $cnt = count($gameTxExt);
+            if ($cnt > 0){
+                return $gameTxExt[0];
+            }else{
+                // return self::checkAndGetFromOtherServer($select,$where,$connection["connection_name"],'gte');
+                return null;
+            }
+        }else{
+            return null;
+        }
+    }
     public static function getGameTransactionByTokenAndRoundId($player_token,$game_round,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
@@ -117,7 +154,7 @@ class GameTransactionMDB
             //                 WHERE  round_id = '".$game_round."'");
             // $cnt = count($game);
             // return $cnt > 0? $game[0]: null;
-            $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,income FROM ";
+            $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,win,income FROM ";
             $db = "{$connection['db_list'][1]}.game_transactions g ";
             $where = "WHERE  round_id = '{$game_round}'";
             $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
@@ -150,30 +187,6 @@ class GameTransactionMDB
                 return $game[0];
             }else{
                 return self::checkAndGetFromOtherServer($select,$where,$connection["connection_name"],'gt');
-            }
-        }else{
-            return null;
-        }
-    }
-
-    public static function getGameTransactionByRoundIdVivo($game_round,$client_details){
-        $connection = self::getAvailableConnection($client_details->connection_name);
-        if($connection != null){
-            // $game = DB::connection($connection["connection_name"])->select("SELECT
-            //                 entry_id,bet_amount,game_trans_id,pay_amount,income
-            //                 FROM {$connection['db_list'][1]}.game_transactions g
-            //                 WHERE  round_id = '".$game_round."'");
-            // $cnt = count($game);
-            // return $cnt > 0? $game[0]: null;
-            $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,income FROM ";
-            $db = "{$connection['db_list'][1]}.game_transactions g ";
-            $where = "WHERE  round_id = '{$game_round}'";
-            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
-            $cnt = count($game);
-            if ($cnt > 0){
-                return $game[0];
-            }else{
-                return null;
             }
         }else{
             return null;
