@@ -26,12 +26,21 @@ return [
         'password' => '_^+T3chSu4rt+^_',
         'grant_type' => 'password',
     ],
+
+    # OLD
     // 'icgamingapi' => 'https://admin-stage.iconic-gaming.com/service',
     // 'icgaminglogin' => 'https://admin-stage.iconic-gaming.com/service/login',
     // 'icgaminggames' => 'https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
-    'icgamingapi' => 'https://api-stage.at888888.com/service',
-    'icgaminglogin' => 'https://api-stage.at888888.com/service/login',
-    'icgaminggames' => 'https://api-stage.at888888.com/service/api/v1/games?type=all&lang=en',
+
+    // New
+    // 'icgamingapi' => 'https://api-stage.at888888.com/service',
+    // 'icgaminglogin' => 'https://api-stage.at888888.com/service/login',
+    // 'icgaminggames' => 'https://api-stage.at888888.com/service/api/v1/games?type=all&lang=en',
+
+    // New
+    'icgamingapi' => 'https://admin-stage.astrotechgaming.com/service',
+    'icgaminglogin' => 'https://admin-stage.astrotechgaming.com/service/login',
+    'icgaminggames' => 'https://admin-stage.astrotechgaming.com/service/api/v1/games?type=all&lang=en',
     'icgagents'=>[
         'jpyagents'=>[
             'username' => 'betrnkjpy',
