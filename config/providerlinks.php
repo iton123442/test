@@ -38,9 +38,9 @@ return [
     // 'icgaminggames' => 'https://api-stage.at888888.com/service/api/v1/games?type=all&lang=en',
 
     // New
-    'icgamingapi' => 'https://admin-stage.astrotechgaming.com/service',
-    'icgaminglogin' => 'https://admin-stage.astrotechgaming.com/service/login',
-    'icgaminggames' => 'https://admin-stage.astrotechgaming.com/service/api/v1/games?type=all&lang=en',
+    'icgamingapi' => 'https://admin-stage.astrotechgaming.com',
+    'icgaminglogin' => 'https://admin-stage.astrotechgaming.com/login',
+    'icgaminggames' => 'https://admin-stage.astrotechgaming.com/api/v1/games?type=all&lang=en',
     'icgagents'=>[
         'jpyagents'=>[
             'username' => 'betrnkjpy',
