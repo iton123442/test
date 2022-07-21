@@ -880,14 +880,14 @@ $app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
 //DOWINN
 
 
-$app->post('/public/api/dowinn', 'DOWINNController@index');//SINGLE END POINT
-$app->post('/public/api/dowinn/balance', 'DOWINNController@balance');
-$app->post('/public/api/dowinn/debit', 'DOWINNController@bet');
-$app->post('/public/api/dowinn/credit', 'DOWINNController@payment');
-$app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
-$app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
-$app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');
-$app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
+// $app->post('/public/api/dowinn', 'DOWINNController@index');//SINGLE END POINT
+// $app->post('/public/api/dowinn/balance', 'DOWINNController@balance');
+// $app->post('/public/api/dowinn/debit', 'DOWINNController@bet');
+// $app->post('/public/api/dowinn/credit', 'DOWINNController@payment');
+// $app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
+// $app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
+// $app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');
+// $app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
 //NEWFLOW DOWINN
 $app->post('/public/api/dowinn', 'DOWINNNEWController@index');//SINGLE END POINT
 $app->post('/public/api/dowinn/balance', 'DOWINNNEWController@balance');
