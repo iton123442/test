@@ -880,20 +880,20 @@ $app->post('/public/api/bota/callbackBalance', 'BOTAController@index');
 //DOWINN
 
 
-// $app->post('/public/api/dowinn', 'DOWINNController@index');//SINGLE END POINT
-// $app->post('/public/api/dowinn/balance', 'DOWINNController@balance');
-// $app->post('/public/api/dowinn/debit', 'DOWINNController@bet');
-// $app->post('/public/api/dowinn/credit', 'DOWINNController@payment');
-// $app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
-// $app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
-// $app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');
-// $app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
+$app->post('/public/api/dowinn', 'DOWINNController@index');//SINGLE END POINT
+$app->post('/public/api/dowinn/balance', 'DOWINNController@balance');
+$app->post('/public/api/dowinn/debit', 'DOWINNController@bet');
+$app->post('/public/api/dowinn/credit', 'DOWINNController@payment');
+$app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
+$app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
+$app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');
+$app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
 //NEWFLOW DOWINN
-$app->post('/public/api/dowinn', 'DOWINNNEWController@index');//SINGLE END POINT
-$app->post('/public/api/dowinn/balance', 'DOWINNNEWController@balance');
-$app->post('/public/api/dowinn/debit', 'DOWINNNEWController@bet');
-$app->post('/public/api/dowinn/credit', 'DOWINNNEWController@payment');
-$app->post('/public/api/dowinn/cancel', 'DOWINNNEWController@cancel');
-$app->post('/public/api/dowinn/tip', 'DOWINNNEWController@tip');
-$app->post('/public/api/dowinn/limits', 'DOWINNNEWController@limitList');
-$app->post('/public/api/dowinn/history', 'DOWINNNEWController@viewHistory');
+// $app->post('/public/api/dowinn', 'DOWINNNEWController@index');//SINGLE END POINT
+// $app->post('/public/api/dowinn/balance', 'DOWINNNEWController@balance');
+// $app->post('/public/api/dowinn/debit', 'DOWINNNEWController@bet');
+// $app->post('/public/api/dowinn/credit', 'DOWINNNEWController@payment');
+// $app->post('/public/api/dowinn/cancel', 'DOWINNNEWController@cancel');
+// $app->post('/public/api/dowinn/tip', 'DOWINNNEWController@tip');
+// $app->post('/public/api/dowinn/limits', 'DOWINNNEWController@limitList');
+// $app->post('/public/api/dowinn/history', 'DOWINNNEWController@viewHistory');
