@@ -427,6 +427,7 @@ class PNGController extends Controller
                     "mw_request" => json_encode($client_response->requestoclient),
                     "client_response" => json_encode($client_response),
                     "mw_response" => json_encode($array_data),
+                    "transaction_detail" => "SUCCESS"
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 // ProviderHelper::saveLogProcessTime($gametransactionid, 1334, json_encode(["type"=>"debitproccess","stating"=>$startTime,"response"=>microtime(true)]), ["response"=>microtime(true) - $startTime,"mw_response"=> microtime(true) - $startTime - $client_response_time,"clientresponse"=>$client_response_time]);
@@ -606,6 +607,7 @@ class PNGController extends Controller
                         "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response),
                         "mw_response" => json_encode($array_data),
+                        "transaction_detail" => "SUCCESS"
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     // Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$array_data,$client_response);
@@ -619,6 +621,7 @@ class PNGController extends Controller
                         "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response),
                         "mw_response" => json_encode($array_data),
+                        "transaction_detail" => "FAILED"
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }
