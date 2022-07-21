@@ -140,7 +140,6 @@ class DOWINNNEWController extends Controller{
                         "round_id" => $roundId,
                         "amount" => $data['transaction']['amount'],
                         "game_transaction_type" => 1,
-                        "provider_request" => json_encode($data),
                     ];
                     GameTransactionMDB::createGameTransactionExtV2($gametransExt_data,$game_trans_ext_id,$client_details);
                     $client_response = ClientRequestHelper::fundTransfer($client_details,$data['transaction']['amount'],$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$bet_transaction->game_trans_id,'debit');
@@ -222,7 +221,6 @@ class DOWINNNEWController extends Controller{
                     "round_id" => $roundId,
                     "amount" => $betAmount,
                     "game_transaction_type" => 1,
-                    "provider_request" => json_encode($data),
                 ];
                 GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
                 $fund_extra_data = [
@@ -348,7 +346,6 @@ class DOWINNNEWController extends Controller{
                     "round_id" => $roundId,
                     "amount" => $winAmount,
                     "game_transaction_type" => 1,
-                    "provider_request" => json_encode($data),
                 ];
                 GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
                 $fund_extra_data = [
@@ -419,7 +416,6 @@ class DOWINNNEWController extends Controller{
                 "round_id" => $roundId,
                 "amount" => $winAmount,
                 "game_transaction_type" => 2,
-                "provider_request" => json_encode($data),
             ];
             GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
             // $winTotal = $game->pay_amount+$winAmount;
@@ -563,7 +559,6 @@ class DOWINNNEWController extends Controller{
                     "round_id" => $roundId,
                     "amount" => $winAmount,
                     "game_transaction_type" => 1,
-                    "provider_request" => json_encode($data),
                 ];
                 GameTransactionMDB::createGameTransactionExt($gameExtensionData,$game_trans_ext_id,$client_details);
                 $fund_extra_data = [
@@ -634,7 +629,6 @@ class DOWINNNEWController extends Controller{
                 "round_id" => $roundId,
                 "amount" => $winAmount,
                 "game_transaction_type" => 2,
-                "provider_request" => json_encode($data),
             ];
             GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
             $winTotal = $game->pay_amount+$winAmount;
@@ -790,7 +784,6 @@ class DOWINNNEWController extends Controller{
                     "round_id" => $roundId,
                     "amount" => $refundAmount,
                     "game_transaction_type" => 1,
-                    "provider_request" => json_encode($data),
                 ];
                 GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
                 $fund_extra_data = [
@@ -869,7 +862,6 @@ class DOWINNNEWController extends Controller{
                 "round_id" => $roundId,
                 "amount" => $refundAmount,
                 "game_transaction_type" => 3,
-                "provider_request" => json_encode($data),
             ];
             GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
             $updateTransData = [
@@ -1011,7 +1003,6 @@ class DOWINNNEWController extends Controller{
                     "round_id" => $roundId,
                     "amount" => $betAmount,
                     "game_transaction_type" => 4,
-                    "provider_request" => json_encode($data),
                 ];
                 GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
                 $fund_extra_data = [
