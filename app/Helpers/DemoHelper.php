@@ -91,7 +91,7 @@ class DemoHelper{
         elseif($provider_code == 40){  // Evoplay
             $response = array(
                 "game_code" => $data->game_code,
-                "url" => DemoHelper::evoplay($data->game_code,$lang),
+                "url" => DemoHelper::evoplay($data->game_code,$lang, $exitUrl),
                 "game_launch" => true
             );
         }
@@ -290,7 +290,7 @@ class DemoHelper{
             return $game_launch_url->IframeUrl."&backurl=".$request->exitUrl;  
         } 
     }
-    public static function evoplay($game_code, $lang){
+    public static function evoplay($game_code, $lang, $exit_url){
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
         $requesttosend = [
           "project" => config('providerlinks.evoplay.project_id'),
@@ -300,6 +300,7 @@ class DemoHelper{
           "settings" =>  [
             'language'=>$lang,
             'https' => true,
+            'exit_url' => isset($exit_url) ? $exit_url : "",
           ],
           "denomination" => '1', // game to be launched with values like 1.0, 1, default
           "currency" => 'USD',
