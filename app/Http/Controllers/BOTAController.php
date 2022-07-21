@@ -180,6 +180,10 @@ class BOTAController extends Controller{
                 );
                 $dataToUpdate =[
                     "mw_response" =>json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 // $createGameTransactionLog = [
@@ -227,7 +231,11 @@ class BOTAController extends Controller{
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     GameTransactionMDB::updateGametransaction($datatosend,$game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($msg)
+                        "mw_response" =>json_encode($msg),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => "FAILED",
+                        "general_details" => "FAILED",
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
@@ -408,6 +416,10 @@ class BOTAController extends Controller{
                 ];
                 $dataToUpdate =[
                     "mw_response" =>json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $game->game_trans_id, $client_details); 
@@ -456,7 +468,11 @@ class BOTAController extends Controller{
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     GameTransactionMDB::updateGametransaction($datatosend,$game->game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($msg)
+                        "mw_response" =>json_encode($msg),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => "FAILED",
+                        "general_details" => "FAILED",
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
@@ -646,6 +662,10 @@ class BOTAController extends Controller{
                 ];
                 $dataToUpdate =[
                     "mw_response" =>json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$bettransactionExtId, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $game->game_trans_id, $client_details); 
@@ -694,7 +714,11 @@ class BOTAController extends Controller{
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     GameTransactionMDB::updateGametransaction($datatosend,$game->game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($msg)
+                        "mw_response" =>json_encode($msg),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => "FAILED",
+                        "general_details" => "FAILED",
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $bettransactionExtId, $client_details);
                 }catch(\Exception $e){
@@ -860,6 +884,10 @@ class BOTAController extends Controller{
                 );
                 $dataToUpdate =[
                     "mw_response" =>json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$winTransactionExtID, $client_details);
                 // $createGameTransactionLog = [
@@ -909,7 +937,11 @@ class BOTAController extends Controller{
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     GameTransactionMDB::updateGametransaction($datatosend,$game->game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($msg)
+                        "mw_response" =>json_encode($msg),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => "FAILED",
+                        "general_details" => "FAILED",
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $winTransactionExtID, $client_details);
                 }catch(\Exception $e){
@@ -1018,6 +1050,10 @@ class BOTAController extends Controller{
                 ];
                 $dataToUpdate =[
                     "mw_response" =>json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => "Success",
+                    "general_details" => "Success",
                 ];
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id, $client_details);
                 GameTransactionMDB::updateGametransaction($updateBet, $gameExt->game_trans_id, $client_details); 
@@ -1068,7 +1104,11 @@ class BOTAController extends Controller{
                     // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                     GameTransactionMDB::updateGametransaction($datatosend,$gameExt->game_trans_id,$client_details);
                     $updateData = array(
-                        "mw_response" => json_encode($msg)
+                        "mw_response" =>json_encode($msg),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => "FAILED",
+                        "general_details" => "FAILED",
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateData, $game_trans_ext_id, $client_details);
                 }catch(\Exception $e){
