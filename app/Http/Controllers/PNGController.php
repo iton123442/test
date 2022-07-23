@@ -161,7 +161,6 @@ class PNGController extends Controller
                     'provider_name' => $game_details->provider_name,
                     'connection_timeout' => 5,
                 ];
-                sleep(20);
                 // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit", false, $body_details);
                 if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200"){
