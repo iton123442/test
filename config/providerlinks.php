@@ -720,6 +720,9 @@ return [
             // "3457bde6440cb38837da65b3c", 
             // "b391abaf172c2dbc1046965c8"
         ],
+        "localhost" => [
+            "1038e73c29b778884c96b418f", // testing Staging and production USD
+        ],
         "b972d12c42bd31d56fd1bd5cc" => [211,92,222], //ga suppor aning mga client pag pull ni sa data 
 
    ],  

@@ -1357,4 +1357,74 @@ class IDNPokerController extends Controller
         return $response;
      
     }
+
+
+    public static function TransactionHistory(Request $request) {
+        
+        $time = '00:00'; 
+        $date = $request->date;  //$getTime[0]->date
+        $datedb = $request->datedb;  //$getTime[0]->date
+        $data = [
+            "start_time" => $time,
+            "date" => $date,
+        ];
+        $key = config('providerlinks.idnpoker');
+       
+        foreach ($key["localhost"] as  $keyVal) {
+            // $rate = IDNPokerHelper::getRate($keyVal); //TESTINGn); // check balance
+            $true = false;
+            do {
+                $check = DB::select("SELECT count(*) as `page` FROM api_test.production_idn_transaction where `date` BETWEEN '".$datedb." 00:00:00' and '".$datedb." 23:59:59'");
+                $page = (int) ($check[0]->page / 1000) + 1;
+                $transactionList = IDNPokerHelper::TransactionHistory($data,$keyVal,$page);
+                if($transactionList != "false"){
+                    foreach ($transactionList["row"] as  $value) {
+                        try {
+                            ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"].$value["date"]);
+                            $idn_transaciton = [
+                                "game_trans_id" => 1,
+                                "transaction_no" => $value["transaction_no"],
+                                "userid" => $value["userid"],
+                                "tableno" => $value["tableno"],
+                                "date" => $value["date"],
+                                "game" => $value["game"],
+                                "table" => $value["table"],
+                                "periode" => $value["periode"],
+                                "room" => $value["room"],
+                                "bet" => isset($value["bet"]) ? $value["bet"] : 0,
+                                "curr_bet" => isset($value["curr_bet"]) ? $value["curr_bet"] : 0,
+                                "r_bet" => isset($value["r_bet"]) ? $value["r_bet"] : 0,
+                                "status" => $value["status"],
+                                "hand" => isset($value["hand"]) ? $value["hand"] : '',
+                                "card" => isset($value["card"]) ? $value["card"] : '',
+                                "prize" =>  isset($value["prize"]) ? $value["prize"] : '',
+                                "curr" => $value["curr"],
+                                "curr_player" => $value["curr_player"],
+                                "amount" => $value["amount"],
+                                "curr_amount" => $value["curr_amount"],
+                                "total" => $value["total"],
+                                "agent_comission" => $value["agent_comission"],
+                                "agent_bill" => $value["agent_bill"],
+        
+                            ];
+                            IDNPokerHelper::createIDNTransactionLocalhost($idn_transaciton);
+                        } catch (\Exception $e) {
+                            echo $e->getMessage();
+                        }
+                        
+                       
+                    }
+                    sleep(1);
+                    $true = true;
+                } else {
+                    $true = false;
+                    echo "falseeeeee";
+                }
+            } while ($true);
+
+            
+
+           
+        }
+    }
 }

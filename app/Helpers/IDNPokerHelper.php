@@ -355,6 +355,10 @@ class IDNPokerHelper{
         $data_saved = DB::table('idn_transaction_list')->insertGetId($data);
         return $data_saved;
     }
+    public static function createIDNTransactionLocalhost($data) {
+        $data_saved = DB::table('production_idn_transaction')->insertGetId($data);
+        return $data_saved;
+    }
 
     public static function updateCurrencyRate(){
         try {
@@ -398,5 +402,36 @@ class IDNPokerHelper{
             return "false";
         }
     }
+
+    public static function TransactionHistory($data,$auth,$count){
+        try {
+            $url = config('providerlinks.idnpoker.URL');
+            $client = new Client();
+            $guzzle_response = $client->post($url,[
+                'body' => '
+                <request>
+                    <secret_key>'.$auth.'</secret_key>
+                    <id>15</id>
+                    <date>'.$data["date"].'</date>
+                    <start_time>00:00</start_time>
+                    <end_time>23:59</end_time>
+                    <page>'.$count.'</page>
+                </request>'
+            ]
+            );
+            $details = $guzzle_response->getBody();
+            $json = json_encode(simplexml_load_string($details));
+            $response = json_decode($json,true);
+            if(isset($response["numrow"]) && $response["numrow"] > 0 ){
+                return $response;
+            }
+            ProviderHelper::saveLogWithExeption('IDNPOKER TransactionHistory', 110, json_encode($response),  "CHECK RESPONSE TransactionHistory" );
+            return "false";
+        } catch (\Exception $e) {
+            ProviderHelper::saveLogWithExeption('IDNPOKER TransactionHistory', 110, json_encode($e->getMessage()),  "CHECK RESPONSE TransactionHistory ERROR" );
+            return "false";
+        }
+    }
+
 
 }
