@@ -91,6 +91,7 @@ class TransactionInfo{
                 ],
             ]);
             $iconicResponse = json_decode((string) $response->getBody(), true);
+            ProviderHelper::saveLogWithExeption('IconicGaming', 1223, json_encode($clientDetails), GameLobby::icgConnect($clientDetails->default_currency));
             ProviderHelper::saveLogWithExeption('IconicGaming', 1223, json_encode($clientDetails), $iconicResponse);
             if(isset($iconicResponse['data']) && $iconicResponse['data'] != null){
                 $mw_response = ["data" => $iconicResponse['data'],"status" => ["code" => 200, "message" => TransactionInfo::TransactionErrorCode(200)]];
