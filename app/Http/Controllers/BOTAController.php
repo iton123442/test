@@ -601,7 +601,7 @@ class BOTAController extends Controller{
                     "round_id" => $data['detail']['shoeNo'].$data['detail']['gameNo'],
                     "amount" => round($data['price'],2),
                     "game_transaction_type" => 1,
-                    // "provider_request" => json_encode($data),
+                    "provider_request" => json_encode($data),
                 );
                 $bettransactionExtId = GameTransactionMDB::createGameTransactionExt($bettransactionExt, $client_details);
                 $fund_extra_data = [
