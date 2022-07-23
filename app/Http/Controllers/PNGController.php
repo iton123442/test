@@ -112,7 +112,7 @@ class PNGController extends Controller
                         "amount" =>(float)$xmlparser->real,
                         "game_transaction_type"=>1,
                         "provider_request" => json_encode($xmlparser),
-                        "mw_response" => 'statusCode 10',
+                        "mw_response" => json_encode($array_data),
                         "transaction_detail" => "FAILED"
                     );
                     $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
@@ -161,8 +161,8 @@ class PNGController extends Controller
                     'provider_name' => $game_details->provider_name,
                     'connection_timeout' => 5,
                 ];
-                // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
                 sleep(20);
+                // $transactionId=PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,1);
                 $client_response = ClientRequestHelper::fundTransfer($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$transactionId,$gametransactionid,"debit", false, $body_details);
                 if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
