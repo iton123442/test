@@ -105,17 +105,6 @@ class PNGController extends Controller
                     $array_data = array(
                         "statusCode" => 10, # not enough funds to session expire to not let PNG resend it again!
                     );
-                    $wingametransactionext = array(
-                        "game_trans_id" => $bet_transaction->game_trans_id,
-                        "provider_trans_id" => $xmlparser->transactionId,
-                        "round_id" =>$xmlparser->roundId,
-                        "amount" =>(float)$xmlparser->real,
-                        "game_transaction_type"=>1,
-                        "provider_request" => json_encode($xmlparser),
-                        "mw_response" => json_encode($array_data),
-                        "transaction_detail" => "FAILED"
-                    );
-                    $transactionId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                     Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
                 }
