@@ -269,7 +269,7 @@ class VivoController extends Controller
 	            "token_id" => $client_details->token_id,
 	            "game_id" => $game_details->game_id,
 	            "round_id" => $data["roundId"],
-	            "bet_amount" => $getGameEXT->amount,
+	            "bet_amount" => $data["Amount"],
 	            "win" => 5,
 	            "pay_amount" => 0,
 	            "income" => 0,
