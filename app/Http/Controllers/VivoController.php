@@ -256,7 +256,7 @@ class VivoController extends Controller
 	        $gameHistory = $data["History"];
 	        $getChairID = str_replace($remove,' ', $gameHistory);
 	        $dataHistory = explode(" ",$getChairID);
-	        if($dataHistory[1] == 'BET'){
+	        if($dataHistory[1] == 'INITBET'){
 				$gameTransactionData = array(
 		            "provider_trans_id" => $data["TransactionID"],
 		            "token_id" => $client_details->token_id,
