@@ -236,7 +236,7 @@ class VivoController extends Controller
 		$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 		$game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name,1);
 		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
-		$findExt = GameTransactionMDB::findGameExt($data["roundId"], 1, "round_id",$client_details)
+		$findExt = GameTransactionMDB::findGameExt($data["roundId"], 1, "round_id",$client_details);
 		if($findExt == 'false'){
 			$bet_game_transaction_ext = array(
 				"game_trans_id" => $game_transaction_id,
