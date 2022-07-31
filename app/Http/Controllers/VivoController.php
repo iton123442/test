@@ -129,7 +129,7 @@ class VivoController extends Controller
 				$remove[] = ":";
 		        $remove[] = ';';
 		        $remove[] = "\\";
-		        $gameHistory = $data["History"];
+		        $gameHistory = $request->History;
 		        $getChairID = str_replace($remove,' ', $gameHistory);
 		        $dataHistory = explode(" ",$getChairID);
 				if($dataHistory[0] == "BLACKJACK"){
