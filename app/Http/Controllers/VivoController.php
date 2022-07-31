@@ -277,7 +277,7 @@ class VivoController extends Controller
 		        $bet_transaction2 = GameTransactionMDB::getGameTransactionByRoundId($data["roundId"], $client_details);
 		        $getGameEXT2 = GameTransactionMDB::findGameExtVivo($bet_transaction2->game_trans_id,1,$client_details);
 				$game_transaction_id = $bet_transaction2->game_trans_id;
-				$amount = $bet_transaction->bet_amount + $data["Amount"];
+				$amount = $bet_transaction2->bet_amount + $data["Amount"];
 				$updateGameTransaction = [
 	            	"bet_amount" => $getGameEXT2->amount,
 		        ];
