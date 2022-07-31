@@ -26,9 +26,16 @@ return [
         'password' => '_^+T3chSu4rt+^_',
         'grant_type' => 'password',
     ],
-    'icgamingapi' => 'https://admin-stage.iconic-gaming.com/service',
-    'icgaminglogin' => 'https://admin-stage.iconic-gaming.com/service/login',
-    'icgaminggames' => 'https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
+
+    # OLD
+    // 'icgamingapi' => 'https://admin-stage.iconic-gaming.com/service',
+    // 'icgaminglogin' => 'https://admin-stage.iconic-gaming.com/service/login',
+    // 'icgaminggames' => 'https://admin-stage.iconic-gaming.com/service/api/v1/games?type=all&lang=en',
+
+    // New
+    'icgamingapi' => 'https://api-stage.at888888.com/service',
+    'icgaminglogin' => 'https://api-stage.at888888.com/service/login',
+    'icgaminggames' => 'https://api-stage.at888888.com/service/api/v1/games?type=all&lang=en',
     'icgagents'=>[
         'jpyagents'=>[
             'username' => 'betrnkjpy',
@@ -719,6 +726,9 @@ return [
             // "5e2c5dc120e4ae6aeeae4000e", 
             // "3457bde6440cb38837da65b3c", 
             // "b391abaf172c2dbc1046965c8"
+        ],
+        "localhost" => [
+            "1038e73c29b778884c96b418f", // testing Staging and production USD
         ],
         "b972d12c42bd31d56fd1bd5cc" => [211,92,222], //ga suppor aning mga client pag pull ni sa data 
 
