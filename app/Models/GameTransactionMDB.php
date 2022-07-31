@@ -73,7 +73,7 @@ class GameTransactionMDB
     public static function findGameExtVivo($game_trans_id,$entry_type,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
-            $select = "SELECT sum(amount) as amount FROM ";
+            $select = "SELECT sum(amount),game_trans_id as amount FROM ";
             $db = "{$connection['db_list'][0]}.game_transaction_ext gte ";
             $where = "where gte.game_trans_id ='{$game_trans_id}' AND gte.game_transaction_type={$entry_type}";
             $gameTxExt = DB::connection($connection["connection_name"])->select($select.$db.$where);
