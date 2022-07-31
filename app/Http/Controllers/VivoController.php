@@ -250,6 +250,28 @@ class VivoController extends Controller
 
 	        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
 	        GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
+	        $remove[] = ":";
+	        $remove[] = ';';
+	        $remove[] = "\\";
+	        $gameHistory = $data["History"];
+	        $getChairID = str_replace($remove,' ', $gameHistory);
+	        $dataHistory = explode(" ",$getChairID);
+	        if($dataHistory[1] == 'BET'){
+				$gameTransactionData = array(
+		            "provider_trans_id" => $data["TransactionID"],
+		            "token_id" => $client_details->token_id,
+		            "game_id" => $game_details->game_id,
+		            "round_id" => $data["roundId"],
+		            "bet_amount" => $data["Amount"],
+		            "win" => 5,
+		            "pay_amount" => 0,
+		            "income" => 0,
+		            "entry_id" => 1,
+		        );
+		        // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+		        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+		        $game_transaction_id = $findExt->game_trans_id;
+	        }
 	        $game_transaction_id = $gen_game_trans_id;
 		}else{
 			$bet_game_transaction_ext = array(
@@ -264,20 +286,7 @@ class VivoController extends Controller
 
 	        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($bet_game_transaction_ext, $client_details);
 	        GameTransactionMDB::createGameTransactionExtV2($bet_game_transaction_ext,$gen_game_extid,$client_details); //create extension
-			$gameTransactionData = array(
-	            "provider_trans_id" => $data["TransactionID"],
-	            "token_id" => $client_details->token_id,
-	            "game_id" => $game_details->game_id,
-	            "round_id" => $data["roundId"],
-	            "bet_amount" => $data["Amount"],
-	            "win" => 5,
-	            "pay_amount" => 0,
-	            "income" => 0,
-	            "entry_id" => 1,
-	        );
-	        // $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-	        GameTransactionMDB::createGametransactionV2($gameTransactionData,$findExt->game_trans_id,$client_details); //create game_transaction
-	        $game_transaction_id = $findExt->game_trans_id;
+
 		}
 		$getGameEXT = GameTransactionMDB::findGameExtVivo($game_transaction_id,1,$client_details);
         $updateGameTransaction = [
