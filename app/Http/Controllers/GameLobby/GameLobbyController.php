@@ -766,7 +766,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 } 
-                elseif(in_array($provider_code, [69, 61, 62, 63, 64, 65, 66, 114, 138])){
+                elseif(in_array($provider_code, [69, 61, 62, 63, 64, 65, 66, 114, 138,140])){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::vivoGamingLaunchUrl($request->game_code,$request->token,$request->exitUrl, $request->input('game_provider')), 

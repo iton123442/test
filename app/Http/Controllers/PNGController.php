@@ -104,6 +104,7 @@ class PNGController extends Controller
                     } 
                     $array_data = array(
                         "statusCode" => 10, # not enough funds to session expire to not let PNG resend it again!
+                        "real" => round($client_details->balance,2)
                     );
                     Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                     return PNGHelper::arrayToXml($array_data,"<reserve/>");
@@ -179,9 +180,18 @@ class PNGController extends Controller
                         ];
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $gametransactionid, $client_details);
                     }
-                    $array_data = array(
-                        "statusCode" => 7,
-                    );
+
+                    if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TIME_OUT'){
+                        $array_data = array(
+                            "statusCode" => 10,
+                            "real" => round($client_details->balance,2)
+                        );
+                    }else{
+                        $array_data = array(
+                            "statusCode" => 7
+                        );  
+                    }
+                    
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
                         "mw_request" => json_encode($client_response->requestoclient),
@@ -200,6 +210,7 @@ class PNGController extends Controller
                     }
                     $array_data = array(
                         "statusCode" => 10,
+                        "real" => round($client_details->balance,2)
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
