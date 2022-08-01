@@ -1578,7 +1578,9 @@ class GameLobby{
                     $url = config("providerlinks.vivo.7MOJOS_URL").'?tableguid=J37809HJDJ348HNH232221&token='.$token.'&operatorID='.$operator_id.'&operatorToken='. config("providerlinks.vivo.OPERATOR_TOKEN") .'&homeURL='.$exitUrl.'&gameid='.$game_code.'&mode=real&language=EN&currency='.$client_details->default_currency.'&host=https://de-lce.svmsrv.com&gametype=live';
                 }
             break;
-    
+            case 'Red Rake':
+                $url = config("providerlinks.vivo.RedRake").'?tableguid=9677AB921EB4EEC867355A2BA234929&token='.$token.'&OperatorId='.$operator_id.'&homeUrl=&language=en&GameID='.$game_code.'&cashierUrl=&gameMode=real&currency='.$client_details->default_currency.'';
+                break;
             default:
                 # code...
                 break;
