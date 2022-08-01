@@ -536,23 +536,24 @@ class NolimitController extends Controller
             return $response;
              } // End catch error
             $existing_bet = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
-            if($existing_bet == false || $existing_bet->transaction_detail == 'failed' || $existing_bet->transaction_detail == null){
-                $response = array(
-                            "jsonrpc" => '2.0',
-                            "error" => [
-                                'code' => -32000,
-                                "message" => "Server error",
-                                "data" => [
-
-                                    "code" => 14005,
-                                    "message" => "Responsible gaming, bet not allowed.",
-                                ],
-                            ],
-                            "id" => $data['id']
-                        );
-                    return $response; 
-                }
             if($existing_bet != 'false'){
+                if ($existing_bet->transaction_detail == 'failed' || $existing_bet->transaction_detail == 'null'){
+                    $response = array(
+                        "jsonrpc" => '2.0',
+                        "error" => [
+                            'code' => -32000,
+                            "message" => "Server error",
+                            "data" => [
+
+                                "code" => 14005,
+                                "message" => "Responsible gaming, bet not allowed.",
+                            ],
+                        ],
+                        "id" => $data['id']
+                    );
+                return $response; 
+
+                }
             $client_details->connection_name = $existing_bet->connection_name;
             $amount = $existing_bet->amount;
             $balance = $client_details->balance + $amount;
