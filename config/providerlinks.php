@@ -127,6 +127,10 @@ return [
             'merchant_id' => 'ASKME',
             'merchant_key' => 'a44c3ca52ef01f55b0a8b3859610f554b05aa57ca36e4a508addd9ddae539a84d43f9407c72d555bc3093bf3516663d504e98b989f3ec3e3ff8407171f43ccdc',
         ],
+        '32USD' => [  // ASK ME USD
+            'merchant_id' => 'ASKME',
+            'merchant_key' => 'a44c3ca52ef01f55b0a8b3859610f554b05aa57ca36e4a508addd9ddae539a84d43f9407c72d555bc3093bf3516663d504e98b989f3ec3e3ff8407171f43ccdc',
+        ],
         '5USD' => [ // XIGOLO USD
             'merchant_id' => 'XIGOLO',
             'merchant_key' => 'b7943fc2e48c3b74a2c31514aebdce25364bd2b1a97855f290c01831052b25478c35bdebdde8aa7a963e140a8c1e6401102321a2bd237049f9e675352c35c4cc',
@@ -558,6 +562,7 @@ return [
         'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
         '7MOJOS_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
         'ArrowsEdge_URL' => 'https://2vivo.com/flashrungame/RunGenericGame.aspx',
+        'RedRake' => 'https://2vivo.com/flashrungame/RunGenericGame.aspx',
     ],
     'oryx' => [
         'PROVIDER_ID' => 18,
@@ -797,9 +802,16 @@ return [
         'gamelaunch_url' => 'https://seam.go-65.com/token/',
     ],
     'dowinn' =>[
-        'api_url' => 'https://t-agent.sbet56789.com/cash',
-        'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
-        'user_agent' => 'kapi0006s',
+    //Staging
+        // 'api_url' => 'https://t-agent.sbet56789.com/cash',
+        // 'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
+        // 'user_agent' => 'kapi0006s',
+        // 'prefix' => 'TG',
+        // 'provider_db_id' => 139,
+    //Production
+        'api_url' => 'http://172.105.220.231:10332/cash',
+        'gamelaunch_url' => 'https://cash.sbet56789.com/',
+        'user_agent' => 'api006',
         'prefix' => 'TG',
         'provider_db_id' => 139,
     ],

@@ -131,18 +131,24 @@ class WalletDetailsController extends Controller
              * 
              *****************************/
             if($request->has('game_provider')){
+                $general_error_message = [
+                    103, // maintenance<
+                    101, // Failed to connect!!<
+                    403, // Blocked! Please contact your account
+                    404, // not found
+                ];
                 $mw_response = ["data" => null,"status" => ["code" => 303 ,"message" => TWHelpers::getPTW_Message(303)]];
                 $playerDetails = TWHelpers::playerDetails('ptw' ,$request->client_player_id ,$request->client_id); // GET PLAYER DETAILS NO BLANACE CHECKER FROM THE PROVDIER BALANCE GET
                 if($playerDetails != null){
                         $provider_id = GameLobby::checkAndGetProviderId($request->game_provider);
                         if($provider_id){
                             $provider_code = $provider_id->sub_provider_id;
-                            if($provider_code == 110){
+                            if($provider_code ==  config('providerlinks.idnpoker.sub_provider_id')){
                                 // $player_id = "TGTW".$playerDetails->player_id;
                                 $player_id = $playerDetails->username;
                                 $auth_token = IDNPokerHelper::getAuthPerOperator($playerDetails, config('providerlinks.idnpoker.type')); 
                                 $data = IDNPokerHelper::playerDetails($player_id,$auth_token);
-                                if ($data != "false") {
+                                if ($data != "false" && !isset($data["error"]) ) {
                                     $mw_response = [
                                         "data" => [
                                             "client_player_id" => $playerDetails->client_player_id,
@@ -153,6 +159,14 @@ class WalletDetailsController extends Controller
                                             "message" => TWHelpers::getPTW_Message(200)
                                         ]
                                     ]; 
+                                    Helper::saveLog('IDN getPlayerWalletBalance',$provider_code, json_encode($request->all()), $data);
+                                    return $mw_response;
+                                } elseif(isset($data["error"]) && in_array($data["error"], $general_error_message) ) {
+                                    $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
+                                    Helper::saveLog('IDN getPlayerWalletBalance',$provider_code, json_encode($request->all()), $data);
+                                    return $mw_response;
+                                } elseif (isset($data["error"]) && $data["error"] == 1 ) {
+                                    $mw_response = ["data" => null,"status" => ["code" => 303 ,"message" => TWHelpers::getPTW_Message(303)]];
                                     Helper::saveLog('IDN getPlayerWalletBalance',$provider_code, json_encode($request->all()), $data);
                                     return $mw_response;
                                 }
