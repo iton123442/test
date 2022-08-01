@@ -536,7 +536,7 @@ class NolimitController extends Controller
             return $response;
              } // End catch error
             $existing_bet = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
-            if($existing_bet->transaction_detail == 'failed' || $existing_bet->transaction_detail == null){
+            if($existing_bet == false || $existing_bet->transaction_detail == 'failed' || $existing_bet->transaction_detail == null){
                 $response = array(
                             "jsonrpc" => '2.0',
                             "error" => [
