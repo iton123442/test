@@ -798,9 +798,16 @@ return [
         'gamelaunch_url' => 'https://seam.go-65.com/token/',
     ],
     'dowinn' =>[
-        'api_url' => 'https://t-agent.sbet56789.com/cash',
-        'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
-        'user_agent' => 'kapi0006s',
+    //Staging
+        // 'api_url' => 'https://t-agent.sbet56789.com/cash',
+        // 'gamelaunch_url' => 'https://t-cash.sbet56789.com/',
+        // 'user_agent' => 'kapi0006s',
+        // 'prefix' => 'TG',
+        // 'provider_db_id' => 139,
+    //Production
+        'api_url' => 'http://172.105.220.231:10332/cash',
+        'gamelaunch_url' => 'https://cash.sbet56789.com/',
+        'user_agent' => 'api006',
         'prefix' => 'TG',
         'provider_db_id' => 139,
     ],
