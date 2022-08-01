@@ -340,7 +340,7 @@ class NolimitController extends Controller
         $game_code = $data['params']['information']['game'];
         $balance = $client_details->balance;
         //$game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
-        $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
+        $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
         if($bet_transaction == false || $bet_transaction == null || $bet_transaction == 'false'){
             $response = [      
                 'jsonrpc' => '2.0',
