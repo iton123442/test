@@ -497,7 +497,6 @@ class NolimitController extends Controller
         $round_id = $data['params']['information']['gameRoundId'];
         $game_code = $data['params']['information']['game'];
         $game_details = Game::find($game_code, $this->provider_db_id);
-        $client_details = ProviderHelper::getClientDetails('player_id', $data['params']['userId']);
         try{
             ProviderHelper::idenpotencyTable($provider_trans_id);
         }catch(\Exception $e){
