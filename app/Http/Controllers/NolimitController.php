@@ -223,7 +223,7 @@ class NolimitController extends Controller
                  ProviderHelper::saveLogWithExeption('after  client_response', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');                    
                 if (isset($client_response->fundtransferresponse->status->code)) {
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);  
-                sleep(10);     
+                sleep(1000);     
                 switch ($client_response->fundtransferresponse->status->code){
                     case '200':          
                         $http_status = 200;
