@@ -617,7 +617,7 @@ class SkyWindController extends Controller
         try{
           ProviderHelper::idenpotencyTable($this->prefix_user.'_'.$trx_id.'_1');
         }catch(\Exception $e){
-          $response = ["error_code" => -7];
+          $response = ["error_code" => -1];
           return response($response,200)->header('Content-Type', 'application/json');
         }
         // $game_ext_check = ProviderHelper::findGameExt($trx_id, 1, 'transaction_id');
