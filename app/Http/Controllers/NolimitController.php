@@ -222,7 +222,7 @@ class NolimitController extends Controller
                 }
                  ProviderHelper::saveLogWithExeption('after  client_response', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');                    
                 if (isset($client_response->fundtransferresponse->status->code)) {
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);       
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);      
                 switch ($client_response->fundtransferresponse->status->code){
                     case '200':          
                         $http_status = 200;
@@ -497,7 +497,6 @@ class NolimitController extends Controller
         $round_id = $data['params']['information']['gameRoundId'];
         $game_code = $data['params']['information']['game'];
         $game_details = Game::find($game_code, $this->provider_db_id);
-        $client_details = ProviderHelper::getClientDetails('player_id', $data['params']['userId']);
         try{
             ProviderHelper::idenpotencyTable($provider_trans_id);
         }catch(\Exception $e){
@@ -536,23 +535,24 @@ class NolimitController extends Controller
             return $response;
              } // End catch error
             $existing_bet = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
-            if($existing_bet->transaction_detail == 'failed' || $existing_bet->transaction_detail == null){
-                $response = array(
-                            "jsonrpc" => '2.0',
-                            "error" => [
-                                'code' => -32000,
-                                "message" => "Server error",
-                                "data" => [
-
-                                    "code" => 14005,
-                                    "message" => "Responsible gaming, bet not allowed.",
-                                ],
-                            ],
-                            "id" => $data['id']
-                        );
-                    return $response; 
-                }
             if($existing_bet != 'false'){
+                if ($existing_bet->transaction_detail == 'failed' || $existing_bet->transaction_detail == 'null'){
+                    $response = array(
+                        "jsonrpc" => '2.0',
+                        "error" => [
+                            'code' => -32000,
+                            "message" => "Server error",
+                            "data" => [
+
+                                "code" => 14005,
+                                "message" => "Responsible gaming, bet not allowed.",
+                            ],
+                        ],
+                        "id" => $data['id']
+                    );
+                return $response; 
+
+                }
             $client_details->connection_name = $existing_bet->connection_name;
             $amount = $existing_bet->amount;
             $balance = $client_details->balance + $amount;
