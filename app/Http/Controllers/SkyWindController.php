@@ -254,9 +254,6 @@ class SkyWindController extends Controller
             "provider_request" => json_encode($data),
           ];
           $game_transextension = GameTransactionMDB::createGameTransactionExt($insertExtData,$client_details);
-          $client_response = 
-          // $this->updateGameTransaction($existing_bet_details->game_trans_id, $pay_amount, $income, $existing_bet_details->win, $existing_bet_details->entry_id,$bet_amount);
-          // $game_transextension = ProviderHelper::createGameTransExtV2($check_bet_round->game_trans_id,$provider_trans_id, $round_id, $amount, $game_transaction_type);
           $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$game_information->game_code,$game_information->game_name,$game_transextension,$check_bet_round->game_trans_id,'debit');
           if(isset($client_response->fundtransferresponse->status->code) &&
           $client_response->fundtransferresponse->status->code == "200"){
@@ -564,7 +561,7 @@ class SkyWindController extends Controller
             ];
             GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
             $response = [
-              "error_code" => -4
+              "error_code" => -1500
             ];
             $gameExtDatas = [
               "mw_request" => json_encode($client_response->requestoclient),
@@ -588,7 +585,6 @@ class SkyWindController extends Controller
      */
     public  function gameRollback(Request $request){
         Helper::saveLog('Skywind gameRollback', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
-        // dd($this->seamless_key);
         $raw_request = file_get_contents("php://input");
         parse_str($raw_request, $data);
         $general_details = ["aggregator" => [], "provider" => [], "client" => []];
