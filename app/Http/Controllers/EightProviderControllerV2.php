@@ -76,6 +76,45 @@ class EightProviderControllerV2 extends Controller
 	    }
 	}
 
+
+
+	/**
+	 * get player or insert token!
+	 * @param $token [custom token using token and player id]
+	 */
+	public function getClientDetailsEvoPlay($customToken){
+		$data = explode('TIGER', $customToken);
+		if(count($data) == 1){
+			$client_details = ProviderHelper::getClientDetails('token', $customToken);
+			if($client_details == null){
+				return null;
+			}
+			return $client_details;
+		}else{
+			$client_details = ProviderHelper::getClientDetails('player_id', $data[1]);
+			if($client_details == null){
+				$query = DB::select('select player_id from players where player_id = '.$data[1].'');
+				$playerExist = count($query);
+				if($playerExist > 0){
+					DB::table('player_session_tokens')->insert(
+                    array('player_id' => $data[1], 
+                    	  'player_token' =>  $data[0], 
+                    	  'status_id' => 1)
+                    );
+                    $client_details = ProviderHelper::getClientDetails('player_id', $data[1]);
+                    if($client_details == null){
+                    	return null;
+                    }
+                    return $client_details;
+				}else{
+					return null;
+				}
+			}else{
+				return $client_details; // with the latest token
+			}
+		}
+	}
+
 	/**
 	 * @author's note single method that will handle 4 API Calls
 	 * @param name = bet, win, refund,
@@ -83,7 +122,7 @@ class EightProviderControllerV2 extends Controller
 	 */
 	public function index(Request $request){
 		// DB::enableQueryLog();
-		ProviderHelper::saveLog('8P index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
+		ProviderHelper::saveLogWithExeption('8P index '.$request->name, $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
 
 		// $signature_checker = $this->getSignature($this->project_id, 2, $request->all(), $this->secret_key);
 		// if($signature_checker == 'false'):
@@ -91,15 +130,20 @@ class EightProviderControllerV2 extends Controller
 		// 				"status" => 'error',
 		// 				"error" => ["scope" => "user","no_refund" => 1,"message" => "Signature is invalid!"]
 		// 			);
-		// 	ProviderHelper::saveLog('8P Signature Failed '.$request->name, $this->provider_db_id, json_encode($request->all()), $msg);
+		// 	ProviderHelper::saveLogWithExeption('8P Signature Failed '.$request->name, $this->provider_db_id, json_encode($request->all()), $msg);
 		// 	return $msg;
 		// endif;
 
 		$data = $request->all();
 		if($request->name == 'init'){
 
-			$client_details = ProviderHelper::getClientDetails('token', $data['token']);
-			// $player_details = $this->playerDetailsCall($client_details);
+			// $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+			$client_details = $this->getClientDetailsEvoPlay($data['token']);
+			if($client_details == null){
+				$response = ['status' => 'error','data' => ['scope' => 'user','message' => 'player not found']];
+				return $response;
+			}
+			
 			$response = array(
 				'status' => 'ok',
 				'data' => [
@@ -108,12 +152,18 @@ class EightProviderControllerV2 extends Controller
 					'currency' => $client_details->default_currency,
 				],
 			);
-			ProviderHelper::saveLog('8P GAME INIT', $this->provider_db_id, json_encode($data), $response);
+			ProviderHelper::saveLogWithExeption('8P GAME INIT', $this->provider_db_id, json_encode($data), $response);
 			return $response;
 
 		}elseif($request->name == 'bet'){
 
-			$client_details = ProviderHelper::getClientDetails('token', $data['token']);
+			// $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+			$client_details = $this->getClientDetailsEvoPlay($data['token']);
+			if($client_details == null){
+				$response = ['status' => 'error','data' => ['scope' => 'user','message' => 'player not found']];
+				return $response;
+			}
+
 			$game_ext = GameTransactionMDB::findGameExt($data['callback_id'], 1,'transaction_id', $client_details);
 			if($game_ext == 'false'): // NO BET
 				$string_to_obj = json_decode($data['data']['details']);
@@ -140,7 +190,7 @@ class EightProviderControllerV2 extends Controller
 					return $msg;
 				endif;
 				try {
-					ProviderHelper::saveLog('8Provider gameBet 1', $this->provider_db_id, json_encode($data), 1);
+					ProviderHelper::saveLogWithExeption('8Provider gameBet 1', $this->provider_db_id, json_encode($data), 1);
 					$payout_reason = 'Bet';
 			 		$win_or_lost = 5; 
 			 		# $win_or_lost = 0; // 0 Lost, 1 win, 3 draw, 4 refund, 5 processing  # (PROGRESSING MODIFIED! #01-12-21)
@@ -203,7 +253,7 @@ class EightProviderControllerV2 extends Controller
 
 					try {
 						$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit',false,$action);
-			       	     ProviderHelper::saveLog('8Provider gameBet CRID '.$round_id, $this->provider_db_id, json_encode($data), $client_response);
+			       	     ProviderHelper::saveLogWithExeption('8Provider gameBet CRID '.$round_id, $this->provider_db_id, json_encode($data), $client_response);
 					} catch (\Exception $e) {
 						$msg = array("status" => 'error',"message" => $e->getMessage());
 						$updateGameTransaction = ["win" => 2,'trans_status' => 5];
@@ -248,7 +298,7 @@ class EightProviderControllerV2 extends Controller
 
 						}			
 
-						ProviderHelper::saveLog('8Provider gameBet 2', $this->provider_db_id, json_encode($data), 2);
+						ProviderHelper::saveLogWithExeption('8Provider gameBet 2', $this->provider_db_id, json_encode($data), 2);
 						$response = array(
 							'status' => 'ok',
 							'data' => [
@@ -303,7 +353,7 @@ class EightProviderControllerV2 extends Controller
 	     //                    ];
 	     //                ProviderHelper::queTransactionLogs($createGameTransactionLog);
 					}
-			   		ProviderHelper::saveLog('8Provider gameBet', $this->provider_db_id, json_encode($data), $response);
+			   		ProviderHelper::saveLogWithExeption('8Provider gameBet', $this->provider_db_id, json_encode($data), $response);
 				  	return $response;
 				}catch(\Exception $e){
 					$msg = array(
@@ -331,8 +381,14 @@ class EightProviderControllerV2 extends Controller
 				}
 		    else:
 		    	// NOTE IF CALLBACK WAS ALREADY PROCESS PROVIDER DONT NEED A ERROR RESPONSE! LEAVE IT AS IT IS!
-		    	ProviderHelper::saveLog('8Provider gameBet 3 Duplicate', $this->provider_db_id, json_encode($data), 3);
-				$client_details = ProviderHelper::getClientDetails('token', $data['token']);
+		    	ProviderHelper::saveLogWithExeption('8Provider gameBet 3 Duplicate', $this->provider_db_id, json_encode($data), 3);
+				// $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+				$client_details = $this->getClientDetailsEvoPlay($data['token']);
+				if($client_details == null){
+					$response = ['status' => 'error','data' => ['scope' => 'user','message' => 'player not found']];
+					return $response;
+				}
+
 				$response = array(
 					'status' => 'ok',
 					'data' => [
@@ -340,7 +396,7 @@ class EightProviderControllerV2 extends Controller
 						'currency' => $client_details->default_currency,
 					],
 			 	 );
-				ProviderHelper::saveLog('8Provider'.$data['data']['round_id'], $this->provider_db_id, json_encode($data), $response);
+				ProviderHelper::saveLogWithExeption('8Provider'.$data['data']['round_id'], $this->provider_db_id, json_encode($data), $response);
 				return $response;
 		    endif;
 
@@ -349,17 +405,22 @@ class EightProviderControllerV2 extends Controller
 		$string_to_obj = json_decode($data['data']['details']);
 		$game_id = $string_to_obj->game->game_id;
 		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
-		$client_details = ProviderHelper::getClientDetails('token', $data['token']);
-		// $player_details = $this->playerDetailsCall($client_details);
+
+		// $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+		$client_details = $this->getClientDetailsEvoPlay($data['token']);
+		if($client_details == null){
+			$response = ['status' => 'error','data' => ['scope' => 'user','message' => 'player not found']];
+			return $response;
+		}
 
 		$game_ext = GameTransactionMDB::findGameExt($data['callback_id'], 2,'transaction_id', $client_details);
-		ProviderHelper::saveLog('8P game_ext', $this->provider_db_id, json_encode($data), 'game_ext');
+		ProviderHelper::saveLogWithExeption('8P game_ext', $this->provider_db_id, json_encode($data), 'game_ext');
 		if($game_ext == 'false'):
 			
 			// Find if win has bet record
 			$existing_bet = GameTransactionMDB::findGameTransactionDetails($data['data']['round_id'], 'round_id',false, $client_details);
 
-			ProviderHelper::saveLog('8P existing_bet', $this->provider_db_id, json_encode($data), 'existing_bet');
+			ProviderHelper::saveLogWithExeption('8P existing_bet', $this->provider_db_id, json_encode($data), 'existing_bet');
 			if($existing_bet != 'false'): // Bet is existing, else the bet is already updated to win
 					// No Bet was found check if this is a free spin and proccess it!
 				    if(isset($string_to_obj->game->action) && $string_to_obj->game->action == 'freespin'):
@@ -426,7 +487,7 @@ class EightProviderControllerV2 extends Controller
 									"round_id" => $round_id,
 									"amount" => $data['data']['amount'],
 									"game_transaction_type"=> $method,
-									// "provider_request" =>json_encode($data),
+									"provider_request" =>json_encode($data),
 								);
 								$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 								// GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
@@ -502,7 +563,7 @@ class EightProviderControllerV2 extends Controller
 				     //                      ]
 			      //                   ];
 				     //                ProviderHelper::queTransactionLogs($createGameTransactionLog);
-				                    ProviderHelper::saveLogWithExeption('8P ERROR FREESPIN - CLIENT CALL', $this->provider_db_id, json_encode($data), $msg);
+				                    ProviderHelper::saveLogWithExeptionWithExeption('8P ERROR FREESPIN - CLIENT CALL', $this->provider_db_id, json_encode($data), $msg);
 									return $msg;
 								}
 
@@ -535,7 +596,7 @@ class EightProviderControllerV2 extends Controller
 				     //                      ]
 				     //                    ];
 				     //                ProviderHelper::queTransactionLogs($createGameTransactionLog);
-									ProviderHelper::saveLog('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
+									ProviderHelper::saveLogWithExeption('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
 							  		return $response;
 								}else{
 									$response = array(
@@ -560,7 +621,7 @@ class EightProviderControllerV2 extends Controller
 				     //                      ]
 				     //                    ];
 				     //                ProviderHelper::queTransactionLogs($createGameTransactionLog);
-									ProviderHelper::saveLog('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
+									ProviderHelper::saveLogWithExeption('8P FREESPIN', $this->provider_db_id, json_encode($data), $response);
 							  		return $response;
 								}
 
@@ -570,7 +631,7 @@ class EightProviderControllerV2 extends Controller
 									"status" => 'error',
 									"message" => $e->getMessage().' '.$e->getFile().' '.$e->getLine(),
 								);
-								ProviderHelper::saveLogWithExeption('8P ERROR FREESPIN - FATAL ERROR', $this->provider_db_id, json_encode($data), $e->getMessage().' '.$e->getFile().' '.$e->getLine());
+								ProviderHelper::saveLogWithExeptionWithExeption('8P ERROR FREESPIN - FATAL ERROR', $this->provider_db_id, json_encode($data), $e->getMessage().' '.$e->getFile().' '.$e->getLine());
 								return $msg;
 							}
 					else:
@@ -603,7 +664,7 @@ class EightProviderControllerV2 extends Controller
 									"round_id" => $round_id,
 									"amount" => ProviderHelper::amountToFloat($data['data']['amount']),
 									"game_transaction_type"=> 2,
-									// "provider_request" =>json_encode($data),
+									"provider_request" =>json_encode($data),
 								);
 								$game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 								// GameTransactionMDB::createGameTransactionExtv2($gameTransactionEXTData,$game_transextension,$client_details);
@@ -708,7 +769,7 @@ class EightProviderControllerV2 extends Controller
 									"status" => 'error',
 									"error" => ["scope" => "user","no_refund" => 1,"message" =>  $e->getMessage().' '.$e->getLine()]
 								);
-								ProviderHelper::saveLogWithExeption('8P ERROR WIN', $this->provider_db_id, json_encode($data), $msg);
+								ProviderHelper::saveLogWithExeptionWithExeption('8P ERROR WIN', $this->provider_db_id, json_encode($data), $msg);
 								return $msg;
 							}
 				    endif;	
@@ -776,7 +837,7 @@ class EightProviderControllerV2 extends Controller
 									"round_id" => $round_id,
 									"amount" => $data['data']['amount'],
 									"game_transaction_type"=> $method,
-									// "provider_request" =>json_encode($data),
+									"provider_request" =>json_encode($data),
 								);
 								// $game_transextension = ProviderHelper::idGenerate($client_details->connection_name,1);
 								// GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
@@ -856,7 +917,7 @@ class EightProviderControllerV2 extends Controller
 				     //                      ]
 				     //                    ];
 				     //                ProviderHelper::queTransactionLogs($createGameTransactionLog);
-				                    ProviderHelper::saveLogWithExeption('8P ERROR FREESPIN - FATAL ERROR', $this->provider_db_id, json_encode($data), $msg);
+				                    ProviderHelper::saveLogWithExeptionWithExeption('8P ERROR FREESPIN - FATAL ERROR', $this->provider_db_id, json_encode($data), $msg);
 									return $msg;
 								}
 
@@ -922,7 +983,7 @@ class EightProviderControllerV2 extends Controller
 									// "message" => $e->getMessage(),
 									"error" => ["scope" => "user","message" => $e->getMessage().' '.$e->getFile().' '.$e->getLine()]
 								);
-								ProviderHelper::saveLogWithExeption('8P ERROR FREESPIN - FATAL ERROR', $this->provider_db_id, json_encode($data), $msg);
+								ProviderHelper::saveLogWithExeptionWithExeption('8P ERROR FREESPIN - FATAL ERROR', $this->provider_db_id, json_encode($data), $msg);
 								return $msg;
 							}
 				    else:
@@ -951,7 +1012,12 @@ class EightProviderControllerV2 extends Controller
 
 		}elseif($request->name == 'refund'){
 
-			$client_details = ProviderHelper::getClientDetails('token', $data['token']);
+			// $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+			$client_details = $this->getClientDetailsEvoPlay($data['token']);
+			if($client_details == null){
+				$response = ['status' => 'error','data' => ['scope' => 'user','message' => 'player not found']];
+				return $response;
+			}
 
 			$string_to_obj = json_decode($data['data']['details']);
 			$game_id = $string_to_obj->game->game_id;
@@ -971,7 +1037,7 @@ class EightProviderControllerV2 extends Controller
 							'currency' => $client_details->default_currency,
 						],
 					);
-					ProviderHelper::saveLog('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
+					ProviderHelper::saveLogWithExeption('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
 					return $response;
 				endif;
 
@@ -985,7 +1051,7 @@ class EightProviderControllerV2 extends Controller
 							'currency' => $client_details->default_currency,
 						],
 					);
-					ProviderHelper::saveLog('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
+					ProviderHelper::saveLogWithExeption('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
 					return $response;
 				endif;
 
@@ -1039,8 +1105,8 @@ class EightProviderControllerV2 extends Controller
 					];
 
 					try {
-						$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$existing_transaction->game_trans_id, $transaction_type,false,$action);
-						ProviderHelper::saveLog('8Provider Refund CRID '.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $client_response);
+						$client_response = ClientRequestHelper::fundTransfer($client_details,ProviderHelper::amountToFloat($data['data']['amount']),$game_details->game_code,$game_details->game_name,$game_transextension,$existing_transaction->game_trans_id, $transaction_type,true,$action);
+						ProviderHelper::saveLogWithExeption('8Provider Refund CRID '.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $client_response);
 					} catch (\Exception $e) {
 						$msg = array("status" => 'error',"message" => $e->getMessage().' '.$e->getFile().' '.$e->getLine());
 						$updateTransactionEXt = array(
@@ -1049,7 +1115,7 @@ class EightProviderControllerV2 extends Controller
 							'client_response' => $e->getMessage(),
 						);
 						GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-						ProviderHelper::saveLog('8Provider gameRefund - FATAL ERROR', $this->provider_db_id, json_encode($data), Helper::datesent());
+						ProviderHelper::saveLogWithExeption('8Provider gameRefund - FATAL ERROR', $this->provider_db_id, json_encode($data), Helper::datesent());
 						return $msg;
 					}
 
@@ -1090,7 +1156,7 @@ class EightProviderControllerV2 extends Controller
 						"status" => 'error',
 						"error" => ["scope" => "user","message" => $e->getMessage()]
 					);
-					ProviderHelper::saveLog('8P ERROR REFUND', $this->provider_db_id, json_encode($data), $e->getMessage());
+					ProviderHelper::saveLogWithExeption('8P ERROR REFUND', $this->provider_db_id, json_encode($data), $e->getMessage());
 					return $msg;
 				}
 			else:
@@ -1103,7 +1169,7 @@ class EightProviderControllerV2 extends Controller
 						'currency' => $client_details->default_currency,
 					],
 				);
-				ProviderHelper::saveLog('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
+				ProviderHelper::saveLogWithExeption('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
 				return $response;
 			endif;
 			else:
@@ -1116,7 +1182,7 @@ class EightProviderControllerV2 extends Controller
 						'currency' => $client_details->default_currency,
 					],
 				);
-				ProviderHelper::saveLog('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
+				ProviderHelper::saveLogWithExeption('8Provider'.$data['data']['refund_round_id'], $this->provider_db_id, json_encode($data), $response);
 				return $response;
 			endif;
 		}
