@@ -21,7 +21,6 @@ class WalletDetailsController extends Controller
     }
 
     public function createPlayerBalance(Request $request){
-       
         if(!$request->has('access_token') || !$request->has('client_id') || !$request->has('client_player_id') || !$request->has('username')){
             $mw_response = ["data" => null,"status" => ["code" => "404","message" => TWHelpers::getPTW_Message(404)]];
             return $mw_response;

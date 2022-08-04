@@ -1582,7 +1582,7 @@ class GameLobby{
                 }
                 break;
             case 'Red Rake':
-                $url = config("providerlinks.vivo.RedRake").'?tableguid=F9677AB921EB4EEC867355A2BA234929&token='.$token.'&OperatorId='.$operator_id.'&homeUrl=&language=en&GameID='.$game_code.'&cashierUrl=&gameMode=real&currency='.$client_details->default_currency.'';
+                $url = config("providerlinks.vivo.RedRake").'?token='.$token.'&operatorID='.$operator_id.'&language=en&gameid='.$game_code.'&mode=real&currency='.$client_details->default_currency.'&tableguid=F9677AB921EB4EEC867355A2BA234929';
                 break;
             default:
                 # code...
