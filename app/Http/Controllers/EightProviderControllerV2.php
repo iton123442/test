@@ -99,7 +99,9 @@ class EightProviderControllerV2 extends Controller
 					DB::table('player_session_tokens')->insert(
                     array('player_id' => $data[1], 
                     	  'player_token' =>  $data[0], 
-                    	  'status_id' => 1)
+                    	  'status_id' => 1,
+                    	  'balance' => 0
+                    	)
                     );
                     $client_details = ProviderHelper::getClientDetails('player_id', $data[1]);
                     if($client_details == null){
