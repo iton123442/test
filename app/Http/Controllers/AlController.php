@@ -47,7 +47,7 @@ class AlController extends Controller
       }else{
 
         $data = [
-              "trans_id" => 1,
+              "trans_id" => 2,
               "details" => "details"
             ];
         $data_saved = DB::table('providers_log')->insertGetId($data);
