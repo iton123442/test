@@ -430,7 +430,7 @@ class EightProviderControllerV2 extends Controller
 								# Freespin
 								$amount = $data['data']['amount'];
 								$payout_reason = 'Free Spin';
-						 		$win_or_lost = 1; // 0 Lost, 1 win, 3 draw, 4 refund, 5 processing
+						 		$win_or_lost = $existing_bet->pay_amount + $amount > 0 ? 1 : 0; // 0 Lost, 1 win, 3 draw, 4 refund, 5 processing
 						 		$method = 2; // 1 bet, 2 win
 						 	    $token_id = $client_details->token_id;
 						 	    $provider_trans_id = $data['callback_id'];
@@ -643,7 +643,7 @@ class EightProviderControllerV2 extends Controller
 								$round_id = $data['data']['round_id'];
 
 								# NEW ADDED 01-12-21
-								if($data['data']['amount'] == 0){
+								if($existing_bet->pay_amount + $amount == 0){
 									$win = 0; //lose
 									$entry_id = 1; //win
 								}else{
@@ -780,7 +780,7 @@ class EightProviderControllerV2 extends Controller
 							try {
 								# Freespin
 								$payout_reason = 'Free Spin';
-						 		$win_or_lost = 1; // 0 Lost, 1 win, 3 draw, 4 refund, 5 processing
+						 		$win_or_lost = $existing_bet->pay_amount + $amount > 0 ? 1 : 0; // 0 Lost, 1 win, 3 draw, 4 refund, 5 processing
 						 		$method = 2; // 1 bet, 2 win
 						 	    $token_id = $client_details->token_id;
 						 	    $provider_trans_id = $data['callback_id'];
