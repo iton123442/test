@@ -29,6 +29,47 @@ class AlController extends Controller
     public $hashen = '$2y$10$37VKbBiaJzWh7swxTpy6OOlldjjO9zdoSJSMvMM0.Xi2ToOv1LcSi';
 
     public function index(Request $request){
+
+      $request_data = json_decode(json_encode($request->all()));
+
+      // $query = DB::Select("SELECT * from game_transactions WHERE round_id = '" . $request_data->round_id . "'");
+      $query = DB::Select("SELECT * from providers_log WHERE trans_id = '" . $request_data->round_id . "'");
+      $result = count($query);
+
+      if ($result > 0 ){
+            $update = DB::table('providers_log')
+                ->where('trans_id', $request_data->round_id)
+                ->update(['details' => rand()]);
+
+           // $update = DB::table('game_transactions')
+           //      ->where('round_id', $request_data->round_id)
+           //      ->update(['transaction_reason' => rand()]);
+      }else{
+
+        $data = [
+              "trans_id" => 1,
+              "details" => "details"
+            ];
+        $data_saved = DB::table('providers_log')->insertGetId($data);
+
+        // $data = [
+        //       "token_id" => 1,
+        //       "game_id" => 1,
+        //       "round_id" => $request_data->round_id,
+        //       "bet_amount" =>1,
+        //       "provider_trans_id" =>$request_data->round_id,
+        //       "pay_amount" => 1,
+        //       "income" => 1,
+        //       "entry_id" => 1,
+        //       "win" => 1,
+        //       "transaction_reason" => "AUTO",
+        //       "payout_reason" => "GG"
+        //     ];
+        // $data_saved = DB::table('game_transactions')->insertGetId($data);
+      }
+      return 'DONE';
+
+
       // $token = Helper::tokenCheck('n58ec5e159f769ae0b7b3a0774fdbf80');
         $gg = DB::table('games as g')
             ->where('provider_id', $request->provider_id)
