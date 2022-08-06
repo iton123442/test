@@ -512,7 +512,11 @@ class EightProviderControllerV2 extends Controller
 									],
 							 	);
 
-								$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
+								if($endround == false){
+									$win = 5;
+								}else{
+									$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
+								}
 
 								$action_payload = [
 									"type" => "custom", #genreral,custom :D # REQUIRED!
@@ -674,8 +678,13 @@ class EightProviderControllerV2 extends Controller
 								# Check if data is already finished
 								// $final_action = $string_to_obj->final_action;
 								$final_action = $data['data']['final_action'];
-								$final_action = $data['data']['final_action'];
 								$endround = $final_action == 1 || $final_action == true ? true : false;
+
+								if($endround == false){
+									$win = 5;
+								}else{
+									$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
+								}
 
 								$action_payload = [
 									"type" => "custom", #genreral,custom :D # REQUIRED!
@@ -863,7 +872,11 @@ class EightProviderControllerV2 extends Controller
 									],
 							 	);
 
-								$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
+								if($endround == false){
+									$win = 5;
+								}else{
+									$win = $existing_bet->pay_amount + $amount > 0 ? 1 : 0;
+								}
 
 								$action_payload = [
 									"type" => "custom", #genreral,custom :D # REQUIRED!
@@ -1087,19 +1100,19 @@ class EightProviderControllerV2 extends Controller
 					$final_action = isset($data['data']['final_action']) ? $data['data']['final_action'] : true;
 					$endround = $final_action == 1 || $final_action == true ? true : false;
 
-					$totalBetCount = [];
-					$allRoundCount = GameTransactionMDB::findGameExtAll($data['data']['refund_round_id'],'allround', $client_details);
-					if(count($allRoundCount) != 0){
-						foreach ($allRoundCount as $key) {
-		                    if($key->game_transaction_type == 1){
-		                        array_push($totalBetCount, $key->amount);
-		                    }
-			            }
-					}
+					// $totalBetCount = [];
+					// $allRoundCount = GameTransactionMDB::findGameExtAll($data['data']['refund_round_id'],'allround', $client_details);
+					// if(count($allRoundCount) != 0){
+					// 	foreach ($allRoundCount as $key) {
+		   //                  if($key->game_transaction_type == 1){
+		   //                      array_push($totalBetCount, $key->amount);
+		   //                  }
+			  //           }
+					// }
 
-					if(count($totalBetCount) == 1){
-						$endround = true;
-					}
+					// if(count($totalBetCount) == 1){
+					// 	$endround = true;
+					// }
 
 					$action = [
 						"provider_name" => "evoplay",
