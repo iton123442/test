@@ -721,7 +721,7 @@ class IDNPokerController extends Controller
                     try {
                         if( isset($value["status"]) ) {
                             if($value["status"] != "Withdraw" && $value["status"] != "Deposit"){
-                                ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"]);
+                                ProviderHelper::idenpotencyTable('IDN-ID'.$value["date"].$value["game"].$value["transaction_no"]);
                                 $gameDetails = self::getSubGameDetails(config('providerlinks.idnpoker.PROVIDER_ID'), $value["game"]);
                                 // $playerID = substr($value["userid"],4);
                                 $playerDetails = IDNPokerHelper::getPlayerID($value["userid"],config('providerlinks.idnpoker')[$keyVal] ); //TESTINGn); // check balance
@@ -731,12 +731,12 @@ class IDNPokerController extends Controller
                                     $bet_amount = 0;
                                     $win = 5;
                                     // $pay_amount =  ($value["status"] == "Lose"  || $value["status"] == "Fold") ? 0 :  $value["curr_amount"];
-                                    if($value["status"] == "Lose" || $value["status"] == "Fold" || $value["status"] == 'Buy Jackpot'){
+                                    if($value["status"] == "Lose" || $value["status"] == "Fold" || $value["status"] == 'Buy Jackpot' || $value["status"] == 'Tournament-register' ){
                                         // $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
                                         $bet_amount = $value['curr_bet'];
                                         $pay_amount = 0;
                                         $win = 0;
-                                    } elseif ($value["status"] == "Win") {
+                                    } elseif ($value["status"] == "Win" || $value["status"] == "Tournament-unregister" ) {
                                         // $bet_amount = ($value["r_bet"] / $rate);
                                         // $bet_amount = (isset($value["r_bet"])) ? ($value["r_bet"] / $rate)  : $value["curr_bet"]  ;
                                         $bet_amount = $value["curr_bet"];
@@ -744,7 +744,8 @@ class IDNPokerController extends Controller
                                         $pay_amount = $value["curr_amount"];
                                         $win = 1;
                                     } elseif ($value["status"] == "Win Global Jackpot" ) {
-                                        $bet_amount = 0; // already calculated from IDN system
+                                        // $bet_amount = 0; // already calculated from IDN system
+                                        $bet_amount = $value["curr_bet"];
                                         $pay_amount = $value["curr_amount"];
                                         $win = 1;
                                     } elseif ($value["status"] == "Draw" || $value["status"] == "Refund" ) {
@@ -821,7 +822,7 @@ class IDNPokerController extends Controller
                         echo "ALREADY INSERTED THE DATA". $e->getMessage();
                         // return $e->getMessage();
                     }
-                    sleep(2);
+                    // sleep(2);
                 }
             }
 
