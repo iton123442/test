@@ -35,7 +35,7 @@ class AlController extends Controller
       // $query = DB::Select("SELECT * from game_transactions WHERE round_id = '" . $request_data->round_id . "'");
       $query = DB::Select("SELECT * from providers_log WHERE trans_id = '" . $request_data->round_id . "'");
       $result = count($query);
-      Helper::saveLog('al', 133443,json_encode($request->all()),123);
+      Helper::saveLog('al', 122345,json_encode($request->all()),123);
       if ($result > 0 ){
             $update = DB::table('providers_log')
                 ->where('trans_id', $request_data->round_id)
