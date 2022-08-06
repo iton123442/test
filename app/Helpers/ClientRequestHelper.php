@@ -124,7 +124,7 @@ class ClientRequestHelper{
 
                 # Endround
                 if(isset($action['endround'])){
-                    $requesttocient["gamedetails"]['provider_name'] = $action['provider_name'];
+                    $requesttocient["fundtransferrequest"]['fundinfo']["endround"] = $action['endround'];
                 }
 
                 if(isset( $action["fundtransferrequest"]['fundinfo']['freespin'] )){
