@@ -726,6 +726,9 @@ class IDNPokerController extends Controller
                                 // $playerID = substr($value["userid"],4);
                                 $playerDetails = IDNPokerHelper::getPlayerID($value["userid"],config('providerlinks.idnpoker')[$keyVal] ); //TESTINGn); // check balance
                                 $getClientDetails = ProviderHelper::getClientDetails("player_id", $playerDetails);
+                                if($getClientDetails == null){
+                                    $getClientDetails = ProviderHelper::getPlayerOperatorDetails("player_id", $playerDetails);
+                                }
                                 if($getClientDetails != null){
                                     $pay_amount = 0;
                                     $bet_amount = 0;
@@ -1375,13 +1378,17 @@ class IDNPokerController extends Controller
             // $rate = IDNPokerHelper::getRate($keyVal); //TESTINGn); // check balance
             $true = false;
             do {
-                $check = DB::select("SELECT count(*) as `page` FROM api_test.production_idn_transaction where `date` BETWEEN '".$datedb." 00:00:00' and '".$datedb." 23:59:59'");
+                $check = DB::select("SELECT count(*) as `page` FROM api_test.production_idn_transaction_duplicate where `date` BETWEEN '".$datedb." 00:00:00' and '".$datedb." 23:59:59'");
                 $page = (int) ($check[0]->page / 1000) + 1;
                 $transactionList = IDNPokerHelper::TransactionHistory($data,$keyVal,$page);
                 if($transactionList != "false"){
+                    echo 'Total Transaction ====>>>>>>>>>>>>>>>>>>>>>>>>  '.$transactionList["numrow"].'       <<<<<<<<<<<<<<<<<<<<<<<<<';
                     foreach ($transactionList["row"] as  $value) {
                         try {
-                            ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"].$value["date"]);
+                            $date = str_replace('/', '-', $value["date"] );
+                            $date =  date('Y-m-d H:i:s', strtotime($date));
+                            ProviderHelper::idenpotencyTable('IDN-ID'.$value["game"].$value["transaction_no"].$date);
+                            
                             $idn_transaciton = [
                                 "game_trans_id" => 1,
                                 "transaction_no" => $value["transaction_no"],
@@ -1406,16 +1413,16 @@ class IDNPokerController extends Controller
                                 "total" => $value["total"],
                                 "agent_comission" => $value["agent_comission"],
                                 "agent_bill" => $value["agent_bill"],
+                                "created_at" => $date
         
                             ];
                             IDNPokerHelper::createIDNTransactionLocalhost($idn_transaciton);
+
                         } catch (\Exception $e) {
                             echo $e->getMessage();
                         }
-                        
-                       
                     }
-                    sleep(1);
+                    // sleep(1);
                     $true = true;
                 } else {
                     $true = false;
