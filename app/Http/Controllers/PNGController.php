@@ -275,7 +275,10 @@ class PNGController extends Controller
                 "win" => $win,
             );
             $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
-            $fund_extra_data = [];
+            $fund_extra_data = [
+                'provider_name' => $game_details->provider_name,
+                'connection_timeout' => 5,
+            ];
             $is_freespin = false;
             if($game == 'false'){
                 $entry_id = 1;
