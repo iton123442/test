@@ -32,7 +32,6 @@ class AlController extends Controller
 
       $request_data = json_decode(json_encode($request->all()));
 
-      // $query = DB::Select("SELECT * from game_transactions WHERE round_id = '" . $request_data->round_id . "'");
       $query = DB::Select("SELECT * from providers_log WHERE trans_id = '" . $request_data->round_id . "'");
       $result = count($query);
       Helper::saveLog('al', 122345,json_encode($request->all()),123);
@@ -40,32 +39,12 @@ class AlController extends Controller
             $update = DB::table('providers_log')
                 ->where('trans_id', $request_data->round_id)
                 ->update(['details' => rand()]);
-
-           // $update = DB::table('game_transactions')
-           //      ->where('round_id', $request_data->round_id)
-           //      ->update(['transaction_reason' => rand()]);
       }else{
-
         $data = [
               "trans_id" => 2,
               "details" => "details"
             ];
         $data_saved = DB::table('providers_log')->insertGetId($data);
-
-        // $data = [
-        //       "token_id" => 1,
-        //       "game_id" => 1,
-        //       "round_id" => $request_data->round_id,
-        //       "bet_amount" =>1,
-        //       "provider_trans_id" =>$request_data->round_id,
-        //       "pay_amount" => 1,
-        //       "income" => 1,
-        //       "entry_id" => 1,
-        //       "win" => 1,
-        //       "transaction_reason" => "AUTO",
-        //       "payout_reason" => "GG"
-        //     ];
-        // $data_saved = DB::table('game_transactions')->insertGetId($data);
       }
       return 'DONE';
 
@@ -1064,6 +1043,10 @@ class AlController extends Controller
       return ClientRequestHelper::currencyRateConverter("USD",12829967);
     }
 
+
+    public function getAllWaySpinDayTransaction(Request $request){
+        dd(1);
+    }
 
 
 }
