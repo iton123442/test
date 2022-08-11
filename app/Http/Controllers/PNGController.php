@@ -243,7 +243,7 @@ class PNGController extends Controller
             if($xmlparser->roundId == 0){
                 $array_data = array(
                     "real" => $client_details->balance,
-                    "statusCode" => 0,
+                    "statusCode" => 0
                 );
                 return PNGHelper::arrayToXml($array_data,"<release/>");
             }
@@ -252,7 +252,7 @@ class PNGController extends Controller
             }catch(\Exception $e){
                 $array_data = array(
                     "real" => round($client_details->balance,2),
-                    "statusCode" => 0,
+                    "statusCode" => 0
                 );
                 Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                 return PNGHelper::arrayToXml($array_data,"<release/>");
@@ -315,7 +315,7 @@ class PNGController extends Controller
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                     $array_data2 = array(
                         "real" => $balance,
-                        "statusCode" => 0,
+                        "statusCode" => 0
                     );
                     
                     $dataToUpdate = array(
@@ -329,7 +329,7 @@ class PNGController extends Controller
                 elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
                     $array_data10 = array(
-                        "statusCode" => 7,
+                        "statusCode" => 7
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data10),
@@ -346,7 +346,7 @@ class PNGController extends Controller
 
                 if(isset($game->win) && $game->win == 2){ // failed
                     $array_data10 = array(
-                        "statusCode" => 10, # session expire to not let PNG resend it again!
+                        "statusCode" => 10 # session expire to not let PNG resend it again!
                     );
                     return PNGHelper::arrayToXml($array_data10,"<release/>");
                 }
@@ -369,7 +369,7 @@ class PNGController extends Controller
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
             $array_data = array(
                 "real" => $balance,
-                "statusCode" => 0,
+                "statusCode" => 0
             );
             $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -451,7 +451,7 @@ class PNGController extends Controller
             }elseif (isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402") {
                 $array_data = array(
-                    "statusCode" => 7,
+                    "statusCode" => 7
                 );
                 $dataToUpdate = array(
                     "mw_request" => json_encode($client_response->requestoclient),
@@ -471,7 +471,7 @@ class PNGController extends Controller
         }
         else{
             $array_data = array(
-                "statusCode" => 4,
+                "statusCode" => 4
             );
             return PNGHelper::arrayToXml($array_data,"<authenticate/>");
         }
