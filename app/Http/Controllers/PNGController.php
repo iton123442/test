@@ -391,6 +391,12 @@ class PNGController extends Controller
                     FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                 }
             }
+
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GGGGG9");
+                $array_data = array("real" => $balance,"statusCode" => 0);
+                return PNGHelper::arrayToXml($array_data,"<release/>");
+            }
             $sendtoclient =  microtime(true);  
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) 
@@ -406,11 +412,6 @@ class PNGController extends Controller
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 Helper::saveLog('PNGReleasechecker(PNG)', 189, json_encode($array_data), "Response");
-                if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-                    Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GGGGG7");
-                    $array_data = array("real" => $balance,"statusCode" => 0);
-                    return PNGHelper::arrayToXml($array_data,"<release/>");
-                }
                 return PNGHelper::arrayToXml($array_data,"<release/>");
             }elseif (isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402") {
