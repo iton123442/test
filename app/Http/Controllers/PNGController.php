@@ -68,14 +68,14 @@ class PNGController extends Controller
             }
             else{
                 $array_data = array(
-                    "statusCode" => 4,
+                    "statusCode" => 4
                 );
                 return PNGHelper::arrayToXml($array_data,"<authenticate/>");
             }
         }
         else{
             $array_data = array(
-                "statusCode" => 4,
+                "statusCode" => 4
             );
             return PNGHelper::arrayToXml($array_data,"<authenticate/>");
         }
@@ -96,7 +96,7 @@ class PNGController extends Controller
                         if( $bet_transaction->transaction_detail == "SUCCESS" ){
                             $array_data = array(
                                 "real" => round($client_details->balance,2),
-                                "statusCode" => 0,
+                                "statusCode" => 0
                             );
                             Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                             return PNGHelper::arrayToXml($array_data,"<reserve/>"); 
@@ -161,7 +161,7 @@ class PNGController extends Controller
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
                     $array_data = array(
                         "real" => $balance,
-                        "statusCode" => 0,
+                        "statusCode" => 0
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($array_data),
@@ -225,7 +225,7 @@ class PNGController extends Controller
             }
             else{
                 $array_data = array(
-                    "statusCode" => 4,
+                    "statusCode" => 4
                 );
                 Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                 return PNGHelper::arrayToXml($array_data,"<authenticate/>");
@@ -517,13 +517,13 @@ class PNGController extends Controller
 
                 $array_data = array(
                     "statusCode" => 0,
-                    "real"=> number_format($client_response->playerdetailsresponse->balance,2,'.', ''),
+                    "real"=> number_format($client_response->playerdetailsresponse->balance,2,'.', '')
                 );
                 return PNGHelper::arrayToXml($array_data,"<balance/>");
             }
             else{
                 $array_data = array(
-                    "statusCode" => 4,
+                    "statusCode" => 4
                 );
                 return PNGHelper::arrayToXml($array_data,"<balance/>");
             }
@@ -630,7 +630,7 @@ class PNGController extends Controller
                     return PNGHelper::arrayToXml($array_data,"<cancelReserve/>");
                 }else{
                     $array_data = array(
-                        "statusCode" => 10,
+                        "statusCode" => 10
                     );
                     $dataToUpdate = array(
                         "mw_request" => json_encode($client_response->requestoclient),
@@ -643,7 +643,7 @@ class PNGController extends Controller
             }
             else{
                 $array_data = array(
-                    "statusCode" => 4,
+                    "statusCode" => 4
                 );
                 return PNGHelper::arrayToXml($array_data,"<cancelReserve/>");
             }
