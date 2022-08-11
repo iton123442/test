@@ -370,15 +370,17 @@ class PNGController extends Controller
 
        
 
-            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != ""){
                 $getFreespin = FreeSpinHelper::getFreeSpinDetails($xmlparser->freegameExternalId,"provider_trans_id");
+
+                if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                    Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GGGGG1022");
+                    $array_data = array("real" => $balance,"statusCode" => 0);
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
+                }
                 if($getFreespin){
 
-                    if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-                        Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GGGGG10");
-                        $array_data = array("real" => $balance,"statusCode" => 0);
-                        return PNGHelper::arrayToXml($array_data,"<release/>");
-                    }
+                    
 
                     $getOrignalfreeroundID = explode("_",$xmlparser->freegameExternalId);
                     //explod the provider trans use the original
