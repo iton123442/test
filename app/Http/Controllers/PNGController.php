@@ -267,11 +267,6 @@ class PNGController extends Controller
             ];
             $is_freespin = false;
             if($game == 'false'){
-                if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-                    Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GG");
-                    $array_data = array("real" => $balance,"statusCode" => 0);
-                    return PNGHelper::arrayToXml($array_data,"<release/>");
-                }
                 $entry_id = 1;
                 $gameTransactionData = array(
                     "provider_trans_id" => $xmlparser->transactionId,
@@ -342,6 +337,11 @@ class PNGController extends Controller
             // $transactionId = PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,2);
             $balance = round($client_details->balance,2) + (float)$xmlparser->real;
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GGG");
+                $array_data = array("real" => $balance,"statusCode" => 0);
+                return PNGHelper::arrayToXml($array_data,"<release/>");
+            }
             $array_data = array("real"=>$balance,"statusCode"=>0);
             $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
