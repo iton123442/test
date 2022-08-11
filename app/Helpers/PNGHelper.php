@@ -28,7 +28,7 @@ class PNGHelper
             } 
         } 
         
-        return trim($_xml->asXML()); 
+        return $_xml->asXML(); 
     }
     public static function createPNGGameTransactionExt($gametransaction_id,$provider_request,$mw_request,$mw_response,$client_response,$game_transaction_type){
 		$gametransactionext = array(
