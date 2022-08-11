@@ -252,11 +252,11 @@ class PNGController extends Controller
                 return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
             }
 
-            // $balance = round($client_details->balance,2) + (float)$xmlparser->real;
-            // if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-            //     $array_data = array("real" => $balance,"statusCode" => 0);
-            //     return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
-            // }
+            $balance = round($client_details->balance,2) + (float)$xmlparser->real;
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                $array_data = array("real" => $balance,"statusCode" => 0);
+                return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
+            }
 
             $win = $xmlparser->real == 0 ? 0 : 1;
             $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
