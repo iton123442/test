@@ -398,31 +398,31 @@ class PNGController extends Controller
                     ]
             ];
 
-            // if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-            //     $getFreespin = FreeSpinHelper::getFreeSpinDetails($xmlparser->freegameExternalId, "provider_trans_id" );
-            //     if($getFreespin){
-            //         $getOrignalfreeroundID = explode("_",$xmlparser->freegameExternalId);
-            //         $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
-            //         $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
-            //         $updateFreespinData = [
-            //             "status" => $status,
-            //             "win" => $getFreespin->win + $xmlparser->real,
-            //             "spin_remaining" => $getFreespin->spin_remaining - 1
-            //         ];
-            //         $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-            //         if($status == 2 ){
-            //             $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
-            //         } else {
-            //             $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-            //         }
-            //         //create transction 
-            //         $createFreeRoundTransaction = array(
-            //             "game_trans_id" => $gametransactionid,
-            //             'freespin_id' => $getFreespin->freespin_id
-            //         );
-            //         FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-            //     }
-            // }
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                $getFreespin = FreeSpinHelper::getFreeSpinDetails($xmlparser->freegameExternalId, "provider_trans_id" );
+                if($getFreespin){
+                    $getOrignalfreeroundID = explode("_",$xmlparser->freegameExternalId);
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundId"] = $getOrignalfreeroundID[1]; //explod the provider trans use the original
+                    $status = ($getFreespin->spin_remaining - 1) == 0 ? 2 : 1;
+                    $updateFreespinData = [
+                        "status" => $status,
+                        "win" => $getFreespin->win + $xmlparser->real,
+                        "spin_remaining" => $getFreespin->spin_remaining - 1
+                    ];
+                    $updateFreespin = FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                    if($status == 2 ){
+                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true; //explod the provider trans use the original
+                    } else {
+                        $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                    }
+                    //create transction 
+                    $createFreeRoundTransaction = array(
+                        "game_trans_id" => $gametransactionid,
+                        'freespin_id' => $getFreespin->freespin_id
+                    );
+                    FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+                }
+            }
 
             $sendtoclient =  microtime(true);  
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
