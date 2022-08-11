@@ -90,12 +90,10 @@ class FreeSpinHelper{
                 case 'provider_trans_id':
                     $where = " where provider_trans_id = '".$transaction_id."' limit 1";
                     break;
-                
                 default:
                     $where = " where provider_trans_id = '".$transaction_id."' limit 1";
                     break;
             }
-
         }
         $getFreeRound = DB::select('select freespin_id,player_id,game_id,spin_remaining, status, win,details,provider_trans_id from freespin ' . $where);
         $data_rows = count($getFreeRound);
