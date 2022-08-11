@@ -252,17 +252,12 @@ class PNGController extends Controller
                 return PNGHelper::arrayToXml($array_data,"<release/>");
             }
             $balance = round($client_details->balance,2) + (float)$xmlparser->real;
-            // if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-            //     $array_data = array("real" => $balance,"statusCode" => 0);
-            //     return PNGHelper::arrayToXml($array_data,"<release/>");
-            // }
             $win = $xmlparser->real == 0 ? 0 : 1;
             $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
             $json_data = array(
                 "transid" => $xmlparser->transactionId,
                 "amount" => (float)$xmlparser->real,
                 "roundid" => $xmlparser->roundId,
-                // "payout_reason" => null,
                 "win" => $win,
             );
             $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
@@ -272,6 +267,11 @@ class PNGController extends Controller
             ];
             $is_freespin = false;
             if($game == 'false'){
+                if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                    Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GG");
+                    $array_data = array("real" => $balance,"statusCode" => 0);
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
+                }
                 $entry_id = 1;
                 $gameTransactionData = array(
                     "provider_trans_id" => $xmlparser->transactionId,
