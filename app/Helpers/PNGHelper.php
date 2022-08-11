@@ -21,9 +21,7 @@ class PNGHelper
                 
                 // Call function for nested array 
                 PNGHelper::arrayToXml($v, $k, $_xml->addChild($k)); 
-                } 
-                
-            else { 
+            } else { 
                 
                 // Simply add child element.  
                 $_xml->addChild($k, $v); 
