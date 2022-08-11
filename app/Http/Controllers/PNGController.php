@@ -84,7 +84,7 @@ class PNGController extends Controller
     public function reserve(Request $request){
         $data = $request->getContent();
         $xmlparser = new SimpleXMLElement($data);
-        Helper::saveLog('PNG reserve MDB', 50,json_encode($xmlparser), 'endpoint hit');
+        Helper::saveLog('PNG reserve MDB', 189,json_encode($xmlparser), 'endpoint hit');
         if($xmlparser->externalGameSessionId){
             $client_details = ProviderHelper::getClientDetails('token', $xmlparser->externalGameSessionId);
             if($client_details){
@@ -252,20 +252,12 @@ class PNGController extends Controller
                 return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
             }
 
-            $balance = round($client_details->balance,2) + (float)$xmlparser->real;
-            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-                $array_data = array("real" => $balance,"statusCode" => 0);
-                return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
-            }
-
-            // $returnWinTransaction = GameTransactionMDB::checkGameTransactionExist($xmlparser->transactionId,false,false,$client_details);
-            // if($returnWinTransaction){
-            //     $array_data = array(
-            //         "real" => round(Helper::getBalance($client_details),2),
-            //         "statusCode" => 0,
-            //     );
-            //     return PNGHelper::arrayToXml($array_data,"<release/>");
+            // $balance = round($client_details->balance,2) + (float)$xmlparser->real;
+            // if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+            //     $array_data = array("real" => $balance,"statusCode" => 0);
+            //     return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
             // }
+
             $win = $xmlparser->real == 0 ? 0 : 1;
             $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
             $json_data = array(
