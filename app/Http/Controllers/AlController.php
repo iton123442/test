@@ -7,6 +7,7 @@ use App\Helpers\AlHelper;
 use App\Helpers\Helper;
 use App\Helpers\SAHelper;
 use App\Helpers\ProviderHelper;
+use App\Helpers\AWSHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use Illuminate\Support\Facades\Artisan;
@@ -1044,9 +1045,31 @@ class AlController extends Controller
     }
 
 
-    public function getAllWaySpinDayTransaction(Request $request){
-        dd(1);
+    public function getAllWaySpinDayTransaction(){
+
+        $merchantId = 'TGAMBNSB';
+
+        AWSHelper::saveLog('AWS BO Query Status', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
+        $client_details = AWSHelper::getClientDetails('token', $request->token);
+        $client = new Client([
+          'headers' => [
+            'Content-Type' => 'application/json',
+          ]
+        ]);
+        $requesttosend = [
+          "merchantId" => $merchantId,
+          "currentTime" => AWSHelper::currentTimeMS(),
+          "beginDate" => '2022-07-06',
+          "sign" => $this->hashen($this->merchant_id . '_' . $client_details->player_id, AWSHelper::currentTimeMS()),
+        ];
+        $guzzle_response = $client->post(
+          $this->api_url . '/fund/queryStatus',
+          ['body' => json_encode($requesttosend)]
+        );
+        $client_response = json_decode($guzzle_response->getBody()->getContents());
+        return $client_response;
     }
+
 
 
 }

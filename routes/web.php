@@ -23,7 +23,6 @@ $app->post('/public/alplayer','AlController@checkCLientPlayer'); // TESTING!
 $app->post('/public/gg','AlController@tapulan'); // TESTING!
 $app->post('/public/aldebug','AlController@debugMe'); // TESTING!
 $app->post('/public/manual_resend','AlController@resendTransaction'); // TESTING!
-$app->post('/public/aws_transaction','AlController@getAllWaySpinDayTransaction'); // TESTING!
 // Posts
 $app->get('/public/posts','PostController@index');
 $app->post('/public/posts','PostController@store');
@@ -208,6 +207,7 @@ $app->post('/public/api/aws/playerbalance', 'AWSController@playerBalance');
 $app->post('/public/api/aws/fundtransfer', 'AWSController@fundTransfer'); 
 $app->post('/public/api/aws/querystatus', 'AWSController@queryStatus'); 
 $app->post('/public/api/aws/orderquery', 'AWSController@queryOrder');
+$app->post('/public/api/aws/getday', 'AWSController@getAllWaySpinDayTransaction');
 // AWS PROVIDER SINGLE WALLET ROUTE
 $app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
 $app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');

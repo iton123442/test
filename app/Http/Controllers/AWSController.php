@@ -991,6 +991,36 @@ class AWSController extends Controller
 		return $client_response;
 	}
 
+
+	public function getAllWaySpinDayTransaction(Request $request){
+        $merchantId = 'TGAMBNSB';
+        AWSHelper::saveLog('AWS BO Query Status', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
+        $client = new Client([
+          'headers' => [
+            'Content-Type' => 'application/json',
+          ]
+        ]);
+
+        $currentTime = AWSHelper::currentTimeMS();
+        $requesttosend = [
+          "merchantId" => $merchantId,
+          "currentTime" => $currentTime,
+          "beginDate" => '2022-07-06',
+          "beginHour" => 0,
+          "endHour" => 23,
+
+        ];
+
+	    $hashen = md5($merchantId.$currentTime.base64_encode('2825ed2f3a5c371630549ae10f5a65932b617523386fd5c2c26ed7129a41a019c42cdccfaf75e1261da7aa5a755c2c81a50e801d5c84e01be69d98b622afd253'));
+        $requesttosend['sign'] = $hashen ;
+        $guzzle_response = $client->post('https://papi.awsxpartner.com/b2b/affiliateRest/gameReport',
+          ['body' => json_encode($requesttosend)]
+        );
+        $client_response = json_decode($guzzle_response->getBody()->getContents());
+        return json_encode($client_response);
+    }
+
+
 	/**
 	 * MERCHANT BACKOFFICE (NOT/USED) (NOT APLLICABLE IN THE SINGLE WALLET)
 	 * @author's NOTE : Query status of fund transfer
