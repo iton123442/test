@@ -251,6 +251,13 @@ class PNGController extends Controller
                 Helper::saveLog('PNG reserve MDB', 50,json_encode($array_data), 'RESPONSE');
                 return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
             }
+
+            $balance = round($client_details->balance,2) + (float)$xmlparser->real;
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                $array_data = array("real" => $balance,"statusCode" => 0);
+                return ltrim(PNGHelper::arrayToXml($array_data,"<release/>"));
+            }
+
             // $returnWinTransaction = GameTransactionMDB::checkGameTransactionExist($xmlparser->transactionId,false,false,$client_details);
             // if($returnWinTransaction){
             //     $array_data = array(
