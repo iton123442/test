@@ -337,11 +337,6 @@ class PNGController extends Controller
             // $transactionId = PNGHelper::createPNGGameTransactionExt($gametransactionid,$xmlparser,null,null,null,2);
             $balance = round($client_details->balance,2) + (float)$xmlparser->real;
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
-            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-                Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GGG");
-                $array_data = array("real" => $balance,"statusCode" => 0);
-                return PNGHelper::arrayToXml($array_data,"<release/>");
-            }
             $array_data = array("real"=>$balance,"statusCode"=>0);
             $action_payload = [
                     "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -412,6 +407,11 @@ class PNGController extends Controller
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 Helper::saveLog('PNGReleasechecker(PNG)', 189, json_encode($array_data), "Response");
+                if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+                    Helper::saveLog('Al(PNG)', 189, json_encode($xmlparser), "GGGGG");
+                    $array_data = array("real" => $balance,"statusCode" => 0);
+                    return PNGHelper::arrayToXml($array_data,"<release/>");
+                }
                 return PNGHelper::arrayToXml($array_data,"<release/>");
             }elseif (isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "402") {
