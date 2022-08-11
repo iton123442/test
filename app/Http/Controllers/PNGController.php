@@ -252,10 +252,10 @@ class PNGController extends Controller
                 return PNGHelper::arrayToXml($array_data,"<release/>");
             }
             $balance = round($client_details->balance,2) + (float)$xmlparser->real;
-            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
-                $array_data = array("real" => $balance,"statusCode" => 0);
-                return PNGHelper::arrayToXml($array_data,"<release/>");
-            }
+            // if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
+            //     $array_data = array("real" => $balance,"statusCode" => 0);
+            //     return PNGHelper::arrayToXml($array_data,"<release/>");
+            // }
             $win = $xmlparser->real == 0 ? 0 : 1;
             $game_details = Helper::getInfoPlayerGameRound($xmlparser->externalGameSessionId);
             $json_data = array(
@@ -317,8 +317,7 @@ class PNGController extends Controller
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                 }
-            }
-            else{
+            }else{
                 $entry_id = 2;
                 // $client_details->connection_name = $game->connection_name;
                 //$json_data["amount"] = round($data["args"]["win"],2)+ $game->pay_amount;
@@ -373,7 +372,6 @@ class PNGController extends Controller
                         ]
                     ]
             ];
-
             if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "") {
                 $getFreespin = FreeSpinHelper::getFreeSpinDetails($xmlparser->freegameExternalId, "provider_trans_id" );
                 if($getFreespin){
@@ -391,7 +389,6 @@ class PNGController extends Controller
                     } else {
                         $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
                     }
-                    //create transction 
                     $createFreeRoundTransaction = array(
                         "game_trans_id" => $gametransactionid,
                         'freespin_id' => $getFreespin->freespin_id
@@ -399,7 +396,6 @@ class PNGController extends Controller
                     FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                 }
             }
-
             $sendtoclient =  microtime(true);  
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,(float)$xmlparser->real,$game_details->game_code,$game_details->game_name,$gametransactionid,'credit',false,$action_payload);
             // $client_response_time = microtime(true) - $sendtoclient;
