@@ -217,70 +217,62 @@ class MannaPlayController extends Controller
 			        $client_response = ClientRequestHelper::fundTransfer($client_details, $json_data['amount'], $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit', false, $fund_extra_data);
 					if (isset($client_response->fundtransferresponse->status->code)) {
 						/*ProviderHelper::updateGameTransactionFlowStatus($game_transaction_id, 1);*/
-						switch ($client_response->fundtransferresponse->status->code) {
-							case '200':
-								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-								$http_status = 200;
-								$response = [
-									"transaction_id" => $json_data['transaction_id'],
-									"balance" => ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance)
-								];
+						if($client_response->fundtransferresponse->status->code == 200){
+							ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+							$http_status = 200;
+							$response = [
+								"transaction_id" => $json_data['transaction_id'],
+								"balance" => ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance)
+							];
+
+							// $updateGameTrasnactionLog = [
+							// 	"client_details" => $client_details,
+							// 	"type" => "update",
+							// 	"game_trans_ext_id" => $game_trans_ext_id,
+							// 	"column" =>[
+							// 		"mw_response" => json_encode($response)
+							// 	]
+							// ];
+							// Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
+							
+							// $data_to_update = array(
+							//     "mw_response" => json_encode($response)
+							// );
+
+							// GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+
+						}else {
+							$http_status = 200;
+							$response = [
+								"errorCode" =>  10203,
+								"message" => "Insufficient balance",
+							];
+
+							try{
+								$data = array(
+									"win"=> 2
+								);
+
+								GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
 
 								// $updateGameTrasnactionLog = [
 								// 	"client_details" => $client_details,
 								// 	"type" => "update",
-								// 	"game_trans_ext_id" => $game_trans_ext_id,
+								// 	"id" => $game_trans_ext_id,
 								// 	"column" =>[
 								// 		"mw_response" => json_encode($response)
 								// 	]
 								// ];
 								// Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
-								
+
 								// $data_to_update = array(
-			                    //     "mw_response" => json_encode($response)
-			                    // );
-
-			                    // GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
-
-								break;
-							case '402':
-								/*ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);*/
-								$http_status = 200;
-								$response = [
-									"errorCode" =>  10203,
-									"message" => "Insufficient balance",
-								];
-
-								try{
-			                        $data = array(
-			                            "win"=> 2,
-			                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout",
-										"transaction_ddd" => "dfadsfdas"
-			                        );
-
-			                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
-
-									// $updateGameTrasnactionLog = [
-									// 	"client_details" => $client_details,
-									// 	"type" => "update",
-									// 	"id" => $game_trans_ext_id,
-									// 	"column" =>[
-									// 		"mw_response" => json_encode($response)
-									// 	]
-									// ];
-									// Queue::push(new CreateGameTransactionLog($updateGameTrasnactionLog));
-
-			                        // $data_to_update = array(
-			                        //     "mw_response" => json_encode($response)
-			                        // );
-			                        // GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
-			                    }catch(\Exception $e){
-			                        /*ProviderHelper::saveLogWithExeption('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
-			                    } 
-
-								break;
+								//     "mw_response" => json_encode($response)
+								// );
+								// GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
+							}catch(\Exception $e){
+								/*ProviderHelper::saveLogWithExeption('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);*/
+							} 
 						}
-
 						try{
 							$createGameTransactionLog = [
 								"connection_name" => $client_details->connection_name,
