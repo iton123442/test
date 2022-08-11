@@ -254,7 +254,8 @@ class MannaPlayController extends Controller
 								try{
 			                        $data = array(
 			                            "win"=> 2,
-			                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+			                            "transaction_reason" => "FAILED Due to low balance or Client Server Timeout",
+										"transaction_ddd" => "dfadsfdas"
 			                        );
 
 			                        GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
