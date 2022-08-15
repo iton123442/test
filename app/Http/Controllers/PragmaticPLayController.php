@@ -475,7 +475,7 @@ class PragmaticPLayController extends Controller
                 "error" => 0,
                 "description" => "Success",
             );
-            AWSHelper::saveLog('TPP result ext not found', $this->provider_id, json_encode($data), $response_log);
+            AWSHelper::saveLog('TPP result ext not found', $this->provider_id, json_encode($data), $response);
             return $response_log;
         }
         
@@ -513,7 +513,7 @@ class PragmaticPLayController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'tpp',
-                    "game_transaction_ext_id" => $game_trans_ext_v2,
+                    "game_trans_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
@@ -593,16 +593,16 @@ class PragmaticPLayController extends Controller
         $game_code = $game_details->game_code;
         $token_id = $client_details->token_id;
         $win = $bet_amount > 0 ? 1 : 0;
-        if($checkExt != 'false'){
-            $response = array(
-                "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
-                "bonus" => 0,
-                "error" => 0,
-                "description" => "Success",
-            );
-            AWSHelper::saveLog('PP endRound/result already exist', $this->provider_id, json_encode($data) ,$response);
-            return $response;
-        }
+        // if($checkExt != 'false'){
+        //     $response = array(
+        //         "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+        //         "bonus" => 0,
+        //         "error" => 0,
+        //         "description" => "Success",
+        //     );
+        //     AWSHelper::saveLog('PP endRound/result already exist', $this->provider_id, json_encode($data) ,$response);
+        //     return $response;
+        // }
         try {
             $balance = $client_details->balance;
             $create_gametransactionext = array(
@@ -624,7 +624,7 @@ class PragmaticPLayController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'tpp',
-                    "game_transaction_ext_id" => $game_trans_ext_v2,
+                    "game_trans_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
@@ -638,6 +638,7 @@ class PragmaticPLayController extends Controller
                     "game_id" => $game_details->game_id,
                     "player_id" => $client_details->player_id,
                     "mw_response" => $response,
+                    "end_round" => true,
                 ]
             ];
             $updateGameTransaction = [
@@ -778,7 +779,7 @@ class PragmaticPLayController extends Controller
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
                     "provider" => 'tpp',
-                    "game_transaction_ext_id" => $game_trans_ext_v2,
+                    "game_trans_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
                 ],
                 "provider" => [
@@ -792,6 +793,7 @@ class PragmaticPLayController extends Controller
                     "game_id" => $game_details->game_id,
                     "player_id" => $client_details->player_id,
                     "mw_response" => $response,
+                    
                 ]
             ];
             ClientRequestHelper::fundTransfer_TG($client_details, $bet_amount, $game_details->game_code, $game_details->game_name, $game_trans->game_trans_id, 'credit', true, $action_payload);
