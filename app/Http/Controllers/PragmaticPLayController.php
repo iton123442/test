@@ -593,7 +593,8 @@ class PragmaticPLayController extends Controller
         $game_code = $game_details->game_code;
         $token_id = $client_details->token_id;
         $win = $bet_amount > 0 ? 1 : 0;
-        // if($checkExt != 'false'){
+        if($checkExt != 'false'){
+            if($checkExt->amount > 0){$win = 1;}
         //     $response = array(
         //         "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
         //         "bonus" => 0,
@@ -602,7 +603,7 @@ class PragmaticPLayController extends Controller
         //     );
         //     AWSHelper::saveLog('PP endRound/result already exist', $this->provider_id, json_encode($data) ,$response);
         //     return $response;
-        // }
+        }
         try {
             $balance = $client_details->balance;
             $create_gametransactionext = array(
@@ -642,7 +643,7 @@ class PragmaticPLayController extends Controller
                 ]
             ];
             $updateGameTransaction = [
-                'win' => 0,
+                'win' => $win,
                 'income' => $game_trans->bet_amount,
                 'entry_id' => 1,
                 'trans_status' => 2
