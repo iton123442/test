@@ -348,10 +348,13 @@ class GameLobby{
 
     public static function evoplayLunchUrl($token,$game_code,$game_provider,$exit_url,$lang){
         $client_player_details = GameLobby::getClientDetails('token', $token);
+
+        $customToken = $token.'TIGER'.$client_player_details->player_id;
+
         $requesttosend = [
           "project" => config('providerlinks.evoplay.project_id'),
           "version" => 1,
-          "token" => $token,
+          "token" => $customToken ,
           "game" => $game_code, //game_code, game_id
           "settings" =>  [
             'user_id'=> $client_player_details->player_id,

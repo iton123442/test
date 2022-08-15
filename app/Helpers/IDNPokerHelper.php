@@ -356,7 +356,7 @@ class IDNPokerHelper{
         return $data_saved;
     }
     public static function createIDNTransactionLocalhost($data) {
-        $data_saved = DB::table('production_idn_transaction')->insertGetId($data);
+        $data_saved = DB::table('production_idn_transaction_duplicate')->insertGetId($data);
         return $data_saved;
     }
 

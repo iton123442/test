@@ -90,12 +90,10 @@ class FreeSpinHelper{
                 case 'provider_trans_id':
                     $where = " where provider_trans_id = '".$transaction_id."' limit 1";
                     break;
-                
                 default:
                     $where = " where provider_trans_id = '".$transaction_id."' limit 1";
                     break;
             }
-
         }
         $getFreeRound = DB::select('select freespin_id,player_id,game_id,spin_remaining, status, win,details,provider_trans_id from freespin ' . $where);
         $data_rows = count($getFreeRound);
@@ -132,7 +130,7 @@ class FreeSpinHelper{
     public static function updateFreeRound($data,$id){
         return DB::table('freespin')->where('freespin_id',$id)->update($data);
     }
-    
+
     public static function unique_code($limit)
 	{
 		return substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, $limit);
@@ -210,7 +208,7 @@ class FreeSpinHelper{
 
     public static function createFreeRoundPNG($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
-       
+
         try{
             $freeroundtransac = [
                 "player_id" => $player_details->player_id,
@@ -303,9 +301,9 @@ class FreeSpinHelper{
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         }
-        
+
     }
-    
+
     public static function createFreeRoundMannaplay($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($freeround_id), 'HIT');
@@ -336,14 +334,14 @@ class FreeSpinHelper{
             $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
         }
         $URL = config("providerlinks.mannaplay.FREE_ROUND_ADD");
-        
+
         $client = new Client([
-            'headers' => [ 
+            'headers' => [
                 'Content-Type' => 'application/json',
                 'apiKey' => $api_key
             ]
         ]);
-       
+
         try {
             $requestBody =   [
                 "account" => "$player_details->player_id",
@@ -364,7 +362,7 @@ class FreeSpinHelper{
                 );
             $dataresponse = json_decode($game_link_response->getBody()->getContents());
             Helper::saveLog('Freespin '.  $sub_provder_id, $sub_provder_id,json_encode($requestBody),  json_encode($dataresponse));
-      
+
         } catch (\Exception $e) {
             $createFreeround = [
                 "status" => 3,
@@ -502,11 +500,11 @@ class FreeSpinHelper{
                 FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
                 return 200;
             }
-            
+
         } else {
             return 400;
         }
-       
+
     }
 
     public static function soapXMLparser($data){
@@ -540,7 +538,7 @@ class FreeSpinHelper{
         $password = "stage-4j2UUY5MzGVzKAV";
         $credentials = base64_encode($username.":".$password);
         $httpClient = new Client([
-            'headers' => [ 
+            'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $credentials,
             ]
@@ -615,7 +613,7 @@ class FreeSpinHelper{
         $password = "stage-4j2UUY5MzGVzKAV";
         $credentials = base64_encode($username.":".$password);
         $client = new Client([
-            'headers' => [ 
+            'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $credentials,
             ]
@@ -655,7 +653,7 @@ class FreeSpinHelper{
         $password = "YoqJcvRHFUcr2un4";
         $credentials = base64_encode($username.":".$password);
         $httpClient = new Client([
-            'headers' => [ 
+            'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $credentials,
             ]
@@ -733,7 +731,7 @@ class FreeSpinHelper{
         $password = "YoqJcvRHFUcr2un4";
         $credentials = base64_encode($username.":".$password);
         $httpClient = new Client([
-            'headers' => [ 
+            'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic ' . $credentials,
             ]
@@ -914,7 +912,7 @@ class FreeSpinHelper{
             return 200;
         }
         Helper::saveLog('BNG freespin response', 44, json_encode($data), json_encode($dataresponse));
-    }  
+    }
     public static function cancelFreeRoundBNG($freeround_id){
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
         // dd($client_details);
@@ -935,7 +933,7 @@ class FreeSpinHelper{
         } catch (\Exception $e) {
             return 400;
         }
-    } 
+    }
     public static function issueFreeSpinBGaming($player_details,$data, $sub_provder_id,$freeround_id){
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
         if($game_details == false){
@@ -984,7 +982,7 @@ class FreeSpinHelper{
         $signature = hash_hmac('sha256',json_encode($requesttosend),$secret);
         // dd($signature);
         $api_url = config("providerlinks.bgaming.GCP_URL")."/freespins/issue";
-        $client = new Client(['headers' => [ 
+        $client = new Client(['headers' => [
                     'Content-Type' => 'application/json',
                     'X-REQUEST-SIGN' => $signature
                 ]
@@ -1016,7 +1014,7 @@ class FreeSpinHelper{
             return 400;
         }
 
-    } 
+    }
     public static function cancelFreeSpinBGaming($freeround_id){
         $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
         $requesttosend = [
@@ -1025,7 +1023,7 @@ class FreeSpinHelper{
         ];
         $signature = hash_hmac('sha256',json_encode($requesttosend),config("providerlinks.bgaming.AUTH_TOKEN"));
         $api_url = config("providerlinks.bgaming.GCP_URL")."/freespins/cancel";
-        $client = new Client(['headers' => [ 
+        $client = new Client(['headers' => [
                 'Content-Type' => 'application/json',
                 'X-REQUEST-SIGN' => $signature
             ]
@@ -1047,7 +1045,7 @@ class FreeSpinHelper{
             Helper::saveLog('BGaming Cancelfreespin error', 57, json_encode($freeround_id), json_encode($msg));
             return 400;
         }
-    } 
+    }
     public static function createFreeRoundWazdan($player_details,$data, $sub_provder_id,$freeround_id){
         Helper::saveLog('freeSpin(Wazdan)'. $sub_provder_id, 33,json_encode($freeround_id), 'HIT');//savelog
         $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);// get game details
@@ -1116,7 +1114,7 @@ class FreeSpinHelper{
                     ];
                 }
                 $api_key = WazdanHelper::generateSignature($requestBody);
-                $client = new Client(['headers' => [ 
+                $client = new Client(['headers' => [
                     'Content-Type' => 'application/json',
                     'Signature' => $api_key["hmac"]
                     ]
@@ -1131,7 +1129,7 @@ class FreeSpinHelper{
                         "status" => 3,
                         // "provider_trans_id" => $freeround_id
                     ];
-                    
+
                     Helper::saveLog('freeSpin(Wazdan)'. $sub_provder_id, 33,json_encode($requestBody),  json_encode($dataresponse));
                     FreeSpinHelper::updateFreeRound($createFreeround, $id);
                     $freespinExtenstion = [
@@ -1182,7 +1180,7 @@ class FreeSpinHelper{
 
     public static function cancelFreeRoundWazdan($freeround_id){
         Helper::saveLog('Wazdan CancelFreeRound',57, json_encode($freeround_id), 'Cancel FreeRound HIT!');
-        
+
          $getFreespin = FreeSpinHelper::getFreeSpinDetails($freeround_id, "provider_trans_id" );
          if(isset($getFreespin)) {
             $baseUrl = config("providerlinks.wazdan.freeround_api_link")."/forfeit/";
@@ -1193,7 +1191,7 @@ class FreeSpinHelper{
                 "license"=>config("providerlinks.wazdan.license")
             ];
             $api_key = WazdanHelper::generateSignature($datatosend);
-            $client = new Client(['headers' => [ 
+            $client = new Client(['headers' => [
                 'Content-Type' => 'application/json',
                 'Signature' => $api_key["hmac"]
                 ]
@@ -1219,12 +1217,12 @@ class FreeSpinHelper{
                 Helper::saveLog('Wazdan Cancelfreespin error', 57, json_encode($data), json_encode($dataresponse));
 
                 FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
-            
+
                 return 400;
             }
-    
+
          }
-        
+
     }
 
     public static function createFreeRoundTGG($player_details,$data, $sub_provder_id,$freeround_id){
@@ -1266,7 +1264,7 @@ class FreeSpinHelper{
                         "game"=> $game_details->game_code,
                         "currency"=> $player_details->default_currency,
                         "extra_bonuses"=> [
-                            "bonus_spins"=> [  
+                            "bonus_spins"=> [
                                 "spins_count"=> $data["details"]["rounds"],
                                 "bet_in_money"=> $data["details"]["denomination"],
                             ],
@@ -1288,7 +1286,7 @@ class FreeSpinHelper{
                     "game"=> $game_details->game_code,
                     "currency"=> $player_details->default_currency,
                     "extra_bonuses"=> [
-                        "bonus_spins"=> [  
+                        "bonus_spins"=> [
                             "spins_count"=> $data["details"]["rounds"],
                             "bet_in_money"=> $data["details"]["denomination"],
                         ]
@@ -1301,9 +1299,9 @@ class FreeSpinHelper{
                         "expire"=> $endtime
                     ]
                 ];
-                
 
-                $client = new Client(['headers' => [ 
+
+                $client = new Client(['headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ]
                 ]);
@@ -1379,7 +1377,7 @@ class FreeSpinHelper{
                         "game"=> $game_details->game_code,
                         "currency"=> $player_details->default_currency,
                         "extra_bonuses"=> [
-                            "bonus_spins"=> [  
+                            "bonus_spins"=> [
                                 "spins_count"=> $data["details"]["rounds"],
                                 "bet_in_money"=> $data["details"]["denomination"],
                             ],
@@ -1401,7 +1399,7 @@ class FreeSpinHelper{
                     "game"=> $game_details->game_code,
                     "currency"=> $player_details->default_currency,
                     "extra_bonuses"=> [
-                        "bonus_spins"=> [  
+                        "bonus_spins"=> [
                             "spins_count"=> $data["details"]["rounds"],
                             "bet_in_money"=> $data["details"]["denomination"],
                         ]
@@ -1414,9 +1412,9 @@ class FreeSpinHelper{
                         "expire"=> $endtime
                     ]
                 ];
-                
 
-                $client = new Client(['headers' => [ 
+
+                $client = new Client(['headers' => [
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ]
                 ]);
@@ -1503,7 +1501,7 @@ class FreeSpinHelper{
                         "bufferTime" => $data['details']['buffer_time'],
                         "serialNo" => $freeround_id,
                 ];
-                $client = new Client(['headers' => [ 
+                $client = new Client(['headers' => [
                     'API' => 'createLoyalFreeSpin',
                     'DataType' => 'JSON'
                 ]
@@ -1516,7 +1514,7 @@ class FreeSpinHelper{
                     $createFreeround = [
                         "status" => 3,
                     ];
-                    
+
                     Helper::saveLog('SpadeGamingFS', 59,json_encode($requestBody),  json_encode($dataresponse));
                     FreeSpinHelper::updateFreeRound($createFreeround, $id);
                     $freespinExtenstion = [
@@ -1544,7 +1542,7 @@ class FreeSpinHelper{
                     FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
                     return 400;
                 }
-                else {          
+                else {
                     $data = [
                         "details" => json_encode($dataresponse->tranId)
                     ];
@@ -1561,7 +1559,7 @@ class FreeSpinHelper{
                 }
         }
     }
-    
+
     public static function cancelFreeRoundSpadeGaming($freeround_id){
         Helper::saveLog('Spade CancelFreeRound',59, json_encode($freeround_id), 'Cancel FreeRound HIT!');
         $originalfreeround_id = explode("_", $freeround_id);
@@ -1574,7 +1572,7 @@ class FreeSpinHelper{
                 "promotionCode" => $promoCode,
                 "serialNo"=>$originalfreeround_id[1]
             ];
-            $client = new Client(['headers' => [ 
+            $client = new Client(['headers' => [
                 'API' => 'cancelFreeSpin',
                 'DataType' => 'JSON'
                 ]
@@ -1599,12 +1597,12 @@ class FreeSpinHelper{
                 Helper::saveLog('Spade Cancelfreespin error', 59, json_encode($data), json_encode($dataresponse));
 
                 FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
-            
+
                 return 400;
             }
-    
+
          }
-        
+
     }
 
     public static function createFreeSpinKA($player_details,$data, $sub_provder_id,$freeround_id){
@@ -1629,7 +1627,7 @@ class FreeSpinHelper{
         }
 
         $id = FreeSpinHelper::createFreeRound($insertFreespin);
-        
+
          $requesttosend = [
             "partnerName" => config("providerlinks.kagaming.partner_name"),
             "currency" => $player_details->default_currency,
@@ -1637,7 +1635,7 @@ class FreeSpinHelper{
             "numberSpins" => (int) $data['details']['rounds'],
             "betLevel" => (int) $data['details']['denomination'],
             "endDate" => $data["details"]["expiration_date"],
-            "games" =>[$data["game_code"]] 
+            "games" =>[$data["game_code"]]
         ];
 
         $hash = hash_hmac('sha256', json_encode($requesttosend), config("providerlinks.kagaming.secret_key"));
@@ -1684,7 +1682,7 @@ class FreeSpinHelper{
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         }
-        else {      
+        else {
             $data = [
                 "details" => json_encode($dataresponse->promotionSpinId)
             ];
@@ -1695,9 +1693,9 @@ class FreeSpinHelper{
                 "provider_response" => json_encode($dataresponse),
                 "client_request" => json_encode($data),
                 "mw_response" => "200"
-            ];  
+            ];
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
-            Helper::saveLog('KAGaming Freespin Success',75, json_encode($freeround_id), $dataresponse);  
+            Helper::saveLog('KAGaming Freespin Success',75, json_encode($freeround_id), $dataresponse);
             return 200;
         }
     }
@@ -1710,7 +1708,7 @@ class FreeSpinHelper{
                 "partnerName"=> config("providerlinks.kagaming.partner_name"),
                 "promotionSpinId"=>  json_decode($getFreespin->details)
             ];
-            $client = new Client(['headers' => [ 
+            $client = new Client(['headers' => [
                 'Content-Type' => 'application/json'
                 ]
             ]);
@@ -1737,12 +1735,12 @@ class FreeSpinHelper{
                 Helper::saveLog('KA Cancelfreespin error', 75, json_encode($data), json_encode($dataresponse));
 
                 FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
-            
+
                 return 400;
             }
-    
+
          }
-        
+
     }
     public static function createFreeSpinMancala($player_details,$data, $sub_provder_id,$freeround_id){
         // dd($data);
@@ -1785,7 +1783,7 @@ class FreeSpinHelper{
             "BonusType" => 1
         ];
         // dd($requesttosend);
-        $client = new Client(['headers' => [ 
+        $client = new Client(['headers' => [
             'Content-Type' => 'application/json'
             ]
         ]);
@@ -1971,7 +1969,7 @@ class FreeSpinHelper{
         }
 
         $id = FreeSpinHelper::createFreeRound($insertFreespin);
-        
+
          $requesttosend = [
             "BrandId" => config("providerlinks.habanero.brandID"),
             "APIKey" => config("providerlinks.habanero.apiKey"),
@@ -1996,7 +1994,7 @@ class FreeSpinHelper{
                     ],
                     [
                         "CurrencyCode" => "CNY",
-                        "CoinPosition" => 2 
+                        "CoinPosition" => 2
                     ]
                 ],
 
@@ -2049,7 +2047,7 @@ class FreeSpinHelper{
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
             return 400;
         }
-        else {      
+        else {
             $data = [
                 "provider_trans_id" =>$data["client_id"]."_".$dataresponse->Players[0]->BonusBalanceId,
                 "denominations" => $dataresponse->Players[0]->BonusValue
@@ -2061,14 +2059,14 @@ class FreeSpinHelper{
                 "provider_response" => json_encode($dataresponse),
                 "client_request" => json_encode($data),
                 "mw_response" => "200"
-            ];  
+            ];
             FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
-            Helper::saveLog('HabaneroGaming Freespin Success',47, json_encode($freeround_id), $dataresponse);  
+            Helper::saveLog('HabaneroGaming Freespin Success',47, json_encode($freeround_id), $dataresponse);
             return 200;
         }
     }
 
-    
+
     public static function cancelFreespinHabanero($freeround_id){
         Helper::saveLog('Habanero CancelFreeRound',47, json_encode($freeround_id), 'Cancel FreeRound HIT!');
         $originalfreeround_id = explode("_", $freeround_id);
@@ -2108,13 +2106,12 @@ class FreeSpinHelper{
                 Helper::saveLog('Habanero Cancelfreespin error', 47, json_encode($data), json_encode($dataresponse));
 
                 FreeSpinHelper::updateFreeRound($data, $getFreespin->freespin_id);
-            
+
                 return 400;
             }
-    
+
          }
-        
+
     }
 }
 ?>
- 

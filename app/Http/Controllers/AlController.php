@@ -7,6 +7,7 @@ use App\Helpers\AlHelper;
 use App\Helpers\Helper;
 use App\Helpers\SAHelper;
 use App\Helpers\ProviderHelper;
+use App\Helpers\AWSHelper;
 use GuzzleHttp\Client;
 use App\Helpers\ClientRequestHelper;
 use Illuminate\Support\Facades\Artisan;
@@ -29,6 +30,26 @@ class AlController extends Controller
     public $hashen = '$2y$10$37VKbBiaJzWh7swxTpy6OOlldjjO9zdoSJSMvMM0.Xi2ToOv1LcSi';
 
     public function index(Request $request){
+
+      $request_data = json_decode(json_encode($request->all()));
+
+      $query = DB::Select("SELECT * from providers_log WHERE trans_id = '" . $request_data->round_id . "'");
+      $result = count($query);
+      Helper::saveLog('al', 122345,json_encode($request->all()),123);
+      if ($result > 0 ){
+            $update = DB::table('providers_log')
+                ->where('trans_id', $request_data->round_id)
+                ->update(['details' => rand()]);
+      }else{
+        $data = [
+              "trans_id" => 2,
+              "details" => "details"
+            ];
+        $data_saved = DB::table('providers_log')->insertGetId($data);
+      }
+      return 'DONE';
+
+
       // $token = Helper::tokenCheck('n58ec5e159f769ae0b7b3a0774fdbf80');
         $gg = DB::table('games as g')
             ->where('provider_id', $request->provider_id)
@@ -1021,6 +1042,32 @@ class AlController extends Controller
 
     public function currency(){
       return ClientRequestHelper::currencyRateConverter("USD",12829967);
+    }
+
+
+    public function getAllWaySpinDayTransaction(){
+
+        $merchantId = 'TGAMBNSB';
+
+        AWSHelper::saveLog('AWS BO Query Status', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
+        $client_details = AWSHelper::getClientDetails('token', $request->token);
+        $client = new Client([
+          'headers' => [
+            'Content-Type' => 'application/json',
+          ]
+        ]);
+        $requesttosend = [
+          "merchantId" => $merchantId,
+          "currentTime" => AWSHelper::currentTimeMS(),
+          "beginDate" => '2022-07-06',
+          "sign" => $this->hashen($this->merchant_id . '_' . $client_details->player_id, AWSHelper::currentTimeMS()),
+        ];
+        $guzzle_response = $client->post(
+          $this->api_url . '/fund/queryStatus',
+          ['body' => json_encode($requesttosend)]
+        );
+        $client_response = json_decode($guzzle_response->getBody()->getContents());
+        return $client_response;
     }
 
 

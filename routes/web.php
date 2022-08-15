@@ -207,6 +207,7 @@ $app->post('/public/api/aws/playerbalance', 'AWSController@playerBalance');
 $app->post('/public/api/aws/fundtransfer', 'AWSController@fundTransfer'); 
 $app->post('/public/api/aws/querystatus', 'AWSController@queryStatus'); 
 $app->post('/public/api/aws/orderquery', 'AWSController@queryOrder');
+$app->post('/public/api/aws/getday', 'AWSController@getAllWaySpinDayTransaction');
 // AWS PROVIDER SINGLE WALLET ROUTE
 $app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
 $app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
@@ -324,6 +325,8 @@ $app->post('/public/api/ka/revoke','KAGamingController@gameRevoke');
 
 
 // 8PROVIDERS
+$app->post('/public/api/eightproviderTest', 'EightProviderControllerV2@getClientDetailsEvoPlay'); // Single Route
+
 $app->post('/public/api/eightprovider', 'EightProviderControllerV2@index'); // Single Route
 $app->post('/public/api/eightprovider/test', 'EightProviderControllerV2@testcall'); // TEST
 $app->post('/public/api/eightprovider/getlist', 'EightProviderControllerV2@getGames');
