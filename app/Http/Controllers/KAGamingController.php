@@ -705,6 +705,10 @@ class KAGamingController extends Controller
             ];
             ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
         }else{ // Unknown Response Code
+            if($check_bet_round == 'false'){
+                $updateGameTransaction = ["win" => 2,'trans_status' => 5];
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+            }
             $response = ["status" => "Not Enough Balance", "statusCode" =>  200];
             $updateTransactionEXt = array(
                 // "provider_request" =>json_encode($data),
@@ -715,7 +719,6 @@ class KAGamingController extends Controller
                 'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
             $createGameTransactionProviderDetails = [
                 "connection_name" => $client_details->connection_name,
                 "column" =>[
