@@ -307,7 +307,7 @@ class YGGController extends Controller
                     "provider" => 'ygg',
                     "game_trans_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
-                    "win_or_lost" => 4;
+                    "win_or_lost" => 4
                 ],
                 "provider" => [
                     "provider_request" => $request->all(),
