@@ -639,7 +639,7 @@ class PragmaticPLayController extends Controller
                     "game_id" => $game_details->game_id,
                     "player_id" => $client_details->player_id,
                     "mw_response" => $response,
-                    "end_round" => true,
+                    "endround" => true,
                 ]
             ];
             $updateGameTransaction = [
