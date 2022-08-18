@@ -581,14 +581,14 @@ class FundtransferProcessorController extends Controller
                                 Helper::saveLog("Habanero Gaming Success Client Request", 24, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif($payload->action->custom->provider == 'tpp' ){
-                                // $ext_data = array(
-                                //     "mw_request"=>json_encode($requesttocient),
-                                //     "client_response" =>json_encode($client_response),
-                                //     "transaction_detail" =>json_encode("success"),
-                                //     "general_details" =>json_encode("success")
-                                // );
-                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                                 Helper::saveLog("Pragmatic Play Success Client Request", 26, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif($payload->action->custom->provider == 'ygg' ){
