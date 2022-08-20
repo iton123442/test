@@ -101,6 +101,8 @@ class ClientRequestHelper{
                         if (in_array($action["provider_name"], $exclude_provider)) {
                             $timeout =  10;
                         }
+                    }else{
+                        $timeout =  10;
                     }
 
                     # Exclude selected operator
@@ -229,6 +231,8 @@ class ClientRequestHelper{
                         if (in_array($action["provider_name"], $exclude_provider)) {
                             $bol =  false;
                         }
+                    }else{
+                        $bol =  false;
                     }
 
                     # Exclude selected operator
