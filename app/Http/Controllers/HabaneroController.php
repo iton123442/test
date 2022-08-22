@@ -232,7 +232,10 @@ class HabaneroController extends Controller
             if($item->gamestatemode == 1){
                 $bet = $item;
                 AWSHelper::saveLog("Habanero Request bet ", $this->provider_id, json_encode($data,JSON_FORCE_OBJECT),"BET BET BET");
-                $this->bet($details,$bet,$client_details,$game_details,$round_id,$gamerecord);
+                $check = $this->bet($details,$bet,$client_details,$game_details,$round_id,$gamerecord);
+                if(isset($check['fundtransferresponse']['status']['nofunds']) && $check['fundtransferresponse']['status']['nofunds'] == true){
+                    return $check;
+                }
             }
             if($item->gamestatemode == 2){
                 $win = $item;
