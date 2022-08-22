@@ -755,9 +755,10 @@ $app->group(['prefix' => '/public/tw/api/'], function () use ($app) {
     $app->post('tw_wallet/withdraw', 'TransferWalletAggregator\WalletDetailsController@makeTransferWallerWithdraw');
     $app->post('tw_wallet/bethistory', 'TransferWalletAggregator\WalletDetailsController@getBetHistory');
     $app->post('tw_wallet/transactionchecker', 'TransferWalletAggregator\WalletDetailsController@checkTransactionDetails');
+    $app->post('tw_wallet/gamesummary', 'TransferWalletAggregator\WalletDetailsController@gameSummaryPlayerDaily');
 
     //seamless wallet fundster endpoint OPERATOR
-        $app->post('sm_wallet/getPlayerDetails', 'TransferWalletAggregator\DetailsAndFundTransferController@getPlayerDetails');
+    $app->post('sm_wallet/getPlayerDetails', 'TransferWalletAggregator\DetailsAndFundTransferController@getPlayerDetails');
     $app->post('sm_wallet/fundTransfer', 'TransferWalletAggregator\DetailsAndFundTransferController@fundTransfer');
     $app->post('sm_wallet/transactionchecker', 'TransferWalletAggregator\DetailsAndFundTransferController@transactionchecker');
 
@@ -827,6 +828,7 @@ $app->post('/public/api/idnpoker/getPlayerBalance', 'IDNPokerController@getPlaye
 $app->post('/public/api/idnpoker/getPlayerWalletBalance', 'IDNPokerController@getPlayerWalletBalance');
 $app->post('/public/api/idnpoker/getTransaction', 'IDNPokerController@getTransactionHistory');
 $app->post('/public/api/idnpoker/localtransaction', 'IDNPokerController@TransactionHistory'); // testing
+$app->post('/public/api/idnpoker/summaryplayer', 'IDNPokerController@TransactionPlayerSummary'); // testing
 $app->post('/public/api/idnpoker/retryWithdrawalWallet', 'IDNPokerController@retryWithdrawalRestriction');
 $app->post('/public/api/idnpoker/renewSession', 'IDNPokerController@renewSession');
 // Transfer Wallet New Update

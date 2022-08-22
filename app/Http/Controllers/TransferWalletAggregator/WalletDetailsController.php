@@ -747,5 +747,112 @@ class WalletDetailsController extends Controller
         }
     
     }
+
+    
+    public function gameSummaryPlayerDaily(Request $request)
+    {
+        Helper::saveLog('TW Logs', 5 , json_encode($request->all()), "Player Summary Daily HISTORY HIT");
+        if(!$request->has('access_token') || !$request->has('client_id') || !$request->has('date') ){
+            $mw_response = ["data" => null,"status" => ["code" => "404","message" => TWHelpers::getPTW_Message(404)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+            return $mw_response;
+        }
+
+        $security = TWHelpers::Client_SecurityHash($request->client_id ,$request->access_token);
+        if($security !== true){
+           $mw_response = ["data" => null,"status" => ["code" => $security ,"message" => TWHelpers::getPTW_Message($security)]];
+           Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+           return $mw_response;
+        }
+        try{
+            $client_details =  DB::table('clients')->select('*')->whereRaw('client_id = ?', $request->client_id)->first();
+            $query = "
+            select 
+                `userid`,
+                `total_turnover`,
+                `turnover_poker`,
+                `turnover_domino`,
+                `turnover_ceme`,
+                `turnover_blackjack`,
+                `turnover_capsa`,
+                `turnover_ceme_keliling`,
+                `turnover_superten`,
+                `turnover_omaha`,
+                `turnover_super_bull`,
+                `turnover_capsa_susun`,
+                `turnover_qq_spirit`,
+                `turnover_domino_dealer`,
+                `capsa`,
+                `texaspoker`,
+                `domino`,
+                `ceme`,
+                `blackjack`,
+                `poker_tournament`,
+                `ceme_keliling`,
+                `superten`,
+                `omaha`,
+                `super_bull`,
+                `capsa_susun`,
+                `qq_spirit`,
+                `domino_dealer`
+            from idn_player_summary c 
+            where client_id = ".$client_details->client_id."  and `date` = '".$request->date."' 
+            order by userid asc;
+            ";
+            // where client_id = ".$client_details->client_id."  and `date` = '".$request->date."' 
+            $details = DB::select($query);
+            if (count($details) == 0) {
+                $details = ["data" => null,"status" => ["code" => "200","message" => TWHelpers::getPTW_Message(200)]];
+                Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $query);
+                return response()->json($details); 
+            }
+
+            $data = array();//this is to add data and reformat the $table object to datatables standard array
+            foreach($details as $datas){
+                $datatopass['userid']=$datas->userid;
+                $datatopass['total_turnover']=$datas->total_turnover;
+                $datatopass['turnover_poker']=$datas->turnover_poker;
+                $datatopass['turnover_domino']=$datas->turnover_domino;
+                $datatopass['turnover_ceme']=$datas->turnover_ceme;
+                $datatopass['turnover_blackjack']=$datas->turnover_blackjack;
+                $datatopass['turnover_capsa']=$datas->turnover_capsa;
+                $datatopass['turnover_ceme_keliling']=$datas->turnover_ceme_keliling;
+                $datatopass['turnover_superten']=$datas->turnover_superten;
+                $datatopass['turnover_omaha']=$datas->turnover_omaha;
+                $datatopass['turnover_super_bull']=$datas->turnover_super_bull;
+                $datatopass['turnover_capsa_susun']=$datas->turnover_capsa_susun;
+                $datatopass['turnover_qq_spirit']=$datas->turnover_qq_spirit;
+                $datatopass['turnover_domino_dealer']=$datas->turnover_domino_dealer;
+                $datatopass['capsa']=$datas->capsa;
+                $datatopass['texaspoker']=$datas->texaspoker;
+                $datatopass['domino']=$datas->domino;
+                $datatopass['ceme']=$datas->ceme;
+                $datatopass['blackjack']=$datas->blackjack;
+                $datatopass['poker_tournament']=$datas->poker_tournament;
+                $datatopass['ceme_keliling']=$datas->ceme_keliling;
+                $datatopass['superten']=$datas->superten;
+                $datatopass['omaha']=$datas->omaha;
+                $datatopass['super_bull']=$datas->super_bull;
+                $datatopass['capsa_susun']=$datas->capsa_susun;
+                $datatopass['qq_spirit']=$datas->qq_spirit;
+                $datatopass['domino_dealer']=$datas->qq_spirit;
+                $data[]=$datatopass;
+            }
+            $mw_response = [
+                "data" => $data,
+                "date" => $request->date,
+                "status" => [
+                    "code" => 200,
+                    "message" => TWHelpers::getPTW_Message(200)
+                ]
+            ];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $query);
+            return response()->json($mw_response); 
+        } catch (\Exception $e) {
+            $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $e->getMessage());
+            return $mw_response;
+        }
+    }
     
 }
