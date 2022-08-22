@@ -530,30 +530,30 @@ $app->post('/public/hbn/api/query','HabaneroController@queryrequest');
 
 
 // Pragmatic PLay
-// $app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
-// $app->post('/public/api/pp/balance','PragmaticPLayController@balance');
-// $app->post('/public/api/pp/bet','PragmaticPLayController@bet');
-// $app->post('/public/api/pp/result','PragmaticPLayController@result');
-// $app->post('/public/api/pp/refund','PragmaticPLayController@refund');
-// $app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
-// $app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
-// $app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
-// $app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
-// $app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
-// $app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+$app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
+$app->post('/public/api/pp/balance','PragmaticPLayController@balance');
+$app->post('/public/api/pp/bet','PragmaticPLayController@bet');
+$app->post('/public/api/pp/result','PragmaticPLayController@result');
+$app->post('/public/api/pp/refund','PragmaticPLayController@refund');
+$app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
+$app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
+$app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
+$app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
+$app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
+$app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
 //NEWFLOW PRAGMATIOC PLAY
 // Pragmatic PLay
-$app->post('/public/api/pp/authenticate','PragmaticPlayNEWController@authenticate');
-$app->post('/public/api/pp/balance','PragmaticPlayNEWController@balance');
-$app->post('/public/api/pp/bet','PragmaticPlayNEWController@bet');
-$app->post('/public/api/pp/result','PragmaticPlayNEWController@result');
-$app->post('/public/api/pp/refund','PragmaticPlayNEWController@refund');
-$app->post('/public/api/pp/bonusWin','PragmaticPlayNEWController@bonusWin');
-$app->post('/public/api/pp/jackpotWin','PragmaticPlayNEWController@jackpotWin');
-$app->post('/public/api/pp/promoWin','PragmaticPlayNEWController@promoWin');
-$app->post('/public/api/pp/endRound','PragmaticPlayNEWController@endRound');
-$app->post('/public/api/pp/getBalancePerGame','PragmaticPlayNEWController@getBalancePerGame');
-$app->post('/public/api/pp/session/expired','PragmaticPlayNEWController@sessionExpired');
+// $app->post('/public/api/pp/authenticate','PragmaticPlayNEWController@authenticate');
+// $app->post('/public/api/pp/balance','PragmaticPlayNEWController@balance');
+// $app->post('/public/api/pp/bet','PragmaticPlayNEWController@bet');
+// $app->post('/public/api/pp/result','PragmaticPlayNEWController@result');
+// $app->post('/public/api/pp/refund','PragmaticPlayNEWController@refund');
+// $app->post('/public/api/pp/bonusWin','PragmaticPlayNEWController@bonusWin');
+// $app->post('/public/api/pp/jackpotWin','PragmaticPlayNEWController@jackpotWin');
+// $app->post('/public/api/pp/promoWin','PragmaticPlayNEWController@promoWin');
+// $app->post('/public/api/pp/endRound','PragmaticPlayNEWController@endRound');
+// $app->post('/public/api/pp/getBalancePerGame','PragmaticPlayNEWController@getBalancePerGame');
+// $app->post('/public/api/pp/session/expired','PragmaticPlayNEWController@sessionExpired');
 
 
 
@@ -894,3 +894,12 @@ $app->post('/public/api/dowinn/cancel', 'DOWINNController@cancel');
 $app->post('/public/api/dowinn/tip', 'DOWINNController@tip');
 $app->post('/public/api/dowinn/limits', 'DOWINNController@limitList');
 $app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
+//NEWFLOW DOWINN
+// $app->post('/public/api/dowinn', 'DOWINNNEWController@index');//SINGLE END POINT
+// $app->post('/public/api/dowinn/balance', 'DOWINNNEWController@balance');
+// $app->post('/public/api/dowinn/debit', 'DOWINNNEWController@bet');
+// $app->post('/public/api/dowinn/credit', 'DOWINNNEWController@payment');
+// $app->post('/public/api/dowinn/cancel', 'DOWINNNEWController@cancel');
+// $app->post('/public/api/dowinn/tip', 'DOWINNNEWController@tip');
+// $app->post('/public/api/dowinn/limits', 'DOWINNNEWController@limitList');
+// $app->post('/public/api/dowinn/history', 'DOWINNNEWController@viewHistory');
