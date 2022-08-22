@@ -183,7 +183,7 @@ class WazdanController extends Controller
                 $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);  
                 $fund_extra_data = [
                     'provider_name' => $game_details->provider_name,
-                    'connection_timeout' => 3,
+                    'connection_timeout' => 20,
                 ];
                 $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 if(isset($client_response->fundtransferresponse->status->code) 
