@@ -61,7 +61,7 @@ class VivoController extends Controller
 	{
 		$json_data = $request->all();
 		$client_code = RouteParam::get($request, 'brand_code');
-		
+		Helper::errorDebug('vivo_gameTransaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), "INDEX");
 		if($this->_isIdempotent($request->TransactionID)) {
 			header("Content-type: text/xml; charset=utf-8");
 			return '<?xml version="1.0" encoding="utf-8"?>'. $this->_isIdempotent($request->TransactionID)->mw_response;
