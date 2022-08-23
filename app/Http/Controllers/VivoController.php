@@ -65,7 +65,10 @@ class VivoController extends Controller
 		$client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
 		$hash = md5($request->userId.config("providerlinks.vivo.PASS_KEY"));
         $response = [
-            "REQUEST" => $request->all(),
+            "REQUEST" => [
+                "USERID" => $request->userId,
+                "HASH" => $request->hash,
+            ],
             "TIME" => Helper::datesent(),
             "RESPONSE" => [
                 "RESULT" => "FAILED",
@@ -75,7 +78,10 @@ class VivoController extends Controller
 		if($hash == $request->hash) {
 			if ($client_details) {
                 $response = [
-                    "REQUEST" => $request->all(),
+                    "REQUEST" => [
+                        "USERID" => $request->userId,
+                        "HASH" => $request->hash,
+                    ],
                     "TIME" => Helper::datesent(),
                     "RESPONSE" => [
                         "RESULT" => "OK",
@@ -94,14 +100,24 @@ class VivoController extends Controller
 		$client_code = RouteParam::get($request, 'brand_code');
         $client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
         $response = [
-            "REQUEST" => $request->all(),
+            "REQUEST" => [
+                "USERID" => $request->userId,
+                "AMOUNT" => $request->Amount,
+                "TRANSACTIONID" => $request->TransactionID,
+                "TRNTYPE" => $request->TrnType,
+                "GAMEID" => $request->gameId,
+                "ROUNDID" => $request->roundId,
+                "TRNDESCRIPTION" => $request->TrnDescription,
+                "HISTORY" => $request->History,
+                "ISROUNDFINISHED" => $request->isRoundFinished,
+                "HASH" => $request->hash,
+            ],
             "TIME" => Helper::datesent(),
             "RESPONSE" => [
                 "RESULT" => "FAILED",
                 "CODE" => 310,
             ]
         ];
-        header("Content-type: text/xml; charset=utf-8");
         if($client_details){
             switch ($request->TrnType) {
                 case 'BET':
@@ -116,6 +132,7 @@ class VivoController extends Controller
             }
         }
         Helper::errorDebug('vivo_'.$request->TrnType , config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
+        header("Content-type: text/xml; charset=utf-8");
         return PNGHelper::arrayToXml($response,"<VGSSYSTEM/>");
 	}
 
@@ -127,7 +144,18 @@ class VivoController extends Controller
             if ($bet_transaction != 'false') {
                 if( $bet_transaction->transaction_detail == "SUCCESS" ){
                     $response = [
-                        "REQUEST" => $data,
+                        "REQUEST" => [
+                            "USERID" => $data["userId"],
+                            "AMOUNT" => $data["Amount"],
+                            "TRANSACTIONID" => $data["TransactionID"],
+                            "TRNTYPE" => $data["TrnType"],
+                            "GAMEID" => $data["gameId"],
+                            "ROUNDID" => $data["roundId"],
+                            "TRNDESCRIPTION" => $data["TrnDescription"],
+                            "HISTORY" => $data["History"],
+                            "ISROUNDFINISHED" => $data["isRoundFinished"],
+                            "HASH" => $data["hash"],
+                        ],
                         "TIME" => Helper::datesent(),
                         "RESPONSE" => [
                             "RESULT" => "OK",
@@ -139,7 +167,18 @@ class VivoController extends Controller
                 }
             } 
             $response = [
-                "REQUEST" => $data,
+                "REQUEST" => [
+                    "USERID" => $data["userId"],
+                    "AMOUNT" => $data["Amount"],
+                    "TRANSACTIONID" => $data["TransactionID"],
+                    "TRNTYPE" => $data["TrnType"],
+                    "GAMEID" => $data["gameId"],
+                    "ROUNDID" => $data["roundId"],
+                    "TRNDESCRIPTION" => $data["TrnDescription"],
+                    "HISTORY" => $data["History"],
+                    "ISROUNDFINISHED" => $data["isRoundFinished"],
+                    "HASH" => $data["hash"],
+                ],
                 "TIME" => Helper::datesent(),
                 "RESPONSE" => [
                     "RESULT" => "FAILED",
@@ -192,7 +231,18 @@ class VivoController extends Controller
             }
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
             $response = [
-                "REQUEST" => $data,
+                "REQUEST" => [
+                    "USERID" => $data["userId"],
+                    "AMOUNT" => $data["Amount"],
+                    "TRANSACTIONID" => $data["TransactionID"],
+                    "TRNTYPE" => $data["TrnType"],
+                    "GAMEID" => $data["gameId"],
+                    "ROUNDID" => $data["roundId"],
+                    "TRNDESCRIPTION" => $data["TrnDescription"],
+                    "HISTORY" => $data["History"],
+                    "ISROUNDFINISHED" => $data["isRoundFinished"],
+                    "HASH" => $data["hash"],
+                ],
                 "TIME" => Helper::datesent(),
                 "RESPONSE" => [
                     "RESULT" => "OK",
@@ -215,7 +265,18 @@ class VivoController extends Controller
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transactionid, $client_details);
             }
             $response = [
-                "REQUEST" => $data,
+                "REQUEST" => [
+                    "USERID" => $data["userId"],
+                    "AMOUNT" => $data["Amount"],
+                    "TRANSACTIONID" => $data["TransactionID"],
+                    "TRNTYPE" => $data["TrnType"],
+                    "GAMEID" => $data["gameId"],
+                    "ROUNDID" => $data["roundId"],
+                    "TRNDESCRIPTION" => $data["TrnDescription"],
+                    "HISTORY" => $data["History"],
+                    "ISROUNDFINISHED" => $data["isRoundFinished"],
+                    "HASH" => $data["hash"],
+                ],
                 "TIME" => Helper::datesent(),
                 "RESPONSE" => [
                     "RESULT" => "FAILED",
@@ -240,7 +301,18 @@ class VivoController extends Controller
             $bet_transaction = GameTransactionMDB::findGameExt($data["TransactionID"], 2,'transaction_id', $client_details);
             if ($bet_transaction != 'false') {
                 $response = [
-                    "REQUEST" => $data,
+                    "REQUEST" => [
+                        "USERID" => $data["userId"],
+                        "AMOUNT" => $data["Amount"],
+                        "TRANSACTIONID" => $data["TransactionID"],
+                        "TRNTYPE" => $data["TrnType"],
+                        "GAMEID" => $data["gameId"],
+                        "ROUNDID" => $data["roundId"],
+                        "TRNDESCRIPTION" => $data["TrnDescription"],
+                        "HISTORY" => $data["History"],
+                        "ISROUNDFINISHED" => $data["isRoundFinished"],
+                        "HASH" => $data["hash"],
+                    ],
                     "TIME" => Helper::datesent(),
                     "RESPONSE" => [
                         "RESULT" => "OK",
@@ -251,7 +323,18 @@ class VivoController extends Controller
                 return $response;
             } 
             $response = [
-                "REQUEST" => $data,
+                "REQUEST" => [
+                    "USERID" => $data["userId"],
+                    "AMOUNT" => $data["Amount"],
+                    "TRANSACTIONID" => $data["TransactionID"],
+                    "TRNTYPE" => $data["TrnType"],
+                    "GAMEID" => $data["gameId"],
+                    "ROUNDID" => $data["roundId"],
+                    "TRNDESCRIPTION" => $data["TrnDescription"],
+                    "HISTORY" => $data["History"],
+                    "ISROUNDFINISHED" => $data["isRoundFinished"],
+                    "HASH" => $data["hash"],
+                ],
                 "TIME" => Helper::datesent(),
                 "RESPONSE" => [
                     "RESULT" => "FAILED",
@@ -264,7 +347,18 @@ class VivoController extends Controller
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["roundId"],'round_id', false, $client_details);
         if($bet_transaction == 'false'){
             $response = [
-                "REQUEST" => $data,
+                "REQUEST" => [
+                    "USERID" => $data["userId"],
+                    "AMOUNT" => $data["Amount"],
+                    "TRANSACTIONID" => $data["TransactionID"],
+                    "TRNTYPE" => $data["TrnType"],
+                    "GAMEID" => $data["gameId"],
+                    "ROUNDID" => $data["roundId"],
+                    "TRNDESCRIPTION" => $data["TrnDescription"],
+                    "HISTORY" => $data["History"],
+                    "ISROUNDFINISHED" => $data["isRoundFinished"],
+                    "HASH" => $data["hash"],
+                ],
                 "TIME" => Helper::datesent(),
                 "RESPONSE" => [
                     "RESULT" => "FAILED",
@@ -289,7 +383,18 @@ class VivoController extends Controller
 
         $win = $data["Amount"] == 0 ? 0 : 1;
         $response = [
-            "REQUEST" => $data,
+            "REQUEST" => [
+                "USERID" => $data["userId"],
+                "AMOUNT" => $data["Amount"],
+                "TRANSACTIONID" => $data["TransactionID"],
+                "TRNTYPE" => $data["TrnType"],
+                "GAMEID" => $data["gameId"],
+                "ROUNDID" => $data["roundId"],
+                "TRNDESCRIPTION" => $data["TrnDescription"],
+                "HISTORY" => $data["History"],
+                "ISROUNDFINISHED" => $data["isRoundFinished"],
+                "HASH" => $data["hash"],
+            ],
             "TIME" => Helper::datesent(),
             "RESPONSE" => [
                 "RESULT" => "OK",
