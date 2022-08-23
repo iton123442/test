@@ -96,9 +96,6 @@ class VivoController extends Controller
 
 	public function gameTransaction(Request $request) 
 	{
-        Helper::errorDebug('vivo_gameTransaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), "INDEX");
-		$client_code = RouteParam::get($request, 'brand_code');
-        $client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
         $response = [
             "REQUEST" => [
                 "USERID" => $request->userId,
@@ -118,28 +115,28 @@ class VivoController extends Controller
                 "CODE" => 310,
             ]
         ];
-        if($client_details){
-            switch ($request->TrnType) {
-                case 'BET':
-                    $response = $this->_BET($request->all(), $client_details);
-                    break;
-                case 'WIN':
-                    $response = $this->_WIN($request->all(), $client_details);
-                    break;
-                case 'CANCELED_BET':
-                    $response = $this->_CANCEL_BET($request->all(), $client_details);
-                    break;
-            }
+        switch ($request->TrnType) {
+            case 'BET':
+                $response = $this->_BET($request->all());
+                break;
+            case 'WIN':
+                $response = $this->_WIN($request->all());
+                break;
+            case 'CANCELED_BET':
+                $response = $this->_CANCEL_BET($request->all());
+                break;
         }
         Helper::errorDebug('vivo_'.$request->TrnType , config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
         header("Content-type: text/xml; charset=utf-8");
         return PNGHelper::arrayToXml($response,"<VGSSYSTEM/>");
 	}
 
-    private function _BET($data,$client_details){ 
+    private function _BET($data){ 
         try{
             ProviderHelper::idenpotencyTable($this->prefix.$data["TransactionID"]);
+            Helper::errorDebug('vivo_gameTransaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($data), "INDEX");
         }catch(\Exception $e){
+            $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
             $bet_transaction = GameTransactionMDB::findGameExt($data["TransactionID"], 1,'transaction_id', $client_details);
             if ($bet_transaction != 'false') {
                 if( $bet_transaction->transaction_detail == "SUCCESS" ){
@@ -187,6 +184,7 @@ class VivoController extends Controller
             ];
             return $response;
         }
+        $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
         $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["roundId"],'round_id', false, $client_details);
         if($bet_transaction == 'false'){
@@ -294,10 +292,12 @@ class VivoController extends Controller
         return $response;
     }
 
-    private function _WIN($data,$client_details){ 
+    private function _WIN($data){ 
         try{
             ProviderHelper::idenpotencyTable($this->prefix.$data["TransactionID"]);
+            Helper::errorDebug('vivo_gameTransaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($data), "INDEX");
         }catch(\Exception $e){
+            $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
             $bet_transaction = GameTransactionMDB::findGameExt($data["TransactionID"], 2,'transaction_id', $client_details);
             if ($bet_transaction != 'false') {
                 $response = [
@@ -343,6 +343,7 @@ class VivoController extends Controller
             ];
             return $response;
         }
+        $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
         $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["roundId"],'round_id', false, $client_details);
         if($bet_transaction == 'false'){
@@ -443,7 +444,7 @@ class VivoController extends Controller
         return $response;
     }
 
-    private function _CANCEL_BET($data,$client_details){ 
+    private function _CANCEL_BET($data){ 
 
     }
 }
