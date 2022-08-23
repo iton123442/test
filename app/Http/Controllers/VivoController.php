@@ -26,7 +26,7 @@ class VivoController extends Controller
 		$client_details = ProviderHelper::getClientDetails('token', $request->token);
 		$hash = md5($request->token.config("providerlinks.vivo.PASS_KEY"));
         $response = [
-            "REQUEST" => json_decode($request->getContent(),TRUE),
+            "REQUEST" => $request->all(),
             "TIME" => Helper::datesent(),
             "RESPONSE" => [
                 "RESULT" => "FAILED",
@@ -36,7 +36,7 @@ class VivoController extends Controller
 		if($hash == $request->hash) {
 			if ($client_details) {
                 $response = [
-                    "REQUEST" => json_decode($request->getContent(),TRUE),
+                    "REQUEST" => $request->all(),
                     "TIME" => Helper::datesent(),
                     "RESPONSE" => [
                         "RESULT" => "OK",
@@ -59,7 +59,7 @@ class VivoController extends Controller
 		$client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
 		$hash = md5($request->userId.config("providerlinks.vivo.PASS_KEY"));
         $response = [
-            "REQUEST" => json_decode($request->getContent(),TRUE),
+            "REQUEST" => $request->all(),
             "TIME" => Helper::datesent(),
             "RESPONSE" => [
                 "RESULT" => "FAILED",
@@ -69,7 +69,7 @@ class VivoController extends Controller
 		if($hash == $request->hash) {
 			if ($client_details) {
                 $response = [
-                    "REQUEST" => json_decode($request->getContent(),TRUE),
+                    "REQUEST" => $request->all(),
                     "TIME" => Helper::datesent(),
                     "RESPONSE" => [
                         "RESULT" => "OK",
@@ -88,7 +88,7 @@ class VivoController extends Controller
 		$client_code = RouteParam::get($request, 'brand_code');
         $client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
         $response = [
-            "REQUEST" => json_decode($request->getContent(),TRUE),
+            "REQUEST" => $request->all(),
             "TIME" => Helper::datesent(),
             "RESPONSE" => [
                 "RESULT" => "FAILED",
