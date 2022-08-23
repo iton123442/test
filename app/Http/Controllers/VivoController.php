@@ -8,6 +8,7 @@ use App\Helpers\ClientRequestHelper;
 use App\Models\GameTransactionMDB;
 use App\Support\RouteParam;
 use Illuminate\Http\Request;
+use App\Helpers\PNGHelper;
 
 use DB;
 
@@ -19,68 +20,41 @@ class VivoController extends Controller
 
 	public function authPlayer(Request $request)
 	{
+        header("Content-type: text/xml; charset=utf-8");
 		$client_details = ProviderHelper::getClientDetails('token', $request->token);
-		
-		header("Content-type: text/xml; charset=utf-8");
-			$response = '<?xml version="1.0" encoding="utf-8"?>';
-			$response .= '<VGSSYSTEM>
-							<REQUEST>
-								<TOKEN>'.$request->token.'</TOKEN>
-								<HASH>'.$request->hash.'</HASH>
-							</REQUEST>
-							<TIME>'.Helper::datesent().'</TIME>
-							<RESPONSE>
-								<RESULT>FAILED</RESULT>
-								<CODE>400</CODE>
-							</RESPONSE>
-						</VGSSYSTEM>';
-
 		$hash = md5($request->token.config("providerlinks.vivo.PASS_KEY"));
-
+        $response = [
+            "REQUEST" => [
+                "TOKEN" => $request->token,
+                "HASH"  => $request->hash,
+            ],
+            "TIME" => Helper::datesent(),
+            "RESPONSE" => [
+                "RESULT" => "FAILED",
+                "CODE" => 400,
+            ]
+        ];
 		if($hash != $request->hash) {
-			header("Content-type: text/xml; charset=utf-8");
-			$response = '<?xml version="1.0" encoding="utf-8"?>';
-			$response .= '<VGSSYSTEM>
-							<REQUEST>
-								<TOKEN>'.$request->token.'</TOKEN>
-								<HASH>'.$request->hash.'</HASH>
-							</REQUEST>
-							<TIME>'.Helper::datesent().'</TIME>
-							<RESPONSE>
-								<RESULT>FAILED</RESULT>
-								<CODE>500</CODE>
-							</RESPONSE>
-						</VGSSYSTEM>';
-		}
-		else
-		{
 			if ($client_details) {
-				header("Content-type: text/xml; charset=utf-8");
-			 		$response = '<?xml version="1.0" encoding="utf-8"?>';
-			 		$response .= '<VGSSYSTEM>
-			 						<REQUEST>
-				 						<TOKEN>'.$request->token.'</TOKEN>
-				 						<HASH>'.$request->hash.'</HASH>
-			 						</REQUEST>
-			 						<TIME>'.Helper::datesent().'</TIME>
-			 						<RESPONSE>
-			 							<RESULT>OK</RESULT>
-			 							<USERID>'.$client_details->player_id.'</USERID>
-			 							<USERNAME>'.$client_details->username.'</USERNAME>
-			 							<FIRSTNAME></FIRSTNAME>
-			 							<LASTNAME></LASTNAME>
-			 							<EMAIL>'.$client_details->email.'</EMAIL>
-			 							<CURRENCY>'.$client_details->default_currency.'</CURRENCY>
-			 							<BALANCE>'.$client_details->balance.'</BALANCE>
-			 							<GAMESESSIONID></GAMESESSIONID>
-			 						</RESPONSE>
-			 					</VGSSYSTEM>';
+                $response = [
+                    "REQUEST" => [
+                        "TOKEN" => $request->token,
+                        "HASH"  => $request->hash,
+                    ],
+                    "TIME" => Helper::datesent(),
+                    "RESPONSE" => [
+                        "RESULT" => "OK",
+                        "USERID" => $client_details->player_id,
+                        "USERNAME" => $client_details->username,
+                        "EMAIL" => $client_details->email,
+                        "CURRENCY" => $client_details->default_currency,
+                        "BALANCE" => $client_details->balance,
+                    ]
+                ];
 			}
-			
-		}
-
+		} 
 		Helper::errorDebug('vivo_authentication', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
-		echo $response;
+        return PNGHelper::arrayToXml($response,"<VGSSYSTEM/>");
 	}
 
 	public function gameTransaction(Request $request) 
