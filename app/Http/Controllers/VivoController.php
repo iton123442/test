@@ -34,7 +34,7 @@ class VivoController extends Controller
                 "CODE" => 400,
             ]
         ];
-		if($hash != $request->hash) {
+		if($hash == $request->hash) {
 			if ($client_details) {
                 $response = [
                     "REQUEST" => [
