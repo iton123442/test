@@ -25,7 +25,7 @@ use GuzzleHttp\Client;
 
 use DB;
 
-class VivoController extends Controller
+class VivoControllerNEW extends Controller
 {
     public function __construct(){
     	$this->provider_db_id = config("providerlinks.vivo.PROVIDER_ID");
