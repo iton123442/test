@@ -379,6 +379,14 @@ class VivoController extends Controller
             "provider_request" => json_encode($data),
         );
         $transactionId = GameTransactionMDB::createGameTransactionExt($game_transaction_extension,$client_details);
+        
+        $updateGameTransaction = [
+            "pay_amount" => $data["Amount"] + $bet_transaction->pay_amount,
+            "income" => $bet_transaction->bet_amount - ( $data["Amount"] + $bet_transaction->pay_amount ),
+            "entry_id" => 2,
+        ];
+        GameTransactionMDB::updateGametransaction($updateGameTransaction,$bet_transaction->game_trans_id, $client_details);
+
         $balance = round($client_details->balance,2) + $data["Amount"];
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
 
@@ -427,12 +435,12 @@ class VivoController extends Controller
         ];
         $client_response = ClientRequestHelper::fundTransfer_TG($client_details, $data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
         if(isset($client_response->fundtransferresponse->status->code) ){
-            $updateGameTransaction = [
-                "pay_amount" => $data["Amount"] + $bet_transaction->pay_amount,
-                "income" => $bet_transaction->bet_amount - ( $data["Amount"] + $bet_transaction->pay_amount ),
-                "entry_id" => 2,
-            ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction,$bet_transaction->game_trans_id, $client_details);
+            // $updateGameTransaction = [
+            //     "pay_amount" => $data["Amount"] + $bet_transaction->pay_amount,
+            //     "income" => $bet_transaction->bet_amount - ( $data["Amount"] + $bet_transaction->pay_amount ),
+            //     "entry_id" => 2,
+            // ];
+            // GameTransactionMDB::updateGametransaction($updateGameTransaction,$bet_transaction->game_trans_id, $client_details);
             $dataToUpdate = array(
                 "mw_request" => json_encode($client_response->requestoclient),
                 "client_response" => json_encode($client_response),
