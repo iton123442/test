@@ -22,10 +22,14 @@ class VivoController extends Controller
 
 	public function authPlayer(Request $request)
 	{
+        header("Content-type: text/xml; charset=utf-8");
 		$client_details = ProviderHelper::getClientDetails('token', $request->token);
 		$hash = md5($request->token.config("providerlinks.vivo.PASS_KEY"));
         $response = [
-            "REQUEST" => $request->all(),
+            "REQUEST" => [
+                "TOKEN" => $request->token,
+                "HASH" => $request->hash,
+            ],
             "TIME" => Helper::datesent(),
             "RESPONSE" => [
                 "RESULT" => "FAILED",
@@ -35,7 +39,10 @@ class VivoController extends Controller
 		if($hash == $request->hash) {
 			if ($client_details) {
                 $response = [
-                    "REQUEST" => $request->all(),
+                    "REQUEST" =>  [
+                        "TOKEN" => $request->token,
+                        "HASH" => $request->hash,
+                    ],
                     "TIME" => Helper::datesent(),
                     "RESPONSE" => [
                         "RESULT" => "OK",
@@ -49,7 +56,6 @@ class VivoController extends Controller
 			}
 		} 
 		Helper::errorDebug('vivo_authentication', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $response);
-        header("Content-type: text/xml; charset=utf-8");
         return PNGHelper::arrayToXml($response,"<VGSSYSTEM/>");
 	}
 
