@@ -583,7 +583,7 @@ class VivoController extends Controller
         ];
         $client_response = ClientRequestHelper::fundTransfer($client_details,$data["Amount"],$game_details->game_code,$game_details->game_name,$transactionId,$bet_transaction->game_trans_id,"credit",true,$fund_extra_data);
         // $client_response = ClientRequestHelper::fundTransfer_TG($client_details, $data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',true,$action_payload);
-        if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200") ){
+        if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200"){
         	$response = [
 	            "REQUEST" => [
 	                "USERID" => $data["userId"],
