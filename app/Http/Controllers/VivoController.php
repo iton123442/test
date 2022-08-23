@@ -614,7 +614,7 @@ class VivoController extends Controller
         }
         return $response;
     }
-    private function transactionStatus(Request $request){
+    public function transactionStatus(Request $request){
     	$json_data = json_decode(file_get_contents("php://input"), true);
 		header("Content-type: text/xml; charset=utf-8");
 		$response = '<?xml version="1.0" encoding="utf-8"?>';
