@@ -742,14 +742,14 @@ class VivoController extends Controller
             ]
         ];
         try {
-        	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_dteails->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
+        	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
         	$dataToUpdate = array(
                 "mw_request" => json_encode($client_response->requestoclient),
                 "client_response" => json_encode($client_response),
                 "mw_response" => json_encode($response),
                 "transaction_detail" => "SUCCESS"
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
         } catch (\Exception $e) {
         	$dataToUpdate = array(
                 "mw_request" => json_encode($client_response->requestoclient),
@@ -757,7 +757,7 @@ class VivoController extends Controller
                 "mw_response" => json_encode($response),
                 "transaction_detail" => "FAILED"
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
         }
         header("Content-type: text/xml; charset=utf-8");
 		$final_response =  '<?xml version="1.0" encoding="utf-8"?>';
