@@ -51,7 +51,7 @@ class VivoController extends Controller
                         "EMAIL" => $client_details->email,
                         "CURRENCY" => $client_details->default_currency,
                         "BALANCE" => $client_details->balance,
-                        "GAMESESSIONID" => $client_details->token
+                        "GAMESESSIONID" => $client_details->player_token
                     ]
                 ];
 			}
