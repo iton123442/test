@@ -393,7 +393,7 @@ class VivoController extends Controller
         $balance = round($client_details->balance,2) + $data["Amount"];
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
 
-        $win = $data["Amount"] == 0 ? 0 : 1;
+        $win = ($data["Amount"] + $bet_transaction->pay_amount) == 0 ? 0 : 1;
         $response = [
             "REQUEST" => [
                 "USERID" => $data["userId"],
