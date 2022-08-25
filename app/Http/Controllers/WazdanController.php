@@ -299,7 +299,7 @@ class WazdanController extends Controller
                     $msg = array(
                         "status" =>1,
                         "message" => array(
-                            "text"=>"session not found",
+                            "text"=>"The Transaction Doesn't Exist!",
                             "choices"=>array(
                                 array(
                                     "label" => "Go Back to Game List",
