@@ -178,7 +178,7 @@ class ClientRequestHelper{
                                 "code" => 402,
                                 "status" => "UNKNOWN_FORMAT",
                                 "message" => "INVALID FORMAT",
-                                "client_response" => $guzzle_response->getBody()->getContents()
+                                "client_response" => $client_reponse
                             ),
                             'balance' => 0.0
                         )
