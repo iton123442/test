@@ -287,15 +287,29 @@ class WazdanController extends Controller
                 //$gameExtension = WazdanHelper::getTransactionExt($datadecoded["originalTransactionId"]);
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
                 if($gameExtension==null){
+                    // $msg = array(
+                    //     "status" => 0,
+                    //     "funds" => array(
+                    //         "balance" => round($client_details->balance,2)
+                    //     )
+                    // );
+                    // Helper::saveLog('refundAlreadyexist(Wazdan)', 33, $data, $msg);
+                    // return response($msg,200)
+                    // ->header('Content-Type', 'application/json');
                     $msg = array(
-                        "status" => 0,
-                        "funds" => array(
-                            "balance" => round($client_details->balance,2)
+                        "status" =>1,
+                        "message" => array(
+                            "text"=>"session not found",
+                            "choices"=>array(
+                                array(
+                                    "label" => "Go Back to Game List",
+                                    "action" => "close_game",
+                                    "response" => "quit"
+                                )
+                            )
                         )
                     );
-                    Helper::saveLog('refundAlreadyexist(Wazdan)', 33, $data, $msg);
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
+                    return response($msg,200)->header('Content-Type', 'application/json');
                 }
                 $datadecoded["roundId"] = $gameExtension->round_id;
                 $updateGametransaction = array(
