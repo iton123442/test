@@ -327,6 +327,8 @@ class ICGController extends Controller
                     );
                     $dataToUpdate = array(
                         "mw_response" => json_encode($response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "client_response" => json_encode($client_response),
                         "transaction_detail" => "SUCCESS"
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
