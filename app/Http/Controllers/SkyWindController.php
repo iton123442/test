@@ -8,6 +8,7 @@ use App\Helpers\ProviderHelper;
 use App\Helpers\SkyWind;
 use App\Helpers\GameLobby;
 use App\Helpers\ClientRequestHelper;
+use App\Models\GameTransactionMDB;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\Client;
@@ -69,7 +70,7 @@ class SkyWindController extends Controller
                 'X-ACCESS-TOKEN' => $player_login->accessToken,
             ]
         ]);
-        $response = $client->get($this->api_url.'/games/info/search?limit=20');
+        $response = $client->get($this->api_url.'/games/info/sdaearch?limit=20');
         $response = $response->getBody()->getContents();
         return $response;
     }
@@ -219,81 +220,148 @@ class SkyWindController extends Controller
             Helper::saveLog('SkyWind gameDebit - DUPLICATE', $this->provider_db_id,json_encode($request->all()), $response);
             return $response;
         }
-        $game_ext_check = ProviderHelper::findGameExt($provider_trans_id, 1, 'transaction_id');
-        if($game_ext_check != 'false'){ // Duplicate transaction
+        try{
+          ProviderHelper::idenpotencyTable($this->prefix_user.'_'.$provider_trans_id.'_1');
+        }catch(\Exception $e){
             $response = ["error_code" => 1];
-            Helper::saveLog('SkyWind gameDebit - DUPLICATE', $this->provider_db_id,json_encode($request->all()), $response);
-            return $response;
+            return response($response,200)->header('Content-Type', 'application/json');
         }
-
         $game_transaction_type = 1; // 1 Bet, 2 Win
         $game_code = $game_information->game_id;
         $token_id = $client_details->token_id;
 
-        $check_bet_round = ProviderHelper::findGameExt($round_id, 1, 'round_id');
+        // $check_bet_round = ProviderHelper::findGameExt($round_id, 1, 'round_id');
+        $check_bet_round = GameTransactionMDB::getGameTransactionByRoundId($round_id,$client_details);
         if($check_bet_round != 'false'){
-          $existing_bet_details = Providerhelper::findGameTransaction($check_bet_round->game_trans_id, 'game_transaction');
+          // $check_bet_round = Providerhelper::findGameTransaction($check_bet_round->game_trans_id, 'game_transaction');
 
-          $pay_amount = $existing_bet_details->pay_amount;
-          $bet_amount = $existing_bet_details->bet_amount + $amount;
+          $pay_amount = $check_bet_round->pay_amount;
+          $bet_amount = $check_bet_round->bet_amount + $amount;
           $income = $bet_amount - $pay_amount; //$existing_bet_details->income;
-
-          // $this->updateGameTransaction($existing_bet_details->game_trans_id, $pay_amount, $income, $existing_bet_details->win, $existing_bet_details->entry_id,$bet_amount);
-          $game_transextension = ProviderHelper::createGameTransExtV2($existing_bet_details->game_trans_id,$provider_trans_id, $round_id, $amount, $game_transaction_type);
-          $gamerecord = $existing_bet_details->game_trans_id;
-
-        }else{
-          $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
-          $game_transextension = ProviderHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, abs($amount), $game_transaction_type);
-        }
-
-        try {
-          $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, 'debit');
-          Helper::saveLog('SkyWind gameDebit CRID '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
-           
-        } catch (\Exception $e) {
-          $response = ["error_code" => -1];
-          ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-          Helper::saveLog('SkyWind gameDebit - FATAL ERROR', $this->provider_db_id, $response, Helper::datesent());
-          return $response;
-        }
-
-        if(isset($client_response->fundtransferresponse->status->code) 
-             && $client_response->fundtransferresponse->status->code == "200"){
-          if($check_bet_round != 'false'){
-            $this->updateGameTransaction($existing_bet_details->game_trans_id, $pay_amount, $income, $existing_bet_details->win, $existing_bet_details->entry_id,$bet_amount);
-          }
-          $response = [
+          $gamerecord = $check_bet_round->game_trans_id;
+          $updateTransaction = [
+            "win" => $win_or_lost,
+            "trans_status" => 1,
+            "bet_amount" => round($bet_amount,2),
+          ];
+          GameTransactionMDB::updateGametransaction($updateTransaction,$gamerecord,$client_details);
+          $insertExtData = [
+            "game_trans_id" => $gamerecord,
+            "provider_trans_id" => $provider_trans_id,
+            "round_id" => $round_id,
+            "amount" => round($amount,2),
+            "game_transaction_type" => 1,
+            "provider_request" => json_encode($data),
+          ];
+          $game_transextension = GameTransactionMDB::createGameTransactionExt($insertExtData,$client_details);
+          $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$game_information->game_code,$game_information->game_name,$game_transextension,$check_bet_round->game_trans_id,'debit');
+          if(isset($client_response->fundtransferresponse->status->code) &&
+          $client_response->fundtransferresponse->status->code == "200"){
+            $updateData = [
+              "win" => $win_or_lost,
+            ];
+            GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+            $response = [
               "error_code" => 0,
               "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
               "trx_id" => $provider_trans_id,
-          ];
-         ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-
-        }elseif(isset($client_response->fundtransferresponse->status->code) 
-                    && $client_response->fundtransferresponse->status->code == "402"){
-          if($check_bet_round == 'false'){
-             if(ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)):
-                 ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 6);
-            else:
-               ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-            endif;
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "Success",
+              "general_details" => "Success",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            return response($response,200)->header('Content-Type', 'application/json');
+          }elseif(isset($client_response->fundtransferresponse->stauts->code)
+          && $client_response->fundtransferresponse->stauts->code == "402"){
+            $updateData = [
+              "win" => 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+            $response = [
+              "error_code" => -4
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "FAILED",
+              "general_details" => "FAILED",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            return response($response,200)->header('Content-Type', 'application/json');
           }
-          $response = ["error_code" => -4];
-          ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details);
-        }else{ // Unknown Response Code
-          $response = [
-                "error_code" => -1,
-                // "balance" => $client_response->fundtransferresponse->balance,
-                // "trx_id" => $provider_trans_id,
+        }else{
+          $gameTransactionDatas = [
+            "provider_trans_id" => $provider_trans_id,
+            "token_id" => $client_details->token_id,
+            "game_id" => $game_information->game_id,
+            "round_id" => $round_id,
+            "bet_amount" => round($amount,2),
+            "pay_amount" => 0,
+            "win" => $win_or_lost,
+            "income" => 0,
+            "entry_id" => 1
           ];
-          ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details);
-          Helper::saveLog('SkyWind gameDebit - FATAL ERROR '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
-          return $response;
-        }  
-
-        Helper::saveLog('SkyWind gameDebit - SUCCESS '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
-        return $response;
+          $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
+          // $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
+          $gameTransExtData = [
+            "game_trans_id" => $gamerecord,
+            "provider_trans_id" => $provider_trans_id,
+            "round_id" => $round_id,
+            "amount" => round($amount,2),
+            "game_transaction_type" => 1,
+            "provider_request" => json_encode($data),
+          ];
+          $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransExtData,$client_details);
+          $fund_extra_data = [
+            'provider_name' => $game_information->provider_name
+          ];
+          $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord,'debit', false,$fund_extra_data);
+          if(isset($client_response->fundtransferresponse->status->code) &&
+          $client_response->fundtransferresponse->status->code == "200"){
+            $updateData = [
+              "win" => $win_or_lost,
+            ];
+            GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+            $response = [
+              "error_code" => 0,
+              "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
+              "trx_id" => $provider_trans_id,
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "Success",
+              "general_details" => "Success",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            return response($response,200)->header('Content-Type', 'application/json');
+          }elseif(isset($client_response->fundtransferresponse->stauts->code)
+          && $client_response->fundtransferresponse->stauts->code == "402"){
+            $updateData = [
+              "win" => 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+            $response = [
+              "error_code" => -4
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "FAILED",
+              "general_details" => "FAILED",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            Helper::saveLog('SkyWind gameDebit - SUCCESS '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
+            return response($response,200)->header('Content-Type', 'application/json');
+          }
+        }
     }
 
     /**
@@ -326,10 +394,11 @@ class SkyWindController extends Controller
             $response = ["error_code" => 240];
             return $response;
         }
-        $game_ext_idempotency = ProviderHelper::findGameExt($trx_id, 2, 'transaction_id');
-        if($game_ext_idempotency != 'false'){ // Duplicate transaction
+        try{
+          ProviderHelper::idenpotencyTable($this->prefix_user.'_'.$trx_id.'_1');
+        }catch(\Exception $e){
             $response = ["error_code" => 1];
-            return $response;
+            return response($response,200)->header('Content-Type', 'application/json');
         }
         // $game_ext_check = ProviderHelper::findGameExt($trx_id, 1, 'transaction_id');
         $game_ext_check = ProviderHelper::findGameExt($roundid, 1, 'round_id');
@@ -340,55 +409,171 @@ class SkyWindController extends Controller
 
         $provider_trans_id = $trx_id;
         $roundid = $roundid;
-        $existing_bet = ProviderHelper::findGameTransaction($game_ext_check->game_trans_id, 'game_transaction'); // Find if win has bet record
+        $existing_bet = GameTransactionMDB::getGameTransactionByRoundId($roundid,$client_details);
 
-        if($amount > 0){
-          $win = 1;
-          $entry_id = 2;
-        }else{
-          $win = 0;
-          $entry_id = 1;
-        }
-        
+        $win = $amount == 0 ? 0 : 1;
+        $entry_id = $amount == 0 ? 0 : 1;
         $pay_amount = $existing_bet->pay_amount + $amount;
         $income = $existing_bet->bet_amount - $pay_amount;
         $game_transaction_type = 2;
 
-        $game_transextension = ProviderHelper::createGameTransExtV2($existing_bet->game_trans_id,$provider_trans_id, $roundid, $amount, $game_transaction_type);
-
-        try {
-          $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension, $existing_bet->game_trans_id, 'credit');
-          Helper::saveLog('SkyWind gameCredit CRID '.$existing_bet->game_trans_id, $this->provider_db_id,json_encode($request->all()), $client_response);
-           
-        } catch (\Exception $e) {
-          $response = ["error_code" => -1];
-          ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-          Helper::saveLog('SkyWind gameCredit - FATAL ERROR', $this->provider_db_id, $response, Helper::datesent());
-          return $response;
-        }
-
-        if(isset($client_response->fundtransferresponse->status->code) 
-             && $client_response->fundtransferresponse->status->code == "200"){
-          $response = [
+        if($existing_bet == null){
+          $gameTransactionDatas = [
+            "provider_trans_id" => $provider_trans_id,
+            "token_id" => $client_details->token_id,
+            "game_id" => $game_information->game_id,
+            "round_id" => $roundid,
+            "bet_amount" => round($amount,2),
+            "pay_amount" => 0,
+            "win" => 5,
+            "income" => 0,
+            "entry_id" => 1
+          ];
+          $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
+          // $gamerecord  = ProviderHelper::createGameTransaction($token_id, $game_code, $bet_amount,  $pay_amount, $method, $win_or_lost, null, $payout_reason, $income, $provider_trans_id, $round_id);
+          $gameTransExtData = [
+            "game_trans_id" => $gamerecord,
+            "provider_trans_id" => $provider_trans_id,
+            "round_id" => $roundid,
+            "amount" => round($amount,2),
+            "game_transaction_type" => 1,
+            "provider_request" => json_encode($data),
+          ];
+          $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransExtData,$client_details);
+          $fund_extra_data = [
+            'provider_name' => $game_information->provider_name
+          ];
+          $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord,'debit', false,$fund_extra_data);
+          if(isset($client_response->fundtransferresponse->status->code) &&
+          $client_response->fundtransferresponse->status->code == "200"){
+            $updateData = [
+              "win" => 5,
+            ];
+            GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+            $response = [
               "error_code" => 0,
               "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
-              "trx_id" => $trx_id,
+              "trx_id" => $provider_trans_id,
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "Success",
+              "general_details" => "Success",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            Helper::saveLog('SkyWind gameDebit - SUCCESS '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
+            return response($response,200)->header('Content-Type', 'application/json');
+          }elseif(isset($client_response->fundtransferresponse->stauts->code)
+          && $client_response->fundtransferresponse->stauts->code == "402"){
+            $updateData = [
+              "win" => 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+            $response = [
+              "error_code" => -4
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "FAILED",
+              "general_details" => "FAILED",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            return response($response,200)->header('Content-Type', 'application/json');
+          }
+        }
+        $gamerecord = $existing_bet->game_trans_id;
+        $gameExtDatas = [
+          "game_trans_id" => $gamerecord,
+          "provider_trans_id" => $provider_trans_id,
+          "round_id" => $roundid,
+          "amount" => round($amount,2),
+          "game_transaction_type" => 2,
+          "provider_request" => json_encode($data),
+        ];
+        $game_transextension = GameTransactionMDB::createGameTransactionExt($gameExtDatas,$client_details);
+        $gameTransData = [
+          "win" => 5,
+          "pay_amount" =>round($amount,2),
+          "income" => round($income,2),
+          "entry_id" => $entry_id,
+        ];
+        GameTransactionMDB::updateGametransaction($gameTransData,$gamerecord,$client_details);
+        $response = [
+          "error_code" => 0,
+          "balance" => round($client_details->balance+$amount,2),
+          "trx_id" => $trx_id,
+        ];
+        $action_payload = [
+          "type" => "custom", #genreral,custom :D # REQUIRED!
+          "custom" => [
+              "provider" => "SkyWind",
+              "game_transaction_ext_id" => $game_transextension,
+              "client_connection_name" => $client_details->connection_name,
+              "win_or_lost" => $win,
+          ],
+          "provider" => [
+              "provider_request" => json_encode($data),
+              "provider_trans_id"=>$provider_trans_id,
+              "provider_round_id"=>$game_transextension,
+          ],
+          "mwapi" => [
+              "roundId"=> $existing_bet->game_trans_id,
+              "type" => 2,
+              "game_id" => $game_information->game_id,
+              "player_id" => $client_details->player_id,
+              "mw_response" => json_encode($response),
+          ]
+        ];
+        if($win == 4){
+          $response = [
+            "error_code" => 0,
+            "balance" => round($client_details->balance+$amount,2),
+            "trx_id" => $provider_trans_id,
           ];
-          $this->updateBetTransaction($existing_bet->game_trans_id, $pay_amount, $income, $win, $entry_id);
-          // $this->updateBetTransaction($trx_id, $amount, $income, $win, $entry_id);
-          ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response);
-
-        }elseif(isset($client_response->fundtransferresponse->status->code) 
-                    && $client_response->fundtransferresponse->status->code == "402"){
-            $response = ["error_code" => -4];
-        }else{ // Unknown Response Code
-            $response = ["error_code" => -1];
-            Helper::saveLog('SkyWind gameCredit - FATAL ERROR ', $this->provider_db_id,json_encode($request->all()), $client_response);
-             ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details);
-            return $response;
-        }  
-        Helper::saveLog('SkyWind gameCredit - SUCCESS ', $this->provider_db_id,json_encode($request->all()), $client_response);
-        return $response;
+          return response($response,200)->header('Content-Type', 'application/json');
+        }else{
+          $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_information->game_come,$game_information->game_name,$gamerecord,'credit',false, $action_payload);
+          if(isset($client_response->fundtransferresponse->status->code) &&
+          $client_response->fundtransferresponse->status->code == "200"){
+            $response = [
+              "error_code" => 0,
+              "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
+              "trx_id" => $provider_trans_id,
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "Success",
+              "general_details" => "Success",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            Helper::saveLog('SkyWind gameCredit - SUCCESS '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
+            return response($response,200)->header('Content-Type', 'application/json');
+          }elseif(isset($client_response->fundtransferresponse->stauts->code)
+          && $client_response->fundtransferresponse->stauts->code == "402"){
+            $updateData = [
+              "win" => 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+            $response = [
+              "error_code" => -1500
+            ];
+            $gameExtDatas = [
+              "mw_request" => json_encode($client_response->requestoclient),
+              "mw_response" =>json_encode($response),
+              "client_response" => json_encode($client_response),
+              "transaction_detail" => "FAILED",
+              "general_details" => "FAILED",
+            ];
+            GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+            return response($response,200)->header('Content-Type', 'application/json');
+          } 
+        }
     }
 
 
@@ -400,14 +585,13 @@ class SkyWindController extends Controller
      */
     public  function gameRollback(Request $request){
         Helper::saveLog('Skywind gameRollback', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
-        // dd($this->seamless_key);
         $raw_request = file_get_contents("php://input");
         parse_str($raw_request, $data);
         $general_details = ["aggregator" => [], "provider" => [], "client" => []];
         $cust_id = $data['cust_id'];
         $trx_id = $data['trx_id'];
         $game_code = $data['game_code'];
-        $event_id = $data['event_id'];
+        $roundid = $data['event_id'];
         $event_type = $data['event_type'];
 
         $cust_id = $data['cust_id'];
@@ -426,61 +610,117 @@ class SkyWindController extends Controller
             ];
             return $response;
         }
-        $game_ext_idempotency = ProviderHelper::findGameExt($trx_id, 3, 'transaction_id');
-        if($game_ext_idempotency != 'false'){ // Duplicate transaction
-            $response = ["error_code" => 1];
-            return $response;
+        try{
+          ProviderHelper::idenpotencyTable($this->prefix_user.'_'.$trx_id.'_1');
+        }catch(\Exception $e){
+          $response = ["error_code" => 1];
+          return response($response,200)->header('Content-Type', 'application/json');
         }
-        $game_ext_check = ProviderHelper::findGameExt($trx_id, 1, 'transaction_id'); // find bet
+        // $game_ext_check = ProviderHelper::findGameExt($trx_id, 1, 'transaction_id');
+        $game_ext_check = ProviderHelper::findGameExt($roundid, 1, 'round_id');
         if($game_ext_check == 'false'){ // Transaction not found
-            $response = ["error_code" => -7];
-            return $response;
+          $response = ["error_code" => -7];
+          return $response;
         }
-        $existing_bet = ProviderHelper::findGameTransaction($game_ext_check->game_trans_id, 'game_transaction'); // Find if win has bet record
+
+        $provider_trans_id = $trx_id;
+        $roundid = $roundid;
+        $existing_bet = GameTransactionMDB::getGameTransactionByRoundId($roundid,$client_details);
+
         $amount = $existing_bet->bet_amount;
         $provider_trans_id = $trx_id;
-        $roundid = $event_id;
         $win = 4;
         $entry_id = $existing_bet->entry_id;
         $pay_amount = $amount;
         $income = $existing_bet->bet_amount - $pay_amount;
         $game_transaction_type = 3;
 
-        $game_transextension = ProviderHelper::createGameTransExtV2($existing_bet->game_trans_id,$provider_trans_id, $roundid, $pay_amount, $game_transaction_type);
-
-        try {
-          $client_response = ClientRequestHelper::fundTransfer($client_details,abs($amount),$game_information->game_code,$game_information->game_name,$game_transextension,$existing_bet->game_trans_id, 'credit', true);
-          Helper::saveLog('SkyWind gameRollback CRID '.$existing_bet->game_trans_id, $this->provider_db_id,json_encode($request->all()), $client_response);
-           
-        } catch (\Exception $e) {
-          $response = ["error_code" => -1];
-          ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
-          Helper::saveLog('SkyWind gameRollback - FATAL ERROR', $this->provider_db_id, $response, Helper::datesent());
-          return $response;
-        }
-
-        if(isset($client_response->fundtransferresponse->status->code) 
-             && $client_response->fundtransferresponse->status->code == "200"){
+        if($existing_bet == null){
           $response = [
-              "error_code" => 0,
-              "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
-              "trx_id" => $trx_id,
+            "error_code" => -4
           ];
-          $this->updateBetTransaction($existing_bet->game_trans_id, $amount, $income, $win, $entry_id);
-          // $this->updateBetTransaction($trx_id, $amount, $income, $win, $entry_id);
-          ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response, $general_details);
-
-         }elseif(isset($client_response->fundtransferresponse->status->code) 
-                    && $client_response->fundtransferresponse->status->code == "402"){
-            $response = ["error_code" => -4];
-        }else{ // Unknown Response Code
-            $response = ["error_code" => -1];
-            Helper::saveLog('SkyWind gameRollback - FATAL ERROR ', $this->provider_db_id,json_encode($request->all()), $client_response);
-            ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details);
-            return $response;
-        } 
-        Helper::saveLog('SkyWind gameRollback - SUCCESS ', $this->provider_db_id,json_encode($request->all()), $client_response);
-        return $response;        
+          return response($response,200)->header('Content-Type', 'application/json');
+        }
+        $gamerecord = $existing_bet->game_trans_id;
+        $gameExtDatas = [
+          "game_trans_id" => $gamerecord,
+          "provider_trans_id" => $provider_trans_id,
+          "round_id" => $roundid,
+          "amount" => round($amount,2),
+          "game_transaction_type" => $game_transaction_type,
+          "provider_request" => json_encode($data),
+        ];
+        $game_transextension = GameTransactionMDB::createGameTransactionExt($gameExtDatas,$client_details);
+        $gameTransData = [
+          "win" => 5,
+          "pay_amount" =>round($amount,2),
+          "income" => round($income,2),
+          "entry_id" => $entry_id,
+        ];
+        GameTransactionMDB::updateGametransaction($gameTransData,$gamerecord,$client_details);
+        $response = [
+          "error_code" => 0,
+          "balance" => round($client_details->balance+$amount,2),
+          "trx_id" => $trx_id,
+        ];
+        $action_payload = [
+          "type" => "custom", #genreral,custom :D # REQUIRED!
+          "custom" => [
+              "provider" => "SkyWind",
+              "game_transaction_ext_id" => $game_transextension,
+              "client_connection_name" => $client_details->connection_name,
+              "win_or_lost" => $win,
+          ],
+          "provider" => [
+              "provider_request" => json_encode($data),
+              "provider_trans_id"=>$provider_trans_id,
+              "provider_round_id"=>$game_transextension,
+          ],
+          "mwapi" => [
+              "roundId"=> $existing_bet->game_trans_id,
+              "type" => $game_transaction_type,
+              "game_id" => $game_information->game_id,
+              "player_id" => $client_details->player_id,
+              "mw_response" => json_encode($response),
+          ]
+        ];
+        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_information->game_come,$game_information->game_name,$gamerecord,'credit',true, $action_payload);
+        if(isset($client_response->fundtransferresponse->status->code) &&
+        $client_response->fundtransferresponse->status->code == "200"){
+          $response = [
+            "error_code" => 0,
+            "balance" => Providerhelper::amountToFloat($client_response->fundtransferresponse->balance),
+            "trx_id" => $provider_trans_id,
+          ];
+          $gameExtDatas = [
+            "mw_request" => json_encode($client_response->requestoclient),
+            "mw_response" =>json_encode($response),
+            "client_response" => json_encode($client_response),
+            "transaction_detail" => "Success",
+            "general_details" => "Success",
+          ];
+          GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+          Helper::saveLog('SkyWind gameCancel - SUCCESS '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
+          return response($response,200)->header('Content-Type', 'application/json');
+        }elseif(isset($client_response->fundtransferresponse->stauts->code)
+        && $client_response->fundtransferresponse->stauts->code == "402"){
+          $updateData = [
+            "win" => 2,
+          ];
+          GameTransactionMDB::updateGametransaction($updateData,$gamerecord,$client_details);
+          $response = [
+            "error_code" => -4
+          ];
+          $gameExtDatas = [
+            "mw_request" => json_encode($client_response->requestoclient),
+            "mw_response" =>json_encode($response),
+            "client_response" => json_encode($client_response),
+            "transaction_detail" => "FAILED",
+            "general_details" => "FAILED",
+          ];
+          GameTransactionMDB::updateGametransactionEXT($gameExtDatas,$game_transextension,$client_details);
+          return response($response,200)->header('Content-Type', 'application/json');
+        }
     }
 
 

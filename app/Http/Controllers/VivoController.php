@@ -51,6 +51,7 @@ class VivoController extends Controller
                         "EMAIL" => $client_details->email,
                         "CURRENCY" => $client_details->default_currency,
                         "BALANCE" => $client_details->balance,
+                        "GAMESESSIONID" => $client_details->player_token
                     ]
                 ];
 			}
@@ -62,7 +63,8 @@ class VivoController extends Controller
     public function getBalance(Request $request) 
 	{
         header("Content-type: text/xml; charset=utf-8");
-		$client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
+		// $client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
+        $client_details = ProviderHelper::getClientDetails('token', $request->sessionId);
 		$hash = md5($request->userId.config("providerlinks.vivo.PASS_KEY"));
         $response = [
             "REQUEST" => [
@@ -136,7 +138,8 @@ class VivoController extends Controller
             ProviderHelper::idenpotencyTable($this->prefix.$data["TransactionID"]);
             Helper::errorDebug('vivo_gameTransaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($data), "INDEX");
         }catch(\Exception $e){
-            $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+            // $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+            $client_details = ProviderHelper::getClientDetails('token', $data["sessionId"]);
             $bet_transaction = GameTransactionMDB::findGameExt($data["TransactionID"], 1,'transaction_id', $client_details);
             if ($bet_transaction != 'false') {
                 if( $bet_transaction->transaction_detail == "SUCCESS" ){
@@ -184,7 +187,8 @@ class VivoController extends Controller
             ];
             return $response;
         }
-        $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+        // $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+        $client_details = ProviderHelper::getClientDetails('token', $data["sessionId"]);
         $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["roundId"],'round_id', false, $client_details);
         if($bet_transaction == 'false'){
@@ -300,7 +304,8 @@ class VivoController extends Controller
             ProviderHelper::idenpotencyTable($this->prefix.$data["TransactionID"]);
             Helper::errorDebug('vivo_gameTransaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($data), "INDEX");
         }catch(\Exception $e){
-            $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+            // $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+            $client_details = ProviderHelper::getClientDetails('token', $data["sessionId"]);
             $bet_transaction = GameTransactionMDB::findGameExt($data["TransactionID"], 2,'transaction_id', $client_details);
             if ($bet_transaction != 'false') {
                 $response = [
@@ -346,7 +351,8 @@ class VivoController extends Controller
             ];
             return $response;
         }
-        $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+        // $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+        $client_details = ProviderHelper::getClientDetails('token', $data["sessionId"]);
         $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["roundId"],'round_id', false, $client_details);
         if($bet_transaction == 'false'){
@@ -393,7 +399,7 @@ class VivoController extends Controller
         $balance = round($client_details->balance,2) + $data["Amount"];
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
 
-        $win = $data["Amount"] == 0 ? 0 : 1;
+        $win = ($data["Amount"] + $bet_transaction->pay_amount) == 0 ? 0 : 1;
         $response = [
             "REQUEST" => [
                 "USERID" => $data["userId"],
@@ -460,7 +466,8 @@ class VivoController extends Controller
             ProviderHelper::idenpotencyTable($this->prefix.$data["TransactionID"]);
             Helper::errorDebug('vivo_gameTransaction', config("providerlinks.vivo.PROVIDER_ID"), json_encode($data), "INDEX");
         }catch(\Exception $e){
-            $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+            // $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+            $client_details = ProviderHelper::getClientDetails('token', $data["sessionId"]);
             $bet_transaction = GameTransactionMDB::findGameExt($data["TransactionID"], 3,'transaction_id', $client_details);
             if ($bet_transaction != 'false') {
                 $response = [
@@ -506,7 +513,8 @@ class VivoController extends Controller
             ];
             return $response;
         }
-        $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+        // $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+        $client_details = ProviderHelper::getClientDetails('token', $data["sessionId"]);
         $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["roundId"],'round_id', false, $client_details);
         if($bet_transaction == 'false'){
@@ -630,7 +638,8 @@ class VivoController extends Controller
 						</RESPONSE>
 					</VGSSYSTEM>';
 
-		$client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
+		// $client_details = ProviderHelper::getClientDetails('player_id', $request->userId);
+        $client_details = ProviderHelper::getClientDetails('token', $request->sessionId);
 
 		$hash = md5($request->userId.$request->casinoTransactionId.config("providerlinks.vivo.PASS_KEY"));
 
@@ -679,7 +688,8 @@ class VivoController extends Controller
 		return $response;
     }
     private function loseTransaction($data){
-    	$client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+    	// $client_details = ProviderHelper::getClientDetails('player_id', $data["userId"]);
+        $client_details = ProviderHelper::getClientDetails('token', $data["sessionId"]);
     	$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
     	$bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["roundId"],'round_id', false, $client_details);
     	if($data["Amount"] < 0) {
@@ -742,14 +752,14 @@ class VivoController extends Controller
             ]
         ];
         try {
-        	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_dteails->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
+        	$client_response = ClientRequestHelper::fundTransfer_TG($client_details,0,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
         	$dataToUpdate = array(
                 "mw_request" => json_encode($client_response->requestoclient),
                 "client_response" => json_encode($client_response),
                 "mw_response" => json_encode($response),
                 "transaction_detail" => "SUCCESS"
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
         } catch (\Exception $e) {
         	$dataToUpdate = array(
                 "mw_request" => json_encode($client_response->requestoclient),
@@ -757,7 +767,7 @@ class VivoController extends Controller
                 "mw_response" => json_encode($response),
                 "transaction_detail" => "FAILED"
             );
-            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
         }
         header("Content-type: text/xml; charset=utf-8");
 		$final_response =  '<?xml version="1.0" encoding="utf-8"?>';
