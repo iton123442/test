@@ -137,6 +137,13 @@ class DemoHelper{
             );
             
         }
+        elseif($provider_code==105){ //NLC
+            $response = array(
+                "game_code" =>$data->game_code,
+                "url" =>  DemoHelper::noLimitCityDemo($data),
+                "game_launch" => true
+            );
+        }
         // elseif($provider_code == 34){ // EDP
         //     // / $client = new Client();
         //     // $guzzle_response = $client->get('https://edemo.endorphina.com/api/link/accountId/1002 /hash/' . md5("endorphina_4OfAKing@ENDORPHINA") . '/returnURL/' . $returnURL);
@@ -205,6 +212,12 @@ class DemoHelper{
         ]);
         $result= $game_details->first();
         return $result ? $result : false;
+    }
+
+    public static function noLimitCityDemo($request){
+        $exitUrl = isset($request->exitUrl) ? $request->exitUrl : 'https://play.betrnk.games',
+        $gameurl = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&lobbyUrl='.$exitUrl.'&hideExitButton=false&language=en&operator=BETRNK&game='.$request->game_code.'';
+        return $gameurl;
     }
 
     public static function oryxLaunchUrl($game_code, $lang, $exitUrl){
