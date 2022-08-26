@@ -215,7 +215,7 @@ class DemoHelper{
     }
 
     public static function noLimitCityDemo($request){
-        $exitUrl = isset($request->exitUrl) ? $request->exitUrl : 'https://play.betrnk.games',
+        $exitUrl = isset($request->exitUrl) ? $request->exitUrl : 'https://play.betrnk.games';
         $gameurl = 'https://prod.nlcasiacdn.net/loader/game-loader.html?device=desktop&lobbyUrl='.$exitUrl.'&hideExitButton=false&language=en&operator=BETRNK&game='.$request->game_code.'';
         return $gameurl;
     }
