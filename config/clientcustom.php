@@ -8,7 +8,8 @@ return [
     ],
     'auto_refund' => [
     	'exclude' => [
-    		'operator_id' => [17] // Client Operator Id
+    		'operator_id' => [17], // Client Operator Id
+            'provider_names' => ["Wazdan","JustPlay", "IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming", "Iconic Gaming", "FunTa Gaming"]
     	]
     ]
 ];

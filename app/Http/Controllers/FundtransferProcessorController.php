@@ -104,6 +104,10 @@ class FundtransferProcessorController extends Controller
         if(isset($payload->request_body->fundtransferrequest->fundinfo->endround)){
             $requesttocient["fundtransferrequest"]['fundinfo']['endround'] = $payload->request_body->fundtransferrequest->fundinfo->endround;
         }
+        if(isset($payload->action->mwapi->endround)){
+            $requesttocient["fundtransferrequest"]['fundinfo']['endround'] = $payload->action->mwapi->endround;
+        }
+
 
         if(isset($payload->action->provider->provider_name)){
             $requesttocient["gamedetails"]['provider_name'] = $payload->action->provider->provider_name;
@@ -462,19 +466,18 @@ class FundtransferProcessorController extends Controller
                                 ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_trans_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                             elseif ($payload->action->custom->provider == 'VivoGaming') {
-                                //  $ext_data = array(
-                                //     "mw_request"=>json_encode($requesttocient),
-                                //     "client_response" =>json_encode($client_response),
-                                //     "transaction_detail" =>json_encode("success"),
-                                //     "general_details" =>json_encode("success")
-                                // );
-                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                 $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
-                                
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                             elseif ($payload->action->custom->provider == 'MancalaGaming') {
                                 //  $ext_data = array(
@@ -581,14 +584,14 @@ class FundtransferProcessorController extends Controller
                                 Helper::saveLog("Habanero Gaming Success Client Request", 24, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif($payload->action->custom->provider == 'tpp' ){
-                                // $ext_data = array(
-                                //     "mw_request"=>json_encode($requesttocient),
-                                //     "client_response" =>json_encode($client_response),
-                                //     "transaction_detail" =>json_encode("success"),
-                                //     "general_details" =>json_encode("success")
-                                // );
-                                // ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                $ext_data = array(
+                                    "mw_request"=>json_encode($requesttocient),
+                                    "client_response" =>json_encode($client_response),
+                                    "transaction_detail" =>json_encode("success"),
+                                    "general_details" =>json_encode("success")
+                                );
+                                ClientRequestHelper::updateGametransactionEXTCCMD($ext_data, $gteid, $payload->action->custom->client_connection_name);
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                                 Helper::saveLog("Pragmatic Play Success Client Request", 26, json_encode($requesttocient), json_encode($client_response));
                             }
                             elseif($payload->action->custom->provider == 'ygg' ){

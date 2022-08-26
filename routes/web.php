@@ -364,13 +364,20 @@ $app->post('/public/api/png/betsofted/release','PNGControllerBetsofted@release')
 $app->post('/public/api/png/betsofted/balance','PNGControllerBetsofted@balance');
 $app->post('/public/api/png/betsofted/cancelReserve','PNGController@cancelReserve');
 //Wazdan Endpoints
-$app->post('/public/api/wazdan/authenticate','WazdanControllerNew@authenticate');
-$app->post('/public/api/wazdan/getStake','WazdanControllerNew@getStake');
-$app->post('/public/api/wazdan/rollbackStake','WazdanControllerNew@rollbackState');
-$app->post('/public/api/wazdan/returnWin','WazdanControllerNew@returnWin');
-$app->post('/public/api/wazdan/getFunds','WazdanControllerNew@getFunds');
-$app->post('/public/api/wazdan/gameClose','WazdanControllerNew@gameClose');
-$app->post('/public/api/wazdan/hash','WazdanControllerNew@hashCode');
+// $app->post('/public/api/wazdan/authenticate','WazdanControllerNew@authenticate');
+// $app->post('/public/api/wazdan/getStake','WazdanControllerNew@getStake');
+// $app->post('/public/api/wazdan/rollbackStake','WazdanControllerNew@rollbackState');
+// $app->post('/public/api/wazdan/returnWin','WazdanControllerNew@returnWin');
+// $app->post('/public/api/wazdan/getFunds','WazdanControllerNew@getFunds');
+// $app->post('/public/api/wazdan/gameClose','WazdanControllerNew@gameClose');
+// $app->post('/public/api/wazdan/hash','WazdanControllerNew@hashCode');
+$app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
+$app->post('/public/api/wazdan/getStake','WazdanController@getStake');
+$app->post('/public/api/wazdan/rollbackStake','WazdanController@rollbackState');
+$app->post('/public/api/wazdan/returnWin','WazdanController@returnWin');
+$app->post('/public/api/wazdan/getFunds','WazdanController@getFunds');
+$app->post('/public/api/wazdan/gameClose','WazdanController@gameClose');
+$app->post('/public/api/wazdan/hash','WazdanController@hashCode');
 // BETRNK LOTTO
 $app->post('/public/api/betrnk/lotto', 'BetrnkController@getUrl');
 
@@ -530,30 +537,30 @@ $app->post('/public/hbn/api/query','HabaneroController@queryrequest');
 
 
 // Pragmatic PLay
-// $app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
-// $app->post('/public/api/pp/balance','PragmaticPLayController@balance');
-// $app->post('/public/api/pp/bet','PragmaticPLayController@bet');
-// $app->post('/public/api/pp/result','PragmaticPLayController@result');
-// $app->post('/public/api/pp/refund','PragmaticPLayController@refund');
-// $app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
-// $app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
-// $app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
-// $app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
-// $app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
-// $app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
+$app->post('/public/api/pp/authenticate','PragmaticPLayController@authenticate');
+$app->post('/public/api/pp/balance','PragmaticPLayController@balance');
+$app->post('/public/api/pp/bet','PragmaticPLayController@bet');
+$app->post('/public/api/pp/result','PragmaticPLayController@result');
+$app->post('/public/api/pp/refund','PragmaticPLayController@refund');
+$app->post('/public/api/pp/bonusWin','PragmaticPLayController@bonusWin');
+$app->post('/public/api/pp/jackpotWin','PragmaticPLayController@jackpotWin');
+$app->post('/public/api/pp/promoWin','PragmaticPLayController@promoWin');
+$app->post('/public/api/pp/endRound','PragmaticPLayController@endRound');
+$app->post('/public/api/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
+$app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpired');
 //NEWFLOW PRAGMATIOC PLAY
 // Pragmatic PLay
-$app->post('/public/api/pp/authenticate','PragmaticPlayNEWController@authenticate');
-$app->post('/public/api/pp/balance','PragmaticPlayNEWController@balance');
-$app->post('/public/api/pp/bet','PragmaticPlayNEWController@bet');
-$app->post('/public/api/pp/result','PragmaticPlayNEWController@result');
-$app->post('/public/api/pp/refund','PragmaticPlayNEWController@refund');
-$app->post('/public/api/pp/bonusWin','PragmaticPlayNEWController@bonusWin');
-$app->post('/public/api/pp/jackpotWin','PragmaticPlayNEWController@jackpotWin');
-$app->post('/public/api/pp/promoWin','PragmaticPlayNEWController@promoWin');
-$app->post('/public/api/pp/endRound','PragmaticPlayNEWController@endRound');
-$app->post('/public/api/pp/getBalancePerGame','PragmaticPlayNEWController@getBalancePerGame');
-$app->post('/public/api/pp/session/expired','PragmaticPlayNEWController@sessionExpired');
+// $app->post('/public/api/pp/authenticate','PragmaticPlayNEWController@authenticate');
+// $app->post('/public/api/pp/balance','PragmaticPlayNEWController@balance');
+// $app->post('/public/api/pp/bet','PragmaticPlayNEWController@bet');
+// $app->post('/public/api/pp/result','PragmaticPlayNEWController@result');
+// $app->post('/public/api/pp/refund','PragmaticPlayNEWController@refund');
+// $app->post('/public/api/pp/bonusWin','PragmaticPlayNEWController@bonusWin');
+// $app->post('/public/api/pp/jackpotWin','PragmaticPlayNEWController@jackpotWin');
+// $app->post('/public/api/pp/promoWin','PragmaticPlayNEWController@promoWin');
+// $app->post('/public/api/pp/endRound','PragmaticPlayNEWController@endRound');
+// $app->post('/public/api/pp/getBalancePerGame','PragmaticPlayNEWController@getBalancePerGame');
+// $app->post('/public/api/pp/session/expired','PragmaticPlayNEWController@sessionExpired');
 
 
 
@@ -755,9 +762,10 @@ $app->group(['prefix' => '/public/tw/api/'], function () use ($app) {
     $app->post('tw_wallet/withdraw', 'TransferWalletAggregator\WalletDetailsController@makeTransferWallerWithdraw');
     $app->post('tw_wallet/bethistory', 'TransferWalletAggregator\WalletDetailsController@getBetHistory');
     $app->post('tw_wallet/transactionchecker', 'TransferWalletAggregator\WalletDetailsController@checkTransactionDetails');
+    $app->post('tw_wallet/gamesummary', 'TransferWalletAggregator\WalletDetailsController@gameSummaryPlayerDaily');
 
     //seamless wallet fundster endpoint OPERATOR
-        $app->post('sm_wallet/getPlayerDetails', 'TransferWalletAggregator\DetailsAndFundTransferController@getPlayerDetails');
+    $app->post('sm_wallet/getPlayerDetails', 'TransferWalletAggregator\DetailsAndFundTransferController@getPlayerDetails');
     $app->post('sm_wallet/fundTransfer', 'TransferWalletAggregator\DetailsAndFundTransferController@fundTransfer');
     $app->post('sm_wallet/transactionchecker', 'TransferWalletAggregator\DetailsAndFundTransferController@transactionchecker');
 
@@ -827,6 +835,7 @@ $app->post('/public/api/idnpoker/getPlayerBalance', 'IDNPokerController@getPlaye
 $app->post('/public/api/idnpoker/getPlayerWalletBalance', 'IDNPokerController@getPlayerWalletBalance');
 $app->post('/public/api/idnpoker/getTransaction', 'IDNPokerController@getTransactionHistory');
 $app->post('/public/api/idnpoker/localtransaction', 'IDNPokerController@TransactionHistory'); // testing
+$app->post('/public/api/idnpoker/summaryplayer', 'IDNPokerController@TransactionPlayerSummary'); // testing
 $app->post('/public/api/idnpoker/retryWithdrawalWallet', 'IDNPokerController@retryWithdrawalRestriction');
 $app->post('/public/api/idnpoker/renewSession', 'IDNPokerController@renewSession');
 // Transfer Wallet New Update

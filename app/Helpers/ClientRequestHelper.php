@@ -43,7 +43,7 @@ class ClientRequestHelper{
 
             $sendtoclient =  microtime(true);
 
-            $exclude_provider = ["IDNPoker", "OnlyPlay", "QuickSpin Direct","BGaming", "SimplePlay", "digitain", "bolegaming"];
+            $exclude_provider = config('clientcustom.auto_refund.exclude.provider_names');
 
             $client = new Client([
                 'headers' => [ 
@@ -101,6 +101,8 @@ class ClientRequestHelper{
                         if (in_array($action["provider_name"], $exclude_provider)) {
                             $timeout =  10;
                         }
+                    }else{
+                        $timeout =  10;
                     }
 
                     # Exclude selected operator
@@ -169,6 +171,20 @@ class ClientRequestHelper{
                 $client_reponse = json_decode($guzzle_response->getBody()->getContents());
                 $client_response_time = microtime(true) - $sendtoclient;
                 Helper::saveLog('fundTransfer(ClientRequestHelper)', 12, json_encode(["type"=>"funtransfer","game"=>$game_name]), ["clientresponse"=>$client_response_time,"client_reponse_data"=>$client_reponse,"client_request"=>$requesttocient]);
+                if(!isset($client_reponse->fundtransferresponse->status->code) ) {
+                    $response = array(
+                        "fundtransferresponse" => array(
+                            "status" => array(
+                                "code" => 402,
+                                "status" => "UNKNOWN_FORMAT",
+                                "message" => "INVALID FORMAT",
+                                "client_response" => $client_reponse
+                            ),
+                            'balance' => 0.0
+                        )
+                    );
+                    $client_reponse = json_decode(json_encode($response));
+                }
                 $client_reponse->requestoclient = $requesttocient;
                 //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
                 // try{
@@ -229,6 +245,8 @@ class ClientRequestHelper{
                         if (in_array($action["provider_name"], $exclude_provider)) {
                             $bol =  false;
                         }
+                    }else{
+                        $bol =  false;
                     }
 
                     # Exclude selected operator
@@ -922,33 +940,33 @@ class ClientRequestHelper{
                 );
 
                  // Add Refund Queue
-                if($type == 'debit'){
-                    $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);   
-                    if($game_trans_ext_data == 'false'){
-                        $gameTransactionEXTRefundData = array(
-                                "game_trans_id" => $roundId,
-                                "provider_trans_id" => $transactionId,
-                                "round_id" => $roundId,
-                                "amount" => $amount,
-                                "game_transaction_type"=> 3, // refund change
-                                "provider_request" =>json_encode($requesttocient),
-                        );
-                        $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
-                    }else{
-                        $gameTransactionEXTRefundData = array(
-                                "game_trans_id" => $roundId,
-                                "provider_trans_id" => $game_trans_ext_data->provider_trans_id,
-                                "round_id" => $game_trans_ext_data->round_id,
-                                "amount" => $amount,
-                                "game_transaction_type"=> 3, // refund change
-                                "provider_request" =>json_encode($requesttocient),
-                        );
-                        $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
-                    }
-                    $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
-                    // Queue::push(new DebitRefund($debitRefund));
-                    ProviderHelper::queDebitRefund($debitRefund);
-                }
+                // if($type == 'debit'){
+                //     $game_trans_ext_data = GameTransactionMDB::findGameExt($roundId, 1,'game_trans_id', $client_details);   
+                //     if($game_trans_ext_data == 'false'){
+                //         $gameTransactionEXTRefundData = array(
+                //                 "game_trans_id" => $roundId,
+                //                 "provider_trans_id" => $transactionId,
+                //                 "round_id" => $roundId,
+                //                 "amount" => $amount,
+                //                 "game_transaction_type"=> 3, // refund change
+                //                 "provider_request" =>json_encode($requesttocient),
+                //         );
+                //         $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
+                //     }else{
+                //         $gameTransactionEXTRefundData = array(
+                //                 "game_trans_id" => $roundId,
+                //                 "provider_trans_id" => $game_trans_ext_data->provider_trans_id,
+                //                 "round_id" => $game_trans_ext_data->round_id,
+                //                 "amount" => $amount,
+                //                 "game_transaction_type"=> 3, // refund change
+                //                 "provider_request" =>json_encode($requesttocient),
+                //         );
+                //         $game_transextension_refund = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTRefundData,$client_details);
+                //     }
+                //     $debitRefund = ["payload" => $requesttocient, "client_details" => $client_details, "transaction_id" => $game_transextension_refund];
+                //     // Queue::push(new DebitRefund($debitRefund));
+                //     ProviderHelper::queDebitRefund($debitRefund);
+                // }
                 
                 Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($requesttocient),$response);
                 $client_reponse = json_decode(json_encode($response));

@@ -1393,26 +1393,26 @@ class IDNPokerController extends Controller
                                 "game_trans_id" => 1,
                                 "transaction_no" => $value["transaction_no"],
                                 "userid" => $value["userid"],
-                                "tableno" => $value["tableno"],
+                                "tableno" => isset($value["tableno"]) ? $value["tableno"] : 0,
                                 "date" => $value["date"],
-                                "game" => $value["game"],
-                                "table" => $value["table"],
-                                "periode" => $value["periode"],
-                                "room" => $value["room"],
+                                "game" => isset($value["game"]) ? $value["game"] : 0,
+                                "table" => isset($value["table"]) ? $value["table"] : 0,
+                                "periode" => isset($value["periode"]) ? $value["periode"] : 0,
+                                "room" => isset($value["room"]) ? $value["room"] : 0,
                                 "bet" => isset($value["bet"]) ? $value["bet"] : 0,
                                 "curr_bet" => isset($value["curr_bet"]) ? $value["curr_bet"] : 0,
                                 "r_bet" => isset($value["r_bet"]) ? $value["r_bet"] : 0,
-                                "status" => $value["status"],
+                                "status" => isset($value["status"]) ? $value["status"] : 0,
                                 "hand" => isset($value["hand"]) ? $value["hand"] : '',
                                 "card" => isset($value["card"]) ? $value["card"] : '',
                                 "prize" =>  isset($value["prize"]) ? $value["prize"] : '',
-                                "curr" => $value["curr"],
-                                "curr_player" => $value["curr_player"],
-                                "amount" => $value["amount"],
-                                "curr_amount" => $value["curr_amount"],
-                                "total" => $value["total"],
-                                "agent_comission" => $value["agent_comission"],
-                                "agent_bill" => $value["agent_bill"],
+                                "curr" => isset($value["curr"]) ? $value["curr"] : 0 ,
+                                "curr_player" => isset($value["curr_player"]) ? $value["curr_player"] : 0 ,
+                                "amount" => isset($value["amount"]) ? $value["amount"] : 0,
+                                "curr_amount" => isset($value["curr_amount"]) ? $value["curr_amount"] : 0,
+                                "total" => isset($value["total"]) ? $value["total"] : 0,
+                                "agent_comission" =>  isset($value["agent_comission"]) ? $value["agent_comission"] : 0,
+                                "agent_bill" => isset($value["agent_bill"]) ? $value["agent_bill"] : 0,
                                 "created_at" => $date
         
                             ];
@@ -1433,6 +1433,86 @@ class IDNPokerController extends Controller
             
 
            
+        }
+    }
+
+    public static function TransactionPlayerSummary(Request $request) {
+        
+        $date = $request->date;  //$getTime[0]->date
+        $key = config('providerlinks.idnpoker');
+        foreach ($key["localhost"] as  $keyVal) {
+            try {
+                $url = config('providerlinks.idnpoker.URL');
+                $client = new Client();
+                $guzzle_response = $client->post($url,[
+                    'body' => '
+                    <request>
+                        <secret_key>'.$keyVal.'</secret_key>
+                        <id>8</id>
+                        <date>'.$date.'</date>
+                    </request>'
+                ]
+                );
+                $details = $guzzle_response->getBody();
+                $json = json_encode(simplexml_load_string($details));
+                $response = json_decode($json,true);
+                if(isset($response["date"])){
+                    if(isset($response["data"])){
+                        $date = str_replace('/', '-',  $request->datebb );
+                        $date =  date('Y-m-d', strtotime($date));
+                        // $date = $response["date"];
+                        foreach ($response["data"]["detail"] as $value) {
+                            try {
+                                DB::beginTransaction();
+                                ProviderHelper::idenpotencyTable('SUMMARY-'. $date.$value["userid"] );
+                                $summary_data = [
+                                    "userid" => $value["userid"],
+                                    "total_turnover" => $value["total_turnover"],
+                                    "turnover_poker" => $value["turnover_poker"],
+                                    "turnover_domino" => $value["turnover_domino"],
+                                    "turnover_ceme" => $value["turnover_ceme"],
+                                    "turnover_blackjack" => $value["turnover_blackjack"],
+                                    "turnover_capsa" => $value["turnover_capsa"],
+                                    "turnover_ceme_keliling" => $value["turnover_ceme_keliling"],
+                                    "turnover_superten" => $value["turnover_superten"],
+                                    "turnover_omaha" => $value["turnover_omaha"],
+                                    "turnover_super_bull" => $value["turnover_super_bull"],
+                                    "turnover_capsa_susun" => $value["turnover_capsa_susun"],
+                                    "turnover_qq_spirit" => $value["turnover_qq_spirit"],
+                                    "turnover_domino_dealer" => $value["turnover_domino_dealer"],
+                                    "capsa" => $value["capsa"],
+                                    "texaspoker" => $value["texaspoker"],
+                                    "domino" => $value["domino"],
+                                    "ceme" => $value["ceme"],
+                                    "blackjack" => $value["blackjack"],
+                                    "poker_tournament" => $value["poker_tournament"],
+                                    "ceme_keliling" => $value["ceme_keliling"],
+                                    "superten" => $value["superten"],
+                                    "omaha" => $value["omaha"],
+                                    "super_bull" => $value["super_bull"],
+                                    "capsa_susun" => $value["capsa_susun"],
+                                    "qq_spirit" => $value["qq_spirit"],
+                                    "domino_dealer" => $value["domino_dealer"],
+                                    "agent_commission" => $value["agent_commission"],
+                                    "agent_bill"  => $value["agent_bill"],
+                                    "date" => $date
+                                ];
+                                DB::table('idn_player_summary')->insertGetId($summary_data);
+                                DB::commit();
+                            } catch (\Exception $e) {
+                                DB::rollBack();
+                                echo $e->getMessage(). $e->getLine();
+                            }
+                        }
+                    }
+                }
+                ProviderHelper::saveLogWithExeption('IDNPOKER TransactionHistory', 110, json_encode($response),  "CHECK RESPONSE TransactionHistory" );
+                return "false";
+            } catch (\Exception $e) {
+                ProviderHelper::saveLogWithExeption('IDNPOKER TransactionHistory', 110, json_encode($e->getMessage()),  "CHECK RESPONSE TransactionHistory ERROR" );
+                return "false";
+            }
+            
         }
     }
 }
