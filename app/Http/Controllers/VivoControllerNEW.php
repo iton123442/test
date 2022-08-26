@@ -93,7 +93,7 @@ class VivoControllerNEW extends Controller
 			
 		}
 
-		echo $response;
+		return $response;
 	}
 
 	public function gameTransaction(Request $request) 
