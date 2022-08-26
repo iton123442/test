@@ -247,14 +247,16 @@ class ICGController extends Controller
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$json["transactionId"].'_1');
                 }catch(\Exception $e){
                     $betIdempotent = GameTransactionMDB::findGameExt($json_data['transaction_id'], 1,'transaction_id', $client_details);
+                    $balance = round($client_details->balance * 100,2);
                         if ($betIdempotent != 'false') {
+                            $balance = round($client_details->balance * 100,2);
                             if ($betIdempotent->transaction_detail == "success"){
                                 $response =array(
                                     "data" => array(
                                         "statusCode"=>0,
                                         "username" => $client_details->username,
-                                        "balance" =>$client_details->balance,
-                                        "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$client_details->balance),
+                                        "balance" =>$balance,
+                                        "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                                     ),
                                 );
                             return response($response,400)
@@ -265,8 +267,8 @@ class ICGController extends Controller
                         "data" => array(
                             "statusCode"=>2,
                             "username" => $client_details->username,
-                            "balance" =>$client_details->balance,
-                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$client_details->balance),
+                            "balance" =>$balance,
+                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                         "error" => array(
                             "title"=> "Not Enough Balance",
