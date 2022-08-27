@@ -246,7 +246,7 @@ class ICGController extends Controller
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$json["transactionId"].'_1');
                 }catch(\Exception $e){
-                    $betIdempotent = GameTransactionMDB::findGameExt($json_data['transaction_id'], 1,'transaction_id', $client_details);
+                    $betIdempotent = GameTransactionMDB::findGameExt($json['transaction_id'], 1,'transaction_id', $client_details);
                         if ($betIdempotent != 'false') {
                             if ($betIdempotent->transaction_detail == "success"){
                                 $response =array(
