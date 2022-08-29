@@ -92,11 +92,17 @@ $app->post('/public/api/simpleplay/{brand_code}/PlayerLost', 'SimplePlayControll
 $app->post('/public/api/simpleplay/{brand_code}/PlaceBetCancel', 'SimplePlayController@rollBackTransaction');
 
 // MannaPlay Endpoints
-$app->post('/public/api/manna/{brand_code}/fetchbalance', 'MannaPlayController@getBalance');
-$app->post('/public/api/manna/{brand_code}/bet', 'MannaPlayController@debitProcess');
-$app->post('/public/api/manna/{brand_code}/win', 'MannaPlayController@creditProcess');
-$app->post('/public/api/manna/{brand_code}/betrollback', 'MannaPlayController@rollbackTransaction');
-$app->post('/public/api/manna/{brand_code}/fs_win', 'MannaPlayController@freeRound');
+// $app->post('/public/api/manna/{brand_code}/fetchbalance', 'MannaPlayController@getBalance');
+// $app->post('/public/api/manna/{brand_code}/bet', 'MannaPlayController@debitProcess');
+// $app->post('/public/api/manna/{brand_code}/win', 'MannaPlayController@creditProcess');
+// $app->post('/public/api/manna/{brand_code}/betrollback', 'MannaPlayController@rollbackTransaction');
+// $app->post('/public/api/manna/{brand_code}/fs_win', 'MannaPlayController@freeRound');
+//MannaPlay Idempotent update MannaPlayV2Controller
+$app->post('/public/api/manna/{brand_code}/fetchbalance', 'MannaPlayV2Controller@getBalance');
+$app->post('/public/api/manna/{brand_code}/bet', 'MannaPlayV2Controller@debitProcess');
+$app->post('/public/api/manna/{brand_code}/win', 'MannaPlayV2Controller@creditProcess');
+$app->post('/public/api/manna/{brand_code}/betrollback', 'MannaPlayV2Controller@rollbackTransaction');
+$app->post('/public/api/manna/{brand_code}/fs_win', 'MannaPlayV2Controller@freeRound');
 
 // Ozashiki Single Controller Endpoints
 $app->post('/public/api/ozashiki/fetchbalance', 'MannaPlayController@getBalance');
