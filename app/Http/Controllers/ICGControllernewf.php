@@ -246,33 +246,13 @@ class ICGController extends Controller
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$json["transactionId"].'_1');
                 }catch(\Exception $e){
-                    $betIdempotent = GameTransactionMDB::findGameExt($json['transaction_id'], 1,'transaction_id', $client_details);
-                    $balance = round($client_details->balance * 100,2);
-                        if ($betIdempotent != 'false') {
-                            $balance = round($client_details->balance * 100,2);
-                            if ($betIdempotent->transaction_detail == "success"){
-                                $response =array(
-                                    "data" => array(
-                                        "statusCode"=>0,
-                                        "username" => $client_details->username,
-                                        "balance" =>$balance,
-                                        "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
-                                    ),
-                                );
-                            return response($response,400)
-                            ->header('Content-Type', 'application/json');
-                            }
-                        }
                     $response =array(
                         "data" => array(
-                            "statusCode"=>2,
-                            "username" => $client_details->username,
-                            "balance" =>$balance,
-                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
+                            "statusCode"=>3,
                         ),
                         "error" => array(
-                            "title"=> "Not Enough Balance",
-                            "description"=>"Not Enough Balance"
+                            "title"=> "Something Wrong In Parameters",
+                            "description"=>"Something Wrong In Parameters"
                         )
                     );
                     return response($response,400)
@@ -328,10 +308,7 @@ class ICGController extends Controller
                         ),
                     );
                     $dataToUpdate = array(
-                        "mw_response" => json_encode($response),
-                        "mw_request" => json_encode($client_response->requestoclient),
-                        "client_response" => json_encode($client_response),
-                        "transaction_detail" => "SUCCESS"
+                        "mw_response" => json_encode($response)
                     );
                     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
                     return response($response,200)
