@@ -14,7 +14,7 @@ use App\Models\GameTransaction;
 use App\Models\GameTransactionMDB;
 use DB;
 
-class MannaPlayController extends Controller
+class MannaPlayV2Controller extends Controller
 {   
 	// MANNAPLAY UPDATE LATEST 2021-04-01
 	// CONTROLLER (WIN PROCESS EXT)
