@@ -216,7 +216,8 @@ class MannaPlayV2Controller extends Controller
 						];
 						
 						$data_to_update = array(
-							"mw_response" => json_encode($response)
+							"mw_response" => json_encode($response),
+							"transaction_detail" => "success"
 						);
 
 						GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
@@ -235,7 +236,8 @@ class MannaPlayV2Controller extends Controller
 
 							GameTransactionMDB::updateGametransaction($data, $game_transaction_id, $client_details);
 							$data_to_update = array(
-								"mw_response" => json_encode($response)
+								"mw_response" => json_encode($response),
+								"transaction_detail" => "failed"
 							);
 							GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 						}catch(\Exception $e){
