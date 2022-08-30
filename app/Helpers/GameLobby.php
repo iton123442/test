@@ -1252,7 +1252,7 @@ class GameLobby{
                 $platform_id = config("providerlinks.mannaplay.default.PLATFORM_ID");
             }
             $getGameDetails = Helper::findGameDetails( "game_code",16, $game_code);
-            $token_generate_tg = ProviderHelper::getEncryptToken($client_details->token_id, $client_details->player_id, $getGameDetails->game_id, $client_details->player_token);
+            // $token_generate_tg = ProviderHelper::getEncryptToken($client_details->token_id, $client_details->player_id, $getGameDetails->game_id, $client_details->player_token);
 
             $auth_token = new Client([ // auth_token
                 'headers' => [ 
@@ -1266,7 +1266,7 @@ class GameLobby{
                 "id" => $platform_id,
                 "account" => $client_details->player_id,
                 "currency" => $client_details->default_currency,
-                "sessionId" => $token_generate_tg,
+                "sessionId" => $client_details->player_token,
                 "channel" => ($client_details->test_player ? "demo" : "")
             ];
 

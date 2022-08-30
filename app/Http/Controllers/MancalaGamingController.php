@@ -171,8 +171,13 @@ class MancalaGamingController extends Controller
 								
 								$data_to_update = array(
 			                        "mw_response" => json_encode($response),
+<<<<<<< HEAD
 						"mw_request" => json_encode($client_response->requestoclient),
 						"client_response" => json_encode($client_response),
+=======
+			                        "mw_request"=>json_encode($client_response->requestoclient),
+                                    "client_response" =>json_encode($client_response),
+>>>>>>> 870cfa81b35c089ac28bdd8f54fac247786bae3f
 			                    );
 
 			                    GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
