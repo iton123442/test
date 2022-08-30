@@ -1291,7 +1291,7 @@ class GameLobby{
 
             $game_link_body =  [
              "account" => $client_details->player_id,
-             "sessionId" => $token_generate_tg,
+             "sessionId" => $client_details->player_token,
              "language" => $lang,
              "gameId" => $game_code,
              "exitUrl" => $exitUrl
