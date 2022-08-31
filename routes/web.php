@@ -916,3 +916,4 @@ $app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
 // $app->post('/public/api/dowinn/tip', 'DOWINNNEWController@tip');
 // $app->post('/public/api/dowinn/limits', 'DOWINNNEWController@limitList');
 // $app->post('/public/api/dowinn/history', 'DOWINNNEWController@viewHistory');
+$app->post('/public/api/loadtesting', 'LoadTesterQueryCLientCallController@ProcessTransaction');
