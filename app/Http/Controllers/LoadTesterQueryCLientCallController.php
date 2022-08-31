@@ -16,7 +16,7 @@ class LoadTesterQueryCLientCallController extends Controller
     }
     public function ProcessTransaction(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        // Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $data]), "");
+        Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["request_data" => $data]), "");
         $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
         $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
         $response =array(
