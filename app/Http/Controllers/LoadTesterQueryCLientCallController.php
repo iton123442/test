@@ -42,6 +42,10 @@ class LoadTesterQueryCLientCallController extends Controller
             "provider_request" =>json_encode($data),
         );
         $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
+        $balance = number_format($client_details->balance,2,'.', '');
+        $client_details->balance = $balance;
+        ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+
         $response =array(
             "uid"=>$data["uid"],
             "balance" => array(
