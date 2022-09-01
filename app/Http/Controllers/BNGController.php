@@ -15,6 +15,8 @@ use App\Models\GameTransaction;
 use DB;
 class BNGController extends Controller
 {
+
+    protected $intensionalError
     protected $startTime;
     private $prefix = 22;
     public function __construct() {
