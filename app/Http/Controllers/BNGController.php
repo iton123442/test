@@ -472,7 +472,10 @@ class BNGController extends Controller
                 ),
             );
             $dataToUpdate = array(
-                "mw_response" => json_encode($response)
+                "mw_response" => json_encode($response),
+                "client_response" => json_encode($client_response),
+                "mw_request" => json_encode($client_response->requestoclient),
+                "transaction_detail" => 'SUCCESS',
             );
             GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
