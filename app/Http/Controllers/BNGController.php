@@ -153,6 +153,22 @@ class BNGController extends Controller
         }catch(\Exception $e){
             if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
                 if($client_details){
+                    $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
+                    if($isGameExtFailed != 'false'){ 
+                        if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
+                            $response =array(
+                                "uid"=>$data["uid"],
+                                "balance" => array(
+                                    "value" =>(string)$client_details->balance,
+                                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                                ),
+                                "error" => array(
+                                    "code"=> "OTHER_EXCEED",
+                                )
+                            );
+                            return response($response,200)->header('Content-Type', 'application/json');
+                        }
+                    }
                     ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($client_details),"IF");
                     $gameTransactionExtChecker = GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data["uid"],2,$client_details);
                     ProviderHelper::saveLogWithExeption("BNGCLIENTDETAILS",22,json_encode($gameTransactionExtChecker),"IFgameTransactionExtChecker");
@@ -276,6 +292,24 @@ class BNGController extends Controller
                     return response($response,200)->header('Content-Type', 'application/json');
                 } 
             }elseif($data["args"]["bet"]== null && $data["args"]["win"]!= null){
+
+                $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
+                if($isGameExtFailed != 'false'){ 
+                    if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
+                        $response =array(
+                            "uid"=>$data["uid"],
+                            "balance" => array(
+                                "value" =>(string)$client_details->balance,
+                                "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                            ),
+                            "error" => array(
+                                "code"=> "OTHER_EXCEED",
+                            )
+                        );
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                }
+
                 $failedData = array(
                     "provider_transaction" => $data["uid"],
                     "round_id" => $data["args"]["round_id"],
@@ -299,17 +333,23 @@ class BNGController extends Controller
                         "value" => (string)$client_details->balance,
                         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                     ),
-                );              
-                // $response =array(
-                //     "uid"=>$data["uid"],
-                //     "balance" => array(
-                //         "value" =>(string)$client_details->balance,
-                //         "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
-                //     ),
-                //     "error" => array(
-                //         "code"=> "OTHER_EXCEED",
-                //     )
-                // );
+                );
+                $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
+                if($isGameExtFailed != 'false'){ 
+                    if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
+                        $response =array(
+                            "uid"=>$data["uid"],
+                            "balance" => array(
+                                "value" =>(string)$client_details->balance,
+                                "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                            ),
+                            "error" => array(
+                                "code"=> "OTHER_EXCEED",
+                            )
+                        );
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                }
                 $failedData = array(
                     "provider_transaction" => $data["uid"],
                     "round_id" => $data["args"]["round_id"],
@@ -345,6 +385,24 @@ class BNGController extends Controller
         }
     }
     private function betNotNullWinNotNull($data,$client_details,$game_details){
+
+        $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
+        if($isGameExtFailed != 'false'){ 
+            if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
+                $response =array(
+                    "uid"=>$data["uid"],
+                    "balance" => array(
+                        "value" =>(string)$client_details->balance,
+                        "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                    ),
+                    "error" => array(
+                        "code"=> "OTHER_EXCEED",
+                    )
+                );
+                return response($response,200)->header('Content-Type', 'application/json');
+            }
+        }
+
         $betStart =  microtime(true);
         $win_or_lost = $data["args"]["win"] == 0 ? 0 : 1;
         $gameTransactionData = array(
@@ -516,6 +574,7 @@ class BNGController extends Controller
                     "mw_response" => json_encode($response),
                     "client_response" => json_encode($client_response),
                     "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => 'FAILED',
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             }catch(\Exception $e){
@@ -530,6 +589,24 @@ class BNGController extends Controller
     private function betNullWinNotNull($data,$client_details,$game_details){
         $game = GameTransactionMDB::getGameTransactionByRoundId($data["args"]["round_id"],$client_details);
         if($game != null){
+
+            $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
+            if($isGameExtFailed != 'false'){
+                if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
+                    $response =array(
+                        "uid"=>$data["uid"],
+                        "balance" => array(
+                            "value" =>(string)$client_details->balance,
+                            "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                        ),
+                        "error" => array(
+                            "code"=> "OTHER_EXCEED",
+                        )
+                    );
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }
+            }
+
             $win_or_lost = 5;
             if($data["args"]["round_finished"] == true){
                 $win_or_lost = $data["args"]["win"] == 0 && $game->pay_amount == 0 ? 0 : 1;
@@ -609,11 +686,47 @@ class BNGController extends Controller
             }
         }
         else{
+
+            $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
+            if($isGameExtFailed != 'false'){
+                if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
+                    $response =array(
+                        "uid"=>$data["uid"],
+                        "balance" => array(
+                            "value" =>(string)$client_details->balance,
+                            "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                        ),
+                        "error" => array(
+                            "code"=> "OTHER_EXCEED",
+                        )
+                    );
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }
+            }
+
             Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode("GameTransactionDoesnotExist"), "");
             return json_encode($game);
         }
     }
     private function betNotNullWinNull($data,$client_details,$game_details){
+
+        $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
+        if($isGameExtFailed != 'false'){
+            if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
+                $response =array(
+                    "uid"=>$data["uid"],
+                    "balance" => array(
+                        "value" =>(string)$client_details->balance,
+                        "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                    ),
+                    "error" => array(
+                        "code"=> "OTHER_EXCEED",
+                    )
+                );
+                return response($response,200)->header('Content-Type', 'application/json');
+            }
+        }
+
         $win_or_lost = 0;
         $dataToSave = array(
             "provider_trans_id" => $data["uid"],
@@ -686,6 +799,7 @@ class BNGController extends Controller
                     "mw_response" => json_encode($response),
                     "client_response" => json_encode($client_response),
                     "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => 'FAILED',
                 );
                 GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
             }catch(\Exception $e){
