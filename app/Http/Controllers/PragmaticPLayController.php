@@ -464,6 +464,18 @@ class PragmaticPLayController extends Controller
         $round_id = $data->roundId;
 
         $game_trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
+        if($game_trans->win == 2){
+            $response_log = array(
+                "transactionId" => $game_trans->game_trans_id,
+                "currency" => $client_details->default_currency,
+                "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+                "bonus" => 0,
+                "error" => 0,
+                "description" => "Success",
+            );
+            AWSHelper::saveLog('TPP result already failed', $this->provider_id, json_encode($data), $response);
+            return $response_log;
+        }
         $checkExt = GameTransactionMDB::findGameExt($provider_trans_id,2,'transaction_id',$client_details);
         
         if($checkExt  != 'false'){
@@ -584,6 +596,18 @@ class PragmaticPLayController extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_details = Helper::findGameDetails('game_code', $this->provider_id, $data->gameId);
         $game_trans = GameTransactionMDB::findGameTransactionDetails($data->roundId,'round_id',false,$client_details);
+        if($game_trans->win == 2){
+            $response_log = array(
+                "transactionId" => $game_trans->game_trans_id,
+                "currency" => $client_details->default_currency,
+                "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+                "bonus" => 0,
+                "error" => 0,
+                "description" => "Success",
+            );
+            AWSHelper::saveLog('TPP result already failed', $this->provider_id, json_encode($data), $response);
+            return $response_log;
+        }
         $checkExt = GameTransactionMDB::findGameExt($data->roundId,2,'round_id',$client_details);
         $provider_trans_id = $game_trans->provider_trans_id;
         $round_id = $data->roundId;
@@ -595,14 +619,6 @@ class PragmaticPLayController extends Controller
         $win = $bet_amount > 0 ? 1 : 0;
         if($checkExt != 'false'){
             if($checkExt->amount > 0){$win = 1;}
-        //     $response = array(
-        //         "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
-        //         "bonus" => 0,
-        //         "error" => 0,
-        //         "description" => "Success",
-        //     );
-        //     AWSHelper::saveLog('PP endRound/result already exist', $this->provider_id, json_encode($data) ,$response);
-        //     return $response;
         }
         try {
             $balance = $client_details->balance;
@@ -746,6 +762,18 @@ class PragmaticPLayController extends Controller
         $playerId = ProviderHelper::explodeUsername('_',$data->userId);
         $client_details = ProviderHelper::getClientDetails('player_id',$playerId);
         $game_trans = GameTransactionMDB::findGameTransactionDetails($data->roundId,'round_id',false,$client_details);
+        if($game_trans->win == 2){
+            $response_log = array(
+                "transactionId" => $game_trans->game_trans_id,
+                "currency" => $client_details->default_currency,
+                "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+                "bonus" => 0,
+                "error" => 0,
+                "description" => "Success",
+            );
+            AWSHelper::saveLog('TPP result already failed', $this->provider_id, json_encode($data), $response);
+            return $response_log;
+        }
         $checkExt = GameTransactionMDB::findGameExt($data->reference,3,'transaction_id',$client_details);
         $checkExt2 = GameTransactionMDB::findGameExt($data->reference,1,'transaction_id',$client_details);
         Helper::saveLog("PP hash error", $this->provider_id, json_encode($data), $checkExt2);
