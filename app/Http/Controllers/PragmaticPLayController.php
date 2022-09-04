@@ -336,7 +336,6 @@ class PragmaticPLayController extends Controller
 
         try {
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$gamerecord,'debit');
-            $client_response->fundtransferresponse->status->code = "402";
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
                 $response = array(
