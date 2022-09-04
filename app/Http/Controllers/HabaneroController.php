@@ -300,6 +300,7 @@ class HabaneroController extends Controller
         $game_trans_ext = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         try{
             $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext, $gamerecord, 'debit');
+            $client_response->fundtransferresponse->status->code = "402";
             if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $response = [

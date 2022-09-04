@@ -643,6 +643,7 @@ class PragmaticPLayController extends Controller
                     "provider" => 'tpp',
                     "game_trans_ext_id" => $game_trans_ext_v2,
                     "client_connection_name" => $client_details->connection_name,
+                    "endround" => true,
                 ],
                 "provider" => [
                     "provider_request" => $data,
@@ -654,8 +655,7 @@ class PragmaticPLayController extends Controller
                     "type"=> 2,
                     "game_id" => $game_details->game_id,
                     "player_id" => $client_details->player_id,
-                    "mw_response" => $response,
-                    "endround" => true,
+                    "mw_response" => $response
                 ]
             ];
             $updateGameTransaction = [
