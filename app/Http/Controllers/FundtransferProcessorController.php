@@ -104,10 +104,6 @@ class FundtransferProcessorController extends Controller
         if(isset($payload->request_body->fundtransferrequest->fundinfo->endround)){
             $requesttocient["fundtransferrequest"]['fundinfo']['endround'] = $payload->request_body->fundtransferrequest->fundinfo->endround;
         }
-        if(isset($payload->action->mwapi->endround)){
-            $requesttocient["fundtransferrequest"]['fundinfo']['endround'] = $payload->action->mwapi->endround;
-        }
-
 
         if(isset($payload->action->provider->provider_name)){
             $requesttocient["gamedetails"]['provider_name'] = $payload->action->provider->provider_name;
