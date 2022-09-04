@@ -343,14 +343,19 @@ class PragmaticPLayController extends Controller
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$gamerecord,'debit');
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
+                // $response = array(
+                //     "transactionId" => $gamerecord,
+                //     "currency" => $client_details->default_currency,
+                //     "cash" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
+                //     "bonus" => 0.00,
+                //     "usedPromo" => 0,
+                //     "error" => 0,
+                //     "description" => "Success"
+                // );
                 $response = array(
-                    "transactionId" => $gamerecord,
-                    "currency" => $client_details->default_currency,
-                    "cash" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
-                    "bonus" => 0.00,
-                    "usedPromo" => 0,
-                    "error" => 0,
-                    "description" => "Success"
+                    "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "error" => 1,
+                    "description" => "Not Enough Balance"
                 );
                 $update_gametransactionext = array(
                     "mw_response" =>json_encode($response),
@@ -586,7 +591,7 @@ class PragmaticPLayController extends Controller
         parse_str($enc_body, $data);
         $json_encode = json_encode($data, true);
         $data = json_decode($json_encode);
-        AWSHelper::saveLog('PP endRound requestssssss', $this->provider_id, json_encode($data) ,"endRound");
+        AWSHelper::saveLog('PP endRound request', $this->provider_id, json_encode($data) ,"endRound");
         $dataSort = json_decode($json_encode, true);
         $hash = $this->hashParam($dataSort);
         if($hash != $data->hash){
