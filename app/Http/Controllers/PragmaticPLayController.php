@@ -224,14 +224,19 @@ class PragmaticPLayController extends Controller
                 
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
+                    // $response = array(
+                    //     "transactionId" => $game_transextension,
+                    //     "currency" => $client_details->default_currency,
+                    //     "cash" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
+                    //     "bonus" => 0.00,
+                    //     "usedPromo" => 0,
+                    //     "error" => 0,
+                    //     "description" => "Success"
+                    // );
                     $response = array(
-                        "transactionId" => $game_transextension,
-                        "currency" => $client_details->default_currency,
-                        "cash" => floatval(number_format($client_response->fundtransferresponse->balance, 2, '.', '')),
-                        "bonus" => 0.00,
-                        "usedPromo" => 0,
-                        "error" => 0,
-                        "description" => "Success"
+                        "cash" => floatval(number_format($client_details->balance, 2, '.', '')),
+                        "error" => 1,
+                        "description" => "Not Enough Balance"
                     );
                     $update_gametransactionext = array(
                         "mw_response" =>json_encode($response),
