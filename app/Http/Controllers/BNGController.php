@@ -928,7 +928,17 @@ class BNGController extends Controller
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($data["args"]["round_id"], 'round_id',false, $client_details);
                 $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],3);
                 if(!$game_transaction){
-                    $transactionId=Helper::createBNGGameTransactionExt($bet_transaction->game_trans_id,$data,null,null,null,3);
+                    // $transactionId=Helper::createBNGGameTransactionExt($bet_transaction->game_trans_id,$data,null,null,null,3);
+                    $rollbackgametransactionext = array(
+                        "game_trans_id" => $bet_transaction->game_trans_id,
+                        "provider_trans_id" => $data["transactionId"],
+                        "round_id" => array_key_exists("roundId",$data)?$data["roundId"]:0,
+                        "amount" => round($data["amount"]/100,2),
+                        "game_transaction_type"=>3,
+                        "provider_request" =>json_encode($data),
+                        "mw_response" => null
+                    );
+                    $transactionId = GameTransactionMDB::createGameTransactionExt($rollbackgametransactionext,$client_details);
                 }else{
                     $response =array(
                         "uid"=>$data["uid"],
@@ -971,7 +981,14 @@ class BNGController extends Controller
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
                     );
-                    Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+                    // Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+                    $dataToUpdate = array(
+                        "mw_response" => json_encode($response),
+                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "transaction_detail" => 'SUCCESS',
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
