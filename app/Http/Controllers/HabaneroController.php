@@ -181,6 +181,18 @@ class HabaneroController extends Controller
                 }
                 if($data->gamestatemode == 1){
                     $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
+                    if($trans->win == '2'){
+                        $response = [
+                            "fundtransferresponse" => [
+                                "status" => [
+                                    "success" => false,
+                                    "nofunds" => true,
+                                ],
+                                "balance" => $client_details->balance,
+                                "currencycode" => $client_details->default_currency
+                            ]
+                        ];
+                    }
                     if($trans != 'false'){
                         return $this->newBet($details,$data,$client_details,$trans,$game_details,$round_id);
                     }else{
@@ -189,6 +201,18 @@ class HabaneroController extends Controller
                 }
                 if($data->gamestatemode == 0){
                     $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
+                    if($trans->win == '2'){
+                        $response = [
+                            "fundtransferresponse" => [
+                                "status" => [
+                                    "success" => false,
+                                    "nofunds" => true,
+                                ],
+                                "balance" => $client_details->balance,
+                                "currencycode" => $client_details->default_currency
+                            ]
+                        ];
+                    }
                     if($data->gameinfeature == true){
                         return $this->newCredit($data,$client_details->player_token,$trans,$game_details,$round_id);
                     }else{
@@ -197,6 +221,18 @@ class HabaneroController extends Controller
                 }
                 if($data->gamestatemode == 2){
                     $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
+                    if($trans->win == '2'){
+                        $response = [
+                            "fundtransferresponse" => [
+                                "status" => [
+                                    "success" => false,
+                                    "nofunds" => true,
+                                ],
+                                "balance" => $client_details->balance,
+                                "currencycode" => $client_details->default_currency
+                            ]
+                        ];
+                    }
                     if($data->gameinfeature == true){
                         return $this->newCredit($data,$client_details->player_token,$trans,$game_details,$round_id);
                     }else{
@@ -264,6 +300,7 @@ class HabaneroController extends Controller
         $game_trans_ext = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         try{
             $client_response = ClientRequestHelper::fundTransfer($client_details, abs($data->amount), $game_details->game_code, $game_details->game_name, $game_trans_ext, $gamerecord, 'debit');
+            
             if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $response = [

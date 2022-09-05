@@ -250,7 +250,7 @@ class ICGController extends Controller
                     $balance = round($client_details->balance * 100,2);
                         if ($betIdempotent != 'false') {
                             $balance = round($client_details->balance * 100,2);
-                            if ($betIdempotent->transaction_detail == "success"){
+                            if ($betIdempotent->transaction_detail == "SUCCESS"){
                                 $response =array(
                                     "data" => array(
                                         "statusCode"=>0,
@@ -363,6 +363,10 @@ class ICGController extends Controller
                         // GameTransactionMDB::updateGametransaction($data,$game_transactionid);
                         GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
                         //Helper::updateICGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+                        $dataToUpdate = array(
+                            "transaction_detail" => "FAILED"
+                        );
+                        GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
                     }

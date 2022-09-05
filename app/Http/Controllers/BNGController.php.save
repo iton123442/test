@@ -906,8 +906,9 @@ class BNGController extends Controller
     //         }
     //     } 
     // }
-    public function _rollbackGame($data,$client_details){
-        //return $data["args"]["bet"];	
+    private function _rollbackGame($data,$client_details){
+        //return $data["args"]["bet"];
+dd($data);
         if($data["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
             if($client_details){
@@ -931,9 +932,9 @@ class BNGController extends Controller
                     // $transactionId=Helper::createBNGGameTransactionExt($bet_transaction->game_trans_id,$data,null,null,null,3);
                     $rollbackgametransactionext = array(
                         "game_trans_id" => $bet_transaction->game_trans_id,
-                        "provider_trans_id" => $data["uid"],
-                        "round_id" => $data["args"]["round_id"],
-                        "amount" => round($data["args"]["bet"]/100,2),
+                        "provider_trans_id" => $data["transactionId"],
+                        "round_id" => array_key_exists("roundId",$data)?$data["roundId"]:0,
+                        "amount" => round($data["amount"]/100,2),
                         "game_transaction_type"=>3,
                         "provider_request" =>json_encode($data),
                         "mw_response" => null

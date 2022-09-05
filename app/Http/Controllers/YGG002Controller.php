@@ -148,6 +148,7 @@ class YGG002Controller extends Controller
         
         try{
             $client_response = ClientRequestHelper::fundTransfer($client_details, $bet_amount,$game_details->game_code,$game_details->game_name,$game_transextension,$game_trans,'debit');
+            
             if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
                 $response = array(
@@ -256,7 +257,22 @@ class YGG002Controller extends Controller
         $provider_trans_id = $request->subreference;
         $round_id = $request->reference;
         $checkTrans = GameTransactionMDB::findGameTransactionDetails($request->subreference,'transaction_id',false,$client_details);
-
+        if($checkTrans->win == 2){
+            $response = array(
+                "code" => 0,
+                "data" => array(
+                    "currency" => $client_details->default_currency,
+                    "applicableBonus" => 0.00,
+                    "homeCurrency" => $client_details->default_currency,
+                    "organization" => $this->org,
+                    "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "nickName" => $client_details->display_name,
+                    "playerId" => "TG002_".$client_details->player_id,
+                ),
+            );
+            Helper::saveLog("YGG 002 endwager(win) already failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            return $response;
+        }
         if($checkTrans != 'false'){
             $game_details = Helper::findGameDetails('game_id', $this->provider_id, $checkTrans->game_id);
             $checktTran = GameTransactionMDB::findGameExt($request->subreference,3,'transaction_id',$client_details);
@@ -406,6 +422,22 @@ class YGG002Controller extends Controller
                 Helper::saveLog("YGG 002 appendwagerresult dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
             }
+            if($checkTrans->win == 2){
+                $response = array(
+                    "code" => 0,
+                    "data" => array(
+                        "currency" => $client_details->default_currency,
+                        "applicableBonus" => 0.00,
+                        "homeCurrency" => $client_details->default_currency,
+                        "organization" => $this->org,
+                        "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                        "nickName" => $client_details->display_name,
+                        "playerId" => "TG002_".$client_details->player_id,
+                    ),
+                );
+                Helper::saveLog("YGG 002 endwager(win) already failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+                return $response;
+            }
             $income = $checkTrans->bet_amount - $bonusamount;
             $entry_id = $bonusamount > 0 ? 2 : 1;
             $win = $bonusamount > 0 ? 1 : 0;
@@ -517,6 +549,22 @@ class YGG002Controller extends Controller
         $provider_trans_id = $request->subreference;
         $round_id = $request->reference;
         $checkTrans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
+        if($checkTrans->win == 2){
+            $response = array(
+                "code" => 0,
+                "data" => array(
+                    "currency" => $client_details->default_currency,
+                    "applicableBonus" => 0.00,
+                    "homeCurrency" => $client_details->default_currency,
+                    "organization" => $this->org,
+                    "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "nickName" => $client_details->display_name,
+                    "playerId" => "TG002_".$client_details->player_id,
+                ),
+            );
+            Helper::saveLog("YGG 002 endwager(win) already failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            return $response;
+        }
         $checkTransExt = GameTransactionMDB::findGameExt($provider_trans_id,false,'transaction_id',$client_details);
         $income = $checkTrans->bet_amount - $win_amount;
         $entry_id = $win_amount > 0 ? 2 : 1;
@@ -673,6 +721,22 @@ class YGG002Controller extends Controller
                 ),
             );
             Helper::saveLog("YGG 002 campaignpayout dubplicate", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            return $response;
+        }
+        if($checkTrans->win == 2){
+            $response = array(
+                "code" => 0,
+                "data" => array(
+                    "currency" => $client_details->default_currency,
+                    "applicableBonus" => 0.00,
+                    "homeCurrency" => $client_details->default_currency,
+                    "organization" => $this->org,
+                    "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
+                    "nickName" => $client_details->display_name,
+                    "playerId" => "TG002_".$client_details->player_id,
+                ),
+            );
+            Helper::saveLog("YGG 002 endwager(win) already failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
             return $response;
         }
         $gameTransactionData = array(

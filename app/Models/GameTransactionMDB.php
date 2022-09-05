@@ -366,6 +366,7 @@ class GameTransactionMDB
      * @return bool
      */
     public static function checkDBConnection($connection_name='default'){
+        return true;
         try {
             DB::connection($connection_name)->getPdo();
             return true;
