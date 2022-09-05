@@ -457,7 +457,7 @@ class DOWINNController extends Controller{
                     "mw_response" => json_encode($response),
                 ]
             ];
-            if($game->win == 4){
+            if($game->win == 4 || $game->win == 2){
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             else{
