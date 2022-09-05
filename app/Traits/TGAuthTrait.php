@@ -49,12 +49,13 @@ trait TGAuthTrait {
             return ['error' => "access_denied", "error_description" => "Wrong grant type."];
         }
 
-        if(!$this->storeAccessToken($request->client_id)){
+        $storeToken = $this->storeAccessToken($request->client_id);
+        if(!$storeToken){
             return ['error' => "error", "error_description" => "System busy please try again"];
         }
 
         $grantToken = [
-            'access_token' => $this->storeAccessToken($request->client_id),
+            'access_token' => $storeToken,
             'token_type' => "Bearer",
         ];
 
