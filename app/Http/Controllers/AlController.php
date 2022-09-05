@@ -27,12 +27,16 @@ use Illuminate\Validation\ValidationException;
 class AlController extends Controller
 {
 
+
+    public function __construct()
+    {
+        $this->middleware('tg_auth', ['only' => ['index']]);
+    }
+
     public $hashen = '$2y$10$37VKbBiaJzWh7swxTpy6OOlldjjO9zdoSJSMvMM0.Xi2ToOv1LcSi';
 
     public function index(Request $request){
-
       $request_data = json_decode(json_encode($request->all()));
-
       $query = DB::Select("SELECT * from providers_log WHERE trans_id = '" . $request_data->round_id . "'");
       $result = count($query);
       Helper::saveLog('al', 122345,json_encode($request->all()),123);
