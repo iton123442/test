@@ -162,7 +162,7 @@ class GameLobbyController extends Controller
                                 'form_params' => $requesttosend,
                             ]);
                             $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
-                            ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($request), json_encode($clientBetTransactionStatus));
+                            ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($requesttosend), json_encode($clientBetTransactionStatus));
                             return $clientBetTransactionStatus;
                     }catch(\Exception $e){
                         ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
