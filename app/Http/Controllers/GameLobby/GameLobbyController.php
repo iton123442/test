@@ -155,8 +155,7 @@ class GameLobbyController extends Controller
                                 'country_code' => 'th',
                                 'currency_code' => 'THB',
                                 'lang' => 'th',
-                                'ip_address' => '127.0.0.1',
-                                'device' => 'desktop',
+                                'ip_address' => '127.0.0.1'
                             ];
                             $response = $http_client->post($v2GamePortal, [
                                 'form_params' => $requesttosend,
