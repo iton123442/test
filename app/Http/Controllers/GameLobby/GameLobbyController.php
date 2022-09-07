@@ -139,7 +139,7 @@ class GameLobbyController extends Controller
             if(env('ASKMEBET_V2')){
                 if($request->client_id == 23){
                     try{
-                        ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), json_encode($request->all()));
+                            ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), request->all());
                             $http_client = new Client([]);
                             $v2GamePortal = '119.92.151.35:9004/api/game/launchurl';
                             $requesttosend= [
@@ -162,9 +162,10 @@ class GameLobbyController extends Controller
                                 'form_params' => $requesttosend,
                             ]);
                             $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                            ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($request), json_encode($clientBetTransactionStatus));
                             return $clientBetTransactionStatus;
                     }catch(\Exception $e){
-                        ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), json_encode($request->all()));
+                        ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
                         return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
                     }
                 }
