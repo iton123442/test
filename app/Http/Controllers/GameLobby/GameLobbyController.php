@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\GameLobby;
 
 use App\Http\Controllers\Controller;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Models\Game;
 use App\Models\GameType;
@@ -132,6 +133,41 @@ class GameLobbyController extends Controller
                  ->header('Content-Type', 'application/json');
             }
             // CLIENT SUBSCRIPTION FILTER
+
+
+            # Temporary Trap ASKMEBET TO USE version2 API
+            if(env('ASKMEBET_V2')){
+                if($request->client_id == 23){
+                    try{
+                            $http_client = new Client([]);
+                            $v2GamePortal = '119.92.151.35:9004/api/game/launchurl';
+                            $requesttosend= [
+                                "token" => $request->gg,
+                                "client_id" => $request->client_id,
+                                "client_player_id" => $request->client_player_id,
+                                "email" => $request->email,
+                                "display_name" => $request->display_name,
+                                "username" => $request->username,
+                                "game_code"=> $request->game_code,
+                                "exitUrl" => $request->exitUrl,
+                                "game_provider" => $request->gg,
+                                'country_code' => 'th',
+                                'currency_code' => 'THB',
+                                'lang' => 'th',
+                                'ip_address' => '127.0.0.1',
+                                'device' => 'desktop',
+                            ];
+                            $response = $http_client->post($v2GamePortal, [
+                                'form_params' => $requesttosend,
+                            ]);
+                            $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                            return $clientBetTransactionStatus;
+                    }catch(\Exception $e){
+                        ProviderHelper::saveLogGameLaunch('TRAP', 1111, json_encode($request), json_encode($request));
+                        return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
+                    }
+                }
+            }
 
            # Filter Added GameID for clients who used game_id as identifier
            if ($request->has("game_id")){
