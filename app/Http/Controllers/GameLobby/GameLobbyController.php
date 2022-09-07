@@ -143,7 +143,7 @@ class GameLobbyController extends Controller
                             $http_client = new Client([]);
                             $v2GamePortal = '119.92.151.35:9004/api/game/launchurl';
                             $requesttosend= [
-                                "token" => $request->gg,
+                                "token" => $request->token,
                                 "client_id" => $request->client_id,
                                 "client_player_id" => $request->client_player_id,
                                 "email" => $request->email,
@@ -151,7 +151,7 @@ class GameLobbyController extends Controller
                                 "username" => $request->username,
                                 "game_code"=> $request->game_code,
                                 "exitUrl" => $request->exitUrl,
-                                "game_provider" => $request->gg,
+                                "game_provider" => $request->game_provider,
                                 'country_code' => 'th',
                                 'currency_code' => 'THB',
                                 'lang' => 'th',
