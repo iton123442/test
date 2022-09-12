@@ -122,16 +122,25 @@ class WazdanController extends Controller
                 $client_details = ProviderHelper::getClientDetails('token', $request->token);
                 $bet_transaction = GameTransactionMDB::findGameExt($datadecoded["transactionId"], 1,'transaction_id', $client_details);
                 if ($bet_transaction != 'false') {
-                    if( $bet_transaction->transaction_detail == "SUCCESS" ){
-                       $msg = array(
-                            "status" => 0,
-                            "funds" => array(
-                                "balance" => round($client_details->balance,2)
-                            ),
+                    // if( $bet_transaction->transaction_detail == "SUCCESS" ){
+                    if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
+                        $msg = array(
+                            "status" =>8,
+                            "message" => array(
+                                "text"=>"Insufficient funds",
+                            )
                         );
                         return response($msg,200)
                                     ->header('Content-Type', 'application/json');
                     }
+                    $msg = array(
+                        "status" => 0,
+                        "funds" => array(
+                            "balance" => round($client_details->balance,2)
+                        ),
+                    );
+                    return response($msg,200)
+                                    ->header('Content-Type', 'application/json');
                 } 
                 $msg = array(
                     "status" =>8,
@@ -141,7 +150,6 @@ class WazdanController extends Controller
                 );
                 return response($msg,200)
                                 ->header('Content-Type', 'application/json');
-
             }
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
