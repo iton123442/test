@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Helpers\BGamingHelper;
-use App\Helpers\CallParameters;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\Helper;
 use App\Helpers\Game;
-use App\Models\GameTransaction;
 use App\Helpers\FreeSpinHelper;
 use App\Models\GameTransactionMDB;
 use DB;
@@ -19,39 +17,53 @@ use DateTime;
 class BGamingController extends Controller
 {   
 
-	public $client_api_key , $provider_db_id ;
+	public $client_api_key , $provider_db_id, $prefix_transc ;
 
 	public function __construct(){
 		$this->client_api_key = config("providerlinks.bgaming.CLIENT_API_KEY");
 		$this->provider_db_id = config("providerlinks.bgaming.PROVIDER_ID");
+        $this->prefix_transc = "BG_";
 	}
 
 	public function gameTransaction(Request $request){
-	  Helper::saveLog('Bgaming Auth', $this->provider_db_id, json_encode($request->all()), $request->header('x-request-sign'));
+	    Helper::saveLog('Bgaming Auth', $this->provider_db_id, json_encode($request->all()), $request->header('x-request-sign'));
 	  	$payload = $request->all();
 	  	$client_details = ProviderHelper::getClientDetails('player_id', $payload['user_id']);
 		$request_sign = $request->header('x-request-sign');
         $secret = config('providerlinks.bgaming.AUTH_TOKEN');
 		$signature = hash_hmac('sha256',json_encode($payload),$secret);
-        // dd($signature);
-		Helper::saveLog('Bgaming signature', $this->provider_db_id, json_encode($signature), $request_sign);
+		
 		if($signature != $request_sign){
             $response = [
-                        "code" =>  403,
-                        "message" => "Forbidden",
-                        "balance" => '0'
-                    ];
+                "code" =>  403,
+                "message" => "Forbidden",
+                "balance" => '0'
+            ];
             return response($response,400)->header('Content-Type', 'application/json');
 		}
+
 		if($client_details == 'false'){
-            $http_status = 400;
             $response = [
                     "code" =>  101,
                     "message" => "Player is invalid",
                     "balance" => 0
                 ];
-            return response()->json($response, $http_status);
+            return response($response,400)->header('Content-Type', 'application/json');
         }
+        
+        if(count($payload["actions"]) == 0){
+            $response = $this->GetBalance($request->all(), $client_details);
+			return response($response,200)
+                ->header('Content-Type', 'application/json');	
+        } else {
+            // Transaction Process
+            $round_id = $this->prefix_transc.$payload["game_id"];
+            dd($round_id);
+        }
+
+        
+        
+        
         if(!isset($payload['actions'][0]['action'])){
 			$response = $this->GetBalance($request->all(), $client_details);
 			return response($response,200)
@@ -103,16 +115,16 @@ class BGamingController extends Controller
   
   }
 
-  /**
+     /**
 	 * Initialize the balance 
 	 */
- public function GetBalance($request, $client_details){
-            $balance = str_replace(".", "", $client_details->balance);
-			$response = [
-				"balance" => (float)$balance
-			];
-    		Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request), $response);	
-    		return $response;
+    public function GetBalance($request, $client_details){
+        $balance = str_replace(".", "", $client_details->balance);
+        $response = [
+            "balance" => (float)$balance
+        ];
+        Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request), $response);	
+        return $response;
 	}
 
 public function gameBet($request, $client_details){	

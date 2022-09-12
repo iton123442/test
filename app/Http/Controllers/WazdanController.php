@@ -378,6 +378,36 @@ class WazdanController extends Controller
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
 
+                $isGameExtFailed = GameTransactionMDB::findGameExt($datadecoded["roundId"], 1,'round_id', $client_details);
+                if($isGameExtFailed != 'false'){ 
+                    if($isGameExtFailed->transaction_detail != '"SUCCESS"' || $isGameExtFailed->transaction_detail != 'SUCCESS'){
+                        $response = array(
+                            "status" =>1,
+                            "message" => array(
+                                "text"=>"The Transaction Doesn't Exist!",
+                                "choices"=>array(
+                                    array(
+                                        "label" => "Go Back to Game List",
+                                        "action" => "close_game",
+                                        "response" => "quit"
+                                    )
+                                )
+                            )
+                        );
+                        $wingametransactionext = array(
+                            "game_trans_id" => $isGameExtFailed->game_trans_id,
+                            "provider_trans_id" => $datadecoded["transactionId"],
+                            "round_id" => $datadecoded["roundId"],
+                            "amount" => round($datadecoded["amount"],2),
+                            "game_transaction_type"=>2,
+                            "provider_request" =>json_encode($datadecoded),
+                            "mw_response" => json_encode($response)
+                        );
+                        $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                }
+
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_2');
                 }catch(\Exception $e){
