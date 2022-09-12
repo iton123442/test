@@ -119,19 +119,28 @@ class WazdanController extends Controller
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
             }catch(\Exception $e){
-                $client_details = ProviderHelper::getClientDetails('token', $request->token);
+                $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                 $bet_transaction = GameTransactionMDB::findGameExt($datadecoded["transactionId"], 1,'transaction_id', $client_details);
                 if ($bet_transaction != 'false') {
-                    if( $bet_transaction->transaction_detail == "SUCCESS" ){
-                       $msg = array(
-                            "status" => 0,
-                            "funds" => array(
-                                "balance" => round($client_details->balance,2)
-                            ),
+                    // if( $bet_transaction->transaction_detail == "SUCCESS" ){
+                    if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
+                        $msg = array(
+                            "status" =>8,
+                            "message" => array(
+                                "text"=>"Insufficient funds",
+                            )
                         );
                         return response($msg,200)
                                     ->header('Content-Type', 'application/json');
                     }
+                    $msg = array(
+                        "status" => 0,
+                        "funds" => array(
+                            "balance" => round($client_details->balance,2)
+                        ),
+                    );
+                    return response($msg,200)
+                                    ->header('Content-Type', 'application/json');
                 } 
                 $msg = array(
                     "status" =>8,
@@ -141,7 +150,6 @@ class WazdanController extends Controller
                 );
                 return response($msg,200)
                                 ->header('Content-Type', 'application/json');
-
             }
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
@@ -179,6 +187,7 @@ class WazdanController extends Controller
                     "amount" => round($datadecoded["amount"],2),
                     "game_transaction_type"=>1,
                     "provider_request" =>json_encode($datadecoded),
+                    "transaction_detail" => "FAILED"
                 );
                 $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);  
                 $fund_extra_data = [
@@ -230,7 +239,7 @@ class WazdanController extends Controller
                             "mw_response" => json_encode($msg),
                             "mw_request" => json_encode($client_response->requestoclient),
                             "client_response" => json_encode($client_response),
-                            "general_details" => "failed"
+                            "general_details" => "FAILED"
                         );
                         GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
                     }catch(\Exception $e){
@@ -377,6 +386,36 @@ class WazdanController extends Controller
         if($datadecoded["user"]["token"]){
             $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
             if($client_details){
+
+                $isGameExtFailed = GameTransactionMDB::findGameExt($datadecoded["roundId"], 1,'round_id', $client_details);
+                if($isGameExtFailed != 'false'){ 
+                    if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == "FAILED" ){
+                        $response = array(
+                            "status" =>1,
+                            "message" => array(
+                                "text"=>"The Transaction Doesn't Exist!",
+                                "choices"=>array(
+                                    array(
+                                        "label" => "Go Back to Game List",
+                                        "action" => "close_game",
+                                        "response" => "quit"
+                                    )
+                                )
+                            )
+                        );
+                        $wingametransactionext = array(
+                            "game_trans_id" => $isGameExtFailed->game_trans_id,
+                            "provider_trans_id" => $datadecoded["transactionId"],
+                            "round_id" => $datadecoded["roundId"],
+                            "amount" => round($datadecoded["amount"],2),
+                            "game_transaction_type"=>2,
+                            "provider_request" =>json_encode($datadecoded),
+                            "mw_response" => json_encode($response)
+                        );
+                        $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
+                        return response($response,200)->header('Content-Type', 'application/json');
+                    }
+                }
 
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_2');

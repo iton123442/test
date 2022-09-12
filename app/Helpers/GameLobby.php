@@ -152,30 +152,21 @@ class GameLobby{
     public static function BGamingLaunchUrl($request_data, $device){
         Helper::saveLog('Bgaming create session', 49, json_encode($request_data), "BGamingLaunchUrl");
         $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
-        $balance = str_replace(".", "", $client_player_details->balance);
-
         /* CREATE SESSION REQUEST */
-        $game_launch = new Client([
-                'headers' => [ 
-                    'Content-Type' => 'application/json'
-                ]
-            ]);
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
         $requesttosend = [
             "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
             "game" => $request_data['game_code'],
             "currency" => $client_player_details->default_currency,
-            "locale" => "en",
+            "locale" => $request_data['lang'],
             "ip" => $request_data['ip_address'],
-            "balance" => $balance,
             "client_type" => $device,
             "urls" => [
-                "deposit_url" => "https://example.com/deposit",
+                "deposit_url" => $request_data['exitUrl'],
                 "return_url" => $request_data['exitUrl']
             ],
             "user" => [
                 "id" => $client_player_details->player_id,
-                "email" => $client_player_details->email,
                 "firstname" => $client_player_details->username,
                 "lastname" => $client_player_details->username,
                 "nickname" => $client_player_details->display_name,
@@ -186,6 +177,13 @@ class GameLobby{
                 "registered_at" => $registration_date
             ]
         ];
+        $signature = hash_hmac('sha256',json_encode($requesttosend), config("providerlinks.bgaming.AUTH_TOKEN") );
+        $game_launch = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'X-REQUEST-SIGN' => $signature
+            ]
+        ]);
         Helper::saveLog('Bgaming create session', 49, json_encode($requesttosend), $game_launch);
         $game_launch_response = $game_launch->post(config("providerlinks.bgaming.GCP_URL")."/sessions",
                 ['body' => json_encode($requesttosend)]
