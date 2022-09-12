@@ -380,7 +380,7 @@ class WazdanController extends Controller
 
                 $isGameExtFailed = GameTransactionMDB::findGameExt($datadecoded["roundId"], 1,'round_id', $client_details);
                 if($isGameExtFailed != 'false'){ 
-                    if($isGameExtFailed->transaction_detail != '"SUCCESS"' || $isGameExtFailed->transaction_detail != 'SUCCESS'){
+                    if($isGameExtFailed->transaction_detail != '"SUCCESS"' || $isGameExtFailed->transaction_detail != "SUCCESS" ){
                         $response = array(
                             "status" =>1,
                             "message" => array(
