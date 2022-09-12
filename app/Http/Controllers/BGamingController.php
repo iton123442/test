@@ -184,8 +184,9 @@ class BGamingController extends Controller
                     Helper::saveLog('Bgaming BET IDEMPOTENT', $this->provider_db_id, json_encode($data), $response);
                     return $response;
                 }
+                $balance = str_replace(".", "", $client_details->balance);
                 $response = [
-                    "balance" => (float)$client_details->balance,
+                    "balance" => (float)$balance,
                     "game_id" => $data['game_id'],
                     "transactions" =>[
                         [
@@ -250,6 +251,7 @@ class BGamingController extends Controller
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
             }
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+            $balance = str_replace(".", "", $balance);
             $response = [
                 "balance" => (float)$balance,
                 "game_id" => $data['game_id'],
@@ -335,8 +337,9 @@ class BGamingController extends Controller
         try{
             ProviderHelper::idenpotencyTable($transactionId);
         }catch(\Exception $e){
+            $balance = str_replace(".", "", $client_details->balance);
             $response = [
-                "balance" => (float)$client_details->balance,
+                "balance" => (float)$balance,
                 "game_id" => $data['game_id'],
                 "transactions" =>[
                     [
@@ -369,6 +372,7 @@ class BGamingController extends Controller
         $balance = round($client_details->balance,2) + $amount;
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
         $win = ($amount + $bet_transaction->pay_amount) == 0 ? 0 : 1;
+        $balance = str_replace(".", "", $balance);
         $response = [
             "balance" => (float)$balance,
             "game_id" => $data['game_id'],
