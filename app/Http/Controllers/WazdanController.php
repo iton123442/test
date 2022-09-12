@@ -179,6 +179,7 @@ class WazdanController extends Controller
                     "amount" => round($datadecoded["amount"],2),
                     "game_transaction_type"=>1,
                     "provider_request" =>json_encode($datadecoded),
+                    "transaction_detail" => "FAILED"
                 );
                 $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);  
                 $fund_extra_data = [
@@ -230,7 +231,7 @@ class WazdanController extends Controller
                             "mw_response" => json_encode($msg),
                             "mw_request" => json_encode($client_response->requestoclient),
                             "client_response" => json_encode($client_response),
-                            "general_details" => "failed"
+                            "general_details" => "FAILED"
                         );
                         GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
                     }catch(\Exception $e){
@@ -380,7 +381,7 @@ class WazdanController extends Controller
 
                 $isGameExtFailed = GameTransactionMDB::findGameExt($datadecoded["roundId"], 1,'round_id', $client_details);
                 if($isGameExtFailed != 'false'){ 
-                    if($isGameExtFailed->transaction_detail != '"SUCCESS"' || $isGameExtFailed->transaction_detail != "SUCCESS" ){
+                    if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == "FAILED" ){
                         $response = array(
                             "status" =>1,
                             "message" => array(
