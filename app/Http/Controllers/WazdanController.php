@@ -119,7 +119,7 @@ class WazdanController extends Controller
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
             }catch(\Exception $e){
-                $client_details = ProviderHelper::getClientDetails('token', $request->token);
+                $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
                 $bet_transaction = GameTransactionMDB::findGameExt($datadecoded["transactionId"], 1,'transaction_id', $client_details);
                 if ($bet_transaction != 'false') {
                     // if( $bet_transaction->transaction_detail == "SUCCESS" ){
