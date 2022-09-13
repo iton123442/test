@@ -163,9 +163,9 @@ class BGamingController extends Controller
      * Initialize the balance 
      */
     private function GetBalance($request, $client_details){
-        $balance = str_replace(".", "", $client_details->balance);
+        $balance = $client_details->balance;
         $response = [
-            "balance" => (float)$balance
+            "balance" => $balance
         ];
         Helper::saveLog('BG Get balance Hit', $this->provider_db_id, json_encode($request), $response);	
         return $response;
