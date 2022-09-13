@@ -61,7 +61,7 @@ class BGamingController extends Controller
                         [
                             "action" => "win",
                             "amount" => 0,
-                            "action_id" => $json_data["actions"][0]["action_id"].'_0',
+                            "action_id" => $json_data["game_id"].'_0',
                         ]
                     ]
                 ];
