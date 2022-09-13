@@ -372,6 +372,24 @@ class BGamingController extends Controller
         try{
             ProviderHelper::idenpotencyTable($transactionId);
         }catch(\Exception $e){
+            $win_transaction = GameTransactionMDB::findGameExt($transactionId, 2,'transaction_id', $client_details);
+            if($win_transaction != 'false'){ 
+                $balance = number_format(round($client_details->balance,2),2,'.','');
+                $balance = str_replace(".", "", $balance);
+                $response = [
+                    "balance" => (float)$balance,
+                    "game_id" => $data['game_id'],
+                    "transactions" =>[
+                        [
+                            "action_id" =>$data['actions'][0]['action_id'],
+                            "tx_id" =>  $win_transaction->game_trans_ext_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                    ],
+                ];
+                Helper::saveLog('Bgaming WIN IDEMPOTENCE', $this->provider_db_id, json_encode($data), $response);
+                return $response;
+            }
             $balance = number_format(round($client_details->balance,2),2,'.','');
             $balance = str_replace(".", "", $balance);
             $response = [
@@ -380,7 +398,7 @@ class BGamingController extends Controller
                 "transactions" =>[
                     [
                         "action_id" =>$data['actions'][0]['action_id'],
-                        "tx_id" =>  $isGameExtFailed->game_trans_ext_id,
+                        "tx_id" =>  $bet_transaction->game_trans_ext_id,
                         "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
                     ],
                 ],
