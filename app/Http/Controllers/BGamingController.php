@@ -132,7 +132,7 @@ class BGamingController extends Controller
                         $balance = $bet_response["balance"] + $json_data["actions"][1]["amount"];
                         $balance = str_replace(".", "", $balance);
                         $response = [
-                            "balance" => (float)$balance,
+                            "balance" => $balance,
                             "game_id" => $data['game_id'],
                             "transactions" =>[
                                 [
@@ -191,7 +191,7 @@ class BGamingController extends Controller
                 }
                 $balance = str_replace(".", "", $client_details->balance);
                 $response = [
-                    "balance" => (float)$balance,
+                    "balance" => $balance,
                     "game_id" => $data['game_id'],
                     "transactions" =>[
                         [
@@ -258,7 +258,7 @@ class BGamingController extends Controller
             ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
             $balance = str_replace(".", "", $balance);
             $response = [
-                "balance" => (float)$balance,
+                "balance" => $balance,
                 "game_id" => $data['game_id'],
                 "transactions" =>[
                     [
@@ -286,7 +286,7 @@ class BGamingController extends Controller
             $response = [
                 "code" => 100,
                 "message" => "Player has not enough funds to process an action.",
-                "balance" => $client_details->balance
+                "balance" => 0
             ];
             $dataToUpdate = array(
                 "mw_response" => json_encode($response),
@@ -312,7 +312,7 @@ class BGamingController extends Controller
             $response = [
                 "code" => 100,
                 "message" => "Player has not enough funds to process an action.",
-                "balance" => $balance
+                "balance" => 0
             ];
             Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
             return $response;
@@ -323,7 +323,7 @@ class BGamingController extends Controller
                 $response = [
                     "code" => 100,
                     "message" => "Player has not enough funds to process an action.",
-                    "balance" => $balance
+                    "balance" => 0
                 ];
                 $game_transaction_extension = array(
                     "game_trans_id" => $bet_transaction->game_trans_id,
@@ -344,7 +344,7 @@ class BGamingController extends Controller
         }catch(\Exception $e){
             $balance = str_replace(".", "", $balance);
             $response = [
-                "balance" => (float)$balance,
+                "balance" => $balance,
                 "game_id" => $data['game_id'],
                 "transactions" =>[
                     [
@@ -379,7 +379,7 @@ class BGamingController extends Controller
         $win = ($amount + $bet_transaction->pay_amount) == 0 ? 0 : 1;
         $balance = str_replace(".", "", $balance);
         $response = [
-            "balance" => (float)$balance,
+            "balance" => $balance,
             "game_id" => $data['game_id'],
             "transactions" =>[
                 [
