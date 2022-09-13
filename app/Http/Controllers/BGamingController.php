@@ -372,7 +372,8 @@ class BGamingController extends Controller
         try{
             ProviderHelper::idenpotencyTable($transactionId);
         }catch(\Exception $e){
-            $balance = str_replace(".", "", round($client_details->balance,2));
+            $balance = number_format(round($client_details->balance,2),2,'.','');
+            $balance = str_replace(".", "", $balance);
             $response = [
                 "balance" => (float)$balance,
                 "game_id" => $data['game_id'],
