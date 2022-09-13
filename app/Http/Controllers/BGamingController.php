@@ -83,29 +83,36 @@ class BGamingController extends Controller
                 ->header('Content-Type', 'application/json');	
         } else {
             // BET WEN ROLLBACK ONE TIME
+            $status = 200;
             if(count($json_data["actions"]) == 1){
                 if($json_data["actions"][0]["action"] == "bet"){
                     Helper::saveLog('Bgaming BET PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
                     $response = $this->gameBET($request->all(), $client_details);
-                    if($json_data["finished"] == true){
-                        $data = [
-                            "user_id" => $json_data["user_id"],
-                            "currency" => $json_data["currency"],
-                            "game" => $json_data["game"],
-                            "game_id" => $json_data["game_id"],
-                            "session_id" => $json_data["session_id"],
-                            "finished" => $json_data["finished"],
-                            "actions" => [
-                                [
-                                    "action" => "win",
-                                    "amount" => 0,
-                                    "action_id" => $json_data["actions"][0]["action_id"].'_0',
+                    if(!isset($bet_response["code"])) {
+                        if($json_data["finished"] == true){
+                            $data = [
+                                "user_id" => $json_data["user_id"],
+                                "currency" => $json_data["currency"],
+                                "game" => $json_data["game"],
+                                "game_id" => $json_data["game_id"],
+                                "session_id" => $json_data["session_id"],
+                                "finished" => $json_data["finished"],
+                                "actions" => [
+                                    [
+                                        "action" => "win",
+                                        "amount" => 0,
+                                        "action_id" => $json_data["actions"][0]["action_id"].'_0',
+                                    ]
                                 ]
-                            ]
-                        ];
-                        $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
-                        $this->gameWIN($data, $client_details);
+                            ];
+                            $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
+                            $this->gameWIN($data, $client_details);
+                        }
+
+                    } else {
+                        $status = 412;
                     }
+                    
                 }
                 
                 if($json_data["actions"][0]["action"] == "win"){
@@ -119,7 +126,7 @@ class BGamingController extends Controller
                     $response = $this->gameROLLBACK($request->all(), $client_details);
                 }
                 Helper::saveLog('Bgaming WIN AND BET RESPONSE', $this->provider_db_id, json_encode($request->all()), $response);
-                return response($response,200)
+                return response($response,$status)
                 ->header('Content-Type', 'application/json');
             }
 
@@ -178,8 +185,10 @@ class BGamingController extends Controller
                         return response($response,200)
                                 ->header('Content-Type', 'application/json');
                     }
+                } else {
+                    $status = 412;
                 }
-                return response($bet_response,200)
+                return response($bet_response,$status)
                     ->header('Content-Type', 'application/json');
             }
             
