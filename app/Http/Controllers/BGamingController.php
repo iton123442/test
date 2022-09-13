@@ -167,7 +167,7 @@ class BGamingController extends Controller
                         ];
                         $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
                         $second_response = $this->gameBET($data, $client_details);
-                        if(!isset($response["code"])) {
+                        if(!isset($second_response["code"])) {
                             if($json_data["finished"] == true){
                                 $data = [
                                     "user_id" => $json_data["user_id"],
@@ -209,6 +209,7 @@ class BGamingController extends Controller
                         }  else {
                             $status = 412;
                         }
+                        return response($second_response,$status)->header('Content-Type', 'application/json');
                     } else {
                         $status = 412;
                     }
