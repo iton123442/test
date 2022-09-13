@@ -575,7 +575,146 @@ class BGamingController extends Controller
     }
 
     private function gameROLLBACK($data, $client_details){ 
+        $round_id = $this->prefix_transc.$data["game_id"];
+        $transactionId = $this->prefix_transc.$data["actions"][0]["action_id"];
+        $amount = $data["actions"][0]["amount"] / 100;
+        $processtime = new DateTime('NOW');
+        $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $data["game"]);
+        $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
+        if($bet_transaction == 'false'){
+            $response = [
+                "code" => 100,
+                "message" => "Player has not enough funds to process an action.",
+                "balance" => 0
+            ];
+            Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
+            return $response;
+        }
+        $isGameExtFailed = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
+        if($isGameExtFailed != 'false'){ 
+            if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == "FAILED" ){
+                $response = [
+                    "code" => 100,
+                    "message" => "Player has not enough funds to process an action.",
+                    "balance" => 0
+                ];
+                $game_transaction_extension = array(
+                    "game_trans_id" => $bet_transaction->game_trans_id,
+                    "provider_trans_id" => $transactionId,
+                    "round_id" => $round_id,
+                    "amount" => $amount,
+                    "game_transaction_type"=> 2,
+                    "provider_request" => json_encode($data),
+                    "mw_response" => json_encode($response)
+                );
+                $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($game_transaction_extension,$client_details);
+                Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
+                return $response;
+            }
+        }
+        try{
+            ProviderHelper::idenpotencyTable($transactionId);
+        }catch(\Exception $e){
+            $win_transaction = GameTransactionMDB::findGameExt($transactionId, 3,'transaction_id', $client_details);
+            if($win_transaction != 'false'){ 
+                $balance = number_format(round($client_details->balance,2),2,'.','');
+                $balance = str_replace(".", "", $balance);
+                $response = [
+                    "balance" => (float)$balance,
+                    "game_id" => $data['game_id'],
+                    "transactions" =>[
+                        [
+                            "action_id" =>$data['actions'][0]['action_id'],
+                            "tx_id" =>  $win_transaction->game_trans_ext_id,
+                            "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                        ],
+                    ],
+                ];
+                Helper::saveLog('Bgaming WIN IDEMPOTENCE', $this->provider_db_id, json_encode($data), $response);
+                return $response;
+            }
+            $balance = number_format(round($client_details->balance,2),2,'.','');
+            $balance = str_replace(".", "", $balance);
+            $response = [
+                "balance" => (float)$balance,
+                "game_id" => $data['game_id'],
+                "transactions" =>[
+                    [
+                        "action_id" =>$data['actions'][0]['action_id'],
+                        "tx_id" =>  $bet_transaction->game_trans_ext_id,
+                        "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                    ],
+                ],
+            ];
+            Helper::saveLog('Bgaming WIN IDEMPOTENCE', $this->provider_db_id, json_encode($data), $response);
+            return $response;
+        }
+        $client_details->connection_name = $bet_transaction->connection_name;
+        $game_transaction_extension = array(
+            "game_trans_id" => $bet_transaction->game_trans_id,
+            "provider_trans_id" => $transactionId,
+            "round_id" => $round_id,
+            "amount" => $amount,
+            "game_transaction_type"=> 3,
+            "provider_request" => json_encode($data),
+        );
+        $game_transaction_ext_id = GameTransactionMDB::createGameTransactionExt($game_transaction_extension,$client_details);
+        $updateGameTransaction = [
+            "pay_amount" => $amount + $bet_transaction->pay_amount,
+            "income" => $bet_transaction->bet_amount - ( $amount + $bet_transaction->pay_amount ),
+            "entry_id" => 2,
+        ];
+        GameTransactionMDB::updateGametransaction($updateGameTransaction,$bet_transaction->game_trans_id, $client_details);
 
+        $balance = round($client_details->balance,2) + $amount;
+        $balance = number_format($balance,2,'.','');
+        ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+        $balance = str_replace(".", "", $balance);
+        $response = [
+            "balance" => (float)$balance,
+            "game_id" => $data['game_id'],
+            "transactions" =>[
+                [
+                    "action_id" =>$data['actions'][0]['action_id'],
+                    "tx_id" =>  $game_transaction_ext_id,
+                    "processed_at" => $processtime->format('Y-m-d\TH:i:s.u'),
+                ],
+            ],
+        ];
+        $action_payload = [
+            "type" => "custom", #genreral,custom :D # REQUIRED!
+            "custom" => [
+                "provider" => "BGaming",
+                "client_connection_name" => $client_details->connection_name,
+                "win_or_lost" => 4,
+                "pay_amount" => $amount,
+                "game_transaction_ext_id" => $game_transaction_ext_id
+            ],
+            "provider" => [
+                "provider_request" => $data, #R
+                "provider_trans_id"=> $transactionId, #e
+                "provider_round_id"=> $round_id, #R
+            ],
+            "mwapi" => [
+                "roundId"=> $bet_transaction->game_trans_id, #R
+                "type"=>2, #R
+                "game_id" => $game_details->game_id, #R
+                "player_id" => $client_details->player_id, #R
+                "mw_response" => $response, #R
+            ]
+        ];
+        $client_response = ClientRequestHelper::fundTransfer_TG($client_details, $amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',true,$action_payload);
+        if(isset($client_response->fundtransferresponse->status->code) ){
+            $dataToUpdate = array(
+                "mw_request" => json_encode($client_response->requestoclient),
+                "client_response" => json_encode($client_response),
+                "mw_response" => json_encode($response),
+                "transaction_detail" => "SUCCESS"
+            );
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_transaction_ext_id,$client_details);
+        }
+        Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
+        return $response;    
     }
 
 }
