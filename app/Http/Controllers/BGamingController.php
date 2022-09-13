@@ -47,7 +47,14 @@ class BGamingController extends Controller
                 ];
             return response($response,400)->header('Content-Type', 'application/json');
         }
-        
+        if(!isset($json_data["actions"])) {
+            $response = [
+                "code" =>  403,
+                "message" => "Forbidden",
+                "balance" => '0'
+            ];
+            return response($response,400)->header('Content-Type', 'application/json');
+        }
         if(count($json_data["actions"]) == 0){
             if($json_data["finished"] == true){
                 $data = [
