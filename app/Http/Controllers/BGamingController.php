@@ -131,23 +131,8 @@ class BGamingController extends Controller
             }
 
             if(count($json_data["actions"]) == 2){
-                $data = [
-                    "user_id" => $json_data["user_id"],
-                    "currency" => $json_data["currency"],
-                    "game" => $json_data["game"],
-                    "game_id" => $json_data["game_id"],
-                    "session_id" => $json_data["session_id"],
-                    "finished" => $json_data["finished"],
-                    "actions" => [
-                        [
-                            "action" => $json_data["actions"][0]["action"],
-                            "amount" => $json_data["actions"][0]["amount"],
-                            "action_id" => $json_data["actions"][0]["action_id"],
-                        ]
-                    ]
-                ];
-                $bet_response = $this->gameBET($data, $client_details);
-                if(!isset($bet_response["code"])) {
+                if($json_data["actions"][0]["action"] == "bet" && $json_data["actions"][1]["action"] == "bet") {
+                    Helper::saveLog('Bgaming BET and BET PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
                     $data = [
                         "user_id" => $json_data["user_id"],
                         "currency" => $json_data["currency"],
@@ -157,36 +142,136 @@ class BGamingController extends Controller
                         "finished" => $json_data["finished"],
                         "actions" => [
                             [
-                                "action" => $json_data["actions"][1]["action"],
-                                "amount" => $json_data["actions"][1]["amount"],
-                                "action_id" => $json_data["actions"][1]["action_id"],
+                                "action" => $json_data["actions"][0]["action"],
+                                "amount" => $json_data["actions"][0]["amount"],
+                                "action_id" => $json_data["actions"][0]["action_id"],
                             ]
                         ]
                     ];
-                    $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
-                    $win_response = $this->gameWIN($data, $client_details);
-                    if(!isset($win_response["code"])) {
-                        $response = [
-                            "balance" => $win_response["balance"],
-                            "game_id" => $data['game_id'],
-                            "transactions" =>[
+                    $bet_response = $this->gameBET($data, $client_details);
+                    if(!isset($bet_response["code"])) {
+                        $data = [
+                            "user_id" => $json_data["user_id"],
+                            "currency" => $json_data["currency"],
+                            "game" => $json_data["game"],
+                            "game_id" => $json_data["game_id"],
+                            "session_id" => $json_data["session_id"],
+                            "finished" => $json_data["finished"],
+                            "actions" => [
                                 [
-                                    "action_id" => $json_data['actions'][0]['action_id'],
-                                    "tx_id" =>  $bet_response["transactions"][0]["tx_id"],
-                                    "processed_at" => $bet_response["transactions"][0]["processed_at"],
-                                ],
-                                [
-                                    "action_id" => $json_data['actions'][1]['action_id'],
-                                    "tx_id" =>  $win_response["transactions"][0]["tx_id"],
-                                    "processed_at" => $win_response["transactions"][0]["processed_at"],
-                                ],
-                            ],
+                                    "action" => $json_data["actions"][1]["action"],
+                                    "amount" => $json_data["actions"][1]["amount"],
+                                    "action_id" => $json_data["actions"][1]["action_id"],
+                                ]
+                            ]
                         ];
-                        return response($response,200)
-                                ->header('Content-Type', 'application/json');
+                        $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
+                        $second_response = $this->gameBET($data, $client_details);
+                        if(!isset($response["code"])) {
+                            if($json_data["finished"] == true){
+                                $data = [
+                                    "user_id" => $json_data["user_id"],
+                                    "currency" => $json_data["currency"],
+                                    "game" => $json_data["game"],
+                                    "game_id" => $json_data["game_id"],
+                                    "session_id" => $json_data["session_id"],
+                                    "finished" => $json_data["finished"],
+                                    "actions" => [
+                                        [
+                                            "action" => "win",
+                                            "amount" => 0,
+                                            "action_id" => $json_data["actions"][0]["action_id"].'_0',
+                                        ]
+                                    ]
+                                ];
+                                $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
+                                $this->gameWIN($data, $client_details);
+                            }
+                            $response = [
+                                "balance" => $second_response["balance"],
+                                "game_id" => $data['game_id'],
+                                "transactions" =>[
+                                    [
+                                        "action_id" => $json_data['actions'][0]['action_id'],
+                                        "tx_id" =>  $bet_response["transactions"][0]["tx_id"],
+                                        "processed_at" => $bet_response["transactions"][0]["processed_at"],
+                                    ],
+                                    [
+                                        "action_id" => $json_data['actions'][1]['action_id'],
+                                        "tx_id" =>  $second_response["transactions"][0]["tx_id"],
+                                        "processed_at" => $second_response["transactions"][0]["processed_at"],
+                                    ],
+                                ],
+                            ];
+                            return response($response,200)
+                                    ->header('Content-Type', 'application/json');
+
+                        }  else {
+                            $status = 412;
+                        }
+                    } else {
+                        $status = 412;
                     }
+                    return response($bet_response,$status)
+                    ->header('Content-Type', 'application/json');
                 } else {
-                    $status = 412;
+                    $data = [
+                        "user_id" => $json_data["user_id"],
+                        "currency" => $json_data["currency"],
+                        "game" => $json_data["game"],
+                        "game_id" => $json_data["game_id"],
+                        "session_id" => $json_data["session_id"],
+                        "finished" => $json_data["finished"],
+                        "actions" => [
+                            [
+                                "action" => $json_data["actions"][0]["action"],
+                                "amount" => $json_data["actions"][0]["amount"],
+                                "action_id" => $json_data["actions"][0]["action_id"],
+                            ]
+                        ]
+                    ];
+                    $bet_response = $this->gameBET($data, $client_details);
+                    if(!isset($bet_response["code"])) {
+                        $data = [
+                            "user_id" => $json_data["user_id"],
+                            "currency" => $json_data["currency"],
+                            "game" => $json_data["game"],
+                            "game_id" => $json_data["game_id"],
+                            "session_id" => $json_data["session_id"],
+                            "finished" => $json_data["finished"],
+                            "actions" => [
+                                [
+                                    "action" => $json_data["actions"][1]["action"],
+                                    "amount" => $json_data["actions"][1]["amount"],
+                                    "action_id" => $json_data["actions"][1]["action_id"],
+                                ]
+                            ]
+                        ];
+                        $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
+                        $win_response = $this->gameWIN($data, $client_details);
+                        if(!isset($win_response["code"])) {
+                            $response = [
+                                "balance" => $win_response["balance"],
+                                "game_id" => $data['game_id'],
+                                "transactions" =>[
+                                    [
+                                        "action_id" => $json_data['actions'][0]['action_id'],
+                                        "tx_id" =>  $bet_response["transactions"][0]["tx_id"],
+                                        "processed_at" => $bet_response["transactions"][0]["processed_at"],
+                                    ],
+                                    [
+                                        "action_id" => $json_data['actions'][1]['action_id'],
+                                        "tx_id" =>  $win_response["transactions"][0]["tx_id"],
+                                        "processed_at" => $win_response["transactions"][0]["processed_at"],
+                                    ],
+                                ],
+                            ];
+                            return response($response,200)
+                                    ->header('Content-Type', 'application/json');
+                        }
+                    } else {
+                        $status = 412;
+                    }
                 }
                 return response($bet_response,$status)
                     ->header('Content-Type', 'application/json');
