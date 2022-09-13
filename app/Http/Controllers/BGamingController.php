@@ -366,10 +366,11 @@ class BGamingController extends Controller
             "provider_request" => json_encode($data),
         );
         $game_transaction_ext_id = GameTransactionMDB::createGameTransactionExt($game_transaction_extension,$client_details);
+        $entry_id = $amount + $bet_transaction->pay_amount == 0 ? 1 : 2; 
         $updateGameTransaction = [
             "pay_amount" => $amount + $bet_transaction->pay_amount,
             "income" => $bet_transaction->bet_amount - ( $amount + $bet_transaction->pay_amount ),
-            "entry_id" => 2,
+            "entry_id" => $entry_id,
         ];
         GameTransactionMDB::updateGametransaction($updateGameTransaction,$bet_transaction->game_trans_id, $client_details);
 
