@@ -74,13 +74,15 @@ class BGamingController extends Controller
                                 ]
                             ]
                         ];
-                        $this->gameWIN($data, $client_details);
+                        $balance = $response["balance"];
+                        $this->gameWIN($data, $client_details, $balance);
                     }
                 }
                 
                 if($json_data["actions"][0]["action"] == "win"){
                     Helper::saveLog('Bgaming WIN PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
-                    $response = $this->gameWIN($request->all(), $client_details);
+                    $balance = $client_details->balance;
+                    $response = $this->gameWIN($request->all(), $client_details, $balance);
                 }
 
                 if($json_data["actions"][0]["action"] == "rollback"){
@@ -124,8 +126,8 @@ class BGamingController extends Controller
                             ]
                         ]
                     ];
-                    
-                    $win_response = $this->gameWIN($data, $client_details);
+                    $balance = $bet_response["balance"];
+                    $win_response = $this->gameWIN($data, $client_details, $balance);
                     if(!isset($win_response["code"])) {
                         $balance = $bet_response["balance"] + $json_data["actions"][1]["amount"];
                         $balance = str_replace(".", "", $balance);
@@ -299,7 +301,7 @@ class BGamingController extends Controller
         return $response;
     }
 
-    private function gameWIN($data, $client_details){ 
+    private function gameWIN($data, $client_details, $balance){ 
         $round_id = $this->prefix_transc.$data["game_id"];
         $transactionId = $this->prefix_transc.$data["actions"][0]["action_id"];
         $amount = $data["actions"][0]["amount"] / 100;
@@ -310,7 +312,7 @@ class BGamingController extends Controller
             $response = [
                 "code" => 100,
                 "message" => "Player has not enough funds to process an action.",
-                "balance" => $client_details->balance
+                "balance" => $balance
             ];
             Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
             return $response;
@@ -321,7 +323,7 @@ class BGamingController extends Controller
                 $response = [
                     "code" => 100,
                     "message" => "Player has not enough funds to process an action.",
-                    "balance" => $client_details->balance
+                    "balance" => $balance
                 ];
                 $game_transaction_extension = array(
                     "game_trans_id" => $bet_transaction->game_trans_id,
@@ -340,7 +342,7 @@ class BGamingController extends Controller
         try{
             ProviderHelper::idenpotencyTable($transactionId);
         }catch(\Exception $e){
-            $balance = str_replace(".", "", $client_details->balance);
+            $balance = str_replace(".", "", $balance);
             $response = [
                 "balance" => (float)$balance,
                 "game_id" => $data['game_id'],
@@ -372,7 +374,7 @@ class BGamingController extends Controller
         ];
         GameTransactionMDB::updateGametransaction($updateGameTransaction,$bet_transaction->game_trans_id, $client_details);
 
-        $balance = round($client_details->balance,2) + $amount;
+        $balance = round($balance,2) + $amount;
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
         $win = ($amount + $bet_transaction->pay_amount) == 0 ? 0 : 1;
         $balance = str_replace(".", "", $balance);
