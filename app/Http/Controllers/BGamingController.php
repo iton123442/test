@@ -85,7 +85,7 @@ class BGamingController extends Controller
 
                 if($json_data["actions"][0]["action"] == "rollback"){
                     Helper::saveLog('Bgaming WIN PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
-                    $response = $this->gameWIN($request->all(), $client_details);
+                    $response = $this->gameROLLBACK($request->all(), $client_details);
                 }
                 return response($response,200)
                 ->header('Content-Type', 'application/json');
@@ -123,11 +123,14 @@ class BGamingController extends Controller
                                 "action_id" => $json_data["actions"][1]["action_id"],
                             ]
                         ]
-                   ];
+                    ];
+                    
                     $win_response = $this->gameWIN($data, $client_details);
                     if(!isset($win_response["code"])) {
+                        $balance = $bet_response["balance"] + $json_data["actions"][1]["amount"];
+                        $balance = str_replace(".", "", $balance);
                         $response = [
-                            "balance" => $win_response["balance"],
+                            "balance" => (float)$balance,
                             "game_id" => $data['game_id'],
                             "transactions" =>[
                                 [
@@ -418,6 +421,10 @@ class BGamingController extends Controller
         }
         Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
         return $response;
+    }
+
+    private function gameROLLBACK($data, $client_details){ 
+
     }
 
 }
