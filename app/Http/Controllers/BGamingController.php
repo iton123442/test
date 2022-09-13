@@ -88,7 +88,7 @@ class BGamingController extends Controller
                 if($json_data["actions"][0]["action"] == "bet"){
                     Helper::saveLog('Bgaming BET PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
                     $response = $this->gameBET($request->all(), $client_details);
-                    if(!isset($bet_response["code"])) {
+                    if(!isset($response["code"])) {
                         if($json_data["finished"] == true){
                             $data = [
                                 "user_id" => $json_data["user_id"],
