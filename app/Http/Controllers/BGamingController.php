@@ -49,6 +49,25 @@ class BGamingController extends Controller
         }
         
         if(count($json_data["actions"]) == 0){
+            if($json_data["finished"] == true){
+                $data = [
+                    "user_id" => $json_data["user_id"],
+                    "currency" => $json_data["currency"],
+                    "game" => $json_data["game"],
+                    "game_id" => $json_data["game_id"],
+                    "session_id" => $json_data["session_id"],
+                    "finished" => $json_data["finished"],
+                    "actions" => [
+                        [
+                            "action" => "win",
+                            "amount" => 0,
+                            "action_id" => $json_data["actions"][0]["action_id"].'_0',
+                        ]
+                    ]
+                ];
+                $client_details = ProviderHelper::getClientDetails('token_id', $client_details->token_id);
+                $this->gameWIN($data, $client_details);
+            }
             $response = $this->GetBalance($request->all(), $client_details);
 			return response($response,200)
                 ->header('Content-Type', 'application/json');	
