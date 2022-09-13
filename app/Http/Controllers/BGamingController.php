@@ -577,7 +577,7 @@ class BGamingController extends Controller
     private function gameROLLBACK($data, $client_details){ 
         $round_id = $this->prefix_transc.$data["game_id"];
         $transactionId = $this->prefix_transc.$data["actions"][0]["action_id"];
-        $amount = $data["actions"][0]["amount"] / 100;
+        $original_ID_transaction = $this->prefix_transc.$data["actions"][0]["original_action_id"];
         $processtime = new DateTime('NOW');
         $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $data["game"]);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
@@ -590,7 +590,8 @@ class BGamingController extends Controller
             Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
             return $response;
         }
-        $isGameExtFailed = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
+        $isGameExtFailed = GameTransactionMDB::findGameExt($original_ID_transaction, 1,'transaction_id', $client_details);
+        $amount = $isGameExtFailed->amount;
         if($isGameExtFailed != 'false'){ 
             if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == "FAILED" ){
                 $response = [
@@ -603,7 +604,7 @@ class BGamingController extends Controller
                     "provider_trans_id" => $transactionId,
                     "round_id" => $round_id,
                     "amount" => $amount,
-                    "game_transaction_type"=> 2,
+                    "game_transaction_type"=> $isGameExtFailed->amount,
                     "provider_request" => json_encode($data),
                     "mw_response" => json_encode($response)
                 );
