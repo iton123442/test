@@ -403,8 +403,8 @@ class BGamingController extends Controller
         ];
         GameTransactionMDB::updateGametransaction($updateGameTransaction,$bet_transaction->game_trans_id, $client_details);
 
-        // $balance = round($client_details->balance,2) + $amount;
-        $balance = number_format($client_details->balance,2,'.','') + $amount;
+        $balance = round($client_details->balance,2) + $amount;
+        $balance = number_format($balance,2,'.','');
         ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
         $win = ($amount + $bet_transaction->pay_amount) == 0 ? 0 : 1;
         $balance = str_replace(".", "", $balance);
