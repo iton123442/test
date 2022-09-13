@@ -122,7 +122,7 @@ class BGamingController extends Controller
                 }
 
                 if($json_data["actions"][0]["action"] == "rollback"){
-                    Helper::saveLog('Bgaming WIN PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
+                    Helper::saveLog('Bgaming ROLLBACK PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
                     $response = $this->gameROLLBACK($request->all(), $client_details);
                 }
                 Helper::saveLog('Bgaming WIN AND BET RESPONSE', $this->provider_db_id, json_encode($request->all()), $response);
