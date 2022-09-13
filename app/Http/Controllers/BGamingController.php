@@ -217,7 +217,8 @@ class BGamingController extends Controller
                     Helper::saveLog('Bgaming BET IDEMPOTENT', $this->provider_db_id, json_encode($data), $response);
                     return $response;
                 }
-                $balance = str_replace(".", "", round($client_details->balance,2));
+                $balance = number_format(round($client_details->balance,2),2,'.','');
+                $balance = str_replace(".", "", $balance);
                 $response = [
                     "balance" => (float)$balance,
                     "game_id" => $data['game_id'],
