@@ -89,6 +89,7 @@ class BGamingController extends Controller
                     Helper::saveLog('Bgaming WIN PROCESS', $this->provider_db_id, json_encode($request->all()), "HIT ENDPOINT");
                     $response = $this->gameROLLBACK($request->all(), $client_details);
                 }
+                Helper::saveLog('Bgaming WIN AND BET RESPONSE', $this->provider_db_id, json_encode($request->all()), $response);
                 return response($response,200)
                 ->header('Content-Type', 'application/json');
             }
