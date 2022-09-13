@@ -322,10 +322,13 @@ class BGamingController extends Controller
                 ];
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
             }
+            $balance = round($client_response->fundtransferresponse->balance,2);
+            $balance = number_format($balance,2,'.','');
+            $balance = str_replace(".", "", $balance);
             $response = [
                 "code" => 100,
                 "message" => "Player has not enough funds to process an action.",
-                "balance" => 0
+                "balance" => (float)$balance
             ];
             $dataToUpdate = array(
                 "mw_response" => json_encode($response),
