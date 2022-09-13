@@ -276,7 +276,7 @@ class BGamingController extends Controller
         ];
         $client_response = ClientRequestHelper::fundTransfer($client_details, $amount ,$game_details->game_code,$game_details->game_name,$game_transaction_ext_id,$game_trans_id,"debit", false, $body_details);
         if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200"){
-            $balance = round($client_response->fundtransferresponse->balance,2);
+            $balance = $client_response->fundtransferresponse->balance;
             if($bet_transaction != 'false'){
                 $updateGameTransaction = [
                     "bet_amount" => $amount + $bet_transaction->bet_amount,
