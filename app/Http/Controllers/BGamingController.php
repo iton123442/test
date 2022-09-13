@@ -163,7 +163,7 @@ class BGamingController extends Controller
      * Initialize the balance 
      */
     private function GetBalance($request, $client_details){
-        $balance = $client_details->balance;
+        $balance = str_replace(".", "", $client_details->balance);
         $response = [
             "balance" => $balance
         ];
