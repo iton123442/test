@@ -48,10 +48,10 @@ $app->patch('/public/posts/{post_id}/comments/{comment_id}', 'PostCommentControl
 $app->delete('/public/posts/{post_id}/comments/{comment_id}', 'PostCommentController@destroy');
 
 // Request an access token
-$app->post('/public/oauth/access_token', function() use ($app){
-    return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
-});
-$app->post('/public/tg/oauth/access_token', ['middleware' => 'tg_auth:issue_access_token']);
+// $app->post('/public/oauth/access_token', function() use ($app){
+//     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
+// });
+$app->post('/public/oauth/access_token', ['middleware' => 'tg_auth:issue_access_token']);
 
 
 // Client Round History Inquire
