@@ -508,6 +508,7 @@ $app->post('/public/currency/convert','Payments\PaymentLobbyController@currencyC
 $app->post('/public/game/demo','GameLobby\DemoGameController@GameDemo');
 $app->get('/public/game/launchurl/playforfun', 'GameLobby\GameDemoClientController@gameLaunchDemo');
 
+$app->get('/public/game/upcoming','GameLobby\GameLobbyController@getUpcomingGames');
 $app->get('/public/game/list','GameLobby\GameLobbyController@getGameList');
 $app->get('/public/game/provider/{provider_name}','GameLobby\GameLobbyController@getProviderDetails');
 $app->post('/public/game/launchurl','GameLobby\GameLobbyController@gameLaunchUrl');

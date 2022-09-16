@@ -29,6 +29,58 @@ class GameLobbyController extends Controller
         //$this->middleware('oauth', ['except' => ['index']]);
         /*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
     }
+
+    /**
+     * Get all upcoming games
+     */
+    public function getUpcomingGames(Request $request){
+
+        /** Data need by Everymatrix
+
+            Game name
+            Game Code
+            RTP
+            Modules, Brands, Whitelabels, ClientID’s Environments (if this game will be enabled only somewhere or its dedicated release)
+            Jurisdiction
+            TableID (only for Live games)
+            Limits (only for Live games)
+            Free spins info
+            Jackpots info
+            Assets
+
+         */
+
+        # Get all upcoming games
+        $allGames = DB::select('select sub_provider_name, game_type_name, game_id ,game_code , game_name,license_fee,min_bet,max_bet,pay_lines,info,rtp, release_date 
+                                from games 
+                                inner join game_types USING (game_type_id)
+                                inner join sub_providers USING (sub_provider_id)
+                                where status = "upcoming"');
+
+        $upcomingGames = [];
+        foreach ($allGames as $key => $value) {
+           $upcomingGame = [
+                'game_provider' => $value->sub_provider_name,
+                'game_code' => $value->game_id,
+                'provider_game_code' => $value->game_code,
+                'game_name' => $value->game_name,
+                'game_type' => $value->game_type_name,
+                'license_fee' => $value->license_fee,
+                'min_bet' => $value->min_bet,
+                'max_bet' => $value->max_bet,
+                'info' => $value->info,
+                'rtp' => $value->rtp,
+                'module' => null,
+                'release_date' => $value->release_date,
+           ];
+           array_push($upcomingGames, $upcomingGame);
+        }
+
+        # Check if client is subscribed to this provider!
+        return $upcomingGames;
+    }
+
+
     public function getGameList(Request $request){
         if($request->has("client_id")){
             
