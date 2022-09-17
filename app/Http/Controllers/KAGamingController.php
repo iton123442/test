@@ -381,7 +381,7 @@ class KAGamingController extends Controller
         $token_id = $client_details->token_id;
 
         #2 OLD FLOW - 4-29-22
-        $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 2,'transaction_id', $client_details);
+        $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 1,'transaction_id', $client_details);
         #2 END
 
         #22 NEW FLOW - 4-29-22
