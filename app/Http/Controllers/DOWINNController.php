@@ -114,6 +114,17 @@ class DOWINNController extends Controller{
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['transaction']['id'].'_1');
                 }catch(\Exception $e){
+                    $betIdempotent = GameTransactionMDB::findGameExt($data['uuid'], 1,'transaction_id', $client_details);
+                    if ($betIdempotent != 'false') {
+                        if ($betIdempotent->transaction_detail == "success"){
+                            $response = [
+                                "status" => 'OK',
+                                "balance" => $client_details->balance,
+                                "uuid" => $data['uuid'],
+                            ];
+                        return $response;
+                        }
+                    }
                     $response = array(
                         "code" =>'210',
                         "extra"=>'Duplicate Transaction number',
