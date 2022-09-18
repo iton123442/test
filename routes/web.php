@@ -48,10 +48,10 @@ $app->patch('/public/posts/{post_id}/comments/{comment_id}', 'PostCommentControl
 $app->delete('/public/posts/{post_id}/comments/{comment_id}', 'PostCommentController@destroy');
 
 // Request an access token
-$app->post('/public/oauth/access_token', function() use ($app){
-    return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
-});
-$app->post('/public/tg/oauth/access_token', ['middleware' => 'tg_auth:issue_access_token']);
+// $app->post('/public/oauth/access_token', function() use ($app){
+//     return response()->json($app->make('oauth2-server.authorizer')->issueAccessToken());
+// });
+$app->post('/public/oauth/access_token', ['middleware' => 'tg_auth:issue_access_token']);
 
 
 // Client Round History Inquire
@@ -508,6 +508,7 @@ $app->post('/public/currency/convert','Payments\PaymentLobbyController@currencyC
 $app->post('/public/game/demo','GameLobby\DemoGameController@GameDemo');
 $app->get('/public/game/launchurl/playforfun', 'GameLobby\GameDemoClientController@gameLaunchDemo');
 
+$app->get('/public/game/upcoming','GameLobby\GameLobbyController@getUpcomingGames');
 $app->get('/public/game/list','GameLobby\GameLobbyController@getGameList');
 $app->get('/public/game/provider/{provider_name}','GameLobby\GameLobbyController@getProviderDetails');
 $app->post('/public/game/launchurl','GameLobby\GameLobbyController@gameLaunchUrl');
@@ -706,7 +707,7 @@ $app->get('/public/api/justplay/callback', 'JustPlayController@callback');
 // BGaming Single Controller Endpoints
 $app->post('/public/api/bgaming/play', 'BGamingController@gameTransaction');
 $app->post('/public/api/bgaming/freespins', 'BGamingController@freeSpinSettlement');
-$app->post('/public/api/bgaming/rollback', 'BGamingController@rollbackTransaction');
+$app->post('/public/api/bgaming/rollback', 'BGamingController@gameTransaction');
 $app->post('/public/api/bgaming/checkSign', 'BGamingController@signatureChecker');
 
 // Five Men
