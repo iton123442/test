@@ -18,6 +18,7 @@ use App\Helpers\GameLobby;
 use App\Models\ClientGameSubscribe;
 use Stripe\Balance;
 use DB;
+use Validator;
 use GameLobby as GlobalGameLobby;
 
 class GameLobbyController extends Controller
@@ -48,36 +49,92 @@ class GameLobbyController extends Controller
             Jackpots info
             Assets
 
-         */
+        */
+     
+        # pass client ID 
+        # 1. select client, then select the operator id, then select all client with operator_id
 
-        # Get all upcoming games
-        $allGames = DB::select('select sub_provider_name, game_type_name, game_id ,game_code , game_name,license_fee,min_bet,max_bet,pay_lines,info,rtp, release_date 
-                                from games 
-                                inner join game_types USING (game_type_id)
-                                inner join sub_providers USING (sub_provider_id)
-                                where status = "upcoming"');
+         // $clients = DB::select('SELECT client_id FROM clients where operator_id = (select operator_id from clients where client_id = '.$client_id.')');
 
-        $upcomingGames = [];
-        foreach ($allGames as $key => $value) {
-           $upcomingGame = [
-                'game_provider' => $value->sub_provider_name,
-                'game_code' => $value->game_id,
-                'provider_game_code' => $value->game_code,
-                'game_name' => $value->game_name,
-                'game_type' => $value->game_type_name,
-                'license_fee' => $value->license_fee,
-                'min_bet' => $value->min_bet,
-                'max_bet' => $value->max_bet,
-                'info' => $value->info,
-                'rtp' => $value->rtp,
-                'module' => null,
-                'release_date' => $value->release_date,
-           ];
-           array_push($upcomingGames, $upcomingGame);
+        // # Get all upcoming games
+        // $allGames = DB::select('select sub_provider_name, game_type_name, game_id ,game_code , game_name,license_fee,min_bet,max_bet,pay_lines,info,rtp, status,release_date 
+        //                         from games 
+        //                         inner join game_types USING (game_type_id)
+        //                         inner join sub_providers USING (sub_provider_id)
+        //                         where status = "upcoming"');
+
+        // $upcomingGames = [];
+        // foreach ($allGames as $key => $value) {
+        //    $upcomingGame = [
+        //         'client_id' => [1,2,3],
+        //         'game_provider' => $value->sub_provider_name,
+        //         'game_code' => $value->game_id,
+        //         'provider_game_code' => $value->game_code,
+        //         'game_name' => $value->game_name,
+        //         'game_type' => $value->game_type_name,
+        //         'license_fee' => $value->license_fee,
+        //         'min_bet' => $value->min_bet,
+        //         'max_bet' => $value->max_bet,
+        //         'info' => $value->info,
+        //         'rtp' => $value->rtp,
+        //         'module' => null,
+        //         'status' => $value->status,
+        //         'release_date' => $value->release_date,
+        //    ];
+        //    array_push($upcomingGames, $upcomingGame);
+        // }
+
+        // # Check if client is subscribed to this provider!
+        // return $upcomingGames;
+
+        $clientID = $request->get('client_id');
+        if (!is_numeric($clientID)){
+            return ['status' => 'failed', 'msg' => 'Client ID Not Found'];
         }
 
-        # Check if client is subscribed to this provider!
-        return $upcomingGames;
+        $upcomingGamesArray = array();
+        $clients = DB::select("select client_id as id, operator_id as opID from clients where operator_id in (select operator_id from clients where client_id = $clientID )");
+        foreach($clients as $client){
+
+            $spID= DB::select("select g.sub_provider_id,(select sub_provider_name from sub_providers where sub_provider_id = g.sub_provider_id) proivder,game_id,game_name,game_code, min_bet,max_bet,info,rtp,status,release_date, (select game_type_name from game_types where game_type_id = g.game_type_id) type
+            from games g where sub_provider_id NOT IN (select sub_provider_id from excluded_sub_provider where cgs_id in (select cgs_id from client_game_subscribe where client_id IN (select client_id from clients where client_id = ".$client->id.") )) and status = 'upcoming' ");
+            foreach($spID as $item){
+          
+              $upcomingGamesArray[] = array( 'client_id' => $client->id, 'game_provider' => $item->proivder, 'game_code' => $item->game_id, 'provider_game_code' => $item->game_code, 'game_name' => $item->game_name, 'game_type' => $item->type, 'min_bet' => $item->min_bet, 'max_bet' => $item->max_bet, 'info' => $item->info, 'rtp' => $item->rtp, 'status' => $item->status, 'release_date' => $item->release_date );
+              
+            }
+        }
+        $client = array();
+        foreach($upcomingGamesArray as $v) {
+            $result[$v['game_code']] = array();
+            if (array_key_exists($v['game_code'],$result)){
+              array_push($client,$v['client_id']);
+              $result[$v['game_code']]['client_id'] = $client;
+              $result[$v['game_code']]['game_provider']=$v['game_provider'];
+              $result[$v['game_code']]['game_code']=$v['game_code'];
+              $result[$v['game_code']]['provider_game_code']=$v['provider_game_code'];
+              $result[$v['game_code']]['game_name']=$v['game_name'];
+              $result[$v['game_code']]['game_type']=$v['game_type'];
+              $result[$v['game_code']]['min_bet']=$v['min_bet'];
+              $result[$v['game_code']]['max_bet']=$v['max_bet'];
+              $result[$v['game_code']]['info']=$v['info'];
+              $result[$v['game_code']]['module']=null;
+              $result[$v['game_code']]['rtp']=$v['rtp'];
+              $result[$v['game_code']]['status']=$v['status'];
+              $result[$v['game_code']]['release_date']=$v['release_date'];
+            }else{
+              unset($client);
+            }
+        }
+
+        if(isset($result) && count($result) != 0){
+             foreach ($result as $data){
+              $gameList[] = $data;
+            }
+            return response()->json($gameList);
+        }else{
+            return response()->json(['status' => 'failed', 'msg' => 'Client ID Not Found']);
+        }
     }
 
 
