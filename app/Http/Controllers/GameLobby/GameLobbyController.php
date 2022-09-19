@@ -18,7 +18,6 @@ use App\Helpers\GameLobby;
 use App\Models\ClientGameSubscribe;
 use Stripe\Balance;
 use DB;
-use Validator;
 use GameLobby as GlobalGameLobby;
 
 class GameLobbyController extends Controller
@@ -51,42 +50,6 @@ class GameLobbyController extends Controller
 
         */
      
-        # pass client ID 
-        # 1. select client, then select the operator id, then select all client with operator_id
-
-         // $clients = DB::select('SELECT client_id FROM clients where operator_id = (select operator_id from clients where client_id = '.$client_id.')');
-
-        // # Get all upcoming games
-        // $allGames = DB::select('select sub_provider_name, game_type_name, game_id ,game_code , game_name,license_fee,min_bet,max_bet,pay_lines,info,rtp, status,release_date 
-        //                         from games 
-        //                         inner join game_types USING (game_type_id)
-        //                         inner join sub_providers USING (sub_provider_id)
-        //                         where status = "upcoming"');
-
-        // $upcomingGames = [];
-        // foreach ($allGames as $key => $value) {
-        //    $upcomingGame = [
-        //         'client_id' => [1,2,3],
-        //         'game_provider' => $value->sub_provider_name,
-        //         'game_code' => $value->game_id,
-        //         'provider_game_code' => $value->game_code,
-        //         'game_name' => $value->game_name,
-        //         'game_type' => $value->game_type_name,
-        //         'license_fee' => $value->license_fee,
-        //         'min_bet' => $value->min_bet,
-        //         'max_bet' => $value->max_bet,
-        //         'info' => $value->info,
-        //         'rtp' => $value->rtp,
-        //         'module' => null,
-        //         'status' => $value->status,
-        //         'release_date' => $value->release_date,
-        //    ];
-        //    array_push($upcomingGames, $upcomingGame);
-        // }
-
-        // # Check if client is subscribed to this provider!
-        // return $upcomingGames;
-
         $clientID = $request->get('client_id');
         if (!is_numeric($clientID)){
             return ['status' => 'failed', 'msg' => 'Client ID Not Found'];
