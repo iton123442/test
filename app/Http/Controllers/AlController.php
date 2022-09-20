@@ -324,6 +324,39 @@ class AlController extends Controller
         }elseif($request->debugtype == 5){
             $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
             return $this->checkTransaction($client_details,$request->roundId,$request->transactionId);
+        }elseif($request->debugtype == 6){  // Same Request Body send direct to client
+            $client_details = ProviderHelper::getClientDetails('player_id',$request->identifier);
+            $requesttocient = $request->raw_json;
+
+            $client = new Client([
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.$client_details->client_access_token
+                ]
+            ]);
+
+            try {
+                 $guzzle_response = $client->post($client_details->fund_transfer_url,
+                    [
+                        'body' => $requesttocient
+                    ],
+                    ['defaults' => [ 'exceptions' => false ]]
+                );
+                 $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+                 return json_encode($client_reponse);
+            } catch (\Exception $e) {
+                  $response = array(
+                        "fundtransferresponse" => array(
+                            "status" => array(
+                                "code" => 402,
+                                "status" => "Exception",
+                                "message" => $e->getMessage().' '.$e->getLine(),
+                            ),
+                            'balance' => 0.0
+                        )
+                  );
+                  return $response;
+            }
         }
 
     }
