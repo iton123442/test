@@ -96,7 +96,7 @@ class GameLobbyController extends Controller
             }
             return response()->json($gameList);
         }else{
-            return response()->json(['status' => 'failed', 'msg' => 'Client ID Not Found']);
+            return response()->json(['status' => 'failed', 'msg' => 'No GameList']);
         }
     }
 
