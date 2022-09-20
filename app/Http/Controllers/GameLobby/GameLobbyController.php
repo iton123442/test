@@ -60,7 +60,7 @@ class GameLobbyController extends Controller
         foreach($clients as $client){
 
             $spID= DB::select("select g.sub_provider_id,(select sub_provider_name from sub_providers where sub_provider_id = g.sub_provider_id) proivder,game_id,game_name,game_code, min_bet,max_bet,info,rtp,status,release_date, (select game_type_name from game_types where game_type_id = g.game_type_id) type
-            from games g where sub_provider_id NOT IN (select sub_provider_id from excluded_sub_provider where cgs_id in (select cgs_id from client_game_subscribe where client_id IN (select client_id from clients where client_id = ".$client->id.") )) and status = 'upcoming' ");
+            from games g where sub_provider_id NOT IN (select sub_provider_id from excluded_sub_provider where cgs_id in (select cgs_id from client_game_subscribe where client_id IN (select client_id from clients where client_id = ".$client->id.") )) and status = 'upcoming'");
             foreach($spID as $item){
           
               $upcomingGamesArray[] = array( 'client_id' => $client->id, 'game_provider' => $item->proivder, 'game_code' => $item->game_id, 'provider_game_code' => $item->game_code, 'game_name' => $item->game_name, 'game_type' => $item->type, 'min_bet' => $item->min_bet, 'max_bet' => $item->max_bet, 'info' => $item->info, 'rtp' => $item->rtp, 'status' => $item->status, 'release_date' => $item->release_date );
@@ -71,7 +71,11 @@ class GameLobbyController extends Controller
         foreach($upcomingGamesArray as $v) {
             $result[$v['game_code']] = array();
             if (array_key_exists($v['game_code'],$result)){
-              array_push($client,$v['client_id']);
+
+              if (!in_array($v['client_id'], $client)){
+                array_push($client,$v['client_id']);
+              }
+
               $result[$v['game_code']]['client_id'] = $client;
               $result[$v['game_code']]['game_provider']=$v['game_provider'];
               $result[$v['game_code']]['game_code']=$v['game_code'];
