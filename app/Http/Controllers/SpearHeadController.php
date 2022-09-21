@@ -164,17 +164,16 @@ public function DebitProcess($req){
       try{
           ProviderHelper::idenpotencyTable($provider_trans_id);
         }catch(\Exception $e){
-            $res = [
+          $res = [
               "ApiVersion"=>"1.0",
               "Request" =>"WalletDebit",
               "ReturnCode" => 107,
               "Message" => "Transaction is processing"
           ];
-              return $res;
-          }
+          return $res;
+        }
       
-     $game_details = Game::find($game_code, $this->provider_db_id);  
-      
+      $game_details = Game::find($game_code, $this->provider_db_id);  
       $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
       if($bet_transaction != "false"){
           $client_details->connection_name = $bet_transaction->connection_name;
