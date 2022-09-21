@@ -214,34 +214,37 @@ class GameLobbyController extends Controller
             # Temporary Trap ASKMEBET TO USE version2 API
             if(env('ASKMEBET_V2')){
                 if($request->client_id == 23){
-                    try{
-                            ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
-                            $http_client = new Client([]);
-                            $v2GamePortal = '119.92.151.35:9004/api/game/launchurl';
-                            $requesttosend= [
-                                "token" => $request->token,
-                                "client_id" => $request->client_id,
-                                "client_player_id" => $request->client_player_id,
-                                "email" => $request->email,
-                                "display_name" => $request->display_name,
-                                "username" => $request->username,
-                                "game_code"=> $request->game_code,
-                                "exitUrl" => $request->exitUrl,
-                                "game_provider" => $request->game_provider,
-                                'country_code' => 'th',
-                                'currency_code' => 'THB',
-                                'lang' => 'th',
-                                'ip_address' => '127.0.0.1'
-                            ];
-                            $response = $http_client->post($v2GamePortal, [
-                                'form_params' => $requesttosend,
-                            ]);
-                            $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
-                            ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($requesttosend), json_encode($clientBetTransactionStatus));
-                            return $clientBetTransactionStatus;
-                    }catch(\Exception $e){
-                        ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
-                        return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
+
+                    if($request->game_provider == 'KAGaming' && $request->game_code == 'Leprechauns'){
+                        try{
+                                ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
+                                $http_client = new Client([]);
+                                $v2GamePortal = '119.92.151.35:9004/api/game/launchurl';
+                                $requesttosend= [
+                                    "token" => $request->token,
+                                    "client_id" => $request->client_id,
+                                    "client_player_id" => $request->client_player_id,
+                                    "email" => $request->email,
+                                    "display_name" => $request->display_name,
+                                    "username" => $request->username,
+                                    "game_code"=> $request->game_code,
+                                    "exitUrl" => $request->exitUrl,
+                                    "game_provider" => $request->game_provider,
+                                    'country_code' => 'th',
+                                    'currency_code' => 'THB',
+                                    'lang' => 'th',
+                                    'ip_address' => '127.0.0.1'
+                                ];
+                                $response = $http_client->post($v2GamePortal, [
+                                    'form_params' => $requesttosend,
+                                ]);
+                                $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                                ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($requesttosend), json_encode($clientBetTransactionStatus));
+                                return $clientBetTransactionStatus;
+                        }catch(\Exception $e){
+                            ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
+                            return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
+                        }
                     }
                 }
             }
