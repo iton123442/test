@@ -230,9 +230,9 @@ class GameLobbyController extends Controller
                                     "game_code"=> $request->game_code,
                                     "exitUrl" => $request->exitUrl,
                                     "game_provider" => $request->game_provider,
-                                    'country_code' => 'th',
+                                    'country_code' => 'ph',
                                     'currency_code' => 'THB',
-                                    'lang' => 'th',
+                                    'lang' => 'en',
                                     'ip_address' => '127.0.0.1'
                                 ];
                                 $response = $http_client->post($v2GamePortal, [
