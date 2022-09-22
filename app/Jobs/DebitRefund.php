@@ -16,7 +16,6 @@ use DB;
 
 
 
-// NOT USED
 class DebitRefund extends Job implements ShouldQueue
 {
     /**
@@ -93,7 +92,7 @@ class DebitRefund extends Job implements ShouldQueue
                             ];
                             ProviderHelper::saveLogLatency($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 999, json_encode($data), $stats->getTransferTime());
                         },
-                        // 'timeout' => 2, # 2 seconds
+                        'timeout' => 10, # 10 seconds
                         'body' => json_encode($requesttocient)
                     ],
                     ['defaults' => [ 'exceptions' => false ]]
