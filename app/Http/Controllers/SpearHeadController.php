@@ -150,7 +150,6 @@ public function getBalance($req){
   Helper::saveLog('Spearhead  GetBalance', $this->provider_db_id, json_encode($data), $res);
   return $res;
 }
-
 public function DebitProcess($req){
       $data = $req;
       Helper::saveLog('Spearhead  DebitProcess', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
@@ -315,19 +314,44 @@ public function CreditProcess($req){
   $game_code = $data['AdditionalData']['GameSlug'];
   $round_id = $data['RoundId'];
   if($client_details != null){
+    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
     try{
       ProviderHelper::idenpotencyTable($provider_trans_id);
     }catch(\Exception $e){
+      if($bet_transaction != "false"){
+          if($bet_transaction->win != 5){
+              $res = [
+                  "ApiVersion" => "1.0",
+                  "Request" => "WalletCredit",
+                  "ReturnCode" => 0,
+                  "Details" => null,
+                  "SessionId" => $client_details->player_token,
+                  "ExternalUserId" => $client_details->player_id,
+                  "AccountTransactionId" => $bet_transaction->game_trans_id,
+                  "Balance" => $client_details->balance,
+                  "Currency" => $client_details->default_currency,
+                  "Message" => "Success"
+              ];
+              return $res;
+          }else{
+              $res = [
+                "ApiVersion"=>"1.0",
+                "Request" =>"WalletCredit",
+                "ReturnCode" => 107,
+                "Message" => "Transaction is processing"
+              ];
+                return $res;                      
+          }
+      }
       $res = [
         "ApiVersion"=>"1.0",
-        "Request" =>"WalletDebit",
+        "Request" =>"WalletCredit",
         "ReturnCode" => 107,
         "Message" => "Transaction is processing"
-    ];
+      ];
         return $res;
     }
     $game_details = Game::find($game_code, $this->provider_db_id);
-    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
     $winBalance = $client_details->balance + $pay_amount;
     $win_or_lost = $pay_amount > 0 ?  1 : 0;
     $entry_id = $pay_amount > 0 ?  2 : 1;
@@ -461,19 +485,44 @@ public function RollbackProcess($req){
   $game_code = $data['AdditionalData']['GameSlug'];
   $round_id = $data['RoundId'];
   if($client_details != null){
+    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollbackTransactionId,'transaction_id', false, $client_details);
     try{
       ProviderHelper::idenpotencyTable($provider_trans_id);
     }catch(\Exception $e){
+      if($bet_transaction != "false"){
+          if($bet_transaction->win != 5){
+              $res = [
+                  "ApiVersion" => "1.0",
+                  "Request" => "WalletCredit",
+                  "ReturnCode" => 0,
+                  "Details" => null,
+                  "SessionId" => $client_details->player_token,
+                  "ExternalUserId" => $client_details->player_id,
+                  "AccountTransactionId" => $bet_transaction->game_trans_id,
+                  "Balance" => $client_details->balance,
+                  "Currency" => $client_details->default_currency,
+                  "Message" => "Success"
+              ];
+              return $res;
+          }else{
+              $res = [
+                  "ApiVersion"=>"1.0",
+                  "Request" =>"WalletCredit",
+                  "ReturnCode" => 107,
+                  "Message" => "Transaction is processing"
+              ];
+                return $res;
+          }
+      }
       $res = [
-        "ApiVersion"=>"1.0",
-        "Request" =>"WalletDebit",
-        "ReturnCode" => 107,
-        "Message" => "Transaction is processing"
-    ];
+          "ApiVersion"=>"1.0",
+          "Request" =>"WalletCredit",
+          "ReturnCode" => 108,
+          "Message" => "Transaction Not Found Error"
+      ];
         return $res;
     }
     $game_details = Game::find($game_code, $this->provider_db_id);
-    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollbackTransactionId,'transaction_id', false, $client_details);
     $client_details->connection_name = $bet_transaction->connection_name;
     $income = $bet_transaction->bet_amount - $rollback_amount;
     $NewBalance = $client_details->balance + $rollback_amount;
@@ -529,6 +578,6 @@ public function RollbackProcess($req){
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
 
         }
-  }//end check player details
-}//end rollback func
+    }//end check player details
+  }//end rollback func
 }
