@@ -16,7 +16,9 @@ use DB;
 
 
 
-// NOT USED
+/**
+ * @deprecated
+ */
 class ResendDebitNotFound extends Job implements ShouldQueue
 {
     /**

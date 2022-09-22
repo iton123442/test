@@ -78,6 +78,9 @@ class ProviderHelper{
         dispatch($job);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public static function resendDebitNotFound($debitRefund){
 	    $job = (new ResendDebitNotFound($debitRefund))->onQueue('resend_not_found');
         dispatch($job);
