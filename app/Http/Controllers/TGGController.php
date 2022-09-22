@@ -694,13 +694,13 @@ class TGGController extends Controller
 		if ($existing_refund != 'false') {
 			if ($existing_refund->mw_response == 'null') {
 					$response = array(
-					"status" => 'error',
-					"error" => [
-						'scope' => 'user',
-						'no_refund'=> 0,
-						"message" => "Internal error. Please reopen the game",
-					]
-				);
+						"status" => 'error',
+						"error" => [
+							'scope' => 'user',
+							'no_refund'=> 0,
+							"message" => "Internal error. Please reopen the game",
+						]
+					);
 			}else {
 				$response = $existing_refund->mw_response;
 			}
@@ -709,6 +709,18 @@ class TGGController extends Controller
 		}
 		$existing_bet = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 1,'round_id', $client_details);
 		if ($existing_bet != 'false') {
+			if($existing_bet->transaction_detail != 'SUCCESS'){
+				$response = array(
+					"status" => 'error',
+					"error" => [
+						'scope' => 'user',
+						'no_refund'=> 0,
+						"message" => "Internal error. Please reopen the game",
+					]
+				);
+				return $response;
+			}
+
 			$client_details->connection_name = $existing_bet->connection_name;
 			$amount = $data['data']['amount'];
 			$transaction_uuid = $data['callback_id'];
