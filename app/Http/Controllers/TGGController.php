@@ -359,6 +359,17 @@ class TGGController extends Controller
             return $response;
 		}
 		
+		if (isset($string_to_obj->game->action) && $string_to_obj->game->action == 'collect') {
+			$response = array(
+				'status' => 'ok',
+				'data' => [
+					'balance' => (string)$client_details->balance,
+					'currency' => $client_details->default_currency,
+				],
+			);
+			Helper::saveLog('TGG collect', $this->provider_db_id, json_encode($request), $response);
+			return $response;
+		}
 
 		$reference_transaction_uuid = $request['data']['action_id'];// action id its first action id is round id
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
