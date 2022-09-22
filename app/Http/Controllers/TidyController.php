@@ -337,8 +337,8 @@ class TidyController extends Controller
 						break;
 					default:
 						$response = array(
-							'error_code' 	=> '99-005',
-							'error_msg'  	=> 'system is busy',
+							'error_code' 	=> '00-000',
+							'error_msg'  	=> 'not_enough_balance',
 							'request_uuid'	=> $request_uuid
 						);
 	          			$update_gametransactionext = array(
