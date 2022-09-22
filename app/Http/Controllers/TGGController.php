@@ -714,7 +714,7 @@ class TGGController extends Controller
 					"status" => 'error',
 					"error" => [
 						'scope' => 'user',
-						'no_refund'=> 0,
+						'no_refund'=> 1,
 						"message" => "Internal error. Please reopen the game",
 					]
 				);
