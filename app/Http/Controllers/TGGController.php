@@ -689,6 +689,24 @@ class TGGController extends Controller
 
 		$reference_transaction_uuid = $data['data']['refund_round_id'];
 		// $existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
+
+		$existing_refund = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 3,'round_id', $client_details);
+		if ($existing_refund != 'false') {
+			if ($existing_refund->mw_response == 'null') {
+					$response = array(
+					"status" => 'error',
+					"error" => [
+						'scope' => 'user',
+						'no_refund'=> 0,
+						"message" => "Internal error. Please reopen the game",
+					]
+				);
+			}else {
+				$response = $existing_refund->mw_response;
+			}
+			Helper::saveLog('TGG bet refund 1 ', $this->provider_db_id, json_encode($data), $response);
+            return $response;
+		}
 		$existing_bet = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 1,'round_id', $client_details);
 		if ($existing_bet != 'false') {
 			$client_details->connection_name = $existing_bet->connection_name;
