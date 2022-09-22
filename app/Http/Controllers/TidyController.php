@@ -248,6 +248,11 @@ class TidyController extends Controller
 		        );
 		        $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
 			} 
+			$response_first = array(
+				'error_code' 	=> '00-000',
+				'error_msg'  	=> 'not_enough_balance',
+				'request_uuid'	=> $request_uuid
+			);
 			$gameTransactionEXTData = array(
 	            "game_trans_id" => $game_trans_id,
 	            "provider_trans_id" => $provider_trans_id,
@@ -255,6 +260,9 @@ class TidyController extends Controller
 	            "amount" => $bet_amount,
 	            "game_transaction_type"=> 1,
 	            "provider_request" =>json_encode($request->all()),
+				"mw_response" =>json_encode($response_first),
+				"transaction_detail" => "FAILED",
+				"general_details" => "FAILED",
 	        );
 	        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 	        $fund_extra_data = [
