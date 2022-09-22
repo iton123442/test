@@ -258,7 +258,8 @@ class TidyController extends Controller
 	        );
 	        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 	        $fund_extra_data = [
-	            'provider_name' => $game_details->provider_name
+	            'provider_name' => $game_details->provider_name,
+				'connection_timeout' => 3,
 	        ];
 			try {
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
