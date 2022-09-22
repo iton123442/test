@@ -40,12 +40,12 @@ trait TGAuthTrait {
             return ['error' => "access_denied", "error_description" => "Missing required parameter."];
         }
 
-        $grantToken = [
-            'access_token' => Str::random(43),
-            'token_type' => "Bearer",
-            'expires_in' => 864000
-        ];
-        return $grantToken;
+        // $grantToken = [
+        //     'access_token' => Str::random(43),
+        //     'token_type' => "Bearer",
+        //     'expires_in' => 864000
+        // ];
+        // return $grantToken;
 
 
         $isVerified = $this->verifyClient($request->username, $request->password, $request->client_id, $request->client_secret);
