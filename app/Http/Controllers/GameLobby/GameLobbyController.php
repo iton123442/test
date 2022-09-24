@@ -1237,7 +1237,7 @@ class GameLobbyController extends Controller
             return true; // Game can be accessedd!
 
 
-
+            /**
             $excludedlist = ClientGameSubscribe::with("selectedProvider")->with("gameExclude")->with("subProviderExcluded")->where("client_id",$client_id)->get();
            
             if(count($excludedlist)>0){  # No Excluded Provider
@@ -1296,6 +1296,7 @@ class GameLobbyController extends Controller
             }else{ 
                 return false; # NO SUBSCRIBE RETURN FALSE
             }
+            */
    }
 
     public static function getLanguage(Request $request){
