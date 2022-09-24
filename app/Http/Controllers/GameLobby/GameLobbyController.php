@@ -1218,18 +1218,30 @@ class GameLobbyController extends Controller
             $haveExcludedProvider = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type,sub_provider_id
                                               FROM client_game_subscribe cgs
                                               INNER JOIN excluded_sub_provider esp USING (cgs_id)
-                                              WHERE client_id = ". $client_id." and sub_provider_id = ". $sub_provider_id);
+                                              WHERE client_id = ".$client_id." and sub_provider_id = ".$sub_provider_id);
 
             if(count($haveExcludedProvider) > 0){
+
+                $query = "SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type,sub_provider_id
+                                              FROM client_game_subscribe cgs
+                                              INNER JOIN excluded_sub_provider esp USING (cgs_id)
+                                              WHERE client_id = ".$client_id." and sub_provider_id = ".$sub_provider_id;
+
+                $log_id = ProviderHelper::saveLogWithExeption('checkGameAccess1', 6789, json_encode('query' => $query), 'FAILED LAUNCH');
                 return false; // Provider is in excluded subscription
             }
 
             $haveExcludedGame = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type
                                           FROM client_game_subscribe cgs
                                           INNER JOIN  game_exclude ge USING (cgs_id)
-                                          WHERE game_id = (select game_id from games where game_code = '". $game_code."' and sub_provider_id = ". $sub_provider_id.")");
+                                          WHERE game_id = (select game_id from games where game_code = '".$game_code."' and sub_provider_id = ".$sub_provider_id.")");
 
             if(count($haveExcludedGame) > 0){
+                $query = "SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type
+                                          FROM client_game_subscribe cgs
+                                          INNER JOIN  game_exclude ge USING (cgs_id)
+                                          WHERE game_id = (select game_id from games where game_code = '".$game_code."' and sub_provider_id = ".$sub_provider_id.")";
+                $log_id = ProviderHelper::saveLogWithExeption('checkGameAccess1', 6789, json_encode('query' => $query), 'FAILED LAUNCH');
                 return false; // Game is in excluded games
             }
 
