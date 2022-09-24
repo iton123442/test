@@ -1228,7 +1228,7 @@ class GameLobbyController extends Controller
             $isExcludedGame = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type
                                           FROM client_game_subscribe cgs
                                           INNER JOIN  game_exclude ge USING (cgs_id)
-                                          WHERE game_id = (select game_id from games where game_code = ". $game_code." and sub_provider_id = ". $sub_provider_id.");");
+                                          WHERE game_id = (select game_id from games where game_code = ". $game_code." and sub_provider_id = ". $sub_provider_id.")");
 
             if(count($isExcludedGame) > 0){
                 return false; // Game is in excluded games
