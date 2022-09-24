@@ -1215,6 +1215,29 @@ class GameLobbyController extends Controller
    
     public function checkGameAccess($client_id, $game_code, $sub_provider_id){
 
+
+            $isExcludedProvider = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type,sub_provider_id
+                                     FROM client_game_subscribe cgs
+                                     INNER JOIN excluded_sub_provider esp USING (cgs_id)
+                                     WHERE client_id = ". $sub_provider_id." and sub_provider_id = ". $sub_provider_id);
+
+            if(count($isExcludedProvider) > 0){
+                return false; // Provider is in excluded subscription
+            }
+
+            $isExcludedGame = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type
+                                          FROM client_game_subscribe cgs
+                                          INNER JOIN  game_exclude ge USING (cgs_id)
+                                          WHERE game_id = (select game_id from games where game_code = ". $game_code." and sub_provider_id = ". $sub_provider_id.");");
+
+            if(count($isExcludedGame) > 0){
+                return false; // Game is in excluded games
+            }
+
+            return true; // Game is in subscription
+
+
+
             $excludedlist = ClientGameSubscribe::with("selectedProvider")->with("gameExclude")->with("subProviderExcluded")->where("client_id",$client_id)->get();
            
             if(count($excludedlist)>0){  # No Excluded Provider
