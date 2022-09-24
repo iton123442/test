@@ -1217,9 +1217,9 @@ class GameLobbyController extends Controller
 
 
             $isExcludedProvider = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type,sub_provider_id
-                                     FROM client_game_subscribe cgs
-                                     INNER JOIN excluded_sub_provider esp USING (cgs_id)
-                                     WHERE client_id = ". $sub_provider_id." and sub_provider_id = ". $sub_provider_id);
+                                              FROM client_game_subscribe cgs
+                                              INNER JOIN excluded_sub_provider esp USING (cgs_id)
+                                              WHERE client_id = ". $client_id." and sub_provider_id = ". $sub_provider_id);
 
             if(count($isExcludedProvider) > 0){
                 return false; // Provider is in excluded subscription
