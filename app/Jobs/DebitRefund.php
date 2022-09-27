@@ -102,16 +102,6 @@ class DebitRefund extends Job implements ShouldQueue
                 $client_response_time = microtime(true) - $sendtoclient;
 
                 if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 200){
-
-                    $countGameExt = GameTransactionMDB::CountGameExtAll($round_id, 'game_trans_id', $client_details);
-                    if (isset($countGameExt[0]->total) && $countGameExt[0]->total == 2){
-                        // Update to refund
-                        $updateGameTransaction = [
-                            "win" => 4,
-                        ];
-                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $round_id, $client_details);
-                    }
-
                     $canProceed = true;
                     continue;
                 }else if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TRANSACTION_NOT_FOUND'){
@@ -171,21 +161,36 @@ class DebitRefund extends Job implements ShouldQueue
                     'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+
+                $countGameExt = GameTransactionMDB::CountGameExtAll($round_id, 'game_trans_id', $client_details);
+                if (isset($countGameExt[0]->total) && $countGameExt[0]->total == 2){
+                    // Update to refund
+                    $updateGameTransaction = ["win" => 4];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $round_id, $client_details);
+                }
+                return;
+
             }else if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 402){
 
 
                 if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'DUPLICATE_TRANSACTION'){
+                    $updateTransactionEXt = array(
+                        "mw_response" => json_encode(['retry' => 'jobs']),
+                        'mw_request' => json_encode($requesttocient),
+                        'client_response' => json_encode($client_response),
+                        'transaction_detail' => 'DUPLICATE_TRANSACTION',
+                        'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+
                     $countGameExt = GameTransactionMDB::CountGameExtAll($round_id, 'game_trans_id', $client_details);
                     if (isset($countGameExt[0]->total) && $countGameExt[0]->total == 2){
                         // Update to refund
-                        $updateGameTransaction = [
-                            "win" => 4,
-                        ];
+                        $updateGameTransaction = ["win" => 4];
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $round_id, $client_details);
                     }
-                    return;
                 }else{
-                     $updateTransactionEXt = array(
+                    $updateTransactionEXt = array(
                         "mw_response" => json_encode(['retry' => 'jobs']),
                         'mw_request' => json_encode($requesttocient),
                         'client_response' => json_encode($client_response),
@@ -193,7 +198,8 @@ class DebitRefund extends Job implements ShouldQueue
                         'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
-                    return;
+
+                    // No need further update the transaction is not found on client!
                 }
 
 
