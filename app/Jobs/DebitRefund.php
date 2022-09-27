@@ -39,7 +39,7 @@ class DebitRefund extends Job implements ShouldQueue
     public function handle()
     {
         $payload = $this->data;
-        
+
         $client_details = $payload['client_details'];
         $client_callback_url = $client_details->fund_transfer_url;
         $client_access_token = $client_details->client_access_token;
@@ -53,6 +53,7 @@ class DebitRefund extends Job implements ShouldQueue
             $transaction_id = $payload['transaction_id'];
             $round_id = $payload['payload']['fundtransferrequest']['fundinfo']['roundId'];
         }
+
 
         // Modify the payload use the generated extension
         $payload['payload']['fundtransferrequest']['fundinfo']['transactionId'] = $transaction_id; // use the same generated game ext id every call
@@ -101,6 +102,16 @@ class DebitRefund extends Job implements ShouldQueue
                 $client_response_time = microtime(true) - $sendtoclient;
 
                 if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 200){
+
+                    $countGameExt = GameTransactionMDB::CountGameExtAll($round_id, 'game_trans_id', $client_details);
+                    if (isset($countGameExt[0]->total) && $countGameExt[0]->total == 2){
+                        // Update to refund
+                        $updateGameTransaction = [
+                            "win" => 4,
+                        ];
+                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $round_id, $client_details);
+                    }
+
                     $canProceed = true;
                     continue;
                 }else if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'TRANSACTION_NOT_FOUND'){
@@ -161,16 +172,32 @@ class DebitRefund extends Job implements ShouldQueue
                 );
                 GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
             }else if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == 402){
-                $updateTransactionEXt = array(
-                    // "provider_request" =>json_encode($payload),
-                    "mw_response" => json_encode(['retry' => 'jobs']),
-                    'mw_request' => json_encode($requesttocient),
-                    'client_response' => json_encode($client_response),
-                    'transaction_detail' => 'TRANSACTION_NOT_FOUND',
-                    'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
-                );
-                // ProviderHelper::mandatorySaveLog($round_id, 333,json_encode($client_response), 'NOT_ENOUGH_FUNDS');
-                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+
+
+                if(isset($client_response->fundtransferresponse->status->status) && $client_response->fundtransferresponse->status->status == 'DUPLICATE_TRANSACTION'){
+                    $countGameExt = GameTransactionMDB::CountGameExtAll($round_id, 'game_trans_id', $client_details);
+                    if (isset($countGameExt[0]->total) && $countGameExt[0]->total == 2){
+                        // Update to refund
+                        $updateGameTransaction = [
+                            "win" => 4,
+                        ];
+                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $round_id, $client_details);
+                    }
+                    return;
+                }else{
+                     $updateTransactionEXt = array(
+                        "mw_response" => json_encode(['retry' => 'jobs']),
+                        'mw_request' => json_encode($requesttocient),
+                        'client_response' => json_encode($client_response),
+                        'transaction_detail' => 'TRANSACTION_NOT_FOUND',
+                        'general_details' => DB::raw('IFNULL(general_details, 0) + 1')
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
+                    return;
+                }
+
+
+                return;
 
                 // try {
 
@@ -283,7 +310,6 @@ class DebitRefund extends Job implements ShouldQueue
                 //     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$transaction_id,$client_details);
                 //     throw new \ErrorException('FAILED_EXCEPTION');
                 // }
-
             }else{
                 $updateTransactionEXt = array(
                     // "provider_request" =>json_encode($payload),
