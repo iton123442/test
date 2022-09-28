@@ -430,6 +430,12 @@ class TWHelpers {
         }
     }
 
+    // client details
+    public static function clientDetails($client_id){
+        $data = DB::table('clients')->select('*')->whereRaw('client_id = ?', $client_id)->first();
+        return $data;
+    }
+
 }
 
 ?>
