@@ -855,4 +855,107 @@ class WalletDetailsController extends Controller
         }
     }
     
+    public function getstatusTransaction(Request $request)
+    {
+        // if($request->has('client_id')&&$request->has('player_id')&&$request->has('dateStart')&&$request->has('dateEnd')){
+        Helper::saveLog('TW Logs', 5 , json_encode($request->all()), "TRANSACTION CHECKER HIT");
+        if(!$request->has('access_token') || !$request->has('client_id') || !$request->has('game_trans_id') ){
+            $mw_response = ["data" => null,"status" => ["code" => "404","message" => TWHelpers::getPTW_Message(404)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+            return $mw_response;
+        }
+        
+        $security = TWHelpers::Client_SecurityHash($request->client_id ,$request->access_token);
+        if($security !== true){
+           $mw_response = ["data" => null,"status" => ["code" => $security ,"message" => TWHelpers::getPTW_Message($security)]];
+
+           Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $mw_response);
+           return $mw_response;
+        }
+
+        $client_details = TWHelpers::clientDetails($request->client_id);
+        if($client_details == null){
+            $mw_response = ["data" => null,"status" => ["code" => 303 ,"message" => TWHelpers::getPTW_Message(303)]];
+            return $mw_response;
+        }
+
+        try {
+            $connection = config("serverlist.server_list.".$client_details->connection_name);
+
+            if ($connection["connection_name"] == "mysql" || $connection["connection_name"] == "server1" ) {
+                //default
+                $connection["TG_GameInfo"] = $connection["db_list"][1];
+                $connection["TG_PlayerInfo"] = $connection["db_list"][1];
+                $connection["TG_ClientInfo"] = $connection["db_list"][1];
+            } else {
+                $connection["TG_GameInfo"] = "TG_GameInfo";
+                $connection["TG_PlayerInfo"] = "TG_PlayerInfo";
+                $connection["TG_ClientInfo"] = "TG_ClientInfo";
+            }
+          
+            $query = "
+                select 
+                game_trans_id,
+                c.round_id as round_id,
+                (select client_name from ".$connection["TG_ClientInfo"].".clients where client_id = c.client_id) as client_name,
+                (select client_player_id from ".$connection["TG_PlayerInfo"].".players where player_id = c.player_id) as client_player_id,
+                (select sub_provider_name from ".$connection["TG_GameInfo"].".sub_providers where sub_provider_id = (SELECT sub_provider_id FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) ) as provider_name,
+                (SELECT game_name FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_name,
+                (SELECT game_code FROM ".$connection["TG_GameInfo"].".games where game_id = c.game_id) game_code,
+                bet_amount,
+                pay_amount,
+                bet_amount - pay_amount as income,
+                case
+                    when win = 1 then 'win'
+                    when win = 2 then 'failed'
+                    when win = 0 then 'lose'
+                    when win = 5 then 'progressing'
+                    when win = 4 then 'refunded'
+                end as status,
+                convert_tz(c.created_at,'+00:00', '+08:00') created_at,
+                convert_tz(c.updated_at,'+00:00', '+08:00') updated_at
+                from ".$connection["db_list"][1].".game_transactions c 
+                where c.game_trans_id = ".$request->game_trans_id."; ";
+
+            $details = DB::connection( $connection["connection_name"] )->select($query);
+            if (count($details) == 0) {
+                $details = ["data" => null,"status" => ["code" => "200","message" => TWHelpers::getPTW_Message(200)]];
+                Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $query);
+                return response()->json($details); 
+            }
+
+            $data = array();//this is to add data and reformat the $table object to datatables standard array
+            foreach($details as $datas){
+                $datatopass['game_trans_id']=$datas->game_trans_id;
+                $datatopass['round_id']=$datas->round_id;
+                $datatopass['client_name']=$datas->client_name;
+                $datatopass['client_player_id']=$datas->client_player_id;
+                $datatopass['provider_name']=$datas->provider_name;
+                $datatopass['game_name']=$datas->game_name;
+                $datatopass['game_code']=$datas->game_code;
+                $datatopass['bet_amount']=$datas->bet_amount;
+                $datatopass['pay_amount']=$datas->pay_amount;
+                $datatopass['income']=$datas->income;
+                $datatopass['status']=$datas->status;
+                $datatopass['created_at']=$datas->created_at;
+                $datatopass['updated_at']=$datas->updated_at;
+                $data[]=$datatopass;
+            }
+            $mw_response = [
+                "data" => $data,
+                "status" => [
+                    "code" => 200,
+                    "message" => TWHelpers::getPTW_Message(200)
+                ]
+            ];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $query);
+            return response()->json($mw_response); 
+        } catch (\Exception $e) {
+            $mw_response = ["data" => null,"status" => ["code" => "400","message" => TWHelpers::getPTW_Message(400)]];
+            Helper::saveLog('TW Logs', 5 , json_encode($request->all()), $e->getMessage());
+            return $mw_response;
+        }
+    
+    }
+    
 }
