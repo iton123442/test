@@ -220,6 +220,10 @@ class AlController extends Controller
 
 
     public function checkCLientPlayer(Request $request){
+
+        // return json_encode($request->server);
+        // dd($request->headers->get('Content-Type'));
+
         if(!$request->header('hashen')){
           return ['al' => 'OOPS RAINDROPS'];
         }

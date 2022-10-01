@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use GuzzleHttp\Client;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -11,6 +13,8 @@ trait TGAuthTrait {
 
     private $expiry_time = 15; // in minutes
     private $access_token = 'oauth_tokens'; // custom table
+    private $auth_provider_url = 'url';
+    private $auth_provider_name = 'GO';
 
     /**
      * @param string $grantType
@@ -38,6 +42,31 @@ trait TGAuthTrait {
     public function issueAccessToken(Request $request){
         if(!$request->has('client_id') || !$request->has('username') || !$request->has('password') || !$request->has('client_secret') || !$request->has('grant_type')){
             return ['error' => "access_denied", "error_description" => "Missing required parameter."];
+        }
+
+        if(env('OAUTH_PROVIDER', "DEFAULT") == $auth_provider_name){
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/x-www-form-urlencoded',
+                ]
+            ]);
+
+            $datatopass= [
+                "client_id" => $request->client_id,
+                "username" => $request->username,
+                'password' => $request->password,
+                'client_secret' => $request->client_secret,
+                'grant_type' => $request->grant_type,
+            ];
+
+            try {
+                $response = $http_client->post($auth_provider_url, [   
+                    'form_params' => $requesttosend,
+                ]);
+                $client_reponse = json_decode($response->getBody(),TRUE);
+            } catch (\Exception $e) {
+                ProviderHelper::saveLogGameLaunch('GAMELAUNCH EVOPLAY', 15, json_encode($requesttosend), $e->getMessage());
+            }
         }
 
         // $grantToken = [
