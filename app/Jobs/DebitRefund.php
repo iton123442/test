@@ -165,7 +165,7 @@ class DebitRefund extends Job implements ShouldQueue
                 $countGameExt = GameTransactionMDB::CountGameExtAll($round_id, 'game_trans_id', $client_details);
                 if (isset($countGameExt[0]->total) && $countGameExt[0]->total == 2){
                     // Update to refund
-                    $updateGameTransaction = ["win" => 4];
+                    $updateGameTransaction = ["win" => 4, "pay_amount" => $payload['payload']['fundtransferrequest']['fundinfo']['amount']];
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $round_id, $client_details);
                 }
                 return;
@@ -186,7 +186,7 @@ class DebitRefund extends Job implements ShouldQueue
                     $countGameExt = GameTransactionMDB::CountGameExtAll($round_id, 'game_trans_id', $client_details);
                     if (isset($countGameExt[0]->total) && $countGameExt[0]->total == 2){
                         // Update to refund
-                        $updateGameTransaction = ["win" => 4];
+                        $updateGameTransaction = ["win" => 4, "pay_amount" => $payload['payload']['fundtransferrequest']['fundinfo']['amount']];
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $round_id, $client_details);
                     }
                 }else{
