@@ -154,7 +154,7 @@ class GameLobby{
         $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
         /* CREATE SESSION REQUEST */
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
-        $casinoId = config("providerlinks.bgaming.brand")[$client_player_details->operator_id];
+        $casinoId = config("providerlinks.bgaming.brand");
         Helper::saveLog('Bgaming create session', 49, json_encode($casinoId), $casinoId);
         $requesttosend = [
             "casino_id" => $casinoId,
