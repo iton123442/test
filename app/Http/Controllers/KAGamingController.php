@@ -52,27 +52,9 @@ class KAGamingController extends Controller
             return false;
         }
     }
-    public function getPromo(){
-    //Get given promotion details
-        $client = new Client([  
-            'headers' => [ 
-                'Content-Type' => 'application/json'
-            ]
-        ]);
-        $body = [
-            "partnerName" => 'TIGER',
-            "promotionSpinId" => '0963b9eafbce0d29691fde224f0d35e0'
-        ];
-        $guzzle_response = $client->post($this->ka_api.'promotionspin/get?hash='.$this->generateHash($body),
-            ['body' => json_encode(
-                    $body
-            )]
-        );
-        $client_response = json_decode($guzzle_response->getBody()->getContents());
-        dd($client_response);
-    }
+
     public function index(){
-        $client = new Client([  
+        $client = new Client([
             'headers' => [ 
                 'Content-Type' => 'application/json'
             ]
@@ -122,11 +104,11 @@ class KAGamingController extends Controller
         //     return  $response = ["status" => "failed", "statusCode" =>  3];
         // }
         $data = json_decode($request_body);
-        // $session_check = KAHelper::getClientDetails('token',$data->token);
+        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->token);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -158,11 +140,11 @@ class KAGamingController extends Controller
         //     return  $response = ["status" => "failed", "statusCode" =>  3];
         // }
         $data = json_decode($request_body);
-        // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -205,12 +187,12 @@ class KAGamingController extends Controller
         $win_amount = $this->formatAmounts($data->winAmount);
         $payout_reason = 'Game Bets and Win';
 
-        $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
         // dd($client_details);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
-        $game_information = KAHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
+        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
@@ -265,7 +247,7 @@ class KAGamingController extends Controller
                 "status" => "success",
                 "statusCode" =>  0
               ];
-              ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+              ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
               ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response,$client_response->requestoclient, $client_response, 'SUCCESS', $general_details);
               $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $win_amount, 2,$data,$response,$client_response->requestoclient, $client_response, 'SUCCESS', $general_details);
               if($check_bet_round != 'false'){
@@ -306,7 +288,6 @@ class KAGamingController extends Controller
     }
 
     public function checkPlay(Request $request){
-
         KAHelper::saveLog('KAGaming checkPlay - EH', $this->provider_db_id, json_encode($request->all()), $request->input("hash"));
         // $request_body = file_get_contents("php://input");
         $request_body = $request->getContent();
@@ -344,23 +325,18 @@ class KAGamingController extends Controller
         $payout_reason = 'settled';
         $rounds_remaining = isset($data->roundsRemaining) ? $data->roundsRemaining : 0;
         $complete = isset($data->complete) ? $data->complete : false;
-
-        # Auto Generated IDs
-        $gamerecord = ProviderHelper::idGen();
-        $game_transextension = ProviderHelper::idGen();
       
-        $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
 
-        $game_information = KAHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
+        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
 
 
-        #1 OLD FLOW - 4-29-22
         $game_ext_check = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
         if($game_ext_check != 'false'){ // Duplicate transaction
             if($game_ext_check->transaction_detail != '"FAILED"' && $game_ext_check->transaction_detail != 'FAILED'){
@@ -371,7 +347,6 @@ class KAGamingController extends Controller
                }
             }
         }
-        #1 END
 
         $general_details['client']['before_balance'] = KAHelper::amountToFloat($client_details->balance);
         // $general_details['client']['before_balance'] = KAHelper::amountToFloat($player_details->playerdetailsresponse->balance);
@@ -380,23 +355,7 @@ class KAGamingController extends Controller
         $game_code = $game_information->game_id;
         $token_id = $client_details->token_id;
 
-        #2 OLD FLOW - 4-29-22
-        $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 1,'transaction_id', $client_details);
-        #2 END
-
-        #22 NEW FLOW - 4-29-22
-        // $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 1,'transaction_id', $client_details);
-        // if($check_bet_round != 'false'){ // Duplicate transaction
-        //     if($check_bet_round->transaction_detail != '"FAILED"' || $check_bet_round->transaction_detail != 'FAILED'){
-        //        // If Round has refund dont filter duplicate (PROCESS THE DATA)
-        //        $game_ext_check_is_refund_success = GameTransactionMDB::findGameExt($round_id, 3, 'round_id', $client_details);
-        //        if($game_ext_check_is_refund_success == 'false'){
-        //            return  $response = ["status" => "Duplicate transaction", "statusCode" =>  1];
-        //        }
-        //     }
-        // }
-        
-        #22 END
+        $check_bet_round = GameTransactionMDB::findGameExt($provider_trans_id, 2,'transaction_id', $client_details);
         if($check_bet_round != 'false'){
           // $is_multiple = true;
           $existing_bet_details = GameTransactionMDB::findGameTransactionDetails($check_bet_round->game_trans_id, 'game_transaction',1, $client_details);
@@ -407,10 +366,9 @@ class KAGamingController extends Controller
                 "round_id" => $round_id,
                 "amount" => $amount,
                 "game_transaction_type"=> $game_transaction_type,
-                // "provider_request" =>json_encode($data),
+                "provider_request" =>json_encode($data),
           );
-         // $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
+         $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         }else{
             #1 DEBIT OPERATION
             $flow_status = 0;
@@ -425,20 +383,17 @@ class KAGamingController extends Controller
                 "income" =>  $income,
                 "entry_id" =>$method,
             );
-            // $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-            GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details);
+            $gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
             $gameTransactionEXTData = array(
                 "game_trans_id" => $gamerecord,
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $round_id,
                 "amount" => $bet_amount,
                 "game_transaction_type"=> $game_transaction_type,
-                // "provider_request" =>json_encode($data),
+                "provider_request" =>json_encode($data),
             );
-            // $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
+            $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         }
-
 
         $fund_extra_data = [
             'fundtransferrequest' => [
@@ -461,38 +416,15 @@ class KAGamingController extends Controller
                         'trans_status' => 5
                     ];
                     GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
-                    // $updateTransactionEXt = array(
-                    //     "provider_request" =>json_encode($data),
-                    //     "mw_response" => json_encode($response),
-                    //     'mw_request' => 'FAILED',
-                    //     'client_response' => $e->getMessage(),
-                    //     'transaction_detail' => 'FAILED',
-                    //     'general_details' => json_encode($general_details),
-                    // );
-                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-                    $createGameTransactionLogProvider = [
-                        "connection_name" => $client_details->connection_name,
-                        "column" =>[
-                            "game_trans_ext_id" => $game_transextension,
-                            "request" => json_encode($data),
-                            "response" => $e->getMessage(),
-                            "log_type" => "provider_details",
-                            "transaction_detail" => "failed",
-                        ]
-                    ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLogProvider);
-
-                    $createGameTransactionLogGeneralDetails = [
-                        "connection_name" => $client_details->connection_name,
-                        "column" =>[
-                            "game_trans_ext_id" => $game_transextension,
-                            "request" => json_encode($general_details),
-                            "response" => $e->getMessage(),
-                            "log_type" => "general_details",
-                            "transaction_detail" => "failed",
-                        ]
-                    ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLogGeneralDetails);
+                    $updateTransactionEXt = array(
+                        "provider_request" =>json_encode($data),
+                        "mw_response" => json_encode($response),
+                        'mw_request' => 'FAILED',
+                        'client_response' => $e->getMessage(),
+                        'transaction_detail' => 'FAILED',
+                        'general_details' => json_encode($general_details),
+                    );
+                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
                 }
             }
           KAHelper::saveLog('KAGaming checkPlay - FATAL ERROR', $this->provider_db_id, $response, KAHelper::datesent());
@@ -503,7 +435,7 @@ class KAGamingController extends Controller
                 // ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 2);
                 # NEW FLOW WIN
                 try {
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $new_balance = $client_response->fundtransferresponse->balance + abs($win_amount);
                     $response = [
                         "balance" => $this->formatBalance($new_balance),
@@ -512,39 +444,14 @@ class KAGamingController extends Controller
                     ];
 
                     $updateTransactionEXt = array(
-                        // "provider_request" =>json_encode($data),
-                        // "mw_response" => json_encode($response),
-                        // 'mw_request' => json_encode($client_response->requestoclient),
-                        // 'client_response' => json_encode($client_response),
-                        'transaction_detail' => 'SUCCESS',
+                        "provider_request" =>json_encode($data),
+                        "mw_response" => json_encode($response),
+                        'mw_request' => json_encode($client_response->requestoclient),
+                        'client_response' => json_encode($client_response),
+                        'transaction_detail' => json_encode($response),
                         'general_details' => json_encode($general_details),
                     );
                     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
-                    $createGameTransactionProviderDetails = [
-                        "connection_name" => $client_details->connection_name,
-                        "column" =>[
-                            "game_trans_ext_id" => $game_transextension,
-                            "request" => json_encode($data),
-                            "response" => json_encode($response),
-                            "log_type" => "provider_details",
-                            "transaction_detail" => "success",
-                        ]
-                    ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
-
-                    # Already have in ClientRequestHelper
-                    // $createGameTransactionClientDetails = [
-                    //     "connection_name" => $client_details->connection_name,
-                    //     "column" =>[
-                    //         "game_trans_ext_id" => $game_transextension,
-                    //         "request" => json_encode($client_response->requestoclient),
-                    //         "response" => json_encode($client_response),
-                    //         "log_type" => "client_details",
-                    //         "transaction_detail" => "success",
-                    //     ]
-                    // ];
-                    // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
 
                     if($check_bet_round != 'false'){
                         $pay_amount = $existing_bet_details->pay_amount + $win_amount;
@@ -604,33 +511,19 @@ class KAGamingController extends Controller
                     }
 
                     # Exclude from cut call auto generate EXT
-                    // $gameTransactionCREDITEXTData = array(
-                    //     "game_trans_id" => $gamerecord,
-                    //     "provider_trans_id" => $provider_trans_id,
-                    //     "round_id" => $round_id,
-                    //     "amount" => abs($win_amount),
-                    //     "game_transaction_type"=> 2,
-                    //     "provider_request" =>json_encode($data),
-                    //     "mw_response" => json_encode($response),
-                    //     // "transaction_detail" => json_encode($response),
-                    //     "transaction_detail" => "FAILED",
-                    //     "general_details" => json_encode($general_details),
-                    // );
-                    // $credit_game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionCREDITEXTData,$client_details);
-
-
-                    $credit_game_transextension = ProviderHelper::idGen();
-
-                    $gameTransactionEXTData = array(
+                    $gameTransactionCREDITEXTData = array(
                         "game_trans_id" => $gamerecord,
                         "provider_trans_id" => $provider_trans_id,
                         "round_id" => $round_id,
                         "amount" => abs($win_amount),
                         "game_transaction_type"=> 2,
-                        "transaction_detail" => "FAILED", // Tobe updated in next action
+                        "provider_request" =>json_encode($data),
+                        "mw_response" => json_encode($response),
+                        // "transaction_detail" => json_encode($response),
+                        "transaction_detail" => "FAILED",
                         "general_details" => json_encode($general_details),
                     );
-                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$credit_game_transextension,$client_details);
+                    $credit_game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionCREDITEXTData,$client_details);
 
                     $action_payload = [
                         "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -666,10 +559,10 @@ class KAGamingController extends Controller
                     ];
                     $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details,abs($win_amount),$game_information->game_code,$game_information->game_name,$gamerecord,'credit',false,$action_payload);
                 } catch (\Exception $e) {
-                    return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
+                    // return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
                 }
                 // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
                 # END NEW FLOW WIN  
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
@@ -684,26 +577,14 @@ class KAGamingController extends Controller
             }
             $response = ["status" => "Low Balance", "statusCode" =>  200];
             $updateTransactionEXt = array(
-                // "provider_request" =>json_encode($data),
-                // "mw_response" => json_encode($response),
-                // 'mw_request' => json_encode($client_response->requestoclient),
-                // 'client_response' => json_encode($client_response),
+                "provider_request" =>json_encode($data),
+                "mw_response" => json_encode($response),
+                'mw_request' => json_encode($client_response->requestoclient),
+                'client_response' => json_encode($client_response),
                 'transaction_detail' => 'FAILED',
                 'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
-            $createGameTransactionProviderDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($data),
-                    "response" => json_encode($response),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
         }else{ // Unknown Response Code
             if($check_bet_round == 'false'){
                 $updateGameTransaction = ["win" => 2,'trans_status' => 5];
@@ -711,25 +592,14 @@ class KAGamingController extends Controller
             }
             $response = ["status" => "Not Enough Balance", "statusCode" =>  200];
             $updateTransactionEXt = array(
-                // "provider_request" =>json_encode($data),
-                // "mw_response" => json_encode($response),
-                // 'mw_request' => json_encode($client_response->requestoclient),
-                // 'client_response' => json_encode($client_response),
+                "provider_request" =>json_encode($data),
+                "mw_response" => json_encode($response),
+                'mw_request' => json_encode($client_response->requestoclient),
+                'client_response' => json_encode($client_response),
                 'transaction_detail' => 'FAILED',
                 'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-            $createGameTransactionProviderDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($data),
-                    "response" => json_encode($response),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
         }  
         return $response;
     }
@@ -751,47 +621,41 @@ class KAGamingController extends Controller
         $amount = $this->formatAmounts($data->amount);
 
         $payout_reason = 'Credited Side Bets';
+        $provider_trans_id = $data->transactionId;
         $game_code = $data->gameId;
         $complete = isset($data->complete) ? $data->complete : false;
-
-
-        $provider_trans_id = $data->transactionId;
-        $round_id = $provider_trans_id.'_'.$data->creditIndex;
-
-        // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
-      
-        $game_information = KAHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
+        // $player_details = KAHelper::playerDetailsCall($client_details);
+        // if($player_details == 'false'){
+        //     return  $response = ["status" => "Server Timeout", "statusCode" =>  1];
+        // }
+        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
 
-        $game_ext_check_win = GameTransactionMDB::findGameExt($round_id , 2,'round_id', $client_details);
-        // if($game_ext_check_win != 'false'){
-        //     $last_provider_request = json_decode($game_ext_check_win->provider_request);
-        //     if(isset($last_provider_request->action) && $last_provider_request->action == 'credit'){
-        //         if(isset($last_provider_request->creditIndex) && $last_provider_request->creditIndex == $data->creditIndex){
-        //             return  $response = ["status" => "Double transactionId with an action credit", "statusCode" =>  301];
-        //         }
-        //     }
-        // }
-
-        # General Details
+        // $game_ext_check_win = KAHelper::findGameExt($provider_trans_id, 2, 'transaction_id');
+        $game_ext_check_win = GameTransactionMDB::findGameExt($provider_trans_id, 2,'transaction_id', $client_details);
         if($game_ext_check_win != 'false'){
-            $last_provider_request = json_decode($game_ext_check_win->general_details);
-            if(isset($last_provider_request->client->action) && $last_provider_request->client->action == 'credit'){
-                if(isset($last_provider_request->client->creditIndex) && $last_provider_request->client->creditIndex == $data->creditIndex){
+            $last_provider_request = json_decode($game_ext_check_win->provider_request);
+            if(isset($last_provider_request->action) && $last_provider_request->action == 'credit'){
+                if(isset($last_provider_request->creditIndex) && $last_provider_request->creditIndex == $data->creditIndex){
                     return  $response = ["status" => "Double transactionId with an action credit", "statusCode" =>  301];
                 }
             }
+            // $transaction_general_details = json_decode($game_ext_check_win->general_details);
+            // dd($transaction_general_details);
+            // if(isset($transaction_general_details->client->action) && $transaction_general_details->client->action == 'credit'){
+            //     return  $response = ["status" => "Double transactionId with an action credit", "statusCode" =>  301];
+            // }
         }
-
 
         # Insert Idenpotent (CREDIT)
         // try{
@@ -806,47 +670,49 @@ class KAGamingController extends Controller
             return  $response = ["status" => "Licensee or operator denied crediting to player (cashable or bonus) / Transaction Not Found", "statusCode" =>  301];
         }
         $general_details['client']['before_balance'] = KAHelper::amountToFloat($client_details->balance);
+        // $general_details['client']['before_balance'] = KAHelper::amountToFloat($player_details->playerdetailsresponse->balance);
         $general_details['client']['action'] = 'credit';
-        $general_details['client']['creditIndex'] = $data->creditIndex;
 
 
         $gamerecord = $game_ext_check->game_trans_id;
+        // $existing_bet = KAHelper::findGameTransaction($gamerecord,'game_transaction');
         $existing_bet = GameTransactionMDB::findGameTransactionDetails($gamerecord, 'game_transaction',1, $client_details);
-        // $round_id = $existing_bet->round_id;
+        $round_id = $existing_bet->round_id;
       
         $bet_amount = $existing_bet->bet_amount;
         $pay_amount =  $existing_bet->pay_amount + $amount; //abs($data['amount']);
         $income = $bet_amount - $pay_amount;
 
-        // if($pay_amount > 0){
-        //     $entry_id = 2; // Credit
-        //     $win_or_lost = 5; // 1 win,  5 processing
-        //     if($complete == true){
-        //         $win_or_lost = 1;
-        //     }
-        // }else{
-        //     $entry_id = 1; // Debit
-        //     $win_or_lost = 5; // 0 lost,  5 processing
-        //     if($complete == true){
-        //         $win_or_lost = 0;
-        //     }
-        // }
+        if($pay_amount > 0){
+            $entry_id = 2; // Credit
+            $win_or_lost = 5; // 1 win,  5 processing
+            if($complete == true){
+                $win_or_lost = 1;
+            }
+        }else{
+            $entry_id = 1; // Debit
+            $win_or_lost = 5; // 0 lost,  5 processing
+            if($complete == true){
+                $win_or_lost = 0;
+            }
+        }
 
         $game_transaction_type = 2; // 1 Bet, 2 Win
         $game_code = $game_information->game_id;
         $token_id = $client_details->token_id;
 
-        // $updateGameTransaction = [
-        //     "pay_amount" => $pay_amount,
-        //     "income" =>  $income,
-        //     "win" => $win_or_lost,
-        //     "entry_id" => $entry_id,
-        // ];
-        // GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+        $updateGameTransaction = [
+            "pay_amount" => $pay_amount,
+            "income" =>  $income,
+            "win" => $win_or_lost,
+            "entry_id" => $entry_id,
+        ];
+        GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+        // ProviderHelper::updateGameTransaction($gamerecord, $pay_amount, $income, $win_or_lost, $entry_id);
 
          # NEW FLOW WIN
          try {
-            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_details->balance+abs($amount));
+            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_details->balance+abs($amount));
             $new_balance = $client_details->balance+abs($amount);
             $response = [
                 "balance" => $this->formatBalance($new_balance),
@@ -868,40 +734,18 @@ class KAGamingController extends Controller
                 }
             }
 
-            // $gameTransactionEXTData = array(
-            //     "game_trans_id" => $gamerecord,
-            //     "provider_trans_id" => $provider_trans_id,
-            //     "round_id" => $round_id,
-            //     "amount" => abs($amount),
-            //     "game_transaction_type"=> 2,
-            //     // "provider_request" => json_encode($data),
-            //     // "transaction_detail" => json_encode($response),
-            //     // "mw_response" => json_encode($response),
-            //     "general_details" => json_encode($general_details)
-            // );
-            // $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
-            $game_transextension = ProviderHelper::idGen();
             $gameTransactionEXTData = array(
                 "game_trans_id" => $gamerecord,
                 "provider_trans_id" => $provider_trans_id,
                 "round_id" => $round_id,
                 "amount" => abs($amount),
                 "game_transaction_type"=> 2,
+                "provider_request" => json_encode($data),
+                "transaction_detail" => json_encode($response),
+                "mw_response" => json_encode($response),
                 "general_details" => json_encode($general_details)
             );
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
-            $createGameTransactionProviderDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($data),
-                    "response" => json_encode($response),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "success",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
+            $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -938,7 +782,8 @@ class KAGamingController extends Controller
         } catch (\Exception $e) {
             return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
         }
-        ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+        // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
+        ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
         return $response;
         # END NEW FLOW WIN  
     }
@@ -959,11 +804,11 @@ class KAGamingController extends Controller
         $provider_trans_id = $data->transactionId;
         $round_id = $provider_trans_id.'_'.$data->round;
 
-        // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -971,7 +816,7 @@ class KAGamingController extends Controller
         // if($player_details == 'false'){
         //     return  $response = ["status" => "Server Timeout", "statusCode" =>  1];
         // }
-        $game_information = KAHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
+        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
@@ -1063,69 +908,41 @@ class KAGamingController extends Controller
 
         #1 DEBIT OPERATION
         // $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, abs($refund_amount), $game_transaction_type, $data);
-        // $gameTransactionEXTData = array(
-        //     "game_trans_id" => $gamerecord,
-        //     "provider_trans_id" => $provider_trans_id,
-        //     "round_id" => $round_id,
-        //     "amount" => abs($refund_amount),
-        //     "game_transaction_type"=> $game_transaction_type,
-        //     "provider_request" =>json_encode($data),
-        // );
-        // $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
-        $game_transextension = ProviderHelper::idGen();
         $gameTransactionEXTData = array(
             "game_trans_id" => $gamerecord,
             "provider_trans_id" => $provider_trans_id,
             "round_id" => $round_id,
             "amount" => abs($refund_amount),
             "game_transaction_type"=> $game_transaction_type,
-            'general_details' => json_encode($general_details),
+            "provider_request" =>json_encode($data),
         );
-        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
+        $game_transextension = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 
         $fund_extra_data = [
             'provider_name' => $game_information->provider_name
         ];
 
         try {
-            $client_response = ClientRequestHelper::fundTransfer($client_details,abs($refund_amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, $transaction_type, true,$fund_extra_data);
-            KAHelper::saveLog('KAGaming gameRevoke CRID '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
+          $client_response = ClientRequestHelper::fundTransfer($client_details,abs($refund_amount),$game_information->game_code,$game_information->game_name,$game_transextension,$gamerecord, $transaction_type, true,$fund_extra_data);
+          KAHelper::saveLog('KAGaming gameRevoke CRID '.$gamerecord, $this->provider_db_id,json_encode($request->all()), $client_response);
            
         } catch (\Exception $e) {
-            $response = ["status" => "Server Timeout", "statusCode" =>  1];
-            // $updateTransactionEXt = array(
-            //         "provider_request" =>json_encode($data),
-            //         "mw_response" => json_encode($response),
-            //         'client_response' => json_encode($e->getMessage()),
-            //         'transaction_detail' => 'FAILED',
-            //         'general_details' => json_encode($general_details),
-            // );
-            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
-            $updateTransactionEXt = array(
-                    'transaction_detail' => 'FAILED',
-                    'general_details' => json_encode($general_details)
-            );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-            $createGameTransactionProviderDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($data),
-                    "response" => json_encode($e->getMessage()),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
-
-            KAHelper::saveLog('KAGaming gameRevoke - FATAL ERROR', $this->provider_db_id, json_encode($response), KAHelper::datesent());
-            return $response;
+          $response = ["status" => "Server Timeout", "statusCode" =>  1];
+          $updateTransactionEXt = array(
+                "provider_request" =>json_encode($data),
+                "mw_response" => json_encode($response),
+                'client_response' => json_encode($e->getMessage()),
+                'transaction_detail' => 'FAILED',
+                'general_details' => json_encode($general_details),
+          );
+          GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
+        //   ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $response, 'FAILED', $e->getMessage(), 'FAILED', $general_details);
+          KAHelper::saveLog('KAGaming gameRevoke - FATAL ERROR', $this->provider_db_id, json_encode($response), KAHelper::datesent());
+          return $response;
         }
         if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
-            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
             #2 CREDIT OPERATION   
             $general_details['client']['after_balance'] = KAHelper::amountToFloat($client_response->fundtransferresponse->balance);
             $response = [
@@ -1142,128 +959,38 @@ class KAGamingController extends Controller
                 "entry_id" => $entry_id,
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
-            // $updateTransactionEXt = array(
-            //     "provider_request" =>json_encode($data),
-            //     "mw_response" => json_encode($response),
-            //     'mw_request' => json_encode($client_response->requestoclient),
-            //     'client_response' => json_encode($client_response),
-            //     'transaction_detail' => json_encode($response),
-            //     'general_details' => json_encode($general_details),
-            // );
-            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
             $updateTransactionEXt = array(
-                'transaction_detail' => "success",
+                "provider_request" =>json_encode($data),
+                "mw_response" => json_encode($response),
+                'mw_request' => json_encode($client_response->requestoclient),
+                'client_response' => json_encode($client_response),
+                'transaction_detail' => json_encode($response),
                 'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
-            # Already have in ClientRequestHelper
-            // $createGameTransactionClientDetails = [
-            //     "connection_name" => $client_details->connection_name,
-            //     "column" =>[
-            //         "game_trans_ext_id" => $game_transextension,
-            //         "request" => json_encode($client_response->requestoclient),
-            //         "response" => json_encode($client_response),
-            //         "log_type" => "client_details",
-            //         "transaction_detail" => "success",
-            //     ]
-            // ];
-            // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
-            $createGameTransactionProviderDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($data),
-                    "response" => json_encode($response),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "success",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
-
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
             $response = ["status" => "success", "statusCode" =>  200];
-            // $updateTransactionEXt = array(
-            //         "provider_request" =>json_encode($data),
-            //         "mw_response" => json_encode($response),
-            //         'client_response' => json_encode($client_response),
-            //         'transaction_detail' => 'FAILED',
-            //         'general_details' => json_encode($general_details),
-            // );
-            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
+            // ProviderHelper::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details);
             $updateTransactionEXt = array(
-                'transaction_detail' => "FAILED",
-                'general_details' => json_encode($general_details),
+                    "provider_request" =>json_encode($data),
+                    "mw_response" => json_encode($response),
+                    'client_response' => json_encode($client_response),
+                    'transaction_detail' => 'FAILED',
+                    'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
-            # Already have in ClientRequestHelper
-            // $createGameTransactionClientDetails = [
-            //     "connection_name" => $client_details->connection_name,
-            //     "column" =>[
-            //         "game_trans_ext_id" => $game_transextension,
-            //         "request" => json_encode($client_response->requestoclient),
-            //         "response" => json_encode($client_response),
-            //         "log_type" => "client_details",
-            //         "transaction_detail" => "FAILED",
-            //     ]
-            // ];
-            // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
-            $createGameTransactionProviderDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($data),
-                    "response" => json_encode($response),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
-
         }else{ // Unknown Response Code
             $response = ["status" => "Client Error", "statusCode" =>  1];
-            // $updateTransactionEXt = array(
-            //         "provider_request" =>json_encode($data),
-            //         "mw_response" => json_encode($response),
-            //         'client_response' => json_encode($client_response),
-            //         'transaction_detail' => 'FAILED',
-            //         'general_details' => json_encode($general_details),
-            // );
-            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
             $updateTransactionEXt = array(
-                'transaction_detail' => "FAILED",
-                'general_details' => json_encode($general_details),
+                    "provider_request" =>json_encode($data),
+                    "mw_response" => json_encode($response),
+                    'client_response' => json_encode($client_response),
+                    'transaction_detail' => 'FAILED',
+                    'general_details' => json_encode($general_details),
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_transextension,$client_details);
-
-            # Already have in ClientRequestHelper
-            // $createGameTransactionClientDetails = [
-            //     "connection_name" => $client_details->connection_name,
-            //     "column" =>[
-            //         "game_trans_ext_id" => $game_transextension,
-            //         "request" => json_encode($client_response->requestoclient),
-            //         "response" => json_encode($client_response),
-            //         "log_type" => "client_details",
-            //         "transaction_detail" => "FAILED",
-            //     ]
-            // ];
-            // ProviderHelper::queTransactionLogs($createGameTransactionClientDetails);
-            $createGameTransactionProviderDetails = [
-                "connection_name" => $client_details->connection_name,
-                "column" =>[
-                    "game_trans_ext_id" => $game_transextension,
-                    "request" => json_encode($data),
-                    "response" => json_encode($response),
-                    "log_type" => "provider_details",
-                    "transaction_detail" => "FAILED",
-                ]
-            ];
-            ProviderHelper::queTransactionLogs($createGameTransactionProviderDetails);
+            KAHelper::saveLog('KAGaming gameRevoke - FATAL ERROR', $this->provider_db_id, $response, KAHelper::datesent());
         }  
         return $response;
     }
@@ -1280,11 +1007,11 @@ class KAGamingController extends Controller
         //     return  $response = ["status" => "failed", "statusCode" =>  3];
         // }
         $data = json_decode($request_body);
-        // $session_check = KAHelper::getClientDetails('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = KAHelper::getClientDetails('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -1315,7 +1042,7 @@ class KAGamingController extends Controller
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
-        $client_details = KAHelper::getClientDetails('token', $request->token);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
         if ($client_details == null || $client_details == 'false') {
             $msg = array("status" => "error", "message" => "Token Invalid");
             KAHelper::saveLog('GetPlayerBalance', $this->provider_db_id, json_encode($request->all()), $msg);
@@ -1345,7 +1072,7 @@ class KAGamingController extends Controller
 
     public function getPlayerWalletBalance(Request $request)
     {
-        $client_details = KAHelper::getClientDetails('token', $request->token);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
         if ($client_details == 'false') {
             $msg = array("status" => "error", "message" => "Token Invalid");
             KAHelper::saveLog('GetPlayerBalance', $this->provider_db_id, json_encode($request->all()), $msg);
@@ -1411,7 +1138,7 @@ class KAGamingController extends Controller
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
-        $client_details = KAHelper::getClientDetails('token', $request->token);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
         if ($client_details == 'false') {
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
             TransferWalletHelper::saveLog('TransferWallet TransferOut FAILED', $this->provider_db_id, json_encode($request->all()), $msg);
@@ -1595,7 +1322,7 @@ class KAGamingController extends Controller
             "roundid" => 0,
         );
 
-        $client_details = KAHelper::getClientDetails('token', $request->token);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
         if ($client_details == 'false') {
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
             TransferWalletHelper::saveLog('TransferWallet TransferOut FAILED', $this->provider_db_id, json_encode($request->all()), $msg);
