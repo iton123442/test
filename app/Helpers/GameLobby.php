@@ -154,7 +154,7 @@ class GameLobby{
         $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
         /* CREATE SESSION REQUEST */
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
-        $casinoId = config("providerlinks.bgaming.CASINO_ID");
+        $casinoId = config("providerlinks.bgaming.KONIBET");
         if($client_player_details->operator_id == 11){
             $casinoId = config("providerlinks.bgaming.KONIBET");
         }
