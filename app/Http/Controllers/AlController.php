@@ -238,13 +238,11 @@ class AlController extends Controller
         }
         if($request->debugtype == 1){
           $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
-          ProviderHelper::_insertOrUpdateCache($client_details->token_id, 5000);
-          $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
-          dd($client_details);
-
-
-          $game_information = ProviderHelper::findGameDetailsCache('game_code', 43, 'BonusMania');
-          dd($game_information);
+          // ProviderHelper::_insertOrUpdateCache($client_details->token_id, 5000);
+          // $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
+          // dd($client_details);
+          // $game_information = ProviderHelper::findGameDetailsCache('game_code', 43, 'BonusMania');
+          // dd($game_information);
 
           // app('redis')->setex(10210, 320, json_encode($client_details));
           // dd(json_decode(app('redis')->get('10210')));
