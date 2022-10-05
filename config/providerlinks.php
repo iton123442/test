@@ -325,8 +325,8 @@ return [
         'PROVIDER_ID'=> 49,
         'CASINO_ID' => 'tigergames-int',
         'brand' => [
-            11 => "KONIBET",
-            1 => "tigergames-int",
+            "11" => "KONIBET",
+            "1" => "tigergames-int",
         ],
         'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
         'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM'
