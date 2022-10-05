@@ -22,6 +22,8 @@ use DB;
  */
 class ProviderHelper{
 
+	const REDIS_EXPIRATION = 1800; // 1800 seconds equ. 30min
+
 	/**
 	 * @param string $key
 	 * @param any $data
@@ -133,9 +135,9 @@ class ProviderHelper{
 			$client_details = count($query);
 			$result = count($query);
 			if($result > 0 ){
-				ProviderHelper::setKey("client_details_player_id_".$query[0]->player_id, json_encode($query[0]));
-				ProviderHelper::setKey("client_details_player_token_".$query[0]->player_token, json_encode($query[0]), 1800); // 1800 seconds equ. 30min
-				ProviderHelper::setKey("client_details_token_id_".$query[0]->token_id, $query[0]->player_id.'_'.$query[0]->player_token, 1800); // 1800 seconds equ. 30min
+				ProviderHelper::setKey("client_details_player_id_".$query[0]->player_id, json_encode($query[0]), self::REDIS_EXPIRATION);
+				ProviderHelper::setKey("client_details_player_token_".$query[0]->player_token, json_encode($query[0]), self::REDIS_EXPIRATION); 
+				ProviderHelper::setKey("client_details_token_id_".$query[0]->token_id, $query[0]->player_id.'_'.$query[0]->player_token, self::REDIS_EXPIRATION);
 				return $query[0];
 			}else{
 				return null;
@@ -164,8 +166,9 @@ class ProviderHelper{
 					if($data != null){
 						$data = json_decode($data);
 						$data->balance = $balance;
-						ProviderHelper::setKey("client_details_player_id_".$data->player_id, json_encode($data));
-						ProviderHelper::setKey("client_details_player_token_".$data->player_token, json_encode($data));
+						ProviderHelper::setKey("client_details_player_id_".$data->player_id, json_encode($data), self::REDIS_EXPIRATION);
+						ProviderHelper::setKey("client_details_player_token_".$data->player_token, json_encode($data), self::REDIS_EXPIRATION);
+						ProviderHelper::setKey("client_details_token_id_".$data->token_id, $data->player_id.'_'.$data->player_token, self::REDIS_EXPIRATION);
 						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
 					}else{
 						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
@@ -189,7 +192,7 @@ class ProviderHelper{
 		$data = ProviderHelper::getKey($key);
 		$data = json_decode($data);
 		$data->balance = $balance;
-		ProviderHelper::setKey($key, json_encode($data));
+		ProviderHelper::setKey($key, json_encode($data), self::REDIS_EXPIRATION);
 	}
 
 	/**
@@ -1471,7 +1474,7 @@ class ProviderHelper{
 	public static function saveBalance($token){
 		$client_details = ProviderHelper::getClientDetailsCache('token', $token);
 		if($client_details){
-			ProviderHelper::setKey("client_details_player_id_".$client_details->player_id, json_encode($client_details));
+			ProviderHelper::setKey("client_details_player_id_".$client_details->player_id, json_encode($client_details), self::REDIS_EXPIRATION);
 			$client = new Client([
 			    'headers' => [ 
 			    	'Content-Type' => 'application/json',
