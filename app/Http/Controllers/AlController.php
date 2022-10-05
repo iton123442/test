@@ -240,7 +240,7 @@ class AlController extends Controller
           try {
                $guzzle_response = $client->post($url,
                   [
-                      'body' => json_encode($json_data)
+                      'body' => $json_data
                   ],
                   ['defaults' => [ 'exceptions' => false ]]
               );
