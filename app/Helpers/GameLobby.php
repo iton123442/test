@@ -155,7 +155,7 @@ class GameLobby{
         /* CREATE SESSION REQUEST */
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
         $requesttosend = [
-            "casino_id" => config("providerlinks.bgaming.CASINO_ID"),
+            "casino_id" => config("providerlinks.bgaming.brand.".$client_player_details->operator_id),
             "game" => $request_data['game_code'],
             "currency" => $client_player_details->default_currency,
             "locale" => $request_data['lang'],
