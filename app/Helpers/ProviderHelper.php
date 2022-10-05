@@ -164,8 +164,8 @@ class ProviderHelper{
 					if($data != null){
 						$data = json_decode($data);
 						$data->balance = $balance;
-						ProviderHelper::setKey("client_details_player_id_".$data[0], json_encode($data));
-						ProviderHelper::setKey("client_details_player_token_".$data[1], json_encode($data));
+						ProviderHelper::setKey("client_details_player_id_".$data->player_id, json_encode($data));
+						ProviderHelper::setKey("client_details_player_token_".$data->player_token, json_encode($data));
 						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
 					}else{
 						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
