@@ -23,6 +23,160 @@ use DB;
 class ProviderHelper{
 
 	/**
+	 * @param string $key
+	 * @param any $data
+	 * @param int $expire [default = null]
+	 * @return bool
+	 */
+	public static function setKey($key, $data, $expire = null)
+	{
+		try {
+			if($expire != null){
+				app('redis')->setex($key, $expire, is_array($data) ? json_encode($data) : $data);
+			}else{
+				app('redis')->set($key, is_array($data) ? json_encode($data) : $data);
+			}
+			return true;
+		} catch (\Exception $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * @param string $key
+	 * @return null | any
+	 */
+	public static function getKey($key)
+	{
+		try {
+			return app('redis')->get($key);
+		} catch (\Exception $e) {
+			return null;
+		}
+
+	}
+
+	public static function findGameDetailsCache($type, $provider_id, $game_code)
+	{
+		$gameInfo = ProviderHelper::getKey($provider_id.'_'.$game_code);
+		if($gameInfo != null){
+			return json_decode($gameInfo);
+		}else{
+			$query = DB::Select("SELECT game_id,game_code,game_name,sub_provider_name as provider_name FROM games inner join sub_providers sp using (sub_provider_id) WHERE game_code = '" . $game_code . "' AND sp.provider_id = '" . $provider_id . "' order by sp.sub_provider_id desc");
+			$result = count($query);
+			if($result > 0 ){
+				$gameInfo = ProviderHelper::setKey($provider_id.'_'.$game_code, json_encode($query[0]));
+				return $query[0];
+			}else{
+				return null;
+			}
+		}
+	}
+
+
+	/**
+	 * 
+	 * # Redis cache keys and values
+	 * client_details_player_id_xxxx = client details
+	 * client_details_player_token_xxxxxxx = client details
+	 * client_details_token_id_xxxx = client_player_id_+player_token
+	 *  
+	 */
+	public static function getClientDetailsCache($type = "", $value = "", $gg=1, $providerfilter='all', $client_id = 1) 
+	{
+        if ($type == 'player_id') {
+		   $where = 'where pst.player_id = "'.$value.'"';
+		   $key = "client_details_player_id_".$value;
+		}
+		if ($type == 'token_id') {
+			$where = 'where pst.token_id = "'.$value.'"';
+			$key = "client_details_token_id_".$value;
+		}
+		if ($type == 'token') {
+		 	$where = 'where pst.player_token = "'.$value.'"';
+		 	$key = "client_details_player_token_".$value;
+		}
+
+	    $filter = 'order by token_id desc LIMIT 1';
+
+		$data = ProviderHelper::getKey($key);
+		if($data != null){
+			if($type == 'player_id'){
+				return json_decode($data);
+			}else{
+				$clientDetails = ProviderHelper::getKey("client_details_player_id_".$data );
+				return json_decode($clientDetails);
+			}
+		}else{
+			$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language` 
+			from (select token_id, player_id, player_token, balance, player_ip_address,status_id from player_session_tokens pst '.$where.' '.$filter.') pst 
+			inner join players as p using(player_id) 
+			inner join clients as c using (client_id)
+			inner join client_endpoints as ce using (client_id) 
+			inner join operator as op using (operator_id)');
+			$client_details = count($query);
+			$result = count($query);
+			if($result > 0 ){
+				ProviderHelper::setKey("client_details_player_id_".$query[0]->player_id, json_encode($query[0]));
+				ProviderHelper::setKey("client_details_player_token_".$query[0]->player_token, json_encode($query[0]), 1800); // 21600 seconds equ. 6hrs
+				ProviderHelper::setKey("client_details_token_id_".$query[0]->token_id, $query[0]->player_id.'_'.$query[0]->player_token, 1800); // 21600 seconds equ. 6hrs
+				return $query[0];
+			}else{
+				return null;
+			}
+		}
+	}
+
+	/**
+	 * @param int $token_id
+	 * @param int $balance
+	 * @param int|null $player_id
+	 * @return bol
+	 */
+	public static function _insertOrUpdateCache($token_id,$balance,$player_id=null){
+		try {
+			$player_id_and_player_token = ProviderHelper::getKey("client_details_token_id_".$token_id);
+			if($player_id_and_player_token != null){
+				$player_id_and_player_token = explode('_', $player_id_and_player_token);
+				ProviderHelper::getKeyAndUpdateBalance('client_details_player_id_'.$player_id_and_player_token[0], $balance); // player_id
+				ProviderHelper::getKeyAndUpdateBalance('client_details_player_token_'.$player_id_and_player_token[1], $balance); // player_token
+				return true;
+			}else{
+				$client_details = ProviderHelper::getClientDetailsRedis('token_id', $token_id);
+				if($client_details != null){
+					$data = ProviderHelper::getKey("client_details_player_id_".$client_details->player_id);
+					if($data != null){
+						$data = json_decode($data);
+						$data->balance = $balance;
+						ProviderHelper::setKey("client_details_player_id_".$data[0], json_encode($data));
+						ProviderHelper::setKey("client_details_player_token_".$data[1], json_encode($data));
+						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
+					}else{
+						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
+					}	
+				}
+	 		}
+		} catch (\Exception $e) {
+			// dd($e->getMessage());
+			return false;
+		}
+	}
+
+
+	/**
+	 * 
+	 * @param string $key
+	 * @param int $balance
+	 * @return void
+	 */
+	public static function getKeyAndUpdateBalance($key, $balance){
+		$data = ProviderHelper::getKey($key);
+		$data = json_decode($data);
+		$data->balance = $balance;
+		ProviderHelper::setKey($key, json_encode($data));
+	}
+
+	/**
 	 * Generate Random IDENTIFICATION
 	 */
 	public static function idGen(){
@@ -1299,7 +1453,7 @@ class ProviderHelper{
 	 * 
 	 */
 	public static function saveBalance($token){
-		$client_details = ProviderHelper::getClientDetails('token', $token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $token);
 		if($client_details){
 			$client = new Client([
 			    'headers' => [ 
@@ -1329,7 +1483,7 @@ class ProviderHelper{
 			$client_response = json_decode($guzzle_response->getBody()->getContents());
 			ProviderHelper::saveLogWithExeption('PLAYER DETAILS LOG', 999, json_encode($client_response), $datatosend);
 			if(isset($client_response->playerdetailsresponse->status->code) && $client_response->playerdetailsresponse->status->code == 200){
-				ProviderHelper::_insertOrUpdate($client_details->token_id,$client_response->playerdetailsresponse->balance);
+				ProviderHelper::_insertOrUpdateCache($client_details->token_id,$client_response->playerdetailsresponse->balance);
 				return true;
 			}else{
 				return false;

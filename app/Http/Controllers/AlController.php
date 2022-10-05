@@ -15,6 +15,7 @@ use App\Models\GameTransactionMDB;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\DebitRefund;
 use App\Jobs\AlJobs;
+use Illuminate\Support\Facades\Redis;
 use Session;
 use Queue;
 use Auth;
@@ -221,6 +222,11 @@ class AlController extends Controller
 
     public function checkCLientPlayer(Request $request){
 
+        // Redis::set('site_name', 10, 'Lumen of redis');
+        // app('redis')->setex("asdasdasasdasdasdd", 40, "awittttt");
+        // Redis::set('key', 'value');
+        // dd(app('redis'));
+        // dd(1123);
         // return json_encode($request->server);
         // dd($request->headers->get('Content-Type'));
 
@@ -231,7 +237,20 @@ class AlController extends Controller
           return ['al' => 'OOPS RAINDROPS'];
         }
         if($request->debugtype == 1){
-          $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
+          $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
+          ProviderHelper::_insertOrUpdateCache($client_details->token_id, 5000);
+          $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
+          dd($client_details);
+
+
+          $game_information = ProviderHelper::findGameDetailsCache('game_code', 43, 'BonusMania');
+          dd($game_information);
+
+          // app('redis')->setex(10210, 320, json_encode($client_details));
+          // dd(json_decode(app('redis')->get('10210')));
+          // dd(ProviderHelper::getKey());
+
+          // dd($client_details);
           if($client_details == 'false'){
             return ['al' => 'NO PLAYER FOUND'];
           }else{
