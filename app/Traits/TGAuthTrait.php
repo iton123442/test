@@ -165,6 +165,8 @@ trait TGAuthTrait {
         if($data == null){
             return false;
         }
+        
+        return true;
 
         // $query = DB::select("SELECT id,created_at FROM `".$this->access_token."` WHERE access_token = '".$auth[1]."' limit 1");
         // $auth_token = count($query);
