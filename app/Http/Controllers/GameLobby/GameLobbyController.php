@@ -249,6 +249,49 @@ class GameLobbyController extends Controller
                 }
             }
 
+
+            $v3Api = DB::table('V3_API')->first();
+            if($v3Api){
+                $decode = json_decode($v3Api->meta_data);
+                if($decode->v3_api != false){
+                        if($request->client_id == 23){
+                            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+                              try{
+                                        ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
+                                        $http_client = new Client([]);
+                                        $v2GamePortal = $decode->v3_api;
+                                        $requesttosend= [
+                                            "token" => $request->token,
+                                            "client_id" => $request->client_id,
+                                            "client_player_id" => $request->client_player_id,
+                                            "email" => $request->email,
+                                            "display_name" => $request->display_name,
+                                            "username" => $request->username,
+                                            "game_code"=> $request->game_code,
+                                            "exitUrl" => $request->exitUrl,
+                                            "game_provider" => $request->game_provider,
+                                            'country_code' => 'ph',
+                                            'currency_code' => 'THB',
+                                            'lang' => 'en',
+                                            'ip_address' => '127.0.0.1'
+                                        ];
+                                        dd($v2GamePortal);
+                                        $response = $http_client->post($v2GamePortal, [
+                                            'form_params' => $requesttosend,
+                                        ]);
+                                        $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                                        ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($requesttosend), json_encode($clientBetTransactionStatus));
+                                        return $clientBetTransactionStatus;
+                                }catch(\Exception $e){
+                                    ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
+                                    return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
+                                }
+                            }
+                        }
+                }
+            }
+
+
            # Filter Added GameID for clients who used game_id as identifier
            if ($request->has("game_id")){
                 $log_id = Helper::saveLog('GAME LAUNCH NO GAMEID NOT FOUND', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));

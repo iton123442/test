@@ -44,6 +44,36 @@ trait TGAuthTrait {
             return ['error' => "access_denied", "error_description" => "Missing required parameter."];
         }
 
+        $v3Api = DB::table('V3_API')->first();
+        if($v3Api){
+            $decode = json_decode($v3Api->meta_data);
+            if($request->client_id == 23){
+                if($v3Api->v3_auth != false){
+                    try{
+                        $http_client = new Client([]);
+                        $authUrl = $v3Api->v3_auth;
+                        $requesttosend= [
+                            "client_id" => $request->client_id,
+                            "username" => $request->username,
+                            'password' => $request->password,
+                            'client_secret' => $request->client_secret,
+                            'grant_type' => $request->grant_type,
+                        ];
+                        $response = $http_client->post($authUrl, [
+                            'form_params' => $requesttosend,
+                        ]);
+                        $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                        return $clientBetTransactionStatus;
+                    }catch(\Exception $e){
+                        return false;
+                    }
+                }
+            }
+
+        }
+                
+
+
         // if(env('OAUTH_PROVIDER', "DEFAULT") == $auth_provider_name){
         //     $client = new Client([
         //         'headers' => [ 
