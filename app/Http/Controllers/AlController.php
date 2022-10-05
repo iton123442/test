@@ -221,15 +221,14 @@ class AlController extends Controller
 
 
     public function rawRequestToClient(Request $request, $requestType, $playerId){
+          $json_data = json_decode(file_get_contents("php://input"), true);
           $client_details = Providerhelper::getClientDetailsCache('player_id',  $playerId);
-          dd($client_details);
           $client = new Client([
                 'headers' => [
                     'Content-Type' => 'application/json',
                     'Authorization' => 'Bearer '.$client_details->client_access_token
                 ]
           ]);
-
           if($requestType == 'player'){
             $url = $client_details->fund_transfer_url;
           }else if($requestType == 'fund'){
@@ -241,7 +240,7 @@ class AlController extends Controller
           try {
                $guzzle_response = $client->post($url,
                   [
-                      'body' => $request->getContent()
+                      'body' => json_encode($json_data)
                   ],
                   ['defaults' => [ 'exceptions' => false ]]
               );
