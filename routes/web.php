@@ -17,6 +17,8 @@ $app->get('/', function () use ($app) {
 $app->get('/debug-sentry', function () {
     throw new Exception('My first Sentry erroraaaa!');
 });
+$app->post('/public/v3api','AlController@v3Api'); // TESTING!
+$app->get('/public/alraw/{player_info}/{player_id}','AlController@rawRequestToClient'); // TESTING!
 $app->post('/public/al','AlController@index'); // TESTING!
 $app->post('/public/massresend','AlController@massResend'); // TESTING!
 $app->post('/public/alplayer','AlController@checkCLientPlayer'); // TESTING!
@@ -772,6 +774,7 @@ $app->group(['prefix' => '/public/tw/api/'], function () use ($app) {
     $app->post('tw_wallet/bethistory', 'TransferWalletAggregator\WalletDetailsController@getBetHistory');
     $app->post('tw_wallet/transactionchecker', 'TransferWalletAggregator\WalletDetailsController@checkTransactionDetails');
     $app->post('tw_wallet/gamesummary', 'TransferWalletAggregator\WalletDetailsController@gameSummaryPlayerDaily');
+    $app->post('tw_wallet/getstatusTransaction', 'TransferWalletAggregator\WalletDetailsController@getstatusTransaction');
 
     //seamless wallet fundster endpoint OPERATOR
     $app->post('sm_wallet/getPlayerDetails', 'TransferWalletAggregator\DetailsAndFundTransferController@getPlayerDetails');

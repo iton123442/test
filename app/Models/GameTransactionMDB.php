@@ -606,7 +606,7 @@ class GameTransactionMDB
             $where = 'where gte.provider_trans_id = "' . $provider_identifier . '"';
         }
         if ($type == 'game_trans_id') {
-            $where = 'where gte.game_trans_id = "' . $provider_identifier . '"';
+            $where = 'where gte.game_trans_ids = "' . $provider_identifier . '"';
 
         }
         
@@ -656,6 +656,52 @@ class GameTransactionMDB
                     // }
                 }
 
+                $count = count($details);
+                if ($count > 0) {
+                    $details[0]->connection_name = $connection_name;
+                }
+                return $count > 0 ? $details : 'false';
+            }
+            return 'false';
+        } catch (\Exception $e) {
+           return 'false';
+        }
+        
+
+    }
+
+    /** 
+     * Find all game ext extensions MDB
+     */
+    public  static function CountGameExtAll($provider_identifier, $type,$client_details)
+    {
+        $connection_name = $client_details->connection_name;
+        if ($type == 'all') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier  . '" AND gte.transaction_detail != "FAILED"';
+        }
+        if ($type == 'allround') {
+            $where = 'where gte.round_id = "' . $provider_identifier  . '" AND gte.transaction_detail != "FAILED"';
+        }
+        if ($type == 'transaction_id') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '" ';
+        }
+        if ($type == 'round_id') {
+            $where = 'where gte.round_id = "' . $provider_identifier . '" ';
+        }
+        if ($type == 'game_transaction_ext_id') {
+            $where = 'where gte.provider_trans_id = "' . $provider_identifier . '"';
+        }
+        if ($type == 'game_trans_id') {
+            $where = 'where gte.game_trans_id = "' . $provider_identifier . '"';
+
+        }
+        
+        try {
+            $details = [];
+            $connection = self::getAvailableConnection($client_details->connection_name);
+            if ($connection != null) {
+                $details = DB::connection( $connection["connection_name"] )->select('select count(game_trans_id) as total from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                $connection_name = $connection["connection_name"];
                 $count = count($details);
                 if ($count > 0) {
                     $details[0]->connection_name = $connection_name;

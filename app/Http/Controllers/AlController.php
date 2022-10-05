@@ -15,6 +15,7 @@ use App\Models\GameTransactionMDB;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\DebitRefund;
 use App\Jobs\AlJobs;
+use Illuminate\Support\Facades\Redis;
 use Session;
 use Queue;
 use Auth;
@@ -219,7 +220,124 @@ class AlController extends Controller
     }
 
 
+    public function v3Api(Request $request){
+
+        $v3Api = DB::table('V3_API')->first();
+        if(!$v3Api){
+          $meta_data = [
+            'v3_api' => false,
+            'v3_auth' => false,
+            'games' =>[]
+          ];
+          $meta_data = json_encode($meta_data);
+          $data = ["meta_data" => $meta_data];
+          DB::table('V3_API')->insertGetId($data);
+          return 'activated try again!';
+        }
+
+        if($request->type == 'info'){
+          return json_encode(json_decode($v3Api->meta_data));
+        }
+
+        if($request->type == 'auth'){
+          $data = DB::table('V3_API')->first();
+          $decode = json_decode($data->meta_data);
+          $decode->v3_auth = $request->action;
+          $newdata = ["meta_data" => json_encode($decode)];
+          DB::table('V3_API')->update($newdata);
+          return 'success';
+        }
+
+        if($request->type == 'api'){
+          $data = DB::table('V3_API')->first();
+          $decode = json_decode($data->meta_data);
+          $decode->v3_api = $request->action;
+          $newdata = ["meta_data" => json_encode($decode)];
+          DB::table('V3_API')->update($newdata);
+          return 'success';
+        }
+
+
+        if($request->type == 'game'){
+          $data = DB::table('V3_API')->first();
+          $decode = json_decode($data->meta_data);
+          if($request->action == 'add'){
+            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+              // return 'success';
+            }else{
+              $decode->games[] = $request->game_provider.'_'.$request->game_code;
+              $newdata = ["meta_data" => json_encode($decode)];
+              DB::table('V3_API')->update($newdata);
+            }
+          }else{
+            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+              if (($key = array_search($request->game_provider.'_'.$request->game_code, $decode->games)) !== false) {
+                  unset($decode->games[$key]);
+              }
+              $newdata = ["meta_data" => json_encode($decode)];
+              DB::table('V3_API')->update($newdata);
+            }
+          }
+        }
+
+        return 'success';
+
+    }
+
+
+    public function rawRequestToClient(Request $request, $requestType, $playerId){
+          $json_data = json_decode(file_get_contents("php://input"), true);
+          $client_details = Providerhelper::getClientDetailsCache('player_id',  $playerId);
+          $client = new Client([
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.$client_details->client_access_token
+                ]
+          ]);
+          if($requestType == 'player'){
+            $url = $client_details->player_details_url;
+          }else if($requestType == 'fund'){
+            $url = $client_details->fund_transfer_url;
+          }else if($requestType == 'check'){
+            $url = $client_details->transaction_checker_url;
+          }
+
+          try {
+               $guzzle_response = $client->post($url,
+                  [
+                      'body' => json_encode($json_data)
+                  ],
+                  ['defaults' => [ 'exceptions' => false ]]
+              );
+               $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+               return json_encode($client_reponse);
+          } catch (\Exception $e) {
+                $response = array(
+                      "fundtransferresponse" => array(
+                          "status" => array(
+                              "code" => 402,
+                              "status" => "Exception",
+                              "message" => $e->getMessage().' '.$e->getLine(),
+                          ),
+                          'balance' => 0.0
+                      )
+                );
+                return $response;
+          }
+
+    }
+
+
     public function checkCLientPlayer(Request $request){
+
+        // Redis::set('site_name', 10, 'Lumen of redis');
+        // app('redis')->setex("asdasdasasdasdasdd", 40, "awittttt");
+        // Redis::set('key', 'value');
+        // dd(app('redis'));
+        // dd(1123);
+        // return json_encode($request->server);
+        // dd($request->headers->get('Content-Type'));
+
         if(!$request->header('hashen')){
           return ['al' => 'OOPS RAINDROPS'];
         }
@@ -227,7 +345,18 @@ class AlController extends Controller
           return ['al' => 'OOPS RAINDROPS'];
         }
         if($request->debugtype == 1){
-          $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
+          $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
+          // ProviderHelper::_insertOrUpdateCache($client_details->token_id, 5000);
+          // $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
+          // dd($client_details);
+          // $game_information = ProviderHelper::findGameDetailsCache('game_code', 43, 'BonusMania');
+          // dd($game_information);
+
+          // app('redis')->setex(10210, 320, json_encode($client_details));
+          // dd(json_decode(app('redis')->get('10210')));
+          // dd(ProviderHelper::getKey());
+
+          // dd($client_details);
           if($client_details == 'false'){
             return ['al' => 'NO PLAYER FOUND'];
           }else{

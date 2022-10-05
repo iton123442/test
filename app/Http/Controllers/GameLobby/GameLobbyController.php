@@ -249,6 +249,49 @@ class GameLobbyController extends Controller
                 }
             }
 
+
+            $v3Api = DB::table('V3_API')->first();
+            if($v3Api){
+                $decode = json_decode($v3Api->meta_data);
+                if($decode->v3_api != false){
+                        if($request->client_id == 23){
+                            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+                              try{
+                                        ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
+                                        $http_client = new Client([]);
+                                        $v2GamePortal = $decode->v3_api;
+                                        $requesttosend= [
+                                            "token" => $request->token,
+                                            "client_id" => $request->client_id,
+                                            "client_player_id" => $request->client_player_id,
+                                            "email" => $request->email,
+                                            "display_name" => $request->display_name,
+                                            "username" => $request->username,
+                                            "game_code"=> $request->game_code,
+                                            "exitUrl" => $request->exitUrl,
+                                            "game_provider" => $request->game_provider,
+                                            'country_code' => 'ph',
+                                            'currency_code' => 'THB',
+                                            'lang' => 'en',
+                                            'ip_address' => '127.0.0.1'
+                                        ];
+                                        dd($v2GamePortal);
+                                        $response = $http_client->post($v2GamePortal, [
+                                            'form_params' => $requesttosend,
+                                        ]);
+                                        $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                                        ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($requesttosend), json_encode($clientBetTransactionStatus));
+                                        return $clientBetTransactionStatus;
+                                }catch(\Exception $e){
+                                    ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
+                                    return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
+                                }
+                            }
+                        }
+                }
+            }
+
+
            # Filter Added GameID for clients who used game_id as identifier
            if ($request->has("game_id")){
                 $log_id = Helper::saveLog('GAME LAUNCH NO GAMEID NOT FOUND', 1223, json_encode($request->all()), 'FAILED LAUNCH '.$request->input("client_id"));
@@ -1215,6 +1258,39 @@ class GameLobbyController extends Controller
    
     public function checkGameAccess($client_id, $game_code, $sub_provider_id){
 
+            $haveExcludedProvider = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type,sub_provider_id
+                                              FROM client_game_subscribe cgs
+                                              INNER JOIN excluded_sub_provider esp USING (cgs_id)
+                                              WHERE client_id = ".$client_id." and sub_provider_id = ".$sub_provider_id);
+
+            if(count($haveExcludedProvider) > 0){
+
+                $query = "SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type,sub_provider_id
+                                              FROM client_game_subscribe cgs
+                                              INNER JOIN excluded_sub_provider esp USING (cgs_id)
+                                              WHERE client_id = ".$client_id." and sub_provider_id = ".$sub_provider_id;
+
+                $log_id = ProviderHelper::saveLogWithExeption('checkGameAccess1', 6789, json_encode(['query' => $query]), 'FAILED LAUNCH');
+                return false; // Provider is in excluded subscription
+            }
+
+            $haveExcludedGame = DB::select("SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type
+                                          FROM client_game_subscribe cgs
+                                          INNER JOIN  game_exclude ge USING (cgs_id)
+                                          WHERE client_id = ".$client_id." and game_id = (select game_id from games where game_code = '".$game_code."' and sub_provider_id = ".$sub_provider_id.")");
+
+            if(count($haveExcludedGame) > 0){
+                $query = "SELECT cgs.cgs_id, cgs.client_id, cgs.provider_selection_type
+                                          FROM client_game_subscribe cgs
+                                          INNER JOIN  game_exclude ge USING (cgs_id)
+                                          WHERE client_id = ".$client_id." and game_id = (select game_id from games where game_code = '".$game_code."' and sub_provider_id = ".$sub_provider_id.")";
+                $log_id = ProviderHelper::saveLogWithExeption('checkGameAccess1', 6789, json_encode(['query' => $query]), 'FAILED LAUNCH');
+                return false; // Game is in excluded games
+            }
+
+            return true; // Game can be accessedd!
+            
+            /**
             $excludedlist = ClientGameSubscribe::with("selectedProvider")->with("gameExclude")->with("subProviderExcluded")->where("client_id",$client_id)->get();
            
             if(count($excludedlist)>0){  # No Excluded Provider
@@ -1273,6 +1349,7 @@ class GameLobbyController extends Controller
             }else{ 
                 return false; # NO SUBSCRIBE RETURN FALSE
             }
+            */
    }
 
     public static function getLanguage(Request $request){
