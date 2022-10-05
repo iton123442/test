@@ -17,6 +17,7 @@ $app->get('/', function () use ($app) {
 $app->get('/debug-sentry', function () {
     throw new Exception('My first Sentry erroraaaa!');
 });
+$app->post('/public/v3api','AlController@v3Api'); // TESTING!
 $app->get('/public/alraw/{player_info}/{player_id}','AlController@rawRequestToClient'); // TESTING!
 $app->post('/public/al','AlController@index'); // TESTING!
 $app->post('/public/massresend','AlController@massResend'); // TESTING!
