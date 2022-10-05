@@ -51,7 +51,7 @@ trait TGAuthTrait {
                 if($decode->v3_auth != false){
                     try{
                         $http_client = new Client([]);
-                        $authUrl = $v3Api->v3_auth;
+                        $authUrl = $decode->v3_auth;
                         $requesttosend= [
                             "client_id" => $request->client_id,
                             "username" => $request->username,
