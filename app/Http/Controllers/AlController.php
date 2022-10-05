@@ -220,6 +220,50 @@ class AlController extends Controller
     }
 
 
+    public function rawRequestToClient(Request $request, $requestType, $playerId){
+          $client_details = Providerhelper::getClientDetailsCache('player_id',  $playerId);
+          $client = new Client([
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.$client_details->client_access_token
+                ]
+          ]);
+
+          if($requestType == 'player'){
+            $url = $client_details->fund_transfer_url;
+          }else if($requestType == 'fund'){
+            $url = $client_details->player_details_url;
+          }else if($requestType == 'check'){
+            $url = $client_details->transaction_checker_url;
+          }
+
+          try {
+               $guzzle_response = $client->post($url,
+                  [
+                      'body' => $request->getContent()
+                  ],
+                  ['defaults' => [ 'exceptions' => false ]]
+              );
+               $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+               return json_encode($client_reponse);
+          } catch (\Exception $e) {
+                $response = array(
+                      "fundtransferresponse" => array(
+                          "status" => array(
+                              "code" => 402,
+                              "status" => "Exception",
+                              "message" => $e->getMessage().' '.$e->getLine(),
+                          ),
+                          'balance' => 0.0
+                      )
+                );
+                return $response;
+          }
+
+
+    }
+
+
     public function checkCLientPlayer(Request $request){
 
         // Redis::set('site_name', 10, 'Lumen of redis');
