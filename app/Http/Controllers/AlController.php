@@ -245,6 +245,7 @@ class AlController extends Controller
                   ['defaults' => [ 'exceptions' => false ]]
               );
                $client_reponse = json_decode($guzzle_response->getBody()->getContents());
+               dd($client_reponse);
                return json_encode($client_reponse);
           } catch (\Exception $e) {
                 $response = array(
