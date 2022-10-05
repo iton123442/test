@@ -161,7 +161,7 @@ trait TGAuthTrait {
             return false;
         }
 
-        $data = ProviderHelper::getKey('client_auth_access_token_'.$access_token);
+        $data = ProviderHelper::getKey('client_auth_access_token_'.$auth[1]);
         if($data == null){
             return false;
         }
