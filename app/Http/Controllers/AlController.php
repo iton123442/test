@@ -230,9 +230,9 @@ class AlController extends Controller
                 ]
           ]);
           if($requestType == 'player'){
-            $url = $client_details->fund_transfer_url;
-          }else if($requestType == 'fund'){
             $url = $client_details->player_details_url;
+          }else if($requestType == 'fund'){
+            $url = $client_details->fund_transfer_url;
           }else if($requestType == 'check'){
             $url = $client_details->transaction_checker_url;
           }
@@ -240,7 +240,7 @@ class AlController extends Controller
           try {
                $guzzle_response = $client->post($url,
                   [
-                      'body' => $json_data
+                      'body' => json_encode($json_data)
                   ],
                   ['defaults' => [ 'exceptions' => false ]]
               );
@@ -259,7 +259,6 @@ class AlController extends Controller
                 );
                 return $response;
           }
-
 
     }
 
