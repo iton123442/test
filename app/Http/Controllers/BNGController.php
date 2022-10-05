@@ -22,7 +22,7 @@ class BNGController extends Controller
     }
     public function index(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $data["token"]);
         $invokeStart =  microtime(true);
         if($data["name"]== "login"){
             return $this->_authPlayer($data,$client_details);
@@ -94,7 +94,7 @@ class BNGController extends Controller
     }
     private function _authPlayer($data,$client_details){
         if($data["token"]){
-            // $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+            // $client_details = ProviderHelper::getClientDetailsCache('token', $data["token"]);
             if($client_details){
                 $is_test= $client_details->test_player == 0?false:true;
                 $brand = $client_details->client_code?$client_details->client_code:"TigerGames";
@@ -129,7 +129,7 @@ class BNGController extends Controller
     }
     private function _getBalance($data,$client_details){
         if($data["token"]){
-            //$client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+            //$client_details = ProviderHelper::getClientDetailsCache('token', $data["token"]);
             if($client_details){
                 Helper::saveLog('BNGMETHOD(BNG)', 12, json_encode(["method" =>"_getBalance","balance"=>$client_details->balance]), "");
                 $msg = array(
@@ -360,10 +360,10 @@ class BNGController extends Controller
                 return response($response,200)->header('Content-Type', 'application/json'); 
             }  
         }
-            //$client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+            //$client_details = ProviderHelper::getClientDetailsCache('token', $data["token"]);
         if($client_details){
             //$game_details = Helper::getInfoPlayerGameRound($data["token"]);
-            $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
+            $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $data["game_id"]);
             if($data["args"]["bet"]!= null && $data["args"]["win"]!= null){
                 return $this->betNotNullWinNotNull($data,$client_details,$game_details);
             }
@@ -820,7 +820,7 @@ class BNGController extends Controller
     // private function _betGame($data){
     //     //return $data["args"]["bet"];
     //     if($data["token"]){
-    //         $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+    //         $client_details = ProviderHelper::getClientDetailsCache('token', $data["token"]);
     //         if($client_details){
     //             $game_transaction = Helper::checkGameTransaction($data["uid"]);
     //             $bet = $data["args"]["bet"]==null ? 0:$data["args"]["bet"];
@@ -852,7 +852,7 @@ class BNGController extends Controller
     // private function _winGame($data){
     //     //return $data["args"]["win"];
     //     if($data["token"]){
-    //         $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+    //         $client_details = ProviderHelper::getClientDetailsCache('token', $data["token"]);
     //         if($client_details){
     //             //$game_transaction = Helper::checkGameTransaction($json["transactionId"]);
     //             $game_transaction = Helper::checkGameTransaction($data["uid"],$data["args"]["round_id"],2);
@@ -909,7 +909,7 @@ class BNGController extends Controller
     public function _rollbackGame($data,$client_details){
         //return $data["args"]["bet"];	
         if($data["token"]){
-            $client_details = ProviderHelper::getClientDetails('token', $data["token"]);
+            $client_details = ProviderHelper::getClientDetailsCache('token', $data["token"]);
             if($client_details){
                 //$game_transaction = Helper::checkGameTransaction($json["transactionId"]);
                 $rollbackchecker = Helper::checkGameTransaction($data["args"]["transaction_uid"],$data["args"]["round_id"],1);
@@ -955,7 +955,7 @@ class BNGController extends Controller
                 $refund_amount = $refund_amount < 0 ? 0 :$refund_amount;
                 $win = $data["args"]["win"] == 0 ? 0 : 1;
                 $game_details = Helper::getInfoPlayerGameRound($data["token"]);
-                $game = ProviderHelper::findGameDetails('game_code', $this->prefix, $data["game_id"]);
+                $game = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $data["game_id"]);
                 if($bet_transaction != 'false'){
                     $updateGameTransaction = [
                         'win' => 4,

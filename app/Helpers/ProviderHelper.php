@@ -86,10 +86,14 @@ class ProviderHelper{
 	 * @param int $gg [test]
 	 * @param string $providerfilter [test]
 	 * @param int $client_id [test]
-	 *  
+	 * @return obj|null
 	 */
 	public static function getClientDetailsCache($type = "", $value = "", $gg=1, $providerfilter='all', $client_id = 1) 
 	{
+		if (!in_array($type, ['player_id', 'token_id', 'token'])){
+			return null;
+		}
+
         if ($type == 'player_id') {
 		   $where = 'where pst.player_id = "'.$value.'"';
 		   $key = "client_details_player_id_".$value;
@@ -109,9 +113,15 @@ class ProviderHelper{
 		if($data != null){
 			if($type == 'player_id'){
 				return json_decode($data);
+			}else if($type == 'token'){
+				return json_decode($data);
+			}else if($type == 'token_id'){
+				$token_id = ProviderHelper::getKey("client_details_token_id_".$data);
+				$player_id_and_player_token = explode('_', $token_id);
+				$client_details = ProviderHelper::getClientDetailsCache('player_id', $player_id_and_player_token[0]);
+				return json_decode($client_details);
 			}else{
-				$clientDetails = ProviderHelper::getKey("client_details_player_id_".$data );
-				return json_decode($clientDetails);
+				return null;
 			}
 		}else{
 			$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language` 
@@ -1461,6 +1471,7 @@ class ProviderHelper{
 	public static function saveBalance($token){
 		$client_details = ProviderHelper::getClientDetailsCache('token', $token);
 		if($client_details){
+			ProviderHelper::setKey("client_details_player_id_".$client_details->player_id, json_encode($client_details));
 			$client = new Client([
 			    'headers' => [ 
 			    	'Content-Type' => 'application/json',
