@@ -280,8 +280,7 @@ class AlController extends Controller
           }
         }
 
-        $v3Api = DB::select('select * from V3_API limit 1');
-        dd($v3Api);
+        return 'success';
 
     }
 
