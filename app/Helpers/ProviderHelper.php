@@ -80,6 +80,12 @@ class ProviderHelper{
 	 * client_details_player_id_xxxx = client details
 	 * client_details_player_token_xxxxxxx = client details
 	 * client_details_token_id_xxxx = client_player_id_+player_token
+	 * 
+	 * @param string $type
+	 * @param string|int $value
+	 * @param int $gg [test]
+	 * @param string $providerfilter [test]
+	 * @param int $client_id [test]
 	 *  
 	 */
 	public static function getClientDetailsCache($type = "", $value = "", $gg=1, $providerfilter='all', $client_id = 1) 
@@ -118,8 +124,8 @@ class ProviderHelper{
 			$result = count($query);
 			if($result > 0 ){
 				ProviderHelper::setKey("client_details_player_id_".$query[0]->player_id, json_encode($query[0]));
-				ProviderHelper::setKey("client_details_player_token_".$query[0]->player_token, json_encode($query[0]), 1800); // 21600 seconds equ. 6hrs
-				ProviderHelper::setKey("client_details_token_id_".$query[0]->token_id, $query[0]->player_id.'_'.$query[0]->player_token, 1800); // 21600 seconds equ. 6hrs
+				ProviderHelper::setKey("client_details_player_token_".$query[0]->player_token, json_encode($query[0]), 1800); // 1800 seconds equ. 30min
+				ProviderHelper::setKey("client_details_token_id_".$query[0]->token_id, $query[0]->player_id.'_'.$query[0]->player_token, 1800); // 1800 seconds equ. 30min
 				return $query[0];
 			}else{
 				return null;
@@ -142,7 +148,7 @@ class ProviderHelper{
 				ProviderHelper::getKeyAndUpdateBalance('client_details_player_token_'.$player_id_and_player_token[1], $balance); // player_token
 				return true;
 			}else{
-				$client_details = ProviderHelper::getClientDetailsRedis('token_id', $token_id);
+				$client_details = ProviderHelper::getClientDetailsCache('token_id', $token_id);
 				if($client_details != null){
 					$data = ProviderHelper::getKey("client_details_player_id_".$client_details->player_id);
 					if($data != null){
