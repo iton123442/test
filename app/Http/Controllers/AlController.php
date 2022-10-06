@@ -284,6 +284,70 @@ class AlController extends Controller
 
     }
 
+    public function v2Api(Request $request){
+
+        $v2Api = DB::table('v2_API')->first();
+        if(!$v2Api){
+          $meta_data = [
+            'v2_api' => false,
+            'v2_auth' => false,
+            'games' =>[]
+          ];
+          $meta_data = json_encode($meta_data);
+          $data = ["meta_data" => $meta_data];
+          DB::table('v2_API')->insertGetId($data);
+          return 'activated try again!';
+        }
+
+        if($request->type == 'info'){
+          return json_encode(json_decode($v2Api->meta_data));
+        }
+
+        if($request->type == 'auth'){
+          $data = DB::table('v2_API')->first();
+          $decode = json_decode($data->meta_data);
+          $decode->v2_auth = $request->action;
+          $newdata = ["meta_data" => json_encode($decode)];
+          DB::table('v2_API')->update($newdata);
+          return 'success';
+        }
+
+        if($request->type == 'api'){
+          $data = DB::table('v2_API')->first();
+          $decode = json_decode($data->meta_data);
+          $decode->v2_api = $request->action;
+          $newdata = ["meta_data" => json_encode($decode)];
+          DB::table('v2_API')->update($newdata);
+          return 'success';
+        }
+
+
+        if($request->type == 'game'){
+          $data = DB::table('v2_API')->first();
+          $decode = json_decode($data->meta_data);
+          if($request->action == 'add'){
+            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+              // return 'success';
+            }else{
+              $decode->games[] = $request->game_provider.'_'.$request->game_code;
+              $newdata = ["meta_data" => json_encode($decode)];
+              DB::table('v2_API')->update($newdata);
+            }
+          }else{
+            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+              if (($key = array_search($request->game_provider.'_'.$request->game_code, $decode->games)) !== false) {
+                  unset($decode->games[$key]);
+              }
+              $newdata = ["meta_data" => json_encode($decode)];
+              DB::table('v2_API')->update($newdata);
+            }
+          }
+        }
+
+        return 'success';
+
+    }
+
 
     public function rawRequestToClient(Request $request, $requestType, $playerId){
           $json_data = json_decode(file_get_contents("php://input"), true);
