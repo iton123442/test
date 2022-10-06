@@ -214,7 +214,7 @@ class GameLobbyController extends Controller
             # Temporary Trap ASKMEBET TO USE version2 API
             $v2Api = DB::table('V2_API')->first();
             if($v2Api){
-                if($request->client_id == 144){
+                if($request->client_id == 23){
                     $decode = json_decode($v2Api->meta_data);
                     if($decode->v2_api != false){
                         if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
