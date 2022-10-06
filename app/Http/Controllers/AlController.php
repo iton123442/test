@@ -245,7 +245,7 @@ class AlController extends Controller
           $decode->v3_auth = $request->action;
           $newdata = ["meta_data" => json_encode($decode)];
           DB::table('V3_API')->update($newdata);
-          return 'success';
+          // return 'success';
         }
 
         if($request->type == 'api'){
@@ -254,7 +254,7 @@ class AlController extends Controller
           $decode->v3_api = $request->action;
           $newdata = ["meta_data" => json_encode($decode)];
           DB::table('V3_API')->update($newdata);
-          return 'success';
+          // return 'success';
         }
 
 
@@ -280,7 +280,8 @@ class AlController extends Controller
           }
         }
 
-        return 'success';
+        $v3Api = DB::table('V3_API')->first();
+        return json_encode(json_decode($v3Api->meta_data));
 
     }
 
@@ -309,7 +310,7 @@ class AlController extends Controller
           $decode->v2_auth = $request->action;
           $newdata = ["meta_data" => json_encode($decode)];
           DB::table('V2_API')->update($newdata);
-          return 'success';
+          // return 'success';
         }
 
         if($request->type == 'api'){
@@ -318,7 +319,7 @@ class AlController extends Controller
           $decode->v2_api = $request->action;
           $newdata = ["meta_data" => json_encode($decode)];
           DB::table('V2_API')->update($newdata);
-          return 'success';
+          // return 'success';
         }
 
 
@@ -344,7 +345,8 @@ class AlController extends Controller
           }
         }
 
-        return 'success';
+        $v2Api = DB::table('V2_API')->first();
+        return json_encode(json_decode($v2Api->meta_data));
 
     }
 
