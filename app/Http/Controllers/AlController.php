@@ -286,7 +286,7 @@ class AlController extends Controller
 
     public function v2Api(Request $request){
 
-        $v2Api = DB::table('v2_API')->first();
+        $v2Api = DB::table('V2_API')->first();
         if(!$v2Api){
           $meta_data = [
             'v2_api' => false,
@@ -295,7 +295,7 @@ class AlController extends Controller
           ];
           $meta_data = json_encode($meta_data);
           $data = ["meta_data" => $meta_data];
-          DB::table('v2_API')->insertGetId($data);
+          DB::table('V2_API')->insertGetId($data);
           return 'activated try again!';
         }
 
@@ -304,26 +304,26 @@ class AlController extends Controller
         }
 
         if($request->type == 'auth'){
-          $data = DB::table('v2_API')->first();
+          $data = DB::table('V2_API')->first();
           $decode = json_decode($data->meta_data);
           $decode->v2_auth = $request->action;
           $newdata = ["meta_data" => json_encode($decode)];
-          DB::table('v2_API')->update($newdata);
+          DB::table('V2_API')->update($newdata);
           return 'success';
         }
 
         if($request->type == 'api'){
-          $data = DB::table('v2_API')->first();
+          $data = DB::table('V2_API')->first();
           $decode = json_decode($data->meta_data);
           $decode->v2_api = $request->action;
           $newdata = ["meta_data" => json_encode($decode)];
-          DB::table('v2_API')->update($newdata);
+          DB::table('V2_API')->update($newdata);
           return 'success';
         }
 
 
         if($request->type == 'game'){
-          $data = DB::table('v2_API')->first();
+          $data = DB::table('V2_API')->first();
           $decode = json_decode($data->meta_data);
           if($request->action == 'add'){
             if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
@@ -331,7 +331,7 @@ class AlController extends Controller
             }else{
               $decode->games[] = $request->game_provider.'_'.$request->game_code;
               $newdata = ["meta_data" => json_encode($decode)];
-              DB::table('v2_API')->update($newdata);
+              DB::table('V2_API')->update($newdata);
             }
           }else{
             if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
@@ -339,7 +339,7 @@ class AlController extends Controller
                   unset($decode->games[$key]);
               }
               $newdata = ["meta_data" => json_encode($decode)];
-              DB::table('v2_API')->update($newdata);
+              DB::table('V2_API')->update($newdata);
             }
           }
         }
