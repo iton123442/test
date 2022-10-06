@@ -158,6 +158,7 @@ class GameLobby{
         if($client_player_details->operator_id == 11){
             $casinoId = config("providerlinks.bgaming.KONIBET");
         }
+        $casinoId = "KONIBET";
         Helper::saveLog('Bgaming create session', 49, json_encode($casinoId), $casinoId);
         $requesttosend = [
             "casino_id" => $casinoId,
@@ -1308,7 +1309,7 @@ class GameLobby{
                     ['body' => json_encode($game_link_body)]
             );
             $link_result = json_decode($game_link_response->getBody()->getContents());
-            
+            ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($game_link_body), $link_result);
             return $link_result->url;
         } catch (\Exception $e) {
             ProviderHelper::saveLogGameLaunch('MannaPlay Error', 15, json_encode($client_details), $e->getMessage().' '.$e->getLine());
