@@ -177,49 +177,6 @@ public function DebitProcess($req){
           ];
               return $res;
           }
-      
-<<<<<<< HEAD
-      // $game_details = Game::find($game_code, $this->provider_db_id);  
-      $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
-      $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
-      if($bet_transaction != "false"){
-          $client_details->connection_name = $bet_transaction->connection_name;
-          $amount = $bet_transaction->bet_amount + $bet_amount;
-          $updateGameTransaction = [
-              'win' => 5,
-              'bet_amount' => $amount,
-              'entry_id' => 1,
-          ];
-          GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-          $game_transaction_id = $bet_transaction->game_trans_id;
-      }else{
-          Helper::saveLog('Spearhead gameTransactionData', $this->provider_db_id, json_encode($req), 'ENDPOINT HIT');
-          $gameTransactionData = array(
-              "provider_trans_id" => $provider_trans_id,
-              "token_id" => $client_details->token_id,
-              "game_id" => $game_details->game_id,
-              "round_id" => $round_id,
-              "bet_amount" => $bet_amount,
-              "win" => 5,
-              "pay_amount" => 0,
-              "income" => 0,
-              "entry_id" => 1,
-          );
-          $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-      }
-      $gameTransactionEXTData = array(
-          "game_trans_id" => $game_transaction_id,
-          "provider_trans_id" => $provider_trans_id,
-          "round_id" => $round_id,
-          "amount" => $bet_amount,
-          "game_transaction_type"=> 1,
-          "provider_request" =>json_encode($req),
-          );
-      Helper::saveLog('Spearhead  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-      $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-
-      $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
-=======
      $game_details = Game::find($game_code, $this->provider_db_id);  
       //   $gameTransactionData = array(
       //     "provider_trans_id" => $provider_trans_id,
@@ -246,7 +203,6 @@ public function DebitProcess($req){
       //   $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details); 
      
         $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit');
->>>>>>> 983612f63fe291cacd79d2e354286198f285b630
         if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
           switch ($client_response->fundtransferresponse->status->code) {
@@ -363,14 +319,9 @@ public function CreditProcess($req){
     ];
         return $res;
     }
-<<<<<<< HEAD
-    // $game_details = Game::find($game_code, $this->provider_db_id);
-    $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
-=======
     $game_details = Game::find($game_code, $this->provider_db_id);
     $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
     // $bet_transaction = GameTransactionMDB::findGameTransactionDetailsV2($round_id,'round_id', false, $client_details);
->>>>>>> 983612f63fe291cacd79d2e354286198f285b630
     $winBalance = $client_details->balance + $pay_amount;
     $win_or_lost = $pay_amount > 0 ?  1 : 0;
     $entry_id = $pay_amount > 0 ?  2 : 1;
@@ -505,15 +456,9 @@ public function CreditProcess($req){
               // "provider_request" => json_encode($req),
               // "mw_response" => json_encode($res),
           );
-<<<<<<< HEAD
-    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $winBalance);
-
-=======
     // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
     ProviderHelper::_insertOrUpdate($client_details->token_id, $winBalance);
->>>>>>> 983612f63fe291cacd79d2e354286198f285b630
     $action_payload = [
           "type" => "custom", #genreral,custom :D # REQUIRED!
           "custom" => [
@@ -615,13 +560,8 @@ public function RollbackProcess($req){
     ];
         return $res;
     }
-<<<<<<< HEAD
-    // $game_details = Game::find($game_code, $this->provider_db_id);
-    $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
-=======
     $game_details = Game::find($game_code, $this->provider_db_id);
     $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollbackTransactionId,'transaction_id', false, $client_details);
->>>>>>> 983612f63fe291cacd79d2e354286198f285b630
     $client_details->connection_name = $bet_transaction->connection_name;
     $income = $bet_transaction->bet_amount - $rollback_amount;
     $NewBalance = $client_details->balance + $rollback_amount;
@@ -679,12 +619,12 @@ public function RollbackProcess($req){
         }
   }//end check player details
 }//end rollback func
-public function generateId($type){
-    if($type == "ext"){
-        return shell_exec('date +%s%N');
-    }
-    if($type == "transid"){
-        return shell_exec('date +%s%N');
-    }
-}
+  public function generateId($type){
+      if($type == "ext"){
+          return shell_exec('date +%s%N');
+      }
+      if($type == "transid"){
+          return shell_exec('date +%s%N');
+      }
+  }
 }
