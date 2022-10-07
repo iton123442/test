@@ -221,17 +221,17 @@ public function DebitProcess($req){
                             "Message" => 'Success',
                             "Details" => null,
                     ];
-                    $createGameTransactionLog = [
-                              "connection_name" => $client_details->connection_name,
-                              "column" =>[
-                                  "game_trans_ext_id" => $gen_game_extid,
-                                  "request" => json_encode($data),
-                                  "response" => json_encode($res),
-                                  "log_type" => "provider_details",
-                                  "transaction_detail" => "SUCCESS",
-                              ]
-                          ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                    // $createGameTransactionLog = [
+                    //           "connection_name" => $client_details->connection_name,
+                    //           "column" =>[
+                    //               "game_trans_ext_id" => $gen_game_extid,
+                    //               "request" => json_encode($data),
+                    //               "response" => json_encode($res),
+                    //               "log_type" => "provider_details",
+                    //               "transaction_detail" => "SUCCESS",
+                    //           ]
+                    //       ];
+                    // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 break;
                 case '402':
                     $http_status = 400;
@@ -245,17 +245,30 @@ public function DebitProcess($req){
                       "ReturnCode" => 104,
                       "Message" => "Insufficient funds"
                     ];
-                    $createGameTransactionLog = [
-                              "connection_name" => $client_details->connection_name,
-                              "column" =>[
-                                  "game_trans_ext_id" => $gen_game_extid,
-                                  "request" => json_encode($data),
-                                  "response" => json_encode($res),
-                                  "log_type" => "provider_details",
-                                  "transaction_detail" => "failed",
-                              ]
-                          ];
-                    ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                    // $createGameTransactionLog = [
+                    //           "connection_name" => $client_details->connection_name,
+                    //           "column" =>[
+                    //               "game_trans_ext_id" => $gen_game_extid,
+                    //               "request" => json_encode($data),
+                    //               "response" => json_encode($res),
+                    //               "log_type" => "provider_details",
+                    //               "transaction_detail" => "failed",
+                    //           ]
+                    //       ];
+                    // ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                    $gameTransactionEXTData = array(
+                        "game_trans_id" => $gen_game_trans_id,
+                        "provider_trans_id" => $provider_trans_id,
+                        "round_id" => $round_id,
+                        "amount" => $bet_amount,
+                        "game_transaction_type"=> 1,
+                        "provider_request" =>json_encode($req),
+                        "mw_response" => "FAILED",
+                        "mw_request" => json_encode($client_reponse->requestoclient),
+                        "client_response" => json_encode($client_response->fundtransferresponse),
+                        "transaction_detail" => "FAILED",
+                    );
+                   GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
                 break;
           }
       }
@@ -277,7 +290,11 @@ public function DebitProcess($req){
           "round_id" => $round_id,
           "amount" => $bet_amount,
           "game_transaction_type"=> 1,
-          // "provider_request" =>json_encode($req),
+          "provider_request" =>json_encode($req),
+          "mw_response" => json_encode($res),
+          "mw_request" => json_encode($client_reponse->requestoclient),
+          "client_response" => json_encode($client_response->fundtransferresponse),
+          "transaction_detail" => "SUCCESS",
       );
      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
     
@@ -447,17 +464,7 @@ public function CreditProcess($req){
     ];
     // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
     GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction_id, $client_details);
-    $gameTransactionEXTData = array(
-              "game_trans_id" => $game_transaction_id,
-              "provider_trans_id" => $provider_trans_id,
-              "round_id" => $round_id,
-              "amount" => $pay_amount,
-              "game_transaction_type"=> 2,
-              // "provider_request" => json_encode($req),
-              // "mw_response" => json_encode($res),
-          );
-    // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
+    
     ProviderHelper::_insertOrUpdate($client_details->token_id, $winBalance);
     $action_payload = [
           "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -500,17 +507,32 @@ public function CreditProcess($req){
         //       'general_details' => 'success',
         // );
         // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$gen_game_extid,$client_details);
-        $createGameTransactionLog = [
-              "connection_name" => $client_details->connection_name,
-              "column" =>[
-                  "game_trans_ext_id" => $gen_game_extid,
-                  "request" => json_encode($data),
-                  "response" => json_encode($res),
-                  "log_type" => "provider_details",
-                  "transaction_detail" => "success",
-              ]
-          ];
-        ProviderHelper::queTransactionLogs($createGameTransactionLog);
+        $gameTransactionEXTData = array(
+                  "game_trans_id" => $game_transaction_id,
+                  "provider_trans_id" => $provider_trans_id,
+                  "round_id" => $round_id,
+                  "amount" => $pay_amount,
+                  "game_transaction_type"=> 2,
+                  "provider_request" =>json_encode($req),
+                  "mw_response" => json_encode($res),
+                  'mw_request' => json_encode($client_response->requestoclient),
+                  'client_response' => json_encode($client_response->fundtransferresponse),
+                  'transaction_detail' => 'success',
+                  'general_details' => 'success',
+              );
+        // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);  
+        // $createGameTransactionLog = [
+        //       "connection_name" => $client_details->connection_name,
+        //       "column" =>[
+        //           "game_trans_ext_id" => $gen_game_extid,
+        //           "request" => json_encode($data),
+        //           "response" => json_encode($res),
+        //           "log_type" => "provider_details",
+        //           "transaction_detail" => "success",
+        //       ]
+        //   ];
+        // ProviderHelper::queTransactionLogs($createGameTransactionLog);
         return $res;
     }elseif (isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "402") {
@@ -520,6 +542,21 @@ public function CreditProcess($req){
         "ReturnCode" => 104,
         "Message" => "Casino session limit exceeded"
       ];
+      $gameTransactionEXTData = array(
+                "game_trans_id" => $game_transaction_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $round_id,
+                "amount" => $pay_amount,
+                "game_transaction_type"=> 2,
+                "provider_request" =>json_encode($req),
+                "mw_response" => json_encode($res),
+                'mw_request' => json_encode($client_response->requestoclient),
+                'client_response' => json_encode($client_response->fundtransferresponse),
+                'transaction_detail' => 'FAILED',
+                'general_details' => 'FAILED',
+            );
+      // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
       $createGameTransactionLog = [
             "connection_name" => $client_details->connection_name,
             "column" =>[
