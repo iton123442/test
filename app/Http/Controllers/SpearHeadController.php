@@ -87,7 +87,7 @@ class SpearHeadController extends Controller
    public function getAccount($req){
       $data = $req;
       Helper::saveLog('Spearhead Verification', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-      $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+      $client_details = ProviderHelper::getClientDetailsCache('token',$data['SessionId']);
       if($client_details != null){
 
         if($client_details->country_code == null){
@@ -125,7 +125,7 @@ class SpearHeadController extends Controller
 public function getBalance($req){
   $data = $req;
   Helper::saveLog('Spearhead  GetBalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-  $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+  $client_details = ProviderHelper::getClientDetailsCache('token',$data['SessionId']);
   if($client_details != null){
     $res = [
       "Balance" => (float)$client_details->balance,
@@ -153,7 +153,7 @@ public function getBalance($req){
 public function DebitProcess($req){
       $data = $req;
       Helper::saveLog('Spearhead  DebitProcess', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
-      $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+      $client_details = ProviderHelper::getClientDetailsCache('token',$data['SessionId']);
       $playerId = $data['ExternalUserId'];
       $bet_amount = $data['Amount'];
       $provider_trans_id = $data['TransactionId'];
@@ -172,7 +172,8 @@ public function DebitProcess($req){
           return $res;
         }
       
-      $game_details = Game::find($game_code, $this->provider_db_id);  
+      // $game_details = Game::find($game_code, $this->provider_db_id);  
+      $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
       $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
       if($bet_transaction != "false"){
           $client_details->connection_name = $bet_transaction->connection_name;
@@ -212,7 +213,7 @@ public function DebitProcess($req){
 
       $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
         if (isset($client_response->fundtransferresponse->status->code)) {
-          ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+          ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
           switch ($client_response->fundtransferresponse->status->code) {
               case '200':
                 $http_status = 200;
@@ -307,7 +308,7 @@ public function DebitProcess($req){
 public function CreditProcess($req){
   $data = $req;
   Helper::saveLog('Spearhead Credit', $this->provider_db_id, json_encode($data), 'ENDPOINT Hit');
-  $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+  $client_details = ProviderHelper::getClientDetailsCache('token',$data['SessionId']);
   $playerId = $data['ExternalUserId'];
   $pay_amount = $data['Amount'];
   $provider_trans_id = $data['TransactionId'];
@@ -351,7 +352,8 @@ public function CreditProcess($req){
       ];
         return $res;
     }
-    $game_details = Game::find($game_code, $this->provider_db_id);
+    // $game_details = Game::find($game_code, $this->provider_db_id);
+    $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
     $winBalance = $client_details->balance + $pay_amount;
     $win_or_lost = $pay_amount > 0 ?  1 : 0;
     $entry_id = $pay_amount > 0 ?  2 : 1;
@@ -406,7 +408,7 @@ public function CreditProcess($req){
               "mw_response" => json_encode($res),
           );
     $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-    ProviderHelper::_insertOrUpdate($client_details->token_id, $winBalance);
+    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $winBalance);
 
     $action_payload = [
           "type" => "custom", #genreral,custom :D # REQUIRED!
@@ -477,7 +479,7 @@ public function CreditProcess($req){
 public function RollbackProcess($req){
   $data = $req;
   Helper::saveLog('Spearhead Credit', $this->provider_db_id, json_encode($data), 'ENDPOINT Hit');
-  $client_details = ProviderHelper::getClientDetails('token',$data['SessionId']);
+  $client_details = ProviderHelper::getClientDetailsCache('token',$data['SessionId']);
   $playerId = $data['ExternalUserId'];
   $rollback_amount = $data['Amount'];
   $provider_trans_id = $data['TransactionId'];
@@ -522,7 +524,8 @@ public function RollbackProcess($req){
       ];
         return $res;
     }
-    $game_details = Game::find($game_code, $this->provider_db_id);
+    // $game_details = Game::find($game_code, $this->provider_db_id);
+    $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
     $client_details->connection_name = $bet_transaction->connection_name;
     $income = $bet_transaction->bet_amount - $rollback_amount;
     $NewBalance = $client_details->balance + $rollback_amount;
@@ -551,7 +554,7 @@ public function RollbackProcess($req){
                             
             switch ($client_response->fundtransferresponse->status->code) {
                 case '200':
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                      $res = [
                         "ApiVersion" => "1.0",
                         "Request" => "WalletCredit",
