@@ -216,7 +216,7 @@ class GameLobbyController extends Controller
             if($v2Api){
                 if($request->client_id == 23){
                     $decode = json_decode($v2Api->meta_data);
-                    if($decode->v2_api != false){
+                    if($decode->v2_api != false && $decode->v2_api != "false"){       
                         if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
                             try{
                                     ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
@@ -257,7 +257,7 @@ class GameLobbyController extends Controller
             $v3Api = DB::table('V3_API')->first();
             if($v3Api){
                 $decode = json_decode($v3Api->meta_data);
-                if($decode->v3_api != false){
+                if($decode->v3_api != false && $decode->v3_api != "false"){
                         if($request->client_id == 23){
                             if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
                               try{
