@@ -49,7 +49,19 @@ trait TGAuthTrait {
         if($v3Api){
             $decode = json_decode($v3Api->meta_data);
             if($request->client_id == 23){
-                if($decode->v3_auth != false && $decode->v3_auth != "false"){
+
+                $customAuth = false;
+                if(gettype($decode->v3_auth) == "string"){
+                    if($decode->v3_auth != 'false'){
+                        $customAuth = true;
+                    }
+                }else{
+                    if($decode->v3_auth != false){
+                       $customAuth = true;
+                    }
+                }
+
+                if($customAuth == true){
                     try{
                         $http_client = new Client([]);
                         $authUrl = $decode->v3_auth;
@@ -72,6 +84,47 @@ trait TGAuthTrait {
             }
         }
                 
+
+
+        $v2Api = DB::table('V2_API')->first();
+        if($v2Api){
+            $decode = json_decode($v2Api->meta_data);
+            if($request->client_id == 23){
+
+                $customAuth = false;
+                if(gettype($decode->v2_auth) == "string"){
+                    if($decode->v2_auth != 'false'){
+                        $customAuth = true;
+                    }
+                }else{
+                    if($decode->v2_auth != false){
+                       $customAuth = true;
+                    }
+                }
+
+                if($customAuth == true){
+                    try{
+                        $http_client = new Client([]);
+                        $authUrl = $decode->v2_auth;
+                        $requesttosend= [
+                            "client_id" => $request->client_id,
+                            "username" => $request->username,
+                            'password' => $request->password,
+                            'client_secret' => $request->client_secret,
+                            'grant_type' => $request->grant_type,
+                        ];
+                        $response = $http_client->post($authUrl, [
+                            'form_params' => $requesttosend,
+                        ]);
+                        $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                        return json_encode($clientBetTransactionStatus);
+                    }catch(\Exception $e){
+                        return false;
+                    }
+                }
+
+            }
+        }
 
 
         // if(env('OAUTH_PROVIDER', "DEFAULT") == $auth_provider_name){
