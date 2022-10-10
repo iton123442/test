@@ -49,8 +49,7 @@ trait TGAuthTrait {
         if($v3Api){
             $decode = json_decode($v3Api->meta_data);
             if($request->client_id == 23){
-                if($decode->v3_auth != false || $decode->v3_auth != "false"){
-                    dd($decode->v3_auth);
+                if($decode->v3_auth != false && $decode->v3_auth != "false"){
                     try{
                         $http_client = new Client([]);
                         $authUrl = $decode->v3_auth;
@@ -65,7 +64,7 @@ trait TGAuthTrait {
                             'form_params' => $requesttosend,
                         ]);
                         $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
-                        return $clientBetTransactionStatus;
+                        return json_encode($clientBetTransactionStatus);
                     }catch(\Exception $e){
                         return false;
                     }
