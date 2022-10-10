@@ -49,7 +49,7 @@ trait TGAuthTrait {
         if($v3Api){
             $decode = json_decode($v3Api->meta_data);
             if($request->client_id == 23){
-                if($decode->v3_auth != false){
+                if($decode->v3_auth != false || $decode->v3_auth != "false"){
                     dd(123);
                     try{
                         $http_client = new Client([]);
