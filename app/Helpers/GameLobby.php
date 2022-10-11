@@ -661,13 +661,17 @@ class GameLobby{
             );
             $client_response = json_decode($guzzle_response->getBody()->getContents());
             ProviderHelper::saveLogGameLaunch('Tidy Gameluanch 102', 23, json_encode($requesttosend), $client_response);
-            return $client_response->link;
+            if(isset($client_response->link)){
+                return $client_response->link;
+            } 
+            return false;
         }catch(\Exception $e){
             $requesttosend = [
                 'error' => 1010
             ];
             ProviderHelper::saveLogGameLaunch('Tidy Gameluanch 101', 23, json_encode($requesttosend), $e->getMessage() );
-            return $e->getMessage();
+            // return $e->getMessage();
+            return false;
         }
         
     }

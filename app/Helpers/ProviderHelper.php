@@ -158,7 +158,8 @@ class ProviderHelper{
 				$player_id_and_player_token = explode('_', $player_id_and_player_token);
 				ProviderHelper::getKeyAndUpdateBalance('client_details_player_id_'.$player_id_and_player_token[0], $balance); // player_id
 				ProviderHelper::getKeyAndUpdateBalance('client_details_player_token_'.$player_id_and_player_token[1], $balance); // player_token
-				return true;
+				// return true;
+				return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id =".$token_id.""); // temporary
 			}else{
 				$client_details = ProviderHelper::getClientDetailsCache('token_id', $token_id);
 				if($client_details != null){
@@ -169,9 +170,9 @@ class ProviderHelper{
 						ProviderHelper::setKey("client_details_player_id_".$data->player_id, json_encode($data), self::REDIS_EXPIRATION);
 						ProviderHelper::setKey("client_details_player_token_".$data->player_token, json_encode($data), self::REDIS_EXPIRATION);
 						ProviderHelper::setKey("client_details_token_id_".$data->token_id, $data->player_id.'_'.$data->player_token, self::REDIS_EXPIRATION);
-						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
+						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id =".$token_id."");
 					}else{
-						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
+						return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id =".$token_id."");
 					}	
 				}
 	 		}
