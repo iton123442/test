@@ -78,7 +78,7 @@ trait TGAuthTrait {
                         $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
                         return json_encode($clientBetTransactionStatus);
                     }catch(\Exception $e){
-                        return false;
+                        return ['error' => "access_denied", "error_description" => "false"];
                     }
                 }
             }
@@ -119,7 +119,7 @@ trait TGAuthTrait {
                         $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
                         return json_encode($clientBetTransactionStatus);
                     }catch(\Exception $e){
-                        return false;
+                        return ['error' => "access_denied", "error_description" => "false"];
                     }
                 }
 
