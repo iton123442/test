@@ -178,22 +178,33 @@ class GameLobbyController extends Controller
 
         // Demo Handler
         #Required Parameter game_code, game_provider
-        if ($request->has("demo") && $request->input("demo") == true) {
-            if($request->has('game_code')
-                &&$request->has('game_provider')){
-                return DemoHelper::DemoGame($request->all());
+        // if ($request->has("demo") && $request->input("demo") == true) {
+        //     if($request->has('game_code')
+        //         &&$request->has('game_provider')){
+        //         return DemoHelper::DemoGame($request->all());
+        //     }
+        // }
+
+
+        if($request->has("demo")){
+            $isDemo = false;
+            if(gettype($request->demo) == "string"){
+                if($request->demo == 'true'){
+                    $isDemo = true;
+                }
+            }else{
+                if($request->demo == true){
+                   $isDemo = true;
+                }
+            }
+            if($isDemo == true){
+                if($request->has('game_code')
+                    &&$request->has('game_provider')){
+                    return DemoHelper::DemoGame($request->all());
+                }
             }
         }
 
-
-        // if(isset($request->input("demo"))){
-        //     if($request->input("demo") == true){
-        //         if($request->has('game_code')
-        //             &&$request->has('game_provider')){
-        //             return DemoHelper::DemoGame($request->all());
-        //         }
-        //     }
-        // }
 
         if($request->has('client_id')
         &&$request->has('client_player_id')
