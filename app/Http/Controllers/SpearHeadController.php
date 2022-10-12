@@ -239,7 +239,7 @@ public function DebitProcess($req){
                         "game_transaction_type"=> 1,
                         "provider_request" =>json_encode($req),
                         "mw_response" => "FAILED",
-                        "mw_request" => json_encode($client_reponse->requestoclient),
+                        "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response->fundtransferresponse),
                         "transaction_detail" => "FAILED",
                     );
