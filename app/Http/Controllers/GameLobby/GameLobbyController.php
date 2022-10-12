@@ -177,23 +177,23 @@ class GameLobbyController extends Controller
         ProviderHelper::saveLogGameLaunch('GAMELAUNCH LOG', 12, json_encode($request->all()), 'GAME REQUEST BODY');
 
         // Demo Handler
-        // Required Parameter game_code, game_provider
-        // if ($request->has("demo") && $request->input("demo") == true) {
-        //     if($request->has('game_code')
-        //         &&$request->has('game_provider')){
-        //         return DemoHelper::DemoGame($request->all());
-        //     }
-        // }
-
-
-        if(isset($request->input("demo"))){
-            if($request->input("demo") == true){
-                if($request->has('game_code')
-                    &&$request->has('game_provider')){
-                    return DemoHelper::DemoGame($request->all());
-                }
+        #Required Parameter game_code, game_provider
+        if ($request->has("demo") && $request->input("demo") == true) {
+            if($request->has('game_code')
+                &&$request->has('game_provider')){
+                return DemoHelper::DemoGame($request->all());
             }
         }
+
+
+        // if(isset($request->input("demo"))){
+        //     if($request->input("demo") == true){
+        //         if($request->has('game_code')
+        //             &&$request->has('game_provider')){
+        //             return DemoHelper::DemoGame($request->all());
+        //         }
+        //     }
+        // }
 
         if($request->has('client_id')
         &&$request->has('client_player_id')
