@@ -229,7 +229,7 @@ class GameLobbyController extends Controller
                     }
 
                     if($customLaunch == true){       
-                        if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+                        if (in_array($request->game_provider.'_GG_'.$request->game_code, $decode->games)){
                             try{
                                     ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
                                     $http_client = new Client([]);
