@@ -262,16 +262,16 @@ class AlController extends Controller
           $data = DB::table('V3_API')->first();
           $decode = json_decode($data->meta_data);
           if($request->action == 'add'){
-            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+            if (in_array($request->game_provider.'__'.$request->game_code, $decode->games)){
               // return 'success';
             }else{
-              $decode->games[] = $request->game_provider.'_'.$request->game_code;
+              $decode->games[] = $request->game_provider.'__'.$request->game_code;
               $newdata = ["meta_data" => json_encode($decode)];
               DB::table('V3_API')->update($newdata);
             }
           }else{
-            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
-              if (($key = array_search($request->game_provider.'_'.$request->game_code, $decode->games)) !== false) {
+            if (in_array($request->game_provider.'__'.$request->game_code, $decode->games)){
+              if (($key = array_search($request->game_provider.'__'.$request->game_code, $decode->games)) !== false) {
                   unset($decode->games[$key]);
               }
               $newdata = ["meta_data" => json_encode($decode)];
@@ -327,16 +327,16 @@ class AlController extends Controller
           $data = DB::table('V2_API')->first();
           $decode = json_decode($data->meta_data);
           if($request->action == 'add'){
-            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+            if (in_array($request->game_provider.'__'.$request->game_code, $decode->games)){
               // return 'success';
             }else{
-              $decode->games[] = $request->game_provider.'_'.$request->game_code;
+              $decode->games[] = $request->game_provider.'__'.$request->game_code;
               $newdata = ["meta_data" => json_encode($decode)];
               DB::table('V2_API')->update($newdata);
             }
           }else{
-            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
-              if (($key = array_search($request->game_provider.'_'.$request->game_code, $decode->games)) !== false) {
+            if (in_array($request->game_provider.'__'.$request->game_code, $decode->games)){
+              if (($key = array_search($request->game_provider.'__'.$request->game_code, $decode->games)) !== false) {
                   unset($decode->games[$key]);
               }
               $newdata = ["meta_data" => json_encode($decode)];

@@ -177,13 +177,34 @@ class GameLobbyController extends Controller
         ProviderHelper::saveLogGameLaunch('GAMELAUNCH LOG', 12, json_encode($request->all()), 'GAME REQUEST BODY');
 
         // Demo Handler
-        // Required Parameter game_code, game_provider
-        if ($request->has("demo") && $request->input("demo") == true) {
-            if($request->has('game_code')
-                &&$request->has('game_provider')){
-                return DemoHelper::DemoGame($request->all());
+        #Required Parameter game_code, game_provider
+        // if ($request->has("demo") && $request->input("demo") == true) {
+        //     if($request->has('game_code')
+        //         &&$request->has('game_provider')){
+        //         return DemoHelper::DemoGame($request->all());
+        //     }
+        // }
+
+
+        if($request->has("demo")){
+            $isDemo = false;
+            if(gettype($request->demo) == "string"){
+                if($request->demo == 'true'){
+                    $isDemo = true;
+                }
+            }else{
+                if($request->demo == true){
+                   $isDemo = true;
+                }
+            }
+            if($isDemo == true){
+                if($request->has('game_code')
+                    &&$request->has('game_provider')){
+                    return DemoHelper::DemoGame($request->all());
+                }
             }
         }
+
 
         if($request->has('client_id')
         &&$request->has('client_player_id')
@@ -216,12 +237,23 @@ class GameLobbyController extends Controller
             if($v2Api){
                 if($request->client_id == 23){
                     $decode = json_decode($v2Api->meta_data);
-                    if($decode->v2_api != false){
-                        if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
+
+                    $customLaunch = false;
+                    if(gettype($decode->v2_api) == "string"){
+                        if($decode->v2_api != 'false'){
+                            $customLaunch = true;
+                        }
+                    }else{
+                        if($decode->v2_api != false){
+                            $customLaunch = true;
+                        }
+                    }
+
+                    if($customLaunch == true){       
+                        if (in_array($request->game_provider.'__'.$request->game_code, $decode->games)){
                             try{
                                     ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
                                     $http_client = new Client([]);
-                                    // $GamePortal = '119.92.151.35:9004/api/game/launchurl';
                                     $GamePortal = $decode->v2_api;
                                     $requesttosend= [
                                         "token" => $request->token,
@@ -256,42 +288,53 @@ class GameLobbyController extends Controller
 
             $v3Api = DB::table('V3_API')->first();
             if($v3Api){
-                $decode = json_decode($v3Api->meta_data);
-                if($decode->v3_api != false){
-                        if($request->client_id == 23){
-                            if (in_array($request->game_provider.'_'.$request->game_code, $decode->games)){
-                              try{
-                                        ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
-                                        $http_client = new Client([]);
-                                        $GamePortal = $decode->v3_api;
-                                        $requesttosend= [
-                                            "token" => $request->token,
-                                            "client_id" => $request->client_id,
-                                            "client_player_id" => $request->client_player_id,
-                                            "email" => $request->email,
-                                            "display_name" => $request->display_name,
-                                            "username" => $request->username,
-                                            "game_code"=> $request->game_code,
-                                            "exitUrl" => $request->exitUrl,
-                                            "game_provider" => $request->game_provider,
-                                            'country_code' => 'ph',
-                                            'currency_code' => 'THB',
-                                            'lang' => 'en',
-                                            'ip_address' => '127.0.0.1'
-                                        ];
-                                        // dd($GamePortal);
-                                        $response = $http_client->post($GamePortal, [
-                                            'form_params' => $requesttosend,
-                                        ]);
-                                        $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
-                                        ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($requesttosend), json_encode($clientBetTransactionStatus));
-                                        return $clientBetTransactionStatus;
-                                }catch(\Exception $e){
-                                    ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
-                                    return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
-                                }
+                if($request->client_id == 23){
+                    $decode = json_decode($v3Api->meta_data);
+
+                    $customLaunch = false;
+                    if(gettype($decode->v3_api) == "string"){
+                        if($decode->v3_api != 'false'){
+                            $customLaunch = true;
+                        }
+                    }else{
+                        if($decode->v3_api != false){
+                            $customLaunch = true;
+                        }
+                    }
+
+                    if($customLaunch == true){       
+                        if (in_array($request->game_provider.'__'.$request->game_code, $decode->games)){
+                            try{
+                                    ProviderHelper::saveLogGameLaunch('TRAP_START', 1111, json_encode($request), $request->all());
+                                    $http_client = new Client([]);
+                                    $GamePortal = $decode->v3_api;
+                                    $requesttosend= [
+                                        "token" => $request->token,
+                                        "client_id" => $request->client_id,
+                                        "client_player_id" => $request->client_player_id,
+                                        "email" => $request->email,
+                                        "display_name" => $request->display_name,
+                                        "username" => $request->username,
+                                        "game_code"=> $request->game_code,
+                                        "exitUrl" => $request->exitUrl,
+                                        "game_provider" => $request->game_provider,
+                                        'country_code' => 'ph',
+                                        'currency_code' => 'THB',
+                                        'lang' => 'en',
+                                        'ip_address' => '127.0.0.1'
+                                    ];
+                                    $response = $http_client->post($GamePortal, [
+                                        'form_params' => $requesttosend,
+                                    ]);
+                                    $clientBetTransactionStatus = json_decode((string)$response->getBody(), true);
+                                    ProviderHelper::saveLogGameLaunch('TRAP_RESPONSE', 1111, json_encode($requesttosend), json_encode($clientBetTransactionStatus));
+                                    return $clientBetTransactionStatus;
+                            }catch(\Exception $e){
+                                ProviderHelper::saveLogGameLaunch('TRAP_ERROR', 1111, json_encode($request), $request->all());
+                                return ["game_code" => $request->game_code, "url" => false, "game_launch" => false];
                             }
                         }
+                    }
                 }
             }
 
