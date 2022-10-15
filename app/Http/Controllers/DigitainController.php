@@ -733,9 +733,10 @@ class DigitainController extends Controller
 
 		} // END FOREACH
 
+		$responseTimestamp = date('YmdHisms');
 		$response = array(
-			 "timestamp" => date('YmdHisms'),
-		     "signature" => $this->createSignature(date('YmdHisms')),
+			 "timestamp" => $responseTimestamp,
+		     "signature" => $this->createSignature($responseTimestamp),
 			 "errorCode" => 1,
 			 "items" => $items_array,
 		);	
