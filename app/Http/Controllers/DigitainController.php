@@ -383,9 +383,11 @@ class DigitainController extends Controller
 			return $this->noBody();
 		}
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
-			$withBalance = $this->wrongOperatorID();
-			$withBalance['balance'] = 0;
-			return $withBalance;
+			// $withBalance = $this->wrongOperatorID();
+			// $withBalance['balance'] = 0;
+			// return $withBalance;
+			$wrongOperatorIDCode = 15;
+			$wrongOperatorID = true;
 		}
 		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
 			$withBalance = $this->authError();
@@ -427,6 +429,17 @@ class DigitainController extends Controller
         	    ]; 
 				continue;
 			}
+
+			if($wrongOperatorID == true){
+				$items_array[] = [
+					 "info" => $key['info'], 
+					 "balance" => 0,
+					 "errorCode" => $wrongOperatorIDCode, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+        	    ];  
+				continue;
+			}
+
 			// Provider Details Logger
 			$general_details['provider']['operationType'] = $key['operationType'];
 			$general_details['provider']['currencyId'] = $key['currencyId'];
