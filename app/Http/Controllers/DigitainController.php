@@ -382,6 +382,10 @@ class DigitainController extends Controller
 		if($json_data == null){
 			return $this->noBody();
 		}
+
+		$wrongOperatorID = false;
+		$wrongAuth = false;
+
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
 			// $withBalance = $this->wrongOperatorID();
 			// $withBalance['balance'] = 0;
@@ -390,9 +394,11 @@ class DigitainController extends Controller
 			$wrongOperatorID = true;
 		}
 		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
-			$withBalance = $this->authError();
-			$withBalance['balance'] = 0;
-			return $withBalance;
+			// $withBalance = $this->authError();
+			// $withBalance['balance'] = 0;
+			// return $withBalance;
+			$wrongAuthCode = 12;
+			$wrongAuth = true;
 		}
 
 
@@ -435,6 +441,16 @@ class DigitainController extends Controller
 					 "info" => $key['info'], 
 					 "balance" => 0,
 					 "errorCode" => $wrongOperatorIDCode, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+        	    ];  
+				continue;
+			}
+
+			if($wrongAuth == true){
+				$items_array[] = [
+					 "info" => $key['info'], 
+					 "balance" => 0,
+					 "errorCode" => $wrongAuthCode, 
 					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
         	    ];  
 				continue;
