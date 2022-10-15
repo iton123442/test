@@ -385,7 +385,7 @@ class DigitainController extends Controller
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
 			$withBalance = $this->wrongOperatorID();
 			$withBalance['balance'] = 0;
-			return $this->wrongOperatorID();
+			return $withBalance;
 		}
 		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
 			$withBalance = $this->authError();
