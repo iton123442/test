@@ -383,11 +383,13 @@ class DigitainController extends Controller
 			return $this->noBody();
 		}
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
+			$withBalance = $this->wrongOperatorID();
+			$withBalance['balance'] = 0;
 			return $this->wrongOperatorID();
 		}
 		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
 			$withBalance = $this->authError();
-			$withBalance['balance'] = $this->getPlayerBalance();
+			$withBalance['balance'] = 0;
 			return $withBalance;
 		}
 
