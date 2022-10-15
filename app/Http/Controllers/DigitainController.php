@@ -438,6 +438,7 @@ class DigitainController extends Controller
 			if($client_details == null || $client_details == 'false'){ // SessionNotFound
 				$items_array[] = [
 					 "info" => $key['info'], 
+					 "balance" => 0,
 					 "errorCode" => 2, 
 					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
         	    ];  
