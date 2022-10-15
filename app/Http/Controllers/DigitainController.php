@@ -433,50 +433,7 @@ class DigitainController extends Controller
 			$general_details['provider']['txId'] = $key['txId'];
 			// Provider Details Logger
 
-			# if bet operation type is not in the bet operation types
-			if ($this->getBetWinOpType($key['operationType']) == false) {
-				$items_array[] = array(
-					"info" => $key['info'],
-					"errorCode" => 19, // error operation type for this bet not in the bet operation types
-					"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
-				);
-				continue;
-			}
-
-			# if bet is in the change balance 0 oepration type table make the amount zero
-			if ($this->betWithNoChangeBalanceOT($key['operationType'])) {
-				if ($key['changeBalance'] == true) {
-					$items_array[] = array(
-						"info" => $key['info'],
-						"errorCode" => 19, // error operation type
-						"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
-					);
-					continue;
-				} else {
-					$key['betAmount'] = 0;  // make the bet amount zero (free bets/artificial bets)
-				}
-			}
-
-			$is_exist_gameid = $this->getGameId($key["gameId"]);
-			if($is_exist_gameid == false){
-				$items_array[] = [
-					 "info" => $key['info'], 
-					 "errorCode" => 11, 
-					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-        	    ]; 
-        	    continue;
-			}
-			$key["gameId"] = $is_exist_gameid; // Overwrite GameId
-
-			$game_details = DigitainHelper::findGameDetails('game_code', $this->provider_db_id, $key["gameId"]);
-			if($game_details == null){ // Game not found
-				$items_array[] = [
-					 "info" => $key['info'], 
-					 "errorCode" => 11, 
-					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-        	    ]; 
-        	    continue;
-			}
+			
 			$client_details = ProviderHelper::getClientDetails('token', $key["token"]);	
 			if($client_details == null || $client_details == 'false'){ // SessionNotFound
 				$items_array[] = [
@@ -491,6 +448,7 @@ class DigitainController extends Controller
 				if($client_details->player_id != $key["playerId"]){
 					$items_array[] = [
 						 "info" => $key['info'], 
+						 "balance" => $client_details->balance,
 						 "errorCode" => 4, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 	        	    ];  
@@ -508,7 +466,8 @@ class DigitainController extends Controller
 				// }
 				if($key['currencyId'] != $client_details->default_currency){
 	        		$items_array[] = [
-						 "info" => $key['info'], 
+						 "info" => $key['info'],
+						 "balance" => $client_details->balance, 
 						 "errorCode" => 16, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : ''
 	        	    ];   
@@ -516,7 +475,8 @@ class DigitainController extends Controller
 				}
 				if(abs($client_details->balance) < $key['betAmount']){
 			        $items_array[] = array(
-						 "info" => $key['info'], 
+						 "info" => $key['info'],
+						 "balance" => $client_details->balance, 
 						 "errorCode" => 6, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : ''
 		   			);
@@ -532,7 +492,8 @@ class DigitainController extends Controller
 			 		$token_check = DigitainHelper::tokenCheck($key["token"]);
 					if($token_check != true){
 						$items_array[] = array(
-							 "info" => $key['info'], 
+							 "info" => $key['info'],
+							 "balance" => $client_details->balance, 
 							 "errorCode" => 3, 
 							 "metadata" => isset($key['metadata']) ? $key['metadata'] : ''
 			   			);
@@ -540,6 +501,56 @@ class DigitainController extends Controller
 					}
 				}
 			}
+
+			# if bet operation type is not in the bet operation types
+			if ($this->getBetWinOpType($key['operationType']) == false) {
+				$items_array[] = array(
+					"info" => $key['info'],
+					"balance" => $client_details->balance,
+					"errorCode" => 19, // error operation type for this bet not in the bet operation types
+					"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+				);
+				continue;
+			}
+
+			# if bet is in the change balance 0 oepration type table make the amount zero
+			if ($this->betWithNoChangeBalanceOT($key['operationType'])) {
+				if ($key['changeBalance'] == true) {
+					$items_array[] = array(
+						"info" => $key['info'],
+						"balance" => $client_details->balance,
+						"errorCode" => 19, // error operation type
+						"metadata" => isset($key['metadata']) ? $key['metadata'] : ''
+					);
+					continue;
+				} else {
+					$key['betAmount'] = 0;  // make the bet amount zero (free bets/artificial bets)
+				}
+			}
+
+			$is_exist_gameid = $this->getGameId($key["gameId"]);
+			if($is_exist_gameid == false){
+				$items_array[] = [
+					 "info" => $key['info'],
+					 "balance" => $client_details->balance, 
+					 "errorCode" => 11, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+        	    ]; 
+        	    continue;
+			}
+			$key["gameId"] = $is_exist_gameid; // Overwrite GameId
+
+			$game_details = DigitainHelper::findGameDetails('game_code', $this->provider_db_id, $key["gameId"]);
+			if($game_details == null){ // Game not found
+				$items_array[] = [
+					 "info" => $key['info'],
+					 "balance" => $client_details->balance, 
+					 "errorCode" => 11, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+        	    ]; 
+        	    continue;
+			}
+
 			// $check_bet_exist = DigitainHelper::findGameExt($key['txId'], 1,'transaction_id');
 			$check_bet_exist = GameTransactionMDB::findGameExt($key['txId'], 1,'transaction_id', $client_details);
 			if($check_bet_exist != 'false'){
@@ -559,6 +570,7 @@ class DigitainController extends Controller
 				if($is_round_has_refunded != null && $is_round_has_refunded != false && $is_round_has_refunded != "false"){
 					$items_array[] = [
 						 "info" => $key['info'],
+						 "balance" => $client_details->balance,
 						 "errorCode" => 14, // this transaction is not found
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 					]; 
