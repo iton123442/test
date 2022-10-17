@@ -69,7 +69,7 @@ class AWSController extends Controller
 		$details = json_decode($data);
 		AWSHelper::saveLog('AWS singleBalance - HIT 1', $this->provider_db_id, $data, $details);
 		$prefixed_username = explode("_TG", $details->accountId);
-		$client_details = AWSHelper::getClientDetails('player_id', $prefixed_username[1]);
+		$client_details = ProviderHelper::getClientDetailsCache('player_id', $prefixed_username[1]);
 		if ($client_details == 'false') {
 			$response = [
 				"msg" => "Player Not Found - Client Failed To Respond",
@@ -175,7 +175,7 @@ class AWSController extends Controller
 			return $response;
 		}
 
-		$game_details = AWSHelper::findGameDetails('game_code', $this->provider_db_id, $details->gameId);
+		$game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $details->gameId);
 		if ($game_details == null) {
 			$response = [
 				"msg" => "Game not found",
@@ -256,7 +256,7 @@ class AWSController extends Controller
 		&& $client_response->fundtransferresponse->status->code == "200"){
 			$new_balance = $client_details->balance - $bet_amount_2way;
 			$new_balance = $new_balance + $win_amount_2way;
-			ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+			ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
 			$response = [
 				"msg" => "success",
 				"code" => 0,
@@ -298,7 +298,7 @@ class AWSController extends Controller
 		$prefixed_username = explode("_TG", $details->accountId);
 
 		// AWSHelper::saveLog('AWS singleFundTransfer - getClientDetails CHECK', $this->provider_db_id, $data, 'CHECK');
-		$client_details = AWSHelper::getClientDetails('player_id', $prefixed_username[1]);
+		$client_details = ProviderHelper::getClientDetailsCache('player_id', $prefixed_username[1]);
 		if ($client_details == 'false') {
 			$response = [
 				"msg" => "Player Not Found - Client Failed To Respond",
@@ -339,7 +339,7 @@ class AWSController extends Controller
 		// 	return $response;
 		// }
 
-		$game_details = AWSHelper::findGameDetails('game_code', $this->provider_db_id, $details->gameId);
+		$game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $details->gameId);
 		if ($game_details == null) {
 			$response = [
 				"msg" => "Game not found",
@@ -522,7 +522,7 @@ class AWSController extends Controller
 				try {
 					$new_balance = $client_details->balance - $bet_amount_2way;
 					$new_balance = $new_balance + $win_amount_2way;
-					ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+					ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
 
 					$response = [
 						"msg" => "success",
@@ -712,7 +712,7 @@ class AWSController extends Controller
 		// }
 
 		$prefixed_username = explode("_TG", $details->accountId);
-		$client_details = AWSHelper::getClientDetails('player_id', $prefixed_username[1]);
+		$client_details = ProviderHelper::getClientDetailsCache('player_id', $prefixed_username[1]);
 		$player_details = AWSHelper::playerDetailsCall($client_details);
 		// $player_details = AWSHelper::playerDetailsCall($client_details->player_token);
 
@@ -796,7 +796,7 @@ class AWSController extends Controller
 	 */
 	// public function launchGame(Request $request){
 	// 	$lang = GameLobby::getLanguage('All Way Spin','en');
-	// 	$client_details = AWSHelper::getClientDetails('token', $request->token);
+	// 	$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 	// 	$client = new Client([
 	// 	    'headers' => [ 
 	// 	    	'Content-Type' => 'application/json',
@@ -856,7 +856,7 @@ class AWSController extends Controller
 	{
 		AWSHelper::saveLog('AWS BO Player Manage', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$status = $request->has('status') ? $request->status : 'enable';
-		$client_details = AWSHelper::getClientDetails('token', $request->token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 		$client = new Client([
 			'headers' => [
 				'Content-Type' => 'application/json',
@@ -885,7 +885,7 @@ class AWSController extends Controller
 	{
 		AWSHelper::saveLog('AWS BO Player Status', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
 		$status = $request->has('status') ? $request->status : 'enable';
-		$client_details = AWSHelper::getClientDetails('token', $request->token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 		$client = new Client([
 			'headers' => [
 				'Content-Type' => 'application/json',
@@ -912,7 +912,7 @@ class AWSController extends Controller
 	 */
 	public function playerBalance(Request $request)
 	{
-		$client_details = AWSHelper::getClientDetails('token', $request->token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 		$client = new Client([
 			'headers' => [
 				'Content-Type' => 'application/json',
@@ -940,7 +940,7 @@ class AWSController extends Controller
 	public function fundTransfer(Request $request)
 	{
 		AWSHelper::saveLog('AWS BO Fund Transfer', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
-		$client_details = AWSHelper::getClientDetails('token', $request->token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 		$client = new Client([
 			'headers' => [
 				'Content-Type' => 'application/json',
@@ -970,7 +970,7 @@ class AWSController extends Controller
 	public function queryStatus(Request $request)
 	{
 		AWSHelper::saveLog('AWS BO Query Status', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
-		$client_details = AWSHelper::getClientDetails('token', $request->token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 		$client = new Client([
 			'headers' => [
 				'Content-Type' => 'application/json',
@@ -1029,7 +1029,7 @@ class AWSController extends Controller
 	public function queryOrder(Request $request)
 	{
 		AWSHelper::saveLog('AWS BO Query Order', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
-		$client_details = AWSHelper::getClientDetails('token', $request->token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 		$client = new Client([
 			'headers' => [
 				'Content-Type' => 'application/json',
@@ -1058,7 +1058,7 @@ class AWSController extends Controller
 	public function playerLogout(Request $request)
 	{
 		AWSHelper::saveLog('AWS BO Player Logout', $this->provider_db_id, file_get_contents("php://input"), 'ENDPOINT HIT');
-		$client_details = AWSHelper::getClientDetails('token', $request->token);
+		$client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
 		$client = new Client([
 			'headers' => [
 				'Content-Type' => 'application/json',

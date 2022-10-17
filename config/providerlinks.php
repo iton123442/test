@@ -167,6 +167,10 @@ return [
             'merchant_id' => 'TG',
             'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
         ], 
+        '39THB'=> [ // 
+            'merchant_id' => 'TG',
+            'merchant_key' => '5819e7a6d0683606e60cd6294edfc4c557a2dd8c9128dd6fbe1d58e77cd8067fead68c48cdb3ea85dcb2e05518bac60412a0914d156a36b4a2ecab359c7adfad',
+        ], 
     ],
     'cqgames' => [
         "prefix" => "TG",
@@ -815,6 +819,14 @@ return [
         // 'user_agent' => 'api006',
         // 'prefix' => 'TG',
         // 'provider_db_id' => 139,
+    ],
+    'naga' => [
+        'brandCode' => 'tget',
+        'publicKey' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDD5RRnSM/TaY7slTGX4AP55CAiiIs4xopBwdFmFhnmsw8M7yGA2LNmeLn3zxbzVKliyId1UWGwIATqD60bRwUT0QgLDKW71mwlacAAVCBzc6GHBfUGQ/eMsAteT1GyE+ImfLUgzINc5A4Zd68PpHq/8zlT HP5xhpNNZkPABnBF8wIDAQAB',
+        'secretKey' => 'tgetbxj7s8VLMx',
+        'apiKey' => '99479fd1af57c02316c5d6611937f8412c5bbb58cf07836bdab0beb691cd68b0',
+        'groupCode' => 'ttie',
+        'gameLaunchUrl' => 'https://stg-bonanza.azureedge.net/?',
     ],
 ];
 

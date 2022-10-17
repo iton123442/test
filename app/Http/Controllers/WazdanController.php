@@ -34,7 +34,7 @@ class WazdanController extends Controller
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
         if($datadecoded["token"]){
-            $client_details = ProviderHelper::getClientDetails('token', $request->token);
+            $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
             Helper::saveLog('AuthPlayer (Wazdan)', 33, $data, $client_details);
             if($client_details){
                 // $client = new Client([
@@ -119,7 +119,7 @@ class WazdanController extends Controller
             try{
                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$datadecoded["transactionId"].'_1');
             }catch(\Exception $e){
-                $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
+                $client_details = ProviderHelper::getClientDetailsCache('token', $datadecoded["user"]["token"]);
                 $bet_transaction = GameTransactionMDB::findGameExt($datadecoded["transactionId"], 1,'transaction_id', $client_details);
                 if ($bet_transaction != 'false') {
                     // if( $bet_transaction->transaction_detail == "SUCCESS" ){
@@ -151,9 +151,9 @@ class WazdanController extends Controller
                 return response($msg,200)
                                 ->header('Content-Type', 'application/json');
             }
-            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
+            $client_details = ProviderHelper::getClientDetailsCache('token', $datadecoded["user"]["token"]);
             if($client_details){
-                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $datadecoded["gameId"]);
                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($datadecoded["roundId"], 'round_id',false, $client_details);
                 if($bet_transaction != "false") {
                     $client_details->connection_name = $bet_transaction->connection_name;
@@ -198,7 +198,7 @@ class WazdanController extends Controller
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
@@ -270,11 +270,11 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('rollbackStake(Wazdan)', 33, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-        $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $datadecoded["user"]["token"]);
         if($client_details){
                 // $win = 0;
                 // $game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
-                // $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                // $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $datadecoded["gameId"]);
                 // $json_data = array(
                 //     "transid" => $datadecoded["transactionId"],
                 //     "amount" => round($datadecoded["amount"],2),
@@ -294,7 +294,7 @@ class WazdanController extends Controller
                 }
                 $gameExtension =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($datadecoded["originalTransactionId"],1,$client_details);
                 //$gameExtension = WazdanHelper::getTransactionExt($datadecoded["originalTransactionId"]);
-                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $datadecoded["gameId"]);
                 if($gameExtension==null){
                     // $msg = array(
                     //     "status" => 0,
@@ -345,7 +345,7 @@ class WazdanController extends Controller
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
@@ -384,7 +384,7 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('returnWin(Wazdan)', 33, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
+            $client_details = ProviderHelper::getClientDetailsCache('token', $datadecoded["user"]["token"]);
             if($client_details){
 
                 $isGameExtFailed = GameTransactionMDB::findGameExt($datadecoded["roundId"], 1,'round_id', $client_details);
@@ -430,7 +430,7 @@ class WazdanController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 //ryy
-                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $datadecoded["gameId"]);
+                $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $datadecoded["gameId"]);
                 // $client_details->connection_name = $bet_transaction->connection_name;
                 $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
                 if($game==null){
@@ -466,7 +466,7 @@ class WazdanController extends Controller
                         if(isset($client_response->fundtransferresponse->status->code) 
                         && $client_response->fundtransferresponse->status->code == "200"){
                             $balance = round($client_response->fundtransferresponse->balance,2);
-                            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                             $msg = array(
                                 "status" => 0,
                                 "funds" => array(
@@ -569,7 +569,7 @@ class WazdanController extends Controller
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
@@ -601,7 +601,7 @@ class WazdanController extends Controller
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('getFund(Wazdan)', 33, $data, "Initialize");
         if($datadecoded["user"]["token"]){
-            $client_details = ProviderHelper::getClientDetails('token', $datadecoded["user"]["token"]);
+            $client_details = ProviderHelper::getClientDetailsCache('token', $datadecoded["user"]["token"]);
             Helper::saveLog('GetFund (Wazdan)', 33, $data, $client_details);
             if($client_details){
                 // $client = new Client([
