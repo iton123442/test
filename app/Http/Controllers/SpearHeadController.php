@@ -208,11 +208,11 @@ public function DebitProcess($req){
                       return response()->json($res, $http_status);             
                 break;
                 case '402':
-                    $http_status = 400;
-                    $updateGameTransaction = [
-                          'win' => 2,
-                    ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+                    // $http_status = 400;
+                    // $updateGameTransaction = [
+                    //       'win' => 2,
+                    // ];
+                    // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
                     $res = [
                       "ApiVersion"=>"1.0",
                       "Request" =>"WalletDebit",
@@ -225,7 +225,7 @@ public function DebitProcess($req){
                           "game_id" => $game_details->game_id,
                           "round_id" => $round_id,
                           "bet_amount" => $bet_amount,
-                          "win" => 5,
+                          "win" => 2,
                           "pay_amount" => 0,
                           "income" => 0,
                           "entry_id" => 1,
@@ -239,7 +239,7 @@ public function DebitProcess($req){
                         "game_transaction_type"=> 1,
                         "provider_request" =>json_encode($req),
                         "mw_response" => "FAILED",
-                        "mw_request" => json_encode($client_reponse->requestoclient),
+                        "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response->fundtransferresponse),
                         "transaction_detail" => "FAILED",
                     );
