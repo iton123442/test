@@ -49,21 +49,22 @@ class NagaGamesController extends Controller{
 
     
     public function hashParam($sortData){
-        ksort($sortData);
-        $param = "";
-        $i = 0;
-        foreach($sortData as $key => $item){
-            if($key != 'hash'){
-                if($i == 0){
-                    $param .= $key ."=". $item;
-                }else{
-                    $param .= "&".$key ."=". $item;
-                }
-                $i++;
-            }
-        }
-        $str = str_replace("\n","",$param.$this->api_key);
-        $clean = str_replace("\r","",$str);
+        // ksort($sortData);
+        // $param = "";
+        // $i = 0;
+        // foreach($sortData as $key => $item){
+        //     if($key != 'hash'){
+        //         if($i == 0){
+        //             $param .= $key ."=". $item;
+        //         }else{
+        //             $param .= "&".$key ."=". $item;
+        //         }
+        //         $i++;
+        //     }
+        // }
+        // $str = str_replace("\n","",$param.$this->api_key);
+        // $clean = str_replace("\r","",$str);
+        $clean = hash_hmac('sha256',json_encode($sortData),$this->api_key);
         Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean), 'HASH!');
         return $hash = hash('sha256',$clean);
     }
