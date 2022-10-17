@@ -22,7 +22,7 @@ class NagaGamesController extends Controller{
     public function __construct() {
         $this->startTime = microtime(true);
         $this->provider_db_id = config('providerlinks.naga.provider_db_id'); //sub provider ID
-        $this->api_key = config('providerlinks.dowinn.api_key');
+        $this->api_key = config('providerlinks.naga.secretKey');
         $this->api_url = config('providerlinks.dowinn.api_url');
         $this->prefix = config('providerlinks.dowinn.prefix');
         $this->providerID = 72; //Real provider ID
@@ -64,7 +64,8 @@ class NagaGamesController extends Controller{
         }
         $str = str_replace("\n","",$param.$this->key);
         $clean = str_replace("\r","",$str);
-        return $hash = hash('sha256',$clean);
+        Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean), 'HASH!');
+        return $hash = hash('sha256',$clean + $this->api_key);
     }
     public function balance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
