@@ -64,7 +64,7 @@ class NagaGamesController extends Controller{
         }
         $str = str_replace("\n","",$param.$this->key);
         $clean = str_replace("\r","",$str);
-        return $hash = md5($clean);
+        return $hash = hash('sha256',$clean);
     }
     public function balance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
