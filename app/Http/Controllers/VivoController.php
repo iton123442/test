@@ -22,6 +22,7 @@ class VivoController extends Controller
 
 	public function authPlayer(Request $request)
 	{
+        Helper::errorDebug('vivo_authentication', config("providerlinks.vivo.PROVIDER_ID"), json_encode($request->all()), $request);
         header("Content-type: text/xml; charset=utf-8");
 		$client_details = ProviderHelper::getClientDetails('token', $request->token);
 		$hash = md5($request->token.config("providerlinks.vivo.PASS_KEY"));
