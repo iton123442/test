@@ -303,7 +303,7 @@ class MancalaGamingController extends Controller
 			            $update_game_transaction = array(
 		                    "win" => 5,
 		                    "pay_amount" => $bet_transaction->pay_amount + $json_data["Amount"],
-		                    "income" => $bet_transaction->income - $json_data["Amount"],
+		                    "income" => $bet_transaction->bet_amount - $json_data["Amount"],
 		                    "entry_id" => $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
 		                );
 
