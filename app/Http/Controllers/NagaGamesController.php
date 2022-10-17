@@ -32,8 +32,8 @@ class NagaGamesController extends Controller{
     public function auth(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
-        $client_details = ProviderHelper::getClientDetails('token', $data['playerToken']);
-        $hash = $this-> hashParam($data['data'][0]);
+        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $hash = $this-> hashParam($data['data']);
         Helper::saveLog('Naga Games Hash 1', $this->provider_db_id, json_encode($hash), 'HASH!');
         if($client_details){
             $response = array(
