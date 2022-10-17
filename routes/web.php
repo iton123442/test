@@ -924,5 +924,3 @@ $app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
 // $app->post('/public/api/dowinn/limits', 'DOWINNNEWController@limitList');
 // $app->post('/public/api/dowinn/history', 'DOWINNNEWController@viewHistory');
 $app->post('/public/api/loadtesting', 'LoadTesterQueryCLientCallController@ProcessTransaction');
-//Naga Games
-$app->post('/public/nagagames/api/auth', 'NagaGamesController@auth');
