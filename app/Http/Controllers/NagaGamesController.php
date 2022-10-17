@@ -22,8 +22,8 @@ class NagaGamesController extends Controller{
     public function __construct() {
         $this->startTime = microtime(true);
         $this->provider_db_id = config('providerlinks.naga.provider_db_id'); //sub provider ID
-        $this->api_key = config('providerlinks.naga.secretKey');
-        $this->api_url = config('providerlinks.dowinn.api_url');
+        $this->secretKey = config('providerlinks.naga.secretKey');
+        $this->apiKey = config('providerlinks.naga.apiKey');
         $this->prefix = config('providerlinks.dowinn.prefix');
         $this->providerID = 72; //Real provider ID
         $this->dateToday = date("Y/m/d");
@@ -33,12 +33,12 @@ class NagaGamesController extends Controller{
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
-        $hash = $this-> hashParam($data['data']);
+        $hash = $this-> hashParam($data);
         Helper::saveLog('Naga Games Hash 1', $this->provider_db_id, json_encode($hash), 'HASH!');
         if($client_details){
             $response = array(
                 "data"=> [
-                "nativeId"=>"TG_" +$client_details->player_id,
+                "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
                 "balance"=>number_format($client_details->balance,2,'.', '')
             ],
@@ -49,23 +49,24 @@ class NagaGamesController extends Controller{
 
     
     public function hashParam($sortData){
-        ksort($sortData);
-        $param = "";
-        $i = 0;
-        foreach($sortData as $key => $item){
-            if($key != 'hash'){
-                if($i == 0){
-                    $param .= $key ."=". $item;
-                }else{
-                    $param .= "&".$key ."=". $item;
-                }
-                $i++;
-            }
-        }
-        $str = str_replace("\n","",$param.$this->api_key);
-        $clean = str_replace("\r","",$str);
+        // ksort($sortData);
+        // $param = "";
+        // $i = 0;
+        // foreach($sortData as $key => $item){
+        //     if($key != 'hash'){
+        //         if($i == 0){
+        //             $param .= $key ."=". $item;
+        //         }else{
+        //             $param .= "&".$key ."=". $item;
+        //         }
+        //         $i++;
+        //     }
+        // }
+        // $str = str_replace("\n","",$param.$this->api_key);
+        // $clean = str_replace("\r","",$str);
+        $clean = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
         Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean), 'HASH!');
-        return $hash = hash('sha256',$clean);
+        return $clean;
     }
     public function balance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
