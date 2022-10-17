@@ -24,6 +24,7 @@ class NagaGamesController extends Controller{
         $this->provider_db_id = config('providerlinks.naga.provider_db_id'); //sub provider ID
         $this->secretKey = config('providerlinks.naga.secretKey');
         $this->apiKey = config('providerlinks.naga.apiKey');
+        $this->publicKey = config('providerlinks.naga.publicKey');
         $this->prefix = config('providerlinks.dowinn.prefix');
         $this->providerID = 72; //Real provider ID
         $this->dateToday = date("Y/m/d");
@@ -33,7 +34,7 @@ class NagaGamesController extends Controller{
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
-        $hash = $this-> hashParam($data);
+        $hash = $this-> hashParam($data['data']);
         Helper::saveLog('Naga Games Hash 1', $this->provider_db_id, json_encode($hash), 'HASH!');
         if($client_details){
             $response = array(
@@ -52,19 +53,24 @@ class NagaGamesController extends Controller{
         // ksort($sortData);
         // $param = "";
         // $i = 0;
+        $clean1 = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
+        Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean1), 'HASH!');
         // foreach($sortData as $key => $item){
         //     if($key != 'hash'){
         //         if($i == 0){
         //             $param .= $key ."=". $item;
         //         }else{
         //             $param .= "&".$key ."=". $item;
+        
+        $clean2 = hash_hmac('sha256',json_encode($sortData),$this->secretKey);
+        Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean2), 'HASH!');
         //         }
         //         $i++;
         //     }
         // }
         // $str = str_replace("\n","",$param.$this->api_key);
         // $clean = str_replace("\r","",$str);
-        $clean = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
+        $clean = hash_hmac('sha256',json_encode($sortData),$this->publicKey);
         Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean), 'HASH!');
         return $clean;
     }
