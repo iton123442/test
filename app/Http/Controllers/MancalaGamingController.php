@@ -199,9 +199,13 @@ class MancalaGamingController extends Controller
 			                        );
 			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    }catch(\Exception $e){
-			                        
+			                        $data_to_update = array(
+			                            "mw_response" => json_encode($response),
+			                            'transaction_detail' => json_encode($e),
+	                                    'general_details' => json_encode($e),
+			                        );
+			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    } 
-
 								break;
 						}
 
@@ -256,6 +260,14 @@ class MancalaGamingController extends Controller
 					try{
 						ProviderHelper::idenpotencyTable($json_data['TransactionId']);
 					}catch(\Exception $e){
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 2, 'transaction_id',$client_details);
+						if($game_transaction != 'false'){
+							$response = [
+								"Error" =>  0,
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance),
+							];
+							return $response;
+						}
 						$response = [
 							"Error" =>  0,
 							"Balance" => ProviderHelper::amountToFloat($client_details->balance),
@@ -403,6 +415,14 @@ class MancalaGamingController extends Controller
 					try{
 						ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
 					}catch(\Exception $e){
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 3, 'transaction_id',$client_details);
+						if($game_transaction != 'false'){
+							$response = [
+								"Error" =>  0,
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance),
+							];
+							return $response;
+						}
 						$response = [
 							"Error" =>  0, 
 							"Balance" => ProviderHelper::amountToFloat($client_details->balance)
