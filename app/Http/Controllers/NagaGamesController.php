@@ -62,10 +62,10 @@ class NagaGamesController extends Controller{
                 $i++;
             }
         }
-        $str = str_replace("\n","",$param.$this->key);
+        $str = str_replace("\n","",$param.$this->api_key);
         $clean = str_replace("\r","",$str);
         Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean), 'HASH!');
-        return $hash = hash('sha256',$clean + $this->api_key);
+        return $hash = hash('sha256',$clean);
     }
     public function balance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
