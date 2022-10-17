@@ -2225,6 +2225,22 @@ class GameLobby{
         // Helper::saveLog('dowinn gamelaunchfinal', 139, json_encode($gameurl), 'Gamelaunch Success');
         return $gameurl;  
     }
+
+    public static function nagaLaunchUrl($request){
+        $exit_url = $request['exitUrl'];
+        $game_code = $request['game_code'];
+        $brandCode = config('providerlinks.naga.brandCode');
+        $groupCode = config('providerlinks.naga.groupCode');
+        $gameUrl = config('providerlinks.naga.gameLaunchUrl');
+        $get_player_details = ProviderHelper::getClientDetails('token',$request['token']);
+        // Helper::saveLog('dowinn gametoken', 131, json_encode($get_player_details), json_encode($logintoken));
+        // Helper::savePLayerGameRound($game_code,$token,$provider);
+        $game_launch_url = $gameUrl.'playerToken='.$request['token'].'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&gameCode=" . $game_code . "&redirectUrl=".$exit_url;
+        // Helper::saveLog('dowinn gamelaunch', 139, json_encode($game_launch_url), 'Initialized');
+        $gameLaunchURL = isset($game_launch_url) ? $game_launch_url : $exit_url;
+        Helper::saveLog('Naga gamelaunchfinal', 141, json_encode($gameLaunchURL), 'Gamelaunch Success');
+        return $gameLaunchURL;  
+    }
 }
 
 ?>

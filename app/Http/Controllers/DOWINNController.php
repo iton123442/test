@@ -29,39 +29,6 @@ class DOWINNController extends Controller{
         $this->dateToday = date("Y/m/d");
     }
 
-    // public function index(Request $request){
-    //     $data = json_decode($request->getContent(),TRUE);
-    //     $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-    //     if($client_details){
-    //         if(isset($data['transaction']) && isset($data['game'])){
-    //             if($data['transaction']['type'] == 'bet'){
-    //                 $result = $this->bet($data,$client_details);
-    //                 Helper::saveLog('DOWINN BET',$this->provider_db_id, json_encode($result), 'BET HIT');
-    //                 return $result;
-    //             }
-    //             elseif($data['transaction']['type'] == 'award'){
-    //                 $result = $this->payment($data,$client_details);
-    //                 Helper::saveLog('DOWINN WIN',$this->provider_db_id, json_encode($result), 'WIN HIT');
-    //                 return $result;
-    //             }
-    //             elseif($data['transaction']['type'] == 'cancel'){
-    //                 $result = $this->cancel($data,$client_details);
-    //                 Helper::saveLog('DOWINN CANCEL',$this->provider_db_id, json_encode($result), 'CANCEL HIT');
-    //                 return $result;
-    //             }
-    //             elseif($data['transaction']['type'] == 'tip'){
-    //                 $result = $this->tip($data,$client_details);
-    //                 Helper::saveLog('DOWINN TIP',$this->provider_db_id, json_encode($result), 'TIP HIT');
-    //                 return $result;
-    //             }
-    //         }else{
-    //             $result = $this->balance($data,$client_details);
-    //             Helper::saveLog('DOWINN BALANCE',$this->provider_db_id, json_encode($result), json_encode($data));
-    //             return $result;
-    //         }
-    //     }
-    // }
-
     public function balance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['token']);
@@ -75,32 +42,6 @@ class DOWINNController extends Controller{
             return response($response,200)->header('Content-Type', 'application/json');
         }
     }
-
-    // public function bet(Request $request){
-    //     $data = json_decode($request->getContent(),TRUE);
-    //     $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-    //     $explodedOrderId = explode("-", $data['transaction']['orderId']);
-    //     if($explodedOrderId['1'] == 1){
-    //         // sleep(0.10);
-    //         Helper::saveLog("BET 1", 139,json_encode($data),$this->startTime);
-    //         $result = $this->betProcessor($data,$client_details);
-    //         return $result;
-    //     }elseif($explodedOrderId['1'] == 2){
-    //         // sleep(0.30);
-    //         Helper::saveLog("BET 2", 139,json_encode($data),$this->startTime);
-    //         $result = $this->betProcessor($data,$client_details);
-    //         return $result;
-    //     }elseif($explodedOrderId['1'] > 2){
-    //         // sleep(0.50);
-    //         Helper::saveLog("BET >=3", 139,json_encode($data),$this->startTime);
-    //         $result = $this->betProcessor($data,$client_details);
-    //         return $result;
-    //     }else{
-    //         Helper::saveLog("BET 0", 139,json_encode($data),$this->startTime);
-    //         $result = $this->betProcessor($data,$client_details);
-    //         return $result;
-    //     }
-    // }
 
     public function bet(Request $request){
         $data = json_decode($request->getContent(),TRUE);
