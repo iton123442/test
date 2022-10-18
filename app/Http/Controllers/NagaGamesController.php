@@ -78,7 +78,7 @@ class NagaGamesController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
         $hash = $this-> hashParam($data['data']);
         Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
-        $hash = $this-> hashParam($data);
+        // $hash = $this-> hashParam($data);
         if($client_details){
             $response = array(
                 "data"=> [
