@@ -41,7 +41,8 @@ class NagaGamesController extends Controller{
                 "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
                 "balance"=>number_format($client_details->balance,2,'.', '')
-                ]
+                ],
+                "error" => null
             );
             return response($response,200)->header('Content-Type', 'application/json');
         }
@@ -85,7 +86,49 @@ class NagaGamesController extends Controller{
                 "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
                 "balance"=>number_format($client_details->balance,2,'.', '')
-                ]
+                ],
+                "error" => null
+            );
+            return response($response,200)->header('Content-Type', 'application/json');
+        }
+    }
+    public function placeBet (Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
+        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        if ($client_details){
+            // try{
+            //     ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
+            // }catch(\Exception $e){
+
+            // }
+            $response = array(
+                "data"=> [
+                "currency"=>"USD",
+                "balance"=>number_format($client_details->balance,2,'.', '')
+                ],
+                "error" => null
+            );
+            return response($response,200)->header('Content-Type', 'application/json');
+        }
+    }
+
+    public function payout (Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($data), 'PayOut HIT!');
+        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        if ($client_details){
+            // try{
+            //     ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
+            // }catch(\Exception $e){
+
+            // }
+            $response = array(
+                "data"=> [
+                "currency"=>"USD",
+                "balance"=>number_format($client_details->balance,2,'.', '')
+                ],
+                "error" => null
             );
             return response($response,200)->header('Content-Type', 'application/json');
         }
@@ -93,8 +136,8 @@ class NagaGamesController extends Controller{
 
     public function bet(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        Helper::saveLog("BET PROCESS", 139,json_encode($data),"BET ON PROCESSING!");
+        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);;
+        Helper::saveLog("BET PROCESS", 141,json_encode($data),"BET ON PROCESSING!");
         if($client_details){
             $token = $client_details->player_token;
             $guid = substr("abcdefghijklmnopqrstuvwxyz1234567890", mt_rand(0, 25), 1).substr(md5(time()), 1);
