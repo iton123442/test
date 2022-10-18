@@ -52,8 +52,8 @@ class NagaGamesController extends Controller{
         // ksort($sortData);
         // $param = "";
         // $i = 0;
-        // $clean1 = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
-        // Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean1), 'HASH!');
+        $clean1 = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
+        Helper::saveLog('Naga Games Hasher1', $this->provider_db_id, json_encode($clean1), 'HASH!');
         // foreach($sortData as $key => $item){
         //     if($key != 'hash'){
         //         if($i == 0){
@@ -61,8 +61,8 @@ class NagaGamesController extends Controller{
         //         }else{
         //             $param .= "&".$key ."=". $item;
         
-        // $clean2 = hash_hmac('sha256',json_encode($sortData),$this->secretKey);
-        // Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean2), 'HASH!');
+        $clean2 = hash_hmac('sha256',json_encode($sortData),$this->secretKey);
+        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($clean2), 'HASH!');
         //         }
         //         $i++;
         //     }
@@ -70,18 +70,22 @@ class NagaGamesController extends Controller{
         // $str = str_replace("\n","",$param.$this->api_key);
         // $clean = str_replace("\r","",$str);
         $clean = hash_hmac('sha256',json_encode($sortData),$this->publicKey);
-        Helper::saveLog('Naga Games Hasher', $this->provider_db_id, json_encode($clean), 'HASH!');
+        Helper::saveLog('Naga Games Hasher3', $this->provider_db_id, json_encode($clean), 'HASH!');
         return $clean;
     }
-    public function balance(Request $request){
+    public function getBalance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
-        Helper::saveLog('DOWINN GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
+        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $hash = $this-> hashParam($data['data']);
+        Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
+        $hash = $this-> hashParam($data);
         if($client_details){
             $response = array(
-                "status" =>'OK',
-                "balance"=>(int) number_format($client_details->balance,2,'.', ''),
-                "uuid" => $data['uuid'],
+                "data"=> [
+                "nativeId"=>"TG_" . $client_details->player_id,
+                "currency"=>"USD",
+                "balance"=>number_format($client_details->balance,2,'.', '')
+                ]
             );
             return response($response,200)->header('Content-Type', 'application/json');
         }
