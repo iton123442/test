@@ -927,3 +927,4 @@ $app->post('/public/api/loadtesting', 'LoadTesterQueryCLientCallController@Proce
 //Naga Games
 $app->post('/public/nagagames/api/auth', 'NagaGamesController@auth');
 $app->post('/public/nagagames/api/getBalance', 'NagaGamesController@getBalance');
+$app->post('/public/nagagames/api/balance', 'NagaGamesController@getBalance');
