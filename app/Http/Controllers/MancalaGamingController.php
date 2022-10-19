@@ -49,7 +49,7 @@ class MancalaGamingController extends Controller
 					"message" => "User is not identified.",
 				];
 
-				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
+				// $session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
  	
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data["ExtraData"]);
@@ -97,8 +97,8 @@ class MancalaGamingController extends Controller
 				];
 				
 				// Find the player and client details
-				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
-				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
+				// $session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
+				$client_details = ProviderHelper::getClientDetails('token', $json_data["ExtraData"]);
 				if ($client_details != null) {
 					
 					try{
@@ -141,8 +141,8 @@ class MancalaGamingController extends Controller
 
 					$bet_game_transaction_ext = array(
 						"game_trans_id" => $game_transaction_id,
-						"provider_trans_id" => $json_data['TransactionId'],
-						"round_id" => $json_data['RoundId'],
+						"provider_trans_id" => $json_data['TransactionGuid'],
+						"round_id" => $json_data['RoundGuid'],
 						"amount" => $json_data['Amount'],
 						"game_transaction_type" => 1,
 						"provider_request" => json_encode($json_data),
@@ -201,8 +201,8 @@ class MancalaGamingController extends Controller
 			                    }catch(\Exception $e){
 			                        $data_to_update = array(
 			                            "mw_response" => json_encode($response),
-			                            'transaction_detail' => json_encode($e),
-	                                    'general_details' => json_encode($e),
+			                            'transaction_detail' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+	                                    'general_details' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
 			                        );
 			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    } 
@@ -228,7 +228,7 @@ class MancalaGamingController extends Controller
         $json_data = $request->all();
         Helper::errorDebug('mancala_credit', config("providerlinks.mancala.PROVIDER_ID"), json_encode($json_data), '');
 		$http_status = 200;
-		if(!CallParameters::check_keys($json_data, 'Amount', 'SessionId', 'TransactionId', 'RoundId', 'Hash', 'ExtraData'))
+		if(!CallParameters::check_keys($json_data, 'Amount', 'SessionId', 'TransactionGuid', 'RoundGuid', 'Hash', 'ExtraData'))
 		{
 			$http_status = 200;
 			$response = [
@@ -238,7 +238,7 @@ class MancalaGamingController extends Controller
 		}
 		else
 		{
-			if ($this->_hashGenerator(['Debit/', $json_data['SessionId'], $json_data['TransactionId'], $json_data['RoundId'], $json_data['Amount']]) !== $json_data["Hash"]) {
+			if ($this->_hashGenerator(['Debit/', $json_data['SessionId'], $json_data['TransactionGuid'], $json_data['RoundGuid'], $json_data['Amount']]) !== $json_data["Hash"]) {
 				$http_status = 200;
 				$response = [
 					"Error" =>  1,
@@ -253,14 +253,14 @@ class MancalaGamingController extends Controller
 				];
 				// Find the player and client details
 				
-				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
-				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
+				// $session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
+				$client_details = ProviderHelper::getClientDetails('token', $json_data["ExtraData"]);
 				if ($client_details != null) {
 					
 					try{
-						ProviderHelper::idenpotencyTable($json_data['TransactionId']);
+						ProviderHelper::idenpotencyTable($json_data['TransactionGuid']);
 					}catch(\Exception $e){
-						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 2, 'transaction_id',$client_details);
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionGuid'], 2, 'transaction_id',$client_details);
 						if($game_transaction != 'false'){
 							$response = [
 								"Error" =>  0,
@@ -284,12 +284,12 @@ class MancalaGamingController extends Controller
 					else
 					{
 						
-						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
-						$bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($session_token->player_token, $json_data['RoundId'], $client_details);
-						$game_transaction = GameTransactionMDB::findGameTransactionDetails($bet_transaction->game_trans_id, 'game_transaction', false, $client_details);
+						// $game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
+						// $bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($session_token->player_token, $json_data['RoundGuid'], $client_details);
+						$bet_transaction = GameTransactionMDB::findGameTransactionDetails($json_data['RoundGuid'], 'round_id', false, $client_details);
 						$win_or_lost = $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
 						
-						$client_details->connection_name = $game_transaction->connection_name;
+						$client_details->connection_name = $bet_transaction->connection_name;
 
 						$winbBalance = $client_details->balance + $json_data["Amount"];
 						
@@ -338,8 +338,8 @@ class MancalaGamingController extends Controller
 		                }
 		                $win_game_transaction_ext = array(
 		                    "game_trans_id" => $bet_transaction->game_trans_id,
-		                    "provider_trans_id" => $json_data["TransactionId"],
-		                    "round_id" => $json_data["RoundId"],
+		                    "provider_trans_id" => $json_data["TransactionGuid"],
+		                    "round_id" => $json_data["RoundGuid"],
 		                    "amount" => $json_data["Amount"],
 		                    "game_transaction_type"=> 2,
 		                    "provider_request" =>json_encode($json_data),
@@ -356,8 +356,8 @@ class MancalaGamingController extends Controller
 			                ],
 			                "provider" => [
 			                    "provider_request" => $json_data, #R
-			                    "provider_trans_id"=> $json_data['TransactionId'], #R
-			                    "provider_round_id"=> $json_data['RoundId'], #R
+			                    "provider_trans_id"=> $json_data['TransactionGuid'], #R
+			                    "provider_round_id"=> $json_data['RoundGuid'], #R
 			                    "provider_name"=> $game_details->provider_name
 			                ],
 			                "mwapi" => [
@@ -385,7 +385,7 @@ class MancalaGamingController extends Controller
     	$json_data = $request->all();
     	Helper::errorDebug('mancala_rollback', config("providerlinks.mancala.PROVIDER_ID"), json_encode($json_data), '');
 		$http_status = 200;
-		if(!CallParameters::check_keys($json_data, 'Amount','SessionId', 'TransactionId', 'RefundTransactionId', 'RoundId', 'Hash', 'ExtraData')) {
+		if(!CallParameters::check_keys($json_data, 'Amount','SessionId', 'TransactionGuid', 'RefundTransactionGuid', 'RoundGuid', 'Hash', 'ExtraData')) {
 			$response = [
 					"Error" =>  10102,
 					"message" => "Post data is invalid!",
@@ -393,7 +393,7 @@ class MancalaGamingController extends Controller
 		}
 		else
 		{
-			if ($this->_hashGenerator(['RefundId', $json_data['SessionId'], $json_data['TransactionId'], $json_data['RefundTransactionId'], $json_data['RoundId'], $json_data['Amount']]) !== $json_data["Hash"]) {
+			if ($this->_hashGenerator(['RefundId', $json_data['SessionId'], $json_data['TransactionGuid'], $json_data['RefundTransactionGuid'], $json_data['RoundGuid'], $json_data['Amount']]) !== $json_data["Hash"]) {
 
 				$http_status = 200;
 				$response = [
@@ -407,15 +407,15 @@ class MancalaGamingController extends Controller
 					"message" => "Account is not exist!",
 				];
 				// Find the player and client details
-				$session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
-				$client_details = ProviderHelper::getClientDetails('token', $session_token->player_token);
+				// $session_token = Helper::getSessionTokenBySessionId($json_data['SessionId']);
+				$client_details = ProviderHelper::getClientDetails('token', $json_data["ExtraData"]);
 
 				if ($client_details != null) {
 					
 					try{
-						ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
+						ProviderHelper::idenpotencyTable($json_data['RefundTransactionGuid']);
 					}catch(\Exception $e){
-						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 3, 'transaction_id',$client_details);
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionGuid'], 3, 'transaction_id',$client_details);
 						if($game_transaction != 'false'){
 							$response = [
 								"Error" =>  0,
@@ -431,7 +431,7 @@ class MancalaGamingController extends Controller
 					}
 
 					// $game_transaction =  GameTransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($json_data["RefundTransactionId"], 1, $client_details);
-					$game_transaction =  GameTransactionMDB::findGameTransactionDetails($json_data["TransactionId"], 'transaction_id', false, $client_details);
+					$game_transaction =  GameTransactionMDB::findGameTransactionDetails($json_data["TransactionGuid"], 'transaction_id', false, $client_details);
 
 					$response = [
 						"Error" =>  10210,
@@ -457,8 +457,8 @@ class MancalaGamingController extends Controller
 
 			           	$refund_game_transaction_ext = array(
 		                    "game_trans_id" => $game_transaction->game_trans_id,
-		                    "provider_trans_id" => $json_data["TransactionId"],
-		                    "round_id" => $json_data["RoundId"],
+		                    "provider_trans_id" => $json_data["TransactionGuid"],
+		                    "round_id" => $json_data["RoundGuid"],
 		                    "amount" => $game_transaction->bet_amount,
 		                    "game_transaction_type"=> 3,
 		                    "provider_request" =>json_encode($json_data),
@@ -490,6 +490,14 @@ class MancalaGamingController extends Controller
 
 									GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 
+									break;
+								case '402':
+									$data_to_update = array(
+				                        "mw_response" => json_encode($response),
+				                        'transaction_detail' => 'failed',
+	                                    'general_details' => 'failed',
+				                    );
+									GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 									break;
 							}
 						}
