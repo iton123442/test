@@ -97,6 +97,15 @@ class NagaGamesController extends Controller{
         Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
         if ($client_details){
+            $response = array(
+                "data"=> [
+                "nativeId"=>"TG_" . $client_details->player_id,
+                "currency"=>"USD",
+                "balance"=>number_format($client_details->balance,2,'.', '')
+                ],
+                "error" => null
+            );
+            return response($response,200)->header('Content-Type', 'application/json');
             try{
                 ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
             }catch(\Exception $e){
