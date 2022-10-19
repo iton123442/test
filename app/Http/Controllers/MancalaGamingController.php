@@ -394,6 +394,15 @@ class MancalaGamingController extends Controller
 					          ]
 					    ];											
 			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$json_data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+			            if(isset($client_response->fundtransferresponse->status->code)){
+				            $dataToUpdate = array(
+				                "mw_request" => json_encode($client_response->requestoclient),
+				                "client_response" => json_encode($client_response),
+				                "mw_response" => json_encode($response),
+				                "transaction_detail" => "SUCCESS"
+				            );
+				            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
+				        }
 
 					}
 				}
