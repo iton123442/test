@@ -94,8 +94,8 @@ class NagaGamesController extends Controller{
     }
     public function placeBet (Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
         if ($client_details){
             // $response = array(
             //     "data"=> [
