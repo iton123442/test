@@ -1449,7 +1449,7 @@ class GameLobby{
                     'Content-Type' => 'application/json'
                 ]
             ]);
-        $hash = md5("GetToken/".config("providerlinks.mancala.PARTNER_ID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
+        $hash = md5("GetToken/".config("providerlinks.mancala.GUID").$request_data['game_code'].$client_details->player_id.$client_details->default_currency.config("providerlinks.mancala.API_KEY"));
         $datatosend = [
                 "ClientGuid" => config("providerlinks.mancala.GUID"),
                 "GameId" => $request_data['game_code'],
