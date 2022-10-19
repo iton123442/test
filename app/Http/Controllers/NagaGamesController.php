@@ -227,8 +227,7 @@ class NagaGamesController extends Controller{
                     "data"=> [
                     "currency"=>"USD",
                     "balance"=>$balance
-                    ],
-                    "error" => null
+                    ]
                 ];
                 $extensionData = [
                     "mw_request" => json_encode($client_response->requestoclient),
@@ -238,6 +237,7 @@ class NagaGamesController extends Controller{
                     "general_details" => "Success",
                 ];
                 GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
+                Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($response), 'Success HIT!');
                 return response($response,200)->header('Content-Type', 'application/json');
             }elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
