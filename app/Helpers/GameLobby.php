@@ -1462,7 +1462,7 @@ class GameLobby{
                 "DemoMode" => false,
                 "ExtraData" => "data"
             ];
-        Helper::saveLog('Mancala GAMELAUNCH',$provider, json_encode($datatosend), "");
+        Helper::saveLog('Mancala GAMELAUNCH',"mancala", json_encode($datatosend), "");
         $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
                 ['body' => json_encode($datatosend)]
             );
