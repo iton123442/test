@@ -374,7 +374,7 @@ class MancalaGamingController extends Controller
 					              "provider" => 'MancalaGaming',
 					              "client_connection_name" => $client_details->connection_name,
 					              "win_or_lost" => $win_or_lost,
-					              "entry_id" => $entry_id,
+					              "entry_id" => $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
 					              "pay_amount" => $bet_transaction->pay_amount + $json_data["Amount"],
 					              "income" => $bet_transaction->bet_amount - $json_data["Amount"],
 					              "game_transaction_ext_id" => $game_trans_ext_id
