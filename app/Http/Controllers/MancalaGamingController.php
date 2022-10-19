@@ -346,28 +346,53 @@ class MancalaGamingController extends Controller
 		                    "mw_response" => json_encode($response)
 		                );
 		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
-						$action_payload = [
-			                "type" => "custom", #genreral,custom :D # REQUIRED!
-			                "custom" => [
-			                    "provider" => 'MancalaGaming',
-			                    "game_trans_ext_id" => $game_trans_ext_id,
-			                    "win_or_lost" => $win_or_lost,
-			                    "client_connection_name" => $client_details->connection_name
-			                ],
-			                "provider" => [
-			                    "provider_request" => $json_data, #R
-			                    "provider_trans_id"=> $json_data['TransactionGuid'], #R
-			                    "provider_round_id"=> $json_data['RoundGuid'], #R
-			                    "provider_name"=> $game_details->provider_name
-			                ],
-			                "mwapi" => [
-			                    "roundId"=>$bet_transaction->game_trans_id, #R
-			                    "type"=>2, #R
-			                    "game_id" => $game_details->game_id, #R
-			                    "player_id" => $client_details->player_id, #R
-			                    "mw_response" => $response, #R
-			                ]
-			            ];
+						// $action_payload = [
+			   //              "type" => "custom", #genreral,custom :D # REQUIRED!
+			   //              "custom" => [
+			   //                  "provider" => 'MancalaGaming',
+			   //                  "game_trans_ext_id" => $game_trans_ext_id,
+			   //                  "win_or_lost" => $win_or_lost,
+			   //                  "client_connection_name" => $client_details->connection_name
+			   //              ],
+			   //              "provider" => [
+			   //                  "provider_request" => $json_data, #R
+			   //                  "provider_trans_id"=> $json_data['TransactionGuid'], #R
+			   //                  "provider_round_id"=> $json_data['RoundGuid'], #R
+			   //                  "provider_name"=> $game_details->provider_name
+			   //              ],
+			   //              "mwapi" => [
+			   //                  "roundId"=>$bet_transaction->game_trans_id, #R
+			   //                  "type"=>2, #R
+			   //                  "game_id" => $game_details->game_id, #R
+			   //                  "player_id" => $client_details->player_id, #R
+			   //                  "mw_response" => $response, #R
+			   //              ]
+			   //          ];
+			            $action_payload = [
+					          "type" => "custom", #genreral,custom :D # REQUIRED!
+					          "custom" => [
+					              "provider" => 'MancalaGaming',
+					              "client_connection_name" => $client_details->connection_name,
+					              "win_or_lost" => $win_or_lost,
+					              "entry_id" => $entry_id,
+					              "pay_amount" => $bet_transaction->pay_amount + $json_data["Amount"],
+					              "income" => $bet_transaction->bet_amount - $json_data["Amount"],
+					              "game_transaction_ext_id" => $game_trans_ext_id
+					          ],
+					          "provider" => [
+					              "provider_request" => $json_data, #R
+			                      "provider_trans_id"=> $json_data['TransactionGuid'], #R
+			                      "provider_round_id"=> $json_data['RoundGuid'], #R
+	                     		  "provider_name"=> $game_details->provider_name
+					          ],
+					          "mwapi" => [
+					              "roundId"=>$bet_transaction->game_trans_id, #R
+					              "type"=>2, #R
+					              "game_id" => $game_details->game_id, #R
+					              "player_id" => $client_details->player_id, #R
+					              "mw_response" => $response, #R
+					          ]
+					    ];											
 			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$json_data["Amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
 
 					}
