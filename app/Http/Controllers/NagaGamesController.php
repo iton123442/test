@@ -121,6 +121,7 @@ class NagaGamesController extends Controller{
             $provider_trans_id = $data['data']['transactionId'];
             $amount = $data['data']['amount'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', $this->providerID, $data['data']['gameCode']);
+            Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($gamedetails), 'GAMEDETAILS HIT!');
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             if($bet_transaction != null){
                 //this is double bet
@@ -191,7 +192,6 @@ class NagaGamesController extends Controller{
                     }
                 }
             }
-            Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BETFALSE HIT!');
             $gameTransactionDatas = [
                 "provider_trans_id" => $provider_trans_id,
                 "token_id" => $client_details->token_id,
