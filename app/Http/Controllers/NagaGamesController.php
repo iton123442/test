@@ -74,24 +74,24 @@ class NagaGamesController extends Controller{
         Helper::saveLog('Naga Games Hasher3', $this->provider_db_id, json_encode($clean), 'HASH!');
         return $clean;
     }
-    // public function getBalance(Request $request){
-    //     $data = json_decode($request->getContent(),TRUE);
-    //     $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
-    //     $hash = $this-> hashParam($data['data']);
-    //     Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
-    //     // $hash = $this-> hashParam($data);
-    //     if($client_details){
-    //         $response = array(
-    //             "data"=> [
-    //             "nativeId"=>"TG_" . $client_details->player_id,
-    //             "currency"=>"USD",
-    //             "balance"=>number_format($client_details->balance,2,'.', '')
-    //             ],
-    //             "error" => null
-    //         );
-    //         return response($response,200)->header('Content-Type', 'application/json');
-    //     }
-    // }
+    public function getBalance(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $hash = $this-> hashParam($data['data']);
+        Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
+        // $hash = $this-> hashParam($data);
+        if($client_details){
+            $response = array(
+                "data"=> [
+                "nativeId"=>"TG_" . $client_details->player_id,
+                "currency"=>"USD",
+                "balance"=>number_format($client_details->balance,2,'.', '')
+                ],
+                "error" => null
+            );
+            return response($response,200)->header('Content-Type', 'application/json');
+        }
+    }
     public function placeBet (Request $request){
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
@@ -99,7 +99,6 @@ class NagaGamesController extends Controller{
         if ($client_details){
             $response = array(
                 "data"=> [
-                "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
                 "balance"=>number_format($client_details->balance,2,'.', '')
                 ],
@@ -172,8 +171,11 @@ class NagaGamesController extends Controller{
                         ];
                         GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
                         $response = [
-                            "code" => 51,
-                            "extra" => "Invalid Request"
+                            "data"=> null,
+                            "error" => [
+                                "statusCode" => 500,
+                                "message" => "Cannot read properties of undefined (reading 'realMoney')"
+                            ],
                         ];
                         $updateExt = [
                             "mw_request" => json_encode('FAILED'),
