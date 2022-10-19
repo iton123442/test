@@ -283,12 +283,14 @@ class NagaGamesController extends Controller{
                     "currency"=>"USD",
                     "balance"=>number_format($client_details->balance,2,'.', '')
                     ],
+                    "error" => null
                 ],
             ];
             Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($response), 'PayOut HIT!');
             return response($response,200)->header('Content-Type', 'application/json');
         }
     }
+
     public function cancelBet (Request $request){
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($data), 'Cancel HIT!');
@@ -306,6 +308,7 @@ class NagaGamesController extends Controller{
         );
         return response($response,200)->header('Content-Type', 'application/json');
     }
+
     public function paymentProcessor($data,$client_details, $explodedOrderId){
         // $data = json_decode($request->getContent(),TRUE);
         // $client_details = ProviderHelper::getClientDetails('token', $data['token']);
