@@ -150,8 +150,7 @@ class NagaGamesController extends Controller{
                         "data"=> [
                         "currency"=>"USD",
                         "balance"=>$balance
-                        ],
-                        "error" => null
+                        ]
                     ];
                     $extensionData = [
                         "mw_request" => json_encode($client_response->requestoclient),
@@ -283,8 +282,7 @@ class NagaGamesController extends Controller{
                 "data"=> [
                 "currency"=>"USD",
                 "balance"=>number_format($client_details->balance,2,'.', '')
-                ],
-                "error" => null
+                ]
             );
             return response($response,200)->header('Content-Type', 'application/json');
         }
