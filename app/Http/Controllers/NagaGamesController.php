@@ -288,6 +288,23 @@ class NagaGamesController extends Controller{
             return response($response,200)->header('Content-Type', 'application/json');
         }
     }
+    public function cancelBet (Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($data), 'Cancel HIT!');
+            // try{
+            //     ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
+            // }catch(\Exception $e){
+
+            // }
+        $response = array(
+            "data"=> [
+            "betId"=>$data['data']['betId'],
+            "status"=>"CANCELED"
+            ],
+            "error" => null
+        );
+        return response($response,200)->header('Content-Type', 'application/json');
+    }
     public function paymentProcessor($data,$client_details, $explodedOrderId){
         // $data = json_decode($request->getContent(),TRUE);
         // $client_details = ProviderHelper::getClientDetails('token', $data['token']);
