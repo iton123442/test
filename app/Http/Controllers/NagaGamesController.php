@@ -94,17 +94,17 @@ class NagaGamesController extends Controller{
     }
     public function placeBet (Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
         if ($client_details){
-            $response = array(
-                "data"=> [
-                "currency"=>"USD",
-                "balance"=>number_format($client_details->balance,2,'.', '')
-                ],
-                "error" => null
-            );
-            return response($response,200)->header('Content-Type', 'application/json');
+            // $response = array(
+            //     "data"=> [
+            //     "currency"=>"USD",
+            //     "balance"=>number_format($client_details->balance,2,'.', '')
+            //     ],
+            //     "error" => null
+            // );
+            // return response($response,200)->header('Content-Type', 'application/json');
             try{
                 ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
             }catch(\Exception $e){
@@ -187,10 +187,11 @@ class NagaGamesController extends Controller{
                         GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
                         return response($response,200)->header('Content-Type', 'application/json');
                     }catch(\Exception $e){
-                    Helper::saveLog("FAILED BET", 139,json_encode($client_response),"FAILED HIT!");
+                    Helper::saveLog("FAILED BET", 141,json_encode($client_response),"FAILED HIT!");
                     }
                 }
             }
+            Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BETFALSE HIT!');
             $gameTransactionDatas = [
                 "provider_trans_id" => $provider_trans_id,
                 "token_id" => $client_details->token_id,
@@ -218,6 +219,7 @@ class NagaGamesController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$bet_transaction->game_trans_id,'debit',false,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "200"){
+                Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'FUNDTRANSFER HIT!');
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
@@ -262,7 +264,7 @@ class NagaGamesController extends Controller{
                     GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
                 }catch(\Exception $e){
-                Helper::saveLog("FAILED BET", 139,json_encode($client_response),"FAILED HIT!");
+                Helper::saveLog("FAILED BET", 141,json_encode($client_response),"FAILED HIT!");
                 }
             }
         }
