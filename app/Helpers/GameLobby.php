@@ -1458,9 +1458,10 @@ class GameLobby{
                 "Lang" => "EN",
                 "ClientType" => 1,
                 "IsVirtual" => false,
+                "ApiVersion" => "v2",
                 "Hash" => $hash,
                 "DemoMode" => false,
-                "ExtraData" => "data"
+                "ExtraData" => $request_data['token'],
             ];
         Helper::saveLog('Mancala GAMELAUNCH',"mancala", json_encode($datatosend), "");
         $game_launch_response = $game_launch->post(config("providerlinks.mancala.RGS_URL")."/GetToken",
