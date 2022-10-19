@@ -215,7 +215,7 @@ class NagaGamesController extends Controller{
             $fund_extra_data = [
                 'provider_name' => $gamedetails->provider_name
             ];
-            $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$bet_transaction->game_trans_id,'debit',false,$fund_extra_data);
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "200"){
                 Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'FUNDTRANSFER HIT!');
