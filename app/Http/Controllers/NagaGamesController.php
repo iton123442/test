@@ -277,12 +277,12 @@ class NagaGamesController extends Controller{
             // }catch(\Exception $e){
 
             // }
-            $response = array(
+            $response =[
                 "data" => [
                 "currency"=>"USD",
                 "balance"=>number_format($client_details->balance,2,'.', '')
                 ]
-            );
+            ];
             Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($response), 'PayOut HIT!');
             return response($response,200)->header('Content-Type', 'application/json');
         }
