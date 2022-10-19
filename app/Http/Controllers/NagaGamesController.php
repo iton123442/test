@@ -270,7 +270,6 @@ class NagaGamesController extends Controller{
 
     public function payout (Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($data), 'PayOut HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
         if ($client_details){
             // try{
@@ -279,11 +278,12 @@ class NagaGamesController extends Controller{
 
             // }
             $response = array(
-                "data"=> [
+                "data" => [
                 "currency"=>"USD",
                 "balance"=>number_format($client_details->balance,2,'.', '')
                 ]
             );
+            Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($response), 'PayOut HIT!');
             return response($response,200)->header('Content-Type', 'application/json');
         }
     }
