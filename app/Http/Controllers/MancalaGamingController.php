@@ -123,7 +123,7 @@ class MancalaGamingController extends Controller
 					// $json_data['roundid'] = $json_data['RoundGuid'];
 					// $json_data['transid'] = $json_data['TransactionGuid'];
 					/*$game_details = Game::find($json_data["game_id"], $this->provider_db_id);*/
-					$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
+					$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 
 					$gameTransactionData = array(
 			            "provider_trans_id" => $json_data['TransactionGuid'],
@@ -284,7 +284,7 @@ class MancalaGamingController extends Controller
 					else
 					{
 						
-						// $game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
+						$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 						// $bet_transaction = GameTransactionMDB::getGameTransactionByTokenAndRoundId($session_token->player_token, $json_data['RoundGuid'], $client_details);
 						$bet_transaction = GameTransactionMDB::findGameTransactionDetails($json_data['RoundGuid'], 'round_id', false, $client_details);
 						$win_or_lost = $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 0 : 1;
@@ -444,7 +444,7 @@ class MancalaGamingController extends Controller
 							return response()->json($response, $http_status);
 						}
 
-						$game_details = Helper::getInfoPlayerGameRound($session_token->player_token);
+						$game_details = Helper::getInfoPlayerGameRound($client_details->player_token);
 						$client_details->connection_name = $game_transaction->connection_name;
 						$update_game_transaction = array(
 		                    "win" => 4,
