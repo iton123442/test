@@ -706,8 +706,11 @@ return [
          'PROVIDER_ID'=> 61,
          'BRAND_NAME' => 'Tiger Conexion',
          'PARTNER_ID' => 264,
-         'RGS_URL' => 'https://slots-test.mancalagroup.net/api/partners/partners',
-         'API_KEY' => 'QNGIXXAI'
+         // 'RGS_URL' => 'https://slots-test.mancalagroup.net/api/partners/partners', ====v1
+         'RGS_URL' => 'https://develop-partner.api.perfecttlos.com/partnersV2',
+         'API_KEY' => 'QNGIXXAI',
+         'GUID' => '6cf7d265-594d-40c9-8be3-c8e3d86a2867',
+         'PROD_RGS_URL' => 'https://partner.api.mancala66.com/partnersV2',
     ],
     'idnpoker' => [
         'PROVIDER_ID'=> 110,
