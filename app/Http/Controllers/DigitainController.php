@@ -3432,7 +3432,7 @@ class DigitainController extends Controller
 			if(!isset($key['playerId'])) {
 	 		    $items_array[] = [
 					 "info" => $key['info'],
-					 "balance" => $this->formatBalance($client_details->balance),
+					 "balance" => 0,
 					 "errorCode" => 4, 
 					 "metadata" => isset($key['metadata']) ? $key['metadata'] : ''
 			    ];  
@@ -3441,7 +3441,7 @@ class DigitainController extends Controller
 			if($key['playerId'] == "") {
 	 		    $items_array[] = [
 					 "info" => $key['info'],
-					 "balance" => $this->formatBalance($client_details->balance),
+					 "balance" => 0,
 					 "errorCode" => 4, 
 					 "metadata" => isset($key['metadata']) ? $key['metadata'] : ''
 			    ];  
@@ -3452,7 +3452,7 @@ class DigitainController extends Controller
  		    if($client_details == null || $client_details == 'false'){
  		    	$items_array[] = [
 					 "info" => $key['info'],
-					 "balance" => $this->formatBalance($client_details->balance),
+					 "balance" => 0,
 					 "errorCode" => 4, 
 					 "metadata" => isset($key['metadata']) ? $key['metadata'] : ''
 			    ];  
@@ -3951,7 +3951,7 @@ class DigitainController extends Controller
 				if(!isset($value['playerId'])) {
 		 		    $items_array[] = [
 						 "info" => $value['info'],
-						 "balance" => $this->formatBalance($client_details->balance),
+						 "balance" => 0,
 						 "errorCode" => 4, 
 						 "metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 				    ];  
@@ -3964,7 +3964,7 @@ class DigitainController extends Controller
 				if($value['playerId'] == "") {
 		 		    $items_array[] = [
 						 "info" => $value['info'],
-						 "balance" => $this->formatBalance($client_details->balance),
+						 "balance" => 0,
 						 "errorCode" => 4, 
 						 "metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 				    ];  
@@ -3979,7 +3979,7 @@ class DigitainController extends Controller
 	 		    if($client_details == null || $client_details == 'false'){
 	 		    	$items_array[] = [
 						 "info" => $value['info'],
-						 "balance" => $this->formatBalance($client_details->balance),
+						 "balance" => 0,
 						 "errorCode" => 4, 
 						 "metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 				    ];  
