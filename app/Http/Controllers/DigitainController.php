@@ -427,11 +427,21 @@ class DigitainController extends Controller
 			$general_details = ["aggregator" => [],"provider" => [],"client" => []];
 
 			# Missing Parameters
-			if(!isset($key['info']) || !isset($key['txId']) || !isset($key['betAmount']) || !isset($key['token']) || !isset($key['playerId']) || !isset($key['roundId']) || !isset($key['gameId'])){
+			if(!isset($key['info']) || !isset($key['txId']) || !isset($key['betAmount']) || !isset($key['token'])  || !isset($key['roundId']) || !isset($key['gameId'])){
 				$items_array[] = [
 					"info" => $key['info'], 
-					"balance" => 0,
 					"errorCode" => 17, 
+					"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+        	    ]; 
+				continue;
+			}
+
+
+			if(!isset($key['playerId'])){
+				$items_array[] = [
+					"info" => $key['info'], 
+					"balance" => 0, 
+					"errorCode" => 4, 
 					"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
         	    ]; 
 				continue;
