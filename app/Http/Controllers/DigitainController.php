@@ -4676,7 +4676,7 @@ class DigitainController extends Controller
 		 //   // $error_encounter= 1;
 		 //   continue;
 			$general_details = ["aggregator" => [],"provider" => [],"client" => []];
-			if(!isset($key['playerId']) || !isset($key['gameId']) || !isset($key['roundId']) || !isset($key['txId']) || !isset($key['winTxId']) || !isset($key['winOperationType']) || !isset($key['currencyId']) || !isset($key['info']) || !isset($key['amendAmount'])){
+			if(!isset($key['gameId']) || !isset($key['roundId']) || !isset($key['txId']) || !isset($key['winTxId']) || !isset($key['winOperationType']) || !isset($key['currencyId']) || !isset($key['info']) || !isset($key['amendAmount'])){
 				$items_array[] = [
 					 "info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
 					 "errorCode" => 17, //The playerId was not found
@@ -4684,6 +4684,17 @@ class DigitainController extends Controller
         	    ];  
 				continue;
 			}
+
+			if(!isset($key['playerId'])){
+				$items_array[] = [
+					 "info" => isset($key['info']) ? $key['info'] : '', // Info from RSG, MW Should Return it back!
+					 "balance" => 0,
+					 "errorCode" => 4, //The playerId was not found
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
+        	    ];  
+				continue;
+			}
+
 			$client_details = ProviderHelper::getClientDetails('player_id', $key['playerId']);
 			if($client_details == null || $client_details == 'false'){
 				$items_array[] = [
@@ -5101,13 +5112,28 @@ class DigitainController extends Controller
 
 		foreach ($json_data['items'] as $key => $value) { // FOREACH CHECK
 				# Missing item param
-				if (!isset($value['playerId']) || !isset($value['gameId']) || !isset($value['roundId']) || !isset($value['txId']) || !isset($value['winTxId']) || !isset($value['winOperationType']) || !isset($value['currencyId']) || !isset($value['info']) || !isset($value['amendAmount'])) {
+				if (!isset($value['gameId']) || !isset($value['roundId']) || !isset($value['txId']) || !isset($value['winTxId']) || !isset($value['winOperationType']) || !isset($value['currencyId']) || !isset($value['info']) || !isset($value['amendAmount'])) {
 					$items_array[] = [
 						"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
 						"errorCode" => 17, //The playerId was not found
 						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
 					$global_error = $global_error == 1 ? 17 : $global_error;
+					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
+					continue;
+				}
+
+
+				if(!isset($value['playerId'])){
+					$items_array[] = [
+						"info" => isset($value['info']) ? $value['info'] : '', // Info from RSG, MW Should Return it back!
+						"balance" => 0, //The playerId was not found
+						"errorCode" => 4, //The playerId was not found
+						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
+					];
+					$global_error = $global_error == 1 ? 4 : $global_error;
 					$error_encounter = 1;
 					$value['tg_error'] = $global_error;
 					array_push($json_data_ii, $value);
