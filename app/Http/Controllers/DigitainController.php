@@ -4695,6 +4695,26 @@ class DigitainController extends Controller
 				continue;
 			}
 
+			if($wrongOperatorID == true){
+				$items_array[] = [
+					 "info" => $key['info'], 
+					 "balance" => 0,
+					 "errorCode" => $wrongOperatorIDCode, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+			    ];  
+				continue;
+			}
+
+			if($wrongAuth == true){
+				$items_array[] = [
+					 "info" => $key['info'], 
+					 "balance" => 0,
+					 "errorCode" => $wrongAuthCode, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+			    ];  
+				continue;
+			}
+
 			$is_exist_gameid = $this->getGameId($key["gameId"]);
 			if($is_exist_gameid == false){
 				$items_array[] = [
@@ -5093,6 +5113,26 @@ class DigitainController extends Controller
 					array_push($json_data_ii, $value);
 					continue;
 				}
+
+				if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
+					$wrongOperatorIDCode = 15;
+					$wrongOperatorID = true;
+					$global_error = $global_error == 1 ? 15 : $global_error;
+					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
+					continue;
+				}
+				if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
+					$wrongAuthCode = 12;
+					$wrongAuth = true;
+					$global_error = $global_error == 1 ? 12 : $global_error;
+					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
+					continue;
+				}
+
 				if ($isset_allbets_amount == 0) { # Calculate all total bets
 					foreach ($json_data['items'] as $key2 => $key_amount) {
 						array_push($duplicate_txid_request, $key_amount['txId']);
