@@ -753,7 +753,9 @@ class DigitainController extends Controller
 		$responseTimestamp = $json_data['timestamp'];
 		$response = array(
 			 "timestamp" => $responseTimestamp,
-		     "signature" => $this->createSignature($responseTimestamp),
+		     "timestamp" => $responseTimestamp,
+		     "signatureGenerated" => $this->createSignature($responseTimestamp),
+		     "signature" => $json_data['signature'],
 			 "errorCode" => 1,
 			 "items" => $items_array,
 		);	
