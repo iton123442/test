@@ -5668,7 +5668,7 @@ class DigitainController extends Controller
 			return $withBalance;
 		}
 		# Missing Parameters
-		if(!isset($json_data['providerId']) || !isset($json_data['operatorId']) || !isset($json_data['signature']) || !isset($json_data['timestamp']) || !isset($json_data['playerId']) || !isset($json_data['promoWinAmount']) || !isset($json_data['currencyId']) || !isset($json_data['txId'])){
+		if(!isset($json_data['providerId']) || !isset($json_data['operatorId']) || !isset($json_data['signature']) || !isset($json_data['timestamp']) || !isset($json_data['promoWinAmount']) || !isset($json_data['currencyId']) || !isset($json_data['txId'])){
 			$response = array(
 					 "timestamp" => date('YmdHisms'),
 				     "signature" => $this->createSignature(date('YmdHisms')),
@@ -5677,6 +5677,18 @@ class DigitainController extends Controller
    			);	
 			return $response;
 		}
+
+		if(!isset($json_data['playerId'])){
+			$response = array(
+					 "timestamp" => $json_data['timestamp'],
+					 "signature" => $json_data['signature'],
+				     "balance" => 0,
+					 "errorCode" => 4,
+					 "items" => [],
+   			);	
+			return $response;
+		}
+
 		$client_details = ProviderHelper::getClientDetails('player_id', $json_data['playerId']);
 		if($client_details == null || $client_details == 'false'){
 			$response = [
