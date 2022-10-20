@@ -2337,9 +2337,21 @@ class DigitainController extends Controller
 					continue;
 				}
 
+				if(!isset($key['playerId'])){
+					$items_array[] = [
+						"betInfo" => $key['betInfo'], // Betinfo
+					    "winInfo" => $key['winInfo'], // IWininfo
+						"balance" => 0, 
+						"errorCode" => 4, 
+						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+				    ]; 
+					continue;
+				}
+
 				if($wrongOperatorID == true){
 					$items_array[] = [
-						 "info" => $key['info'], 
+						 "betInfo" => $key['betInfo'], // Betinfo
+					     "winInfo" => $key['winInfo'], // IWininfo
 						 "balance" => 0,
 						 "errorCode" => $wrongOperatorIDCode, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
@@ -2349,7 +2361,8 @@ class DigitainController extends Controller
 
 				if($wrongAuth == true){
 					$items_array[] = [
-						 "info" => $key['info'], 
+						 "betInfo" => $key['betInfo'], // Betinfo
+					     "winInfo" => $key['winInfo'], // IWininfo
 						 "balance" => 0,
 						 "errorCode" => $wrongAuthCode, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
@@ -2362,6 +2375,7 @@ class DigitainController extends Controller
 		 			$items_array[] = [
 						 "betInfo" => $key['betInfo'], // Betinfo
 					     "winInfo" => $key['winInfo'], // IWininfo
+					     "balance" => 0,
 						 "errorCode" => 2, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 	        	    ];  
@@ -2372,6 +2386,9 @@ class DigitainController extends Controller
 				if($is_exist_gameid == false){
 					$items_array[] = [
 						 "info" => isset($key['betInfo']) ? $key['betInfo'] : "", 
+						 "betInfo" => $key['betInfo'], // Betinfo
+						 "winInfo" => $key['winInfo'], // IWininfo
+						 "balance" => $this->formatBalance($client_details->balance),
 						 "errorCode" => 11, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 	        	    ]; 
@@ -2384,6 +2401,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						 "betInfo" => $key['betInfo'], // Betinfo
 					     "winInfo" => $key['winInfo'], // IWininfo
+					     "balance" => $this->formatBalance($client_details->balance),
 						 "errorCode" => 11, //The playerId was not found
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 	        	    ];  
@@ -2403,6 +2421,7 @@ class DigitainController extends Controller
 						$items_array[] = [
 							 "betInfo" => $key['betInfo'], // Betinfo
 						     "winInfo" => $key['winInfo'], // IWininfo
+						     "balance" => $this->formatBalance($client_details->balance),
 							 "errorCode" => 3, 
 							 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 		        	    ];  
@@ -2413,6 +2432,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						"betInfo" => $key['betInfo'], // Betinfo
 					    "winInfo" => $key['winInfo'], // IWininfo
+					    "balance" => $this->formatBalance($client_details->balance),
 						"errorCode" => 4, 
 						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 	        	    ];  
@@ -2422,6 +2442,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						 "betInfo" => $key['betInfo'], // Betinfo
 					     "winInfo" => $key['winInfo'], // IWininfo
+					     "balance" => $this->formatBalance($client_details->balance),
 						 "errorCode" => 16, // Currency code dont match!
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 	        	    ];   
@@ -2728,8 +2749,8 @@ class DigitainController extends Controller
 				}
 		} # End Foreach
 		$response = array(
-			 "timestamp" => date('YmdHisms'),
-		     "signature" => $this->createSignature(date('YmdHisms')),
+			 "timestamp" => $json_data['timestamp'],
+		     "signature" => $json_data['signature'],
 			 "errorCode" => 1,
 			 "items" => $items_array,
 		);
@@ -2767,10 +2788,25 @@ class DigitainController extends Controller
 					continue;
 				}
 
+				if(!isset($key['playerId'])){
+					$items_array[] = [
+						"info" => isset($value['betInfo']) ? $value['betInfo'] : '',
+						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '', // Info from RSG, MW Should Return it back!
+						"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '', // Info from RSG, MW Should Return it back!
+						"balance" => 0, 
+						"errorCode" => 4, 
+						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+				    ]; 
+					continue;
+				}
+
 				$is_exist_gameid = $this->getGameId($value["gameId"]);
 				if($is_exist_gameid == false){
 					$items_array[] = [
-						 "info" => isset($value['betInfo']) ? $value['betInfo'] : '', 
+						 "info" => isset($value['betInfo']) ? $value['betInfo'] : '',
+						 "betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '', // Info from RSG, MW Should Return it back!
+						 "winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '', // Info from RSG, MW Should Return it back!
+						 "balance" => $this->formatBalance($client_details->balance), 
 						 "errorCode" => 11, 
 						 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 	        	    ]; 
@@ -2787,6 +2823,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '', // Info from RSG, MW Should Return it back!
 						"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '', // Info from RSG, MW Should Return it back!
+						"balance" => $this->formatBalance($client_details->balance), 
 						"errorCode" => 11, // transaction already refunded
 						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
@@ -2812,6 +2849,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '', // Info from RSG, MW Should Return it back!
 						"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '', // Info from RSG, MW Should Return it back!
+						"balance" => $this->formatBalance($client_details->balance), 
 						"errorCode" => 2, // transaction already refunded
 						"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 					];
@@ -2830,6 +2868,7 @@ class DigitainController extends Controller
 						$items_array[] = [
 							"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '', // Info from RSG, MW Should Return it back!
 							"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '', // Info from RSG, MW Should Return it back!
+							"balance" => $this->formatBalance($client_details->balance), 
 							"errorCode" => 3, // transaction already refunded
 							"metadata" => isset($value['metadata']) ? $value['metadata'] : '' // Optional but must be here!
 						];
@@ -2845,6 +2884,7 @@ class DigitainController extends Controller
 						$items_array[] = [
 							"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '',
 							"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '',
+							"balance" => $this->formatBalance($client_details->balance), 
 							"errorCode" => 4, // transaction already refunded
 							"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 						];
@@ -2858,6 +2898,7 @@ class DigitainController extends Controller
 						$items_array[] = [
 							"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '',
 							"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '',
+							"balance" => $this->formatBalance($client_details->balance), 
 							"errorCode" => 16, // transaction already refunded
 							"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 						];
@@ -2875,7 +2916,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '',
 						"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '',
-						"balance" => $client_details->balance,
+						"balance" => $this->formatBalance($client_details->balance), 
 						"errorCode" => 8,
 						"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 					];
@@ -2894,7 +2935,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '',
 						"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '',
-						"balance" => $client_details->balance,
+						"balance" => $this->formatBalance($client_details->balance), 
 						"errorCode" => 8,
 						"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 					];
@@ -2911,7 +2952,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '',
 						"winInfo" => isset($value['winInfo']) ? $value['winInfo'] : '',
-						"balance" => $client_details->balance,
+						"balance" => $this->formatBalance($client_details->balance), 
 						"errorCode" => 8,
 						"metadata" => isset($value['metadata']) ? $value['metadata'] : ''
 					];
@@ -3230,6 +3271,7 @@ class DigitainController extends Controller
 					$items_array[] = [
 						"betInfo" => $key['betInfo'], // Betinfo
 						"winInfo" => $key['winInfo'], // IWininfo
+						"balance" => $this->formatBalance($client_details->balance), 
 						"errorCode" => 6, // Player Low Balance!
 						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' // Optional but must be here!
 					];
@@ -3246,8 +3288,8 @@ class DigitainController extends Controller
 				## DEBIT
 			} # END FOREACH
 			$response = array(
-				"timestamp" => date('YmdHisms'),
-				"signature" => $this->createSignature(date('YmdHisms')),
+				"timestamp" => $json_data['timestamp'],
+				"signature" => $json_data['signature'],
 				"errorCode" => 1,
 				"items" => $items_array,
 			);
