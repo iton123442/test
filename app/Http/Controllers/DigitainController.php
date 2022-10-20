@@ -407,8 +407,8 @@ class DigitainController extends Controller
 		# Missing Parameters
 		if(!isset($json_data['providerId']) || !isset($json_data['allOrNone']) || !isset($json_data['signature']) || !isset($json_data['timestamp']) || !isset($json_data['operatorId']) || !isset($json_data['items'])){
 			$response = array(
-					 "timestamp" => date('YmdHisms'),
-				     "signature" => $this->createSignature(date('YmdHisms')),
+					 "timestamp" => $json_data['timestamp'],
+				     "signature" => $json_data['signature'],
 					 "errorCode" => 17,
 					 "items" => $items_array,
    			);	
@@ -749,12 +749,12 @@ class DigitainController extends Controller
 			}
 
 		} // END FOREACH
-		// $responseTimestamp = date('YmdHisms');
+
+		// $responseTimestamp = date('YmdHisms'); // use the request exact timestamp
 		$responseTimestamp = $json_data['timestamp'];
 		$response = array(
 			 "timestamp" => $responseTimestamp,
-		     "timestamp" => $responseTimestamp,
-		     "signatureGenerated" => $this->createSignature($responseTimestamp),
+		     // "signatureGenerated" => $this->createSignature($responseTimestamp), // use therequest exact signature
 		     "signature" => $json_data['signature'],
 			 "errorCode" => 1,
 			 "items" => $items_array,
@@ -1199,10 +1199,10 @@ class DigitainController extends Controller
 				}
 			} // END FOREACH
 
-			$responseTimestamp = date('YmdHisms');
+			$responseTimestamp = $json_data['timestamp'];
 			$response = array(
-				 "timestamp" => $responseTimestamp,
-			     "signature" => $this->createSignature($responseTimestamp),
+				"timestamp" => $responseTimestamp,
+			    "signature" => $json_data['signature'],
 				"errorCode" => 1,
 				"items" => $items_array,
 			);
