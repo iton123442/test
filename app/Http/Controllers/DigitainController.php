@@ -2797,6 +2797,32 @@ class DigitainController extends Controller
 						"errorCode" => 4, 
 						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 				    ]; 
+					$global_error = $global_error == 1 ? 4 : $global_error;
+					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
+					continue;
+				}
+
+				$wrongOperatorID = false;
+				$wrongAuth = false;
+
+				if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
+					$wrongOperatorIDCode = 15;
+					$wrongOperatorID = true;
+					$global_error = $global_error == 1 ? 15 : $global_error;
+					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
+					continue;
+				}
+				if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
+					$wrongAuthCode = 12;
+					$wrongAuth = true;
+					$global_error = $global_error == 1 ? 12 : $global_error;
+					$error_encounter = 1;
+					$value['tg_error'] = $global_error;
+					array_push($json_data_ii, $value);
 					continue;
 				}
 
@@ -2810,7 +2836,7 @@ class DigitainController extends Controller
 						 "errorCode" => 11, 
 						 "metadata" => isset($value['metadata']) ? $value['metadata'] : '' 
 	        	    ]; 
-	        	    $global_error = 11;
+	        	    $global_error = $global_error == 1 ? 11 : $global_error;
 	        	    $error_encounter = 1;
 	        	    $value['tg_error'] = $global_error;
 					array_push($json_data_ii, $value);
