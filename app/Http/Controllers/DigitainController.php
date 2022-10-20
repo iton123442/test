@@ -821,6 +821,17 @@ class DigitainController extends Controller
 				continue;
 			}
 
+
+			if(!isset($value['playerId'])){
+				$items_array[] = [
+					"info" => $key['info'], 
+					"balance" => 0, 
+					"errorCode" => 4, 
+					"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+			    ]; 
+				continue;
+			}
+
 			if($wrongOperatorID == true){
 				$items_array[] = [
 					 "info" => $key['info'], 
@@ -1281,6 +1292,17 @@ class DigitainController extends Controller
 					continue;
 				}
 
+
+				if(!isset($key['playerId'])){
+					$items_array[] = [
+						"info" => $key['info'], 
+						"balance" => 0, 
+						"errorCode" => 4, 
+						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+				    ]; 
+					continue;
+				}
+
 				if($wrongOperatorID == true){
 					$items_array[] = [
 						 "info" => $key['info'], 
@@ -1672,10 +1694,10 @@ class DigitainController extends Controller
 					# END Credit Auto Success Response
 				}    
 		} // END FOREACH
-		$responseTimestamp = date('YmdHisms');
+		$responseTimestamp = $json_data['timestamp'];
 		$response = array(
 			 "timestamp" => $responseTimestamp,
-		     "signature" => $this->createSignature($responseTimestamp),
+		     "signature" => $json_data['signature'],
 			 "errorCode" => 1,
 			 "items" => $items_array,
 		);	
@@ -1711,6 +1733,16 @@ class DigitainController extends Controller
 		}
 	
 		foreach ($json_data['items'] as $key => $value ) { // FOREACH CHECK
+				if(!isset($value['playerId'])){
+					$items_array[] = [
+						"info" => $key['info'], 
+						"balance" => 0, 
+						"errorCode" => 4, 
+						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+				    ]; 
+					continue;
+				}
+
 				if($wrongOperatorID == true){
 					$items_array[] = [
 						 "info" => $key['info'], 
@@ -2230,10 +2262,10 @@ class DigitainController extends Controller
 
 				}
 			} // END FOREACH
-			$responseTimestamp = date('YmdHisms');
+			$responseTimestamp = $json_data['timestamp'];
 			$response = array(
 				 "timestamp" => $responseTimestamp,
-			     "signature" => $this->createSignature($responseTimestamp),
+			     "signature" => $json_data['signature'],
 				 "errorCode" => 1,
 				 "items" => $items_array,
 			);	
