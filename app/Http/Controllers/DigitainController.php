@@ -4642,16 +4642,6 @@ class DigitainController extends Controller
 			$wrongAuth = true;
 		}
 
-
-		if(!isset($key['playerId'])){
-			$items_array[] = [
-				"info" => $key['info'], 
-				"balance" => 0, 
-				"errorCode" => 4, 
-				"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
-		    ]; 
-			continue;
-		}
 		# Missing Parameters
 		if(!isset($json_data['providerId']) || !isset($json_data['allOrNone']) || !isset($json_data['signature']) || !isset($json_data['timestamp']) || !isset($json_data['operatorId']) || !isset($json_data['items'])){
 			$response = array(
