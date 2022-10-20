@@ -2788,7 +2788,7 @@ class DigitainController extends Controller
 					continue;
 				}
 
-				if(!isset($key['playerId'])){
+				if(!isset($value['playerId'])){
 					$items_array[] = [
 						"info" => isset($value['betInfo']) ? $value['betInfo'] : '',
 						"betInfo" => isset($value['betInfo']) ? $value['betInfo'] : '', // Info from RSG, MW Should Return it back!
