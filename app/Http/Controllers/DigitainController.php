@@ -666,12 +666,14 @@ class DigitainController extends Controller
 			$game_transextension = $this->CreateGameLog($gameTransactionEXTData,$client_details);
 
 
+			# Not Implemented yet on v3.7.0
 			# Custom Configs
 			# Change Fund Amount to 0 when changeBalance is false
 			if (isset($key["changeBalance"]) && $key["changeBalance"] == true){
 				$fundAmount = abs($key['betAmount']);
 			}else{	
-				$fundAmount = 0;
+				// $fundAmount = 0;
+				$fundAmount = abs($key['betAmount']);
 			}
 
 			$fund_extra_data = [
@@ -1142,7 +1144,8 @@ class DigitainController extends Controller
 				if (isset($key["changeBalance"]) && $key["changeBalance"] == true){
 					$fundAmount = abs($key['betAmount']);
 				}else{	
-					$fundAmount = 0;
+					// $fundAmount = 0;
+					$fundAmount = abs($key['betAmount']);
 				}
 
 				$fund_extra_data = [
