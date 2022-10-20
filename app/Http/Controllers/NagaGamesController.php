@@ -279,7 +279,8 @@ class NagaGamesController extends Controller{
                     "balance"=>round($client_details->balance,2),
                 ]
             ];
-            return response($response,200)->header('Content-Type', 'application/json');
+            return $response;
+            // return response($response,200)->header('Content-Type', 'application/json');
             // try{
             //     ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
             // }catch(\Exception $e){
