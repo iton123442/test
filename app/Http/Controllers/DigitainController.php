@@ -749,7 +749,6 @@ class DigitainController extends Controller
 			}
 
 		} // END FOREACH
-
 		// $responseTimestamp = date('YmdHisms');
 		$responseTimestamp = $json_data['timestamp'];
 		$response = array(
