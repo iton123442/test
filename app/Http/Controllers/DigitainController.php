@@ -6004,7 +6004,7 @@ class DigitainController extends Controller
 			return $withBalance;
 		}
 		# Missing Parameters
-		if(!isset($json_data['providerId']) || !isset($json_data['operatorId']) || !isset($json_data['signature']) || !isset($json_data['timestamp']) || !isset($json_data['playerId'])  || !isset($json_data['currencyId']) || !isset($json_data['txId']) || !isset($json_data['chargeAmount'])){
+		if(!isset($json_data['providerId']) || !isset($json_data['operatorId']) || !isset($json_data['signature']) || !isset($json_data['timestamp']) || !isset($json_data['currencyId']) || !isset($json_data['txId']) || !isset($json_data['chargeAmount'])){
 			$response = array(
 					 "timestamp" => $json_data['timestamp'],
 					 "signature" => $json_data['signature'],
@@ -6014,6 +6014,17 @@ class DigitainController extends Controller
 			return $response;
 		}
 
+
+		if(!isset($json_data['playerId'])){
+			$response = array(
+					 "timestamp" => $json_data['timestamp'],
+					 "signature" => $json_data['signature'],
+				     "balance" => 0,
+					 "errorCode" => 4,
+					 "items" => [],
+   			);	
+			return $response;
+		}
 
 
 		if(isset($json_data['token']) && $json_data['token'] != ""){
