@@ -829,6 +829,10 @@ class DigitainController extends Controller
 					"errorCode" => 4, 
 					"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 			    ]; 
+				$global_error = 4;
+				$value['tg_error'] = 4;
+        	    array_push($json_data_ii, $value);
+				$error_encounter = 1;
 				continue;
 			}
 
@@ -839,6 +843,10 @@ class DigitainController extends Controller
 					 "errorCode" => $wrongOperatorIDCode, 
 					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 			    ];  
+				$global_error = $wrongOperatorIDCode;
+				$value['tg_error'] = $wrongOperatorIDCode;
+        	    array_push($json_data_ii, $value);
+				$error_encounter = 1;
 				continue;
 			}
 
@@ -849,6 +857,10 @@ class DigitainController extends Controller
 					 "errorCode" => $wrongAuthCode, 
 					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 			    ];  
+				$global_error = $wrongAuthCode;
+				$value['tg_error'] = $wrongAuthCode;
+        	    array_push($json_data_ii, $value);
+				$error_encounter = 1;
 				continue;
 			}
 
@@ -1740,6 +1752,10 @@ class DigitainController extends Controller
 						"errorCode" => 4, 
 						"metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 				    ]; 
+					$global_error = 4;
+	        	    $error_encounter = 1;
+	        	    $value['tg_error'] = 4;
+					array_push($json_data_ii, $value);
 					continue;
 				}
 
@@ -1750,6 +1766,10 @@ class DigitainController extends Controller
 						 "errorCode" => $wrongOperatorIDCode, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 				    ];  
+					$global_error = 15;
+	        	    $error_encounter = 1;
+	        	    $value['tg_error'] = 15;
+					array_push($json_data_ii, $value);
 					continue;
 				}
 
@@ -1760,6 +1780,10 @@ class DigitainController extends Controller
 						 "errorCode" => $wrongAuthCode, 
 						 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
 				    ];  
+					$global_error = 12;
+	        	    $error_encounter = 1;
+	        	    $value['tg_error'] = 12;
+					array_push($json_data_ii, $value);
 					continue;
 				}
 
@@ -3340,11 +3364,18 @@ class DigitainController extends Controller
 		if($json_data == null){
 			return $this->noBody();
 		}
+		
+
+		$wrongOperatorID = false;
+		$wrongAuth = false;
+
 		if($json_data['operatorId'] != $this->operator_id){ //Wrong Operator Id 
-			return $this->wrongOperatorID();
+			$wrongOperatorIDCode = 15;
+			$wrongOperatorID = true;
 		}
 		if(!$this->authMethod($json_data['operatorId'], $json_data['timestamp'], $json_data['signature'])){ 
-			return $this->authError();
+			$wrongAuthCode = 12;
+			$wrongAuth = true;
 		}
 
 		# Missing Parameters
@@ -3377,7 +3408,26 @@ class DigitainController extends Controller
 		foreach ($json_data['items'] as $key) { 
 			$general_details = ["aggregator" => [], "provider" => [], "client" => []];
 
+			if($wrongOperatorID == true){
+				$items_array[] = [
+					 "info" => $key['info'], 
+					 "balance" => 0,
+					 "errorCode" => $wrongOperatorIDCode, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+			    ];  
+				continue;
+			}
 
+			if($wrongAuth == true){
+				$items_array[] = [
+					 "info" => $key['info'], 
+					 "balance" => 0,
+					 "errorCode" => $wrongAuthCode, 
+					 "metadata" => isset($key['metadata']) ? $key['metadata'] : '' 
+			    ];  
+				continue;
+			}
+			
 			# 001 (FILTER MDB ONLY ACCEPT REQUET THAT HAS PLAYERID PARAM)
 			if(!isset($key['playerId'])) {
 	 		    $items_array[] = [
