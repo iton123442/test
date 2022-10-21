@@ -32,15 +32,15 @@ class NagaGamesController extends Controller{
 
     public function auth(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
+        // Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
-        $hash = $this-> hashParam($data['data']);
+        // $hash = $this-> hashParam($data['data']);
         if($client_details){
             $response = array(
                 "data"=> [
                 "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
-                "balance"=>number_format($client_details->balance,2,'.', '')
+                "balance"=>(int)round($client_details->balance,2)
                 ],
                 "error" => null
             );
@@ -77,17 +77,18 @@ class NagaGamesController extends Controller{
     public function getBalance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
         $hash = $this-> hashParam($data['data']);
         if($client_details){
             $response = array(
                 "data"=> [
                 "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
-                "balance"=>round($client_details->balance,2)
+                "balance"=> (int) round($client_details->balance,2)
                 ],
                 "error" => null
             );
-            Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($response), 'Balance HIT!');
+            Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($response), 'Success HIT!');
             return response($response,200)->header('Content-Type', 'application/json');
         }
     }
@@ -148,7 +149,7 @@ class NagaGamesController extends Controller{
                     $response = [
                         "data" => [
                             "currency"=>"USD",
-                            "balance"=>round($client_details->balance,2),
+                            "balance"=> (int) round($client_details->balance,2),
                         ]
                     ];
                     $extensionData = [
@@ -223,7 +224,7 @@ class NagaGamesController extends Controller{
                 $response = [
                     "data" => [
                         "currency"=>"USD",
-                        "balance"=>round($client_details->balance,2),
+                        "balance"=> (int) round($client_details->balance,2),
                     ]
                 ];
                 $extensionData = [
@@ -275,7 +276,7 @@ class NagaGamesController extends Controller{
             // $response =[
             //     "data" => [
             //         "currency"=>"USD",
-            //         "balance"=>round($client_details->balance,2),
+            //         "balance"=> (int) round($client_details->balance,2),
             //     ]
             // ];
             // return response($response,200)->header('Content-Type', 'application/json');
@@ -285,7 +286,7 @@ class NagaGamesController extends Controller{
                 $response =[
                     "data" => [
                         "currency"=>"USD",
-                        "balance"=>round($client_details->balance,2)
+                        "balance"=> (int) round($client_details->balance,2)
                     ]
                 ];
                 return response($response,200)->header('Content-Type', 'application/json');
@@ -335,7 +336,7 @@ class NagaGamesController extends Controller{
                     $response = [
                         "data" => [
                             "currency"=>"USD",
-                            "balance"=>round($client_details->balance,2),
+                            "balance"=> (int) $balance,
                         ]
                     ];
                     $extensionData = [
@@ -386,7 +387,7 @@ class NagaGamesController extends Controller{
             $response =[
                 "data" => [
                     "currency"=>"USD",
-                    "balance"=>round($client_details->balance,2)
+                    "balance"=> (int) round($client_details->balance,2)
                 ]
             ];
             $gameExtensionData = [
@@ -433,7 +434,7 @@ class NagaGamesController extends Controller{
                     $response = [
                         "data" => [
                             "currency"=>"USD",
-                            "balance"=>round($client_details->balance,2),
+                            "balance"=> (int) $balance,
                         ]
                     ];
                     $msg = [
