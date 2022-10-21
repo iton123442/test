@@ -438,6 +438,10 @@ class NagaGamesController extends Controller{
                             "balance"=>round($client_details->balance,2),
                         ]
                     ];
+                    $msg = [
+                        "mw_response" => $response,
+                    ];
+                    GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
                 }
             }
