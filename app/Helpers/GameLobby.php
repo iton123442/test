@@ -2233,7 +2233,7 @@ class GameLobby{
         $game_code = $request['game_code'];
         $brandCode = config('providerlinks.naga.brandCode');
         $groupCode = config('providerlinks.naga.groupCode');
-        $url = NagaGamesHelper::findGameUrl($request['playerToken'],$game_code);
+        $url = NagaGamesHelper::findGameUrl($request['token'],$game_code);
         // $game_launch_url = $gameUrl.'playerToken='.$request['token'].'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
         // Helper::saveLog('dowinn gametoken', 131, json_encode($get_player_details), json_encode($logintoken));
         // Helper::savePLayerGameRound($game_code,$token,$provider);
