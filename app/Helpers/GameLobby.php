@@ -2237,7 +2237,10 @@ class GameLobby{
         // $game_launch_url = $gameUrl.'playerToken='.$request['token'].'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
         // Helper::saveLog('dowinn gametoken', 131, json_encode($get_player_details), json_encode($logintoken));
         // Helper::savePLayerGameRound($game_code,$token,$provider);
-        $game_launch_url = $url.'?playerToken='.$request['token'].'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&gameCode=" . $game_code . "&redirectUrl=".$exit_url;
+
+        
+        // $game_launch_url = $url.'?playerToken='.$request['token'].'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&gameCode=" . $game_code . "&redirectUrl=".$exit_url;
+        $game_launch_url = 'https://stg-bonanza.azureedge.net/?playerToken='.$request['token'].'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&gameCode=" . $game_code . "&redirectUrl=".$exit_url;
         // Helper::saveLog('dowinn gamelaunch', 139, json_encode($game_launch_url), 'Initialized');
         $gameLaunchURL = isset($game_launch_url) ? $game_launch_url : $exit_url;
         Helper::saveLog('Naga gamelaunchfinal', 141, json_encode($gameLaunchURL), 'Gamelaunch Success');
