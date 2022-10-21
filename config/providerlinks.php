@@ -829,7 +829,7 @@ return [
         'secretKey' => 'tgetbxj7s8VLMx',
         'apiKey' => '99479fd1af57c02316c5d6611937f8412c5bbb58cf07836bdab0beb691cd68b0',
         'groupCode' => 'ttie',
-        'gameLaunchUrl' => 'https://stg-bonanza.azureedge.net/?',
+        'api_url' => 'https://api.game-stg.topasianplatform.com/client/game/enter-lobby-page-get-all-games',
         'provider_db_id' => 141,
     ],
 ];
