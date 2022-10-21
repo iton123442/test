@@ -42,7 +42,7 @@ class FundtransferProcessorController extends Controller
         try{
             $providers = ["hbn","tpp","ygg","AmuseGaming","OnlyPlay","Nolimit City","BGaming","SpearHead","Smartsoft Gaming","kagaming","allwayspin","evoplay","sagaming","cqgames","evolution","bng","icg","wazdan","TopTrendGaming","MannaPlay","VivoGaming","MancalaGaming","Quickspin","PlayNGo","BOTA","DOWINN","digitain",
 
-                "PlayStar Gaming","Ozashiki","SG","SimplePlay","Oryx Gaming","FunkyGames","SkyWind"
+                "PlayStar Gaming","Ozashiki","SG","SimplePlay","Oryx Gaming","FunkyGames","SkyWind,NagaGames"
             ];
 
             if(in_array($payload->action->custom->provider, $providers)){
