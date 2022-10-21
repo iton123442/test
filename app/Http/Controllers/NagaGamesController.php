@@ -391,6 +391,7 @@ class NagaGamesController extends Controller{
                 "win" => $win,
                 "pay_amount" => round($amount,2),
                 "income" => round($game->bet_amount-$amount,2),
+                "entry_id" => $amount == 0 ? 1 : 2,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $response =[
@@ -436,14 +437,6 @@ class NagaGamesController extends Controller{
                             "balance"=>round($client_details->balance,2),
                         ]
                     ];
-                    $extensionData = [
-                        "mw_response" =>json_encode($response),
-                        "client_response" => json_encode($client_response),
-                        "mw_request" => json_encode($client_response->requestoclient),
-                        "transaction_detail" => "Success",
-                        "general_details" => "Success",
-                    ];
-                    GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
                 }
             }
