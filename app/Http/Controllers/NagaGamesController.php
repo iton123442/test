@@ -78,17 +78,16 @@ class NagaGamesController extends Controller{
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
         $hash = $this-> hashParam($data['data']);
-        Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
-        // $hash = $this-> hashParam($data);
         if($client_details){
             $response = array(
                 "data"=> [
                 "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
-                "balance"=>number_format($client_details->balance,2,'.', '')
+                "balance"=>round($client_details->balance,2)
                 ],
                 "error" => null
             );
+            Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($response), 'Balance HIT!');
             return response($response,200)->header('Content-Type', 'application/json');
         }
     }

@@ -21,7 +21,7 @@ class NagaGamesHelper{
         ]);
         $response = $client->get($url);
         $response = json_decode($response->getBody(),TRUE);
-        Helper::saveLog('NAGA FINDGAME', 141, json_encode($response), 'URL HIT!');
+        // Helper::saveLog('NAGA FINDGAME', 141, json_encode($response), 'URL HIT!');
         //Iterate every array to get the matching game code
         foreach($response as $item) {
             if ($item['code'] == $gameCode){
