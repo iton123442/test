@@ -283,14 +283,13 @@ class NagaGamesController extends Controller{
             try{
                 ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
             }catch(\Exception $e){
-                $response = [
-                    "data"=> null,
-                    "error" => [
-                        "statusCode" => 500,
-                        "message" => "Cannot read properties of undefined (reading 'realMoney')"
-                    ],
+                $response =[
+                    "data" => [
+                        "currency"=>"USD",
+                        "balance"=>round($client_details->balance,2)
+                    ]
                 ];
-                return response($response,400)->header('Content-Type', 'application/json');
+                return response($response,200)->header('Content-Type', 'application/json');
             }
             $provider_trans_id = $data['data']['transactionId'];
             $roundId = $data['data']['betId'];
@@ -388,7 +387,7 @@ class NagaGamesController extends Controller{
             $response =[
                 "data" => [
                     "currency"=>"USD",
-                    "balance"=>number_format($client_details->balance,2,'.', '')
+                    "balance"=>round($client_details->balance,2)
                 ]
             ];
             $gameExtensionData = [
