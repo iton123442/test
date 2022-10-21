@@ -44,13 +44,13 @@ class NagaGamesHelper{
                 "sortBy" => "playCount",
                 "orderBy" => "DESC",
             ];
-            Helper::saveLog('NAGA STATUS CHECKER', 141, $dataToSend, 'REQUEST');
+            Helper::saveLog('NAGA STATUS CHECKER', 141, json_encode($dataToSend), 'REQUEST');
             $client = new Client([
                 'headers' => [
                     'Content-Type' => 'x-www-form-urlencoded' 
                 ],
             ]);
-            $response = $client->post(config('providerlinks.naga.api_url'),
+            $response = $client->get(config('providerlinks.naga.api_url'),
             ['form_params' => $dataToSend,]);
             $response = json_decode($response->getBody(),TRUE);
             Helper::saveLog('NAGA FINDGAME', 141, $response, 'URL HIT!');
