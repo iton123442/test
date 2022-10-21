@@ -439,7 +439,7 @@ class NagaGamesController extends Controller{
                         ]
                     ];
                     $msg = [
-                        "mw_response" => $response,
+                        "mw_response" => json_encode($response)
                     ];
                     GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
                     return response($response,200)->header('Content-Type', 'application/json');
