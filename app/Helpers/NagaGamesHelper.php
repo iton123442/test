@@ -42,16 +42,18 @@ class NagaGamesHelper{
                 "playerToken" => $token,
                 "groupCode" => config('providerlinks.naga.groupCode'),
                 "sortBy" => "playCount",
-                "orderBy" => "DESC",
+                "orderBy" => "DESC"
             ];
+            $brandCode = config('providerlinks.naga.brandCode');
+            $groupCode = config('providerlinks.naga.groupCode');
             Helper::saveLog('NAGA STATUS CHECKER', 141, json_encode($dataToSend), 'REQUEST');
+            $url = config('providerlinks.naga.api_url') .'?playerToken='.$token.'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
             $client = new Client([
                 'headers' => [
-                    'Content-Type' => 'x-www-form-urlencoded' 
+                    'Content-Type' => 'application/json' 
                 ],
             ]);
-            $response = $client->get(config('providerlinks.naga.api_url'),
-            ['form_params' => $dataToSend,]);
+            $response = $client->get($url);
             $response = json_decode($response->getBody(),TRUE);
             Helper::saveLog('NAGA FINDGAME', 141, $response, 'URL HIT!');
             foreach($response as $item) {
