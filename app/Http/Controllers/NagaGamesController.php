@@ -378,15 +378,6 @@ class NagaGamesController extends Controller{
                     }
                 }
             }
-            $gameExtensionData = [
-                "game_trans_id" => $game->game_trans_id,
-                "provider_trans_id" => $provider_trans_id,
-                "round_id" => $roundId,
-                "amount" => $amount,
-                "game_transaction_type" => 2,
-                "provider_request" => json_encode($data),
-            ];
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
             $updateTransData = [
                 "win" => $win,
                 "pay_amount" => round($amount,2),
@@ -400,6 +391,15 @@ class NagaGamesController extends Controller{
                     "balance"=>number_format($client_details->balance,2,'.', '')
                 ]
             ];
+            $gameExtensionData = [
+                "game_trans_id" => $game->game_trans_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $roundId,
+                "amount" => $amount,
+                "game_transaction_type" => 2,
+                "provider_request" => json_encode($data),
+            ];
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
@@ -409,16 +409,17 @@ class NagaGamesController extends Controller{
                     "win_or_lost" => $win,
                 ],
                 "provider" => [
-                    "provider_request" => json_encode($data),
+                    "provider_request" => $data,
                     "provider_trans_id"=>$provider_trans_id,
                     "provider_round_id"=>$roundId,
+                    'provider_name' => $gamedetails->provider_name
                 ],
                 "mwapi" => [
                     "roundId"=> $game->game_trans_id,
                     "type" => 2,
                     "game_id" => $gamedetails->game_id,
                     "player_id" => $client_details->player_id,
-                    "mw_response" => json_encode($response),
+                    "mw_response" => $response,
                 ]
             ];
             if($game->win == 4 || $game->win == 2){
