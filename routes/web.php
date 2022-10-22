@@ -581,21 +581,21 @@ $app->post('/public/api/pp/session/expired','PragmaticPLayController@sessionExpi
 
 
 // Yggdrasil 
-// $app->get('/public/api/ygg/playerinfo.json','YGGController@playerinfo');
-// $app->get('/public/api/ygg/wager.json','YGGController@wager');
-// $app->get('/public/api/ygg/cancelwager.json','YGGController@cancelwager');
-// $app->get('/public/api/ygg/appendwagerresult.json','YGGController@appendwagerresult');
-// $app->get('/public/api/ygg/endwager.json','YGGController@endwager');
-// $app->get('/public/api/ygg/campaignpayout.json','YGGController@campaignpayout');
-// $app->get('/public/api/ygg/getbalance.json','YGGController@getbalance');
-// // ygg local
-// $app->post('/public/api/ygg/playerinfo/test','YGGController@playerinfo');
-// $app->post('/public/api/ygg/wager/test','YGGController@wager');
-// $app->post('/public/api/ygg/cancelwager/test','YGGController@cancelwager');
-// $app->post('/public/api/ygg/appendwagerresult/test','YGGController@appendwagerresult');
-// $app->post('/public/api/ygg/endwager/test','YGGController@endwager');
-// $app->post('/public/api/ygg/campaignpayout/test','YGGController@campaignpayout');
-// $app->post('/public/api/ygg/getbalance/test','YGGController@getbalance');
+$app->get('/public/api/ygg/playerinfo.json','YGGController@playerinfo');
+$app->get('/public/api/ygg/wager.json','YGGController@wager');
+$app->get('/public/api/ygg/cancelwager.json','YGGController@cancelwager');
+$app->get('/public/api/ygg/appendwagerresult.json','YGGController@appendwagerresult');
+$app->get('/public/api/ygg/endwager.json','YGGController@endwager');
+$app->get('/public/api/ygg/campaignpayout.json','YGGController@campaignpayout');
+$app->get('/public/api/ygg/getbalance.json','YGGController@getbalance');
+// ygg local
+$app->post('/public/api/ygg/playerinfo/test','YGGController@playerinfo');
+$app->post('/public/api/ygg/wager/test','YGGController@wager');
+$app->post('/public/api/ygg/cancelwager/test','YGGController@cancelwager');
+$app->post('/public/api/ygg/appendwagerresult/test','YGGController@appendwagerresult');
+$app->post('/public/api/ygg/endwager/test','YGGController@endwager');
+$app->post('/public/api/ygg/campaignpayout/test','YGGController@campaignpayout');
+$app->post('/public/api/ygg/getbalance/test','YGGController@getbalance');
 
 
 //IFRAME URL ENDPOINTS
