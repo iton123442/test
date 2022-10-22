@@ -204,7 +204,8 @@ class HabaneroController extends Controller
                                     "nofunds" => true,
                                 ],
                                 "balance" => $client_details->balance,
-                                "currencycode" => $client_details->default_currency
+                                "currencycode" => $client_details->default_currency,
+                                "msg" => 'not exist'
                             ]
                         ];
                         return $response;
