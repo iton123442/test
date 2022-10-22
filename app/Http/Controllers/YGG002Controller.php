@@ -366,7 +366,6 @@ class YGG002Controller extends Controller
                     "organization" => $this->org,
                     "balance" => floatval(number_format($client_details->balance, 2, '.', '')),
                     "currency" => $client_details->default_currency,
-                    'msg' => 'no exist'
                 )
             );
             Helper::saveLog('YGG 002 cancelwager not exist', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
