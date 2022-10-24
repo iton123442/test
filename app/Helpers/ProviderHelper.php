@@ -590,7 +590,7 @@ class ProviderHelper{
 	{
 		// $query = DB::Select("SELECT game_id,game_code,game_name FROM games WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
 		// $query = DB::Select("SELECT game_id,game_code,game_name,provider_name FROM games inner join providers using (provider_id) WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
-		$query = DB::Select("SELECT IFNULL(game_launch_url,0) FROM games WHERE game_code = '" . $game_code . "' AND sub_provider_id = '" . $provider_id . "' order by game_id desc");
+		$query = DB::Select("SELECT IFNULL(game_launch_url,0) game_launch_url FROM games WHERE game_code = '" . $game_code . "' AND sub_provider_id = '" . $provider_id . "' order by game_id desc");
 		$result = count($query);
 		return $result > 0 ? $query[0] : null;
 	}
