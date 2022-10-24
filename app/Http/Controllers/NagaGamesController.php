@@ -40,7 +40,7 @@ class NagaGamesController extends Controller{
                 "data"=> [
                 "nativeId"=>"TG_" . $client_details->player_id,
                 "currency"=>"USD",
-                "balance"=>(int)round($client_details->balance,2)
+                "balance"=>(float)round($client_details->balance,2)
                 ],
                 "error" => null
             );
@@ -149,7 +149,7 @@ class NagaGamesController extends Controller{
                     $response = [
                         "data" => [
                             "currency"=>"USD",
-                            "balance"=> (int) round($client_details->balance,2),
+                            "balance"=> (float) $balance,
                         ]
                     ];
                     $extensionData = [
@@ -224,7 +224,7 @@ class NagaGamesController extends Controller{
                 $response = [
                     "data" => [
                         "currency"=>"USD",
-                        "balance"=> (int) round($client_details->balance,2),
+                        "balance"=> (float) $balance,
                     ]
                 ];
                 $extensionData = [
@@ -344,7 +344,7 @@ class NagaGamesController extends Controller{
                     $response = [
                         "data" => [
                             "currency"=>"USD",
-                            "balance"=> (int) $balance,
+                            "balance"=> (float) $balance,
                         ]
                     ];
                     $extensionData = [
@@ -442,7 +442,7 @@ class NagaGamesController extends Controller{
                     $response = [
                         "data" => [
                             "currency"=>"USD",
-                            "balance"=> (int) $balance,
+                            "balance"=> (float) $balance,
                         ]
                     ];
                     $msg = [
@@ -473,7 +473,7 @@ class NagaGamesController extends Controller{
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($client_details), $explodedData);
         if (json_encode($client_details)){
             try{
-                ProviderHelper::IdenpotencyTable("CaB_".$data['data']['betId']);
+                ProviderHelper::IdenpotencyTable("Cancel_".$data['data']['betId']);
             }catch(\Exception $e){
                 $response =[
                     "data"=> [
@@ -619,54 +619,55 @@ class NagaGamesController extends Controller{
          return $res;
     }
 
-    // public function insertGameLaunchURL(Request $request){
-    //     //Auto Bulk insert in table FreeRound Denomination!!
-    //             $games = DB::select("Select * FROM games as g where g.sub_provider_id = ". $this->provider_db_id.";");
-    //             $results =array();
-    //             dump($games);
-    //             foreach($games as $item){
-    //                 $gametocompare = DB::select("select IFNULL (game_launch_url,0) as gameURL from games WHERE game_id = ".$item->game_id.";");
-    //                 if($gametocompare->gameURL == 0){
-    //                     dump($gametocompare);
-    //                     try{
-    //                         $brandCode = config('providerlinks.naga.brandCode');
-    //                         $groupCode = config('providerlinks.naga.groupCode');;
-    //                         $url = config('providerlinks.naga.api_url') .'?playerToken='.$request->token.'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
-    //                         $client = new Client([
-    //                             'headers' => [
-    //                                 'Content-Type' => 'application/json' 
-    //                             ],
-    //                         ]);
-    //                         $response = $client->get($url);
-    //                         $response = json_decode($response->getBody(),TRUE);
-    //                         // Helper::saveLog('NAGA FINDGAME', 141, json_encode($response), 'URL HIT!');
-    //                         //Iterate every array to get the matching game code
-    //                         foreach($response as $value) {
-    //                             if ($value['code'] == $item->game_code){
-    //                                 $link = $value['playUrl'];
-    //                             }
-    //                         }
-    //                         dump($link);
-    //                             $arraydenom = array(
-    //                                 'game_launch_url' => $link,
-    //                             ) ;
-    //                             $result[] = $arraydenom;
-    //                             DB::table('games')->insert($arraydenom);
-                            
-    //                     }
-    //                     catch(\Exception $e) {
-    //                         $msg = $e->getMessage().' '.$e->getLine().' '.$e->getFile();
-    //                         $arr = array(
-    //                             'Message' => $msg,
-    //                             'Game Code' => $item->game_code
-    //                         );
-    //                         return $arr;
-    //                     }
-    //                 }
-    //             }
-        
-    //             return $result;
-                
-    //         }
+    public function insertGameLaunchURL(Request $request){
+        //Auto Bulk insert in table FreeRound Denomination!!
+        $games = DB::select("Select * FROM games as g where g.sub_provider_id = ". $this->provider_db_id.";");
+        $results =array();
+        dump($games);
+        foreach($games as $item){
+            $gametocompare = DB::select("select IFNULL (game_launch_url,0) as gameURL from games WHERE game_id = ".$item->game_id.";");
+            if($gametocompare->gameURL == 0){
+                dump($gametocompare);
+                try{
+                    $brandCode = config('providerlinks.naga.brandCode');
+                    $groupCode = config('providerlinks.naga.groupCode');;
+                    $url = config('providerlinks.naga.api_url') .'?playerToken='.$request->token.'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
+                    $client = new Client([
+                        'headers' => [
+                            'Content-Type' => 'application/json' 
+                        ],
+                    ]);
+                    $response = $client->get($url);
+                    $response = json_decode($response->getBody(),TRUE);
+                    // Helper::saveLog('NAGA FINDGAME', 141, json_encode($response), 'URL HIT!');
+                    //Iterate every array to get the matching game code
+                    foreach($response as $value) {
+                        if ($value['code'] == $item->game_code){
+                            $link = $value['playUrl'];
+                        }
+                    }
+                    dump($link);
+                        $arraydenom = array(
+                            'game_launch_url' => $link,
+                        ) ;
+                        $result[] = $arraydenom;
+                        // DB::table('games')
+                        //     ->where('')
+                        //      ->update($arraydenom);
+                    DB::update('update games set game_launch_url = ? where game_id = ? and game_code = ?',[$link,$item->game_id,$item->game_code]);
+                    
+                }
+                catch(\Exception $e) {
+                    $msg = $e->getMessage().' '.$e->getLine().' '.$e->getFile();
+                    $arr = array(
+                        'Message' => $msg,
+                        'Game Code' => $item->game_code
+                    );
+                    return $arr;
+                }
+            }
+        }
+        return $result;
+    }
 }
 ?>
