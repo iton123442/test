@@ -619,11 +619,11 @@ class NagaGamesController extends Controller{
     public function insertGameLaunchURL(Request $request){
         //Auto Bulk insert in table FreeRound Denomination!!
                 $games = DB::select("Select * FROM games as g where g.sub_provider_id = ". $this->provider_db_id.";");
-                $results =array();
                 foreach($games as $item){
                     $gametocompare = DB::select("select IFNULL (game_launch_url,0) as gameURL from games WHERE game_id = ".$item->game_id.";");
-        
-                    if(count($gametocompare) == 0){
+                    dd($gametocompare);
+                    if($gametocompare == 0){
+                        dd($gametocompare);
                         try{
                             $brandCode = config('providerlinks.naga.brandCode');
                             $groupCode = config('providerlinks.naga.groupCode');;
