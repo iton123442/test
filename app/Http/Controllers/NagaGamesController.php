@@ -469,9 +469,8 @@ class NagaGamesController extends Controller{
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($data), 'Cancel HIT!');
         $betExt = ProviderHelper::getGeneralDetails(1, $data['data']['betId']);
         $explodedData = explode($betExt->general_details, "_");
-        dump(json_encode($explodedData));
         $client_details = ProviderHelper::getClientDetails('token', $explodedData[0]);
-        dump($client_details);
+        Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($client_details), $explodedData);
         if (json_encode($client_details)){
             try{
                 ProviderHelper::IdenpotencyTable("CaB_".$data['data']['betId']);
@@ -490,7 +489,6 @@ class NagaGamesController extends Controller{
             $win = 4;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $explodedData[1]);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
-            dump(json_encode($game));
             if ($game == null){
                 $response = [
                     "data"=> null,
