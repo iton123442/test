@@ -469,7 +469,9 @@ class NagaGamesController extends Controller{
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($data), 'Cancel HIT!');
         $betExt = ProviderHelper::getGeneralDetails(1, $data['data']['betId']);
         $explodedData = explode($betExt->general_details, "_");
+        dump($explodedData);
         $client_details = ProviderHelper::getClientDetails('token', $explodedData[0]);
+        dump($client_details);
         if ($client_details){
             try{
                 ProviderHelper::IdenpotencyTable("CancelB_".$data['data']['betId']);
