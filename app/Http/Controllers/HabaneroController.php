@@ -181,7 +181,22 @@ class HabaneroController extends Controller
                 }
                 if($data->gamestatemode == 1){
                     $trans = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id',false,$client_details);
-                    if($trans->win == '2'){
+                    if($trans != 'false'){
+                        if($trans->win == '2'){
+                            $response = [
+                                "fundtransferresponse" => [
+                                    "status" => [
+                                        "success" => false,
+                                        "nofunds" => true,
+                                    ],
+                                    "balance" => $client_details->balance,
+                                    "currencycode" => $client_details->default_currency
+                                ]
+                            ];
+                            return $response;
+                        }
+                        return $this->newBet($details,$data,$client_details,$trans,$game_details,$round_id);
+                    }else{
                         $response = [
                             "fundtransferresponse" => [
                                 "status" => [
@@ -189,14 +204,11 @@ class HabaneroController extends Controller
                                     "nofunds" => true,
                                 ],
                                 "balance" => $client_details->balance,
-                                "currencycode" => $client_details->default_currency
+                                "currencycode" => $client_details->default_currency,
+                                "msg" => 'not exist'
                             ]
                         ];
-                    }
-                    if($trans != 'false'){
-                        return $this->newBet($details,$data,$client_details,$trans,$game_details,$round_id);
-                    }else{
-                        return $this->tableBet($details,$data,$client_details,$game_details,$round_id);
+                        return $response;
                     }
                 }
                 if($data->gamestatemode == 0){
