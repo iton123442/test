@@ -472,7 +472,7 @@ class NagaGamesController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $explodedData[0]);
         if ($client_details){
             try{
-                ProviderHelper::IdenpotencyTable("Cancel_".$data['data']['betId']);
+                ProviderHelper::IdenpotencyTable("CancelB_".$data['data']['betId']);
             }catch(\Exception $e){
                 $response =[
                     "data"=> [
@@ -488,6 +488,7 @@ class NagaGamesController extends Controller{
             $win = 4;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $explodedData[1]);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
+            dump($game);
             if ($game == null){
                 $response = [
                     "data"=> null,
