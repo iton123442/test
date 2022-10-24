@@ -471,13 +471,14 @@ class NagaGamesController extends Controller{
         $client_details = ProviderHelper::getClientDetails('token', $betExt->general_details);
         if ($client_details){
             try{
-                ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
+                ProviderHelper::IdenpotencyTable("Cancel_".$data['data']['betId']);
             }catch(\Exception $e){
                 $response =[
-                    "data" => [
-                        "currency"=>"USD",
-                        "balance"=> (int) round($client_details->balance,2)
-                    ]
+                    "data"=> [
+                        "betId"=>$data['data']['betId'],
+                        "status"=>"CANCELED"
+                    ],
+                    "error" => null
                 ];
                 return response($response,200)->header('Content-Type', 'application/json');
             }
