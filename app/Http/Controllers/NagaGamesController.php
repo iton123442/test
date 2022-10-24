@@ -619,11 +619,12 @@ class NagaGamesController extends Controller{
     public function insertGameLaunchURL(Request $request){
         //Auto Bulk insert in table FreeRound Denomination!!
                 $games = DB::select("Select * FROM games as g where g.sub_provider_id = ". $this->provider_db_id.";");
+                $results =array();
+                dump($games);
                 foreach($games as $item){
                     $gametocompare = DB::select("select IFNULL (game_launch_url,0) as gameURL from games WHERE game_id = ".$item->game_id.";");
-                    dd($gametocompare);
                     if($gametocompare == 0){
-                        dd($gametocompare);
+                        dump($gametocompare);
                         try{
                             $brandCode = config('providerlinks.naga.brandCode');
                             $groupCode = config('providerlinks.naga.groupCode');;
@@ -637,11 +638,12 @@ class NagaGamesController extends Controller{
                             $response = json_decode($response->getBody(),TRUE);
                             // Helper::saveLog('NAGA FINDGAME', 141, json_encode($response), 'URL HIT!');
                             //Iterate every array to get the matching game code
-                            foreach($response as $key) {
-                                if ($key['code'] == $item->game_code){
-                                    $link = $key['playUrl'];
+                            foreach($response as $value) {
+                                if ($value['code'] == $item->game_code){
+                                    $link = $value['playUrl'];
                                 }
                             }
+                            dump($link);
                                 $arraydenom = array(
                                     'game_launch_url' => $link,
                                 ) ;
