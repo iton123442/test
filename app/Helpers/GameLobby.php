@@ -2235,7 +2235,7 @@ class GameLobby{
         $groupCode = config('providerlinks.naga.groupCode');
         $getURL = ProviderHelper::findGameLaunchURL('game_code', 141, $game_code);
         Helper::saveLog('Naga gamelaunchfinal', 141, json_encode($getURL), 'Gamelaunch INITIATE');
-        if ($getURL->game_launch_url == 0){
+        if ($getURL->game_launch_url == '0'){
             $url = NagaGamesHelper::findGameUrl($request['token'],$game_code);
         }else{
             $url = $getURL->game_launch_url;
