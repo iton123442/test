@@ -32,7 +32,7 @@ class NagaGamesController extends Controller{
 
     public function auth(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        // Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
+        Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
         $toExplode = explode(',"dataHash"',json_encode($data));
         $hash = $this-> hashParam($toExplode[0]);
