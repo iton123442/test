@@ -9,7 +9,7 @@ use App\Helpers\Helper;
 use App\Helpers\ProviderHelper;
 use App\Helpers\ClientRequestHelper;
 use App\Helpers\TransactionHelper;
-use App\Helpers\DOWINNHelper;
+use App\Helpers\NagaGamesHelper;
 use App\Jobs\UpdateGametransactionJobs;
 use App\Models\GameTransactionMDB;
 use App\Models\GameTransaction;
@@ -28,6 +28,8 @@ class NagaGamesController extends Controller{
         $this->prefix = config('providerlinks.dowinn.prefix');
         $this->providerID = 72; //Real provider ID
         $this->dateToday = date("Y/m/d");
+        $this->brandCode = config('providerlinks.naga.brandCode');
+        $this->groupCode = config('providerlinks.naga.groupCode');
     }
 
     public function auth(Request $request){
@@ -276,7 +278,17 @@ class NagaGamesController extends Controller{
         ];
         return response($response,200)->header('Content-Type', 'application/json');
     }
-
+    
+    public function betStatus (Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $betStatus = NagaGamesHelper::viewBetHistory($data['betId']);
+        $response = [
+            "betId" => $data['betId'],
+            "status" => $betStatus
+        ];
+        Helper::saveLog('NAGAGAMES BetStatus', $this->provider_db_id, json_encode($response), 'betStatus HIT!');
+        return response($response,200)->header('Content-Type', 'application/json');
+    }
     public function payout (Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
@@ -575,100 +587,6 @@ class NagaGamesController extends Controller{
             ],
         ];
         return response($response,400)->header('Content-Type', 'application/json');
-    }
-
-    public function limitList(Request $request){
-        $dataToSend = [
-            "account" => config('providerlinks.dowinn.user_agent'),
-        ];
-        // Helper::saveLog('DOWINN STATUS CHECKER', 139, json_encode($dataToSend), 'REQUEST');
-        $client = new Client([
-            'headers' => [
-                'Content-Type' => 'x-www-form-urlencoded' 
-            ],
-        ]);
-        $response = $client->post(config('providerlinks.dowinn.api_url').'/limits.do',
-        ['form_params' => $dataToSend,]);
-        $response = json_decode($response->getBody(),TRUE);
-        // Helper::saveLog('DOWINN LOGIN/AUTH', 139, json_encode($response), 'LOGIN HIT!');
-        return($response);
-    }
-
-    public function viewHistory(Request $request){
-        $data = json_decode($request->getContent(),TRUE);
-        // ($player_id, $startTime,$endTime)
-        // $dataToSend = [
-        //     "account" => config('providerlinks.dowinn.user_agent'),
-        //     "beginTime" => $startTime,
-        //     "endTime" => $endTime,
-        //     "child" => $this->prefix.'_'.$player_id,
-        // ];
-        $dataToSend = [
-            "account" => config('providerlinks.dowinn.user_agent'),
-            "beginTime" => $data['Stime'],
-            "endTime" => $data['Etime'],
-            "child" => $this->prefix.'_'.$data['player_id'],
-        ];
-        $client = new Client([
-            'headers' => [
-                'Content-Type' => 'x-www-form-urlencoded'
-            ],
-        ]);
-        $response = $client->post(config('providerlinks.dowinn.api_url'),'/history2.do',
-         ['form_params' => $dataToSend]);
-         $res = json_decode($response->getBody(),TRUE);
-         return $res;
-    }
-
-    public function insertGameLaunchURL(Request $request){
-        //Auto Bulk insert in table FreeRound Denomination!!
-        $games = DB::select("Select * FROM games as g where g.sub_provider_id = ". $this->provider_db_id.";");
-        $results =array();
-        dump($games);
-        foreach($games as $item){
-            $gametocompare = DB::select("select IFNULL (game_launch_url,0) as gameURL from games WHERE game_id = ".$item->game_id.";");
-            if($gametocompare->gameURL == 0){
-                dump($gametocompare);
-                try{
-                    $brandCode = config('providerlinks.naga.brandCode');
-                    $groupCode = config('providerlinks.naga.groupCode');;
-                    $url = config('providerlinks.naga.api_url') .'?playerToken='.$request->token.'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
-                    $client = new Client([
-                        'headers' => [
-                            'Content-Type' => 'application/json' 
-                        ],
-                    ]);
-                    $response = $client->get($url);
-                    $response = json_decode($response->getBody(),TRUE);
-                    // Helper::saveLog('NAGA FINDGAME', 141, json_encode($response), 'URL HIT!');
-                    //Iterate every array to get the matching game code
-                    foreach($response as $value) {
-                        if ($value['code'] == $item->game_code){
-                            $link = $value['playUrl'];
-                        }
-                    }
-                    dump($link);
-                        $arraydenom = array(
-                            'game_launch_url' => $link,
-                        ) ;
-                        $result[] = $arraydenom;
-                        // DB::table('games')
-                        //     ->where('')
-                        //      ->update($arraydenom);
-                    DB::update('update games set game_launch_url = ? where game_id = ? and game_code = ?',[$link,$item->game_id,$item->game_code]);
-                    
-                }
-                catch(\Exception $e) {
-                    $msg = $e->getMessage().' '.$e->getLine().' '.$e->getFile();
-                    $arr = array(
-                        'Message' => $msg,
-                        'Game Code' => $item->game_code
-                    );
-                    return $arr;
-                }
-            }
-        }
-        return $result;
     }
 }
 ?>

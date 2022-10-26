@@ -931,4 +931,4 @@ $app->post('/public/nagagames/api/balance', 'NagaGamesController@getBalance');
 $app->post('/public/nagagames/api/payout', 'NagaGamesController@payout');
 $app->post('/public/nagagames/api/placeBet', 'NagaGamesController@placeBet');
 $app->post('/public/nagagames/api/cancelBet', 'NagaGamesController@cancelBet');
-$app->post('/public/nagagames/api/insertUrl', 'NagaGamesController@insertGameLaunchURL');
+$app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');

@@ -9,11 +9,12 @@ use App\Models\GameTransactionMDB;
 use DB; 
 
 class NagaGamesHelper{
+
     //FIND THE GAME URL
     public static function findGameUrl($token,$gameCode,$client_details){
         $brandCode = config('providerlinks.naga.brandCode');
-        $groupCode = config('providerlinks.naga.groupCode');;
-        $url = config('providerlinks.naga.api_url') .'?groupCode='.$groupCode.'&brandCode='.$brandCode;
+        $groupCode = config('providerlinks.naga.groupCode');
+        $url = config('providerlinks.naga.api_url') .'/client/game?groupCode='.$groupCode.'&brandCode='.$brandCode;
         $client = new Client([
             'headers' => [
                 'Content-Type' => 'application/json' 
@@ -21,8 +22,6 @@ class NagaGamesHelper{
         ]);
         $response = $client->get($url);
         $response = json_decode($response->getBody(),TRUE);
-        // Helper::saveLog('NAGA FINDGAME', 141, json_encode($response), 'URL HIT!');
-        //Iterate every array to get the matching game code
         foreach($response as $item) {
             if ($item['code'] == $gameCode){
                 $link = $item['playUrl'];
@@ -34,5 +33,18 @@ class NagaGamesHelper{
         GameTransactionMDB::updateGameLaunchURL($toSend,$gameCode,$client_details);
         
         return($link);
+    }
+    
+    //Get the bet's sstatus
+    public static function viewBetHistory($betId){
+        $url = config('providerlinks.naga.api_url') .'/operator/bet/history?betId='. $betId.'&groupCode='.$this->groupCode.'&brandCode='.$this->brandCode;
+        $client = new Client([
+            'headers' => [
+                'Content-Type' => 'application/json' 
+            ],
+        ]);
+        $response = $client->get($url);
+        $response = json_decode($response->getBody(),TRUE);
+         return $response['betStatus'];
     }
 }
