@@ -13,7 +13,7 @@ class NagaGamesHelper{
     public static function findGameUrl($token,$gameCode,$client_details){
         $brandCode = config('providerlinks.naga.brandCode');
         $groupCode = config('providerlinks.naga.groupCode');;
-        $url = config('providerlinks.naga.api_url') .'?playerToken='.$token.'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
+        $url = config('providerlinks.naga.api_url') .'?groupCode='.$groupCode.'&brandCode='.$brandCode;
         $client = new Client([
             'headers' => [
                 'Content-Type' => 'application/json' 
