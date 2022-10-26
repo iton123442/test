@@ -10,7 +10,7 @@ use DB;
 
 class NagaGamesHelper{
     //FIND THE GAME URL
-    public static function findGameUrl($token,$gameCode){
+    public static function findGameUrl($token,$gameCode,$client_details){
         $brandCode = config('providerlinks.naga.brandCode');
         $groupCode = config('providerlinks.naga.groupCode');;
         $url = config('providerlinks.naga.api_url') .'?playerToken='.$token.'&groupCode='.$groupCode.'&brandCode='.$brandCode. "&sortBy=playCount&orderBy=DESC";
@@ -28,6 +28,11 @@ class NagaGamesHelper{
                 $link = $item['playUrl'];
             }
         }
+        $toSend = [
+            "game_launch_url" => $link
+        ];
+        GameTransactionMDB::updateGameLaunchURL($toSend,$gameCode,$client_details);
+        
         return($link);
     }
 }

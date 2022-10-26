@@ -319,6 +319,20 @@ class GameTransactionMDB
             return null;
         }
     } 
+    public static function updateGameLaunchURL($data,$game_code,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            try {
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".games")->where('game_code',$game_code)->update($data);
+            } catch (\Exception $e) {
+                $data["game_launch_url"] .= $e->getMessage();
+                return DB::connection($connection["connection_name"])->table($connection['db_list'][0].".games")->where('game_code',$game_code)->update($data);
+            }
+            return null;
+        }else{
+            return null;
+        }
+    }
     public static function updateGametransactionEXTV2($data,$game_trans_ext_id,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){

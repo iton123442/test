@@ -34,7 +34,8 @@ class NagaGamesController extends Controller{
         $data = json_decode($request->getContent(),TRUE);
         // Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
-        // $hash = $this-> hashParam($data['data']);
+        $toExplode = explode(',"dataHash"',json_encode($data));
+        $hash = $this-> hashParam($toExplode[0]);
         if($client_details){
             $response = array(
                 "data"=> [
@@ -52,9 +53,9 @@ class NagaGamesController extends Controller{
     public function hashParam($sortData){
         // ksort($sortData);
         // $param = "";
-        // $i = 0;
-        $clean1 = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
-        Helper::saveLog('Naga Games Hasher1', $this->provider_db_id, json_encode($clean1), 'HASH!');
+        // // $i = 0;
+        // $clean1 = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
+        // Helper::saveLog('Naga Games Hasher1', $this->provider_db_id, json_encode($clean1), 'HASH!');
         // foreach($sortData as $key => $item){
         //     if($key != 'hash'){
         //         if($i == 0){
@@ -69,10 +70,10 @@ class NagaGamesController extends Controller{
         //     }
         // }
         // $str = str_replace("\n","",$param.$this->api_key);
-        // $clean = str_replace("\r","",$str);
-        $clean = hash_hmac('sha256',json_encode($sortData),$this->publicKey);
-        Helper::saveLog('Naga Games Hasher3', $this->provider_db_id, json_encode($clean), 'HASH!');
-        return $clean;
+        // // $clean = str_replace("\r","",$str);
+        // $clean = hash_hmac('sha256',json_encode($sortData),$this->publicKey);
+        // Helper::saveLog('Naga Games Hasher3', $this->provider_db_id, json_encode($clean), 'HASH!');
+        return $clean2;
     }
     public function getBalance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
