@@ -26,7 +26,7 @@ class NagaGamesController extends Controller{
         $this->apiKey = config('providerlinks.naga.apiKey');
         $this->publicKey = config('providerlinks.naga.publicKey');
         $this->prefix = config('providerlinks.dowinn.prefix');
-        $this->providerID = 72; //Real provider ID
+        $this->providerID = 74; //Real provider ID
         $this->dateToday = date("Y/m/d");
         $this->brandCode = config('providerlinks.naga.brandCode');
         $this->groupCode = config('providerlinks.naga.groupCode');
