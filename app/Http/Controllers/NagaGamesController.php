@@ -322,7 +322,199 @@ class NagaGamesController extends Controller{
                         ]
                     ];
                     return response($response,200)->header('Content-Type', 'application/json');
+                }else {
+                    $result = $this->resendPayout($data);
+                    Helper::saveLog('RESEND PAYOUT',$this->provider_db_id, json_encode($result), 'RESEND HIT');
+                    return $result;
                 }
+            }
+            $provider_trans_id = $data['data']['transactionId'];
+            $roundId = $data['data']['betId'];
+            $amount = $data['data']['amount'];
+            $win = $amount == 0 ? 0 : 1;
+            $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
+            $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
+            if ($game == null){
+                Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
+                $gameTransactionDatas = [
+                    "provider_trans_id" => $provider_trans_id,
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $gamedetails->game_id,
+                    "round_id" => $roundId,
+                    "bet_amount" => $amount,
+                    "pay_amount" => 0,
+                    "win" => 5,
+                    "income" => 0,
+                    "entry_id" => 1
+                ];
+                $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
+                $gameExtensionData = [
+                    "game_trans_id" => $game_trans_id,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" => $roundId,
+                    "amount" => $amount,
+                    "game_transaction_type" => 1,
+                    "provider_request" => json_encode($data),
+                ];
+                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+                $fund_extra_data = [
+                    'provider_name' => $gamedetails->provider_name
+                ];
+                $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
+                if(isset($client_response->fundtransferresponse->status->code)
+                && $client_response->fundtransferresponse->status->code == "200"){
+                    $balance = round($client_response->fundtransferresponse->balance, 2);
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    //SUCCESS FUNDTRANSFER
+                    $updateTransData = [
+                        "win" => 5,
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
+                    $response = [
+                        "data" => [
+                            "currency"=>"USD",
+                            "balance"=> (float) $balance,
+                        ]
+                    ];
+                    $extensionData = [
+                        "mw_response" =>json_encode($response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "client_response" => json_encode($client_response),
+                        "transaction_detail" => "Success",
+                        "general_details" => $data['data']['playerToken'] . "_" . $data['data']['gameCode'],
+                    ];
+                    GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }elseif(isset($client_response->fundtransferresponse->status->code)
+                && $client_response->fundtransferresponse->status->code == "402"){
+                    try{    
+                        $updateTrans = [
+                            "win" => 2,
+                            "trans_status" => 5
+                        ];
+                        GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
+                        $response = [
+                            "data"=> null,
+                            "error" => [
+                                "statusCode" => 500,
+                                "message" => "Cannot read properties of undefined (reading 'realMoney')"
+                            ],
+                        ];
+                        $updateExt = [
+                            "mw_response" =>json_encode($response),
+                            "mw_request" => json_encode('FAILED'),
+                            "client_response" => json_encode($client_response),
+                            "transaction_detail" => "FAILED",
+                            "general_details" => "FAILED",
+                        ];
+                        GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
+                        return response($response,400)->header('Content-Type', 'application/json');
+                    }catch(\Exception $e){
+                        Helper::saveLog("FAILED WIN", 141,json_encode($client_response),"FAILED HIT!");
+                    }
+                }
+            }
+            $updateTransData = [
+                "win" => $win,
+                "pay_amount" => round($amount,2),
+                "income" => round($game->bet_amount-$amount,2),
+                "entry_id" => $amount == 0 ? 1 : 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
+            $response =[
+                "data" => [
+                    "currency"=>"USD",
+                    "balance"=> (int) round($client_details->balance,2)
+                ]
+            ];
+            $gameExtensionData = [
+                "game_trans_id" => $game->game_trans_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $roundId,
+                "amount" => $amount,
+                "game_transaction_type" => 2,
+                "provider_request" => json_encode($data),
+            ];
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+            $action_payload = [
+                "type" => "custom", #genreral,custom :D # REQUIRED!
+                "custom" => [
+                    "provider" => 'NagaGames',
+                    "game_transaction_ext_id" => $game_trans_ext_id,
+                    "client_connection_name" => $client_details->connection_name,
+                    "win_or_lost" => $win,
+                ],
+                "provider" => [
+                    "provider_request" => $data,
+                    "provider_trans_id"=>$provider_trans_id,
+                    "provider_round_id"=>$roundId,
+                    'provider_name' => $gamedetails->provider_name
+                ],
+                "mwapi" => [
+                    "roundId"=> $game->game_trans_id,
+                    "type" => 2,
+                    "game_id" => $gamedetails->game_id,
+                    "player_id" => $client_details->player_id,
+                    "mw_response" => $response,
+                ]
+            ];
+            if($game->win == 4 || $game->win == 2){
+                return response($response,200)->header('Content-Type', 'application/json');
+            }
+            else{
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
+                if(isset($client_response->fundtransferresponse->status->code) &&
+                $client_response->fundtransferresponse->status->code == "200"){
+                    $balance = round($client_response->fundtransferresponse->balance, 2);
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    //SUCCESS FUNDTRANSFER
+                    $response = [
+                        "data" => [
+                            "currency"=>"USD",
+                            "balance"=> (float) $balance,
+                        ]
+                    ];
+                    $msg = [
+                        "mw_response" => json_encode($response)
+                    ];
+                    GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
+                    Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($response), 'PayOut HIT!');
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }
+            }
+        }
+        $response = [
+            "data"=> null,
+            "error" => [
+                "statusCode" => 500,
+                "message" => "Cannot read properties of undefined (reading 'realMoney')"
+            ],
+        ];
+        return response($response,200)->header('Content-Type', 'application/json');
+    }
+
+    
+    public function resendPayout ($data){
+        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($data), 'PayOut HIT!');
+        if ($client_details){
+            // $response =[
+            //     "data" => [
+            //         "currency"=>"USD",
+            //         "balance"=> (int) round($client_details->balance,2),
+            //     ]
+            // ];
+            // return response($response,200)->header('Content-Type', 'application/json');
+            try{
+                ProviderHelper::IdenpotencyTable("RESEND_".$data['data']['transactionId']);
+            }catch(\Exception $e){
+                $response =[
+                    "data" => [
+                        "currency"=>"USD",
+                        "balance"=> (int) round($client_details->balance,2)
+                    ]
+                ];
+                return response($response,200)->header('Content-Type', 'application/json');
             }
             $provider_trans_id = $data['data']['transactionId'];
             $roundId = $data['data']['betId'];
