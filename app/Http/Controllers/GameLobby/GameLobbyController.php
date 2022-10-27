@@ -189,11 +189,11 @@ class GameLobbyController extends Controller
         if($request->has("demo")){
             $isDemo = false;
             if(gettype($request->demo) == "string"){
-                if($request->demo == 'true'){
+                if($request->demo == 'true' || $request->demo == "1"){
                     $isDemo = true;
                 }
             }else{
-                if($request->demo == true){
+                if($request->demo == true || $request->demo == 1){
                    $isDemo = true;
                 }
             }
