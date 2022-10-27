@@ -1224,6 +1224,16 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                elseif($provider_code==141){
+                    Helper::saveLog('naga Gamelaunch', 141, json_encode($request->all()), "Gamelaunch response");
+                    $msg = array(
+                        "game_code" => $request->input("game_code"),
+                        "url" => GameLobby::nagaLaunchUrl($request->all()), 
+                        "game_launch" => true
+                    );
+                    return response($msg,200)
+                    ->header('Content-Type', 'application/json');
+                }
 
             }
         }

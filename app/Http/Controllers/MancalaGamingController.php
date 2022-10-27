@@ -169,10 +169,10 @@ class MancalaGamingController extends Controller
 									"Balance" => ProviderHelper::amountToFloat($client_response->fundtransferresponse->balance)
 								];
 								
-					$data_to_update = array(
+								$data_to_update = array(
 			                        "mw_response" => json_encode($response),
-						"mw_request" => json_encode($client_response->requestoclient),
-						"client_response" => json_encode($client_response
+									"mw_request" => json_encode($client_response->requestoclient),
+									"client_response" => json_encode($client_response)
 			                    );
 
 			                    GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
@@ -199,9 +199,13 @@ class MancalaGamingController extends Controller
 			                        );
 			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    }catch(\Exception $e){
-			                        
+			                        $data_to_update = array(
+			                            "mw_response" => json_encode($response),
+			                            'transaction_detail' => json_encode($e),
+	                                    'general_details' => json_encode($e),
+			                        );
+			                        GameTransactionMDB::updateGametransactionEXT($data_to_update, $game_trans_ext_id, $client_details);
 			                    } 
-
 								break;
 						}
 
@@ -256,6 +260,14 @@ class MancalaGamingController extends Controller
 					try{
 						ProviderHelper::idenpotencyTable($json_data['TransactionId']);
 					}catch(\Exception $e){
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 2, 'transaction_id',$client_details);
+						if($game_transaction != 'false'){
+							$response = [
+								"Error" =>  0,
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance),
+							];
+							return $response;
+						}
 						$response = [
 							"Error" =>  0,
 							"Balance" => ProviderHelper::amountToFloat($client_details->balance),
@@ -291,7 +303,7 @@ class MancalaGamingController extends Controller
 			            $update_game_transaction = array(
 		                    "win" => 5,
 		                    "pay_amount" => $bet_transaction->pay_amount + $json_data["Amount"],
-		                    "income" => $bet_transaction->income - $json_data["Amount"],
+		                    "income" => $bet_transaction->bet_amount - $json_data["Amount"],
 		                    "entry_id" => $json_data["Amount"] == 0 && $bet_transaction->pay_amount == 0 ? 1 : 2,
 		                );
 
@@ -403,6 +415,14 @@ class MancalaGamingController extends Controller
 					try{
 						ProviderHelper::idenpotencyTable($json_data['RefundTransactionId']);
 					}catch(\Exception $e){
+						$game_transaction = GameTransactionMDB::findGameExt($json_data['TransactionId'], 3, 'transaction_id',$client_details);
+						if($game_transaction != 'false'){
+							$response = [
+								"Error" =>  0,
+								"Balance" => ProviderHelper::amountToFloat($client_details->balance),
+							];
+							return $response;
+						}
 						$response = [
 							"Error" =>  0, 
 							"Balance" => ProviderHelper::amountToFloat($client_details->balance)
