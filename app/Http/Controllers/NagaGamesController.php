@@ -111,6 +111,14 @@ class NagaGamesController extends Controller{
             try{
                 ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
             }catch(\Exception $e){
+                $bet_transaction = GameTransactionMDB::findGameExt($data['data']['transactionId'], 1,'transaction_id', $client_details);
+                if ($bet_transaction != 'false') {
+                    //this will be trigger if error occur 10s
+                    Helper::saveLog('NagaGames BET duplicate_transaction success', $this->provider_db_id, json_encode($request->all()),  $bet_transaction->mw_response);
+                    return response($bet_transaction->mw_response,200)
+                    ->header('Content-Type', 'application/json');
+                } 
+                // sleep(4);
                 $response = array(
                     "data"=> null,
                     "error" => [
@@ -118,7 +126,8 @@ class NagaGamesController extends Controller{
                         "message" => "Cannot read properties of undefined (reading 'realMoney')"
                     ]
                 );
-                return response($response,200)->header('Content-Type', 'application/json');
+                Helper::saveLog('NagaGames BET duplicate_transaction resend', $this->provider_db_id, json_encode($request->all()),  $response);
+                return response($response,400)->header('Content-Type', 'application/json');
             }
             $roundId = $data['data']['betId'];
             $provider_trans_id = $data['data']['transactionId'];
@@ -220,6 +229,7 @@ class NagaGamesController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "200"){
+                sleep(10);
                 Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'FUNDTRANSFER HIT!');
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
