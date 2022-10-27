@@ -229,7 +229,6 @@ class NagaGamesController extends Controller{
             $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "200"){
-                sleep(10);
                 Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'FUNDTRANSFER HIT!');
                 $balance = round($client_response->fundtransferresponse->balance, 2);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -314,13 +313,16 @@ class NagaGamesController extends Controller{
             try{
                 ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
             }catch(\Exception $e){
-                $response =[
-                    "data" => [
-                        "currency"=>"USD",
-                        "balance"=> (int) round($client_details->balance,2)
-                    ]
-                ];
-                return response($response,200)->header('Content-Type', 'application/json');
+                $betStatus = NagaGamesHelper::viewBetHistory($data['betId']);
+                if ($betStatus == "RESOLVED"){
+                    $response =[
+                        "data" => [
+                            "currency"=>"USD",
+                            "balance"=> (int) round($client_details->balance,2)
+                        ]
+                    ];
+                    return response($response,200)->header('Content-Type', 'application/json');
+                }
             }
             $provider_trans_id = $data['data']['transactionId'];
             $roundId = $data['data']['betId'];

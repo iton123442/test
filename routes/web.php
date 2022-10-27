@@ -928,7 +928,7 @@ $app->post('/public/api/loadtesting', 'LoadTesterQueryCLientCallController@Proce
 $app->post('/public/nagagames/api/auth', 'NagaGamesController@auth');
 $app->post('/public/nagagames/api/getBalance', 'NagaGamesController@getBalance');
 $app->post('/public/nagagames/api/balance', 'NagaGamesController@getBalance');
-// $app->post('/public/nagagames/api/payout', 'NagaGamesController@payout');
+$app->post('/public/nagagames/api/payout', 'NagaGamesController@payout');
 $app->post('/public/nagagames/api/placeBet', 'NagaGamesController@placeBet');
-// $app->post('/public/nagagames/api/cancelBet', 'NagaGamesController@cancelBet');
+$app->post('/public/nagagames/api/cancelBet', 'NagaGamesController@cancelBet');
 $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
