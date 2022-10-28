@@ -159,6 +159,7 @@ class GameLobby{
         if($client_player_details->operator_id == 11){
             $casinoId = config("providerlinks.bgaming.KONIBET");
         }
+        $casinoId = config("providerlinks.bgaming.KONIBET");
         Helper::saveLog('Bgaming create session', 49, json_encode($casinoId), $casinoId);
         $requesttosend = [
             "casino_id" => $casinoId,
