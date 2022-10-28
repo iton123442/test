@@ -690,12 +690,12 @@ return [
             'operator_key' => 'TG_DEV',
         ],
     ],
-    'bgaming' => [
-         'PROVIDER_ID'=> 49,
-         'CASINO_ID' => 'tigergames-int',
-         'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
-         'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM'
-    ],
+    // 'bgaming' => [
+    //      'PROVIDER_ID'=> 49,
+    //      'CASINO_ID' => 'tigergames-int',
+    //      'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
+    //      'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM'
+    // ],
      'smartsoft'=>[
         'provider_db_id' => 60,
         'api_url' => 'https://eu-staging.ssgportal.com/GameLauncher',
