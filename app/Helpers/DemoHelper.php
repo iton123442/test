@@ -63,13 +63,14 @@ class DemoHelper{
         elseif($provider_code == 49){ // pragmatic play
             Helper::saveLog('Game Launch Pragmatic Play Demo Tirgger', 26, json_encode($data), "im here!");
             if(isset($data->token)) {
-                $client_details = ProviderHelper::getClientDetails("ptw",$data->client_player_id, 1, 'all', $data->client_id);
+                // $client_details = ProviderHelper::getClientDetails("ptw",$data->client_player_id, 1, 'all', $data->client_id);
+                $client_details = ProviderHelper::getClientDetails('token', $data->token);
             }else{
                 $client_details = false;
             }
             $response = array(
                 "game_code" => $data->game_code,
-                "url" => DemoHelper::demoPragamticPlay($data->game_code,$lang,$client_details),
+                "url" => DemoHelper::demoPragamticPlay($data->game_code,$lang,$client_details, $exitUrl),
                 "game_launch" => true
             );
         }
@@ -233,12 +234,11 @@ class DemoHelper{
         return 'https://static-fra.pff-ygg.com/init/launchClient.html?gameid='.$game_code.'&lang='.$lang.'&currency=EUR&org=DEMO&channel=pc';
     }
 
-    public static function demoPragamticPlay($game_code,$lang,$client_details){
+    public static function demoPragamticPlay($game_code,$lang,$client_details, $exitUrl){
+        //https://daddy.betrnk.games
         $lang = $lang != '' ? (strtolower(ProviderHelper::getLangIso($lang)) != false ? strtolower(ProviderHelper::getLangIso($lang)) : 'en') : 'en';
         if($client_details == false){ $currency = 'USD'; $lang = 'en';}else{ $currency = $client_details->default_currency; $lang = $client_details->language; }
-        // return 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang=en&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
-        $url = 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang='.$lang.'&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL=https://daddy.betrnk.games&stylename=some_secureLogin';
-        Helper::saveLog('Game Launch Pragmatic Play Demo Url', 26, $url, json_encode($client_details));
+        $url = 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?lang='.$lang.'&cur='.$currency.'&gameSymbol='.$game_code.'&lobbyURL='.$exitUrl.'&stylename=some_secureLogin';
         return $url;
     }
 
