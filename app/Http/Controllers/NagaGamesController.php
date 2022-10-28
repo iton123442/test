@@ -290,7 +290,7 @@ class NagaGamesController extends Controller{
     
     public function betStatus (Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $betStatus = NagaGamesHelper::viewBetHistory($data['betId']);
+        $betStatus = NagaGamesHelper::viewBetHistory($data['betId'],$this->groupCode,$this->brandCode);
         $response = [
             "betId" => $data['betId'],
             "status" => $betStatus
@@ -313,7 +313,7 @@ class NagaGamesController extends Controller{
             try{
                 ProviderHelper::IdenpotencyTable($data['data']['transactionId']);
             }catch(\Exception $e){
-                $betStatus = NagaGamesHelper::viewBetHistory($data['betId']);
+                $betStatus = NagaGamesHelper::viewBetHistory($data['betId'],$this->groupCode,$this->brandCode);
                 if ($betStatus == "RESOLVED"){
                     $response =[
                         "data" => [

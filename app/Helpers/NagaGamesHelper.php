@@ -36,8 +36,8 @@ class NagaGamesHelper{
     }
     
     //Get the bet's sstatus
-    public static function viewBetHistory($betId){
-        $url = config('providerlinks.naga.api_url') .'/operator/bet/history?betId='. $betId.'&groupCode='.$this->groupCode.'&brandCode='.$this->brandCode;
+    public static function viewBetHistory($betId,$groupCode,$brandCode){
+        $url = config('providerlinks.naga.api_url') .'/operator/bet/history?betId='. $betId.'&groupCode='.$groupCode.'&brandCode='.$brandCode;
         $client = new Client([
             'headers' => [
                 'Content-Type' => 'application/json' 
