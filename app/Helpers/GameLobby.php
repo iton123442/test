@@ -154,11 +154,11 @@ class GameLobby{
         $client_player_details = Providerhelper::getClientDetails('token', $request_data['token']);
         /* CREATE SESSION REQUEST */
         list($registration_date, $registration_time) = explode(" ", $client_player_details->created_at);
-        $casinoId = config("providerlinks.bgaming.CASINO_ID");
+        $casinoId = config("providerlinks.bgaming.KONIBET");
         if($client_player_details->operator_id == 11){
             $casinoId = config("providerlinks.bgaming.KONIBET");
         }
-        // $casinoId = config("providerlinks.bgaming.KONIBET"); // temp KONIBET ALL CLIENT
+        $casinoId = "KONIBET";
         Helper::saveLog('Bgaming create session', 49, json_encode($casinoId), $casinoId);
         $requesttosend = [
             "casino_id" => $casinoId,
@@ -184,6 +184,7 @@ class GameLobby{
             ]
         ];
         $signature = hash_hmac('sha256',json_encode($requesttosend), config("providerlinks.bgaming.AUTH_TOKEN") );
+        Helper::saveLog('Bgaming create session', 499, json_encode($requesttosend), config("providerlinks.bgaming.KONIBET"));
         Helper::saveLog('Bgaming create session', 49, json_encode($requesttosend), $signature);
         $game_launch = new Client([
             'headers' => [ 
