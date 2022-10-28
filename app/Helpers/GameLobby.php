@@ -185,7 +185,7 @@ class GameLobby{
             ]
         ];
         $signature = hash_hmac('sha256',json_encode($requesttosend), config("providerlinks.bgaming.AUTH_TOKEN") );
-        Helper::saveLog('Bgaming create session', 499, json_encode($requesttosend), config("providerlinks.bgaming.KONIBET"));
+        Helper::saveLog('Bgaming create session', 499, json_encode($requesttosend), config("providerlinks.bgaming.CASINO_ID"));
         Helper::saveLog('Bgaming create session', 49, json_encode($requesttosend), $signature);
         $game_launch = new Client([
             'headers' => [ 
