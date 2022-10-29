@@ -25,10 +25,26 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            'options'   => [
-                // PDO::ATTR_EMULATE_PREPARES => true
-                \PDO::ATTR_PERSISTENT => true
-            ],
+            // 'options'   => [
+            //     // PDO::ATTR_EMULATE_PREPARES => true
+            //     \PDO::ATTR_PERSISTENT => true
+            // ],
+         ],
+         'mysql-read' => [
+            'driver'    => 'mysql',
+            'host'      => env('DB_HOST_READ'),
+            'port'      => env('DB_PORT_READ'),
+            'database'  => env('DB_DATABASE_READ'),
+            'username'  => env('DB_USERNAME_READ'),
+            'password'  => env('DB_PASSWORD_READ'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+            'strict'    => false,
+            // 'options'   => [
+            //     // PDO::ATTR_EMULATE_PREPARES => true
+            //     \PDO::ATTR_PERSISTENT => true
+            // ],
          ],
          'server2' => [
             'driver'    => 'mysql',
@@ -41,10 +57,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            'options'   => [
-                // PDO::ATTR_EMULATE_PREPARES => true
-                \PDO::ATTR_PERSISTENT => true
-            ],
+            // 'options'   => [
+            //     // PDO::ATTR_EMULATE_PREPARES => true
+            //     \PDO::ATTR_PERSISTENT => true
+            // ],
         ],
 
         'server3' => [
@@ -58,10 +74,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            'options'   => [
-                // PDO::ATTR_EMULATE_PREPARES => true
-                \PDO::ATTR_PERSISTENT => true
-            ],
+            // 'options'   => [
+            //     // PDO::ATTR_EMULATE_PREPARES => true
+            //     \PDO::ATTR_PERSISTENT => true
+            // ],
         ],
         'savelog' => [
             'driver'    => 'mysql',
@@ -74,10 +90,10 @@ return [
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
             'strict'    => false,
-            'options'   => [
-                // PDO::ATTR_EMULATE_PREPARES => true
-                \PDO::ATTR_PERSISTENT => true
-            ],
+            // 'options'   => [
+            //     // PDO::ATTR_EMULATE_PREPARES => true
+            //     \PDO::ATTR_PERSISTENT => true
+            // ],
         ],
     ],
 ];
