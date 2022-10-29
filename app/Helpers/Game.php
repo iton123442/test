@@ -12,7 +12,7 @@ class Game
 		// return ($search_result ? $search_result : false);
 
 		$details = "where g.provider_id = ".$provider_id." and g.game_code = '".$game_code."' limit 1";
-		$game_details = DB::select('select g.game_name, g.game_code, g.game_id, p.provider_name, sp.sub_provider_name from games g inner join providers as p using (provider_id) inner join sub_providers as sp using (sub_provider_id) '.$details.' ');
+		$game_details = DB::connection('default-read')->select('select g.game_name, g.game_code, g.game_id, p.provider_name, sp.sub_provider_name from games g inner join providers as p using (provider_id) inner join sub_providers as sp using (sub_provider_id) '.$details.' ');
 		
 	 	return $game_details ? $game_details[0] : false;
 	}
@@ -24,7 +24,7 @@ class Game
 		// return ($search_result ? $search_result : false);
 
 		$details = "where g.game_id = ".$game_id." limit 1";
-		$game_details = DB::select('select g.game_name, g.game_code, g.game_id, p.provider_name from games g inner join providers as p using (provider_id) '.$details.' ');
+		$game_details = DB::connection('default-read')->select('select g.game_name, g.game_code, g.game_id, p.provider_name from games g inner join providers as p using (provider_id) '.$details.' ');
 		
 	 	return $game_details ? $game_details[0] : false;
 	}
@@ -36,7 +36,7 @@ class Game
 			$refference_id = "gt.provider_trans_id  = '".$value."'";
 		}
 				
-		$result = DB::select('select * from game_transactions gt inner join games as g using(game_id) where '.$refference_id.' and g.provider_id = '.$provider_id.' limit 1');
+		$result = DB::connection('default-read')->select('select * from game_transactions gt inner join games as g using(game_id) where '.$refference_id.' and g.provider_id = '.$provider_id.' limit 1');
 
 
 		// $query = DB::table("game_transactions AS gt")
@@ -64,7 +64,7 @@ class Game
 	public static function findByGameID($game_id, $provider_id = 0) {
 
 		$details = "where g.game_id = ".$game_id." and g.provider_id = ".$provider_id." limit 1";
-		$game_details = DB::select('select g.game_name, g.game_code, g.game_id from games g inner join providers as p using (provider_id) '.$details.' ');
+		$game_details = DB::connection('default-read')->select('select g.game_name, g.game_code, g.game_id from games g inner join providers as p using (provider_id) '.$details.' ');
 		
 	 	return $game_details ? $game_details[0] : false;
 	}

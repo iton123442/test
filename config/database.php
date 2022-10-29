@@ -30,7 +30,7 @@ return [
             //     \PDO::ATTR_PERSISTENT => true
             // ],
          ],
-         'mysql-read' => [
+         'default-read' => [
             'driver'    => 'mysql',
             'host'      => env('DB_HOST_READ'),
             'port'      => env('DB_PORT_READ'),

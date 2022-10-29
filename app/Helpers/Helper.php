@@ -152,7 +152,7 @@ class Helper
 
 	/* NEW 062521 */
 	public static function findGameDetails($type, $provider_id, $identification) {
-		    $game_details = DB::table("games as g")
+		    $game_details = DB::connection('default-read')->table("games as g")
 				->join("providers as p","g.provider_id","=","p.provider_id");
 				
 		    if ($type == 'game_code') {
