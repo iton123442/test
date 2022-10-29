@@ -192,7 +192,7 @@ class KAGamingController extends Controller
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
-        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
+        $game_information = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
@@ -331,7 +331,7 @@ class KAGamingController extends Controller
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
 
-        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
+        $game_information = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
@@ -636,7 +636,7 @@ class KAGamingController extends Controller
         // if($player_details == 'false'){
         //     return  $response = ["status" => "Server Timeout", "statusCode" =>  1];
         // }
-        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
+        $game_information = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
@@ -816,7 +816,7 @@ class KAGamingController extends Controller
         // if($player_details == 'false'){
         //     return  $response = ["status" => "Server Timeout", "statusCode" =>  1];
         // }
-        $game_information = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
+        $game_information = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
         if($game_information == null){ 
             return  $response = ["status" => "Game Not Found", "statusCode" =>  1];
         }
