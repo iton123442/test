@@ -319,7 +319,11 @@ class NagaGamesController extends Controller{
                 }
             }
             $provider_trans_id = $data['data']['transactionId'];
-            $roundId = $data['data']['betId'];
+            if ($data['data']['betType'] == 'BUY_FREESPIN' || $data['data']['betType'] == 'WIN_FREESPIN'){
+                $roundId = $data['data']['parentBetId'];
+            }else{
+                $roundId = $data['data']['betId'];
+            }
             $amount = $data['data']['amount'];
             $win = $amount == 0 ? 0 : 1;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
