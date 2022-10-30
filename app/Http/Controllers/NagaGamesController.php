@@ -415,7 +415,7 @@ class NagaGamesController extends Controller{
             }
             $updateTransData = [
                 "win" => $win,
-                "pay_amount" => round($amount,2),
+                "pay_amount" => round($amount + $game->pay_amount,2),
                 "income" => round($game->bet_amount-$amount,2),
                 "entry_id" => $amount == 0 ? 1 : 2,
             ];
