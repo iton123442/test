@@ -416,7 +416,7 @@ class NagaGamesController extends Controller{
             $updateTransData = [
                 "win" => $win,
                 "pay_amount" => round($amount + $game->pay_amount,2),
-                "income" => round($game->bet_amount-$amount,2),
+                "income" => round($game->bet_amount-$game->pay_amount - $amount,2),
                 "entry_id" => $amount == 0 ? 1 : 2,
             ];
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
