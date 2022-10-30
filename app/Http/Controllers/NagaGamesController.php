@@ -435,7 +435,7 @@ class NagaGamesController extends Controller{
                 "provider_request" => json_encode($data),
             ];
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
-            if ($data['betType'] == 'GAMBLE'){
+            if ($data['data']['betType'] == 'GAMBLE'){
                 $updateTransData = [
                     "win" => 1,
                     "pay_amount" => 0,
