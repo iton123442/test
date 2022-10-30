@@ -25,7 +25,6 @@ class NagaGamesController extends Controller{
         $this->secretKey = config('providerlinks.naga.secretKey');
         $this->apiKey = config('providerlinks.naga.apiKey');
         $this->publicKey = config('providerlinks.naga.publicKey');
-        $this->prefix = config('providerlinks.dowinn.prefix');
         $this->providerID = 74; //Real provider ID
         $this->dateToday = date("Y/m/d");
         $this->brandCode = config('providerlinks.naga.brandCode');
@@ -37,19 +36,7 @@ class NagaGamesController extends Controller{
         Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
         // $toExplode = explode(',"dataHash"',json_encode($data));
-        $hash = $this-> hashParam($data['data']);
-        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($hash), 'HASH!');
-        if ($hash != $data['dataHash']){
-            $response = array(
-                "data"=> null,
-                "error" => [
-                    "statusCode" => 1035,
-                    "message" => "Cannot reach Operator to authorize"
-                ]
-            );
-            Helper::saveLog('NagaGames AUTH HASH NOT MATCHED', $this->provider_db_id, json_encode($hash),  $data['dataHash']);
-            return response($response,400)->header('Content-Type', 'application/json');
-        }
+        $hash = $this-> hashParam($data['data'],$data['dataHash']);
         if($client_details){
             $response = array(
                 "data"=> [
@@ -64,16 +51,27 @@ class NagaGamesController extends Controller{
     }
 
     
-    public function hashParam($sortData){
-        $clean2 = hash('sha256',json_encode($sortData, JSON_FORCE_OBJECT));
-        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($clean2), 'HASH!');
-        return $clean2;
+    public function hashParam($sortData,$toCompare){
+        $hasher = hash('sha256',json_encode($sortData, JSON_FORCE_OBJECT));
+        if ($hasher != $toCompare){
+            $response = array(
+                "data"=> null,
+                "error" => [
+                    "statusCode" => 1035,
+                    "message" => "Cannot reach Operator to authorize"
+                ]
+            );
+            Helper::saveLog('NagaGames AUTH HASH NOT MATCHED', $this->provider_db_id, json_encode($hasher),  $toCompare);
+            return response($response,400)->header('Content-Type', 'application/json');
+        }
+        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($hasher), 'HASH!');
+        return $hasher;
     }
     public function getBalance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
         Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
-        $hash = $this-> hashParam($data['data']);
+        $hash = $this-> hashParam($data['data'],$data['dataHash']);
         if($client_details){
             $response = array(
                 "data"=> [
