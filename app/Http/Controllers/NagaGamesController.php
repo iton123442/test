@@ -56,8 +56,8 @@ class NagaGamesController extends Controller{
         // ksort($sortData);
         // $param = "";
         // // $i = 0;
-        $clean1 = hash_hmac('sha256',json_encode($sortData),$this->apiKey);
-        Helper::saveLog('Naga Games Hasher1', $this->provider_db_id, json_encode($clean1), 'HASH!');
+        // $clean1 = hash('sha256',json_encode($sortData));
+        // Helper::saveLog('Naga Games Hasher1', $this->provider_db_id, json_encode($clean1), 'HASH!');
         // foreach($sortData as $key => $item){
         //     if($key != 'hash'){
         //         if($i == 0){
@@ -65,7 +65,7 @@ class NagaGamesController extends Controller{
         //         }else{
         //             $param .= "&".$key ."=". $item;
         
-        $clean2 = hash_hmac('sha256',$sortData,$this->secretKey);
+        $clean2 = hash('sha256',$sortData);
         Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($clean2), 'HASH!');
         //         }
         //         $i++;
