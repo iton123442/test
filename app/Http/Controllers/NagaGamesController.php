@@ -119,7 +119,7 @@ class NagaGamesController extends Controller{
                 Helper::saveLog('NagaGames BET duplicate_transaction resend', $this->provider_db_id, json_encode($request->all()),  $response);
                 return response($response,400)->header('Content-Type', 'application/json');
             }
-            if ($data['data']['betType'] == 'BUY_FREESPIN' || $data['data']['betType'] == 'WIN_FREESPIN'){
+            if ($data['data']['parentBetId'] != null || $data['data']['betType'] == 'BUY_FREESPIN' || $data['data']['betType'] == 'WIN_FREESPIN'){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];
