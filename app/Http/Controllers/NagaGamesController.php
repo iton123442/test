@@ -330,7 +330,6 @@ class NagaGamesController extends Controller{
                 $roundId = $data['data']['betId'];
             }
             $amount = $data['data']['amount'];
-            $win = $amount == 0 ? 0 : 1;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if ($game == null){
@@ -413,6 +412,7 @@ class NagaGamesController extends Controller{
                     }
                 }
             }
+            $win = $amount + $game->pay_amount == 0 ? 0 : 1;
             $updateTransData = [
                 "win" => $win,
                 "pay_amount" => round($amount + $game->pay_amount,2),
@@ -522,7 +522,6 @@ class NagaGamesController extends Controller{
                 $roundId = $data['data']['betId'];
             }
             $amount = $data['data']['amount'];
-            $win = $amount == 0 ? 0 : 1;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if ($game == null){
@@ -605,6 +604,7 @@ class NagaGamesController extends Controller{
                     }
                 }
             }
+            $win = $amount + $game->pay_amount == 0 ? 0 : 1;
             $updateTransData = [
                 "win" => $win,
                 "pay_amount" => round($amount,2),
