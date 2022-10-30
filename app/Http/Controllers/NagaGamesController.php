@@ -36,8 +36,9 @@ class NagaGamesController extends Controller{
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
         $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
-        $toExplode = explode(',"dataHash"',json_encode($data));
-        $hash = $this-> hashParam($toExplode[0]);
+        // $toExplode = explode(',"dataHash"',json_encode($data));
+        $hash = $this-> hashParam($data['data']);
+        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($hash), 'HASH!');
         if($client_details){
             $response = array(
                 "data"=> [
@@ -66,7 +67,7 @@ class NagaGamesController extends Controller{
         //             $param .= "&".$key ."=". $item;
         
         $clean2 = hash('sha256',json_encode($sortData, JSON_FORCE_OBJECT));
-        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($sortData), 'HASH!');
+        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($clean2), 'HASH!');
         //         }
         //         $i++;
         //     }
