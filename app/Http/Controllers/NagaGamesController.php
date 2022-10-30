@@ -119,7 +119,7 @@ class NagaGamesController extends Controller{
                 Helper::saveLog('NagaGames BET duplicate_transaction resend', $this->provider_db_id, json_encode($request->all()),  $response);
                 return response($response,400)->header('Content-Type', 'application/json');
             }
-            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'WIN_FREESPIN'){
+            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'WIN_FREESPIN'){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];
@@ -324,7 +324,7 @@ class NagaGamesController extends Controller{
                 }
             }
             $provider_trans_id = $data['data']['transactionId'];
-            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'WIN_FREESPIN'){
+            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'WIN_FREESPIN'){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];
@@ -516,7 +516,7 @@ class NagaGamesController extends Controller{
                 return response($response,200)->header('Content-Type', 'application/json');
             }
             $provider_trans_id = $data['data']['transactionId'];
-            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'WIN_FREESPIN'){
+            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'WIN_FREESPIN'){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];
