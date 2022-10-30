@@ -65,8 +65,8 @@ class NagaGamesController extends Controller{
         //         }else{
         //             $param .= "&".$key ."=". $item;
         
-        $clean2 = hash('sha256',json_encode($sortData));
-        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($clean2), 'HASH!');
+        $clean2 = hash('sha256',json_encode($sortData, JSON_FORCE_OBJECT));
+        Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($sortData), 'HASH!');
         //         }
         //         $i++;
         //     }
