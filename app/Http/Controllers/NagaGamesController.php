@@ -324,7 +324,9 @@ class NagaGamesController extends Controller{
                 }
             }
             $provider_trans_id = $data['data']['transactionId'];
-            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'WIN_FREESPIN'){
+            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'BUY_FREESPIN'
+             ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'WIN_FREESPIN'
+            ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'GAMBLE'){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];
@@ -435,7 +437,7 @@ class NagaGamesController extends Controller{
                 "provider_request" => json_encode($data),
             ];
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
-            if ($data['data']['betType'] == 'GAMBLE'){
+            if ($data['data']['betType'] == 'GAMBLE' && $data['data']['parentBetId'] == null){
                 $updateTransData = [
                     "win" => 1,
                     "pay_amount" => 0,
