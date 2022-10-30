@@ -324,7 +324,7 @@ class NagaGamesController extends Controller{
                 }
             }
             $provider_trans_id = $data['data']['transactionId'];
-            if ($data['data']['betType'] == 'BUY_FREESPIN' || $data['data']['betType'] == 'WIN_FREESPIN'){
+            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'BUY_FREESPIN' ||isset($data['data']['parentBetId']) &&  $data['data']['betType'] == 'WIN_FREESPIN'){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];
