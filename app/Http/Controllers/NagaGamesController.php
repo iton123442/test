@@ -435,6 +435,17 @@ class NagaGamesController extends Controller{
                 "provider_request" => json_encode($data),
             ];
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+            if ($data['betType'] == 'GAMBLE'){
+                $updateTransData = [
+                    "win" => 1,
+                    "pay_amount" => 0,
+                    "income" => round($game->bet_amount-$game->pay_amount,2),
+                    "entry_id" => 2,
+                ];
+                GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
+                Helper::saveLog('NAGAGAMES GAMBLE', $this->provider_db_id, json_encode($response), 'GAMBLE HIT!');
+                return response($response,200)->header('Content-Type', 'application/json');
+            }
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
