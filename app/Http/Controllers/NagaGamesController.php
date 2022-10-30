@@ -119,7 +119,12 @@ class NagaGamesController extends Controller{
                 Helper::saveLog('NagaGames BET duplicate_transaction resend', $this->provider_db_id, json_encode($request->all()),  $response);
                 return response($response,400)->header('Content-Type', 'application/json');
             }
-            $roundId = $data['data']['betId'];
+            if ($data['data']['betType'] == 'BUY_FREESPIN' || $data['data']['betType'] == 'WIN_FREESPIN'){
+                $roundId = $data['data']['parentBetId'];
+            }else{
+                $roundId = $data['data']['betId'];
+            }
+            $amount = $data['data']['amount'];
             $provider_trans_id = $data['data']['transactionId'];
             $amount = $data['data']['amount'];
             $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
@@ -319,7 +324,11 @@ class NagaGamesController extends Controller{
                 }
             }
             $provider_trans_id = $data['data']['transactionId'];
-            $roundId = $data['data']['betId'];
+            if ($data['data']['betType'] == 'BUY_FREESPIN' || $data['data']['betType'] == 'WIN_FREESPIN'){
+                $roundId = $data['data']['parentBetId'];
+            }else{
+                $roundId = $data['data']['betId'];
+            }
             $amount = $data['data']['amount'];
             $win = $amount == 0 ? 0 : 1;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
