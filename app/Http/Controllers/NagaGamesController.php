@@ -39,6 +39,17 @@ class NagaGamesController extends Controller{
         // $toExplode = explode(',"dataHash"',json_encode($data));
         $hash = $this-> hashParam($data['data']);
         Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($hash), 'HASH!');
+        if ($hash != $data['dataHash']){
+            $response = array(
+                "data"=> null,
+                "error" => [
+                    "statusCode" => 1035,
+                    "message" => "Cannot reach Operator to authorize"
+                ]
+            );
+            Helper::saveLog('NagaGames AUTH HASH NOT MATCHED', $this->provider_db_id, json_encode($hash),  $data['dataHash']);
+            return response($response,400)->header('Content-Type', 'application/json');
+        }
         if($client_details){
             $response = array(
                 "data"=> [
@@ -54,28 +65,8 @@ class NagaGamesController extends Controller{
 
     
     public function hashParam($sortData){
-        // ksort($sortData);
-        // $param = "";
-        // // $i = 0;
-        // $clean1 = hash('sha256',json_encode($sortData));
-        // Helper::saveLog('Naga Games Hasher1', $this->provider_db_id, json_encode($clean1), 'HASH!');
-        // foreach($sortData as $key => $item){
-        //     if($key != 'hash'){
-        //         if($i == 0){
-        //             $param .= $key ."=". $item;
-        //         }else{
-        //             $param .= "&".$key ."=". $item;
-        
         $clean2 = hash('sha256',json_encode($sortData, JSON_FORCE_OBJECT));
         Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($clean2), 'HASH!');
-        //         }
-        //         $i++;
-        //     }
-        // }
-        // $str = str_replace("\n","",$param.$this->api_key);
-        // // $clean = str_replace("\r","",$str);
-        // $clean = hash_hmac('sha256',json_encode($sortData),$this->publicKey);
-        // Helper::saveLog('Naga Games Hasher3', $this->provider_db_id, json_encode($clean), 'HASH!');
         return $clean2;
     }
     public function getBalance(Request $request){
