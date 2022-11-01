@@ -41,7 +41,7 @@ class NagaGamesController extends Controller{
             $response = array(
                 "data"=> [
                 "nativeId"=>"TG_" . $client_details->player_id,
-                "currency"=>"USD",
+                "currency"=>$client_details ->default_currency,
                 "balance"=>(float)round($client_details->balance,2)
                 ],
                 "error" => null
@@ -76,7 +76,7 @@ class NagaGamesController extends Controller{
             $response = array(
                 "data"=> [
                 "nativeId"=>"TG_" . $client_details->player_id,
-                "currency"=>"USD",
+                "currency"=>$client_details ->default_currency,
                 "balance"=> (int) round($client_details->balance,2)
                 ],
                 "error" => null
@@ -92,7 +92,7 @@ class NagaGamesController extends Controller{
         if ($client_details){
             // $response = array(
             //     "data"=> [
-            //     "currency"=>"USD",
+            //     "currency"=>$client_details ->default_currency,
             //     "balance"=>number_format($client_details->balance,2,'.', '')
             //     ],
             //     "error" => null
@@ -157,7 +157,7 @@ class NagaGamesController extends Controller{
                     //SUCCESS FUNDTRANSFER
                     $response = [
                         "data" => [
-                            "currency"=>"USD",
+                            "currency"=>$client_details ->default_currency,
                             "balance"=> (float) $balance,
                         ]
                     ];
@@ -232,7 +232,7 @@ class NagaGamesController extends Controller{
                 //SUCCESS FUNDTRANSFER
                 $response = [
                     "data" => [
-                        "currency"=>"USD",
+                        "currency"=>$client_details ->default_currency,
                         "balance"=> (float) $balance,
                     ]
                 ];
@@ -302,7 +302,7 @@ class NagaGamesController extends Controller{
         if ($client_details){
             // $response =[
             //     "data" => [
-            //         "currency"=>"USD",
+            //         "currency"=>$client_details ->default_currency,
             //         "balance"=> (int) round($client_details->balance,2),
             //     ]
             // ];
@@ -314,7 +314,7 @@ class NagaGamesController extends Controller{
                 if ($betStatus == "RESOLVED"){
                     $response =[
                         "data" => [
-                            "currency"=>"USD",
+                            "currency"=>$client_details ->default_currency,
                             "balance"=> (int) round($client_details->balance,2)
                         ]
                     ];
@@ -374,7 +374,7 @@ class NagaGamesController extends Controller{
                     GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
                     $response = [
                         "data" => [
-                            "currency"=>"USD",
+                            "currency"=>$client_details ->default_currency,
                             "balance"=> (float) $balance,
                         ]
                     ];
@@ -426,7 +426,7 @@ class NagaGamesController extends Controller{
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $response =[
                 "data" => [
-                    "currency"=>"USD",
+                    "currency"=>$client_details ->default_currency,
                     "balance"=> (int) round($client_details->balance,2)
                 ]
             ];
@@ -484,7 +484,7 @@ class NagaGamesController extends Controller{
                     //SUCCESS FUNDTRANSFER
                     $response = [
                         "data" => [
-                            "currency"=>"USD",
+                            "currency"=>$client_details ->default_currency,
                             "balance"=> (float) $balance,
                         ]
                     ];
@@ -514,7 +514,7 @@ class NagaGamesController extends Controller{
         if ($client_details){
             // $response =[
             //     "data" => [
-            //         "currency"=>"USD",
+            //         "currency"=>$client_details ->default_currency,
             //         "balance"=> (int) round($client_details->balance,2),
             //     ]
             // ];
@@ -524,7 +524,7 @@ class NagaGamesController extends Controller{
             }catch(\Exception $e){
                 $response =[
                     "data" => [
-                        "currency"=>"USD",
+                        "currency"=>$client_details ->default_currency,
                         "balance"=> (int) round($client_details->balance,2)
                     ]
                 ];
@@ -577,7 +577,7 @@ class NagaGamesController extends Controller{
                     GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
                     $response = [
                         "data" => [
-                            "currency"=>"USD",
+                            "currency"=>$client_details ->default_currency,
                             "balance"=> (float) $balance,
                         ]
                     ];
@@ -629,7 +629,7 @@ class NagaGamesController extends Controller{
             GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
             $response =[
                 "data" => [
-                    "currency"=>"USD",
+                    "currency"=>$client_details ->default_currency,
                     "balance"=> (int) round($client_details->balance,2)
                 ]
             ];
@@ -676,7 +676,7 @@ class NagaGamesController extends Controller{
                     //SUCCESS FUNDTRANSFER
                     $response = [
                         "data" => [
-                            "currency"=>"USD",
+                            "currency"=>$client_details ->default_currency,
                             "balance"=> (float) $balance,
                         ]
                     ];
