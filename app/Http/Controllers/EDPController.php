@@ -354,7 +354,7 @@ class EDPController extends Controller
             $payout_reason = null;
         }
         if($sha1key == $request->sign){
-            $round_id = $request->id."-".$request->gameId;
+            $round_id = $request->id."_".$request->gameId;
             $client_details = ProviderHelper::getClientDetails('token', $request->token);
             GameRound::create($request->gameId, $client_details->token_id);
             if($client_details){
@@ -496,7 +496,7 @@ class EDPController extends Controller
         Helper::saveLog('Refund(EDP)', 2, json_encode($request->getContent()), "all refund");
         $sha1key = sha1($request->amount.''.$request->date.''.$request->gameId.''.$request->id.''.$request->token.''.$this->secretkey);
         if($sha1key == $request->sign){
-            $round_id = $request->id."-".$request->gameId;
+            $round_id = $request->id."_".$request->gameId;
             $client_details = ProviderHelper::getClientDetails('token', $request->token);
             $game_transaction = GameTransactionMDB::checkGameTransactionExist($request->id,$round_id,1,$client_details);
             $request->amount = $game_transaction?$request->amount:0;
