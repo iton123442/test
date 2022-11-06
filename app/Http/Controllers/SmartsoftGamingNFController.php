@@ -13,7 +13,7 @@ use App\Helpers\Game;
 use Carbon\Carbon;
 use DB;
 
-class SmartsoftGamingController extends Controller
+class SmartsoftGamingNFController extends Controller
 {
 
     public function __construct(){
