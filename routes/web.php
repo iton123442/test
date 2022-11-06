@@ -756,12 +756,12 @@ $app->post('/public/api/nolimitcity/konibet', 'NolimitController@index');
 
 
 //SmartSoft Gaming
-$app->post('/public/api/smartsoft_gaming/ActivateSession', 'SmartsoftGamingController@ActiveSession');
-$app->get('/public/api/smartsoft_gaming/GetBalance', 'SmartsoftGamingController@GetBalance');
-$app->post('/public/api/smartsoft_gaming/Deposit', 'SmartsoftGamingController@Deposit');
-$app->post('/public/api/smartsoft_gaming/Withdraw', 'SmartsoftGamingController@Withdraw');
-$app->post('/public/api/smartsoft_gaming/RollbackTransaction', 'SmartsoftGamingController@Rollback');
-$app->post('/public/api/smartsoft_gaming/HashValue','SmartSoftGamingController@getHashValue');
+$app->post('/public/api/smartsoft_gaming/ActivateSession', 'SmartsoftGamingNFController@ActiveSession');
+$app->get('/public/api/smartsoft_gaming/GetBalance', 'SmartsoftGamingNFController@GetBalance');
+$app->post('/public/api/smartsoft_gaming/Deposit', 'SmartsoftGamingNFController@Deposit');
+$app->post('/public/api/smartsoft_gaming/Withdraw', 'SmartsoftGamingNFController@Withdraw');
+$app->post('/public/api/smartsoft_gaming/RollbackTransaction', 'SmartsoftGamingNFController@Rollback');
+$app->post('/public/api/smartsoft_gaming/HashValue','SmartSoftGamingNFController@getHashValue');
 
 
 //TIGER GAMES TRANSFER WALLET
