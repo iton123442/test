@@ -122,6 +122,11 @@ class SmartsoftGamingNFController extends Controller
                             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                             switch ($client_response->fundtransferresponse->status->code) {
                                 case '200':
+                                $http_status = 200;
+                                $response = [
+                                  "TransactionId" => $provider_trans_id,
+                                  "Balance" => (float) $client_response->fundtransferresponse->balance
+                                ];
                                 $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);
                                 if ($bet_transaction != 'false') {
                                     $client_details->connection_name = $bet_transaction->connection_name;
@@ -168,12 +173,6 @@ class SmartsoftGamingNFController extends Controller
                                 Helper::saveLog(' smartsoft after  gameTransactionEXTData', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
                                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
                                 
-                                $http_status = 200;
-                                $response = [
-                                  "TransactionId" => $provider_trans_id,
-                                  "Balance" => (float) $client_response->fundtransferresponse->balance
-                                ];
-
                                 break;
 
                                 case '402':
