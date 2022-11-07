@@ -733,11 +733,10 @@ class SmartsoftGamingNFController extends Controller
                         );
                         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
                         
-                        $win_or_lost = 4;
                         $entry_id = 2;
                         $income = 0 ;
                         $updateGameTransaction = [
-                            'win' => 5,
+                            'win' => 4,
                             "pay_amount" => $bet_details->pay_amount + $amount,
                             'income' => $income,
                             'entry_id' => $entry_id,
