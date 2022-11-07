@@ -495,8 +495,8 @@ public function RollbackProcess($req){
         "Request" =>"WalletDebit",
         "ReturnCode" => 107,
         "Message" => "Transaction is processing"
-    ];
-        return $res;
+      ];
+      return $res;
     }
     $game_details = Game::find($game_code, $this->provider_db_id);
     $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollbackTransactionId,'transaction_id', false, $client_details);
@@ -525,7 +525,6 @@ public function RollbackProcess($req){
     $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
     $client_response = ClientRequestHelper::fundTransfer($client_details, $rollback_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $bet_transaction->game_trans_id, 'credit', "true");
     if (isset($client_response->fundtransferresponse->status->code)) {
-                            
             switch ($client_response->fundtransferresponse->status->code) {
                 case '200':
                     ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -543,7 +542,6 @@ public function RollbackProcess($req){
                     ];
                 return $res;
             }
-
             $updateTransactionEXt = array(
                 "provider_request" =>json_encode($req),
                 "mw_response" => json_encode($res),
@@ -553,8 +551,7 @@ public function RollbackProcess($req){
                 'general_details' => 'success',
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-
-        }
+      }
   }//end check player details
 }//end rollback func
   public function generateId($type){
