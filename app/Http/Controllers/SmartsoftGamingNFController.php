@@ -678,7 +678,7 @@ class SmartsoftGamingNFController extends Controller
         $round_id = $data['TransactionInfo']['RoundId'];
         // $game_code = $data['TransactionInfo']['GameName'];
         $client_details = ProviderHelper::getClientDetailsCache('token', $request->header('X-SessionId'));
-        $bet_details = GameTransactionMDB::findGameTransactionDetails($rollback_id,'transaction_id', false, $client_details);
+        $bet_details = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
         if($data['TransactionInfo']['GameName'] != null){
             $game_details = Game::find($data['TransactionInfo']['GameName'], $this->provider_db_id);
         }else{
@@ -700,17 +700,13 @@ class SmartsoftGamingNFController extends Controller
                         
 
                     } else {
-                               
-                    $response = array(
-                        
+                        $response = array(
                          "Error Code" => 112,
                           "Message" =>"Limit loss"
                         );
                     } 
-
-
                     Helper::saveLog('Smartsoft bet found 1 ', $this->provider_db_id, json_encode($request), $response);
-                   return response($response,200)->header('Content-Type', 'application/json');
+                    return response($response,200)->header('Content-Type', 'application/json');
              } // End catch error
             $existing_bet = GameTransactionMDB::findGameExt($rollback_id, false,'transaction_id', $client_details);
             $game_trans_type = $existing_bet->game_transaction_type;
