@@ -26,7 +26,7 @@ class SmartsoftGamingNFController extends Controller
     public function ActiveSession(Request $request){
         Helper::saveLog('Smartsoft Active Session', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = $request->all();
-        $client_details = ProviderHelper::getClientDetails('token', $data['Token']);
+        $client_details = ProviderHelper::getClientDetailsCache('token',$data['Token']);
 
         if($client_details == null){
             $response = [
@@ -60,7 +60,7 @@ class SmartsoftGamingNFController extends Controller
             Helper::saveLog('Smarsoft getbalance', $this->provider_db_id, json_encode($requestHeader), 'ENDPOINT HIT');
            
             try {
-                $client_details = ProviderHelper::getClientDetails('token', $request->header('X-SessionId'));
+                $client_details = ProviderHelper::getClientDetailsCache('token',$request->header('X-SessionId'));
                 $response = [
                        "CurrencyCode" => $client_details->default_currency,
                        "Amount" => (float) $client_details->balance
@@ -79,7 +79,7 @@ class SmartsoftGamingNFController extends Controller
     public function Deposit(Request $request){
          Helper::saveLog('Smartsoft bet', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
             $data = $request->all();
-            $client_details = ProviderHelper::getClientDetails('token', $request->header('X-SessionId'));
+            $client_details = ProviderHelper::getClientDetailsCache('token',$request->header('X-SessionId'));
             // dd($client_details->balance);
             $game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name,1);
             $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
@@ -119,7 +119,7 @@ class SmartsoftGamingNFController extends Controller
                 }
                  Helper::saveLog(' smartsoft after  client_response', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');     
                         if (isset($client_response->fundtransferresponse->status->code)) {
-                            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                             switch ($client_response->fundtransferresponse->status->code) {
                                 case '200':
                                 $http_status = 200;
@@ -219,7 +219,7 @@ class SmartsoftGamingNFController extends Controller
         Helper::saveLog('Smartsoft credit process', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT");
         $data = $request->all();
         $method = $data['TransactionType'];
-        $client_details = ProviderHelper::getClientDetails('token', $request->header('X-SessionId'));
+        $client_details = ProviderHelper::getClientDetailsCache('token',$request->header('X-SessionId'));
         $game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name,1);
         $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
         $pay_amount = $data['Amount'];
@@ -406,7 +406,7 @@ class SmartsoftGamingNFController extends Controller
                 $game_details = Game::find($game_code, $this->provider_db_id);
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance);
+                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $winbBalance);
                 $response = [
                     "TransactionId" => $provider_trans_id,
                     "Balance" => (float)$winbBalance                                           
@@ -455,11 +455,11 @@ class SmartsoftGamingNFController extends Controller
                             ]
                         ]
                     ];
-                $updateTransactionEXt = array(
-                    "provider_request" =>json_encode($request->all()),
-                    "mw_response" => json_encode($response),
-                );
-                GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                // $updateTransactionEXt = array(
+                //     "provider_request" =>json_encode($request->all()),
+                //     "mw_response" => json_encode($response),
+                // );
+                // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
@@ -539,7 +539,7 @@ class SmartsoftGamingNFController extends Controller
                 Helper::saveLog('Smartsoft find game_detailss', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance);
+                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $winbBalance);
 
                 $response = [
                     "TransactionId" => $provider_trans_id,
@@ -677,12 +677,12 @@ class SmartsoftGamingNFController extends Controller
         $provider_trans_id = $data['CurrentTransactionId'];
         $round_id = $data['TransactionInfo']['RoundId'];
         // $game_code = $data['TransactionInfo']['GameName'];
-        $client_details = ProviderHelper::getClientDetails('token', $request->header('X-SessionId'));
+        $client_details = ProviderHelper::getClientDetailsCache('token', $request->header('X-SessionId'));
+        $bet_details = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
         if($data['TransactionInfo']['GameName'] != null){
             $game_details = Game::find($data['TransactionInfo']['GameName'], $this->provider_db_id);
         }else{
-            $getGameID = GameTransactionMDB::findGameTransactionDetails($rollback_id,'transaction_id', false, $client_details);
-            $game_details = Game::findByGameID($getGameID->game_id, $this->provider_db_id);
+            $game_details = Game::findByGameID($bet_details->game_id, $this->provider_db_id);
         }
         try{
             ProviderHelper::idenpotencyTable($provider_trans_id);
@@ -700,38 +700,29 @@ class SmartsoftGamingNFController extends Controller
                         
 
                     } else {
-                               
-                    $response = array(
-                        
+                        $response = array(
                          "Error Code" => 112,
                           "Message" =>"Limit loss"
                         );
                     } 
-
-
                     Helper::saveLog('Smartsoft bet found 1 ', $this->provider_db_id, json_encode($request), $response);
-                   return response($response,200)->header('Content-Type', 'application/json');
+                    return response($response,200)->header('Content-Type', 'application/json');
              } // End catch error
-        $existing_bet = GameTransactionMDB::findGameExt($rollback_id, false,'transaction_id', $client_details);
-        $game_trans_type = $existing_bet->game_transaction_type;
+            $existing_bet = GameTransactionMDB::findGameExt($rollback_id, false,'transaction_id', $client_details);
+            $game_trans_type = $existing_bet->game_transaction_type;
                 if($existing_bet != 'false'){
                         $client_details->connection_name = $existing_bet->connection_name;
                         $amount = $existing_bet->amount;
                         if($game_trans_type == 1){
                             $type = "credit";
                             $balance = $client_details->balance + $amount;
-                            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $balance); 
                         }else{
                             $type = "debit";
                             $balance =  $client_details->balance - $amount;
-                            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
+                            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $balance); 
                         }
-                        $response = [
-
-                                "TransactionId" => $existing_bet->game_trans_id,
-                                "Balance" => $balance
-
-                        ];
+                        
                         $gameTransactionEXTData = array(
                             "game_trans_id" => $existing_bet->game_trans_id,
                             "provider_trans_id" => $provider_trans_id,
@@ -739,50 +730,83 @@ class SmartsoftGamingNFController extends Controller
                             "amount" => $amount,
                             "game_transaction_type"=> 3,
                             "provider_request" =>json_encode($data),
-                            "mw_response" =>json_encode($response),
                         );
                         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
                         
-                        $win_or_lost = 4;
                         $entry_id = 2;
                         $income = 0 ;
                         $updateGameTransaction = [
-                            'win' => 5,
-                            "pay_amount" => $amount,
+                            'win' => 4,
+                            "pay_amount" => $bet_details->pay_amount + $amount,
                             'income' => $income,
                             'entry_id' => $entry_id,
                             'trans_status' => 3
                         ];
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
 
-                         $body_details = [
-                            "type" => $type,
-                            "win" => $win_or_lost,
-                            "token" => $client_details->player_token,
-                            "rollback" => "true",
-                            "game_details" => [
-                                "game_id" => $game_details->game_id
-                            ],
-                            "game_transaction" => [
-                                "amount" => $amount
-                            ],
-                            "connection_name" => $existing_bet->connection_name,
-                            "game_trans_ext_id" => $game_trans_ext_id,
-                            "game_transaction_id" => $existing_bet->game_trans_id
+                        $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $existing_bet->game_trans_id, 'credit', "true");
+                        if (isset($client_response->fundtransferresponse->status->code)) {
+                                switch ($client_response->fundtransferresponse->status->code) {
+                                    case '200':
+                                        $response = [
+                                            "TransactionId" => $existing_bet->game_trans_id,
+                                            "Balance" => $balance
+                                        ];
+                                        $updateTransactionEXt = array(
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'success',
+                                            'general_details' => 'success',
+                                        );
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                        return $response;
+                                    break;
+                                    case '402':
+                                        $updateTransactionEXt = array(
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'failed',
+                                            'general_details' => 'failed',
+                                        );
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                        $response = [
+                                          "Error Code" => 500,
+                                          "Message" => "Internal Error"
+                                        ];
+                                        return $response;
+                                    break;
+                                    default:
+                                        $updateTransactionEXt = array(
+                                            "mw_response" => json_encode($response),
+                                            'mw_request' => json_encode($client_response->requestoclient),
+                                            'client_response' => json_encode($client_response->fundtransferresponse),
+                                            'transaction_detail' => 'failed',
+                                            'general_details' => 'failed',
+                                        );
+                                        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                                        $response = [
+                                          "Error Code" => 500,
+                                          "Message" => "Internal Error"
+                                        ];
+                                        return $response;
 
-                        ];
-                        try {
-                            $client = new Client();
-                            $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
-                                [ 'body' => json_encode($body_details), 'timeout' => '2.00']
-                            );
-                            //THIS RESPONSE IF THE TIMEOUT NOT FAILED
-                            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($data), $response);
-                            return $response;
-                        } catch (\Exception $e) {
-                            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($data), $response);
-                            return $response;
+                                }
+                                
                         }
+                        // try {
+                        //     $client = new Client();
+                        //     $guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+                        //         [ 'body' => json_encode($body_details), 'timeout' => '2.00']
+                        //     );
+                        //     //THIS RESPONSE IF THE TIMEOUT NOT FAILED
+                        //     Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($data), $response);
+                        //     return $response;
+                        // } catch (\Exception $e) {
+                        //     Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($data), $response);
+                        //     return $response;
+                        // }
 
                 }else{
 
