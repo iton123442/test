@@ -734,7 +734,6 @@ class SmartsoftGamingNFController extends Controller
                             "amount" => $amount,
                             "game_transaction_type"=> 3,
                             "provider_request" =>json_encode($data),
-                            "mw_response" =>json_encode($response),
                         );
                         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
                         
@@ -760,7 +759,7 @@ class SmartsoftGamingNFController extends Controller
                                         ];
                                         $updateTransactionEXt = array(
                                             "provider_request" =>json_encode($req),
-                                            "mw_response" => json_encode($res),
+                                            "mw_response" => json_encode($response),
                                             'mw_request' => json_encode($client_response->requestoclient),
                                             'client_response' => json_encode($client_response->fundtransferresponse),
                                             'transaction_detail' => 'success',
@@ -772,7 +771,7 @@ class SmartsoftGamingNFController extends Controller
                                     case '402':
                                         $updateTransactionEXt = array(
                                             "provider_request" =>json_encode($req),
-                                            "mw_response" => json_encode($res),
+                                            "mw_response" => json_encode($response),
                                             'mw_request' => json_encode($client_response->requestoclient),
                                             'client_response' => json_encode($client_response->fundtransferresponse),
                                             'transaction_detail' => 'failed',
@@ -788,7 +787,7 @@ class SmartsoftGamingNFController extends Controller
                                     default:
                                         $updateTransactionEXt = array(
                                             "provider_request" =>json_encode($req),
-                                            "mw_response" => json_encode($res),
+                                            "mw_response" => json_encode($response),
                                             'mw_request' => json_encode($client_response->requestoclient),
                                             'client_response' => json_encode($client_response->fundtransferresponse),
                                             'transaction_detail' => 'failed',
