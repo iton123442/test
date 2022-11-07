@@ -758,7 +758,6 @@ class SmartsoftGamingNFController extends Controller
                                             "Balance" => $balance
                                         ];
                                         $updateTransactionEXt = array(
-                                            "provider_request" =>json_encode($req),
                                             "mw_response" => json_encode($response),
                                             'mw_request' => json_encode($client_response->requestoclient),
                                             'client_response' => json_encode($client_response->fundtransferresponse),
@@ -770,7 +769,6 @@ class SmartsoftGamingNFController extends Controller
                                     break;
                                     case '402':
                                         $updateTransactionEXt = array(
-                                            "provider_request" =>json_encode($req),
                                             "mw_response" => json_encode($response),
                                             'mw_request' => json_encode($client_response->requestoclient),
                                             'client_response' => json_encode($client_response->fundtransferresponse),
@@ -786,7 +784,6 @@ class SmartsoftGamingNFController extends Controller
                                     break;
                                     default:
                                         $updateTransactionEXt = array(
-                                            "provider_request" =>json_encode($req),
                                             "mw_response" => json_encode($response),
                                             'mw_request' => json_encode($client_response->requestoclient),
                                             'client_response' => json_encode($client_response->fundtransferresponse),
