@@ -749,7 +749,7 @@ class SmartsoftGamingNFController extends Controller
                         ];
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
 
-                        $client_response = ClientRequestHelper::fundTransfer($client_details, $rollback_amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $bet_transaction->game_trans_id, 'credit', "true");
+                        $client_response = ClientRequestHelper::fundTransfer($client_details, $amount, $game_details->game_code, $game_details->game_name, $game_trans_ext_id, $existing_bet->game_trans_id, 'credit', "true");
                         if (isset($client_response->fundtransferresponse->status->code)) {
                                 switch ($client_response->fundtransferresponse->status->code) {
                                     case '200':
