@@ -202,7 +202,6 @@ public function DebitProcess($req){
                               "entry_id" => 1,
                           );
                          GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
-                         $game_transaction_id = $gen_game_trans_id;
                     }
                        
                      $gameTransactionEXTData = array(
