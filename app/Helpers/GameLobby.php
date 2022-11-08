@@ -161,14 +161,18 @@ class GameLobby{
         $gcp_URL = config("providerlinks.bgaming.GCP_URL");
         $auth_token = config("providerlinks.bgaming.AUTH_TOKEN");
 
-        if($client_player_details->operator_id == 11){
-            $casinoId = config("providerlinks.bgaming.KONI_CASINO_ID"); 
-            $gcp_URL = config("providerlinks.bgaming.KONI_GCP_URL");
-            $auth_token = config("providerlinks.bgaming.KONI_AUTH_TOKEN");
+        if(isset(config("providerlinks.bgaming.")[$client_player_details->operator_id])){
+            $casinoId = config("providerlinks.bgaming.")[$client_player_details->operator_id]["CASINO_ID"];
+            $gcp_URL = config("providerlinks.bgaming.")[$client_player_details->operator_id]["GCP_URL"];
+            $auth_token = config("providerlinks.bgaming.")[$client_player_details->operator_id]["AUTH_TOKEN"];
         }
-        $casinoId = config("providerlinks.bgaming.KONI_CASINO_ID"); 
-        $gcp_URL = config("providerlinks.bgaming.KONI_GCP_URL");
-        $auth_token = config("providerlinks.bgaming.KONI_AUTH_TOKEN");
+
+        // if($client_player_details->operator_id == 1){
+        //     $casinoId = config("providerlinks.bgaming.KONI_CASINO_ID"); 
+        //     $gcp_URL = config("providerlinks.bgaming.KONI_GCP_URL");
+        //     $auth_token = config("providerlinks.bgaming.KONI_AUTH_TOKEN");
+        // }
+      
         // $casinoId = config("providerlinks.bgaming.KONIBET");
         Helper::saveLog('Bgaming create session', 49, json_encode($casinoId), $casinoId);
         $requesttosend = [
