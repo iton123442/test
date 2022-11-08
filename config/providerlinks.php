@@ -330,10 +330,16 @@ return [
         'CASINO_ID' => 'tigergames-int',
         "KONIBET" => "KONIBET",
         'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
-        'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM',
-        'KONI_GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
-        'KONI_CASINO_ID' => 'konibet',
-        'KONI_AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM',
+        '1' => [
+            'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM',
+            'CASINO_ID' => 'tigergames-int',
+            'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
+        ],
+        '11' => [
+            'AUTH_TOKEN' => 'HZhPwLMXtHrmQUxjmMvBmCPM',
+            'CASINO_ID' => 'konibet',
+            'GCP_URL' => 'https://int.bgaming-system.com/a8r/tigergames-int',
+        ],
    ],
     'pgsoft' => [
         'api_url' => 'http://api.pg-bo.me/external',
