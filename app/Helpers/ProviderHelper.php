@@ -585,7 +585,7 @@ class ProviderHelper{
 		$result = count($query);
 		return $result > 0 ? $query[0] : null;
 	}
-
+//Naga Games
 	public static function findGameLaunchURL($type, $provider_id, $game_code)
 	{
 		// $query = DB::Select("SELECT game_id,game_code,game_name FROM games WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
@@ -594,12 +594,19 @@ class ProviderHelper{
 		$result = count($query);
 		return $result > 0 ? $query[0] : null;
 	}
-
 	public static function getGeneralDetails($type, $roundId)
 	{
 		// $query = DB::Select("SELECT game_id,game_code,game_name FROM games WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
 		// $query = DB::Select("SELECT game_id,game_code,game_name,provider_name FROM games inner join providers using (provider_id) WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
 		$query = DB::Select("SELECT general_details as general_details FROM game_transaction_ext  WHERE round_id = '" . $roundId . "' AND game_transaction_type = '" . $type . "' order by game_trans_ext_id desc limit 1");
+		$result = count($query);
+		return $result > 0 ? $query[0] : null;
+	}
+	public static function getGeneralDetailsV2($type, $roundId)
+	{
+		// $query = DB::Select("SELECT game_id,game_code,game_name FROM games WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
+		// $query = DB::Select("SELECT game_id,game_code,game_name,provider_name FROM games inner join providers using (provider_id) WHERE game_code = '" . $game_code . "' AND provider_id = '" . $provider_id . "'");
+		$query = DB::Select("SELECT general_details as general_details FROM game_transaction_logs  WHERE round_id = '" . $roundId . "' AND game_transaction_type = '" . $type . "' order by game_trans_ext_id desc limit 1");
 		$result = count($query);
 		return $result > 0 ? $query[0] : null;
 	}
