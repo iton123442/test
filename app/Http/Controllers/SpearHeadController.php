@@ -188,7 +188,7 @@ public function DebitProcess($req){
                             'entry_id' => 1,
                         ];
                         GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-                        $game_transaction_id = $bet_transaction->game_trans_id;
+                        $gen_game_trans_id = $bet_transaction->game_trans_id;
                     }else{
                            $gameTransactionData = array(
                               "provider_trans_id" => $provider_trans_id,
@@ -205,7 +205,7 @@ public function DebitProcess($req){
                     }
                        
                      $gameTransactionEXTData = array(
-                          "game_trans_id" => $game_transaction_id,
+                          "game_trans_id" => $gen_game_trans_id,
                           "provider_trans_id" => $provider_trans_id,
                           "round_id" => $round_id,
                           "amount" => $bet_amount,
