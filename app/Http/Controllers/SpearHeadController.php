@@ -156,20 +156,7 @@ public function DebitProcess($req){
                 "Message" => "Transaction is processing"
             ];
               return $res;
-        }
-        $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
-        if($bet_transaction != "false"){
-            $amount = $bet_transaction->bet_amount + $bet_amount;
-            $updateGameTransaction = [
-                'win' => 5,
-                'bet_amount' => $amount,
-                'entry_id' => 1,
-            ];
-            GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-            $gen_game_trans_id = $bet_transaction->game_trans_id;
-        }else{
-            $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
-        }
+        }        
         $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);  
         $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit');
         if (isset($client_response->fundtransferresponse->status->code)) {
@@ -190,20 +177,33 @@ public function DebitProcess($req){
                             "Message" => 'Success',
                             "Details" => null,
                     ];
-                    $gameTransactionData = array(
-                          "provider_trans_id" => $provider_trans_id,
-                          "token_id" => $client_details->token_id,
-                          "game_id" => $game_details->game_id,
-                          "round_id" => $round_id,
-                          "bet_amount" => $bet_amount,
-                          "win" => 5,
-                          "pay_amount" => 0,
-                          "income" => 0,
-                          "entry_id" => 1,
-                      );
-                     GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+                    $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
+                    if($bet_transaction != "false"){
+                        $amount = $bet_transaction->bet_amount + $bet_amount;
+                        $updateGameTransaction = [
+                            'win' => 5,
+                            'bet_amount' => $amount,
+                            'entry_id' => 1,
+                        ];
+                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+                        $game_transaction_id = $bet_transaction->game_trans_id;
+                    }else{
+                           $gameTransactionData = array(
+                              "provider_trans_id" => $provider_trans_id,
+                              "token_id" => $client_details->token_id,
+                              "game_id" => $game_details->game_id,
+                              "round_id" => $round_id,
+                              "bet_amount" => $bet_amount,
+                              "win" => 5,
+                              "pay_amount" => 0,
+                              "income" => 0,
+                              "entry_id" => 1,
+                          );
+                         GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+                    }
+                       
                      $gameTransactionEXTData = array(
-                          "game_trans_id" => $gen_game_trans_id,
+                          "game_trans_id" => $game_transaction_id,
                           "provider_trans_id" => $provider_trans_id,
                           "round_id" => $round_id,
                           "amount" => $bet_amount,
