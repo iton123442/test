@@ -29,6 +29,9 @@ class BGamingController extends Controller
 	  	$client_details = ProviderHelper::getClientDetails('player_id', $json_data['user_id']);
 		$request_sign = $request->header('x-request-sign');
         $secret = config('providerlinks.bgaming.AUTH_TOKEN');
+        if($client_details->operator_id == 11){
+            $secret = config('providerlinks.bgaming.KONI_AUTH_TOKEN');
+        }
 		$signature = hash_hmac('sha256',json_encode($json_data),$secret);
 		if($signature != $request_sign){
             $response = [
