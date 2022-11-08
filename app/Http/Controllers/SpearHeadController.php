@@ -145,6 +145,7 @@ public function DebitProcess($req){
       $game_code = $data['AdditionalData']['GameSlug'];
       $round_id = $data['RoundId'];
       $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+      
     if($client_details != null){
         try{
           ProviderHelper::idenpotencyTable($provider_trans_id);
