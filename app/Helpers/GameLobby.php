@@ -162,9 +162,9 @@ class GameLobby{
         $auth_token = config("providerlinks.bgaming.AUTH_TOKEN");
 
         // if(isset(config("providerlinks.bgaming.")[$client_player_details->operator_id])){
-            $casinoId = config("providerlinks.bgaming.".$client_player_details->operator_id.".CASINO_ID");
-            $gcp_URL = config("providerlinks.bgaming.".$client_player_details->operator_id.".GCP_URL");
-            $auth_token = config("providerlinks.bgaming.".$client_player_details->operator_id.".AUTH_TOKEN");
+        $casinoId = config("providerlinks.bgaming.".$client_player_details->operator_id.".CASINO_ID");
+        $gcp_URL = config("providerlinks.bgaming.".$client_player_details->operator_id.".GCP_URL");
+        $auth_token = config("providerlinks.bgaming.".$client_player_details->operator_id.".AUTH_TOKEN");
         // }
 
         // if($client_player_details->operator_id == 1){
