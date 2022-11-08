@@ -34,7 +34,7 @@ class NagaGamesController extends Controller{
     public function auth(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('Naga Games Authorize', $this->provider_db_id, json_encode($data), 'Auth HIT!');
-        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $data['data']['playerToken']);
         // $toExplode = explode(',"dataHash"',json_encode($data));
         $hash = $this-> hashParam($data['data'],$data['dataHash']);
         if($client_details){
@@ -69,7 +69,7 @@ class NagaGamesController extends Controller{
     }
     public function getBalance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $data['data']['playerToken']);
         Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
         $hash = $this-> hashParam($data['data'],$data['dataHash']);
         if($client_details){
@@ -87,7 +87,7 @@ class NagaGamesController extends Controller{
     }
     public function placeBet (Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $data['data']['playerToken']);
         Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'BET HIT!');
         if ($client_details){
             // $response = array(
@@ -129,7 +129,7 @@ class NagaGamesController extends Controller{
             $amount = $data['data']['amount'];
             $provider_trans_id = $data['data']['transactionId'];
             $amount = $data['data']['amount'];
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
+            $gamedetails = ProviderHelper::findGameDetailsCache('game_code', 74, $data['data']['gameCode']);
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             if($bet_transaction != null){
                 //this is double bet
@@ -153,7 +153,7 @@ class NagaGamesController extends Controller{
                 if(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
                     $response = [
                         "data" => [
@@ -228,7 +228,7 @@ class NagaGamesController extends Controller{
             && $client_response->fundtransferresponse->status->code == "200"){
                 Helper::saveLog('NAGAGAMES Bet', $this->provider_db_id, json_encode($data), 'FUNDTRANSFER HIT!');
                 $balance = round($client_response->fundtransferresponse->balance, 2);
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
                 $response = [
                     "data" => [
@@ -297,7 +297,7 @@ class NagaGamesController extends Controller{
     }
     public function payout (Request $request){
         $data = json_decode($request->getContent(),TRUE);
-        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $data['data']['playerToken']);
         Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($data), 'PayOut HIT!');
         if ($client_details){
             // $response =[
@@ -334,7 +334,7 @@ class NagaGamesController extends Controller{
                 $roundId = $data['data']['betId'];
             }
             $amount = $data['data']['amount'];
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
+            $gamedetails = ProviderHelper::findGameDetailsCache('game_code', 74, $data['data']['gameCode']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if ($game == null){
                 Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
@@ -366,7 +366,7 @@ class NagaGamesController extends Controller{
                 if(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
                     $updateTransData = [
                         "win" => 5,
@@ -480,7 +480,7 @@ class NagaGamesController extends Controller{
                 if(isset($client_response->fundtransferresponse->status->code) &&
                 $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
                     $response = [
                         "data" => [
@@ -509,7 +509,7 @@ class NagaGamesController extends Controller{
 
     
     public function resendPayout ($data){
-        $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $data['data']['playerToken']);
         Helper::saveLog('NAGAGAMES PayOut', $this->provider_db_id, json_encode($data), 'PayOut HIT!');
         if ($client_details){
             // $response =[
@@ -537,7 +537,7 @@ class NagaGamesController extends Controller{
                 $roundId = $data['data']['betId'];
             }
             $amount = $data['data']['amount'];
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $data['data']['gameCode']);
+            $gamedetails = ProviderHelper::findGameDetailsCache('game_code', 74, $data['data']['gameCode']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if ($game == null){
                 Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
@@ -569,7 +569,7 @@ class NagaGamesController extends Controller{
                 if(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
                     $updateTransData = [
                         "win" => 5,
@@ -672,7 +672,7 @@ class NagaGamesController extends Controller{
                 if(isset($client_response->fundtransferresponse->status->code) &&
                 $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance, 2);
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
                     $response = [
                         "data" => [
@@ -704,7 +704,7 @@ class NagaGamesController extends Controller{
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($data), 'Cancel HIT!');
         $betExt = ProviderHelper::getGeneralDetails(1, $data['data']['betId']);
         $explodedData = explode("_", $betExt->general_details);
-        $client_details = ProviderHelper::getClientDetails('token', $explodedData[0]);
+        $client_details = ProviderHelper::getClientDetailsCache('token', $explodedData[0]);
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($client_details), $explodedData);
         if (json_encode($client_details)){
             try{
@@ -722,7 +722,7 @@ class NagaGamesController extends Controller{
             $provider_trans_id = "ref_" . $data['data']['betId'];
             $roundId = $data['data']['betId'];
             $win = 4;
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 74, $explodedData[1]);
+            $gamedetails = ProviderHelper::findGameDetailsCache('game_code', 74, $explodedData[1]);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if ($game == null){
                 $response = [
@@ -784,7 +784,7 @@ class NagaGamesController extends Controller{
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
-                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
                 $response = array(
                     "data"=> [
