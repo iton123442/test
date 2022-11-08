@@ -144,20 +144,32 @@ public function DebitProcess($req){
       $provider_trans_id = $data['TransactionId'];
       $game_code = $data['AdditionalData']['GameSlug'];
       $round_id = $data['RoundId'];
-      $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
       $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
     if($client_details != null){
-      try{
+        try{
           ProviderHelper::idenpotencyTable($provider_trans_id);
         }catch(\Exception $e){
             $res = [
-              "ApiVersion"=>"1.0",
-              "Request" =>"WalletDebit",
-              "ReturnCode" => 107,
-              "Message" => "Transaction is processing"
-          ];
+                "ApiVersion"=>"1.0",
+                "Request" =>"WalletDebit",
+                "ReturnCode" => 107,
+                "Message" => "Transaction is processing"
+            ];
               return $res;
-          }
+        }
+        $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
+        if($bet_transaction != "false"){
+            $amount = $bet_transaction->bet_amount + $bet_amount;
+            $updateGameTransaction = [
+                'win' => 5,
+                'bet_amount' => $amount,
+                'entry_id' => 1,
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+            $gen_game_trans_id = $bet_transaction->game_trans_id;
+        }else{
+            $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+        }
         $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);  
         $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit');
         if (isset($client_response->fundtransferresponse->status->code)) {
