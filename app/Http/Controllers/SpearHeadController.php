@@ -146,6 +146,7 @@ public function DebitProcess($req){
       $round_id = $data['RoundId'];
       $gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
       $gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
+      
     if($client_details != null){
         try{
           ProviderHelper::idenpotencyTable($provider_trans_id);
