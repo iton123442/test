@@ -32,6 +32,7 @@ class BGamingController extends Controller
         // if($client_details->operator_id == 11 ){
         //     $secret = config('providerlinks.bgaming.KONI_AUTH_TOKEN');
         // }
+        $secret = config("providerlinks.bgaming.".$client_details->operator_id.".AUTH_TOKEN");
 		$signature = hash_hmac('sha256',json_encode($json_data),$secret);
 		if($signature != $request_sign){
             $response = [
