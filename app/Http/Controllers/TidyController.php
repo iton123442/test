@@ -36,6 +36,7 @@ class TidyController extends Controller
     	$this->API_URL = config('providerlinks.tidygaming.API_URL');
     	$this->startTime = microtime(true);
     	$this->prefix = "TGOP_";
+		$this->roundID = "FUNTA_";
     }
 
 	 public function autPlayer(Request $request){
@@ -166,7 +167,7 @@ class TidyController extends Controller
 		$token = $data->token;
 		$amount = $data->amount;
 		$uid = $data->uid;
-		$bet_id = $data->bet_id;
+		$bet_id = $this->roundID.$data->bet_id;
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; //Provider Transaction ID	_column
 		if ($data->client_id != $this->client_id) {
@@ -314,6 +315,7 @@ class TidyController extends Controller
 						);
 				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
 		    			Helper::saveLog('Tidy BET success', $this->provider_db_id, json_encode($request->all()), $response);
+						return $response;
 						break;
 					case "402":
 						$response = array(
@@ -342,6 +344,7 @@ class TidyController extends Controller
 			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
 	          			Helper::saveLog('Tidy BET not_enough_balance', $this->provider_db_id, json_encode($request->all()), $response);
 						// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
+						return $response;
 						break;
 					default:
 						$response = array(
@@ -369,9 +372,10 @@ class TidyController extends Controller
 						}
 			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
 	          			Helper::saveLog('Tidy BET not_enough_balance_default', $this->provider_db_id, json_encode($request->all()), $response);
+						return $response;
 				}
 	        }
-		    return $response;
+		    // return $response;
 		} else 
 		{
 			$errormessage = array(
