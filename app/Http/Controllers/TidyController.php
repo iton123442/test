@@ -36,6 +36,7 @@ class TidyController extends Controller
     	$this->API_URL = config('providerlinks.tidygaming.API_URL');
     	$this->startTime = microtime(true);
     	$this->prefix = "TGOP_";
+		$this->roundID = "FUNTA_";
     }
 
 	 public function autPlayer(Request $request){
@@ -166,7 +167,7 @@ class TidyController extends Controller
 		$token = $data->token;
 		$amount = $data->amount;
 		$uid = $data->uid;
-		$bet_id = $data->bet_id;
+		$bet_id = $this->roundID.$data->bet_id;
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; //Provider Transaction ID	_column
 		if ($data->client_id != $this->client_id) {
