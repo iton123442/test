@@ -315,6 +315,7 @@ class TidyController extends Controller
 						);
 				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
 		    			Helper::saveLog('Tidy BET success', $this->provider_db_id, json_encode($request->all()), $response);
+						return $response;
 						break;
 					case "402":
 						$response = array(
@@ -343,6 +344,7 @@ class TidyController extends Controller
 			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
 	          			Helper::saveLog('Tidy BET not_enough_balance', $this->provider_db_id, json_encode($request->all()), $response);
 						// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
+						return $response;
 						break;
 					default:
 						$response = array(
@@ -370,9 +372,10 @@ class TidyController extends Controller
 						}
 			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
 	          			Helper::saveLog('Tidy BET not_enough_balance_default', $this->provider_db_id, json_encode($request->all()), $response);
+						return $response;
 				}
 	        }
-		    return $response;
+		    // return $response;
 		} else 
 		{
 			$errormessage = array(
