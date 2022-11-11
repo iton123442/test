@@ -504,6 +504,7 @@ class BoleGamingController extends Controller
 									]
 								];
 
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details,$client_details);
 
 							}elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -523,6 +524,7 @@ class BoleGamingController extends Controller
 										"msg" => "Insufficient Balance"
 									]
 								];
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details,$client_details);
 
 							}
@@ -669,6 +671,7 @@ class BoleGamingController extends Controller
 										"msg" => "success"
 									]
 								];
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details,$client_details);
 
 							}elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -686,6 +689,7 @@ class BoleGamingController extends Controller
 									]
 								];
 								
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, 'FAILED', $general_details,$client_details);
 
 							}
