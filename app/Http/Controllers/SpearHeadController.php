@@ -175,7 +175,7 @@ public function DebitProcess($req){
                 "game_id" => $game_details->game_id,
                 "round_id" => $round_id,
                 "bet_amount" => $bet_amount,
-                "win" => 5,
+                "win" => 2,
                 "pay_amount" => 0,
                 "income" => 0,
                 "entry_id" => 1,
@@ -326,12 +326,12 @@ public function CreditProcess($req){
       ProviderHelper::idenpotencyTable($provider_trans_id);
     }catch(\Exception $e){
       $res = [
-        "ApiVersion"=>"1.0",
-        "Request" =>"WalletDebit",
-        "ReturnCode" => 107,
-        "Message" => "Transaction is processing"
-    ];
-        return $res;
+          "ApiVersion"=>"1.0",
+          "Request" =>"WalletDebit",
+          "ReturnCode" => 107,
+          "Message" => "Transaction is processing"
+      ];
+      return $res;
     }
     $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
     $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
@@ -358,68 +358,67 @@ public function CreditProcess($req){
         GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //generated game trans id
         $game_transaction_id = $gen_game_trans_id;
         $income = 0;
-        
-    if(isset($data['AdditionalData']['BonusId'])){
-        $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
-        $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);// not generated game trans id ext
-            if($getFreespin){
-                //update transaction
-                $status = 2;
-                $updateFreespinData = [
-                    "status" => $status,
-                    "spin_remaining" => 0
-                ];
-                FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
-                    //create transction 
-                if($status == 2) {
-                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
-                }  else {
-                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
-                }
-                
-                    $createFreeRoundTransaction = array(
-                        "game_trans_id" => $bet_transaction->game_trans_id,
-                        'freespin_id' => $getFreespin->freespin_id
-                );
-                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
-            }
-      }
-      $msg = [
-              "AccountTransactionId" => $game_transaction_id,
-              "Currency" => $client_details->default_currency,
-              "Balance" => (float)$client_details->balance,
-              "SessionId" => $data['SessionId'],
-              "BonusMoneyAffected" => 0.0,
-              "RealMoneyAffected" => 0.0,
-              "ApiVersion" => "1.0",
-              "Request" => 'WalletDebit',
-              "ReturnCode" => 0,
-              "Message" => 'Success',
-              "Details" => null,
-      ];
-      $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $gen_game_extid2, $game_transaction_id, 'debit');
-      if (isset($client_response->fundtransferresponse->status->code)) {
-          ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-          switch ($client_response->fundtransferresponse->status->code) {
-              case '200':
-                $http_status = 200;
-                $gameTransactionEXTData = array(
-                    "game_trans_id" => json_encode($game_transaction_id),
-                    "provider_trans_id" => $provider_trans_id,
-                    "round_id" => $round_id,
-                    "amount" => 0,
-                    "game_transaction_type"=> 1,
-                    "provider_request" => json_encode($req),
-                    'mw_response' => json_encode($msg),
-                    'mw_request' => json_encode($client_response->requestoclient),
-                    'client_response' => json_encode($client_response->fundtransferresponse),
-                    'transaction_detail' => 'success',
-                    'general_details' => 'success',
-                );
-                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid2,$client_details);
-                break;
+        if(isset($data['AdditionalData']['BonusId'])){
+          $getFreespin = FreeSpinHelper::getFreeSpinDetails($data['AdditionalData']['BonusId'], "provider_trans_id" );
+          $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',false, $client_details);// not generated game trans id ext
+              if($getFreespin){
+                  //update transaction
+                  $status = 2;
+                  $updateFreespinData = [
+                      "status" => $status,
+                      "spin_remaining" => 0
+                  ];
+                  FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                      //create transction 
+                  if($status == 2) {
+                      $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+                  }  else {
+                      $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                  }
+                  
+                      $createFreeRoundTransaction = array(
+                          "game_trans_id" => $bet_transaction->game_trans_id,
+                          'freespin_id' => $getFreespin->freespin_id
+                  );
+                  FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+              }
+        }
+        $msg = [
+                "AccountTransactionId" => $game_transaction_id,
+                "Currency" => $client_details->default_currency,
+                "Balance" => (float)$client_details->balance,
+                "SessionId" => $data['SessionId'],
+                "BonusMoneyAffected" => 0.0,
+                "RealMoneyAffected" => 0.0,
+                "ApiVersion" => "1.0",
+                "Request" => 'WalletDebit',
+                "ReturnCode" => 0,
+                "Message" => 'Success',
+                "Details" => null,
+        ];
+          $client_response = ClientRequestHelper::fundTransfer($client_details,0, $game_code, $game_details->game_name, $gen_game_extid2, $game_transaction_id, 'debit');
+          if (isset($client_response->fundtransferresponse->status->code)) {
+              ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+              switch ($client_response->fundtransferresponse->status->code) {
+                  case '200':
+                    $http_status = 200;
+                    $gameTransactionEXTData = array(
+                        "game_trans_id" => json_encode($game_transaction_id),
+                        "provider_trans_id" => $provider_trans_id,
+                        "round_id" => $round_id,
+                        "amount" => 0,
+                        "game_transaction_type"=> 1,
+                        "provider_request" => json_encode($req),
+                        'mw_response' => json_encode($msg),
+                        'mw_request' => json_encode($client_response->requestoclient),
+                        'client_response' => json_encode($client_response->fundtransferresponse),
+                        'transaction_detail' => 'success',
+                        'general_details' => 'success',
+                    );
+                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid2,$client_details);
+                    break;
+              }
           }
-      }
     }else{
       $client_details->connection_name = $bet_transaction->connection_name;
       $income = $bet_transaction->bet_amount - $pay_amount;
@@ -446,8 +445,7 @@ public function CreditProcess($req){
     ];
     // GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
     GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $game_transaction_id, $client_details);
-    
-    ProviderHelper::_insertOrUpdate($client_details->token_id, $winBalance);
+    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $winBalance);
     $action_payload = [
           "type" => "custom", #genreral,custom :D # REQUIRED!
           "custom" => [
@@ -477,27 +475,74 @@ public function CreditProcess($req){
               ]
           ]
     ];
-    $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
+    try{
+        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_transaction_id,'credit',false,$action_payload);
+    }catch(\Exception $e){
+      $res = [
+        "ApiVersion"=>"1.0",
+        "Request" =>"WalletDebit",
+        "ReturnCode" => 104,
+        "Message" => "Casino session limit exceeded"
+      ];
+      $gameTransactionEXTData = array(
+          "game_trans_id" => $game_transaction_id,
+          "provider_trans_id" => $provider_trans_id,
+          "round_id" => $round_id,
+          "amount" => $pay_amount,
+          "game_transaction_type"=> 2,
+          "provider_request" =>json_encode($req),
+          "mw_response" => "FAILED",
+          'mw_request' => "FAILED",
+          'client_response' => "FAILED",
+          'transaction_detail' => 'FAILED',
+          'general_details' => 'FAILED',
+      );
+      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
+      return $res;
+    }
     if(isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "200"){
         $gameTransactionEXTData = array(
-                  "game_trans_id" => $game_transaction_id,
-                  "provider_trans_id" => $provider_trans_id,
-                  "round_id" => $round_id,
-                  "amount" => $pay_amount,
-                  "game_transaction_type"=> 2,
-                  "provider_request" =>json_encode($req),
-                  "mw_response" => json_encode($res),
-                  'mw_request' => json_encode($client_response->requestoclient),
-                  'client_response' => json_encode($client_response->fundtransferresponse),
-                  'transaction_detail' => 'success',
-                  'general_details' => 'success',
-              );
+            "game_trans_id" => $game_transaction_id,
+            "provider_trans_id" => $provider_trans_id,
+            "round_id" => $round_id,
+            "amount" => $pay_amount,
+            "game_transaction_type"=> 2,
+            "provider_request" =>json_encode($req),
+            "mw_response" => json_encode($res),
+            'mw_request' => json_encode($client_response->requestoclient),
+            'client_response' => json_encode($client_response->fundtransferresponse),
+            'transaction_detail' => 'success',
+            'general_details' => 'success',
+        );
         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);  
         return $res;
     }elseif (isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "402") {
+      $res = [
+        "ApiVersion"=>"1.0",
+        "Request" =>"WalletDebit",
+        "ReturnCode" => 104,
+        "Message" => "Casino session limit exceeded"
+      ];
+      $gameTransactionEXTData = array(
+                "game_trans_id" => $game_transaction_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $round_id,
+                "amount" => $pay_amount,
+                "game_transaction_type"=> 2,
+                "provider_request" =>json_encode($req),
+                "mw_response" => json_encode($res),
+                'mw_request' => json_encode($client_response->requestoclient),
+                'client_response' => json_encode($client_response->fundtransferresponse),
+                'transaction_detail' => 'FAILED',
+                'general_details' => 'FAILED',
+            );
+      // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
+      GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
+      return $res;
+    }else{
       $res = [
         "ApiVersion"=>"1.0",
         "Request" =>"WalletDebit",
