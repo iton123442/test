@@ -186,6 +186,7 @@ class BoleGamingController extends Controller
 					// $all_round = GameTransactionMDB::findGameExtAll($json_data->report_id,'allround', $client_details);
 					// if(count($all_round) >= 1){
 					// }
+					ProviderHelper::saveLogWithExeption('BOLE playerWalletCost type EXCEPTION', $this->provider_db_id, $request->getContent(), Helper::datesent());
 					$data = [
 						"data" => [],
 						"status" => [
@@ -239,7 +240,7 @@ class BoleGamingController extends Controller
 			// END LOGGER
 
 				if($json_data->type == 20){
-
+						ProviderHelper::saveLogWithExeption('BOLE playerWalletCost WIN TYPE 20', $this->provider_db_id, $request->getContent(), Helper::datesent());
 						$check_win_ext = GameTransactionMDB::findGameExt($json_data->report_id, 2, 'transaction_id',$client_details);
 						if($check_win_ext == 'false'){
 							$data = [
