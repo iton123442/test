@@ -166,30 +166,36 @@ class BoleGamingController extends Controller
 			$isDuplicate = false;
 			$existingTransactionId = false;
 			$isStrictWin = false;
-			if($json_data->type == 20){ // DEBIT
-				try {
-					ProviderHelper::idenpotencyTable($this->prefix.'_1_'.$json_data->report_id);
-				} catch (\Exception $e) {
-					if($json_data->type != 20){ // its bet!
-						ProviderHelper::saveLogWithExeption('BOLE playerWalletCost type EXCEPTION', $this->provider_db_id, $request->getContent(), 'TYPE EXCEPTION DEBIT');
-						$data = [
-							"data" => [],
-							"status" => [
-								// "code" => 3,
-								// "msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
-								"code" => -1,
-								"msg" => "Failed, Stop the call!"
-							]
-						];
-						return $data;
-					}
-				}
-			}else{ // All type is credit
+			if($json_data->type == 20){ // All type is credit 
 				try {
 					ProviderHelper::idenpotencyTable($this->prefix.'_2_'.$json_data->report_id);
 				} catch (\Exception $e) {
 					ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), 'TYPE EXCEPTION CREDIT');
+					$data = [
+						"data" => [],
+						"status" => [
+							"code" => 3,
+							"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
+						]
+					];
+					return $data;
+				}
+			}else{ // DEBIT
+				try {
+					ProviderHelper::idenpotencyTable($this->prefix.'_1_'.$json_data->report_id);
+				} catch (\Exception $e) {
+					ProviderHelper::saveLogWithExeption('BOLE playerWalletCost type EXCEPTION', $this->provider_db_id, $request->getContent(), 'TYPE EXCEPTION DEBIT');
 					$isStrictWin = true;
+					$data = [
+						"data" => [],
+						"status" => [
+							// "code" => 3,
+							// "msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
+							"code" => -1,
+							"msg" => "Failed, Stop the call!"
+						]
+					];
+					return $data;
 				}
 			}
 
