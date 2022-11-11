@@ -159,8 +159,43 @@ public function DebitProcess($req){
             ];
               return $res;
         }        
-        $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);  
-        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit');
+        $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
+        try{
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $gen_game_extid, $gen_game_trans_id, 'debit');
+        }catch(\Exception $e){
+            $res = [
+                "ApiVersion"=>"1.0",
+                "Request" =>"WalletDebit",
+                "ReturnCode" => 104,
+                "Message" => "Insufficient funds"
+            ];
+            $gameTransactionData = array(
+                "provider_trans_id" => $provider_trans_id,
+                "token_id" => $client_details->token_id,
+                "game_id" => $game_details->game_id,
+                "round_id" => $round_id,
+                "bet_amount" => $bet_amount,
+                "win" => 5,
+                "pay_amount" => 0,
+                "income" => 0,
+                "entry_id" => 1,
+            );
+            GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details);
+            $gameTransactionEXTData = array(
+                "game_trans_id" => $gen_game_trans_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $round_id,
+                "amount" => $bet_amount,
+                "game_transaction_type"=> 1,
+                "provider_request" => "FAILED",
+                "mw_response" => "FAILED",
+                "mw_request" => "FAILED",
+                "client_response" => "FAILED",
+                "transaction_detail" => "FAILED",
+            );
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details); //create extension
+            return $res;
+        } 
         if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
           switch ($client_response->fundtransferresponse->status->code) {
