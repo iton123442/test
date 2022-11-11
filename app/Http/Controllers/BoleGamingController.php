@@ -320,7 +320,7 @@ class BoleGamingController extends Controller
 							$pay_amount = abs($json_data->amount); // amount should be used here for logging!
 
 							if($json_data->cost_info->gain_gold  == 0){
-								$win_or_lost = 3; //For draw!
+								$win_or_lost = 1; //For draw! 3
 								$income = $bet_amount - $json_data->amount;	
 							}elseif($json_data->cost_info->gain_gold  < 0){
 								$income = $bet_amount - $json_data->amount;	
@@ -348,7 +348,7 @@ class BoleGamingController extends Controller
 							$pay_amount =  $json_data->amount;
 							$income = $bet_amount - $pay_amount;
 							if($json_data->cost_info->gain_gold  == 0){
-								$win_or_lost = 3; //For draw!
+								$win_or_lost = 1; //For draw! 3
 							}elseif($json_data->cost_info->gain_gold  < 0){
 								$win_or_lost = 1;
 							}
