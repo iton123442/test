@@ -470,7 +470,7 @@ class BoleGamingController extends Controller
 
 							try {
 								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$existing_bet->game_trans_id,$transaction_type,false,$fund_extra_data);
-								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id,$client_response, 'CRID '.$existing_bet->game_trans_id);
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id,$client_response, 'CRID');
 							   
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
@@ -525,7 +525,7 @@ class BoleGamingController extends Controller
 							return $data;
 		               }catch (\Exception $e){
 			                $data = ["data" => [],"status" => ["code" => -1,"msg" => "Failed connecting to client"]];
-						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), $e->getMessage());
+						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), $e->getMessage().'_'.$e->getLine());
 							return $data;
 			           }
 
@@ -636,7 +636,7 @@ class BoleGamingController extends Controller
 
 							try {
 								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$gamerecord,$transaction_type,$rollback,$fund_extra_data);
-							    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id,$client_response, 'CRID '.$existing_bet->game_trans_id);
+							    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id,$client_response, 'CRID');
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 								if(isset($gamerecord)){
