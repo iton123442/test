@@ -175,7 +175,7 @@ class BoleGamingController extends Controller
 						"data" => [],
 						"status" => [
 							"code" => 3,
-							"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
+							"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call) 2"
 						]
 					];
 					return $data;
@@ -189,10 +189,8 @@ class BoleGamingController extends Controller
 					$data = [
 						"data" => [],
 						"status" => [
-							// "code" => 3,
-							// "msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
-							"code" => -1,
-							"msg" => "Failed, Stop the call!"
+							"code" => 3,
+							"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call) 1"
 						]
 					];
 					return $data;
