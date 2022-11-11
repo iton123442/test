@@ -475,7 +475,7 @@ class BoleGamingController extends Controller
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 
-								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
+								$this::updatecreateGameTransExt($game_transextension, $request->getContent(), $data, 'FAILED', $e->getMessage().'_'.$e->getLine(), 'FAILED', $general_details,$client_details);
 								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
 								return $data;
 							}
@@ -641,7 +641,7 @@ class BoleGamingController extends Controller
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 								if(isset($gamerecord)){
 									// ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-							        $this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
+							        $this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage().'_'.$e->getLine(), 'FAILED', $general_details,$client_details);
 								}
 								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $data, 'FATAL ERROR');
 								return $data;
