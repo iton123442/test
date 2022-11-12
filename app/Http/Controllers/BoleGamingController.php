@@ -321,11 +321,9 @@ class BoleGamingController extends Controller
 
 						// Multi Games / Baccarat and rbwar
 		                if($json_data->game_code == 'baccarat' || $json_data->game_code == 'rbwar'){
-
-		                	$income = $bet_amount - $json_data->amount;	
 							$pay_amount = abs($json_data->amount); // amount should be used here for logging!
 							$income = $bet_amount - $json_data->amount;	
-							
+
 							// if($json_data->cost_info->gain_gold  == 0){
 							// 	$win_or_lost = 0; //For draw! 3
 							// }elseif($json_data->cost_info->gain_gold  < 0){
@@ -362,6 +360,7 @@ class BoleGamingController extends Controller
 						if(in_array($json_data->game_code, $contest_games)){
 							$pay_amount =  $json_data->amount;
 							$income = $bet_amount - $pay_amount;
+							
 							// if($json_data->cost_info->gain_gold  == 0){
 							// 	$win_or_lost = 1; //For draw! 3
 							// }elseif($json_data->cost_info->gain_gold  < 0){
