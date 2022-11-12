@@ -274,7 +274,9 @@ class BoleGamingController extends Controller
 							return $data;
 						}
 
-						$transaction_type = $json_data->cost_info->gain_gold < 0 ? 'debit' : 'credit';
+						// $transaction_type = $json_data->cost_info->gain_gold < 0 ? 'debit' : 'credit';
+						$transaction_type = 'credit'; // CREDIT ALWAYS!
+
 					    if($json_data->game_code == 'slot'){
 					    	$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $json_data->game_code.'_'.$json_data->cost_info->scene);
 					    }else{
@@ -534,7 +536,7 @@ class BoleGamingController extends Controller
 									]
 								];
 								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details,$client_details);
+								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, 'FAILED', $client_response, 'FAILED', $general_details,$client_details);
 
 							}
 
