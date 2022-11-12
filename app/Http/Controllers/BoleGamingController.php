@@ -324,12 +324,18 @@ class BoleGamingController extends Controller
 
 		                	$income = $bet_amount - $json_data->amount;	
 							$pay_amount = abs($json_data->amount); // amount should be used here for logging!
+							$income = $bet_amount - $json_data->amount;	
+							
+							// if($json_data->cost_info->gain_gold  == 0){
+							// 	$win_or_lost = 0; //For draw! 3
+							// }elseif($json_data->cost_info->gain_gold  < 0){
+							// 	$win_or_lost = 1; 
+							// }
 
-							if($json_data->cost_info->gain_gold  == 0){
-								$win_or_lost = 1; //For draw! 3
-								$income = $bet_amount - $json_data->amount;	
-							}elseif($json_data->cost_info->gain_gold  < 0){
-								$income = $bet_amount - $json_data->amount;	
+							if($json_data->amount <= 0){
+								$win_or_lost = 0;
+							}else{
+								$win_or_lost = 1;
 							}
 		                }
 
@@ -337,36 +343,34 @@ class BoleGamingController extends Controller
 		                if($json_data->game_code == 'fish'){
 		                	$pay_amount =  $json_data->amount;
 							$income = $bet_amount - $pay_amount;
-							if($json_data->cost_info->gain_gold  == 0){
-								$win_or_lost = 1; //For draw! 3
-							}elseif($json_data->cost_info->gain_gold  < 0){
+
+							// if($json_data->cost_info->gain_gold  == 0){
+							// 	$win_or_lost = 1; //For draw! 3
+							// }elseif($json_data->cost_info->gain_gold  < 0){
+							// 	$win_or_lost = 1;
+							// }
+
+							if($json_data->amount <= 0){
+								$win_or_lost = 0;
+							}else{
 								$win_or_lost = 1;
 							}
+
 		                }
 
 		                // Contest Games / Mahjongs, BlackJack
 						if(in_array($json_data->game_code, $contest_games)){
-							// OLD
-							// $pay_amount = $json_data->cost_info->gain_gold;
-							// $income = $bet_amount - $json_data->cost_info->gain_gold;	
-							// if($json_data->cost_info->gain_gold  == 0){
-							// 	$income = 0; // If zero it means it was a draw	
-							// 	$win_or_lost = 3; // DRAW
-							// }elseif($json_data->cost_info->gain_gold  < 0){ 
-							//     // NEGATIVE GAIN_GOLD IT MEANS LOST! and GAIN_GOLD WILL BE ALWAYS BET_NUM negative value
-							// 	$pay_amount = 0; // IF NEGATIVE PUT IT AS ZERO
-							// 	$income = $bet_amount - $pay_amount;	
-							// }else{
-							// 	$pay_amount_income = $bet_amount + $json_data->cost_info->gain_gold;
-							// 	$income = $bet_amount - $pay_amount_income;	
-							// 	$pay_amount = $json_data->cost_info->gain_gold;
-							// }
-							// END OLD
 							$pay_amount =  $json_data->amount;
 							$income = $bet_amount - $pay_amount;
-							if($json_data->cost_info->gain_gold  == 0){
-								$win_or_lost = 1; //For draw! 3
-							}elseif($json_data->cost_info->gain_gold  < 0){
+							// if($json_data->cost_info->gain_gold  == 0){
+							// 	$win_or_lost = 1; //For draw! 3
+							// }elseif($json_data->cost_info->gain_gold  < 0){
+							// 	$win_or_lost = 1;
+							// }
+
+							if($json_data->amount <= 0){
+								$win_or_lost = 0;
+							}else{
 								$win_or_lost = 1;
 							}
 							
