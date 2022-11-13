@@ -923,12 +923,21 @@ $app->post('/public/api/dowinn/history', 'DOWINNController@viewHistory');
 // $app->post('/public/api/dowinn/tip', 'DOWINNNEWController@tip');
 // $app->post('/public/api/dowinn/limits', 'DOWINNNEWController@limitList');
 // $app->post('/public/api/dowinn/history', 'DOWINNNEWController@viewHistory');
+//Load tester
 $app->post('/public/api/loadtesting', 'LoadTesterQueryCLientCallController@ProcessTransaction');
 //Naga Games
-$app->post('/public/nagagames/api/auth', 'NagaGamesController@auth');
-$app->post('/public/nagagames/api/getBalance', 'NagaGamesController@getBalance');
-$app->post('/public/nagagames/api/balance', 'NagaGamesController@getBalance');
-$app->post('/public/nagagames/api/payout', 'NagaGamesController@payout');
-$app->post('/public/nagagames/api/placeBet', 'NagaGamesController@placeBet');
-$app->post('/public/nagagames/api/cancelBet', 'NagaGamesController@cancelBet');
-$app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
+// $app->post('/public/nagagames/api/auth', 'NagaGamesController@auth');
+// $app->post('/public/nagagames/api/getBalance', 'NagaGamesController@getBalance');
+// $app->post('/public/nagagames/api/balance', 'NagaGamesController@getBalance');
+// $app->post('/public/nagagames/api/payout', 'NagaGamesController@payout');
+// $app->post('/public/nagagames/api/placeBet', 'NagaGamesController@placeBet');
+// $app->post('/public/nagagames/api/cancelBet', 'NagaGamesController@cancelBet');
+// $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
+//newflow naga
+$app->post('/public/nagagames/api/auth', 'NagaGamesNewController@auth');
+$app->post('/public/nagagames/api/getBalance', 'NagaGamesNewController@getBalance');
+$app->post('/public/nagagames/api/balance', 'NagaGamesNewController@getBalance');
+$app->post('/public/nagagames/api/payout', 'NagaGamesNewController@payout');
+$app->post('/public/nagagames/api/placeBet', 'NagaGamesNewController@placeBet');
+$app->post('/public/nagagames/api/cancelBet', 'NagaGamesNewController@cancelBet');
+$app->post('/public/nagagames/api/betStatus', 'NagaGamesNewController@betStatus');
