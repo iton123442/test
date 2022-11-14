@@ -534,6 +534,15 @@ class ICGNewV2Controller extends Controller
                     $income = $game->income - round($json["amount"]/100,2);
                     $entry_id = round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 1 : 2;
                     try{
+                        $balanceTOsave = $client_details->balance;
+                        $response =array(
+                            "data" => array(
+                                "statusCode"=>0,
+                                "username" => $client_details->username,
+                                "balance" =>$balanceTOsave,
+                                "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balanceTOsave),
+                            ),
+                        );
                         $action_payload = [
                             "type" => "custom", #genreral,custom :D # REQUIRED!
                             "custom" => [
