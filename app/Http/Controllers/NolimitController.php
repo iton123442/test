@@ -20,13 +20,13 @@ class NolimitController extends Controller
 
 {
     
-        public function __construct(){
+    public function __construct(){
         $this->provider_db_id = config('providerlinks.nolimit.provider_db_id');
         $this->api_url = config('providerlinks.nolimit.api_url');
         $this->operator =config('providerlinks.nolimit.operator');
         $this->operator_key = config('providerlinks.nolimit.operator_key');
         $this->groupid = config('providerlinks.nolimit.Group_ID');
-    
+        $this->prefex_roundID = 'NOLIMIT_';    
         
     
     
@@ -138,7 +138,7 @@ class NolimitController extends Controller
         $bet_amount = $data['params']['withdraw']['amount'];
         $game_code = $data['params']['information']['game'];
         $provider_trans_id = $data['params']['information']['uniqueReference'];
-        $round_id = $data['params']['information']['gameRoundId'];
+        $round_id = $this->prefex_roundID.$data['params']['information']['gameRoundId'];
         try{
             ProviderHelper::idenpotencyTable($provider_trans_id);
             }catch(\Exception $e){
@@ -336,7 +336,7 @@ class NolimitController extends Controller
         ProviderHelper::saveLogWithExeption('NOLIMIT credit process', $this->provider_db_id, json_encode($data),"ENDPOINTHIT WIN");
         $pay_amount = $data['params']['deposit']['amount'];
         $provider_trans_id = $data['params']['information']['uniqueReference'];
-        $round_id = $data['params']['information']['gameRoundId'];
+        $round_id = $this->prefex_roundID.$data['params']['information']['gameRoundId'];
         $game_code = $data['params']['information']['game'];
         $balance = $client_details->balance;
         //$game_transid_ext = ProviderHelper::idGenerate($client_details->connection_name, 2);
@@ -494,7 +494,7 @@ class NolimitController extends Controller
         $data = $request;
         ProviderHelper::saveLogWithExeption('Nolimit refund', $this->provider_db_id, json_encode($data),"ENDPOINTHIT refund");
         $provider_trans_id = $data['params']['information']['uniqueReference'];
-        $round_id = $data['params']['information']['gameRoundId'];
+        $round_id = $this->prefex_roundID.$data['params']['information']['gameRoundId'];
         $game_code = $data['params']['information']['game'];
         $game_details = Game::find($game_code, $this->provider_db_id);
         try{
