@@ -18,7 +18,7 @@ use GuzzleHttp\Client;
 use App\Models\GameTransaction as GMT;
 use App\Models\GameTransactionMDB;
 use DB;
-class ICGCNewV2ontroller extends Controller
+class ICGCNewV2Controller extends Controller
 {
     //
     private $prefix = 12;
