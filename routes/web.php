@@ -140,15 +140,15 @@ $app->get('/public/api/vivo/{brand_code}/getbalance', 'VivoController@getBalance
 // $app->post('/public/api/icgaming/withdraw','ICGController@withdraw');
 // $app->post('/public/api/icgaming/deposit','ICGController@deposit');
 //Newflow ICG
-$app->get('/public/api/icgaming/gamelist','ICGCNewV2Controller@getGameList');
-$app->post('/public/api/icgaming/gamelaunch','ICGCNewV2Controller@gameLaunchURL');
-$app->get('/public/api/icgaming/authplayer','ICGCNewV2Controller@authPlayer');
-$app->get('/public/api/icgaming/playerDetails','ICGCNewV2Controller@playerDetails');
-$app->post('/public/api/icgaming/bet','ICGCNewV2Controller@betGame');
-$app->delete('/public/api/icgaming/bet','ICGCNewV2Controller@cancelBetGame');
-$app->post('/public/api/icgaming/win','ICGCNewV2Controller@winGame');
-$app->post('/public/api/icgaming/withdraw','ICGCNewV2Controller@withdraw');
-$app->post('/public/api/icgaming/deposit','ICGCNewV2Controller@deposit');
+$app->get('/public/api/icgaming/gamelist','ICGNewV2Controller@getGameList');
+$app->post('/public/api/icgaming/gamelaunch','ICGNewV2Controller@gameLaunchURL');
+$app->get('/public/api/icgaming/authplayer','ICGNewV2Controller@authPlayer');
+$app->get('/public/api/icgaming/playerDetails','ICGNewV2Controller@playerDetails');
+$app->post('/public/api/icgaming/bet','ICGNewV2Controller@betGame');
+$app->delete('/public/api/icgaming/bet','ICGNewV2Controller@cancelBetGame');
+$app->post('/public/api/icgaming/win','ICGNewV2Controller@winGame');
+$app->post('/public/api/icgaming/withdraw','ICGNewV2Controller@withdraw');
+$app->post('/public/api/icgaming/deposit','ICGNewV2Controller@deposit');
 // EDP Gaming Endpoints
 $app->post('/public/api/edp/gamelunch','EDPController@gameLaunchUrl');
 $app->get('/public/api/edp/check','EDPController@index');
