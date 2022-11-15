@@ -310,9 +310,12 @@ class FundtransferProcessorController extends Controller
                                 // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
+                                    "pay_amount" => $payload->action->custom->pay_amount,
+                                    "income" => $payload->action->custom->income,
+                                    "entry_id" => $payload->action->custom->entry_id,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                             }
                             elseif ($payload->action->custom->provider == 'MannaPlay') {
                                 // $ext_data = array(
