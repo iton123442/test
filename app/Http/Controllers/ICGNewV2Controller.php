@@ -362,6 +362,7 @@ class ICGNewV2Controller extends Controller
                         "mw_response" => json_encode($response),
                         "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response),
+                        "general_details" => "SUCCESS",
                         "transaction_detail" => "SUCCESS"
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
@@ -550,9 +551,6 @@ class ICGNewV2Controller extends Controller
                                 "game_transaction_ext_id" => $winGametransactionExtId,
                                 "client_connection_name" => $client_details->connection_name,
                                 "win_or_lost" => $win_or_lost,
-                                "pay_amount" => $pay_amount,
-                                "income" =>$income,
-                                "entry_id" => $entry_id
                             ],
                             "provider" => [
                                 "provider_request" => $json, #R
@@ -605,16 +603,6 @@ class ICGNewV2Controller extends Controller
                     && $client_response->fundtransferresponse->status->code == "200"){
                         $balance = round($client_response->fundtransferresponse->balance * 100,2);
                         ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
-                        $wingametransactionext = array(
-                            "game_trans_id" => $game->game_trans_id,
-                            "provider_trans_id" => $json["transactionId"],
-                            "round_id" => $json["roundId"],
-                            "amount" => round($json["amount"]/100,2),
-                            "game_transaction_type"=>2,
-                            "provider_request" =>json_encode($json),
-                            "mw_response" => json_encode($response)
-                        );
-                        $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($wingametransactionext,$client_details);
                         $response =array(
                             "data" => array(
                                 "statusCode"=>0,
@@ -623,6 +611,20 @@ class ICGNewV2Controller extends Controller
                                 "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                             ),
                         );
+                        $wingametransactionext = array(
+                            "game_trans_id" => $game->game_trans_id,
+                            "provider_trans_id" => $json["transactionId"],
+                            "round_id" => $json["roundId"],
+                            "amount" => round($json["amount"]/100,2),
+                            "game_transaction_type"=>2,
+                            "provider_request" =>json_encode($json),
+                            "mw_response" => json_encode($response),
+                            "mw_request" => json_encode($client_response->requestoclient),
+                            "client_response" => json_encode($client_response),
+                            "general_details" => "SUCCESS",
+                            "transaction_detail" => "SUCCESS"
+                        );
+                        GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                         //Helper::updateICGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);  
                         return response($response,200)
                             ->header('Content-Type', 'application/json');
