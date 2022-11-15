@@ -551,6 +551,9 @@ class ICGNewV2Controller extends Controller
                                 "game_transaction_ext_id" => $winGametransactionExtId,
                                 "client_connection_name" => $client_details->connection_name,
                                 "win_or_lost" => $win_or_lost,
+                                "pay_amount" => $pay_amount,
+                                "income" => $income,
+                                "entry_id" => $entry_id,
                             ],
                             "provider" => [
                                 "provider_request" => $json, #R
