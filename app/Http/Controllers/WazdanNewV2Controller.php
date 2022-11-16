@@ -403,7 +403,7 @@ class WazdanNewV2Controller extends Controller
                         "amount" =>round($datadecoded["amount"],2),
                         "game_transaction_type"=>3,
                         "provider_request" =>json_encode($datadecoded),
-                        "mw_response" => $msg,
+                        "mw_response" => json_encode($msg),
                         "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response),
                         "general_details" => "SUCCESS",
