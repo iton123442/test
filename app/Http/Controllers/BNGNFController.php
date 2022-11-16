@@ -385,7 +385,7 @@ class BNGNFController extends Controller
         }
     }
     private function betNotNullWinNotNull($data,$client_details,$game_details){
-
+        Helper::saveLog('BNGbetnotnullwinnotnull Credit', 12, json_encode($data), 'ENDPOINT Hit');
         $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
         if($isGameExtFailed != 'false'){ 
             if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
@@ -643,6 +643,7 @@ class BNGNFController extends Controller
         
     }
     private function betNullWinNotNull($data,$client_details,$game_details){
+         Helper::saveLog('BNG betNullWinNotNull', 12, json_encode($data), 'ENDPOINT Hit');
         $game = GameTransactionMDB::getGameTransactionByRoundId($data["args"]["round_id"],$client_details);
         if($game != null){
 
@@ -799,7 +800,7 @@ class BNGNFController extends Controller
         }
     }
     private function betNotNullWinNull($data,$client_details,$game_details){
-
+        Helper::saveLog('BNG betNotNullWinNull', 12, json_encode($data), 'ENDPOINT Hit');
         $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
         if($isGameExtFailed != 'false'){
             if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
