@@ -753,7 +753,7 @@ class BNGNFController extends Controller
                     ),
                 );
                 $wingametransactionext = array(
-                    "game_trans_id" => $game_transactionid,
+                    "game_trans_id" => $game->game_trans_id,
                     "provider_trans_id" => $data["uid"],
                     "amount" => $data["args"]["win"],
                     "round_id" => $data["args"]["round_id"],
