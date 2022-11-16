@@ -453,7 +453,7 @@ class BNGNFController extends Controller
                 "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
             );
             GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
-            $gameTransactionEXTData = array(
+            $dataToUpdate = array(
                 "game_trans_id" => $game_transactionid,
                 "provider_trans_id" => $data["uid"],
                 "round_id" => $data["args"]["round_id"],
@@ -465,7 +465,7 @@ class BNGNFController extends Controller
                 "client_response" => "FAILED",
                 "transaction_detail" => "FAILED",
             );
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$betGametransactionExtId,$client_details); 
+            GameTransactionMDB::createGameTransactionExtV2($dataToUpdate,$betGametransactionExtId,$client_details); 
             $response =array(
                 "uid"=>$data["uid"],
                 "balance" => array(
@@ -514,7 +514,7 @@ class BNGNFController extends Controller
                 "mw_request" => json_encode($client_response->requestoclient),
                 "transaction_detail" => 'SUCCESS',
             );
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$betGametransactionExtId,$client_details); 
+            GameTransactionMDB::createGameTransactionExtV2($dataToUpdate,$betGametransactionExtId,$client_details); 
             $winStart =  microtime(true);
             $response =array(
                 "uid"=>$data["uid"],
@@ -884,7 +884,7 @@ class BNGNFController extends Controller
                 "mw_request" => json_encode($client_response->requestoclient),
                 "transaction_detail" => 'SUCCESS',
             );
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$betGametransactionExtId,$client_details); 
+            GameTransactionMDB::createGameTransactionExtV2($dataToUpdate,$betGametransactionExtId,$client_details); 
             // $this->_setExtParameter($this->_getExtParameter()+1);
             // $dataToUpdate = array(
             //     "mw_response" => json_encode($response),
@@ -934,7 +934,7 @@ class BNGNFController extends Controller
                     "mw_request" => json_encode($client_response->requestoclient),
                     "transaction_detail" => 'FAILED',
                 );
-                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$betGametransactionExtId,$client_details); 
+                GameTransactionMDB::createGameTransactionExtV2($dataToUpdate,$betGametransactionExtId,$client_details); 
             }catch(\Exception $e){
                 Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
             }
