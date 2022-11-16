@@ -447,10 +447,10 @@ class ICGNewV2Controller extends Controller
                 if($game){
                     $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
                     try{
+                        $game_details = Helper::getInfoPlayerGameRound($json["token"]);
                         $fund_extra_data = [
                             'provider_name' => $game_details->provider_name
                         ];
-                        $game_details = Helper::getInfoPlayerGameRound($json["token"]);
                         $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$winGametransactionExtId,$game->game_trans_id,"credit",true,$fund_extra_data);    
                     }catch(\Exception $e){
                         $game_details = Helper::getInfoPlayerGameRound($json["token"]);
