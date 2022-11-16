@@ -392,13 +392,21 @@ $app->post('/public/api/png/betsofted/cancelReserve','PNGController@cancelReserv
 // $app->post('/public/api/wazdan/getFunds','WazdanControllerNew@getFunds');
 // $app->post('/public/api/wazdan/gameClose','WazdanControllerNew@gameClose');
 // $app->post('/public/api/wazdan/hash','WazdanControllerNew@hashCode');
-$app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
-$app->post('/public/api/wazdan/getStake','WazdanController@getStake');
-$app->post('/public/api/wazdan/rollbackStake','WazdanController@rollbackState');
-$app->post('/public/api/wazdan/returnWin','WazdanController@returnWin');
-$app->post('/public/api/wazdan/getFunds','WazdanController@getFunds');
-$app->post('/public/api/wazdan/gameClose','WazdanController@gameClose');
-$app->post('/public/api/wazdan/hash','WazdanController@hashCode');
+// $app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
+// $app->post('/public/api/wazdan/getStake','WazdanController@getStake');
+// $app->post('/public/api/wazdan/rollbackStake','WazdanController@rollbackState');
+// $app->post('/public/api/wazdan/returnWin','WazdanController@returnWin');
+// $app->post('/public/api/wazdan/getFunds','WazdanController@getFunds');
+// $app->post('/public/api/wazdan/gameClose','WazdanController@gameClose');
+// $app->post('/public/api/wazdan/hash','WazdanController@hashCode');
+//Newflow V2
+$app->post('/public/api/wazdan/authenticate','WazdanNewV2Controller@authenticate');
+$app->post('/public/api/wazdan/getStake','WazdanNewV2Controller@getStake');
+$app->post('/public/api/wazdan/rollbackStake','WazdanNewV2Controller@rollbackState');
+$app->post('/public/api/wazdan/returnWin','WazdanNewV2Controller@returnWin');
+$app->post('/public/api/wazdan/getFunds','WazdanNewV2Controller@getFunds');
+$app->post('/public/api/wazdan/gameClose','WazdanNewV2Controller@gameClose');
+$app->post('/public/api/wazdan/hash','WazdanNewV2Controller@hashCode');
 // BETRNK LOTTO
 $app->post('/public/api/betrnk/lotto', 'BetrnkController@getUrl');
 

@@ -398,7 +398,6 @@ class ICGNewV2Controller extends Controller
                             "entry_id" =>1,
                         );
                         GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
-                        
                         $betgametransactionext = array(
                             "game_trans_id" => $game_transactionid,
                             "provider_trans_id" => $json["transactionId"],
