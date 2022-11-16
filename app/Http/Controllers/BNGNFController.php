@@ -646,7 +646,6 @@ class BNGNFController extends Controller
          Helper::saveLog('BNG betNullWinNotNull', 12, json_encode($data), 'ENDPOINT Hit');
         $game = GameTransactionMDB::getGameTransactionByRoundId($data["args"]["round_id"],$client_details);
         if($game != null){
-
             $isGameExtFailed = GameTransactionMDB::findGameExt($data["args"]["round_id"], 1,'round_id', $client_details);
             if($isGameExtFailed != 'false'){
                 if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == 'FAILED'){
@@ -721,11 +720,12 @@ class BNGNFController extends Controller
             try {
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
             } catch (\Exception $e) {
+                Helper::saveLog('BNGMETHOD(BNG) FUNDFAIL', 12, json_encode($data), "FAILED");
                 $response =array(
                     "uid"=>"Error on Client Timeout"
                 );
                 $wingametransactionext = array(
-                    "game_trans_id" => $game_transactionid,
+                    "game_trans_id" => $game->game_trans_id,
                     "provider_trans_id" => $data["uid"],
                     "amount" => $data["args"]["win"],
                     "round_id" => $data["args"]["round_id"],
@@ -766,6 +766,7 @@ class BNGNFController extends Controller
                 );
                 GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                 //Helper::updateBNGGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+                Helper::saveLog('BNGMETHOD(BNG)betnullwinnotnull creatext', 12, json_encode($data), "");
                 return response($response,200)
                     ->header('Content-Type', 'application/json');
             }else{
