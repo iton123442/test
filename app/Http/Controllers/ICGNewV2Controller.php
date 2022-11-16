@@ -282,10 +282,10 @@ class ICGNewV2Controller extends Controller
                 $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $json["productId"]);
                 $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
-                $fund_extra_data = [
-                    'provider_name' => $game_details->provider_name
-                ];
                 try{
+                    $fund_extra_data = [
+                        'provider_name' => $game_details->provider_name
+                    ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 }catch(\Exception $e){
                     $gameTransactionData = array(
