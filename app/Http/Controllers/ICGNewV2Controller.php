@@ -461,6 +461,15 @@ class ICGNewV2Controller extends Controller
                             "entry_id" =>2,
                         );
                         $game_transactionid = GameTransactionMDB::updateGametransaction($createGametransaction,$game->game_trans_id,$client_details);
+                        $msg = array(
+                            "data" => array(
+                                "statusCode" => 3,
+                            ),
+                            "error" => array(
+                                "title"=> "Refund Already Exist",
+                                "description"=> "Refund Already Exist"
+                            )
+                        );
                         $wingametransactionext = array(
                             "game_trans_id" => $game->game_trans_id,
                             "provider_trans_id" => $json["transactionId"],
@@ -468,7 +477,7 @@ class ICGNewV2Controller extends Controller
                             "amount" =>round($json["amount"]/100,2),
                             "game_transaction_type"=>3,
                             "provider_request" =>json_encode($json),
-                            "mw_response" => json_encode("OK"),
+                            "mw_response" => json_encode($msg),
                             "mw_request" => "FAILED",
                             "general_details" => "FAILED",
                             "client_response" => "FAILED",
@@ -476,7 +485,7 @@ class ICGNewV2Controller extends Controller
                         );
                         GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                         // Helper::updateGameTransactionExt($winGametransactionExtId,$client_response->requestoclient,"OK",$client_response);
-                        return response("OK",200)
+                        return response($msg,200)
                             ->header('Content-Type', 'application/json');
                     }
                     if(isset($client_response->fundtransferresponse->status->code) 
