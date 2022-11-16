@@ -362,9 +362,9 @@ $app->post('/public/api/eightprovider/withdrawal', 'EightProviderControllerV2@ga
 $app->post('/public/api/gettransaction', 'AlController@testTransaction');
 
 //BNG Endpoints
-$app->post('/public/api/bng', 'BNGController@index');
-$app->post('/public/api/bng/gamelaunch', 'BNGController@gameLaunchUrl');
-$app->post('/public/api/bng/generateGame','BNGController@generateGame');
+$app->post('/public/api/bng', 'BNGNFController@index');
+$app->post('/public/api/bng/gamelaunch', 'BNGNFController@gameLaunchUrl');
+$app->post('/public/api/bng/generateGame','BNGNFController@generateGame');
 //FC GAMING Endpoints
 $app->post('/public/api/fc/encrypt','FCController@SampleEncrypt');
 $app->post('/public/api/fc/decode','FCController@SampleDecrypt');
