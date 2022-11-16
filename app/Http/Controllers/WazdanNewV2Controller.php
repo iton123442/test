@@ -224,7 +224,7 @@ class WazdanNewV2Controller extends Controller
                         "transaction_detail" => "SUCCESS"
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
-                    sleep(10);
+                    // sleep(10);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
