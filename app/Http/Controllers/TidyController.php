@@ -169,7 +169,9 @@ class TidyController extends Controller
 		$uid = $data->uid;
 		$bet_id = $this->roundID.$data->bet_id;
 		$request_uuid = $data->request_uuid;
-		$transaction_uuid = $data->transaction_uuid; //Provider Transaction ID	_column
+		$game_trans_id = $data->transaction_uuid; //Provider Transaction ID	_column
+		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
 		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
 				'error_code' 	=> '99-001',
@@ -231,47 +233,9 @@ class TidyController extends Controller
 		            'trans_status' => 1
 		        ];
 		        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-			} else {
-				$gameTransactionData = array(
-		            "provider_trans_id" => $provider_trans_id,
-		            "token_id" => $client_details->token_id,
-		            "game_id" => $game_details->game_id,
-		            "round_id" => $bet_id,
-		            "bet_amount" => $bet_amount,
-		            "win" => 5,
-		            "pay_amount" => 0,
-		            "income" => 0,
-		            "entry_id" =>1,
-		            "trans_status" =>1,
-		            "operator_id" => $client_details->operator_id,
-		            "client_id" => $client_details->client_id,
-		            "player_id" => $client_details->player_id,
-		        );
-		        $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
-			} 
-			$response_first = array(
-				'error_code' 	=> '00-000',
-				'error_msg'  	=> 'not_enough_balance',
-				'request_uuid'	=> $request_uuid
-			);
-			$gameTransactionEXTData = array(
-	            "game_trans_id" => $game_trans_id,
-	            "provider_trans_id" => $provider_trans_id,
-	            "round_id" => $bet_id,
-	            "amount" => $bet_amount,
-	            "game_transaction_type"=> 1,
-	            "provider_request" =>json_encode($request->all()),
-				"mw_response" =>json_encode($response_first),
-				"transaction_detail" => "FAILED",
-				"general_details" => "FAILED",
-	        );
-	        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-	        $fund_extra_data = [
-	            'provider_name' => $game_details->provider_name,
-				'connection_timeout' => 3,
-	        ];
+			}	
 			try {
-				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false,$fund_extra_data);
+				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$gen_game_trans_id,"debit",false,$fund_extra_data);
 	        } catch (\Exception $e) {
 	            $response = array(
 					'error_code' 	=> '99-005',
@@ -306,14 +270,31 @@ class TidyController extends Controller
 							"balance" =>  ProviderHelper::amountToFloat($num)
 						];
 
-						$update_gametransactionext = array(
-							"mw_response" =>json_encode($response),
-							"mw_request"=>json_encode($client_response->requestoclient),
-							"client_response" =>json_encode($client_response->fundtransferresponse),
-							"transaction_detail" =>"success",
-							"general_details" => "success",
+						$gameTransactionData = array(
+							"provider_trans_id" => $provider_trans_id,
+							"token_id" => $client_details->token_id,
+							"game_id" => $game_details->game_id,
+							"round_id" => $bet_id,
+							"bet_amount" => $bet_amount,
+							"win" => 5,
+							"pay_amount" => 0,
+							"income" => 0,
+							"entry_id" => 1,
 						);
-				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
+					   GameTransactionMDB::createGametransactionV2($gameTransactionData,$gen_game_trans_id,$client_details); //create game_transaction
+					   $gameTransactionEXTData = array(
+						"game_trans_id" => $gen_game_trans_id,
+						"provider_trans_id" => $provider_trans_id,
+						"round_id" => $bet_id,
+						"amount" => $bet_amount,
+						"game_transaction_type"=> 1,
+						"provider_request" =>json_encode($request->all()),
+						"mw_response" =>json_encode($response_first),
+						"mw_request" => json_encode($client_response->requestoclient),
+						"client_response" => json_encode($client_response->fundtransferresponse),
+						"transaction_detail" => "SUCCESS",
+					);
+				     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
 		    			Helper::saveLog('Tidy BET success', $this->provider_db_id, json_encode($request->all()), $response);
 						return $response;
 						break;
@@ -376,15 +357,6 @@ class TidyController extends Controller
 				}
 	        }
 		    // return $response;
-		} else 
-		{
-			$errormessage = array(
-				'error_code' 	=> '08-025',
-				'error_msg'  	=> 'not_found',
-				'request_uuid'	=> $request_uuid
-			);
-			Helper::saveLog('Tidy BET not_found', $this->provider_db_id, json_encode($request->all()), $errormessage);
-			return $errormessage;
 		}
 	}
 
@@ -405,6 +377,7 @@ class TidyController extends Controller
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; // MW round_id
 		$reference_transaction_uuid = $data->reference_transaction_uuid; //  MW -provider_transaction_id
+		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 		//CHECKING TOKEN
 		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
@@ -512,6 +485,7 @@ class TidyController extends Controller
 		 		$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
 		 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 		 		);
+				
 		 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
 	            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
 	            return $response;
