@@ -170,8 +170,7 @@ class TidyController extends Controller
 		$bet_id = $this->roundID.$data->bet_id;
 		$request_uuid = $data->request_uuid;
 		$game_trans_id = $data->transaction_uuid; //Provider Transaction ID	_column
-		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
-		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
+		
 		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
 				'error_code' 	=> '99-001',
@@ -182,6 +181,8 @@ class TidyController extends Controller
 			return $errormessage;
 		}
 		$client_details = ProviderHelper::getClientDetails('token',$token);
+		$gen_game_trans_id = ProviderHelper::idGenerate($client_details->connection_name,1);
+		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
 		try{
 	 		ProviderHelper::idenpotencyTable($this->prefix.'_'.$transaction_uuid);
 		}catch(\Exception $e){
@@ -377,7 +378,6 @@ class TidyController extends Controller
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; // MW round_id
 		$reference_transaction_uuid = $data->reference_transaction_uuid; //  MW -provider_transaction_id
-		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 		//CHECKING TOKEN
 		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
@@ -389,6 +389,7 @@ class TidyController extends Controller
 			return $errormessage;
 		}
 		$client_details = ProviderHelper::getClientDetails('token',$token);
+		$gen_game_extid = ProviderHelper::idGenerate($client_details->connection_name,2);
 		//CHECKING WIN EXISTING game_transaction_ext IF WIN ALREADY PROCESS
 		// $transaction_check = GameTransactionExt::findGameExt($transaction_uuid, 2,'transaction_id');
 		try{
