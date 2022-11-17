@@ -254,7 +254,7 @@ class TidyController extends Controller
 		            "transaction_detail" => "FAILED",
 					"general_details" =>"FAILED",
 		        );
-		        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+				GameTransactionMDB::createGameTransactionExtV2($updateTransactionEXt,$game_trans_ext_id,$client_details);
 				$updateGameTransaction = [
 	                "win" => 2,
 	                'trans_status' => 5
