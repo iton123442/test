@@ -230,10 +230,15 @@ $app->post('/public/api/aws/querystatus', 'AWSController@queryStatus');
 $app->post('/public/api/aws/orderquery', 'AWSController@queryOrder');
 $app->post('/public/api/aws/getday', 'AWSController@getAllWaySpinDayTransaction');
 // AWS PROVIDER SINGLE WALLET ROUTE
-$app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
-$app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
-$app->post('/public/api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
-$app->post('/public/api/aws/single/wallet/altest', 'AWSController@changeAccount');
+// $app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
+// $app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
+// $app->post('/public/api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
+// $app->post('/public/api/aws/single/wallet/altest', 'AWSController@changeAccount');
+// AWS NEWFLOW Version 2
+$app->post('/public/api/aws/single/wallet/balance', 'AWSNewController@singleBalance');
+$app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSNewController@singleFundTransfer');
+$app->post('/public/api/aws/single/wallet/fund/query', 'AWSNewController@singleFundQuery');
+$app->post('/public/api/aws/single/wallet/altest', 'AWSNewController@changeAccount');
 // SILKSTONE ROUTES (SEAMLESS WALLET)
 // $app->post('/public/skywind/api/get_ticket', 'SkyWindController@getTicket');
 $app->post('/public/api/skywind/api/getgamelist', 'SkyWindController@getGamelist'); // TEST
