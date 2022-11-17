@@ -390,15 +390,6 @@ class AWSNewController extends Controller
                         "entry_id" =>$method,
                     );
                     GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
-                    $gameTransactionEXTData = array(
-                        "game_trans_id" => $gamerecord,
-                        "provider_trans_id" => $provider_trans_id,
-                        "round_id" => $provider_trans_id,
-                        "amount" => $bet_amount_2way,
-                        "game_transaction_type"=> 1,
-                        "provider_request" =>json_encode($details),
-                    );
-                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 					$response = [
 						"msg" => "success",
 						"code" => 0,
@@ -412,6 +403,20 @@ class AWSNewController extends Controller
 							"bonusBalance" => 0
 						]
 					];
+                    $gameTransactionEXTData = array(
+                        "game_trans_id" => $gamerecord,
+                        "provider_trans_id" => $provider_trans_id,
+                        "round_id" => $provider_trans_id,
+                        "amount" => $bet_amount_2way,
+                        "game_transaction_type"=> 1,
+                        "provider_request" =>json_encode($details),
+                        "mw_response" => json_encode($response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "client_response" => json_encode($client_response),
+                        "general_details" => "SUCCESS",
+                        "transaction_detail" => "SUCCESS"
+                    );
+                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 
 					if ($transaction_type == 'credit') {
 						$method = 2;
