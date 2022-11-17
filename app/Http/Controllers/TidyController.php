@@ -236,6 +236,10 @@ class TidyController extends Controller
 		        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
 			}	
 			try {
+				$fund_extra_data = [
+					'provider_name' => $game_details->provider_name
+				];
+				
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$gen_game_trans_id,"debit",false,$fund_extra_data);
 	        } catch (\Exception $e) {
 	            $response = array(
