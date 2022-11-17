@@ -179,7 +179,7 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
 
                                 // V2 EXT UPDATE
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
 
                             }
                             elseif($payload->action->custom->provider == 'kagaming'){
