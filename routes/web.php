@@ -230,10 +230,15 @@ $app->post('/public/api/aws/querystatus', 'AWSController@queryStatus');
 $app->post('/public/api/aws/orderquery', 'AWSController@queryOrder');
 $app->post('/public/api/aws/getday', 'AWSController@getAllWaySpinDayTransaction');
 // AWS PROVIDER SINGLE WALLET ROUTE
-$app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
-$app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
-$app->post('/public/api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
-$app->post('/public/api/aws/single/wallet/altest', 'AWSController@changeAccount');
+// $app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
+// $app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
+// $app->post('/public/api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
+// $app->post('/public/api/aws/single/wallet/altest', 'AWSController@changeAccount');
+// AWS NEWFLOW Version 2
+$app->post('/public/api/aws/single/wallet/balance', 'AWSNewController@singleBalance');
+$app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSNewController@singleFundTransfer');
+$app->post('/public/api/aws/single/wallet/fund/query', 'AWSNewController@singleFundQuery');
+$app->post('/public/api/aws/single/wallet/altest', 'AWSNewController@changeAccount');
 // SILKSTONE ROUTES (SEAMLESS WALLET)
 // $app->post('/public/skywind/api/get_ticket', 'SkyWindController@getTicket');
 $app->post('/public/api/skywind/api/getgamelist', 'SkyWindController@getGamelist'); // TEST
@@ -334,14 +339,14 @@ $app->post('/public/api/sa/PlayerLost','SAGamingController@PlayerLost');
 $app->post('/public/api/sa/PlaceBetCancel','SAGamingController@PlaceBetCancel');
 
 // KAGaming
-$app->post('/public/api/ka/gamelist','KAGamingController@index');
-$app->post('/public/api/ka/start','KAGamingController@gameStart');
-$app->post('/public/api/ka/end','KAGamingController@gameEnd');
-$app->post('/public/api/ka/promo','KAGamingController@getPromo');
-$app->post('/public/api/ka/play','KAGamingController@checkPlay');
-$app->post('/public/api/ka/credit','KAGamingController@gameCredit');
-$app->post('/public/api/ka/balance','KAGamingController@playerBalance');
-$app->post('/public/api/ka/revoke','KAGamingController@gameRevoke');
+$app->post('/public/api/ka/gamelist','KAGamingNFController@index');
+$app->post('/public/api/ka/start','KAGamingNFController@gameStart');
+$app->post('/public/api/ka/end','KAGamingNFController@gameEnd');
+$app->post('/public/api/ka/promo','KAGamingNFController@getPromo');
+$app->post('/public/api/ka/play','KAGamingNFController@checkPlay');
+$app->post('/public/api/ka/credit','KAGamingNFController@gameCredit');
+$app->post('/public/api/ka/balance','KAGamingNFController@playerBalance');
+$app->post('/public/api/ka/revoke','KAGamingNFController@gameRevoke');
 
 
 

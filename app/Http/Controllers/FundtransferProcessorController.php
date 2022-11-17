@@ -179,7 +179,7 @@ class FundtransferProcessorController extends Controller
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
 
                                 // V2 EXT UPDATE
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
 
                             }
                             elseif($payload->action->custom->provider == 'kagaming'){
@@ -205,7 +205,7 @@ class FundtransferProcessorController extends Controller
                                 }
                                 ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
 
-                                $ext_Data = ['transaction_detail' => "SUCCESS"];
+                                $ext_Data = ['transaction_detail' => "SUCCESS",'mw_request' => json_encode($requesttocient),'client_response' => json_encode($client_response), 'mw_response'=> json_encode($payload->action->mwapi->mw_response)];
                                 ClientRequestHelper::updateGametransactionEXTCCMD($ext_Data, $gteid, $payload->action->custom->client_connection_name);
                             }
                             elseif($payload->action->custom->provider == 'evoplay'){
