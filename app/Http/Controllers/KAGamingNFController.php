@@ -14,7 +14,7 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use DB;
 
-class KAGamingController extends Controller
+class KAGamingNFController extends Controller
 {
 
     public $gamelaunch, $partnerName, $ka_api, $access_key, $secret_key, $tw_partnerName, $tw_access_key, $tw_secret_key = '';
