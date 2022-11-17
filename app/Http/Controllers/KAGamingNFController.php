@@ -589,7 +589,7 @@ class KAGamingNFController extends Controller
                             'general_details' => 'success',
                         );
                         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-                        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);  
+                        GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$credit_game_transextension,$client_details);  
                         return $response;
                     }
                 } catch (\Exception $e) {
