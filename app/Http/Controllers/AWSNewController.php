@@ -375,7 +375,6 @@ class AWSNewController extends Controller
 		
 				try {
 					$new_balance = $client_details->balance - $bet_amount_2way;
-					$new_balance = $new_balance + $win_amount_2way;
 					ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
                     
                     $gameTransactionData = array(
@@ -432,37 +431,36 @@ class AWSNewController extends Controller
 
 					$game_transextension2 = ProviderHelper::idGen();
                     try{
-
-					$action_payload = [
-						"type" => "custom", #genreral,custom :D # REQUIRED!
-						"custom" => [
-							"game_transaction_ext_id" => $game_transextension2,
-							"client_connection_name" => $client_details->connection_name,
-							"provider" => 'allwayspin',
-							'pay_amount' => $pay_amount,
-							'income' => $income,
-							'win_or_lost' => $win_type,
-							'entry_id' => $method
-						],
-						"provider" => [
-							"provider_request" => $details, #R
-							"provider_trans_id" => $provider_trans_id, #R
-							"provider_round_id" => $provider_trans_id, #R
-							"provider_name" => $game_details->provider_name
-						],
-						"mwapi" => [
-							"roundId" => $gamerecord, #R
-							"type" => 2, #R
-							"game_id" => $game_details->game_id, #R
-							"player_id" => $client_details->player_id, #R
-							"mw_response" => $response, #R
-						],
-						'fundtransferrequest' => [
-							'fundinfo' => [
-								'freespin' => $is_freespin,
-							]
-						]
-					];
+                        $action_payload = [
+                            "type" => "custom", #genreral,custom :D # REQUIRED!
+                            "custom" => [
+                                "game_transaction_ext_id" => $game_transextension2,
+                                "client_connection_name" => $client_details->connection_name,
+                                "provider" => 'allwayspin',
+                                'pay_amount' => $pay_amount,
+                                'income' => $income,
+                                'win_or_lost' => $win_type,
+                                'entry_id' => $method
+                            ],
+                            "provider" => [
+                                "provider_request" => $details, #R
+                                "provider_trans_id" => $provider_trans_id, #R
+                                "provider_round_id" => $provider_trans_id, #R
+                                "provider_name" => $game_details->provider_name
+                            ],
+                            "mwapi" => [
+                                "roundId" => $gamerecord, #R
+                                "type" => 2, #R
+                                "game_id" => $game_details->game_id, #R
+                                "player_id" => $client_details->player_id, #R
+                                "mw_response" => $response, #R
+                            ],
+                            'fundtransferrequest' => [
+                                'fundinfo' => [
+                                    'freespin' => $is_freespin,
+                                ]
+                            ]
+                        ];
                         $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, abs($win_amount_2way), $game_details->game_code, $game_details->game_name, $gamerecord, 'credit', false, $action_payload);
                     } catch (\Exception $e){
                         $response = [
@@ -499,10 +497,9 @@ class AWSNewController extends Controller
 					// return $e->getMessage() . ' ' . $e->getLine() . ' ' . $e->getFile();
 					return $response;
 				}
-
 				if (isset($client_response2->fundtransferresponse->status->code)
 					&& $client_response2->fundtransferresponse->status->code == "200") {
-
+                    $new_balance = $new_balance + $win_amount_2way;
 					$response = [
 						"msg" => "success",
 						"code" => 0,
@@ -541,6 +538,20 @@ class AWSNewController extends Controller
 
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                    $gameTransactionEXTData = array(
+                        "game_trans_id" => $gamerecord,
+                        "provider_trans_id" => $provider_trans_id,
+                        "round_id" => $provider_trans_id,
+                        "amount" => $pay_amount,
+                        "game_transaction_type"=> 2,
+                        "provider_request" =>json_encode($details),
+                        "mw_response" => json_encode($response),
+                        'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
+                        'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+                        'transaction_detail' => "FAILED",
+                        'general_details' => "FAILED",
+                    );
+                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 					$response = [
 						"msg" => "Insufficient balance",
 						"code" => 1201
@@ -553,7 +564,21 @@ class AWSNewController extends Controller
 				&& $client_response->fundtransferresponse->status->code == "402") {
 				// dd($client_response);
 				$updateGameTransaction = ["win" => 2];
-					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                $gameTransactionEXTData = array(
+                    "game_trans_id" => $gamerecord,
+                    "provider_trans_id" => $provider_trans_id,
+                    "round_id" => $provider_trans_id,
+                    "amount" => $pay_amount,
+                    "game_transaction_type"=> 2,
+                    "provider_request" =>json_encode($details),
+                    "mw_response" => json_encode($response),
+                    'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
+                    'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+                    'transaction_detail' => "FAILED",
+                    'general_details' => "FAILED",
+                );
+                GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 				$response = [
 					"msg" => "Insufficient balance",
 					"code" => 1201
