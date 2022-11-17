@@ -169,7 +169,7 @@ class TidyController extends Controller
 		$uid = $data->uid;
 		$bet_id = $this->roundID.$data->bet_id;
 		$request_uuid = $data->request_uuid;
-		$game_trans_id = $data->transaction_uuid; //Provider Transaction ID	_column
+		$transaction_uuid = $data->transaction_uuid; //Provider Transaction ID	_column
 		
 		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
