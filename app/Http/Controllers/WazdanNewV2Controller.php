@@ -175,6 +175,7 @@ class WazdanNewV2Controller extends Controller
                         "transaction_detail" => "FAILED",
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details); 
+                    Helper::saveLog('responseTime(WazdanFailedBet)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
