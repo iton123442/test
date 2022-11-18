@@ -565,6 +565,10 @@ class AWSNewController extends Controller
 				// dd($client_response);
 				$updateGameTransaction = ["win" => 2];
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+				$response = [
+					"msg" => "Insufficient balance",
+					"code" => 1201
+				];
                 $gameTransactionEXTData = array(
                     "game_trans_id" => $gamerecord,
                     "provider_trans_id" => $provider_trans_id,
@@ -579,10 +583,6 @@ class AWSNewController extends Controller
                     'general_details' => "FAILED",
                 );
                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
-				$response = [
-					"msg" => "Insufficient balance",
-					"code" => 1201
-				];
 			}
 
 
