@@ -274,7 +274,7 @@ class WazdanNewV2Controller extends Controller
                         );
                         GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
                     }catch(\Exception $e){
-                        Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
+                        Helper::saveLog('betGameInsuficient(Wazdan)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
                     } 
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
