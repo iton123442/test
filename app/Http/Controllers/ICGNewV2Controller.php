@@ -44,29 +44,6 @@ class ICGNewV2Controller extends Controller
                 'Accept'     => 'application/json' 
             ]
         ]);
-       //  $data = array();
-       //  $games = json_decode((string) $response->getBody(), true);
-       //  foreach($games["data"] as $game){
-       //      if($game["type"]=="fish"){
-       //          $type_id = 9;
-       //      }
-       //      elseif($game["type"]=="slot"){
-       //          $type_id = 1;
-       //      }
-       //      elseif($game["type"]=="card"){
-       //          $type_id = 4;
-       //      }
-       //      $game_data = array(
-       //          "game_type_id" => $type_id,
-       //          "provider_id" => 12,
-       //          "sub_provider_id" => 1,
-       //     "game_name" => $game["name"],
-       //      "icon" => $game["src"]["image_s"],
-       //       "game_code" => $game["productId"]
-       //   );
-       //    array_push($data,$game_data);
-       // }
-       // DB::table('games')->insert($data);
         return json_decode((string) $response->getBody(), true);
     }
     public function gameLaunchURL(Request $request){
@@ -104,33 +81,6 @@ class ICGNewV2Controller extends Controller
             $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
             Helper::saveLog('AuthPlayer(ICG)', 12, json_encode(array("token"=>$request->token)), $client_details);
             if($client_details){
-                // $client = new Client([
-                //     'headers' => [ 
-                //         'Content-Type' => 'application/json',
-                //         'Authorization' => 'Bearer '.$client_details->client_access_token
-                //     ]
-                // ]);
-                
-                // $guzzle_response = $client->post($client_details->player_details_url,
-                //     ['body' => json_encode(
-                //             [
-                //                 "access_token" => $client_details->client_access_token,
-                //                 "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                //                 "type" => "playerdetailsrequest",
-                //                 "datesent" => "",
-                //                 "gameid" => "",
-                //                 "clientid" => $client_details->client_id,
-                //                 "playerdetailsrequest" => [
-                //                     "player_username"=>$client_details->username,
-                //                     "client_player_id"=>$client_details->client_player_id,
-                //                     "token" => $client_details->player_token,
-                //                     "gamelaunch" => "true"
-                //                 ]]
-                //     )]
-                // );
-                // $client_response = json_decode($guzzle_response->getBody()->getContents());
-                // Helper::saveLog('AuthPlayer(ICG)', 12, json_encode(array("token"=>$request->token)), $client_response);
-                // $balance = round($client_response->playerdetailsresponse->balance*100,2);
                 $balance = round($client_details->balance*100,2);
                 $msg = array(
                     "data" => array(
@@ -175,33 +125,6 @@ class ICGNewV2Controller extends Controller
             $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
             Helper::saveLog('PlayerDetails(ICG)', 12, json_encode(array("token"=>$request->all())), $client_details);
             if($client_details){
-                // $client = new Client([
-                //     'headers' => [ 
-                //         'Content-Type' => 'application/json',
-                //         'Authorization' => 'Bearer '.$client_details->client_access_token
-                //     ]
-                // ]);
-                
-                // $guzzle_response = $client->post($client_details->player_details_url,
-                //     ['body' => json_encode(
-                //             [
-                //                 "access_token" => $client_details->client_access_token,
-                //                 "hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
-                //                 "type" => "playerdetailsrequest",
-                //                 "datesent" => "",
-                //                 "gameid" => "",
-                //                 "clientid" => $client_details->client_id,
-                //                 "playerdetailsrequest" => [
-                //                     "player_username"=>$client_details->username,
-                //                     "client_player_id"=>$client_details->client_player_id,
-                //                     "token" => $client_details->player_token,
-                //                     "gamelaunch" => "false"
-                //                 ]]
-                //     )]
-                // );
-                // $client_response = json_decode($guzzle_response->getBody()->getContents());
-                // Helper::saveLog('PlayerBalance(ICG)AfterClient', 12, json_encode(array("token"=>$request->token)), $client_response);
-                // $balance = round($client_response->playerdetailsresponse->balance*100,2);
                 $balance = round($client_details->balance*100,2);
                 $msg = array(
                     "data" => array(
