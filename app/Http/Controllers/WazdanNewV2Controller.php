@@ -142,7 +142,9 @@ class WazdanNewV2Controller extends Controller
                         'connection_timeout' => 3,
                     ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+                    Helper::saveLog('Fundtransfer hit!', 57, json_encode($client_response), microtime(true) - $this->startTime);
                 }catch(\Exception $e){
+                    Helper::saveLog('responseTime(WazdanFailedBet)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     $msg = array(
                         "status" =>8,
                         "message" => array(
@@ -175,7 +177,6 @@ class WazdanNewV2Controller extends Controller
                         "transaction_detail" => "FAILED",
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details); 
-                    Helper::saveLog('responseTime(WazdanFailedBet)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
