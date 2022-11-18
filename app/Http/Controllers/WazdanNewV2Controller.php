@@ -261,9 +261,9 @@ class WazdanNewV2Controller extends Controller
                         }
                         $betgametransactionext = array(
                             "game_trans_id" => $game_transactionid,
-                            "provider_trans_id" => $json["transactionId"],
-                            "round_id" => $json["roundId"],
-                            "amount" => round($json["amount"]/100,2),
+                            "provider_trans_id" => $datadecoded["transactionId"],
+                            "round_id" => $datadecoded["roundId"],
+                            "amount" => round($datadecoded["amount"],2),
                             "game_transaction_type"=>1,
                             "provider_request" =>json_encode($datadecoded),
                             "mw_response" => json_encode($msg),
