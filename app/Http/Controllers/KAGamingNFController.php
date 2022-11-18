@@ -624,7 +624,7 @@ class KAGamingNFController extends Controller
                 'general_details' => json_encode($general_details),
             );
             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$credit_game_transextension,$client_details);
         }else{ // Unknown Response Code
             if($check_bet_round == 'false'){
                 $updateGameTransaction = ["win" => 2,'trans_status' => 5];
@@ -645,7 +645,7 @@ class KAGamingNFController extends Controller
                 'general_details' => json_encode($general_details),
             );
             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$gen_game_extid,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$credit_game_transextension,$client_details);
         }  
         return $response;
     }
