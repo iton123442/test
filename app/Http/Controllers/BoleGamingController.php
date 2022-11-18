@@ -155,7 +155,7 @@ class BoleGamingController extends Controller
 			];
 
 			$json_data = json_decode($request->getContent());
-			ProviderHelper::saveLogWithExeption('BOLE playerWalletCost EH', $this->provider_db_id, $request->getContent(), Helper::datesent());
+			ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), 'EH');
 			$general_details = ["aggregator" => [], "provider" => [], "client" => []];
 			$client_details = ProviderHelper::getClientDetails('player_id', $json_data->player_account);
 			if($client_details == null){
@@ -163,35 +163,34 @@ class BoleGamingController extends Controller
 				return $data;
 			}
 			
-			// $total_failed_req = count($this::findAllFailedGameExt($json_data->report_id, 'transaction_id', $client_details));
-			// if($total_failed_req > 2){
-			// 	$data = [
-			// 		"data" => [],
-			// 		"status" => [
-			// 			"code" => 3,
-			// 			"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
-			// 		]
-			// 	];
-			// 	ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR '.$json_data->report_id, $this->provider_db_id, $request->getContent(), $data);
-			// 	return $data;
-			// }
-
 			$isDuplicate = false;
 			$existingTransactionId = false;
-			try {
-				ProviderHelper::idenpotencyTable($this->prefix.'_'.$json_data->report_id);
-			} catch (\Exception $e) {
-				$isDuplicate = true;
-				if($json_data->type != 20){ // its bet!
-					// $all_round = GameTransactionMDB::findGameExtAll($json_data->report_id,'allround', $client_details);
-					// if(count($all_round) >= 1){
-					// }
-					ProviderHelper::saveLogWithExeption('BOLE playerWalletCost type EXCEPTION', $this->provider_db_id, $request->getContent(), Helper::datesent());
+			$isStrictWin = false;
+			if($json_data->type == 20){ // All type is credit 
+				try {
+					ProviderHelper::idenpotencyTable($this->prefix.'_2_'.$json_data->report_id);
+				} catch (\Exception $e) {
+					ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), 'TYPE EXCEPTION CREDIT');
 					$data = [
 						"data" => [],
 						"status" => [
 							"code" => 3,
-							"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call)"
+							"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call) 2"
+						]
+					];
+					return $data;
+				}
+			}else{ // DEBIT
+				try {
+					ProviderHelper::idenpotencyTable($this->prefix.'_1_'.$json_data->report_id);
+				} catch (\Exception $e) {
+					ProviderHelper::saveLogWithExeption('BOLE playerWalletCost type EXCEPTION', $this->provider_db_id, $request->getContent(), 'TYPE EXCEPTION DEBIT');
+					$isStrictWin = true;
+					$data = [
+						"data" => [],
+						"status" => [
+							"code" => 3,
+							"msg" => "Order Duplicate (This Transaction failed due to internal error, code 3 to stop the call) 1"
 						]
 					];
 					return $data;
@@ -222,7 +221,7 @@ class BoleGamingController extends Controller
 						"msg" => "Signature Error"
 					]
 				];
-	            ProviderHelper::saveLogWithExeption('BOLE UNKNOWN CALL', $this->provider_db_id, $request->getContent(), 'UnknownboleReq');
+	            ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), 'UnknownboleReq');
 				return $data;
 			}
 
@@ -240,7 +239,26 @@ class BoleGamingController extends Controller
 			// END LOGGER
 
 				if($json_data->type == 20){
-						ProviderHelper::saveLogWithExeption('BOLE playerWalletCost WIN TYPE 20', $this->provider_db_id, $request->getContent(), Helper::datesent());
+
+						if($isStrictWin == true){
+							ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), ' WIN TYPE 20 isStrictWin');
+							// $check_win_ext = GameTransactionMDB::findGameExt($json_data->report_id, 2, 'transaction_id',$client_details);
+							// if($check_win_ext == 'false'){
+							// 	$data = [
+							// 		"data" => [
+							// 			"balance" => floatval(number_format((float)$client_details->balance, 2, '.', '')),
+							// 			"currency" => $client_details->default_currency
+							// 		],
+							// 		"status" => [
+							// 			"code" => 3,
+							// 			"msg" => "Order repeated"
+							// 		]
+							// 	];
+							// 	return $data;
+							// }
+						}
+
+						ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), 'WIN TYPE 20');
 						$check_win_ext = GameTransactionMDB::findGameExt($json_data->report_id, 2, 'transaction_id',$client_details);
 						if($check_win_ext != 'false'){
 							$data = [
@@ -256,7 +274,9 @@ class BoleGamingController extends Controller
 							return $data;
 						}
 
-						$transaction_type = $json_data->cost_info->gain_gold < 0 ? 'debit' : 'credit';
+						// $transaction_type = $json_data->cost_info->gain_gold < 0 ? 'debit' : 'credit';
+						$transaction_type = 'credit'; // CREDIT ALWAYS!
+
 					    if($json_data->game_code == 'slot'){
 					    	$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $json_data->game_code.'_'.$json_data->cost_info->scene);
 					    }else{
@@ -301,41 +321,55 @@ class BoleGamingController extends Controller
 
 						// Multi Games / Baccarat and rbwar
 		                if($json_data->game_code == 'baccarat' || $json_data->game_code == 'rbwar'){
-
-		                	$income = $bet_amount - $json_data->amount;	
 							$pay_amount = abs($json_data->amount); // amount should be used here for logging!
+							$income = $bet_amount - $json_data->amount;	
 
-							if($json_data->cost_info->gain_gold  == 0){
-								$win_or_lost = 3; //For draw!
-								$income = $bet_amount - $json_data->amount;	
-							}elseif($json_data->cost_info->gain_gold  < 0){
-								$income = $bet_amount - $json_data->amount;	
+							// if($json_data->cost_info->gain_gold  == 0){
+							// 	$win_or_lost = 0; //For draw! 3
+							// }elseif($json_data->cost_info->gain_gold  < 0){
+							// 	$win_or_lost = 1; 
+							// }
+
+							if($json_data->amount <= 0){
+								$win_or_lost = 0;
+							}else{
+								$win_or_lost = 1;
 							}
+		                }
+
+		                // Fish Game
+		                if($json_data->game_code == 'fish'){
+		                	$pay_amount =  $json_data->amount;
+							$income = $bet_amount - $pay_amount;
+
+							// if($json_data->cost_info->gain_gold  == 0){
+							// 	$win_or_lost = 1; //For draw! 3
+							// }elseif($json_data->cost_info->gain_gold  < 0){
+							// 	$win_or_lost = 1;
+							// }
+
+							if($json_data->amount <= 0){
+								$win_or_lost = 0;
+							}else{
+								$win_or_lost = 1;
+							}
+
 		                }
 
 		                // Contest Games / Mahjongs, BlackJack
 						if(in_array($json_data->game_code, $contest_games)){
-							// OLD
-							// $pay_amount = $json_data->cost_info->gain_gold;
-							// $income = $bet_amount - $json_data->cost_info->gain_gold;	
-							// if($json_data->cost_info->gain_gold  == 0){
-							// 	$income = 0; // If zero it means it was a draw	
-							// 	$win_or_lost = 3; // DRAW
-							// }elseif($json_data->cost_info->gain_gold  < 0){ 
-							//     // NEGATIVE GAIN_GOLD IT MEANS LOST! and GAIN_GOLD WILL BE ALWAYS BET_NUM negative value
-							// 	$pay_amount = 0; // IF NEGATIVE PUT IT AS ZERO
-							// 	$income = $bet_amount - $pay_amount;	
-							// }else{
-							// 	$pay_amount_income = $bet_amount + $json_data->cost_info->gain_gold;
-							// 	$income = $bet_amount - $pay_amount_income;	
-							// 	$pay_amount = $json_data->cost_info->gain_gold;
-							// }
-							// END OLD
 							$pay_amount =  $json_data->amount;
 							$income = $bet_amount - $pay_amount;
-							if($json_data->cost_info->gain_gold  == 0){
-								$win_or_lost = 3; //For draw!
-							}elseif($json_data->cost_info->gain_gold  < 0){
+							
+							// if($json_data->cost_info->gain_gold  == 0){
+							// 	$win_or_lost = 1; //For draw! 3
+							// }elseif($json_data->cost_info->gain_gold  < 0){
+							// 	$win_or_lost = 1;
+							// }
+
+							if($json_data->amount <= 0){
+								$win_or_lost = 0;
+							}else{
 								$win_or_lost = 1;
 							}
 							
@@ -391,7 +425,7 @@ class BoleGamingController extends Controller
 										"msg" => "order does not exist"
 									]
 								];
-								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - ORDER NOT EXIST '.$json_data->report_id, $this->provider_db_id,$request->getContent(), $data);
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost'.$json_data->report_id, $this->provider_db_id,$data, 'ORDER NOT EXIST ');
 								return $data;
 							}
 							$existing_bet = GameTransactionMDB::findGameTransactionDetails($check_game_ext->game_trans_id, 'game_transaction', false, $client_details);
@@ -456,12 +490,12 @@ class BoleGamingController extends Controller
 
 							try {
 								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$existing_bet->game_trans_id,$transaction_type,false,$fund_extra_data);
-								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost CRID '.$existing_bet->game_trans_id, $this->provider_db_id,$request->getContent(), $client_response);
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id,$client_response, 'CRID');
 							   
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 
-								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
+								$this::updatecreateGameTransExt($game_transextension, $request->getContent(), $data, 'FAILED', $e->getMessage().'_'.$e->getLine(), 'FAILED', $general_details,$client_details);
 								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
 								return $data;
 							}
@@ -484,6 +518,7 @@ class BoleGamingController extends Controller
 									]
 								];
 
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details,$client_details);
 
 							}elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -503,15 +538,16 @@ class BoleGamingController extends Controller
 										"msg" => "Insufficient Balance"
 									]
 								];
-								$this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $client_response, 'FAILED', $general_details,$client_details);
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, 'FAILED', $client_response, 'FAILED', $general_details,$client_details);
 
 							}
 
-							ProviderHelper::saveLogWithExeption('BOLE playerWalletCost  - SUCCESS', $this->provider_db_id, $request->getContent(), $data);
+							ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $data, 'SUCCESS');
 							return $data;
 		               }catch (\Exception $e){
 			                $data = ["data" => [],"status" => ["code" => -1,"msg" => "Failed connecting to client"]];
-						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $request->getContent(), $e->getMessage());
+						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), $e->getMessage().'_'.$e->getLine());
 							return $data;
 			           }
 
@@ -622,14 +658,14 @@ class BoleGamingController extends Controller
 
 							try {
 								$client_response = ClientRequestHelper::fundTransfer($client_details,abs($pay_amount),$db_game_code,$db_game_name,$game_transextension,$gamerecord,$transaction_type,$rollback,$fund_extra_data);
-							    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost CRID '.$gamerecord, $this->provider_db_id, $request->getContent(), $client_response);
+							    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id,$client_response, 'CRID');
 							} catch (\Exception $e) {
 								$data = ["data" => [],"status" => ["code" => -1,"msg" => "Client Failure"]];
 								if(isset($gamerecord)){
 									// ProviderHelper::updateGameTransactionStatus($gamerecord, 2, 99);
-							        $this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage(), 'FAILED', $general_details,$client_details);
+							        $this::updatecreateGameTransExt($game_transextension, 'FAILED', $data, 'FAILED', $e->getMessage().'_'.$e->getLine(), 'FAILED', $general_details,$client_details);
 								}
-								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $data, Helper::datesent());
+								ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $data, 'FATAL ERROR');
 								return $data;
 							}
 
@@ -649,6 +685,7 @@ class BoleGamingController extends Controller
 										"msg" => "success"
 									]
 								];
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, $data, $general_details,$client_details);
 
 							}elseif(isset($client_response->fundtransferresponse->status->code) 
@@ -666,11 +703,12 @@ class BoleGamingController extends Controller
 									]
 								];
 								
+								ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 								$this::updatecreateGameTransExt($game_transextension, json_decode($request->getContent()), $data, $client_response->requestoclient, $client_response, 'FAILED', $general_details,$client_details);
 
 							}
 
-							ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - SUCCESS', $this->provider_db_id, $request->getContent(), $data);
+							ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $data, 'SUCCESS');
 							return $data;
 
 					    } catch (\Exception $e) {
@@ -681,7 +719,7 @@ class BoleGamingController extends Controller
 									"msg" => "Server Error"
 								]
 							];
-						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost - FATAL ERROR', $this->provider_db_id, $request->getContent(), $e->getMessage());
+						    ProviderHelper::saveLogWithExeption('BOLE playerWalletCost', $this->provider_db_id, $request->getContent(), $e->getMessage());
 							return $data;
 					    }
 

@@ -98,8 +98,10 @@ return [
             'AccessKeyId' => '9048dbaa-b489-4b32-9a29-149240a5cefe',
             'access_key_secret' => '4A55C539E93B189EAA5A76A8BD92B99B87B76B80',
             'app_key' => 'R14NDR4FT',
-            'login_url' => 'https://api.cdmolo.com:16800/v1/player/login',
-            'logout_url' => 'https://api.cdmolo.com:16800/v1/player/logout',
+            // 'login_url' => 'https://api.cdmolo.com:16800/v1/player/login',
+            // 'logout_url' => 'https://api.cdmolo.com:16800/v1/player/logout',
+            'login_url' => 'https://api16800.cdmolo.com:16800/v1/player/login',
+            'logout_url' => 'https://api16800.cdmolo.com:16800/v1/player/logout',
         ],
         "USD" => [
             'AccessKeyId' => '912784c6-6f1a-4a0c-a64c-f01f815f8c31',
