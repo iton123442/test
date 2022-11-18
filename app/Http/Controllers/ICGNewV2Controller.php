@@ -336,7 +336,7 @@ class ICGNewV2Controller extends Controller
                             "transaction_detail" => "FAILED",
                         );
                         GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
-                        Helper::saveLog('Bet402 Try hit(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
+                        Helper::saveLog('Bet402 Try hit(ICG)', 12, json_encode($response), $client_response->fundtransferresponse->status->message);
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
                     }
