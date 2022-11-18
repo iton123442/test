@@ -277,7 +277,8 @@ class PNGController extends Controller
             $game = GameTransactionMDB::findGameTransactionDetails($xmlparser->roundId,'round_id', false, $client_details);
             $fund_extra_data = [];
             $is_freespin = false;
-            if($game == 'false'){
+            // if($game == 'false'){
+            if(isset($xmlparser->freegameExternalId) && $xmlparser->freegameExternalId != "" && $game == 'false'  ) {     
                 $entry_id = 1;
                 $gameTransactionData = array(
                     "provider_trans_id" => $xmlparser->transactionId,
