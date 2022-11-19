@@ -163,25 +163,14 @@ class YGG002NewV2Controller extends Controller
                         "playerId" => "TG002_".$client_details->player_id
                     ),
                 );
-                // $update_gametransactionext = array(
-                //     "mw_response" =>json_encode($response),
-                //     "mw_request"=>json_encode($client_response->requestoclient),
-                //     "client_response" =>json_encode($client_response->fundtransferresponse),
-                //     "transaction_detail" =>json_encode("success"),
-                //     "general_details" =>json_encode("success"),
-                // );
-                // GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
-                $createGameTransactionLog = [
-                    "connection_name" => $client_details->connection_name,
-                    "column" =>[
-                        "game_trans_ext_id" => $game_transextension,
-                        "request" => json_encode($request->all()),
-                        "response" => json_encode($response),
-                        "log_type" => "provider_details",
-                        "transaction_detail" => "success",
-                    ]
-                ];
-                ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                $update_gametransactionext = array(
+                    "mw_response" =>json_encode($response),
+                    "mw_request"=>json_encode($client_response->requestoclient),
+                    "client_response" =>json_encode($client_response->fundtransferresponse),
+                    "transaction_detail" =>json_encode("success"),
+                    "general_details" =>json_encode("success"),
+                );
+                GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
                 ProviderHelper::_insertOrUpdate($tokenId, $client_response->fundtransferresponse->balance);
                 Helper::saveLog('YGG 002 wager', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
