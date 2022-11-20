@@ -45,7 +45,6 @@ class MannaPlayV2Controller extends Controller
         }
 	}
 
-
 	public function getBalance(Request $request) {
 
 		$json_data = json_decode(file_get_contents("php://input"), true);
@@ -279,7 +278,7 @@ class MannaPlayV2Controller extends Controller
 				];
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
-
+				$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
 				if ($client_details != null) {
 
 					if (!$this->CheckAuth($client_details, $api_key)){
@@ -332,20 +331,6 @@ class MannaPlayV2Controller extends Controller
 		                );
 
 			           	GameTransactionMDB::updateGametransaction($update_game_transaction, $bet_transaction->game_trans_id, $client_details);
-
-
-		                $win_game_transaction_ext = array(
-		                    "game_trans_id" => $bet_transaction->game_trans_id,
-		                    "provider_trans_id" => $json_data["transaction_id"],
-		                    "round_id" => $json_data["round_id"],
-		                    "amount" => $json_data["amount"],
-		                    "game_transaction_type"=> 2,
-		                    "provider_request" =>json_encode($json_data),
-		                    "mw_response" => json_encode($response)
-		                );
-
-		                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($win_game_transaction_ext, $client_details);
-
 						$action_payload = [
 			                "type" => "custom", #genreral,custom :D # REQUIRED!
 			                "custom" => [
@@ -369,6 +354,20 @@ class MannaPlayV2Controller extends Controller
 			                ]
 			            ];
 			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$json_data["amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
+						$gameTransactionEXTData = array(
+                            "game_trans_id" => $$bet_transaction->game_trans_id,
+                            "provider_trans_id" => $json_data["transaction_id"],
+                            "round_id" => $json_data["round_id"],
+                            "amount" => $json_data["amount"],
+                            "game_transaction_type"=> 2,
+                            "provider_request" =>json_encode($json_data),
+                            "mw_response" => json_encode($response),
+                            'mw_request' => json_encode($client_response->requestoclient),
+                            'client_response' => json_encode($client_response->fundtransferresponse),
+                            'transaction_detail' => 'success',
+                            'general_details' => 'success',
+                        );
+                       GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details);
 
 					}
 				}
