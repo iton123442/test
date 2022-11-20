@@ -201,7 +201,7 @@ class MannaPlayV2Controller extends Controller
 							"income" => 0,
 							"entry_id" => 1,
 						);
-						GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transid_gen,$client_details); //create game_transaction
+						GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transaction_id,$client_details); //create game_transaction
 					   $gameTransactionEXTData = array(
 						"game_trans_id" => $game_transaction_id,
 						"provider_trans_id" => $json_data['transaction_id'],
@@ -214,7 +214,7 @@ class MannaPlayV2Controller extends Controller
 						"client_response" => json_encode($client_response->fundtransferresponse),
 						"transaction_detail" => "SUCCESS",
 					);
-					 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transid_ext,$client_details); //create extension
+					 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_trans_ext_id,$client_details); //create extension
 					} else {
 						$http_status = 200;
 						$response = [
