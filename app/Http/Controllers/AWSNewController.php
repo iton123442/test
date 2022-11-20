@@ -538,6 +538,10 @@ class AWSNewController extends Controller
 
 					$updateGameTransaction = ["win" => 2];
 					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+					$response = [
+						"msg" => "Insufficient balance",
+						"code" => 1201
+					];
                     $gameTransactionEXTData = array(
                         "game_trans_id" => $gamerecord,
                         "provider_trans_id" => $provider_trans_id,
@@ -552,10 +556,6 @@ class AWSNewController extends Controller
                         'general_details' => "FAILED",
                     );
                     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
-					$response = [
-						"msg" => "Insufficient balance",
-						"code" => 1201
-					];
 
 					# Game Restrict (failed win)
 					# Providerhelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_transextension2, 'FAILED');
@@ -563,8 +563,22 @@ class AWSNewController extends Controller
 			} elseif (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "402") {
 				// dd($client_response);
-				$updateGameTransaction = ["win" => 2];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+				$gameTransactionData = array(
+					"provider_trans_id" => $provider_trans_id,
+					"token_id" => $token_id,
+					"game_id" => $game_code,
+					"round_id" => $provider_trans_id,
+					"bet_amount" => $bet_amount,
+					"win" => 2,
+					"pay_amount" => $pay_amount,
+					"income" =>  $income,
+					"entry_id" =>$method,
+				);
+				GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
+				$response = [
+					"msg" => "Insufficient balance",
+					"code" => 1201
+				];
                 $gameTransactionEXTData = array(
                     "game_trans_id" => $gamerecord,
                     "provider_trans_id" => $provider_trans_id,
@@ -579,10 +593,6 @@ class AWSNewController extends Controller
                     'general_details' => "FAILED",
                 );
                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
-				$response = [
-					"msg" => "Insufficient balance",
-					"code" => 1201
-				];
 			}
 
 
