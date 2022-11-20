@@ -719,7 +719,7 @@ class BGamingController extends Controller
                     "provider_trans_id" => $transactionId,
                     "round_id" => $round_id,
                     "amount" => $amount,
-                    "game_transaction_type"=> $isGameExtFailed->amount,
+                    "game_transaction_type"=> 3,
                     "provider_request" => json_encode($data),
                     "mw_response" => json_encode($response)
                 );
