@@ -230,10 +230,15 @@ $app->post('/public/api/aws/querystatus', 'AWSController@queryStatus');
 $app->post('/public/api/aws/orderquery', 'AWSController@queryOrder');
 $app->post('/public/api/aws/getday', 'AWSController@getAllWaySpinDayTransaction');
 // AWS PROVIDER SINGLE WALLET ROUTE
-$app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
-$app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
-$app->post('/public/api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
-$app->post('/public/api/aws/single/wallet/altest', 'AWSController@changeAccount');
+// $app->post('/public/api/aws/single/wallet/balance', 'AWSController@singleBalance');
+// $app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSController@singleFundTransfer');
+// $app->post('/public/api/aws/single/wallet/fund/query', 'AWSController@singleFundQuery');
+// $app->post('/public/api/aws/single/wallet/altest', 'AWSController@changeAccount');
+// AWS NEWFLOW Version 2
+$app->post('/public/api/aws/single/wallet/balance', 'AWSNewController@singleBalance');
+$app->post('/public/api/aws/single/wallet/fund/transfer', 'AWSNewController@singleFundTransfer');
+$app->post('/public/api/aws/single/wallet/fund/query', 'AWSNewController@singleFundQuery');
+$app->post('/public/api/aws/single/wallet/altest', 'AWSNewController@changeAccount');
 // SILKSTONE ROUTES (SEAMLESS WALLET)
 // $app->post('/public/skywind/api/get_ticket', 'SkyWindController@getTicket');
 $app->post('/public/api/skywind/api/getgamelist', 'SkyWindController@getGamelist'); // TEST
@@ -334,14 +339,14 @@ $app->post('/public/api/sa/PlayerLost','SAGamingController@PlayerLost');
 $app->post('/public/api/sa/PlaceBetCancel','SAGamingController@PlaceBetCancel');
 
 // KAGaming
-$app->post('/public/api/ka/gamelist','KAGamingController@index');
-$app->post('/public/api/ka/start','KAGamingController@gameStart');
-$app->post('/public/api/ka/end','KAGamingController@gameEnd');
-$app->post('/public/api/ka/promo','KAGamingController@getPromo');
-$app->post('/public/api/ka/play','KAGamingController@checkPlay');
-$app->post('/public/api/ka/credit','KAGamingController@gameCredit');
-$app->post('/public/api/ka/balance','KAGamingController@playerBalance');
-$app->post('/public/api/ka/revoke','KAGamingController@gameRevoke');
+$app->post('/public/api/ka/gamelist','KAGamingNFController@index');
+$app->post('/public/api/ka/start','KAGamingNFController@gameStart');
+$app->post('/public/api/ka/end','KAGamingNFController@gameEnd');
+$app->post('/public/api/ka/promo','KAGamingNFController@getPromo');
+$app->post('/public/api/ka/play','KAGamingNFController@checkPlay');
+$app->post('/public/api/ka/credit','KAGamingNFController@gameCredit');
+$app->post('/public/api/ka/balance','KAGamingNFController@playerBalance');
+$app->post('/public/api/ka/revoke','KAGamingNFController@gameRevoke');
 
 
 
@@ -362,9 +367,9 @@ $app->post('/public/api/eightprovider/withdrawal', 'EightProviderControllerV2@ga
 $app->post('/public/api/gettransaction', 'AlController@testTransaction');
 
 //BNG Endpoints
-$app->post('/public/api/bng', 'BNGController@index');
-$app->post('/public/api/bng/gamelaunch', 'BNGController@gameLaunchUrl');
-$app->post('/public/api/bng/generateGame','BNGController@generateGame');
+$app->post('/public/api/bng', 'BNGNFController@index');
+$app->post('/public/api/bng/gamelaunch', 'BNGNFController@gameLaunchUrl');
+$app->post('/public/api/bng/generateGame','BNGNFController@generateGame');
 //FC GAMING Endpoints
 $app->post('/public/api/fc/encrypt','FCController@SampleEncrypt');
 $app->post('/public/api/fc/decode','FCController@SampleDecrypt');
@@ -392,13 +397,21 @@ $app->post('/public/api/png/betsofted/cancelReserve','PNGController@cancelReserv
 // $app->post('/public/api/wazdan/getFunds','WazdanControllerNew@getFunds');
 // $app->post('/public/api/wazdan/gameClose','WazdanControllerNew@gameClose');
 // $app->post('/public/api/wazdan/hash','WazdanControllerNew@hashCode');
-$app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
-$app->post('/public/api/wazdan/getStake','WazdanController@getStake');
-$app->post('/public/api/wazdan/rollbackStake','WazdanController@rollbackState');
-$app->post('/public/api/wazdan/returnWin','WazdanController@returnWin');
-$app->post('/public/api/wazdan/getFunds','WazdanController@getFunds');
-$app->post('/public/api/wazdan/gameClose','WazdanController@gameClose');
-$app->post('/public/api/wazdan/hash','WazdanController@hashCode');
+// $app->post('/public/api/wazdan/authenticate','WazdanController@authenticate');
+// $app->post('/public/api/wazdan/getStake','WazdanController@getStake');
+// $app->post('/public/api/wazdan/rollbackStake','WazdanController@rollbackState');
+// $app->post('/public/api/wazdan/returnWin','WazdanController@returnWin');
+// $app->post('/public/api/wazdan/getFunds','WazdanController@getFunds');
+// $app->post('/public/api/wazdan/gameClose','WazdanController@gameClose');
+// $app->post('/public/api/wazdan/hash','WazdanController@hashCode');
+//Newflow V2
+$app->post('/public/api/wazdan/authenticate','WazdanNewV2Controller@authenticate');
+$app->post('/public/api/wazdan/getStake','WazdanNewV2Controller@getStake');
+$app->post('/public/api/wazdan/rollbackStake','WazdanNewV2Controller@rollbackState');
+$app->post('/public/api/wazdan/returnWin','WazdanNewV2Controller@returnWin');
+$app->post('/public/api/wazdan/getFunds','WazdanNewV2Controller@getFunds');
+$app->post('/public/api/wazdan/gameClose','WazdanNewV2Controller@gameClose');
+$app->post('/public/api/wazdan/hash','WazdanNewV2Controller@hashCode');
 // BETRNK LOTTO
 $app->post('/public/api/betrnk/lotto', 'BetrnkController@getUrl');
 
@@ -876,13 +889,13 @@ $app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']]
 
 
 // Yggdrasil 
-$app->get('/public/playerinfo.json','YGG002Controller@playerinfo');
-$app->get('/public/wager.json','YGG002Controller@wager');
-$app->get('/public/cancelwager.json','YGG002Controller@cancelwager');
-$app->get('/public/appendwagerresult.json','YGG002Controller@appendwagerresult');
-$app->get('/public/endwager.json','YGG002Controller@endwager');
-$app->get('/public/campaignpayout.json','YGG002Controller@campaignpayout');
-$app->get('/public/getbalance.json','YGG002Controller@getbalance');
+// $app->get('/public/playerinfo.json','YGG002Controller@playerinfo');
+// $app->get('/public/wager.json','YGG002Controller@wager');
+// $app->get('/public/cancelwager.json','YGG002Controller@cancelwager');
+// $app->get('/public/appendwagerresult.json','YGG002Controller@appendwagerresult');
+// $app->get('/public/endwager.json','YGG002Controller@endwager');
+// $app->get('/public/campaignpayout.json','YGG002Controller@campaignpayout');
+// $app->get('/public/getbalance.json','YGG002Controller@getbalance');
 // ygg local
 $app->post('/public/playerinfo/test','YGG002Controller@playerinfo');
 $app->post('/public/wager/test','YGG002Controller@wager');
@@ -891,7 +904,15 @@ $app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult'
 $app->post('/public/endwager/test','YGG002Controller@endwager');
 $app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
 $app->post('/public/getbalance/test','YGG002Controller@getbalance');
+//Yggdrasil Newflow v2 
 
+$app->get('/public/playerinfo.json','YGG002NewV2Controller@playerinfo');
+$app->get('/public/wager.json','YGG002NewV2Controller@wager');
+$app->get('/public/cancelwager.json','YGG002NewV2Controller@cancelwager');
+$app->get('/public/appendwagerresult.json','YGG002NewV2Controller@appendwagerresult');
+$app->get('/public/endwager.json','YGG002NewV2Controller@endwager');
+$app->get('/public/campaignpayout.json','YGG002NewV2Controller@campaignpayout');
+$app->get('/public/getbalance.json','YGG002NewV2Controller@getbalance');
 // Yggdrasil NEWLOW
 // $app->get('/public/playerinfo.json','YGG002ControllerNEW@playerinfo');
 // $app->get('/public/wager.json','YGG002ControllerNEW@wager');
