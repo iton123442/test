@@ -371,7 +371,6 @@ class WazdanNewV2Controller extends Controller
                         "mw_request" => "FAILED",
                         "general_details" => "FAILED",
                         "client_response" => "FAILED",
-                        "transaction_detail" => "FAILED",
                         "transaction_detail" => "FAILED"
                     );
                     GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$refundgametransactionextId,$client_details);
@@ -670,7 +669,6 @@ class WazdanNewV2Controller extends Controller
                         "mw_request" => "FAILED",
                         "general_details" => "FAILED",
                         "client_response" => "FAILED",
-                        "transaction_detail" => "FAILED",
                         "transaction_detail" => "FAILED"
                     );
                     GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
