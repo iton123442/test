@@ -745,7 +745,7 @@ class YGG002NewV2Controller extends Controller
                         "mw_response" => $response,
                     ]
                 ];
-                ClientRequestHelper::fundTransfer_TG($client_details, $win_amount, $game_details->game_code, $game_details->game_name, $checkTrans->game_trans_id, 'credit', false, $action_payload);
+                $client_response = ClientRequestHelper::fundTransfer_TG($client_details, $win_amount, $game_details->game_code, $game_details->game_name, $checkTrans->game_trans_id, 'credit', false, $action_payload);
             }catch(\Exception $e){
                 $balance = round($client_details->balance,2);
                 $response = array(
