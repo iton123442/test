@@ -889,13 +889,13 @@ $app->group(['prefix' => 'public/api', 'middleware' => ['oauth', 'json_accept']]
 
 
 // Yggdrasil 
-$app->get('/public/playerinfo.json','YGG002Controller@playerinfo');
-$app->get('/public/wager.json','YGG002Controller@wager');
-$app->get('/public/cancelwager.json','YGG002Controller@cancelwager');
-$app->get('/public/appendwagerresult.json','YGG002Controller@appendwagerresult');
-$app->get('/public/endwager.json','YGG002Controller@endwager');
-$app->get('/public/campaignpayout.json','YGG002Controller@campaignpayout');
-$app->get('/public/getbalance.json','YGG002Controller@getbalance');
+// $app->get('/public/playerinfo.json','YGG002Controller@playerinfo');
+// $app->get('/public/wager.json','YGG002Controller@wager');
+// $app->get('/public/cancelwager.json','YGG002Controller@cancelwager');
+// $app->get('/public/appendwagerresult.json','YGG002Controller@appendwagerresult');
+// $app->get('/public/endwager.json','YGG002Controller@endwager');
+// $app->get('/public/campaignpayout.json','YGG002Controller@campaignpayout');
+// $app->get('/public/getbalance.json','YGG002Controller@getbalance');
 // ygg local
 $app->post('/public/playerinfo/test','YGG002Controller@playerinfo');
 $app->post('/public/wager/test','YGG002Controller@wager');
@@ -904,7 +904,15 @@ $app->post('/public/appendwagerresult/test','YGG002Controller@appendwagerresult'
 $app->post('/public/endwager/test','YGG002Controller@endwager');
 $app->post('/public/campaignpayout/test','YGG002Controller@campaignpayout');
 $app->post('/public/getbalance/test','YGG002Controller@getbalance');
+//Yggdrasil Newflow v2 
 
+$app->get('/public/playerinfo.json','YGG002NewV2Controller@playerinfo');
+$app->get('/public/wager.json','YGG002NewV2Controller@wager');
+$app->get('/public/cancelwager.json','YGG002NewV2Controller@cancelwager');
+$app->get('/public/appendwagerresult.json','YGG002NewV2Controller@appendwagerresult');
+$app->get('/public/endwager.json','YGG002NewV2Controller@endwager');
+$app->get('/public/campaignpayout.json','YGG002NewV2Controller@campaignpayout');
+$app->get('/public/getbalance.json','YGG002NewV2Controller@getbalance');
 // Yggdrasil NEWLOW
 // $app->get('/public/playerinfo.json','YGG002ControllerNEW@playerinfo');
 // $app->get('/public/wager.json','YGG002ControllerNEW@wager');
