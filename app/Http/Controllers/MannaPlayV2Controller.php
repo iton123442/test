@@ -104,8 +104,7 @@ class MannaPlayV2Controller extends Controller
         $json_data = json_decode(file_get_contents("php://input"), true);
 		ProviderHelper::saveLogWithExeption('manna_debit', $this->provider_db_id, json_encode($json_data), "HITTTTTT");
 		$api_key = $request->header('apiKey');
-		$game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
-        $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
+		
 		if(!CallParameters::check_keys($json_data, 'account', 'sessionId', 'amount', 'game_id', 'round_id', 'transaction_id'))
 		{
 			$http_status = 200;
@@ -131,6 +130,8 @@ class MannaPlayV2Controller extends Controller
 				];
 				// Find the player and client details
 				$client_details = ProviderHelper::getClientDetails('token', $json_data['sessionId']);
+				$game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name, 1); // ID generator
+                $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 				if ($client_details != null) {
 
 					if (!$this->CheckAuth($client_details, $api_key)){
