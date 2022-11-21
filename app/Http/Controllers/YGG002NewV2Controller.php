@@ -779,6 +779,7 @@ class YGG002NewV2Controller extends Controller
             }
             if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
+                    Helper::saveLog("YGG 002 200", $this->provider_id, json_encode($client_response), $response);
                 $response = array(
                     "code" => 0,
                     "data" => array(
@@ -817,6 +818,7 @@ class YGG002NewV2Controller extends Controller
                 return $response;    
             } elseif(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "402"){
+                    Helper::saveLog("YGG 002 402", $this->provider_id, json_encode($client_response), $response);
                 $balance = round($client_response->fundtransferresponse->balance,2);
                 ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
                 $response = array(
