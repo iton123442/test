@@ -848,6 +848,38 @@ class YGG002NewV2Controller extends Controller
                 GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
                 Helper::saveLog("YGG 002 endwager (win) failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
                 return $response;
+            }else{
+            Helper::saveLog("YGG 002 else", $this->provider_id, json_encode($client_response), $response);
+            $balance = round($client_response->fundtransferresponse->balance,2);
+            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+            $response = array(
+                "code" => 1006,
+                "msg" => "You do not have sufficient fundsfor the bet."
+            );
+            $updateGameTransaction = [
+                'win' => 2,
+                'pay_amount' => 0,
+                'income' => 0,
+                'entry_id' => 0,
+                'trans_status' => 5
+            ];
+            GameTransactionMDB::updateGametransactionV2($updateGameTransaction, $checkTrans->game_trans_id, $client_details);
+            $create_gametransactionext = array(
+                "game_trans_id" => $checkTrans->game_trans_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $round_id,
+                "amount" => $win_amount,
+                "game_transaction_type"=> 2,
+                "mw_response" => $response,
+                "mw_request" => json_encode($client_response->requestoclient),
+                "client_response" => json_encode($client_response),
+                "general_details" => "FAILED",
+                "transaction_detail" => "FAILED"
+            );
+            GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
+            Helper::saveLog("YGG 002 endwager (win) failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
+            return $response;
+
             }
         }else{
             $response = array(
