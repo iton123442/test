@@ -582,7 +582,7 @@ class AWSNewController extends Controller
                     "provider_trans_id" => $provider_trans_id,
                     "round_id" => $provider_trans_id,
                     "amount" => $pay_amount,
-                    "game_transaction_type"=> 2,
+                    "game_transaction_type"=> 1,
                     "provider_request" =>json_encode($details),
                     "mw_response" => json_encode($response),
                     'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
