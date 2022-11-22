@@ -487,7 +487,7 @@ class AWSNewController extends Controller
 							'transaction_detail' => "FAILED",
 							'general_details' => "FAILED",
 						);
-						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
+						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension2,$client_details);
 					}
 					AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
 					return $response;
@@ -551,7 +551,7 @@ class AWSNewController extends Controller
                         'transaction_detail' => "FAILED",
                         'general_details' => "FAILED",
                     );
-                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
+                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension2,$client_details);
 					AWSHelper::saveLog('AWS singleFundTransfer WIN200 = ' . $gamerecord, $this->provider_db_id, $data, $response);
 
 					# Game Restrict (failed win)
