@@ -157,10 +157,11 @@ class YGG002NewV2Controller extends Controller
                 "amount" => $bet_amount,
                 "game_transaction_type"=> 1,
                 "mw_response" =>json_encode($response),
-                "mw_request" => "FAILED",
-                "general_details" => "FAILED",
-                "client_response" => "FAILED",
-                "transaction_detail" => "FAILED",
+                "provider_request" => json_encode($request->all()),
+                "mw_request" => "failed",
+                "general_details" => "failed",
+                "client_response" => "failed",
+                "transaction_detail" => "failed",
             );
             GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
             Helper::saveLog('YGG 002 wager error1', $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $msg);
@@ -202,10 +203,11 @@ class YGG002NewV2Controller extends Controller
                     "amount" => $bet_amount,
                     "game_transaction_type"=> 1,
                     "mw_response" =>json_encode($response),
+                    "provider_request" => json_encode($request->all()),
                     "mw_request"=>json_encode($client_response->requestoclient),
                     "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("success"),
-                    "general_details" =>json_encode("success"),
+                    "transaction_detail" =>"success",
+                    "general_details" =>"success",
                 );
                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
                 ProviderHelper::_insertOrUpdate($tokenId, $client_response->fundtransferresponse->balance);
@@ -237,10 +239,11 @@ class YGG002NewV2Controller extends Controller
                     "amount" => $bet_amount,
                     "game_transaction_type"=> 1,
                     "mw_response" =>json_encode($response),
+                    "provider_request" => json_encode($request->all()),
                     "mw_request"=>json_encode($client_response->requestoclient),
                     "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("failed"),
-                    "general_details" =>json_encode("failed"),
+                    "transaction_detail" =>"failed",
+                    "general_details" =>"failed",
                 );
                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
                 Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -270,10 +273,11 @@ class YGG002NewV2Controller extends Controller
                     "amount" => $bet_amount,
                     "game_transaction_type"=> 1,
                     "mw_response" =>json_encode($response),
+                    "provider_request" => json_encode($request->all()),
                     "mw_request"=>json_encode($client_response->requestoclient),
                     "client_response" =>json_encode($client_response->fundtransferresponse),
-                    "transaction_detail" =>json_encode("failed"),
-                    "general_details" =>json_encode("failed"),
+                    "transaction_detail" =>"failed",
+                    "general_details" =>"failed",
                 );
                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
                 Helper::saveLog("YGG 002 wager response", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -297,9 +301,10 @@ class YGG002NewV2Controller extends Controller
                 "game_transaction_type"=> 1,
                 "mw_response" =>json_encode($response),
                 "mw_request"=>json_encode($client_response->requestoclient),
+                "provider_request" => json_encode($request->all()),
                 "client_response" =>json_encode($client_response->fundtransferresponse),
-                "transaction_detail" =>json_encode("failed"),
-                "general_details" =>json_encode("failed"),
+                "transaction_detail" =>"failed",
+                "general_details" =>"failed",
             );
             GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
             $gameTransactionData = array(
@@ -420,11 +425,12 @@ class YGG002NewV2Controller extends Controller
                     "round_id" => $round_id,
                     "amount" => $checkTrans->bet_amount,
                     "game_transaction_type"=> 3,
+                    "provider_request" => json_encode($request->all()),
                     "mw_response" => json_encode($response),
-                    "mw_request" => "FAILED",
-                    "general_details" => "FAILED",
-                    "client_response" => "FAILED",
-                    "transaction_detail" => "FAILED",
+                    "mw_request" => "failed",
+                    "general_details" => "failed",
+                    "client_response" => "failed",
+                    "transaction_detail" => "failed",
                 );
                 GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
                 Helper::saveLog("YGG 002 endwager (cancel) fundtransfer error", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -447,6 +453,7 @@ class YGG002NewV2Controller extends Controller
                     "round_id" => $round_id,
                     "amount" => $checkTrans->bet_amount,
                     "game_transaction_type"=> 3,
+                    "provider_request" => json_encode($request->all()),
                     "mw_response" => json_encode($response),
                     "mw_request" => json_encode($client_response->requestoclient),
                     "client_response" => json_encode($client_response),
@@ -480,6 +487,7 @@ class YGG002NewV2Controller extends Controller
                         "amount" => $win_amount,
                         "game_transaction_type"=> 2,
                         "mw_response" => json_encode($response),
+                        "provider_request" => json_encode($request->all()),
                         "mw_request" => json_encode($client_response->requestoclient),
                         "client_response" => json_encode($client_response),
                         "general_details" => "success",
@@ -766,11 +774,12 @@ class YGG002NewV2Controller extends Controller
                     "round_id" => $round_id,
                     "amount" => $win_amount,
                     "game_transaction_type"=> 2,
+                    "provider_request" => json_encode($request->all()),
                     "mw_response" => json_encode($response),
-                    "mw_request" => "FAILED",
-                    "general_details" => "FAILED",
-                    "client_response" => "FAILED",
-                    "transaction_detail" => "FAILED",
+                    "mw_request" => "failed",
+                    "general_details" => "failed",
+                    "client_response" => "failed",
+                    "transaction_detail" => "failed",
                 );
                 GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
                 Helper::saveLog("YGG 002 endwager (win) fundtransfer error", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -806,6 +815,7 @@ class YGG002NewV2Controller extends Controller
                     "round_id" => $round_id,
                     "amount" => $win_amount,
                     "game_transaction_type"=> 2,
+                    "provider_request" => json_encode($request->all()),
                     "mw_response" => json_encode($response),
                     "mw_request" => json_encode($client_response->requestoclient),
                     "client_response" => json_encode($client_response),
@@ -839,11 +849,12 @@ class YGG002NewV2Controller extends Controller
                     "round_id" => $round_id,
                     "amount" => $win_amount,
                     "game_transaction_type"=> 2,
+                    "provider_request" => json_encode($request->all()),
                     "mw_response" => json_encode($response),
                     "mw_request" => json_encode($client_response->requestoclient),
                     "client_response" => json_encode($client_response),
-                    "general_details" => "FAILED",
-                    "transaction_detail" => "FAILED"
+                    "general_details" => "failed",
+                    "transaction_detail" => "failed"
                 );
                 GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
                 Helper::saveLog("YGG 002 endwager (win) failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
@@ -871,10 +882,11 @@ class YGG002NewV2Controller extends Controller
                 "amount" => $win_amount,
                 "game_transaction_type"=> 2,
                 "mw_response" => json_encode($response),
+                "provider_request" => json_encode($request->all()),
                 "mw_request" => json_encode($client_response->requestoclient),
                 "client_response" => json_encode($client_response),
-                "general_details" => "FAILED",
-                "transaction_detail" => "FAILED"
+                "general_details" => "failed",
+                "transaction_detail" => "failed"
             );
             GameTransactionMDB::createGameTransactionExtV2($create_gametransactionext,$game_trans_ext_v2,$client_details);
             Helper::saveLog("YGG 002 endwager (win) failed", $this->provider_id, json_encode($request->all(),JSON_FORCE_OBJECT), $response);
