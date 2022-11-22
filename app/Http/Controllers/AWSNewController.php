@@ -588,7 +588,36 @@ class AWSNewController extends Controller
                 );
                 GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 			}
+			else {
+				$response = [
+					"msg" => "Insufficient balance",
+					"code" => 1201
+				];
+				if (isset($gamerecord)) {
+					$updateGameTransaction = [
+						"win" => 2,
+						"pay_amount" => 0,
+						"income" => 0,
+					];
+					GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+					$gameTransactionEXTData = array(
+						"game_trans_id" => $gamerecord,
+						"provider_trans_id" => $provider_trans_id,
+						"round_id" => $provider_trans_id,
+						"amount" => $pay_amount,
+						"game_transaction_type"=> 2,
+						"provider_request" =>json_encode($details),
+						"mw_response" => json_encode($response),
+						'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
+						'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+						'transaction_detail' => "FAILED",
+						'general_details' => "FAILED",
+					);
+					GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
+				}
+				AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
 
+			}
 
 
 			// V2
