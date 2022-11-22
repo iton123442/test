@@ -551,7 +551,7 @@ class AWSNewController extends Controller
                         "provider_request" =>json_encode($details),
                         "mw_response" => json_encode($response),
                         'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
-                        'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+                        'client_response' => json_encode($client_response),
                         'transaction_detail' => "FAILED",
                         'general_details' => "FAILED",
                     );
@@ -588,7 +588,7 @@ class AWSNewController extends Controller
                     "provider_request" =>json_encode($details),
                     "mw_response" => json_encode($response),
                     'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
-                    'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+                    'client_response' => json_encode($client_response),
                     'transaction_detail' => "FAILED",
                     'general_details' => "FAILED",
                 );
