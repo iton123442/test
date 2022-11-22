@@ -601,7 +601,7 @@ class KAGamingNFController extends Controller
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
             $gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
-            $credit_game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
+            $game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
             if($check_bet_round == 'false'){
                  if(ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)):
                         $gameTransactionData = array(
@@ -610,7 +610,7 @@ class KAGamingNFController extends Controller
                             "game_id" => $game_code,
                             "round_id" => $round_id,
                             "bet_amount" => $bet_amount,
-                            "win" => 5,
+                            "win" => 2,
                             "pay_amount" => $pay_amount,
                             "income" =>  $income,
                             "entry_id" =>0,
@@ -623,7 +623,7 @@ class KAGamingNFController extends Controller
                             "game_id" => $game_code,
                             "round_id" => $round_id,
                             "bet_amount" => $bet_amount,
-                            "win" => 5,
+                            "win" => 2,
                             "pay_amount" => $pay_amount,
                             "income" =>  $income,
                             "entry_id" =>0,
@@ -646,11 +646,23 @@ class KAGamingNFController extends Controller
                 'general_details' => json_encode($general_details),
             );
             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$credit_game_transextension,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
         }else{ // Unknown Response Code
+            $gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
+            $game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
             if($check_bet_round == 'false'){
-                $updateGameTransaction = ["win" => 2,'trans_status' => 5];
-                GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                $gameTransactionData = array(
+                    "provider_trans_id" => $provider_trans_id,
+                    "token_id" => $token_id,
+                    "game_id" => $game_code,
+                    "round_id" => $round_id,
+                    "bet_amount" => $bet_amount,
+                    "win" => 2,
+                    "pay_amount" => $pay_amount,
+                    "income" =>  $income,
+                    "entry_id" =>0,
+                );
+                GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details);
             }
             $response = ["status" => "Not Enough Balance", "statusCode" =>  200];
             $gameTransactionEXTData = array(
@@ -667,7 +679,7 @@ class KAGamingNFController extends Controller
                 'general_details' => json_encode($general_details),
             );
             // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$credit_game_transextension,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension,$client_details);
         }  
         return $response;
     }
