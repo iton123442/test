@@ -336,7 +336,7 @@ class AWSNewController extends Controller
 					'provider_name' => $game_details->provider_name
 				];
 				$client_response = ClientRequestHelper::fundTransfer($client_details, abs($bet_amount_2way), $game_details->game_code, $game_details->game_name, $game_transextension1, $gamerecord, 'debit', false, $fund_extra_data);
-				AWSHelper::saveLog('AWS singleFundTransfer response = ' . $gamerecord, $this->provider_db_id, json_encode($client_response), $response);
+				AWSHelper::saveLog('AWS singleFundTransfer response = ' . $gamerecord, $this->provider_db_id, json_encode($client_response), "Hit");
 			} catch (\Exception $e) {
 				$response = ["msg" => "Fund transfer encountered error", "code" => 2205, "data" => []];
 				if (isset($gamerecord)) {
