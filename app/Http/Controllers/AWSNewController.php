@@ -297,8 +297,8 @@ class AWSNewController extends Controller
 
 
 		// V2
-		$gamerecord = ProviderHelper::idGen();
-		$game_transextension1 = ProviderHelper::idGen();
+		$gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
+		$game_transextension1 = ProviderHelper::idGenerate($client_details->connection_name,2);
 
 
 		AWSHelper::saveLog('AWS singleFundTransfer - findGameExt CHECK', $this->provider_db_id, $data, 'CHECK');
@@ -429,7 +429,7 @@ class AWSNewController extends Controller
 					$win_type = 0;
 				}
 
-				$game_transextension2 = ProviderHelper::idGen();
+				$game_transextension2 = ProviderHelper::idGenerate($client_details->connection_name,2);
 				try{
 					$action_payload = [
 						"type" => "custom", #genreral,custom :D # REQUIRED!
@@ -524,6 +524,7 @@ class AWSNewController extends Controller
                         "transaction_detail" => "SUCCESS"
 					);
 					GameTransactionMDB::createGameTransactionExtV2($gameTransactionCRIDETEXTData,$game_transextension2,$client_details);
+					AWSHelper::saveLog('AWS singleFundTransfer WIN200 = ' . $gamerecord, $this->provider_db_id, $data, $response);
 
 					// $updateTransactionDEBITEXt = array("mw_response" => json_encode($response));
 					// GameTransactionMDB::updateGametransactionEXT($updateTransactionDEBITEXt,$game_transextension1,$client_details);
@@ -552,7 +553,7 @@ class AWSNewController extends Controller
                         'general_details' => "FAILED",
                     );
                     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension2,$client_details);
-					AWSHelper::saveLog('AWS singleFundTransfer WIN200 = ' . $gamerecord, $this->provider_db_id, $data, $response);
+					AWSHelper::saveLog('AWS singleFundTransfer WIN4021 = ' . $gamerecord, $this->provider_db_id, $data, $response);
 
 					# Game Restrict (failed win)
 					# Providerhelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_transextension2, 'FAILED');
@@ -567,8 +568,8 @@ class AWSNewController extends Controller
 					"round_id" => $provider_trans_id,
 					"bet_amount" => $bet_amount,
 					"win" => 2,
-					"pay_amount" => $pay_amount,
-					"income" =>  $income,
+					"pay_amount" => 0,
+					"income" =>  0,
 					"entry_id" =>$method,
 				);
 				GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
