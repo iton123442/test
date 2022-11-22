@@ -336,7 +336,7 @@ class AWSNewController extends Controller
 					'provider_name' => $game_details->provider_name
 				];
 				$client_response = ClientRequestHelper::fundTransfer($client_details, abs($bet_amount_2way), $game_details->game_code, $game_details->game_name, $game_transextension1, $gamerecord, 'debit', false, $fund_extra_data);
-				AWSHelper::saveLog('AWS singleFundTransfer response = ' . $gamerecord, $this->provider_db_id, json_encode($detailsclient_response), $response);
+				AWSHelper::saveLog('AWS singleFundTransfer response = ' . $gamerecord, $this->provider_db_id, json_encode($client_response), "Hit");
 			} catch (\Exception $e) {
 				$response = ["msg" => "Fund transfer encountered error", "code" => 2205, "data" => []];
 				if (isset($gamerecord)) {
@@ -367,7 +367,7 @@ class AWSNewController extends Controller
 					);
                     GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 				}
-				AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
+				AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR1', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
 				return $response;
 			}
 
@@ -482,7 +482,7 @@ class AWSNewController extends Controller
 							"game_transaction_type"=> 2,
 							"provider_request" =>json_encode($details),
 							"mw_response" => json_encode($response),
-							'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
+							'mw_request' => isset($client_response2->requestoclient) ? json_encode($client_response2->requestoclient) : 'FAILED',
 							'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
 							'transaction_detail' => "FAILED",
 							'general_details' => "FAILED",
@@ -518,8 +518,8 @@ class AWSNewController extends Controller
 						"game_transaction_type"=> 2,
 						"provider_request" =>json_encode($details),
                         "mw_response" => json_encode($response),
-                        "mw_request" => json_encode($client_response->requestoclient),
-                        "client_response" => json_encode($client_response),
+                        "mw_request" => json_encode($client_response2->requestoclient),
+                        "client_response" => json_encode($client_response2),
                         "general_details" => "SUCCESS",
                         "transaction_detail" => "SUCCESS"
 					);
@@ -546,8 +546,8 @@ class AWSNewController extends Controller
                         "game_transaction_type"=> 2,
                         "provider_request" =>json_encode($details),
                         "mw_response" => json_encode($response),
-                        'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
-                        'client_response' => json_encode($client_response),
+                        'mw_request' => isset($client_response2->requestoclient) ? json_encode($client_response2->requestoclient) : 'FAILED',
+                        'client_response' => json_encode($client_response2),
                         'transaction_detail' => "FAILED",
                         'general_details' => "FAILED",
                     );
