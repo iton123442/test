@@ -600,13 +600,35 @@ class KAGamingNFController extends Controller
                 # END NEW FLOW WIN  
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
+            $gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
+            $credit_game_transextension = ProviderHelper::idGenerate($client_details->connection_name,2);
             if($check_bet_round == 'false'){
                  if(ProviderHelper::checkFundStatus($client_response->fundtransferresponse->status->status)):
-                        $updateGameTransaction = ["win" => 2,'trans_status' => 5];
-                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                        $gameTransactionData = array(
+                            "provider_trans_id" => $provider_trans_id,
+                            "token_id" => $token_id,
+                            "game_id" => $game_code,
+                            "round_id" => $round_id,
+                            "bet_amount" => $bet_amount,
+                            "win" => 5,
+                            "pay_amount" => $pay_amount,
+                            "income" =>  $income,
+                            "entry_id" =>0,
+                        );
+                        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details);
                 else:
-                    $updateGameTransaction = ["win" => 2,'trans_status' => 5];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+                    $gameTransactionData = array(
+                            "provider_trans_id" => $provider_trans_id,
+                            "token_id" => $token_id,
+                            "game_id" => $game_code,
+                            "round_id" => $round_id,
+                            "bet_amount" => $bet_amount,
+                            "win" => 5,
+                            "pay_amount" => $pay_amount,
+                            "income" =>  $income,
+                            "entry_id" =>0,
+                        );
+                        GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details);
                 endif;
             }
             $response = ["status" => "Low Balance", "statusCode" =>  200];
