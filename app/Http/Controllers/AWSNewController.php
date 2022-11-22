@@ -40,7 +40,7 @@ class AWSNewController extends Controller
 {
 
 	public $api_url, $merchant_id, $merchant_key = '';
-	public $provider_db_id = 21;
+	public $provider_db_id = 1020;
 	public $prefix = 'AWS';
 
 	public function __construct()
