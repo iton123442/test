@@ -372,130 +372,124 @@ class AWSNewController extends Controller
 
 			if (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "200") {
-		
-				try {
-					$new_balance = $client_details->balance - $bet_amount_2way;
-					ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
-                    
-                    $gameTransactionData = array(
-                        "provider_trans_id" => $provider_trans_id,
-                        "token_id" => $token_id,
-                        "game_id" => $game_code,
-                        "round_id" => $provider_trans_id,
-                        "bet_amount" => $bet_amount,
-                        "win" => $win_or_lost,
-                        "pay_amount" => $pay_amount,
-                        "income" =>  $income,
-                        "entry_id" =>$method,
-                    );
-                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
-					$response = [
-						"msg" => "success",
-						"code" => 0,
-						"data" => [
-							"currency" => $client_details->default_currency,
-							"amount" => (float) $details->amount,
-							"accountId" => $details->accountId,
-							"txnId" => $details->txnId,
-							"eventTime" => date('Y-m-d H:i:s'),
-							"balance" => floatval(number_format((float) $new_balance, 2, '.', '')),
-							"bonusBalance" => 0
+				$new_balance = $client_details->balance - $bet_amount_2way;
+				ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
+				
+				$gameTransactionData = array(
+					"provider_trans_id" => $provider_trans_id,
+					"token_id" => $token_id,
+					"game_id" => $game_code,
+					"round_id" => $provider_trans_id,
+					"bet_amount" => $bet_amount,
+					"win" => $win_or_lost,
+					"pay_amount" => $pay_amount,
+					"income" =>  $income,
+					"entry_id" =>$method,
+				);
+				GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
+				$response = [
+					"msg" => "success",
+					"code" => 0,
+					"data" => [
+						"currency" => $client_details->default_currency,
+						"amount" => (float) $details->amount,
+						"accountId" => $details->accountId,
+						"txnId" => $details->txnId,
+						"eventTime" => date('Y-m-d H:i:s'),
+						"balance" => floatval(number_format((float) $new_balance, 2, '.', '')),
+						"bonusBalance" => 0
+					]
+				];
+				$gameTransactionEXTData = array(
+					"game_trans_id" => $gamerecord,
+					"provider_trans_id" => $provider_trans_id,
+					"round_id" => $provider_trans_id,
+					"amount" => $bet_amount_2way,
+					"game_transaction_type"=> 1,
+					"provider_request" =>json_encode($details),
+					"mw_response" => json_encode($response),
+					"mw_request" => json_encode($client_response->requestoclient),
+					"client_response" => json_encode($client_response),
+					"general_details" => "SUCCESS",
+					"transaction_detail" => "SUCCESS"
+				);
+				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
+
+				if ($transaction_type == 'credit') {
+					$method = 2;
+					$pay_amount =  $details->winAmount;
+					$win_type = 1;
+					$income = $bet_amount - $pay_amount;
+				} else {
+					$method = 1;
+					$pay_amount = $details->winAmount; // payamount zero
+					$income = $bet_amount - $pay_amount;
+					$win_type = 0;
+				}
+
+				$game_transextension2 = ProviderHelper::idGen();
+				try{
+					$action_payload = [
+						"type" => "custom", #genreral,custom :D # REQUIRED!
+						"custom" => [
+							"game_transaction_ext_id" => $game_transextension2,
+							"client_connection_name" => $client_details->connection_name,
+							"provider" => 'allwayspin',
+							'pay_amount' => $pay_amount,
+							'income' => $income,
+							'win_or_lost' => $win_type,
+							'entry_id' => $method
+						],
+						"provider" => [
+							"provider_request" => $details, #R
+							"provider_trans_id" => $provider_trans_id, #R
+							"provider_round_id" => $provider_trans_id, #R
+							"provider_name" => $game_details->provider_name
+						],
+						"mwapi" => [
+							"roundId" => $gamerecord, #R
+							"type" => 2, #R
+							"game_id" => $game_details->game_id, #R
+							"player_id" => $client_details->player_id, #R
+							"mw_response" => $response, #R
+						],
+						'fundtransferrequest' => [
+							'fundinfo' => [
+								'freespin' => $is_freespin,
+							]
 						]
 					];
-                    $gameTransactionEXTData = array(
-                        "game_trans_id" => $gamerecord,
-                        "provider_trans_id" => $provider_trans_id,
-                        "round_id" => $provider_trans_id,
-                        "amount" => $bet_amount_2way,
-                        "game_transaction_type"=> 1,
-                        "provider_request" =>json_encode($details),
-                        "mw_response" => json_encode($response),
-                        "mw_request" => json_encode($client_response->requestoclient),
-                        "client_response" => json_encode($client_response),
-                        "general_details" => "SUCCESS",
-                        "transaction_detail" => "SUCCESS"
-                    );
-                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
-
-					if ($transaction_type == 'credit') {
-						$method = 2;
-						$pay_amount =  $details->winAmount;
-						$win_type = 1;
-						$income = $bet_amount - $pay_amount;
-					} else {
-						$method = 1;
-						$pay_amount = $details->winAmount; // payamount zero
-						$income = $bet_amount - $pay_amount;
-						$win_type = 0;
+					$client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, abs($win_amount_2way), $game_details->game_code, $game_details->game_name, $gamerecord, 'credit', false, $action_payload);
+				} catch (\Exception $e){
+					$response = [
+						"msg" => "Insufficient balance",
+						"code" => 1201
+					];
+					if (isset($gamerecord)) {
+						$updateGameTransaction = [
+							"win" => 2,
+							"pay_amount" => 0,
+							"income" => 0,
+						];
+						GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
+						$gameTransactionEXTData = array(
+							"game_trans_id" => $gamerecord,
+							"provider_trans_id" => $provider_trans_id,
+							"round_id" => $provider_trans_id,
+							"amount" => $pay_amount,
+							"game_transaction_type"=> 2,
+							"provider_request" =>json_encode($details),
+							"mw_response" => json_encode($response),
+							'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
+							'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
+							'transaction_detail' => "FAILED",
+							'general_details' => "FAILED",
+						);
+						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 					}
-
-					$game_transextension2 = ProviderHelper::idGen();
-                    try{
-                        $action_payload = [
-                            "type" => "custom", #genreral,custom :D # REQUIRED!
-                            "custom" => [
-                                "game_transaction_ext_id" => $game_transextension2,
-                                "client_connection_name" => $client_details->connection_name,
-                                "provider" => 'allwayspin',
-                                'pay_amount' => $pay_amount,
-                                'income' => $income,
-                                'win_or_lost' => $win_type,
-                                'entry_id' => $method
-                            ],
-                            "provider" => [
-                                "provider_request" => $details, #R
-                                "provider_trans_id" => $provider_trans_id, #R
-                                "provider_round_id" => $provider_trans_id, #R
-                                "provider_name" => $game_details->provider_name
-                            ],
-                            "mwapi" => [
-                                "roundId" => $gamerecord, #R
-                                "type" => 2, #R
-                                "game_id" => $game_details->game_id, #R
-                                "player_id" => $client_details->player_id, #R
-                                "mw_response" => $response, #R
-                            ],
-                            'fundtransferrequest' => [
-                                'fundinfo' => [
-                                    'freespin' => $is_freespin,
-                                ]
-                            ]
-                        ];
-                        $client_response2 = ClientRequestHelper::fundTransfer_TG($client_details, abs($win_amount_2way), $game_details->game_code, $game_details->game_name, $gamerecord, 'credit', false, $action_payload);
-                    } catch (\Exception $e){
-                        $response = [
-                            "msg" => "Insufficient balance",
-                            "code" => 1201
-                        ];
-                        if (isset($gamerecord)) {
-                            $updateGameTransaction = [
-                                "win" => 2,
-                                "pay_amount" => 0,
-                                "income" => 0,
-                            ];
-                            GameTransactionMDB::updateGametransaction($updateGameTransaction, $gamerecord, $client_details);
-                            $gameTransactionEXTData = array(
-                                "game_trans_id" => $gamerecord,
-                                "provider_trans_id" => $provider_trans_id,
-                                "round_id" => $provider_trans_id,
-                                "amount" => $pay_amount,
-                                "game_transaction_type"=> 2,
-                                "provider_request" =>json_encode($details),
-                                "mw_response" => json_encode($response),
-                                'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
-                                'client_response' => json_encode($e->getMessage().' '.$e->getLine().' '.$e->getFile()),
-                                'transaction_detail' => "FAILED",
-                                'general_details' => "FAILED",
-                            );
-                            GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
-                        }
-                        AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
-                        return $response;
-
-                    }
-				} catch (\Exception $e) {
-					// return $e->getMessage() . ' ' . $e->getLine() . ' ' . $e->getFile();
+					AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
 					return $response;
+
 				}
 				if (isset($client_response2->fundtransferresponse->status->code)
 					&& $client_response2->fundtransferresponse->status->code == "200") {
