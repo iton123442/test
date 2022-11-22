@@ -523,7 +523,7 @@ class BNGNFController extends Controller
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
-            $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
+            
              
             Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
 
@@ -553,6 +553,7 @@ class BNGNFController extends Controller
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game_transactionid,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
+                $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                 ProviderHelper::_insertOrUpdateCache($client_details->token_id, $balance);
                 $response =array(
@@ -589,6 +590,8 @@ class BNGNFController extends Controller
         }
         elseif(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "402"){
+            $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
+            $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
             $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
             $client_details->balance = $balance;
             $response =array(
@@ -608,10 +611,79 @@ class BNGNFController extends Controller
                 //     "win"=>2,
                 //     "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
                 // );
-                $dataToSave = array(
-                    "win"=>2
+                $gameTransactionData = array(
+                    "provider_trans_id" => $data["uid"],
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $data["args"]["round_id"],
+                    "bet_amount" => $data["args"]["bet"],
+                    "win" => 2,
+                    "pay_amount" =>$data["args"]["win"],
+                    "income" =>$data["args"]["bet"]-$data["args"]["win"],
+                    "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
                 );
-                GameTransactionMDB::updateGametransaction($dataToSave,$game_transactionid,$client_details);
+                GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+                // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
+                $wingametransactionext = array(
+                    "game_trans_id" => $game_transactionid,
+                    "provider_trans_id" => $data["uid"],
+                    "amount" => $data["args"]["win"],
+                    "round_id" => $data["args"]["round_id"],
+                    "game_transaction_type"=>2,
+                    "provider_request" =>json_encode($data),
+                    "mw_response" => json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => 'FAILED',
+                );
+                GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
+                // $dataToUpdate = array(
+                //     "mw_response" => json_encode($response),
+                //     "client_response" => json_encode($client_response),
+                //     "mw_request" => json_encode($client_response->requestoclient),
+                //     "transaction_detail" => 'FAILED',
+                // );
+                // GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
+            }catch(\Exception $e){
+                Helper::saveLog('betGameInsuficient(BNG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
+            }
+            // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->requestoclient,$response,$client_response);
+            return response($response,200)
+                        ->header('Content-Type', 'application/json');
+        }else{
+            $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
+            $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
+            $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
+            $client_details->balance = $balance;
+            $response =array(
+                "uid"=>$data["uid"],
+                "balance" => array(
+                    "value" =>number_format($client_details->balance,2,'.', ''),
+                    "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                ),
+                "error" => array(
+                    "code"=> "FUNDS_EXCEED",
+                    // "code" => "OTHER_EXCEED"
+                )
+            );
+            //$this->_setExtParameter($this->_getExtParameter()+1);
+            try{
+                // $dataToSave = array(
+                //     "win"=>2,
+                //     "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
+                // );
+                $gameTransactionData = array(
+                    "provider_trans_id" => $data["uid"],
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $data["args"]["round_id"],
+                    "bet_amount" => $data["args"]["bet"],
+                    "win" => 2,
+                    "pay_amount" =>$data["args"]["win"],
+                    "income" =>$data["args"]["bet"]-$data["args"]["win"],
+                    "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
+                );
+                GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
                 // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                 $wingametransactionext = array(
                     "game_trans_id" => $game_transactionid,
