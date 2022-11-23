@@ -297,8 +297,8 @@ class AWSNewController extends Controller
 
 
 		// V2
-		$gamerecord = ProviderHelper::idGen();
-		$game_transextension1 = ProviderHelper::idGen();
+		$gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
+		$game_transextension1 = ProviderHelper::idGenerate($client_details->connection_name,2);
 
 
 		AWSHelper::saveLog('AWS singleFundTransfer - findGameExt CHECK', $this->provider_db_id, $data, 'CHECK');
@@ -336,7 +336,7 @@ class AWSNewController extends Controller
 					'provider_name' => $game_details->provider_name
 				];
 				$client_response = ClientRequestHelper::fundTransfer($client_details, abs($bet_amount_2way), $game_details->game_code, $game_details->game_name, $game_transextension1, $gamerecord, 'debit', false, $fund_extra_data);
-				AWSHelper::saveLog('AWS singleFundTransfer response = ' . $gamerecord, $this->provider_db_id, json_encode($client_response), "Hit");
+				// AWSHelper::saveLog('AWS singleFundTransfer response = ' . $gamerecord, $this->provider_db_id, json_encode($client_response), "Hit");
 			} catch (\Exception $e) {
 				$response = ["msg" => "Fund transfer encountered error", "code" => 2205, "data" => []];
 				if (isset($gamerecord)) {
@@ -375,8 +375,6 @@ class AWSNewController extends Controller
 				&& $client_response->fundtransferresponse->status->code == "200") {
 				$new_balance = $client_details->balance - $bet_amount_2way;
 				ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
-				
-				AWSHelper::saveLog('AWS singleFundTransfer BET200 = ' . $gamerecord, $this->provider_db_id, $data, $response);
 				$gameTransactionData = array(
 					"provider_trans_id" => $provider_trans_id,
 					"token_id" => $token_id,
@@ -429,7 +427,7 @@ class AWSNewController extends Controller
 					$win_type = 0;
 				}
 
-				$game_transextension2 = ProviderHelper::idGen();
+				$game_transextension2 = ProviderHelper::idGenerate($client_details->connection_name,2);
 				try{
 					$action_payload = [
 						"type" => "custom", #genreral,custom :D # REQUIRED!
@@ -487,7 +485,7 @@ class AWSNewController extends Controller
 							'transaction_detail' => "FAILED",
 							'general_details' => "FAILED",
 						);
-						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
+						GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension2,$client_details);
 					}
 					AWSHelper::saveLog('AWS singleFundTransfer - FATAL ERROR', $this->provider_db_id, json_encode($response), $e->getMessage() . ' ' . $e->getLine());
 					return $response;
@@ -524,6 +522,7 @@ class AWSNewController extends Controller
                         "transaction_detail" => "SUCCESS"
 					);
 					GameTransactionMDB::createGameTransactionExtV2($gameTransactionCRIDETEXTData,$game_transextension2,$client_details);
+					AWSHelper::saveLog('AWS singleFundTransfer WIN200 = ' . $gamerecord, $this->provider_db_id, $data, $response);
 
 					// $updateTransactionDEBITEXt = array("mw_response" => json_encode($response));
 					// GameTransactionMDB::updateGametransactionEXT($updateTransactionDEBITEXt,$game_transextension1,$client_details);
@@ -551,8 +550,8 @@ class AWSNewController extends Controller
                         'transaction_detail' => "FAILED",
                         'general_details' => "FAILED",
                     );
-                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
-					AWSHelper::saveLog('AWS singleFundTransfer WIN200 = ' . $gamerecord, $this->provider_db_id, $data, $response);
+                    GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension2,$client_details);
+					AWSHelper::saveLog('AWS singleFundTransfer WIN4021 = ' . $gamerecord, $this->provider_db_id, $data, $response);
 
 					# Game Restrict (failed win)
 					# Providerhelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_transextension2, 'FAILED');
@@ -567,8 +566,8 @@ class AWSNewController extends Controller
 					"round_id" => $provider_trans_id,
 					"bet_amount" => $bet_amount,
 					"win" => 2,
-					"pay_amount" => $pay_amount,
-					"income" =>  $income,
+					"pay_amount" => 0,
+					"income" =>  0,
 					"entry_id" =>$method,
 				);
 				GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
@@ -581,7 +580,7 @@ class AWSNewController extends Controller
                     "provider_trans_id" => $provider_trans_id,
                     "round_id" => $provider_trans_id,
                     "amount" => $pay_amount,
-                    "game_transaction_type"=> 2,
+                    "game_transaction_type"=> 1,
                     "provider_request" =>json_encode($details),
                     "mw_response" => json_encode($response),
                     'mw_request' => isset($client_response->requestoclient) ? json_encode($client_response->requestoclient) : 'FAILED',
