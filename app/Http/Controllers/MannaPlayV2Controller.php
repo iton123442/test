@@ -356,7 +356,7 @@ class MannaPlayV2Controller extends Controller
 			            ];
 			            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$json_data["amount"],$game_details->game_code,$game_details->game_name,$bet_transaction->game_trans_id,'credit',false,$action_payload);
 						$gameTransactionEXTData = array(
-                            "game_trans_id" => $$bet_transaction->game_trans_id,
+                            "game_trans_id" => $bet_transaction->game_trans_id,
                             "provider_trans_id" => $json_data["transaction_id"],
                             "round_id" => $json_data["round_id"],
                             "amount" => $json_data["amount"],
