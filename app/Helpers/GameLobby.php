@@ -1792,7 +1792,7 @@ class GameLobby{
             $formatBalance = (int) $balance;
             $decimals = 2;
             // dd($formatBalance);
-            $data = "balance".$formatBalance."callback_url".config('providerlinks.oauth_mw_api.mwurl').'/api/onlyplay'."currency".$client_player_details->default_currency."decimals".$decimals."game_bundle".$game_code."langen"."partner_id".config('providerlinks.onlyplay.partner_id')."token".$token.'user_idTG_'.$client_player_details->player_id; 
+            $data = "balance".$formatBalance."callback_url".config('providerlinks.oauth_mw_api.mwurl').'/api/onlyplay'."currency".$client_player_details->default_currency."decimals".$decimals."game_bundle".$game_code."langen"."partner_id".config('providerlinks.onlyplay.partner_id')."token".$token.'user_idTG_'.$token; 
             $signature = providerHelper::onlyplaySignature($data,config('providerlinks.onlyplay.secret_key'));
             $url = config('providerlinks.onlyplay.api_url');
             $requesttosend = [
@@ -1805,7 +1805,7 @@ class GameLobby{
                 'partner_id' => config('providerlinks.onlyplay.partner_id'),
                 'sign' => $signature,
                 'token' => $token,
-                'user_id' => 'TG_'.$client_player_details->player_id,
+                'user_id' => 'TG_'.$token,
             ];
             
             $client = new Client([
