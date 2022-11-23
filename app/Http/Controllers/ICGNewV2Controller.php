@@ -926,6 +926,46 @@ class ICGNewV2Controller extends Controller
                     ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 }catch(\Exception $e){
+                    $gameTransactionData = array(
+                        "provider_trans_id" => $json["transactionId"],
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $game_details->game_id,
+                        "round_id" => $json["roundId"],
+                        "bet_amount" => round($json["amount"]/100,2),
+                        "pay_amount" =>0,
+                        "income" =>round($json["amount"]/100,2),
+                        "win" => 2,
+                        "entry_id" =>1,
+                    );
+                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+                    $response =array(
+                        "data" => array(
+                            "statusCode"=>2,
+                            "username" => $client_details->username,
+                            "balance" =>$client_details->balance,
+                            "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$client_details->balance),
+                        ),
+                        "error" => array(
+                            "title"=> "Not Enough Balance",
+                            "description"=>"Not Enough Balance"
+                        )
+                    );
+                    $betgametransactionext = array(
+                        "game_trans_id" => $game_transactionid,
+                        "provider_trans_id" => $json["transactionId"],
+                        "round_id" => $json["roundId"],
+                        "amount" => round($json["amount"]/100,2),
+                        "game_transaction_type"=>1,
+                        "provider_request" =>json_encode($json),
+                        "mw_response" => json_encode($response),
+                        "mw_request" => "FAILED",
+                        "general_details" => "FAILED",
+                        "client_response" => "FAILED",
+                        "transaction_detail" => "FAILED",
+                    );
+                    Helper::saveLog('Bet Fundtransfer failed', 12, json_encode($e->getMessage().' '.$e->getLine()), "Failed Fundtransfer Hit!");
+                    GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
+                    return $response;
 
                 }
                 if(isset($client_response->fundtransferresponse->status->code) 
