@@ -487,7 +487,7 @@ class ICGNewV2Controller extends Controller
                 //     "payout_reason" => null,
                 //     "win" => $win,
                 // );
-                $game = GameTransactionMDB::getGameTransactionByRoundId($json["transactionId"],$client_details);
+                $game = GameTransactionMDB::getGameTransactionByRoundId($json["roundId"],$client_details);
                 if($game){
                     $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $json["productId"]);
                     $win_or_lost =round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 0 : 1;
