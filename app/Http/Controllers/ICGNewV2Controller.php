@@ -918,57 +918,32 @@ class ICGNewV2Controller extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 $game_details = Helper::getInfoPlayerGameRound($json["token"]);
-                $gameTransactionData = array(
-                    "provider_trans_id" => $json["transactionId"],
-                    "token_id" => $client_details->token_id,
-                    "game_id" => $game_details->game_id,
-                    "round_id" => 0,
-                    "bet_amount" => round($json["amount"]/100,2),
-                    "win" => 5,
-                    "pay_amount" =>0,
-                    "income" =>0,
-                    "entry_id" =>1,
-                );
-                $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
-                $betgametransactionext = array(
-                    "game_trans_id" => $game_transactionid,
-                    "provider_trans_id" => $json["transactionId"],
-                    "round_id" => 0,
-                    "amount" => round($json["amount"]/100,2),
-                    "game_transaction_type"=>1,
-                    "provider_request" =>json_encode($json),
-                );
-                $betGametransactionExtId = GameTransactionMDB::createGameTransactionExt($betgametransactionext,$client_details);
-                // $game_transaction = Helper::checkGameTransaction($json["transactionId"]);
-                
-                // $json_data = array(
-                //     "transid" => $json["transactionId"],
-                //     "amount" => round($json["amount"]/100,2),
-                //     "roundid" => 0
-                // );
-                // $game = TransactionHelper::getGameTransaction($request->token,0);
-                // if(!$game){
-                //     $gametransactionid=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details); 
-                //     // $game_transaction_id=Helper::createGameTransaction('debit', $json_data, $game_details, $client_details);
-                //     // Helper::saveGame_trans_ext($game_transaction_id,json_encode($json));
-                //     // Helper::saveLog('betGame(ICG)', 12, json_encode($json), $response);
-                // }
-                // else{
-                //     $json_data = array(
-                //         "amount" => round($json["amount"]/100,2),
-                //     );
-                //     $gameupdate = TransactionHelper::updateGameTransaction($game,$json_data,"debit");
-                //     $gametransactionid = $game[0]->game_trans_id;
-                // }
-                // $transactionId=Helper::createICGGameTransactionExt($gametransactionid,$json,null,null,null,1);
-                $fund_extra_data = [
-                    'provider_name' => $game_details->provider_name
-                ];
-                $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+                $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
+                $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
+                try {
+                    $fund_extra_data = [
+                        'provider_name' => $game_details->provider_name
+                    ];
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
+                }catch(\Exception $e){
+
+                }
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance * 100,2);
                     ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    $gameTransactionData = array(
+                        "provider_trans_id" => $json["transactionId"],
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $game_details->game_id,
+                        "round_id" => 0,
+                        "bet_amount" => round($json["amount"]/100,2),
+                        "win" => 5,
+                        "pay_amount" =>0,
+                        "income" =>0,
+                        "entry_id" =>1,
+                    );
+                    GameTransactionMDB::createGametransaction($gameTransactionData,$game_transactionid,$client_details);
                     $response =array(
                         "data" => array(
                             "statusCode"=>0,
@@ -977,10 +952,20 @@ class ICGNewV2Controller extends Controller
                             "hash" => md5($this->changeSecurityCode($client_details->default_currency).$client_details->username."".$balance),
                         ),
                     );
-                    $dataToUpdate = array(
-                        "mw_response" => json_encode($response)
+                    $betgametransactionext = array(
+                        "game_trans_id" => $game_transactionid,
+                        "provider_trans_id" => $json["transactionId"],
+                        "round_id" => 0,
+                        "amount" => round($json["amount"]/100,2),
+                        "game_transaction_type"=>1,
+                        "provider_request" =>json_encode($json),
+                        "mw_response" => json_encode($response),
+                        "mw_request" => json_encode($client_response->requestoclient),
+                        "client_response" => json_encode($client_response),
+                        "general_details" => "SUCCESS",
+                        "transaction_detail" => "SUCCESS"
                     );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details); 
+                    GameTransactionMDB::createGameTransactionExt($betgametransactionext,$betGametransactionExtId,$client_details);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -998,10 +983,32 @@ class ICGNewV2Controller extends Controller
                         )
                     ); 
                     try{
-                        $data = array(
-                            "win" => 2
+                        $gameTransactionData = array(
+                            "provider_trans_id" => $json["transactionId"],
+                            "token_id" => $client_details->token_id,
+                            "game_id" => $game_details->game_id,
+                            "round_id" => 0,
+                            "bet_amount" => round($json["amount"]/100,2),
+                            "win" => 2,
+                            "pay_amount" =>0,
+                            "income" =>0,
+                            "entry_id" =>1,
                         );
-                        GameTransactionMDB::updateGametransaction($data,$game_transactionid, $client_details);
+                        GameTransactionMDB::createGametransaction($gameTransactionData,$game_transactionid,$client_details);
+                        $betgametransactionext = array(
+                            "game_trans_id" => $game_transactionid,
+                            "provider_trans_id" => $json["transactionId"],
+                            "round_id" => 0,
+                            "amount" => round($json["amount"]/100,2),
+                            "game_transaction_type"=>1,
+                            "provider_request" =>json_encode($json),
+                            "mw_response" => json_encode($response),
+                            "mw_request" => json_encode($client_response->requestoclient),
+                            "client_response" => json_encode($client_response),
+                            "general_details" => "FAILED",
+                            "transaction_detail" => "FAILED"
+                        );
+                        GameTransactionMDB::createGameTransactionExt($betgametransactionext,$betGametransactionExtId,$client_details);
                         //Helper::updateICGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
