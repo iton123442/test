@@ -525,7 +525,8 @@ class BNGNFController extends Controller
             );
             
              
-
+            $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
+            Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
@@ -552,8 +553,7 @@ class BNGNFController extends Controller
             $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($data["args"]["win"],2),$game_details->game_code,$game_details->game_name,$game_transactionid,'credit',false,$action_payload);
             if(isset($client_response->fundtransferresponse->status->code) 
             && $client_response->fundtransferresponse->status->code == "200"){
-                $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
-                Helper::saveLog('createGameTransactionExt(BNG)', 12, json_encode($winGametransactionExtId), "");
+                
                 $balance = number_format($client_response->fundtransferresponse->balance,2,'.', '');
                 ProviderHelper::_insertOrUpdateCache($client_details->token_id, $balance);
                 $response =array(
