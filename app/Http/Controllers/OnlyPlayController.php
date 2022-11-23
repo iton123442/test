@@ -24,9 +24,9 @@ class OnlyPlayController extends Controller
     }
 
     public function getBalance(Request $request){
-         // Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()), "ENDPOINTHIT LAUNCH");
+         Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()), "ENDPOINTHIT LAUNCH");
         $user_id = explode('TG_',$request->user_id);
-        $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
+        $get_client_details = ProviderHelper::getClientDetails("token",$user_id[1]);
         // dd($get_client_details);
         $balance = str_replace(".","", $get_client_details->balance);
         $formatBalance = (int) $balance;
@@ -53,7 +53,7 @@ class OnlyPlayController extends Controller
         $data = $request->all();
         Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()), "ENDPOINTHIT BET");
         $user_id = explode('TG_',$request->user_id);
-        $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
+        $get_client_details = ProviderHelper::getClientDetails("token",$user_id[1]);
         $bet_amount = $request->amount/100;
         $gen_game_trans_id = ProviderHelper::idGenerate($get_client_details->connection_name,1);
         $gen_game_extid = ProviderHelper::idGenerate($get_client_details->connection_name,2);
@@ -233,7 +233,7 @@ class OnlyPlayController extends Controller
         $data = $request->all();
         Helper::saveLog('OnlyPlay credit', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
         $user_id = explode('TG_',$request->user_id);
-        $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
+        $get_client_details = ProviderHelper::getClientDetails("token",$user_id[1]);
         $pay_amount = $request->amount/100;
         $balance = str_replace(".","", $get_client_details->balance);
         $formatBalance = (int) $balance;
@@ -401,7 +401,7 @@ class OnlyPlayController extends Controller
         $data = $request->all();
          Helper::saveLog('OnlyPlay', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT ROLLBACK");
         $user_id = explode('TG_',$request->user_id);
-        $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
+        $get_client_details = ProviderHelper::getClientDetails("token",$user_id[1]);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->round_id,'round_id', 1, $get_client_details);
         // $balance = str_replace(".","", $get_client_details->balance);
         // $formatBalance = (int) $balance;
