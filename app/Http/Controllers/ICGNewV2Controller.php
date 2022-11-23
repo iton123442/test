@@ -983,7 +983,7 @@ class ICGNewV2Controller extends Controller
                         "income" =>0,
                         "entry_id" =>1,
                     );
-                    GameTransactionMDB::createGametransaction($gameTransactionData,$game_transactionid,$client_details);
+                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
                     $response =array(
                         "data" => array(
                             "statusCode"=>0,
@@ -1005,7 +1005,7 @@ class ICGNewV2Controller extends Controller
                         "general_details" => "SUCCESS",
                         "transaction_detail" => "SUCCESS"
                     );
-                    GameTransactionMDB::createGameTransactionExt($betgametransactionext,$betGametransactionExtId,$client_details);
+                    GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -1034,7 +1034,7 @@ class ICGNewV2Controller extends Controller
                             "income" =>0,
                             "entry_id" =>1,
                         );
-                        GameTransactionMDB::createGametransaction($gameTransactionData,$game_transactionid,$client_details);
+                        GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
                         $betgametransactionext = array(
                             "game_trans_id" => $game_transactionid,
                             "provider_trans_id" => $json["transactionId"],
@@ -1048,7 +1048,7 @@ class ICGNewV2Controller extends Controller
                             "general_details" => "FAILED",
                             "transaction_detail" => "FAILED"
                         );
-                        GameTransactionMDB::createGameTransactionExt($betgametransactionext,$betGametransactionExtId,$client_details);
+                        GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
                         //Helper::updateICGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                     }catch(\Exception $e){
                         Helper::saveLog('betGameInsuficient(ICG)', 12, json_encode($e->getMessage().' '.$e->getLine()), $client_response->fundtransferresponse->status->message);
