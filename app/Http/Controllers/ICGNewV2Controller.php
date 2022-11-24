@@ -290,7 +290,7 @@ class ICGNewV2Controller extends Controller
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
                     ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
-                    sleep(10);
+                    // sleep(10);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -592,6 +592,7 @@ class ICGNewV2Controller extends Controller
                         );
                         GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                         //Helper::updateICGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);  
+                        sleep(10);
                         return response($response,200)
                             ->header('Content-Type', 'application/json');
                     }
