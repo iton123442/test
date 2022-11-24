@@ -614,7 +614,43 @@ class ICGNewV2Controller extends Controller
                             "provider_trans_id" => $json["transactionId"],
                             "round_id" => $json["roundId"],
                             "amount" => round($json["amount"]/100,2),
-                            "game_transaction_type"=>1,
+                            "game_transaction_type"=>2,
+                            "provider_request" =>json_encode($json),
+                            "mw_response" => json_encode($response),
+                            "mw_request" => json_encode($client_response->requestoclient),
+                            "general_details" => "FAILED",
+                            "client_response" => json_encode($client_response),
+                            "transaction_detail" => "FAILED",
+                        );
+                        GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
+                        $gametransactiondata = array(
+                            "win" => 2,
+                            "pay_amount" => 0,
+                            "income" => $game->bet_amount,
+                        );
+                        GameTransactionMDB::updateGametransaction($gametransactiondata,$game->game_trans_id,$client_details);
+                        return response($response,400)
+                        ->header('Content-Type', 'application/json');
+                    }
+                    else{
+                        $balance = round($client_response->fundtransferresponse->balance * 100,2);
+                        $response =array(
+                            "data" => array(
+                                "statusCode"=>1,
+                                "username" => $client_details->username,
+                                "balance" =>$balance,
+                            ),
+                            "error" => array(
+                                "title"=> "Not Enough Balance",
+                                "description"=>"Not Enough Balance"
+                            )
+                        ); 
+                        $betgametransactionext = array(
+                            "game_trans_id" => $game_transactionid,
+                            "provider_trans_id" => $json["transactionId"],
+                            "round_id" => $json["roundId"],
+                            "amount" => round($json["amount"]/100,2),
+                            "game_transaction_type"=>2,
                             "provider_request" =>json_encode($json),
                             "mw_response" => json_encode($response),
                             "mw_request" => json_encode($client_response->requestoclient),
