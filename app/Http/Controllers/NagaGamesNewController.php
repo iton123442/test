@@ -759,7 +759,7 @@ class NagaGamesController extends Controller{
     public function cancelBet (Request $request){
         $data = json_decode($request->getContent(),TRUE);
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($data), 'Cancel HIT!');
-        $betExt = ProviderHelper::getGeneralDetails(1, $data['data']['betId']);
+        $betExt = ProviderHelper::getGeneralDetailsV2(1, $data['data']['betId']);
         $explodedData = explode("_", $betExt->general_details);
         $client_details = ProviderHelper::getClientDetails('token', $explodedData[0]);
         Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($client_details), $explodedData);
@@ -791,6 +791,7 @@ class NagaGamesController extends Controller{
                 ];
                 return response($response,400)->header('Content-Type', 'application/json');
             }
+            $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
             $amount = round($game->bet_amount,2);
             $updateTransData = [
                 "win" => $win,
@@ -798,7 +799,7 @@ class NagaGamesController extends Controller{
                 "income" => round($game->bet_amount-$amount,2),
                 "entry_id" => $amount == 0 ? 1 : 2,
             ];
-            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
+            GameTransactionMDB::updateGametransactionV2($updateTransData,$game->game_trans_id,$client_details);
             $response =[
                 "data"=> [
                     "betId"=>$roundId,
@@ -814,7 +815,7 @@ class NagaGamesController extends Controller{
                 "game_transaction_type" => 3,
                 "provider_request" => json_encode($data),
             ];
-            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+            GameTransactionMDB::createGameTransactionExtV2($gameExtensionData,$game_trans_ext_id,$client_details);
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
@@ -850,10 +851,18 @@ class NagaGamesController extends Controller{
                     ],
                     "error" => null
                 );
-                $msg = [
-                    "mw_response" => json_encode($response)
+                $createGameTransactionLog = [
+                    "connection_name" => $client_details->connection_name,
+                    "column" =>[
+                        "game_trans_ext_id" => $game_trans_ext_id,
+                        "request" => json_encode($data),
+                        "response" => json_encode($response),
+                        "log_type" => "provider_details",
+                        "transaction_detail" => "Success",
+                        "general_details" => "Success"
+                    ]
                 ];
-                GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
+                ProviderHelper::queTransactionLogs($createGameTransactionLog);
                 Helper::saveLog('NAGAGAMES Cancel', $this->provider_db_id, json_encode($response), 'Cancel HIT!');
                 return response($response,200)->header('Content-Type', 'application/json');
             }
