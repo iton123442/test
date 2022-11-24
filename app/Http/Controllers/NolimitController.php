@@ -233,7 +233,7 @@ class NolimitController extends Controller
                                 "round_id" => $round_id,
                                 "amount" => $bet_amount,
                                 "game_transaction_type"=> 1,
-                                "provider_request" =>json_encode($req),
+                                "provider_request" =>json_encode($request),
                                 "mw_response" => json_encode($response),
                                 "mw_request" => json_encode($client_response->requestoclient),
                                 "client_response" => json_encode($client_response->fundtransferresponse),
