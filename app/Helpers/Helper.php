@@ -263,7 +263,7 @@ class Helper
 		// 						WHERE `player_token` = "'.$player_token.'"');
 		// $client_details = count($query);
 		// return $client_details > 0 ? $query[0] : false;
-		$query = DB::select('SELECT  `game_id` ,`sp`.`sub_provider_id`, `game_code` , `game_name`,`sub_provider_name` as `provider_name`
+		$query = DB::connection('default-read')->select('SELECT  `game_id` ,`sp`.`sub_provider_id`, `game_code` , `game_name`,`sub_provider_name` as `provider_name`
 		FROM `player_game_rounds` `pgr` 
 		INNER JOIN `games` `g` USING ( `game_id` )
 		INNER JOIN `providers` `pr` USING (`provider_id`) 
