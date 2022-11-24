@@ -213,10 +213,9 @@ class ProviderHelper{
 	 */
 	public static function idGenerate($connection_name, $type){
 		$id_type = $type == 1 ? "game_trans_id" : "game_transaction_ext";
-		// $rand = shell_exec('date +%s%N');
-		$rand = 123;
+		$rand = shell_exec('date +%s%N');
         $identifier = (int)$rand + config("generateID.generate_id.".$connection_name.".".$id_type) ;
-        return config("generateID.generate_id.".$connection_name.".".$id_type);
+        return $identifier;
 	}
 
 	// NOTED TOEB REMOVED USE queTransactionLogs instead
