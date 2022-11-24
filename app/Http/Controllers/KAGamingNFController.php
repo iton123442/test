@@ -575,6 +575,7 @@ class KAGamingNFController extends Controller
                     }
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
+                        sleep(20);
                         $gameTransactionEXTData = array(
                             "game_trans_id" => $gamerecord,
                             "provider_trans_id" => $provider_trans_id,
@@ -590,7 +591,6 @@ class KAGamingNFController extends Controller
                         );
                         // $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
                         GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$credit_game_transextension,$client_details);  
-                        sleep(10);
                         return $response;
                     }
                 } catch (\Exception $e) {
