@@ -575,7 +575,7 @@ class KAGamingNFController extends Controller
                     }
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
-                        sleep(20);
+                        // sleep(20);
                         $gameTransactionEXTData = array(
                             "game_trans_id" => $gamerecord,
                             "provider_trans_id" => $provider_trans_id,
