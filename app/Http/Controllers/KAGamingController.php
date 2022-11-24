@@ -104,11 +104,11 @@ class KAGamingController extends Controller
         //     return  $response = ["status" => "failed", "statusCode" =>  3];
         // }
         $data = json_decode($request_body);
-        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->token);
+        // $session_check = ProviderHelper::getClientDetails('token',$data->token);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -140,11 +140,11 @@ class KAGamingController extends Controller
         //     return  $response = ["status" => "failed", "statusCode" =>  3];
         // }
         $data = json_decode($request_body);
-        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetails('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -187,7 +187,7 @@ class KAGamingController extends Controller
         $win_amount = $this->formatAmounts($data->winAmount);
         $payout_reason = 'Game Bets and Win';
 
-        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$data->partnerPlayerId);
         // dd($client_details);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
@@ -247,7 +247,7 @@ class KAGamingController extends Controller
                 "status" => "success",
                 "statusCode" =>  0
               ];
-              ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+              ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
               ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response,$client_response->requestoclient, $client_response, 'SUCCESS', $general_details);
               $game_transextension = KAHelper::createGameTransExtV2($gamerecord,$provider_trans_id, $round_id, $win_amount, 2,$data,$response,$client_response->requestoclient, $client_response, 'SUCCESS', $general_details);
               if($check_bet_round != 'false'){
@@ -326,7 +326,7 @@ class KAGamingController extends Controller
         $rounds_remaining = isset($data->roundsRemaining) ? $data->roundsRemaining : 0;
         $complete = isset($data->complete) ? $data->complete : false;
       
-        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -435,7 +435,7 @@ class KAGamingController extends Controller
                 // ProviderHelper::updateGameTransactionFlowStatus($gamerecord, 2);
                 # NEW FLOW WIN
                 try {
-                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $new_balance = $client_response->fundtransferresponse->balance + abs($win_amount);
                     $response = [
                         "balance" => $this->formatBalance($new_balance),
@@ -562,7 +562,7 @@ class KAGamingController extends Controller
                     // return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
                 }
                 // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
                 # END NEW FLOW WIN  
         }elseif(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "402"){
@@ -624,11 +624,11 @@ class KAGamingController extends Controller
         $provider_trans_id = $data->transactionId;
         $game_code = $data->gameId;
         $complete = isset($data->complete) ? $data->complete : false;
-        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetails('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -712,7 +712,7 @@ class KAGamingController extends Controller
 
          # NEW FLOW WIN
          try {
-            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_details->balance+abs($amount));
+            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_details->balance+abs($amount));
             $new_balance = $client_details->balance+abs($amount);
             $response = [
                 "balance" => $this->formatBalance($new_balance),
@@ -783,7 +783,7 @@ class KAGamingController extends Controller
             return $e->getMessage().' '.$e->getLine().' '.$e->getFile();
         }
         // ProviderHelper::updatecreateGameTransExt($game_transextension, $data, $response, $client_response->requestoclient, $client_response, $response,$general_details);
-        ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
+        ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
         return $response;
         # END NEW FLOW WIN  
     }
@@ -804,11 +804,11 @@ class KAGamingController extends Controller
         $provider_trans_id = $data->transactionId;
         $round_id = $provider_trans_id.'_'.$data->round;
 
-        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetails('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -942,7 +942,7 @@ class KAGamingController extends Controller
         }
         if(isset($client_response->fundtransferresponse->status->code) 
              && $client_response->fundtransferresponse->status->code == "200"){
-            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
             #2 CREDIT OPERATION   
             $general_details['client']['after_balance'] = KAHelper::amountToFloat($client_response->fundtransferresponse->balance);
             $response = [
@@ -1007,11 +1007,11 @@ class KAGamingController extends Controller
         //     return  $response = ["status" => "failed", "statusCode" =>  3];
         // }
         $data = json_decode($request_body);
-        // $session_check = ProviderHelper::getClientDetailsCache('token',$data->sessionId);
+        // $session_check = ProviderHelper::getClientDetails('token',$data->sessionId);
         // if($session_check == 'false'){
         //     return  $response = ["status" => "failed", "statusCode" =>  100];
         // }
-        $client_details = ProviderHelper::getClientDetailsCache('player_id',$data->partnerPlayerId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$data->partnerPlayerId);
         if($client_details == 'false'){
             return  $response = ["status" => "failed", "statusCode" =>  4];
         }
@@ -1042,7 +1042,7 @@ class KAGamingController extends Controller
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
-        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
+        $client_details = ProviderHelper::getClientDetails('token', $request->token);
         if ($client_details == null || $client_details == 'false') {
             $msg = array("status" => "error", "message" => "Token Invalid");
             KAHelper::saveLog('GetPlayerBalance', $this->provider_db_id, json_encode($request->all()), $msg);
@@ -1072,7 +1072,7 @@ class KAGamingController extends Controller
 
     public function getPlayerWalletBalance(Request $request)
     {
-        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
+        $client_details = ProviderHelper::getClientDetails('token', $request->token);
         if ($client_details == 'false') {
             $msg = array("status" => "error", "message" => "Token Invalid");
             KAHelper::saveLog('GetPlayerBalance', $this->provider_db_id, json_encode($request->all()), $msg);
@@ -1138,7 +1138,7 @@ class KAGamingController extends Controller
             return response($msg, 200)->header('Content-Type', 'application/json');
         }
 
-        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
+        $client_details = ProviderHelper::getClientDetails('token', $request->token);
         if ($client_details == 'false') {
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
             TransferWalletHelper::saveLog('TransferWallet TransferOut FAILED', $this->provider_db_id, json_encode($request->all()), $msg);
@@ -1322,7 +1322,7 @@ class KAGamingController extends Controller
             "roundid" => 0,
         );
 
-        $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
+        $client_details = ProviderHelper::getClientDetails('token', $request->token);
         if ($client_details == 'false') {
             $msg = array("status" => "error", "message" => "Invalid Token or Token not found");
             TransferWalletHelper::saveLog('TransferWallet TransferOut FAILED', $this->provider_db_id, json_encode($request->all()), $msg);
