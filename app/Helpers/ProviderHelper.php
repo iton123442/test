@@ -1564,7 +1564,7 @@ class ProviderHelper{
 	}
 
 	public static function _insertOrUpdate($token_id,$balance,$player_id=null){
-		$balance_query = DB::select("SELECT * FROM player_session_tokens WHERE token_id = '".$token_id."'");
+		$balance_query = DB::connection('default-read')->select("SELECT * FROM player_session_tokens WHERE token_id = '".$token_id."'");
 		$data = count($balance_query);
 		if($data > 0){
 			return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
