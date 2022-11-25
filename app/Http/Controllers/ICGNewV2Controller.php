@@ -166,6 +166,7 @@ class ICGNewV2Controller extends Controller
         $json = json_decode($request->getContent(),TRUE);
         if($json["token"]){
             $client_details = ProviderHelper::getClientDetailsCache('token', $json["token"]);
+            Helper::saveLog('Bet Process', 35, json_encode($json), "HIT!");
             if($client_details){
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$json["transactionId"].'_1');
@@ -205,7 +206,6 @@ class ICGNewV2Controller extends Controller
                 $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $json["productId"]);
                 $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
-                Helper::saveLog('Bet Process', 35, json_encode($json), "HIT!");
                 try{
                     $fund_extra_data = [
                         'provider_name' => $game_details->provider_name
