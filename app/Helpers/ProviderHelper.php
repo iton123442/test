@@ -1521,6 +1521,28 @@ class ProviderHelper{
 					"refreshtoken" => false
 				]
 			];
+		}else{
+			$client_details = ProviderHelper::getClientDetails('token', $token);
+			$client = new Client([
+			    'headers' => [ 
+			    	'Content-Type' => 'application/json',
+			    	'Authorization' => 'Bearer '.$client_details->client_access_token
+			    ]
+			]);
+			$datatosend = ["access_token" => $client_details->client_access_token,
+				"hashkey" => md5($client_details->client_api_key.$client_details->client_access_token),
+				"type" => "playerdetailsrequest",
+				"datesent" => Helper::datesent(),
+                "gameid" => "",
+				"clientid" => $client_details->client_id,
+				"playerdetailsrequest" => [
+					"player_username"=>$client_details->username,
+					"client_player_id" => $client_details->client_player_id,
+					"token" => $token,
+					"gamelaunch" => true,
+					"refreshtoken" => false
+				]
+			];
 		}
 		try{	
 			$guzzle_response = $client->post($client_details->player_details_url,
@@ -1542,7 +1564,7 @@ class ProviderHelper{
 	}
 
 	public static function _insertOrUpdate($token_id,$balance,$player_id=null){
-		$balance_query = DB::select("SELECT * FROM player_session_tokens WHERE token_id = '".$token_id."'");
+		$balance_query = DB::connection('default-read')->select("SELECT * FROM player_session_tokens WHERE token_id = '".$token_id."'");
 		$data = count($balance_query);
 		if($data > 0){
 			return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
