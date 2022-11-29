@@ -119,9 +119,7 @@ class NagaGamesController extends Controller{
                 Helper::saveLog('NagaGames BET duplicate_transaction resend', $this->provider_db_id, json_encode($request->all()),  $response);
                 return response($response,400)->header('Content-Type', 'application/json');
             }
-            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'BUY_FREESPIN'
-             ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'WIN_FREESPIN'
-            ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'GAMBLE'){
+            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];
@@ -326,9 +324,7 @@ class NagaGamesController extends Controller{
                 }
             }
             $provider_trans_id = $data['data']['transactionId'];
-            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'BUY_FREESPIN'
-             ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'WIN_FREESPIN'
-            ||isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null &&  $data['data']['betType'] == 'GAMBLE'){
+            if (isset($data['data']['parentBetId']) && $data['data']['parentBetId'] != null){
                 $roundId = $data['data']['parentBetId'];
             }else{
                 $roundId = $data['data']['betId'];

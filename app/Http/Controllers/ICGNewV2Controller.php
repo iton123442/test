@@ -166,6 +166,7 @@ class ICGNewV2Controller extends Controller
         $json = json_decode($request->getContent(),TRUE);
         if($json["token"]){
             $client_details = ProviderHelper::getClientDetailsCache('token', $json["token"]);
+            Helper::saveLog('Bet Process', 35, json_encode($json), "HIT!");
             if($client_details){
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$json["transactionId"].'_1');

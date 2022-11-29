@@ -151,6 +151,9 @@ class GameLobbyController extends Controller
                         }
                         array_push($data,$subproviderdata);
                     }
+                    usort($data, function($a, $b) {
+                        return $b['provider_name'] <=> $a['provider_name'];
+                    });
                     return $data;
                 }
             }
