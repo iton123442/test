@@ -143,7 +143,6 @@ class WazdanNewV2Controller extends Controller
                         'connection_timeout' => 3,
                     ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
-                    Helper::saveLog('Fundtransfer hit!', 57, json_encode($client_response), microtime(true) - $this->startTime);
                 }catch(\Exception $e){
                     Helper::saveLog('responseTime(WazdanFailedBet)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     $msg = array(
@@ -178,9 +177,6 @@ class WazdanNewV2Controller extends Controller
                         "transaction_detail" => "FAILED",
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details); 
-                     $timeEnd = microtime(TRUE);
-                     $timeDiff = $timeEnd - $timeStart;
-                     Helper::saveLog('getStake End (Wazdan)', 57, $data, $timeDiff);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -231,6 +227,8 @@ class WazdanNewV2Controller extends Controller
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
                     // sleep(10);
+                    $timeDiff = microtime(true) - $this->startTime;
+                    Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), $timeDiff * 1000000);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -713,7 +711,8 @@ class WazdanNewV2Controller extends Controller
                     );
                     GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                     //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
-                    Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                    $timeDiff = microtime(true) - $this->startTime;
+                    Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), $timeDiff * 1000000);
                     // sleep(10);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
