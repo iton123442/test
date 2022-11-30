@@ -710,7 +710,7 @@ class WazdanNewV2Controller extends Controller
                     GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                     //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
                     Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
-                    sleep(10);
+                    // sleep(10);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
