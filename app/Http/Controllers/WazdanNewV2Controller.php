@@ -106,7 +106,7 @@ class WazdanNewV2Controller extends Controller
                             )
                         );
                         return response($msg,200)
-                                    ->header('Content-Type', 'application/json');
+                            ->header('Content-Type', 'application/json');
                     }
                     $msg = array(
                         "status" => 0,
@@ -115,7 +115,7 @@ class WazdanNewV2Controller extends Controller
                         ),
                     );
                     return response($msg,200)
-                                    ->header('Content-Type', 'application/json');
+                        ->header('Content-Type', 'application/json');
                 } 
                 $msg = array(
                     "status" =>8,
@@ -124,7 +124,7 @@ class WazdanNewV2Controller extends Controller
                     )
                 );
                 return response($msg,200)
-                                ->header('Content-Type', 'application/json');
+                    ->header('Content-Type', 'application/json');
             }
             $client_details = ProviderHelper::getClientDetailsCache('token', $datadecoded["user"]["token"]);
             if($client_details){
