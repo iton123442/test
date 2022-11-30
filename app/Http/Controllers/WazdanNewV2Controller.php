@@ -587,23 +587,23 @@ class WazdanNewV2Controller extends Controller
                             }  else {
                                 $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
                             }
-                                $createFreeRoundTransaction = array(
-                                    "game_trans_id" => $bet_transaction->game_trans_id,
-                                    'freespin_id' => $getFreespin->freespin_id
+                            $createFreeRoundTransaction = array(
+                                "game_trans_id" => $bet_transaction->game_trans_id,
+                                'freespin_id' => $getFreespin->freespin_id
                             );
                             FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                         }
                         $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
                     } else {
-                    $msg = array(
-                        "status" => 0,
-                        "funds" => array(
-                            "balance" => round($client_details->balance,2)
-                        )
-                    );
-                    Helper::saveLog('refundAlreadyexist(Wazdan)', 33, $data, $msg);
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
+                        $msg = array(
+                            "status" => 0,
+                            "funds" => array(
+                                "balance" => round($client_details->balance,2)
+                            )
+                        );
+                        Helper::saveLog('refundAlreadyexist(Wazdan)', 33, $data, $msg);
+                        return response($msg,200)
+                        ->header('Content-Type', 'application/json');
                     }
                 }
                 $win_or_lost = round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 0 : 1;
