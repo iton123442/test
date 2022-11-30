@@ -228,7 +228,7 @@ class WazdanNewV2Controller extends Controller
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
                     // sleep(10);
                     $timeDiff = microtime(true) - $this->startTime;
-                    Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), $timeDiff * 1000000);
+                    Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), $timeDiff * 1000);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -712,7 +712,7 @@ class WazdanNewV2Controller extends Controller
                     GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                     //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
                     $timeDiff = microtime(true) - $this->startTime;
-                    Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), $timeDiff * 1000000);
+                    Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), $timeDiff * 1000);
                     // sleep(10);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
