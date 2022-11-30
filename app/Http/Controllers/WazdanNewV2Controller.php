@@ -86,8 +86,9 @@ class WazdanNewV2Controller extends Controller
     }
     public function getStake(Request $request){
         $data = $request->getContent();
+        $timeStart = microtime(TRUE);
         $datadecoded = json_decode($data,TRUE);
-        Helper::saveLog('getStake(Wazdan)', 33, $data, "Initialize");
+        Helper::saveLog('getStake process (Wazdan)', 57, $data, $timeStart);
         // dd($datadecoded["user"]["token"]);
         if($datadecoded["user"]["token"]){    
             try{
@@ -177,6 +178,9 @@ class WazdanNewV2Controller extends Controller
                         "transaction_detail" => "FAILED",
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details); 
+                     $timeEnd = microtime(TRUE);
+                     $timeDiff = $timeEnd - $timeStart;
+                     Helper::saveLog('getStake End (Wazdan)', 57, $data, $timeDiff);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
