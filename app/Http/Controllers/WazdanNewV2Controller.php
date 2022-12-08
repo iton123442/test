@@ -86,8 +86,9 @@ class WazdanNewV2Controller extends Controller
     }
     public function getStake(Request $request){
         $data = $request->getContent();
+        $timeStart = microtime(TRUE);
         $datadecoded = json_decode($data,TRUE);
-        Helper::saveLog('getStake(Wazdan)', 33, $data, "Initialize");
+        Helper::saveLog('getStake process (Wazdan)', 57, $data, $timeStart);
         // dd($datadecoded["user"]["token"]);
         if($datadecoded["user"]["token"]){    
             try{
@@ -142,7 +143,6 @@ class WazdanNewV2Controller extends Controller
                         'connection_timeout' => 3,
                     ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($datadecoded["amount"],2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
-                    Helper::saveLog('Fundtransfer hit!', 57, json_encode($client_response), microtime(true) - $this->startTime);
                 }catch(\Exception $e){
                     Helper::saveLog('responseTime(WazdanFailedBet)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
                     $msg = array(
@@ -177,6 +177,7 @@ class WazdanNewV2Controller extends Controller
                         "transaction_detail" => "FAILED",
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details); 
+                    Helper::saveLog('Success bet!', 57, json_encode($client_response), microtime(true) - $this->startTime);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
@@ -586,23 +587,23 @@ class WazdanNewV2Controller extends Controller
                             }  else {
                                 $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
                             }
-                                $createFreeRoundTransaction = array(
-                                    "game_trans_id" => $bet_transaction->game_trans_id,
-                                    'freespin_id' => $getFreespin->freespin_id
+                            $createFreeRoundTransaction = array(
+                                "game_trans_id" => $bet_transaction->game_trans_id,
+                                'freespin_id' => $getFreespin->freespin_id
                             );
                             FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
                         }
                         $game = GameTransactionMDB::getGameTransactionByRoundId($datadecoded["roundId"],$client_details);
                     } else {
-                    $msg = array(
-                        "status" => 0,
-                        "funds" => array(
-                            "balance" => round($client_details->balance,2)
-                        )
-                    );
-                    Helper::saveLog('refundAlreadyexist(Wazdan)', 33, $data, $msg);
-                    return response($msg,200)
-                    ->header('Content-Type', 'application/json');
+                        $msg = array(
+                            "status" => 0,
+                            "funds" => array(
+                                "balance" => round($client_details->balance,2)
+                            )
+                        );
+                        Helper::saveLog('refundAlreadyexist(Wazdan)', 33, $data, $msg);
+                        return response($msg,200)
+                        ->header('Content-Type', 'application/json');
                     }
                 }
                 $win_or_lost = round($datadecoded["amount"],2) == 0 && $game->pay_amount == 0 ? 0 : 1;
@@ -710,6 +711,7 @@ class WazdanNewV2Controller extends Controller
                     GameTransactionMDB::createGameTransactionExtV2($wingametransactionext,$winGametransactionExtId,$client_details);
                     //Helper::updateGameTransactionExt($transactionId,$client_response->requestoclient,$msg,$client_response);
                     Helper::saveLog('responseTime(WAZDANWIN)', 57, json_encode(["starting"=>$this->startTime,"response"=>microtime(true)]), microtime(true) - $this->startTime);
+                    // sleep(10);
                     return response($msg,200)
                         ->header('Content-Type', 'application/json');
                 }
