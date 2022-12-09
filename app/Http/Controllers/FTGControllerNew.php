@@ -158,12 +158,10 @@ class FTGControllerNew extends Controller
 	public function gameBet(Request $request){
 		$header = $request->header('Authorization');
 	    Helper::saveLog('Tidy Authorization Logger BET', $this->provider_db_id, json_encode($request->all()), $header);
-	    // $enc_body = file_get_contents("php://input");
-     	// parse_str($enc_body, $data);
-        // $json_encode = json_encode($data, true);
-        // $data = json_decode($json_encode);
-		
-        $data = json_decode($request->getContent(),TRUE);
+	    $enc_body = file_get_contents("php://input");
+     	parse_str($enc_body, $data);
+        $json_encode = json_encode($data, true);
+        $data = json_decode($json_encode);
 		$game_code = $data->game_id;
 		$token = $data->token;
 		$amount = $data->amount;
@@ -393,11 +391,10 @@ class FTGControllerNew extends Controller
 		$header = $request->header('Authorization');
 		Helper::saveLog('Tidy Authorization Logger WIN', $this->provider_db_id, json_encode($request->all()), $header);
 		//JSON_FORMAT CONVERT
-	    // $enc_body = file_get_contents("php://input");
-        // parse_str($enc_body, $data);
-        // $json_encode = json_encode($data, true);
-        // $data = json_decode($json_encode);
-        $data = json_decode($request->getContent(),TRUE);
+	    $enc_body = file_get_contents("php://input");
+        parse_str($enc_body, $data);
+        $json_encode = json_encode($data, true);
+        $data = json_decode($json_encode);
 		//INITIALIZE DATA
 		$game_code = $data->game_id;
 		$token = $data->token;
