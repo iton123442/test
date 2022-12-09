@@ -169,7 +169,7 @@ class TidyController extends Controller
 		$token = $data['token'];
 		$amount = $data['amount'];
 		$uid = $data['uid'];
-		$bet_id = $this['roundID'].$data['bet_id'];
+		$bet_id = $this->roundID.$data['bet_id'];
 		$request_uuid = $data['request_uuid'];
 		$transaction_uuid = $data['transaction_uuid']; //Provider Transaction ID	_column
 		
