@@ -163,7 +163,7 @@ class TidyController extends Controller
      	// parse_str($enc_body, $data);
         // $json_encode = json_encode($data, true);
         // $data = json_decode($json_encode);
-		$data = json_encode($request);
+        $data = json_decode($request);
 		$game_code = $data->game_id;
 		$token = $data->token;
 		$amount = $data->amount;
@@ -375,8 +375,7 @@ class TidyController extends Controller
         // parse_str($enc_body, $data);
         // $json_encode = json_encode($data, true);
         // $data = json_decode($json_encode);
-        // $data = json_decode($request->getContent(),TRUE);
-		$data = json_encode($request);
+        $data = json_decode($request);
 		//INITIALIZE DATA
 		$game_code = $data->game_id;
 		$token = $data->token;
