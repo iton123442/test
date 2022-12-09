@@ -78,7 +78,7 @@ class ICGNewV2Controller extends Controller
     public function authPlayer(Request $request){
         Helper::saveLog('AuthPlayer(ICG)', 2, json_encode(array("token"=>$request->token)), "test");
         if($request->has("token")){
-            $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
+            $client_details = ProviderHelper::getClientDetails('token', $request->token);
             Helper::saveLog('AuthPlayer(ICG)', 12, json_encode(array("token"=>$request->token)), $client_details);
             if($client_details){
                 $balance = round($client_details->balance*100,2);
@@ -122,7 +122,7 @@ class ICGNewV2Controller extends Controller
     }
     public function playerDetails(Request $request){
         if($request->has("token")){
-            $client_details = ProviderHelper::getClientDetailsCache('token', $request->token);
+            $client_details = ProviderHelper::getClientDetails('token', $request->token);
             Helper::saveLog('PlayerDetails(ICG)', 12, json_encode(array("token"=>$request->all())), $client_details);
             if($client_details){
                 $balance = round($client_details->balance*100,2);
@@ -165,7 +165,7 @@ class ICGNewV2Controller extends Controller
     public function betGame(Request $request){
         $json = json_decode($request->getContent(),TRUE);
         if($json["token"]){
-            $client_details = ProviderHelper::getClientDetailsCache('token', $json["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             Helper::saveLog('Bet Process', 35, json_encode($json), "HIT!");
             if($client_details){
                 try{
@@ -203,7 +203,7 @@ class ICGNewV2Controller extends Controller
                     return response($response,400)
                     ->header('Content-Type', 'application/json');
                 }
-                $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $json["productId"]);
+                $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $json["productId"]);
                 $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
                 $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
                 try{
@@ -290,7 +290,7 @@ class ICGNewV2Controller extends Controller
                         "transaction_detail" => "SUCCESS"
                     );
                     GameTransactionMDB::createGameTransactionExtV2($betgametransactionext,$betGametransactionExtId,$client_details);
-                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     // sleep(10);
                     return response($response,200)
                         ->header('Content-Type', 'application/json');
@@ -351,7 +351,7 @@ class ICGNewV2Controller extends Controller
         $json = json_decode($request->getContent(),TRUE);
         // Helper::saveLog('winGame(ICG)', 2, json_encode($json), "data");
         if($json["token"]){
-            $client_details = ProviderHelper::getClientDetailsCache('token', $json["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             if($client_details){
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$json["transactionId"].'_3');
@@ -415,7 +415,7 @@ class ICGNewV2Controller extends Controller
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
                         $balance = round($client_response->fundtransferresponse->balance,2);
-                        ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         $createGametransaction = array(
                             "win" =>4,
                             "pay_amount" =>round($json["amount"]/100,2),
@@ -475,7 +475,7 @@ class ICGNewV2Controller extends Controller
                 return response($response,400)
                 ->header('Content-Type', 'application/json');
             }
-            $client_details = ProviderHelper::getClientDetailsCache('token', $json["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             if($client_details){
                 //$game_transaction = Helper::checkGameTransaction($json["transactionId"]);
                 // 
@@ -490,7 +490,7 @@ class ICGNewV2Controller extends Controller
                 // );
                 $game = GameTransactionMDB::getGameTransactionByRoundId($json["roundId"],$client_details);
                 if($game){
-                    $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->prefix, $json["productId"]);
+                    $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $json["productId"]);
                     $win_or_lost =round($json["amount"]/100,2) == 0 && $game->pay_amount == 0 ? 0 : 1;
                     $winGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
                     
@@ -569,7 +569,7 @@ class ICGNewV2Controller extends Controller
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
                         $balance = round($client_response->fundtransferresponse->balance * 100,2);
-                        ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         $response =array(
                             "data" => array(
                                 "statusCode"=>0,
@@ -733,7 +733,7 @@ class ICGNewV2Controller extends Controller
                 return response($response,400)
                 ->header('Content-Type', 'application/json');
             }
-            $client_details = ProviderHelper::getClientDetailsCache('token', $json["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             if($client_details){
                 //$game_transaction = Helper::checkGameTransaction($json["transactionId"]);
                 $game = GameTransactionMDB::getGameTransactionByTokenAndRoundId($request->token,0,$client_details);
@@ -812,7 +812,7 @@ class ICGNewV2Controller extends Controller
                     if(isset($client_response->fundtransferresponse->status->code) 
                     && $client_response->fundtransferresponse->status->code == "200"){
                         $balance = round($client_response->fundtransferresponse->balance * 100,2);
-                        ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         $response =array(
                             "data" => array(
                                 "statusCode"=>0,
@@ -938,7 +938,7 @@ class ICGNewV2Controller extends Controller
     public function deposit(Request $request){
         $json = json_decode($request->getContent(),TRUE);
         if($json["token"]){
-            $client_details = ProviderHelper::getClientDetailsCache('token', $json["token"]);
+            $client_details = ProviderHelper::getClientDetails('token', $json["token"]);
             if($client_details){
                 try{
                     ProviderHelper::idenpotencyTable($this->prefix.'_'.$json["transactionId"].'_1');
@@ -1009,7 +1009,7 @@ class ICGNewV2Controller extends Controller
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance * 100,2);
-                    ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     $gameTransactionData = array(
                         "provider_trans_id" => $json["transactionId"],
                         "token_id" => $client_details->token_id,
