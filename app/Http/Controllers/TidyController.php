@@ -172,7 +172,7 @@ class TidyController extends Controller
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; //Provider Transaction ID	_column
 		
-		if ($data->client_id != $this->client_id) {
+		if ($data['client_id'] != $this->client_id) {
 			$errormessage = array(
 				'error_code' 	=> '99-001',
 				'error_msg'  	=> 'invalid_partner',
@@ -220,22 +220,22 @@ class TidyController extends Controller
 			$bet_amount = $amount;
 			$provider_trans_id = $transaction_uuid;
 			$general_details = ["aggregator" => [], "provider" => [], "client" => []];
-			$key_param = json_decode($json_encode, true);
-			if (array_key_exists('reference_transaction_uuid', $key_param)) {
-				$bet_id = $data->reference_transaction_uuid;
-				// $bet_transaction = TidyHelper::findGameTransaction($bet_id, 'transaction_id',1);
-				$bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_id, 'transaction_id',1, $client_details);
-				$client_details->connection_name = $bet_transaction->connection_name;
-				$amount = $bet_transaction->bet_amount + $bet_amount;
-				$game_trans_id = $bet_transaction->game_trans_id;
-				$updateGameTransaction = [
-		            'win' => 5,
-		            'bet_amount' => $amount,
-		            'entry_id' => 1,
-		            'trans_status' => 1
-		        ];
-		        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-			}	
+			// $key_param = json_decode($json_encode, true);
+			// if (array_key_exists('reference_transaction_uuid', $key_param)) {
+			// 	$bet_id = $data->reference_transaction_uuid;
+			// 	// $bet_transaction = TidyHelper::findGameTransaction($bet_id, 'transaction_id',1);
+			// 	$bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_id, 'transaction_id',1, $client_details);
+			// 	$client_details->connection_name = $bet_transaction->connection_name;
+			// 	$amount = $bet_transaction->bet_amount + $bet_amount;
+			// 	$game_trans_id = $bet_transaction->game_trans_id;
+			// 	$updateGameTransaction = [
+		    //         'win' => 5,
+		    //         'bet_amount' => $amount,
+		    //         'entry_id' => 1,
+		    //         'trans_status' => 1
+		    //     ];
+		    //     GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+			// }	
 			try {
 				$fund_extra_data = [
 					'provider_name' => $game_details->provider_name
@@ -377,15 +377,15 @@ class TidyController extends Controller
         $data = json_decode($json_encode);
         $data = json_decode($request);
 		//INITIALIZE DATA
-		$game_code = $data->game_id;
-		$token = $data->token;
-		$amount = $data->amount;
-		$uid = $data->uid;
-		$request_uuid = $data->request_uuid;
-		$transaction_uuid = $data->transaction_uuid; // MW round_id
-		$reference_transaction_uuid = $data->reference_transaction_uuid; //  MW -provider_transaction_id
+		$game_code = $data['game_id'];
+		$token = $data['token'];
+		$amount = $data['amount'];
+		$uid = $data['uid'];
+		$request_uuid = $data['request_uuid'];
+		$transaction_uuid = $data['transaction_uuid']; // MW round_id
+		$reference_transaction_uuid = $data['reference_transaction_uuid']; //  MW -provider_transaction_id
 		//CHECKING TOKEN
-		if ($data->client_id != $this->client_id) {
+		if ($data['client_id'] != $this->client_id) {
 			$errormessage = array(
 				'error_code' 	=> '99-001',
 				'error_msg'  	=> 'invalid_partner',
