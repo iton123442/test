@@ -140,7 +140,22 @@ class ProviderHelper{
 				ProviderHelper::setKey("client_details_token_id_".$query[0]->token_id, $query[0]->player_id.'_'.$query[0]->player_token, self::REDIS_EXPIRATION);
 				return $query[0];
 			}else{
-				return null;
+				$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language` 
+				from (select token_id, player_id, player_token, balance, player_ip_address,status_id from player_session_tokens_backup_with_partition pst '.$where.' '.$filter.') pst 
+				inner join players as p using(player_id) 
+				inner join clients as c using (client_id)
+				inner join client_endpoints as ce using (client_id) 
+				inner join operator as op using (operator_id)');
+				$client_details = count($query);
+				$result = count($query);
+				if($result > 0 ){
+					ProviderHelper::setKey("client_details_player_id_".$query[0]->player_id, json_encode($query[0]), self::REDIS_EXPIRATION);
+					ProviderHelper::setKey("client_details_player_token_".$query[0]->player_token, json_encode($query[0]), self::REDIS_EXPIRATION); 
+					ProviderHelper::setKey("client_details_token_id_".$query[0]->token_id, $query[0]->player_id.'_'.$query[0]->player_token, self::REDIS_EXPIRATION);
+					return $query[0];
+				}else{
+					return null;
+				}
 			}
 		}
 	}
@@ -574,6 +589,16 @@ class ProviderHelper{
 	
 		 $client_details = count($query);
 		 // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
+
+		 if($client_details == 0 ){
+				$query = DB::connection('default-read')->select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language` 
+				from (select token_id, player_id, player_token, balance, player_ip_address,status_id from player_session_tokens_backup_with_partition pst '.$where.' '.$filter.') pst 
+				inner join players as p using(player_id) 
+				inner join clients as c using (client_id)
+				inner join client_endpoints as ce using (client_id) 
+				inner join operator as op using (operator_id)');
+				$client_details = count($query);
+		 }
 		 return $client_details > 0 ? $query[0] : null;
 	}
 
