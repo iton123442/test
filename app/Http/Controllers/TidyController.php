@@ -221,22 +221,22 @@ class TidyController extends Controller
 			$bet_amount = $amount;
 			$provider_trans_id = $transaction_uuid;
 			$general_details = ["aggregator" => [], "provider" => [], "client" => []];
-			$key_param = json_decode($json_encode, true);
-			if (array_key_exists('reference_transaction_uuid', $key_param)) {
-				$bet_id = $data->reference_transaction_uuid;
-				// $bet_transaction = TidyHelper::findGameTransaction($bet_id, 'transaction_id',1);
-				$bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_id, 'transaction_id',1, $client_details);
-				$client_details->connection_name = $bet_transaction->connection_name;
-				$amount = $bet_transaction->bet_amount + $bet_amount;
-				$game_trans_id = $bet_transaction->game_trans_id;
-				$updateGameTransaction = [
-		            'win' => 5,
-		            'bet_amount' => $amount,
-		            'entry_id' => 1,
-		            'trans_status' => 1
-		        ];
-		        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-			}	
+			// $key_param = json_decode($json_encode, true);
+			// if (array_key_exists('reference_transaction_uuid', $key_param)) {
+			// 	$bet_id = $data->reference_transaction_uuid;
+			// 	// $bet_transaction = TidyHelper::findGameTransaction($bet_id, 'transaction_id',1);
+			// 	$bet_transaction = GameTransactionMDB::findGameTransactionDetails($bet_id, 'transaction_id',1, $client_details);
+			// 	$client_details->connection_name = $bet_transaction->connection_name;
+			// 	$amount = $bet_transaction->bet_amount + $bet_amount;
+			// 	$game_trans_id = $bet_transaction->game_trans_id;
+			// 	$updateGameTransaction = [
+		    //         'win' => 5,
+		    //         'bet_amount' => $amount,
+		    //         'entry_id' => 1,
+		    //         'trans_status' => 1
+		    //     ];
+		    //     GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
+			// }	
 			try {
 				$fund_extra_data = [
 					'provider_name' => $game_details->provider_name
