@@ -438,21 +438,25 @@ class BNGNFController extends Controller
         }else{
             $betAmount = round($data["args"]["bet"],2);
         }
-        try{
-            $client_response = ClientRequestHelper::fundTransfer($client_details,$betAmount,$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$body_details);
-        }catch(\Exception $e){
-            $gameTransactionData = array(
+        $gameTransactionData = array(
                 "provider_trans_id" => $data["uid"],
                 "token_id" => $client_details->token_id,
                 "game_id" => $game_details->game_id,
                 "round_id" => $data["args"]["round_id"],
                 "bet_amount" => $data["args"]["bet"],
-                "win" => 2,
+                "win" => 5,
                 "pay_amount" =>$data["args"]["win"],
                 "income" =>$data["args"]["bet"]-$data["args"]["win"],
-                "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
-            );
-            GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+                "entry_id" => $data["args"]["win"] == 0 ? 1 : 2,
+        );
+        GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+        try{
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$betAmount,$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$body_details);
+        }catch(\Exception $e){
+            $updateGameTransaction = [
+                'win' => 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transactionid, $client_details);
             $dataToUpdate = array(
                 "game_trans_id" => $game_transactionid,
                 "provider_trans_id" => $data["uid"],
@@ -490,18 +494,7 @@ class BNGNFController extends Controller
                     "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                 ),
             );
-            $gameTransactionData = array(
-                "provider_trans_id" => $data["uid"],
-                "token_id" => $client_details->token_id,
-                "game_id" => $game_details->game_id,
-                "round_id" => $data["args"]["round_id"],
-                "bet_amount" => $data["args"]["bet"],
-                "win" => 5,
-                "pay_amount" =>$data["args"]["win"],
-                "income" =>$data["args"]["bet"]-$data["args"]["win"],
-                "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
-            );
-            GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+            
             $dataToUpdate = array(
                 "game_trans_id" => $game_transactionid,
                 "round_id" => $data["args"]["round_id"],
@@ -611,18 +604,6 @@ class BNGNFController extends Controller
                 //     "win"=>2,
                 //     "transaction_reason" => "FAILED Due to low balance or Client Server Timeout"
                 // );
-                $gameTransactionData = array(
-                    "provider_trans_id" => $data["uid"],
-                    "token_id" => $client_details->token_id,
-                    "game_id" => $game_details->game_id,
-                    "round_id" => $data["args"]["round_id"],
-                    "bet_amount" => $data["args"]["bet"],
-                    "win" => 2,
-                    "pay_amount" =>$data["args"]["win"],
-                    "income" =>$data["args"]["bet"]-$data["args"]["win"],
-                    "entry_id" =>$data["args"]["win"] == 0 ? 1 : 2,
-                );
-                GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
                 // Helper::updateBNGGameTransactionExt($betGametransactionExtId,$client_response->fundtransferresponse->status->message,$response,'FAILED');
                 $wingametransactionext = array(
                     "game_trans_id" => $game_transactionid,
