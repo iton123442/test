@@ -403,7 +403,19 @@ class BNGNFController extends Controller
         //     }
         // }
         $betStart =  microtime(true);
-        $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
+        $gameTransactionData = array(
+                "provider_trans_id" => $data["uid"],
+                "token_id" => $client_details->token_id,
+                "game_id" => $game_details->game_id,
+                "round_id" => $data["args"]["round_id"],
+                "bet_amount" => $data["args"]["bet"],
+                "win" => 5,
+                "pay_amount" =>$data["args"]["win"],
+                "income" =>$data["args"]["bet"]-$data["args"]["win"],
+                "entry_id" => $data["args"]["win"] == 0 ? 1 : 2,
+        );
+
+        $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
         $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
         $win_or_lost = $data["args"]["win"] == 0 ? 0 : 1;
         $body_details = [
@@ -438,18 +450,6 @@ class BNGNFController extends Controller
         }else{
             $betAmount = round($data["args"]["bet"],2);
         }
-        $gameTransactionData = array(
-                "provider_trans_id" => $data["uid"],
-                "token_id" => $client_details->token_id,
-                "game_id" => $game_details->game_id,
-                "round_id" => $data["args"]["round_id"],
-                "bet_amount" => $data["args"]["bet"],
-                "win" => 5,
-                "pay_amount" =>$data["args"]["win"],
-                "income" =>$data["args"]["bet"]-$data["args"]["win"],
-                "entry_id" => $data["args"]["win"] == 0 ? 1 : 2,
-        );
-        GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
         try{
             $client_response = ClientRequestHelper::fundTransfer($client_details,$betAmount,$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$body_details);
         }catch(\Exception $e){
