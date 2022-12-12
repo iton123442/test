@@ -4,6 +4,7 @@
 return [
     'server_list'=>[
         "default" => [
+            'connection_read'=>'default-read',
             'connection_name'=>'mysql',
             'db_list'=> [
                 'api_Test',//game_trasnaction_ext
@@ -12,6 +13,7 @@ return [
             ]
         ],
         "server1" => [
+            'connection_read'=>'server1-read',
             'connection_name'=>'server1',
             'db_list'=> [
                 'api_Test', //game_trasnaction_ext
@@ -20,6 +22,7 @@ return [
             ]
         ],
         "server2" =>[
+            'connection_read'=>'server2-read',
             'connection_name'=>'server2',
             'db_list'=> [
                 'api_Test_Extension',  //game_trasnaction_ext
@@ -28,6 +31,7 @@ return [
             ]
         ],
         "server3" =>[
+            'connection_read'=>'server3-read',
             'connection_name'=>'server3',
             'db_list'=> [
                 'api_Test_Extension', //game_trasnaction_ext
@@ -36,6 +40,7 @@ return [
             ]
         ],
         "mysql" => [
+            'connection_read'=>'default-read',
             'connection_name'=>'mysql',
             'db_list'=> [
                 'api_Test',//game_trasnaction_ext
@@ -45,6 +50,7 @@ return [
         ],
 
         "server_TW" => [
+            'connection_read'=>'mysql',
             'connection_name'=>'mysql',
             'db_list'=> [
                 'wt_mw_db_staging',//game_trasnaction_ext

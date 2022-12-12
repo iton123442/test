@@ -339,14 +339,14 @@ $app->post('/public/api/sa/PlayerLost','SAGamingController@PlayerLost');
 $app->post('/public/api/sa/PlaceBetCancel','SAGamingController@PlaceBetCancel');
 
 // KAGaming
-$app->post('/public/api/ka/gamelist','KAGamingNFController@index');
-$app->post('/public/api/ka/start','KAGamingNFController@gameStart');
-$app->post('/public/api/ka/end','KAGamingNFController@gameEnd');
-$app->post('/public/api/ka/promo','KAGamingNFController@getPromo');
-$app->post('/public/api/ka/play','KAGamingNFController@checkPlay');
-$app->post('/public/api/ka/credit','KAGamingNFController@gameCredit');
-$app->post('/public/api/ka/balance','KAGamingNFController@playerBalance');
-$app->post('/public/api/ka/revoke','KAGamingNFController@gameRevoke');
+$app->post('/public/api/ka/gamelist','KAGamingController@index');
+$app->post('/public/api/ka/start','KAGamingController@gameStart');
+$app->post('/public/api/ka/end','KAGamingController@gameEnd');
+$app->post('/public/api/ka/promo','KAGamingController@getPromo');
+$app->post('/public/api/ka/play','KAGamingController@checkPlay');
+$app->post('/public/api/ka/credit','KAGamingController@gameCredit');
+$app->post('/public/api/ka/balance','KAGamingController@playerBalance');
+$app->post('/public/api/ka/revoke','KAGamingController@gameRevoke');
 
 
 
