@@ -205,7 +205,18 @@ class ICGNewV2Controller extends Controller
                 }
                 $game_details = ProviderHelper::findGameDetails('game_code', $this->prefix, $json["productId"]);
                 $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
-                $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
+                $gameTransactionData = array(
+                    "provider_trans_id" => $json["transactionId"],
+                    "token_id" => $client_details->token_id,
+                    "game_id" => $game_details->game_id,
+                    "round_id" => $json["roundId"],
+                    "bet_amount" => round($json["amount"]/100,2),
+                    "pay_amount" =>0,
+                    "income" =>round($json["amount"]/100,2),
+                    "win" => 5,
+                    "entry_id" =>1,
+                );
+                $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
                 try{
                     $fund_extra_data = [
                         'provider_name' => $game_details->provider_name
@@ -213,17 +224,9 @@ class ICGNewV2Controller extends Controller
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
                 }catch(\Exception $e){
                     $gameTransactionData = array(
-                        "provider_trans_id" => $json["transactionId"],
-                        "token_id" => $client_details->token_id,
-                        "game_id" => $game_details->game_id,
-                        "round_id" => $json["roundId"],
-                        "bet_amount" => round($json["amount"]/100,2),
-                        "pay_amount" =>0,
-                        "income" =>round($json["amount"]/100,2),
                         "win" => 2,
-                        "entry_id" =>1,
                     );
-                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+                    GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transactionid,$client_details);
                     $response =array(
                         "data" => array(
                             "statusCode"=>2,
@@ -256,18 +259,6 @@ class ICGNewV2Controller extends Controller
                 if(isset($client_response->fundtransferresponse->status->code) 
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance * 100,2);
-                    $gameTransactionData = array(
-                        "provider_trans_id" => $json["transactionId"],
-                        "token_id" => $client_details->token_id,
-                        "game_id" => $game_details->game_id,
-                        "round_id" => $json["roundId"],
-                        "bet_amount" => round($json["amount"]/100,2),
-                        "pay_amount" =>0,
-                        "income" =>round($json["amount"]/100,2),
-                        "win" => 5,
-                        "entry_id" =>1,
-                    );
-                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
                     $response =array(
                         "data" => array(
                             "statusCode"=>0,
@@ -312,17 +303,9 @@ class ICGNewV2Controller extends Controller
                     );
                     try{
                         $gameTransactionData = array(
-                            "provider_trans_id" => $json["transactionId"],
-                            "token_id" => $client_details->token_id,
-                            "game_id" => $game_details->game_id,
-                            "round_id" => $json["roundId"],
-                            "bet_amount" => round($json["amount"]/100,2),
-                            "pay_amount" =>0,
-                            "income" =>round($json["amount"]/100,2),
                             "win" => 2,
-                            "entry_id" =>1,
                         );
-                        GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+                        GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transactionid,$client_details);
                         $betgametransactionext = array(
                             "game_trans_id" => $game_transactionid,
                             "provider_trans_id" => $json["transactionId"],
