@@ -563,6 +563,7 @@ class BGamingController extends Controller
         $isGameExtFailed = GameTransactionMDB::findGameExt($round_id, 1,'round_id', $client_details);
         if($isGameExtFailed != 'false'){ 
             if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == "FAILED" ){
+                Helper::saveLog('Bgaming WIN isGameExtFailed', $this->provider_db_id, json_encode($data), $isGameExtFailed);
                 $response = [
                     "code" => 100,
                     "message" => "Player has not enough funds to process an action ext false.",
