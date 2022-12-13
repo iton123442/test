@@ -559,13 +559,13 @@ class GameTransactionMDB
             $status = self::checkDBConnection($connection);
             if ( ($connection != null) && $status) {
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
-                $details = DB::connection($connection["connection_read"])->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                $details = DB::connection($connection["connection_name"])->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
             }
             if ( !(count($details) > 0) )  {
 
                 if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
                     $connection_default = config("serverlist.server_list.default");
-                    $data = DB::connection($connection_default["connection_read"])->select('select  * from  `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    $data = DB::connection($connection_default["connection_name"])->select('select  * from  `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                     if ( count($data) > 0  ) {
                         $connection_name = "default";
                         $details = $data;
