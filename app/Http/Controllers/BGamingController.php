@@ -554,7 +554,7 @@ class BGamingController extends Controller
         if($bet_transaction == 'false'){
             $response = [
                 "code" => 100,
-                "message" => "Player has not enough funds to process an action.",
+                "message" => "Player has not enough funds to process an action bet false.",
                 "balance" => 0
             ];
             Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
@@ -565,7 +565,7 @@ class BGamingController extends Controller
             if($isGameExtFailed->transaction_detail == '"FAILED"' || $isGameExtFailed->transaction_detail == "FAILED" ){
                 $response = [
                     "code" => 100,
-                    "message" => "Player has not enough funds to process an action.",
+                    "message" => "Player has not enough funds to process an action ext false.",
                     "balance" => 0
                 ];
                 $game_transaction_extension = array(
