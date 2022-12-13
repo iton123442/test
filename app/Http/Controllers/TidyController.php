@@ -172,7 +172,7 @@ class TidyController extends Controller
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; //Provider Transaction ID	_column
 		
-		if ($data['client_id'] != $this->client_id) {
+		if ($data->client_id!= $this->client_id) {
 			$errormessage = array(
 				'error_code' 	=> '99-001',
 				'error_msg'  	=> 'invalid_partner',
