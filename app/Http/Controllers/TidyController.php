@@ -172,7 +172,7 @@ class TidyController extends Controller
 		$request_uuid = $data->request_uuid;
 		$transaction_uuid = $data->transaction_uuid; //Provider Transaction ID	_column
 		
-		if ($data->client_id!= $this->client_id) {
+		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
 				'error_code' 	=> '99-001',
 				'error_msg'  	=> 'invalid_partner',
@@ -377,15 +377,15 @@ class TidyController extends Controller
         $data = json_decode($json_encode);
         $data = json_decode($request);
 		//INITIALIZE DATA
-		$game_code = $data['game_id'];
-		$token = $data['token'];
-		$amount = $data['amount'];
-		$uid = $data['uid'];
-		$request_uuid = $data['request_uuid'];
-		$transaction_uuid = $data['transaction_uuid']; // MW round_id
-		$reference_transaction_uuid = $data['reference_transaction_uuid']; //  MW -provider_transaction_id
+		$game_code = $data->game_id;
+		$token = $data->token;
+		$amount = $data->amount;
+		$uid = $data->uid;
+		$request_uuid = $data->request_uuid;
+		$transaction_uuid = $data->transaction_uuid; // MW round_id
+		$reference_transaction_uuid = $data->reference_transaction_uuid; //  MW -provider_transaction_id
 		//CHECKING TOKEN
-		if ($data['client_id'] != $this->client_id) {
+		if ($data->client_id != $this->client_id) {
 			$errormessage = array(
 				'error_code' 	=> '99-001',
 				'error_msg'  	=> 'invalid_partner',
