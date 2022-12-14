@@ -23,7 +23,7 @@ class GameTransactionMDB
             else{
                 $where =  "WHERE provider_trans_id='{$provider_transaction_id}' limit 1";
             }
-            $game = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             return $game ? true :false;
         }else{
             return false;
@@ -36,7 +36,7 @@ class GameTransactionMDB
             $select = "SELECT game_trans_ext_id,mw_response,round_id,game_trans_id,amount FROM ";
             $db = "{$connection['db_list'][0]}.game_transaction_ext ";
             $where = "where provider_trans_id='{$provider_transaction_id}' limit 1";
-            $game = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
                 return $game[0];
@@ -59,7 +59,7 @@ class GameTransactionMDB
             $select = "SELECT game_trans_ext_id,mw_response,round_id,game_trans_id,amount FROM ";
             $db = "{$connection['db_list'][0]}.game_transaction_ext ";
             $where = "where provider_trans_id='{$provider_transaction_id}' AND game_transaction_type={$entry_type} limit 1";
-            $game = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
                 return $game[0];
@@ -76,7 +76,7 @@ class GameTransactionMDB
             $select = "SELECT sum(amount) as amount FROM ";
             $db = "{$connection['db_list'][0]}.game_transaction_ext gte ";
             $where = "where gte.game_trans_id ='{$game_trans_id}' AND gte.game_transaction_type={$entry_type}";
-            $gameTxExt = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $gameTxExt = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($gameTxExt);
             if ($cnt > 0){
                 return $gameTxExt[0];
@@ -112,7 +112,7 @@ class GameTransactionMDB
             $select = "SELECT IFNULL(sum(amount),0) as win FROM ";
             $db = "{$connection['db_list'][0]}.game_transaction_ext gte ";
             $where = "where gte.game_trans_id ='{$game_trans_id}' AND gte.game_transaction_type={$entry_type}";
-            $gameTxExt = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $gameTxExt = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($gameTxExt);
             if ($cnt > 0){
                 return $gameTxExt[0];
@@ -134,7 +134,7 @@ class GameTransactionMDB
             $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,income FROM ";
             $db = "{$connection['db_list'][1]}.game_transactions g ";
             $where = "WHERE token_id = '{$client_details->token_id}' and round_id = '{$game_round}'";
-            $game = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
                 return $game[0];
@@ -157,7 +157,7 @@ class GameTransactionMDB
             $select = "SELECT entry_id,bet_amount,game_trans_id,pay_amount,win,income FROM ";
             $db = "{$connection['db_list'][1]}.game_transactions g ";
             $where = "WHERE  round_id = '{$game_round}'";
-            $game = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
                 return $game[0];
@@ -181,7 +181,7 @@ class GameTransactionMDB
             $select = "SELECT game_trans_ext_id FROM ";
             $db = "{$connection['db_list'][1]}.game_transaction_ext gt ";
             $where = "WHERE game_trans_id = (select game_trans_id from {$connection['db_list'][1]}.game_transaction_ext gte where general_details = '{$general_details}');";
-            $game = DB::connection($connection["connection_read"])->select($select.$db.$where);
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
             $cnt = count($game);
             if ($cnt > 0){
                 return $game[0];
@@ -421,13 +421,13 @@ class GameTransactionMDB
             $status = self::checkDBConnection($connection);
             if ( ($connection != null) && $status) {
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
-                $details = DB::connection( $connection["connection_read"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                $details = DB::connection( $connection["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
             }
             if ( !(count($details) > 0 )) {
 
                 if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
                     $connection_default = config("serverlist.server_list.default");
-                    $data = DB::connection( $connection_default["connection_read"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection_default['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                    $data = DB::connection( $connection_default["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection_default['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
                     
                     if ( count($data) > 0  ) {
                         $connection_name = "default";
@@ -484,13 +484,13 @@ class GameTransactionMDB
             $status = self::checkDBConnection($connection);
             if ( ($connection != null) && $status) {
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
-                $details = DB::connection( $connection["connection_read"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                $details = DB::connection( $connection["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
             }
             if ( !(count($details) > 0 )) {
 
                 if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
                     $connection_default = config("serverlist.server_list.default");
-                    $data = DB::connection( $connection_default["connection_read"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection_default['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
+                    $data = DB::connection( $connection_default["connection_name"])->select('select game_id,entry_id,bet_amount,game_trans_id,pay_amount,round_id,provider_trans_id,income,win,trans_status from `'.$connection_default['db_list'][1].'`.`game_transactions` gt '.$where.' LIMIT 1');
                     
                     if ( count($data) > 0  ) {
                         $connection_name = "default";
@@ -629,9 +629,9 @@ class GameTransactionMDB
             $connection = self::getAvailableConnection($client_details->connection_name);
             if ($connection != null) {
                 if($type == 'all' || $type == 'allround'){
-                    $details = DB::connection( $connection["connection_read"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                    $details = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                 }else{
-                    $details = DB::connection($connection["connection_read"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                 }
                 $connection_name = $connection["connection_name"];
                 if ( !(count($details) > 0) )  {
@@ -640,9 +640,9 @@ class GameTransactionMDB
                         $connection_default = config("serverlist.server_list.default");
                         if($type == 'all' || $type == 'allround'){
                             // removed limit
-                            $data = DB::connection( $connection_default["connection_read"] )->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                            $data = DB::connection( $connection_default["connection_name"] )->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                         }else{
-                            $data = DB::connection($connection_default["connection_read"])->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                            $data = DB::connection($connection_default["connection_name"])->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                         }
                         if ( count($data) > 0  ) {
                             $connection_name = "default";
@@ -714,7 +714,7 @@ class GameTransactionMDB
             $details = [];
             $connection = self::getAvailableConnection($client_details->connection_name);
             if ($connection != null) {
-                $details = DB::connection( $connection["connection_read"] )->select('select count(game_trans_id) as total from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                $details = DB::connection( $connection["connection_name"] )->select('select count(game_trans_id) as total from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                 $connection_name = $connection["connection_name"];
                 $count = count($details);
                 if ($count > 0) {
@@ -758,9 +758,9 @@ class GameTransactionMDB
             $connection = self::getAvailableConnection($client_details->connection_name);
             if ($connection != null) {
                 if($type == 'all' || $type == 'allround'){
-                    $details = DB::connection( $connection["connection_read"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                    $details = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                 }else{
-                    $details = DB::connection($connection["connection_read"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 2');
+                    $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 2');
                 }
                 $connection_name = $connection["connection_name"];
                 if ( !(count($details) > 0) )  {
@@ -769,9 +769,9 @@ class GameTransactionMDB
                         $connection_default = config("serverlist.server_list.default");
                         if($type == 'all' || $type == 'allround'){
                             // removed limit
-                            $data = DB::connection( $connection_default["connection_read"] )->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                            $data = DB::connection( $connection_default["connection_name"] )->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                         }else{
-                            $data = DB::connection($connection_default["connection_read"])->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 2');
+                            $data = DB::connection($connection_default["connection_name"])->select('select * from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 2');
                         }
                         if ( count($data) > 0  ) {
                             $connection_name = "default";
@@ -851,9 +851,9 @@ class GameTransactionMDB
             $connection = self::getAvailableConnection($client_details->connection_name);
             if ($connection != null) {
                 if($type == 'all' || $type == 'allround'){
-                    $details = DB::connection( $connection["connection_read"] )->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                    $details = DB::connection( $connection["connection_name"] )->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                 }else{
-                    $details = DB::connection($connection["connection_read"])->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id, from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    $details = DB::connection($connection["connection_name"])->select('select sum(amount) as amount, game_trans_id, game_trans_ext_id, from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                 }
                 $connection_name = $connection["connection_name"];
                 if ( !(count($details) > 0) )  {
@@ -862,9 +862,9 @@ class GameTransactionMDB
                         $connection_default = config("serverlist.server_list.default");
                         if($type == 'all' || $type == 'allround'){
                             // removed limit
-                            $data = DB::connection( $connection_default["connection_read"] )->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
+                            $data = DB::connection( $connection_default["connection_name"] )->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . '');
                         }else{
-                            $data = DB::connection($connection_default["connection_read"])->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                            $data = DB::connection($connection_default["connection_name"])->select('select sum(amount) as amount, game_trans_id from `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                         }
                         if ( count($data) > 0  ) {
                             $connection_name = "default";
@@ -930,14 +930,14 @@ class GameTransactionMDB
             $status = self::checkDBConnection($connection);
             if ( ($connection != null) && $status) {
                 $connection = config("serverlist.server_list.".$client_details->connection_name);
-                $details = DB::connection($connection["connection_read"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                $details = DB::connection($connection["connection_name"])->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
             }
             if ( !(count($details) > 0) )  {
                 $connection_list = config("serverlist.server_list");
                 foreach($connection_list as $key => $connection){
                     $status = self::checkDBConnection($connection["connection_name"]);
                     if($status && $connection_name != $connection["connection_name"]){
-                        $data = DB::connection( $connection["connection_read"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                        $data = DB::connection( $connection["connection_name"] )->select('select * from `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
                         if ( count($data) > 0  ) {
                             $connection_name = $key;// key is the client connection_name
                             $details = $data;
@@ -1090,7 +1090,7 @@ class GameTransactionMDB
         
         try {
             $connection = config("serverlist.server_list.".$client_details->connection_name);
-            $details = DB::connection($connection["connection_read"])->select('select  * from  `'.$connection['db_list'][2].'`.`game_transaction_logs` as gte ' . $where);
+            $details = DB::connection($connection["connection_name"])->select('select  * from  `'.$connection['db_list'][2].'`.`game_transaction_logs` as gte ' . $where);
             return count($details)  > 0 ? $details[0] : null;
         } catch (\Exception $e) {
             return null;
