@@ -725,7 +725,7 @@ class BGamingController extends Controller
                 "game_trans_id" => $bet_transaction->game_trans_id,
                 "provider_trans_id" => $transactionId,
                 "round_id" => $round_id,
-                "amount" => $amount,
+                "amount" => $getGameExtWin->amount,
                 "game_transaction_type"=> 3,
                 "provider_request" => json_encode($data),
                 "mw_response" => json_encode($response),
