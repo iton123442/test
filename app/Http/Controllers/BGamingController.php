@@ -730,7 +730,6 @@ class BGamingController extends Controller
                 "provider_request" => json_encode($data),
                 "mw_response" => json_encode($response),
                 "mw_request" => "This transaction has win!!",
-                "mw_response" => "This transaction has win!!",
                 "transaction_detail" => "FAILED"
             );
             $winGametransactionExtId = GameTransactionMDB::createGameTransactionExt($game_transaction_extension,$client_details);
