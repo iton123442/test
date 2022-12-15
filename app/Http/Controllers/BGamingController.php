@@ -700,14 +700,14 @@ class BGamingController extends Controller
         if($bet_transaction == 'false'){
             $response = [
                 "code" => 100,
-                "message" => "Player has not enough funds to process an action.",
+                "message" => "Player has not enough funds to process an action!!.",
                 "balance" => 0
             ];
             Helper::saveLog('Bgaming WIN RESPONSE', $this->provider_db_id, json_encode($data), $response);
             return $response;
         }
         $getGameExtWin = GameTransactionMDB::findGameExt($round_id, 2,'round_id', $client_details);
-        if($getGameExtWin == 'false'){
+        if($getGameExtWin != 'false'){
             $balance = number_format(round($client_details->balance,2),2,'.','');
             $balance = str_replace(".", "", $balance);
             $response = [
