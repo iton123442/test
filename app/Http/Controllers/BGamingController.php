@@ -29,14 +29,14 @@ class BGamingController extends Controller
         // $secret = config('providerlinks.bgaming.AUTH_TOKEN');
         $secret = config("providerlinks.bgaming.".$client_details->operator_id.".AUTH_TOKEN");
 		$signature = hash_hmac('sha256',json_encode($json_data),$secret);
-		if($signature != $request_sign){
-            $response = [
-                "code" =>  403,
-                "message" => "Forbidden",
-                "balance" => '0'
-            ];
-            return response($response,400)->header('Content-Type', 'application/json');
-		}
+		// if($signature != $request_sign){
+  //           $response = [
+  //               "code" =>  403,
+  //               "message" => "Forbidden",
+  //               "balance" => '0'
+  //           ];
+  //           return response($response,400)->header('Content-Type', 'application/json');
+		// }
 
 		if($client_details == 'false'){
             $response = [
