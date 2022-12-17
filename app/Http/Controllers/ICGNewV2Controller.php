@@ -222,7 +222,7 @@ class ICGNewV2Controller extends Controller
                         'provider_name' => $game_details->provider_name
                     ];
                     $client_response = ClientRequestHelper::fundTransfer($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$betGametransactionExtId,$game_transactionid,"debit",false,$fund_extra_data);
-                    sleep(60);
+                    
                 }catch(\Exception $e){
                     $gameTransactionData = array(
                         "win" => 2,
@@ -517,6 +517,7 @@ class ICGNewV2Controller extends Controller
                             ]
                         ];
                         $client_response = ClientRequestHelper::fundTransfer_TG($client_details,round($json["amount"]/100,2),$game_details->game_code,$game_details->game_name,$game->game_trans_id,'credit',false,$action_payload);
+                        sleep(60);
                     }catch(\Exception $e){
                         $createGametransaction = array(
                             "win" => 2,
