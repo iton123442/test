@@ -411,6 +411,19 @@ class AlController extends Controller
           return ['al' => 'OOPS RAINDROPS'];
         }
         if($request->debugtype == 1){
+
+           return [
+              "Work" => "Full Stack Web Developer",
+              "Frameworks" => [
+                 "Laravel", "Lumen", "Vue"
+              ],
+              "Languages" => [
+                 "PHP", "Javascript"
+              ],
+              "Country" => "Philippines",
+              "Email" => "riandraft@gmail.com"
+          ];
+          
           $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
           // ProviderHelper::_insertOrUpdateCache($client_details->token_id, 5000);
           // $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
