@@ -308,6 +308,7 @@ class FundtransferProcessorController extends Controller
                             }
                             elseif($payload->action->custom->provider == 'icg'){
                                 // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                sleep(500);
                                 $updateGameTransaction = [
                                     "win" => $payload->action->custom->win_or_lost,
                                     "pay_amount" => $payload->action->custom->pay_amount,
