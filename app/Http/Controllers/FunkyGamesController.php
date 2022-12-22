@@ -157,7 +157,7 @@ public function CheckBet(Request $req){
 		$provider_trans_id = $req['bet']['refNo'];
 		$token_id = $req['sessionId'];
 		$client_details = ProviderHelper::getClientDetails('token', $token_id);
-		$game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name, 1);
+		// $game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name, 1);
 		$game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name, 2);
 		if($bet_amount > $client_details->balance ){
 			$response = [							                            
@@ -184,6 +184,18 @@ public function CheckBet(Request $req){
             return $response;
         }
 	 	try{ 
+			$gameTransactionData = array(
+				"provider_trans_id" => $provider_trans_id,
+				"token_id" => $client_details->token_id,
+				"game_id" => $game_details->game_id,
+				"round_id" => $round_id,
+				"bet_amount" =>$bet_amount ,
+				"pay_amount" =>0,
+				"income" =>$bet_amount,
+				"win" => 5,
+				"entry_id" =>1,
+			);
+			$game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
 			
  			if($client_details != null ){
 				Helper::saveLog('FunkyG Check CLient Deatails', $this->provider_db_id, json_encode($req->all()),$client_details);
