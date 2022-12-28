@@ -424,7 +424,7 @@ class AlController extends Controller
         // dd($client_details);
 
         $data = ['game_trans_id' => 123, "game_transaction_ext_id" => 456, "data" => ['response' => 123]];
-        dd(ProviderHelper::gameExtLogFile($data)));
+        dd(ProviderHelper::gameExtLogFile($data));
         if(!$request->header('hashen')){
           return ['al' => 'OOPS RAINDROPS'];
         }
