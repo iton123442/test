@@ -12,6 +12,7 @@ use App\Jobs\ResendDebitNotFound;
 use App\Helpers\Helper;
 use App\Helpers\AWSHelper;
 use App\Helpers\DESHelper;
+use Illuminate\Support\Facades\Storage;
 use DB;
 
 // use function GuzzleHttp\json_decode;
@@ -23,6 +24,34 @@ use DB;
 class ProviderHelper{
 
 	const REDIS_EXPIRATION = 1800; // 1800 seconds equ. 30min
+
+
+	/**
+	 * @param string $data
+	 * @return string
+	 */
+	public static function gameExtLogFile($data){
+		try {
+
+			$data = json_encode($data);
+			$day = date('Y-m-d'); //  Day as folder name
+	        if (!Storage::disk('local')->exists($day)) {
+	           Storage::disk('local')->makeDirectory($day);
+	        }
+
+	        $hour = date('Y-m-d h'); // Day and Hour as file name
+	        $absoluteFilePath = $day.'/'.$hour.'.txt';
+
+	        if (!Storage::disk('local')->exists($absoluteFilePath)) {
+	          Storage::disk('local')->put($absoluteFilePath, $data);
+	   	    }else{
+	          Storage::disk('local')->append($absoluteFilePath , $data);
+            }
+            return ['status' => true, 'msg' => 'SUCCESS'];
+		} catch (\Exception $e) {
+			return ['status' => false, 'msg' => $e->getMessage()];
+		}
+	}
 
 	/**
 	 * @param string $key
@@ -1596,7 +1625,12 @@ class ProviderHelper{
 		}
 		else{
 			$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
-			return DB::select("INSERT INTO  player_session_tokenss (token_id,balance, player_token, player_ip_address) VALUEs ('".$token_id."',".$client_details->player_token."','127.0.0.11',".$balance.")");
+			if($client_details == "false"){
+				return DB::select("INSERT INTO  player_session_tokens (token_id,,player_id,player_token, player_ip_address, balance) VALUEs ('".$token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
+			}else{
+				$client_details = ProviderHelper::getClientDetails('token_id', $token_id);
+				return DB::select("INSERT INTO  player_session_tokens (token_id,player_id,player_token, player_ip_address, balance) VALUEs ('".$token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
+			}
 		}
 	}
 	public static function updateTWBalance($player_id,$balance){
