@@ -418,13 +418,13 @@ class AlController extends Controller
         // }
 
 
-        $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
-        // dd($client_details = ProviderHelper::getClientDetails('player_id', 10210));
-        ProviderHelper::_insertOrUpdate('146574', 23456);
-        dd($client_details);
+        // $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
+        // // dd($client_details = ProviderHelper::getClientDetails('player_id', 10210));
+        // ProviderHelper::_insertOrUpdate('146574', 23456);
+        // dd($client_details);
 
-        // $data = ['game_trans_id' => 123, "game_transaction_ext_id" => 456, "data" => ['response' => 123]];
-        // dd(ProviderHelper::gameExtLogFile($data)));
+        $data = ['game_trans_id' => 123, "game_transaction_ext_id" => 456, "data" => ['response' => 123]];
+        dd(ProviderHelper::gameExtLogFile($data)));
         if(!$request->header('hashen')){
           return ['al' => 'OOPS RAINDROPS'];
         }
