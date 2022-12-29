@@ -2187,9 +2187,11 @@ class GameLobby{
             return $url;
         }catch(\Exception $e){
             $error = [
-                'error' => $e->getMessage()
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
             ];
-            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch Err', $provider_id, json_encode($data), json_encode($error));
             return $error;
         }
 
