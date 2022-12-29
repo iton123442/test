@@ -2181,6 +2181,7 @@ class GameLobby{
             ]);
             $res = json_decode($response->getBody(),TRUE);
             $url = $res['data']['launchurl'];
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch0', $provider_id, json_encode($res),json_encode($requesttosend));
             ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch1', $provider_id, json_encode($requesttosend), $url);
             ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch2', $provider_id, json_encode($data), $url);
             return $url;
