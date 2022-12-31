@@ -26,7 +26,7 @@ class SmartsoftGamingNFController extends Controller
     public function ActiveSession(Request $request){
         Helper::saveLog('Smartsoft Active Session', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
         $data = $request->all();
-        $client_details = ProviderHelper::getClientDetailsCache('token',$data['Token']);
+        $client_details = ProviderHelper::getClientDetails('token',$data['Token']);
 
         if($client_details == null){
             $response = [
@@ -60,7 +60,7 @@ class SmartsoftGamingNFController extends Controller
             Helper::saveLog('Smarsoft getbalance', $this->provider_db_id, json_encode($requestHeader), 'ENDPOINT HIT');
            
             try {
-                $client_details = ProviderHelper::getClientDetailsCache('token',$request->header('X-SessionId'));
+                $client_details = ProviderHelper::getClientDetails('token',$request->header('X-SessionId'));
                 $response = [
                        "CurrencyCode" => $client_details->default_currency,
                        "Amount" => (float) $client_details->balance
@@ -79,7 +79,7 @@ class SmartsoftGamingNFController extends Controller
     public function Deposit(Request $request){
          Helper::saveLog('Smartsoft bet', $this->provider_db_id, json_encode($request->all()), 'ENDPOINT HIT');
             $data = $request->all();
-            $client_details = ProviderHelper::getClientDetailsCache('token',$request->header('X-SessionId'));
+            $client_details = ProviderHelper::getClientDetails('token',$request->header('X-SessionId'));
             // dd($client_details->balance);
             $game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name,1);
             $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
@@ -105,7 +105,7 @@ class SmartsoftGamingNFController extends Controller
                 ];
                 return $response;
             }
-            $game_details = ProviderHelper::findGameDetailsCache('game_code', $this->provider_db_id, $game_code);
+            $game_details = ProviderHelper::findGameDetails('game_code', $this->provider_db_id, $game_code);
             try{
                 $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
             }catch(\Exception $e){
@@ -143,7 +143,7 @@ class SmartsoftGamingNFController extends Controller
             }
             Helper::saveLog(' smartsoft after  client_response', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');     
             if (isset($client_response->fundtransferresponse->status->code)) {
-                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 switch ($client_response->fundtransferresponse->status->code) {
                     case '200':
                     $http_status = 200;
@@ -231,7 +231,7 @@ class SmartsoftGamingNFController extends Controller
         Helper::saveLog('Smartsoft credit process', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT");
         $data = $request->all();
         $method = $data['TransactionType'];
-        $client_details = ProviderHelper::getClientDetailsCache('token',$request->header('X-SessionId'));
+        $client_details = ProviderHelper::getClientDetails('token',$request->header('X-SessionId'));
         $game_transaction_id = ProviderHelper::idGenerate($client_details->connection_name,1);
         $game_trans_ext_id = ProviderHelper::idGenerate($client_details->connection_name,2);
         $pay_amount = $data['Amount'];
@@ -415,7 +415,7 @@ class SmartsoftGamingNFController extends Controller
                 $game_details = Game::find($game_code, $this->provider_db_id);
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
-                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $winbBalance);
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance);
                 $response = [
                     "TransactionId" => $provider_trans_id,
                     "Balance" => (float)$winbBalance                                           
@@ -548,7 +548,7 @@ class SmartsoftGamingNFController extends Controller
                 Helper::saveLog('Smartsoft find game_detailss', $this->provider_db_id, json_encode($request->all()),"ENDPOINTHIT WIN");
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $winbBalance = $balance + $pay_amount; 
-                ProviderHelper::_insertOrUpdateCache($client_details->token_id, $winbBalance);
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $winbBalance);
 
                 $response = [
                     "TransactionId" => $provider_trans_id,
@@ -686,7 +686,7 @@ class SmartsoftGamingNFController extends Controller
         $provider_trans_id = $data['CurrentTransactionId'];
         $round_id = $data['TransactionInfo']['RoundId'];
         // $game_code = $data['TransactionInfo']['GameName'];
-        $client_details = ProviderHelper::getClientDetailsCache('token', $request->header('X-SessionId'));
+        $client_details = ProviderHelper::getClientDetails('token', $request->header('X-SessionId'));
         $bet_details = GameTransactionMDB::findGameTransactionDetails($round_id,'round_id', false, $client_details);
         if($data['TransactionInfo']['GameName'] != null){
             $game_details = Game::find($data['TransactionInfo']['GameName'], $this->provider_db_id);
@@ -725,11 +725,11 @@ class SmartsoftGamingNFController extends Controller
                         if($game_trans_type == 1){
                             $type = "credit";
                             $balance = $client_details->balance + $amount;
-                            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $balance); 
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                         }else{
                             $type = "debit";
                             $balance =  $client_details->balance - $amount;
-                            ProviderHelper::_insertOrUpdateCache($client_details->token_id, $balance); 
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
                         }
                         
                         $gameTransactionEXTData = array(
