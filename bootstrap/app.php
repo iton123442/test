@@ -27,6 +27,8 @@ $app->withFacades();
 
 $app->withEloquent();
 
+// class_alias('Illuminate\Support\Facades\Storage', 'Storage');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -48,6 +50,8 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
+
+// $app->singleton('filesystem', function ($app) { return $app->loadComponent('filesystems', 'Illuminate\Filesystem\FilesystemServiceProvider', 'filesystem'); });
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -91,6 +95,8 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(\LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider::class);
 $app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class); 
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(Illuminate\Filesystem\FilesystemServiceProvider::class);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -107,6 +113,8 @@ $app->configure("providerlinks");
 $app->configure("clientcustom");
 $app->configure("serverlist");
 $app->configure("generateid");
+$app->configure('filesystems');
+
 $app->configure('database');
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
     require __DIR__.'/../routes/web.php';
