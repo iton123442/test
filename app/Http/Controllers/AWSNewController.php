@@ -495,6 +495,7 @@ class AWSNewController extends Controller
 				if (isset($client_response2->fundtransferresponse->status->code)
 					&& $client_response2->fundtransferresponse->status->code == "200") {
                     $new_balance = $new_balance + $win_amount_2way;
+               		ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
 					$response = [
 						"msg" => "success",
 						"code" => 0,
