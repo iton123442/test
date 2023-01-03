@@ -374,8 +374,14 @@ class AWSNewController extends Controller
 			if (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "200") {
 				// $new_balance = $client_details->balance - $bet_amount_2way;
-				$new_balance = $client_response->fundtransferresponse->balance;
+				// $new_balance = $client_response->fundtransferresponse->balance;
+				// ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+
+
+				$new_balance = $client_details->balance - $bet_amount_2way;
+				$new_balance = $new_balance + $win_amount_2way;
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+				
 				$gameTransactionData = array(
 					"provider_trans_id" => $provider_trans_id,
 					"token_id" => $token_id,
@@ -494,8 +500,7 @@ class AWSNewController extends Controller
 				}
 				if (isset($client_response2->fundtransferresponse->status->code)
 					&& $client_response2->fundtransferresponse->status->code == "200") {
-                    $new_balance = $new_balance + $win_amount_2way;
-               		ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+                    // $new_balance = $new_balance + $win_amount_2way;
 					$response = [
 						"msg" => "success",
 						"code" => 0,
