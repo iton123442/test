@@ -410,7 +410,7 @@ class AWSNewController extends Controller
 					"mw_response" => json_encode($response),
 					"mw_request" => json_encode($client_response->requestoclient),
 					"client_response" => json_encode($client_response),
-					"general_details" => "SUCCESS",
+					"general_details" => $new_balance.'_'.$client_details->balance,
 					"transaction_detail" => "SUCCESS"
 				);
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
@@ -518,7 +518,7 @@ class AWSNewController extends Controller
                         "mw_response" => json_encode($response),
                         "mw_request" => json_encode($client_response2->requestoclient),
                         "client_response" => json_encode($client_response2),
-                        "general_details" => "SUCCESS",
+                        "general_details" => $new_balance.'_'.$client_details->balance,
                         "transaction_detail" => "SUCCESS"
 					);
 					GameTransactionMDB::createGameTransactionExtV2($gameTransactionCRIDETEXTData,$game_transextension2,$client_details);
