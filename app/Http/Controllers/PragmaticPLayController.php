@@ -56,7 +56,7 @@ class PragmaticPLayController extends Controller
             $country = $client_details->country_code; 
             $balance = $client_details->balance; 
             $userid = "TGaming_".$client_details->player_id;
-            $save_bal = DB::table("player_session_tokens")->where("token_id","=",$client_details->token_id)->update(["balance" => floatval(number_format($balance, 2, '.', ''))]); #val
+            ProviderHelper::_insertOrUpdate($client_details->token_id,$balance,$client_details->player_id);
             $response = array(
                 "userId" => $userid,
                 "currency" => $currency,
@@ -355,6 +355,7 @@ class PragmaticPLayController extends Controller
                     "general_details" =>json_encode("success"),
                 );
                 GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_transextension,$client_details);
+                ProviderHelper::_insertOrUpdate($tokenId,$client_response->fundtransferresponse->balance,$playerId);
                 $save_bal = DB::table("player_session_tokens")->where("token_id","=",$tokenId)->update(["balance" => $client_response->fundtransferresponse->balance]);
                 AWSHelper::saveLog('TPP bet response', $this->provider_id, json_encode($data), "response");
                 return $response;
@@ -554,7 +555,7 @@ class PragmaticPLayController extends Controller
                 "mw_response" =>json_encode($response),
             );
             GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
-            $save_bal = DB::table("player_session_tokens")->where("token_id","=",$token_id)->update(["balance" => $balance]);
+            ProviderHelper::_insertOrUpdate($token_id,$balance,$playerId);
             AWSHelper::saveLog('TPP result response', $this->provider_id, json_encode($data), "response");
             return $response;
 
@@ -670,7 +671,7 @@ class PragmaticPLayController extends Controller
                 "mw_response" =>json_encode($response),
             );
             GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_v2,$client_details);
-            $save_bal = DB::table("player_session_tokens")->where("token_id","=",$token_id)->update(["balance" => $balance]);
+            ProviderHelper::_insertOrUpdate($token_id,$balance,$playerId);
             AWSHelper::saveLog('TPP endRound response', $this->provider_id, json_encode($data), $response);
             return $response;
 
