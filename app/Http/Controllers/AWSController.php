@@ -256,7 +256,7 @@ class AWSController extends Controller
 		&& $client_response->fundtransferresponse->status->code == "200"){
 			$new_balance = $client_details->balance - $bet_amount_2way;
 			$new_balance = $new_balance + $win_amount_2way;
-			ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
+			ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
 			$response = [
 				"msg" => "success",
 				"code" => 0,
@@ -522,7 +522,7 @@ class AWSController extends Controller
 				try {
 					$new_balance = $client_details->balance - $bet_amount_2way;
 					$new_balance = $new_balance + $win_amount_2way;
-					ProviderHelper::_insertOrUpdateCache($client_details->token_id, $new_balance);
+					ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
 
 					$response = [
 						"msg" => "success",
