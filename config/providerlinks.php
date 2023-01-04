@@ -765,7 +765,7 @@ return [
    'funkygames' => [
         'provider_db_id'=> 63,
         'Authentication' => '558b0897-67f3-4b50-8fd0-fbf9503522c5',
-        'User-Agent' =>'tg',
+        'User-Agent' =>'45-tg',
         'api_url' => 'http://trial-gp-api.funkytest.com/',
         'api_report_url' => 'http://trial-gp-api-report.funkytest.com/',
    ],
