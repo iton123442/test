@@ -373,8 +373,15 @@ class AWSNewController extends Controller
 
 			if (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "200") {
+				// $new_balance = $client_details->balance - $bet_amount_2way;
+				// $new_balance = $client_response->fundtransferresponse->balance;
+				// ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+
+
 				$new_balance = $client_details->balance - $bet_amount_2way;
+				$new_balance = $new_balance + $win_amount_2way;
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
+				
 				$gameTransactionData = array(
 					"provider_trans_id" => $provider_trans_id,
 					"token_id" => $token_id,
@@ -410,7 +417,7 @@ class AWSNewController extends Controller
 					"mw_response" => json_encode($response),
 					"mw_request" => json_encode($client_response->requestoclient),
 					"client_response" => json_encode($client_response),
-					"general_details" => "SUCCESS",
+					"general_details" => $client_details->balance.'_'.$new_balance.'_'.$bet_amount_2way.'_'.$client_response->fundtransferresponse->balance,
 					"transaction_detail" => "SUCCESS"
 				);
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
@@ -493,7 +500,7 @@ class AWSNewController extends Controller
 				}
 				if (isset($client_response2->fundtransferresponse->status->code)
 					&& $client_response2->fundtransferresponse->status->code == "200") {
-                    $new_balance = $new_balance + $win_amount_2way;
+                    // $new_balance = $new_balance + $win_amount_2way;
 					$response = [
 						"msg" => "success",
 						"code" => 0,
@@ -518,7 +525,7 @@ class AWSNewController extends Controller
                         "mw_response" => json_encode($response),
                         "mw_request" => json_encode($client_response2->requestoclient),
                         "client_response" => json_encode($client_response2),
-                        "general_details" => "SUCCESS",
+                        "general_details" => $client_details->balance.'_'.$new_balance.'_'.$win_amount_2way,
                         "transaction_detail" => "SUCCESS"
 					);
 					GameTransactionMDB::createGameTransactionExtV2($gameTransactionCRIDETEXTData,$game_transextension2,$client_details);
