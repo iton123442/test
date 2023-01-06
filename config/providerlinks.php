@@ -811,7 +811,7 @@ return [
         'opid'=> 2540
     ],
     'ygg002'=>[
-        'api_url' => 'https://seamless-stage.248ka.com/restless/launchClient.html?',
+        'api_url' => 'https://atpt.stagedc.net/ata/launchClient.html?',
         'Org' => 'TIGERGAMES002',
         'topOrg' => 'TigerGamesGroup',
         'key' => 'yGdqhLKv7E5WUf3ThmW',
