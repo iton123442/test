@@ -2187,15 +2187,18 @@ class GameLobby{
                 'form_params' => $requesttosend,
             ]);
             $res = json_decode($response->getBody(),TRUE);
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch0', $provider_id, json_encode($res),json_encode($requesttosend));
             $url = $res['data']['launchurl'];
             ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch1', $provider_id, json_encode($requesttosend), $url);
             ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch2', $provider_id, json_encode($data), $url);
             return $url;
         }catch(\Exception $e){
             $error = [
-                'error' => $e->getMessage()
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
             ];
-            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch Err', $provider_id, json_encode($data), json_encode($error));
             return $error;
         }
 

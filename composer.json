@@ -25,7 +25,7 @@
         "fzaninotto/faker": "~1.4",
         "phpunit/phpunit": "~5.0",
         "mockery/mockery": "~0.9",
-        "league/flysystem": "1.1"
+        "league/flysystem": "^1.1"
     },
     "autoload": {
         "psr-4": {
