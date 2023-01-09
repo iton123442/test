@@ -1933,7 +1933,14 @@ class GameLobby{
                 $guzzle_response = $client->post($url,['body' => json_encode($paramsToSend)]
                     );
                 $game_luanch_response = json_decode($guzzle_response->getBody()->getContents());
-                    Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $game_luanch_response);
+                // Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $game_luanch_response);
+
+                $responseAndRequest = [
+                    'Authentication' => config('providerlinks.funkygames.Authentication'),
+                    'User-Agent' => config('providerlinks.funkygames.User-Agent'),
+                    "Response" => json_encode($game_luanch_response),
+                ];
+                ProviderHelper::saveLogGameLaunch('FunkyGamesLaunch', config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $responseAndRequest);
                 // dd($game_luanch_response->data->gameUrl);
                 // $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=https://daddy.betrnk.games/provider/FunkyGames";
                 $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=";
