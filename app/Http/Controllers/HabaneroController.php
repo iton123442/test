@@ -23,15 +23,10 @@ class HabaneroController extends Controller
     }
 
     public static function sessionExpire($token){
-		$token = DB::table('player_session_tokens')
-			        ->select("*", DB::raw("NOW() as IMANTO"))
-			    	->where('player_token', $token)
-			    	->first();
-		if($token != null){
-			$check_token = DB::table('player_session_tokens')
-			->selectRaw("TIME_TO_SEC(TIMEDIFF( NOW(), '".$token->created_at."'))/60 as `time`")
-			->first();
-		    if(1440 > $check_token->time) {  // TIMEGAP IN MINUTES!
+        $client_details = ProviderHelper::getClientDetails('token',$token);
+
+        if($client_details == null) {
+		    if(1440 > $client_details->time) {  // TIMEGAP IN MINUTES!
 		        $token = true; // True if Token can still be used!
 		    }else{
 		    	$token = false; // Expired Token
