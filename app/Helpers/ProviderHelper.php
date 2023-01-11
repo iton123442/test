@@ -1624,15 +1624,16 @@ class ProviderHelper{
 			return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
 		}
 		else{
-			$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+			$client_details = ProviderHelper::getClientDetails('token_id', $token_id);
 			if($client_details == "false"){
-				return DB::select("INSERT INTO  player_session_tokens (token_id,,player_id,player_token, player_ip_address, balance) VALUEs ('".$token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
+				return DB::select("INSERT INTO  player_session_tokens (token_id,player_id,player_token, player_ip_address, balance) VALUEs ('".$client_details->token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
 			}else{
-				$client_details = ProviderHelper::getClientDetails('token_id', $token_id);
-				return DB::select("INSERT INTO  player_session_tokens (token_id,player_id,player_token, player_ip_address, balance) VALUEs ('".$token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
+				$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+				return DB::select("INSERT INTO  player_session_tokens (token_id,player_id,player_token, player_ip_address, balance) VALUEs ('".$client_details->token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
 			}
 		}
 	}
+
 	public static function updateTWBalance($player_id,$balance){
 		$balance_query = DB::select("SELECT balance FROM players WHERE player_id = '{$player_id}'");
 		$data = count($balance_query);
