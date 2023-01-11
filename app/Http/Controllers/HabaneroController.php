@@ -24,7 +24,7 @@ class HabaneroController extends Controller
 
     public static function sessionExpire($token){
         $client_details = ProviderHelper::getClientDetails('token',$token);
-
+        Helper::saveLog('HBN sessionExpire ', 24, json_encode($client_details), $token);
         if($client_details == null) {
 		    if(1440 > $client_details->time) {  // TIMEGAP IN MINUTES!
                 Helper::saveLog('HBN sessionExpire ', 24, json_encode($client_details), "Success");
