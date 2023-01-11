@@ -27,11 +27,14 @@ class HabaneroController extends Controller
 
         if($client_details == null) {
 		    if(1440 > $client_details->time) {  // TIMEGAP IN MINUTES!
+                Helper::saveLog('HBN sessionExpire ', 24, json_encode($client_details), "Success");
 		        $token = true; // True if Token can still be used!
 		    }else{
+                Helper::saveLog('HBN sessionExpire ', 24, json_encode($client_details), "time is greater than 1440");
 		    	$token = false; // Expired Token
 		    }
 		}else{
+            Helper::saveLog('HBN sessionExpire', 24, json_encode($client_details), "client details not found");
 			$token = false; // Not Found Token
 		}
 	    return $token;
