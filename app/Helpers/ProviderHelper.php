@@ -12,6 +12,7 @@ use App\Jobs\ResendDebitNotFound;
 use App\Helpers\Helper;
 use App\Helpers\AWSHelper;
 use App\Helpers\DESHelper;
+use Illuminate\Support\Facades\Storage;
 use DB;
 
 // use function GuzzleHttp\json_decode;
@@ -23,6 +24,34 @@ use DB;
 class ProviderHelper{
 
 	const REDIS_EXPIRATION = 1800; // 1800 seconds equ. 30min
+
+
+	/**
+	 * @param string $data
+	 * @return string
+	 */
+	public static function gameExtLogFile($data){
+		try {
+
+			$data = json_encode($data);
+			$day = date('Y-m-d'); //  Day as folder name
+	        if (!Storage::disk('local')->exists($day)) {
+	           Storage::disk('local')->makeDirectory($day);
+	        }
+
+	        $hour = date('Y-m-d h'); // Day and Hour as file name
+	        $absoluteFilePath = $day.'/'.$hour.'.txt';
+
+	        if (!Storage::disk('local')->exists($absoluteFilePath)) {
+	          Storage::disk('local')->put($absoluteFilePath, $data);
+	   	    }else{
+	          Storage::disk('local')->append($absoluteFilePath , $data);
+            }
+            return ['status' => true, 'msg' => 'SUCCESS'];
+		} catch (\Exception $e) {
+			return ['status' => false, 'msg' => $e->getMessage()];
+		}
+	}
 
 	/**
 	 * @param string $key
@@ -580,8 +609,8 @@ class ProviderHelper{
 		// $query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name` from player_session_tokens pst inner join players as p using(player_id) inner join clients as c using (client_id) inner join client_endpoints as ce using (client_id) inner join operator as op using (operator_id) '.$where.' '.$filter.'');
 
 		# New Query
-		$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language` 
-		from (select token_id, player_id, player_token, balance, player_ip_address,status_id from player_session_tokens pst '.$where.' '.$filter.') pst 
+		$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language`,  TIME_TO_SEC(TIMEDIFF( NOW(), `pst`.`created_at`))/60 as `time` 
+		from (select token_id, player_id, player_token, balance, player_ip_address,status_id,created_at from player_session_tokens pst '.$where.' '.$filter.') pst 
 		inner join players as p using(player_id) 
 		inner join clients as c using (client_id)
 		inner join client_endpoints as ce using (client_id) 
@@ -591,8 +620,8 @@ class ProviderHelper{
 		 // Helper::saveLog('GET CLIENT LOG', 999, json_encode(DB::getQueryLog()), "TIME GET CLIENT");
 
 		 if($client_details == 0 ){
-				$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language` 
-				from (select token_id, player_id, player_token, balance, player_ip_address,status_id from player_session_tokens_backup_with_partition pst '.$where.' '.$filter.') pst 
+				$query = DB::select('select `p`.`client_id`,`c`.`country_code`, `p`.`player_id`, `p`.`email`, `p`.`client_player_id`,`p`.`language`,`p`.`balance` as `tw_balance`, `p`.`currency`, `p`.`test_player`, `p`.`username`,`p`.`created_at`,`pst`.`token_id`,`pst`.`player_token`,`pst`.`player_ip_address`,`pst`.`balance`,`c`.`client_url`,`c`.`default_currency`,`c`.`wallet_type`,`pst`.`status_id`,`p`.`display_name`,`op`.`client_api_key`,`op`.`client_code`,`op`.`client_access_token`,`op`.`operator_id`,`ce`.`player_details_url`,`ce`.`fund_transfer_url`,`ce`.`transaction_checker_url`,`p`.`created_at`, `c`.`connection_name`, `c`.`default_language`,  TIME_TO_SEC(TIMEDIFF( NOW(), `pst`.`created_at`))/60 as `time`
+				from (select token_id, player_id, player_token, balance, player_ip_address,status_id,created_at from player_session_tokens_backup_with_partition pst '.$where.' '.$filter.') pst 
 				inner join players as p using(player_id) 
 				inner join clients as c using (client_id)
 				inner join client_endpoints as ce using (client_id) 
@@ -1595,10 +1624,16 @@ class ProviderHelper{
 			return DB::select("UPDATE player_session_tokens SET balance=".$balance." WHERE token_id ='".$token_id."'");
 		}
 		else{
-			$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
-			return DB::select("INSERT INTO  player_session_tokenss (token_id,balance, player_token, player_ip_address) VALUEs ('".$token_id."',".$client_details->player_token."','127.0.0.11',".$balance.")");
+			$client_details = ProviderHelper::getClientDetails('token_id', $token_id);
+			if($client_details == "false"){
+				return DB::select("INSERT INTO  player_session_tokens (token_id,player_id,player_token, player_ip_address, balance) VALUEs ('".$client_details->token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
+			}else{
+				$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+				return DB::select("INSERT INTO  player_session_tokens (token_id,player_id,player_token, player_ip_address, balance) VALUEs ('".$client_details->token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
+			}
 		}
 	}
+
 	public static function updateTWBalance($player_id,$balance){
 		$balance_query = DB::select("SELECT balance FROM players WHERE player_id = '{$player_id}'");
 		$data = count($balance_query);

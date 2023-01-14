@@ -124,7 +124,7 @@ class JustPlayController extends Controller
                         ];
                         break;
                     case "402":
-                    $http_status = 200;
+                    $http_status = 402;
                     ProviderHelper::updateGameTransactionStatus($game_transaction_id, 2, 99);
                         $error_response = array(
                             'done' =>0,
@@ -183,7 +183,6 @@ class JustPlayController extends Controller
                 "provider_response" => $win_response,
                 "game_trans_ext_id" => $game_trans_ext_id_win,
                 "game_transaction_id" => $game_transaction_id
-
             ];
              Helper::saveLog("Justplay after body details", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT");
              $createGameTransactionLog = [
