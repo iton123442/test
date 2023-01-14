@@ -577,7 +577,7 @@ return [
         'VIVO_URL' => 'https://games.vivogaming.com/',
         'BETSOFT_URL' => 'https://2vivo.com/FlashRunGame/RunRngGame.aspx',
         'SPINOMENAL_URL' => 'https://www.2vivo.com/flashRunGame/RunSPNRngGame.aspx',
-        'TOMHORN_URL' => 'https:///www.2vivo.com/FlashRunGame/Prod/RunTomHornGame.aspx',
+        'TOMHORN_URL' => 'https://www.2vivo.com/FlashRunGame/Prod/RunTomHornGame.aspx',
         'NUCLEUS_URL' => 'https://2vivo.com/FlashRunGame/set2/RunNucGame.aspx',
         'PLATIPUS_URL' => 'https://www.2vivo.com/flashrungame/set2/RunPlatipusGame.aspx',
         'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
