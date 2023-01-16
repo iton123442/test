@@ -577,7 +577,7 @@ return [
         'VIVO_URL' => 'https://games.vivogaming.com/',
         'BETSOFT_URL' => 'https://2vivo.com/FlashRunGame/RunRngGame.aspx',
         'SPINOMENAL_URL' => 'https://www.2vivo.com/flashRunGame/RunSPNRngGame.aspx',
-        'TOMHORN_URL' => 'https:///www.2vivo.com/FlashRunGame/Prod/RunTomHornGame.aspx',
+        'TOMHORN_URL' => 'https://www.2vivo.com/FlashRunGame/Prod/RunTomHornGame.aspx',
         'NUCLEUS_URL' => 'https://2vivo.com/FlashRunGame/set2/RunNucGame.aspx',
         'PLATIPUS_URL' => 'https://www.2vivo.com/flashrungame/set2/RunPlatipusGame.aspx',
         'LEAP_URL' => 'https://www.2vivo.com/flashrungame/RunGenericGame.aspx',
@@ -765,7 +765,7 @@ return [
    'funkygames' => [
         'provider_db_id'=> 63,
         'Authentication' => '558b0897-67f3-4b50-8fd0-fbf9503522c5',
-        'User-Agent' =>'tg',
+        'User-Agent' =>'45-tg',
         'api_url' => 'http://trial-gp-api.funkytest.com/',
         'api_report_url' => 'http://trial-gp-api-report.funkytest.com/',
    ],
@@ -811,7 +811,7 @@ return [
         'opid'=> 2540
     ],
     'ygg002'=>[
-        'api_url' => 'https://seamless-stage.248ka.com/restless/launchClient.html?',
+        'api_url' => 'https://atp.stagedc.net/ata/launchClient.html?',
         'Org' => 'TIGERGAMES002',
         'topOrg' => 'TigerGamesGroup',
         'key' => 'yGdqhLKv7E5WUf3ThmW',

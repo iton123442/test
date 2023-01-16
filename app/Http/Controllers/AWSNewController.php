@@ -396,7 +396,13 @@ class AWSNewController extends Controller
 
 			if (isset($client_response->fundtransferresponse->status->code)
 				&& $client_response->fundtransferresponse->status->code == "200") {
+				
+				// NEW FLOW
+				// $new_balance = $client_details->balance - $bet_amount_2way;
+				
+				// PRODUCTION SETUP FOR BALANCE
 				$new_balance = $client_details->balance - $bet_amount_2way;
+				$new_balance = $new_balance + $win_amount_2way;
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
 				$response = [
 					"msg" => "success",
@@ -424,6 +430,7 @@ class AWSNewController extends Controller
 					"general_details" => "SUCCESS",
 					"transaction_detail" => "SUCCESS"
 				);
+				//"general_details" => $client_details->balance.'_'.$new_balance.'_'.$bet_amount_2way.'_'.$client_response->fundtransferresponse->balance,
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
 
 				$game_transextension2 = ProviderHelper::idGenerate($client_details->connection_name,2);
@@ -492,7 +499,7 @@ class AWSNewController extends Controller
 				}
 				if (isset($client_response2->fundtransferresponse->status->code)
 					&& $client_response2->fundtransferresponse->status->code == "200") {
-                    $new_balance = $new_balance + $win_amount_2way;
+                    // $new_balance = $new_balance + $win_amount_2way;
 					$response = [
 						"msg" => "success",
 						"code" => 0,
@@ -520,6 +527,7 @@ class AWSNewController extends Controller
                         "general_details" => "SUCCESS",
                         "transaction_detail" => "SUCCESS"
 					);
+					// "general_details" => $client_details->balance.'_'.$new_balance.'_'.$win_amount_2way,
 					GameTransactionMDB::createGameTransactionExtV2($gameTransactionCRIDETEXTData,$game_transextension2,$client_details);
 					AWSHelper::saveLog('AWS singleFundTransfer WIN200 = ' . $gamerecord, $this->provider_db_id, $data, $response);
 

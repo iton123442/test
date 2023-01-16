@@ -1049,7 +1049,7 @@ class GameLobby{
                     $response_bag["gameluanch_url"] = $gameluanch_url;
                     $response_bag["get_url"] = $get_url;
                     // return $response_bag;
-                    ProviderHelper::saveLogGameLaunch('GoldenF get_url', $provider_id, json_encode($get_url), $data);
+                    ProviderHelper::saveLogGameLaunch('GoldenF get_url', $provider_id, json_encode($get_url),$gameluanch_url);
                     if(isset($get_url->data->action_result) && $get_url->data->action_result == 'Success'){
                         // TransferWalletHelper::savePLayerGameRound($data['game_code'],$data['token'],$data['game_provider']); // Save Player Round
                         return $get_url->data->game_url;
@@ -1933,7 +1933,14 @@ class GameLobby{
                 $guzzle_response = $client->post($url,['body' => json_encode($paramsToSend)]
                     );
                 $game_luanch_response = json_decode($guzzle_response->getBody()->getContents());
-                    Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $game_luanch_response);
+                // Helper::saveLog('funky games launch',config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $game_luanch_response);
+
+                $responseAndRequest = [
+                    'Authentication' => config('providerlinks.funkygames.Authentication'),
+                    'User-Agent' => config('providerlinks.funkygames.User-Agent'),
+                    "Response" => json_encode($game_luanch_response),
+                ];
+                ProviderHelper::saveLogGameLaunch('FunkyGamesLaunch', config('providerlinks.funkygames.provider_db_id'), json_encode($paramsToSend), $responseAndRequest);
                 // dd($game_luanch_response->data->gameUrl);
                 // $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=https://daddy.betrnk.games/provider/FunkyGames";
                 $gameUrl = $game_luanch_response->data->gameUrl."?token=".$game_luanch_response->data->token."&redirectUrl=";
@@ -2180,15 +2187,18 @@ class GameLobby{
                 'form_params' => $requesttosend,
             ]);
             $res = json_decode($response->getBody(),TRUE);
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch0', $provider_id, json_encode($res),json_encode($requesttosend));
             $url = $res['data']['launchurl'];
             ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch1', $provider_id, json_encode($requesttosend), $url);
             ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch2', $provider_id, json_encode($data), $url);
             return $url;
         }catch(\Exception $e){
             $error = [
-                'error' => $e->getMessage()
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
             ];
-            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch', $provider_id, json_encode($data), $e->getMessage());
+            ProviderHelper::saveLogGameLaunch('YGG 002 gamelaunch Err', $provider_id, json_encode($data), json_encode($error));
             return $error;
         }
 

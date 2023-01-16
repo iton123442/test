@@ -404,12 +404,35 @@ class AlController extends Controller
         // return json_encode($request->server);
         // dd($request->headers->get('Content-Type'));
 
+        // $day = date('Y-m-d'); //  Day as folder name
+        // if (!Storage::disk('local')->exists($day)) {
+        //    Storage::disk('local')->makeDirectory($day);
+        // }
+
+        // $hour = date('Y-m-d h'); // Day and Hour as file name
+        // $absoluteFilePath = $day.'/'.$hour.'.txt';
+        // if (!Storage::disk('local')->exists($absoluteFilePath)) {
+        //   Storage::disk('local')->put($absoluteFilePath, rand(10,100));
+        // }else{
+        //   Storage::disk('local')->append($absoluteFilePath , rand(10,100));
+        // }
+
+
+        // $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
+        // // dd($client_details = ProviderHelper::getClientDetails('player_id', 10210));
+        // ProviderHelper::_insertOrUpdate('146574', 23456);
+        // dd($client_details);
+
+        $data = ['game_trans_id' => 123, "game_transaction_ext_id" => 456, "data" => ['response' => 123]];
+        dd(ProviderHelper::gameExtLogFile($data));
         if(!$request->header('hashen')){
           return ['al' => 'OOPS RAINDROPS'];
         }
         if(!Hash::check($request->header('hashen'),$this->hashen)){
           return ['al' => 'OOPS RAINDROPS'];
         }
+
+
         if($request->debugtype == 1){
 
           $client_details = Providerhelper::getClientDetailsCache($request->type,  $request->identifier);
