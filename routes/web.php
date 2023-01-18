@@ -425,6 +425,7 @@ $app->post('/public/tidy/api/transaction/bet', 'TidyController@gameBet');
 $app->post('/public/tidy/api/transaction/rollback', 'TidyController@gameRollback');
 $app->post('/public/tidy/api/transaction/win', 'TidyController@gameWin');
 $app->post('/public/tidy/api/user/balance', 'TidyController@checkBalance');
+$app->get('/public/tidy/api/wagers/outside/list', 'TidyController@checkBet');
 
 //TGG
 $app->post('/public/api/tgg/gamelist', 'TGGController@getGamelist'); // launch game 

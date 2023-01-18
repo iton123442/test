@@ -240,6 +240,7 @@ return [
         'url_lunch' => 'https://api.laksjd.net/api/game/outside/link',
         // 'API_URL' => 'http://staging-v1-api.tidy.zone',
         'API_URL' => 'https://api.laksjd.net',
+        'api_url_bet_history' => 'https://api.laksjd.net/api/wagers/outside/list',
         'client_id' => '8440a5b6',
         'currency' => [
             'USD' => 'af4f3164',
