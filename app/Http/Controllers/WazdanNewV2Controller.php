@@ -781,5 +781,18 @@ class WazdanNewV2Controller extends Controller
             return response($msg,200)->header('Content-Type', 'application/json');
         }
     }
+    public function getTransactionHistory(Request $request){
+        $data = $request->getContent();
+        $datadecoded = json_decode($data,TRUE);
+        $operator = config('providerlinks.wazdan.operator');
+        $license = config('providerlinks.wazdan.license');
+        $paramToSend = array(
+            "operator" => "tigergames",
+            "license" => "curacao",
+            "round_id" => $datadecoded['round_id']
+        );
+        $signature = hash_hmac("sha256",json_encode($paramToSend),$key)
+        dd($signature);
+    }
    
 }
