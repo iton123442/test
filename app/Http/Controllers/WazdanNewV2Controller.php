@@ -781,5 +781,11 @@ class WazdanNewV2Controller extends Controller
             return response($msg,200)->header('Content-Type', 'application/json');
         }
     }
-   
+    public function getTransactionHistory(Request $request){
+        $data = $request->getContent();
+        $datadecoded = json_decode($data,TRUE);
+        dd($request->all());
+        Helper::saveLog('RoundHistory(Wazdan)', 33, $data, "Initialize");
+        
+    }
 }
