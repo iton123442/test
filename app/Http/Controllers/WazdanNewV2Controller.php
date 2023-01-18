@@ -766,7 +766,7 @@ class WazdanNewV2Controller extends Controller
         $paramsToSend = [
             "operator" => $operator_data,
             "license" => $license,
-            "roundId" => $datadecoded->round_id
+            "roundId" => $datadecoded['round_id']
         ];
         $signature = hash_hmac("sha256",$paramsToSend,$key);
         dd($signature);
