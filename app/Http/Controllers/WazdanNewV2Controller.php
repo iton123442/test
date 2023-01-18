@@ -788,8 +788,15 @@ class WazdanNewV2Controller extends Controller
         $datadecoded = json_decode($data,TRUE);
         // dd($request->all());
         Helper::saveLog('RoundHistory(Wazdan)', 33, $data, "Initialize");
+        $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
         $operator_data = config('providerlinks.wazdan.operator_data');
         $license = config('providerlinks.wazdan.license');
-
+        $paramsToSend = [
+            "operator" => $operator_data,
+            "license" => $license,
+            "roundId" => $data->round_id
+        ];
+        $signature = hash_hmac("sha256",$paramsToSend,$key)
+        dd($signature);
     }
 }
