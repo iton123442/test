@@ -404,6 +404,7 @@ $app->post('/public/api/png/betsofted/cancelReserve','PNGController@cancelReserv
 // $app->post('/public/api/wazdan/getFunds','WazdanController@getFunds');
 // $app->post('/public/api/wazdan/gameClose','WazdanController@gameClose');
 // $app->post('/public/api/wazdan/hash','WazdanController@hashCode');
+// $app->post('/public/api/wazdan/round/history','WazdanNewV2Controller@getTransactionHistory');
 //Newflow V2
 $app->post('/public/api/wazdan/authenticate','WazdanNewV2Controller@authenticate');
 $app->post('/public/api/wazdan/getStake','WazdanNewV2Controller@getStake');
@@ -412,6 +413,7 @@ $app->post('/public/api/wazdan/returnWin','WazdanNewV2Controller@returnWin');
 $app->post('/public/api/wazdan/getFunds','WazdanNewV2Controller@getFunds');
 $app->post('/public/api/wazdan/gameClose','WazdanNewV2Controller@gameClose');
 $app->post('/public/api/wazdan/hash','WazdanNewV2Controller@hashCode');
+$app->post('/public/api/wazdan/round/history','WazdanNewV2Controller@getTransactionHistory');
 // BETRNK LOTTO
 $app->post('/public/api/betrnk/lotto', 'BetrnkController@getUrl');
 
