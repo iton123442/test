@@ -289,16 +289,15 @@ class AWSNewController extends Controller
 		$method = 1;
 		$pay_amount = 0; // payamount zero
 		$income = $bet_amount - $pay_amount;
-		$win_type = 5;
+		// $win_type = 5;
 
-		$win_or_lost = $win_type; // 0 lost,  5 processing
+		// $win_or_lost = $win_type; // 0 lost,  5 processing
 		$payout_reason = AWSHelper::getOperationType($details->txnTypeId);
 		$provider_trans_id = $details->txnId;
 
 
 		// V2
-		$gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
-		$game_transextension1 = ProviderHelper::idGenerate($client_details->connection_name,2);
+		// $gamerecord = ProviderHelper::idGenerate($client_details->connection_name,1);
 
 
 		AWSHelper::saveLog('AWS singleFundTransfer - findGameExt CHECK', $this->provider_db_id, $data, 'CHECK');
@@ -325,7 +324,31 @@ class AWSNewController extends Controller
 			} else {
 				$is_freespin = false;
 			}
+			if ($transaction_type == 'credit') {
+				$method = 2;
+				$pay_amount =  $details->winAmount;
+				$win_type = 1;
+				$income = $bet_amount - $pay_amount;
+			} else {
+				$method = 1;
+				$pay_amount = $details->winAmount; // payamount zero
+				$income = $bet_amount - $pay_amount;
+				$win_type = 0;
+			}
 			// V2 (ADD BELOW THE CLIENT REQUEST)
+			$gameTransactionData = array(
+				"provider_trans_id" => $provider_trans_id,
+				"token_id" => $token_id,
+				"game_id" => $game_code,
+				"round_id" => $provider_trans_id,
+				"bet_amount" => $bet_amount,
+				"win" => $win_type,
+				"pay_amount" => $pay_amount,
+				"income" =>  $income,
+				"entry_id" =>$method,
+			);
+			$gamerecord = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details); //create game_transaction
+			$game_transextension1 = ProviderHelper::idGenerate($client_details->connection_name,2);
 			try {
 				$fund_extra_data = [
 					'fundtransferrequest' => [
@@ -381,19 +404,6 @@ class AWSNewController extends Controller
 				$new_balance = $client_details->balance - $bet_amount_2way;
 				$new_balance = $new_balance + $win_amount_2way;
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $new_balance);
-
-				$gameTransactionData = array(
-					"provider_trans_id" => $provider_trans_id,
-					"token_id" => $token_id,
-					"game_id" => $game_code,
-					"round_id" => $provider_trans_id,
-					"bet_amount" => $bet_amount,
-					"win" => $win_or_lost,
-					"pay_amount" => $pay_amount,
-					"income" =>  $income,
-					"entry_id" =>$method,
-				);
-				GameTransactionMDB::createGametransactionV2($gameTransactionData,$gamerecord,$client_details); //create game_transaction
 				$response = [
 					"msg" => "success",
 					"code" => 0,
@@ -422,18 +432,6 @@ class AWSNewController extends Controller
 				);
 				//"general_details" => $client_details->balance.'_'.$new_balance.'_'.$bet_amount_2way.'_'.$client_response->fundtransferresponse->balance,
 				GameTransactionMDB::createGameTransactionExtV2($gameTransactionEXTData,$game_transextension1,$client_details);
-
-				if ($transaction_type == 'credit') {
-					$method = 2;
-					$pay_amount =  $details->winAmount;
-					$win_type = 1;
-					$income = $bet_amount - $pay_amount;
-				} else {
-					$method = 1;
-					$pay_amount = $details->winAmount; // payamount zero
-					$income = $bet_amount - $pay_amount;
-					$win_type = 0;
-				}
 
 				$game_transextension2 = ProviderHelper::idGenerate($client_details->connection_name,2);
 				try{

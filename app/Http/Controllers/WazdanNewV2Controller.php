@@ -135,8 +135,27 @@ class WazdanNewV2Controller extends Controller
                 if($bet_transaction != "false") {
                     $client_details->connection_name = $bet_transaction->connection_name;
                     $game_transactionid = $bet_transaction->game_trans_id;
+                    $updateGameTransaction = [
+                        'win' => 5,
+                        'bet_amount' => $bet_transaction->bet_amount + round($datadecoded["amount"],2),
+                        'entry_id' => 1,
+                        'trans_status' => 1
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                 } else {
-                    $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
+                    // $game_transactionid = ProviderHelper::idGenerate($client_details->connection_name,1);
+                    $gameTransactionData = array(
+                        "provider_trans_id" => $datadecoded["transactionId"],
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $game_details->game_id,
+                        "round_id" => $datadecoded["roundId"],
+                        "bet_amount" => round($datadecoded["amount"],2),
+                        "pay_amount" =>0,
+                        "win" => 5,
+                        "income" =>0,
+                        "entry_id" =>1,
+                    );
+                    $game_transactionid = GameTransactionMDB::createGametransaction($gameTransactionData,$client_details);
                 }
                 $betGametransactionExtId = ProviderHelper::idGenerate($client_details->connection_name,2);
                 try{
@@ -154,17 +173,9 @@ class WazdanNewV2Controller extends Controller
                         )
                     );
                     $gameTransactionData = array(
-                        "provider_trans_id" => $datadecoded["transactionId"],
-                        "token_id" => $client_details->token_id,
-                        "game_id" => $game_details->game_id,
-                        "round_id" => $datadecoded["roundId"],
-                        "bet_amount" => round($datadecoded["amount"],2),
-                        "pay_amount" =>0,
-                        "win" => 2,
-                        "income" =>0,
-                        "entry_id" =>1,
+                        'win' => 2
                     );
-                    GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
+                    GameTransactionMDB::updateGametransaction($gameTransactionData,$game_transactionid,$client_details);
                     $betgametransactionext = array(
                         "game_trans_id" => $game_transactionid,
                         "provider_trans_id" => $datadecoded["transactionId"],
@@ -187,28 +198,6 @@ class WazdanNewV2Controller extends Controller
                 && $client_response->fundtransferresponse->status->code == "200"){
                     $balance = round($client_response->fundtransferresponse->balance,2);
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                    if($bet_transaction != "false"){
-                        $updateGameTransaction = [
-                            'win' => 5,
-                            'bet_amount' => $bet_transaction->bet_amount + round($datadecoded["amount"],2),
-                            'entry_id' => 1,
-                            'trans_status' => 1
-                        ];
-                        GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
-                    }else{
-                        $gameTransactionData = array(
-                            "provider_trans_id" => $datadecoded["transactionId"],
-                            "token_id" => $client_details->token_id,
-                            "game_id" => $game_details->game_id,
-                            "round_id" => $datadecoded["roundId"],
-                            "bet_amount" => round($datadecoded["amount"],2),
-                            "pay_amount" =>0,
-                            "win" => 5,
-                            "income" =>0,
-                            "entry_id" =>1,
-                        );
-                        GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
-                    }
                     $msg = array(
                         "status" => 0,
                         "funds" => array(
@@ -242,26 +231,10 @@ class WazdanNewV2Controller extends Controller
                         )
                     );
                     try{
-                        if ($bet_transaction != "false") {
-                            $data = array(
-                                "win"=>2
-                            );
-                            GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
-                            
-                        }else{
-                            $gameTransactionData = array(
-                                "provider_trans_id" => $datadecoded["transactionId"],
-                                "token_id" => $client_details->token_id,
-                                "game_id" => $game_details->game_id,
-                                "round_id" => $datadecoded["roundId"],
-                                "bet_amount" => round($datadecoded["amount"],2),
-                                "pay_amount" =>0,
-                                "win" => 2,
-                                "income" =>0,
-                                "entry_id" =>1,
-                            );
-                            GameTransactionMDB::createGametransactionV2($gameTransactionData,$game_transactionid,$client_details);
-                        }
+                        $data = array(
+                            "win"=>2
+                        );
+                        GameTransactionMDB::updateGametransaction($data,$game_transactionid,$client_details);
                         $betgametransactionext = array(
                             "game_trans_id" => $game_transactionid,
                             "provider_trans_id" => $datadecoded["transactionId"],
