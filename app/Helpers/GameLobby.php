@@ -677,7 +677,7 @@ class GameLobby{
             $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
             );
             $client_response = json_decode($guzzle_response->getBody()->getContents());
-            ProviderHelper::saveLogGameLaunch('Tidy Gameluanch 102', 23, json_encode($requesttosend), $client_response);
+            ProviderHelper::saveLogGameLaunch('Tidy Gameluanch 102', 23, json_encode($requesttosend), $client);
             if(isset($client_response->link)){
                 return $client_response->link;
             } 
