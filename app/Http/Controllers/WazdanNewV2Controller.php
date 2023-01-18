@@ -20,8 +20,10 @@ class WazdanNewV2Controller extends Controller
     }
     public function hashCode(Request $request){
         Helper::saveLog('hashCode (Wazdan)', 33, $request->getContent(), "Hash Hit");
-        $operator = "tigergames";
-        $license = "curacao";
+        // $operator = "tigergames";
+        // $license = "curacao";
+        $operator = config('providerlinks.wazdan.operator_data');
+        $license = config('providerlinks.wazdan.license');
         $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
         $data = array(
             "how" => 'hash_hmac("sha256","'.$request->getContent().'",'.$key.')',
@@ -784,8 +786,10 @@ class WazdanNewV2Controller extends Controller
     public function getTransactionHistory(Request $request){
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
-        dd($request->all());
+        // dd($request->all());
         Helper::saveLog('RoundHistory(Wazdan)', 33, $data, "Initialize");
-        
+        $operator_data = config('providerlinks.wazdan.operator_data');
+        $license = config('providerlinks.wazdan.license');
+
     }
 }
