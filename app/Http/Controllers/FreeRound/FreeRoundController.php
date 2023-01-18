@@ -17,7 +17,7 @@ class FreeRoundController extends Controller
 {
     
     public function __construct(){
-        // $this->middleware('oauth', ['except' => ['index']]); // old auth
+        // $this->middleware('oauth', ['except' => ['index']]); // old auth marv
         $this->middleware('tg_auth', ['except' => ['index']]);
     }
     public function freeRoundController(Request $request){
