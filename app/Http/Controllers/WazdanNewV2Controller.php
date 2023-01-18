@@ -768,7 +768,7 @@ class WazdanNewV2Controller extends Controller
             "license" => $license,
             "roundId" => $datadecoded['round_id']
         ];
-        $signature = hash_hmac("sha256",$paramsToSend,$key);
+        $signature = hash_hmac("sha256",json_encode($paramsToSend),$key);
         dd($signature);
     }
 }
