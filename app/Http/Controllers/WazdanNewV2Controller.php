@@ -758,6 +758,7 @@ class WazdanNewV2Controller extends Controller
     }
     public function getTransactionHistory(Request $request){
         $data = $request->getContent();
+        dd($data);
         $datadecoded = json_decode($data,TRUE);
         Helper::saveLog('RoundHistory(Wazdan)', 33, $data, "Initialize");
         $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
