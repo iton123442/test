@@ -788,8 +788,8 @@ class WazdanNewV2Controller extends Controller
         $license = config('providerlinks.wazdan.license');
         $key = config('providerlinks.wazdan.hmac_scret_key');
         $paramToSend = array(
-            "operator" => "tigergames",
-            "license" => "curacao",
+            "operator" => $operator,
+            "license" => $license,
             "round_id" => $datadecoded['round_id']
         );
         $signature = hash_hmac("sha256",json_encode($paramToSend),$key);
