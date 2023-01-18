@@ -786,13 +786,15 @@ class WazdanNewV2Controller extends Controller
         $datadecoded = json_decode($data,TRUE);
         $operator = config('providerlinks.wazdan.operator');
         $license = config('providerlinks.wazdan.license');
+        $key = config('providerlinks.wazdan.hmac_scret_key');
         $paramToSend = array(
             "operator" => "tigergames",
             "license" => "curacao",
             "round_id" => $datadecoded['round_id']
         );
         $signature = hash_hmac("sha256",json_encode($paramToSend),$key);
-        dd($signature);
+        
+
     }
    
 }
