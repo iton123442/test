@@ -759,7 +759,6 @@ class WazdanNewV2Controller extends Controller
     public function getTransactionHistory(Request $request){
         $data = $request->getContent();
         $datadecoded = json_decode($data,TRUE);
-        dd($request->all());
         Helper::saveLog('RoundHistory(Wazdan)', 33, $data, "Initialize");
         $key = "uTDVNr4wu6Y78SNbr36bqsSCH904Rcn1";
         $operator_data = config('providerlinks.wazdan.operator_data');
@@ -769,7 +768,7 @@ class WazdanNewV2Controller extends Controller
             "license" => $license,
             "roundId" => $data->round_id
         ];
-        $signature = hash_hmac("sha256",$paramsToSend,$key)
+        $signature = hash_hmac("sha256",$paramsToSend,$key);
         dd($signature);
     }
 }
