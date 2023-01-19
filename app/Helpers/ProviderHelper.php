@@ -627,7 +627,6 @@ class ProviderHelper{
 				inner join client_endpoints as ce using (client_id) 
 				inner join operator as op using (operator_id)');
 				$client_details = count($query);
-				return $client_details > 0 ? $query[0] : null;
 		 }
 		 return $client_details > 0 ? $query[0] : null;
 	}
@@ -1626,7 +1625,7 @@ class ProviderHelper{
 		}
 		else{
 			$client_details = ProviderHelper::getClientDetails('token_id', $token_id);
-			if($client_details == "false"){
+			if($client_details == null){
 				return DB::select("INSERT INTO  player_session_tokens (token_id,player_id,player_token, player_ip_address, balance) VALUEs ('".$client_details->token_id."',".$client_details->player_id.",'".$client_details->player_token."','127.0.0.11',".$balance.")");
 			}else{
 				$client_details = ProviderHelper::getClientDetails('player_id', $player_id);
