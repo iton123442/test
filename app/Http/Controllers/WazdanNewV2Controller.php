@@ -798,7 +798,7 @@ class WazdanNewV2Controller extends Controller
                 'Signature' => $signature,
             ]
         ]);
-        $response = $client->post(config('providerlinks.wazdan.freeround_api_link').'/round/history',[
+        $response = $client->post(config('providerlinks.wazdan.freeround_api_link').'/round/history/',[
             'form_params' => $paramToSend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
