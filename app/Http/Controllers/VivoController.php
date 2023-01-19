@@ -225,14 +225,15 @@ class VivoController extends Controller
         ];
         $client_response = ClientRequestHelper::fundTransfer($client_details, $data["Amount"] ,$game_details->game_code,$game_details->game_name,$transactionId,$game_transactionid,"debit", false, $body_details);
         if(isset($client_response->fundtransferresponse->status->code) && $client_response->fundtransferresponse->status->code == "200"){
-            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
             $balance = round($client_response->fundtransferresponse->balance,2);
+            ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
             if($bet_transaction != 'false'){
                 $updateGameTransaction = [
                     "bet_amount" => $data["Amount"] + $bet_transaction->bet_amount,
                 ];
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transactionid, $client_details);
             }
+            
             $response = [
                 "REQUEST" => [
                     "USERID" => $data["userId"],
