@@ -808,7 +808,7 @@ class WazdanNewV2Controller extends Controller
         } catch ( \Exception $e) {
             $res = json_encode($e);
         }
-        return $res
+        return $res;
         
     }
    
