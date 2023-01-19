@@ -800,11 +800,16 @@ class WazdanNewV2Controller extends Controller
                 'Signature' => $signature,
             ]
         ]);
-        $response = $client->post(config('providerlinks.wazdan.freeround_api_link').'/round/history/',[
-            'json' => $paramToSend,
-        ]);
-        $res = json_decode($response->getBody(),TRUE);
-        dd($res);
+        try {
+            $response = $client->post(config('providerlinks.wazdan.freeround_api_link').'/round/history/',[
+                'json' => $paramToSend,
+            ]);
+            $res = json_decode($response->getBody(),TRUE);
+        } catch ( \Exception $e) {
+            $res = json_encode($e);
+        }
+        return $res
+        
     }
    
 }
