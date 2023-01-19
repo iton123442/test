@@ -801,7 +801,7 @@ class WazdanNewV2Controller extends Controller
             ]
         ]);
         $response = $client->post(config('providerlinks.wazdan.freeround_api_link').'/round/history/',[
-            'form_params' => $paramToSend,
+            'json' => $paramToSend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
         dd($res);
