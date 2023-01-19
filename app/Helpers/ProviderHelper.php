@@ -627,6 +627,7 @@ class ProviderHelper{
 				inner join client_endpoints as ce using (client_id) 
 				inner join operator as op using (operator_id)');
 				$client_details = count($query);
+				return $client_details > 0 ? $query[0] : null;
 		 }
 		 return $client_details > 0 ? $query[0] : null;
 	}
