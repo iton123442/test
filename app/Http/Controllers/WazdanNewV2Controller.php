@@ -795,11 +795,12 @@ class WazdanNewV2Controller extends Controller
         $signature = hash_hmac("sha256",json_encode($paramToSend),$key);
         $client = new Client([
             'headers' => [ 
+                'Content-Type' => 'application/json',
                 'Signature' => $signature,
             ]
         ]);
         $response = $client->post(config('providerlinks.wazdan.freeround_api_link').'/round/history/',[
-            'form_params' => json_encode($paramToSend),
+            'form_params' => $paramToSend,
         ]);
         $res = json_decode($response->getBody(),TRUE);
         dd($res);
