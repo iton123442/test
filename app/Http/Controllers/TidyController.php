@@ -531,7 +531,40 @@ class TidyController extends Controller
 		
 	}
 
-
+	public function checkBet(Request $request){
+			$data = $request->all();
+		    $url = config('providerlinks.tidygaming.api_url_bet_history');
+            $client_details = Providerhelper::getClientDetails('token', $token);
+            $supportClientPrefix_k = config('providerlinks.tidygaming.support_1to1_denomination_prefixK');
+            $currency = $client_details->default_currency;
+            if (in_array( $client_details->client_id, $supportClientPrefix_k)) {
+               $currency = "k".$client_details->default_currency;
+            }
+            $invite_code = config('providerlinks.tidygaming.currency')[$currency];
+            $get_code_currency = TidyHelper::currencyCode($currency);
+            // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+            $requesttosend = [
+                'lobby_id' =>  "",
+                'date_type' => 2,
+                'begin_at' => '',
+                'end_at' => '',
+                'wagers_id' => '',
+                'wagers_type' => 1,
+                'page' => 1,
+                'row_number' => 1000,
+				'client_id' => config('providerlinks.tidygaming.client_id'),
+				'invite_code' =>  $invite_code 
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.TidyHelper::generateToken($requesttosend)
+                ]
+            ]);
+            $guzzle_response = $client->post($url,['body' => json_encode($requesttosend)]
+            );
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+	}
 	public function gameRollback(Request $request){
 		$header = $request->header('Authorization');
 	    Helper::saveLog('Tidy Authorization Logger Rollback', $this->provider_db_id, json_encode(file_get_contents("php://input")), $header);
