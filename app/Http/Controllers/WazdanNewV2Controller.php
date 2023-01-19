@@ -787,11 +787,12 @@ class WazdanNewV2Controller extends Controller
         $operator = config('providerlinks.wazdan.operator');
         $license = config('providerlinks.wazdan.license');
         $key = config('providerlinks.wazdan.hmac_scret_key');
-        $paramToSend = array(
+        $paramToSend = [
             "operator" => $operator,
             "license" => $license,
-            "round_id" => $datadecoded['round_id']
-        );
+            "roundId" => $datadecoded['round_id']
+        ];
+            
         $signature = hash_hmac("sha256",json_encode($paramToSend),$key);
         $client = new Client([
             'headers' => [ 
