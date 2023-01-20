@@ -2282,6 +2282,17 @@ class GameLobby{
         Helper::saveLog('Naga gamelaunchfinal', 141, json_encode($gameLaunchURL), 'Gamelaunch Success');
         return $gameLaunchURL;  
     }
+
+    public static function hacksawgaming($data,$device){
+        try {
+            $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+            $url = config("providerlinks.hacksawgaming.api_url").'language='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&mode=live&token='.$data['token'].'&lobbyurl='.$data['exitUrl'].'&currency='.$client_details->default_currency.'&partner=stg&env=https://rgs-hacksaw-stg.hacksawgaming.com/api&alwaysredirect=true';
+            return $url;
+            } catch (\Exception $e) {
+                Helper::saveLog('Nolimit Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+                return $e->getMessage();
+            }
+    }
 }
 
 ?>
