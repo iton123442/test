@@ -535,7 +535,6 @@ class TidyController extends Controller
 			$data = $request->all();
 		    $url = config('providerlinks.tidygaming.api_url_bet_history');
             $invite_code = config('providerlinks.tidygaming.currency')[$currency];
-            $get_code_currency = TidyHelper::currencyCode($currency);
             // $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
             $requesttosend = [
                 'lobby_id' =>  "TDSLOT",

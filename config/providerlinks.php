@@ -849,6 +849,11 @@ return [
         'api_url' => 'https://api.game-stg.topasianplatform.com',
         'provider_db_id' => 141,
     ],
+    'hacksawgaming' => [
+        'partnerid' => '',
+        'api_url' => 'https://static-stg.hacksawgaming.com/1225/1.41.0/index.html?',
+        'provider_db_id' => 142,
+    ],
 ];
 
 ?>
