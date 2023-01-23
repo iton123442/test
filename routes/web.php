@@ -975,3 +975,5 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 // $app->post('/public/nagagames/api/placeBet', 'NagaGamesNewController@placeBet');
 // $app->post('/public/nagagames/api/cancelBet', 'NagaGamesNewController@cancelBet');
 // $app->post('/public/nagagames/api/betStatus', 'NagaGamesNewController@betStatus');
+
+$app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
