@@ -41,19 +41,11 @@ class HacksawGamingController extends Controller
             ]);
         }
         return response()->json([
-            'externalPlayerId' => '',
-            'name' => 'Christopher',
-            'accountCurrency' => 'EUR',
-            'accountBalance' => 9330,
-            'externalSessionId' => '',
-            'languageId' => 'en',
-            'countryId' => 'RS',
-            'birthDate' => '1980-01-01',
-            'registrationDate' => '2018-01-11',
-            'brandId' => 'brand_123',
-            'gender' => 'm',
+            'externalPlayerId' => $client_details->player_id,
+            'accountCurrency' => $client_details->default_currency,
+            'accountBalance' => $client_details->balance,
             'statusCode' => 0,
-            'statusMessage' => ''
+            'statusMessage' => 'Success'
         ]);
         }
 
