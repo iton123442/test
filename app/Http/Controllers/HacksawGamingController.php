@@ -338,6 +338,8 @@ class HacksawGamingController extends Controller
             try{
                 ProviderHelper::IdenpotencyTable($data['transactionId']);
             }catch(\Exception $e){
+                $balance = str_replace(".","", $client_details->balance);
+                $format_balance = (int)$balance;
                 return response()->json([
                     "accountBalance"=>$format_balance,
                     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
