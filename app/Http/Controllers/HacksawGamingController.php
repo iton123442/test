@@ -27,19 +27,24 @@ class HacksawGamingController extends Controller
         $data = $request->all();
         $action_method = $data['action'];
         $secret_key = $data['secret'];
-        if($action_method == 'Authenticate'){
-            if($secret_key != $this->secret_key){
-                return response()->json([
-                    '4' => "Invalid partner code"
-                ]);
-            }
-
-        $client_details = ProviderHelper::getClientDetails('token', $data['token']);
+        if(isset($data['token'])){
+            $token = $data['token'];
+            $client_details = ProviderHelper::getClientDetails('token', $token);
+        }else{
+            $player_id = $data['externalPlayerId'];
+            $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+        }
         if($client_details == null){
             return response()->json([
                 '2' => "Invalid user / token expired"
             ]);
         }
+        if($action_method == 'Authenticate'){
+            if($secret_key != $this->secret_key){
+                return response()->json([
+                    '4' => "Invalid partner code"
+                ]);
+            } 
         return response()->json([
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
@@ -49,39 +54,23 @@ class HacksawGamingController extends Controller
         ]);
         }
 
+        if($action_method == 'Balance'){
+            $response = $this->getBalance($request->all(), $client_details);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');   
+        }
+
     }
-    public function getBalance(Request $request){
+    public function getBalance($request, $client_details){
 
-      Helper::saveLog("TTG get Bal", $this->provider_db_id, json_encode($request->all()), "ENDPOINT HIT"); 
-      $fileContents = file_get_contents("php://input");
-      $json = json_encode(simplexml_load_string($fileContents));
-      $array = json_decode($json,true);
-      $user_id = explode('TGR_',$array['@attributes']['acctid']);
-      $get_client_details = ProviderHelper::getClientDetails("player_id",$user_id[1]);
-      if($get_client_details == null || $get_client_details->player_id != $user_id[1]){
-
-          $response = '<cw type="getBalanceResp" err="1000" />';
-
-         return response($response,200) 
-        ->header('Content-Type', 'application/xml');
-
-      }
-      if($get_client_details->default_currency != $array['@attributes']['cur']){
-
-        $response = '<cw type="getBalanceResp" err="1001" />';
-
-         return response($response,200) 
-        ->header('Content-Type', 'application/xml');
-      }
-      
-      $formatBalance = number_format($get_client_details->balance,2,'.','');
-      header("Content-type: application/xml; charset=UTF-8");
-     
-      $response = '<cw type="getBalanceResp" cur="'.$get_client_details->default_currency.'" amt="'.$formatBalance.'" err="0" />';
-    
-       return response($response,200) 
-       ->header('Content-Type', 'application/xml');
-      
+        $data = $request; 
+        ProviderHelper::saveLogWithExeption('Nolimit getbalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
+        return response()->json([
+            'accountBalance' => $client_details->balance,
+            'accountCurrency' => $client_details->default_currency,
+            'statusCode' => 0,
+            'statusMessage' => 'Success'
+        ]);  
     }
 
     
