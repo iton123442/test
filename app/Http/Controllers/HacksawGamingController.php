@@ -112,7 +112,7 @@ class HacksawGamingController extends Controller
             ]);
         }
     }
-    public function GameBet($request){ 
+    public function GameBet($request,$client_details){ 
         $data = $request;
         if($client_details){
             $roundId = $data['roundId'];
