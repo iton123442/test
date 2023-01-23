@@ -90,7 +90,7 @@ class HacksawGamingController extends Controller
                 ->header('Content-Type', 'application/json');
         }
         
-        if($action_method == 'Win'){
+        if($action_method == 'Rollback'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
             $response = $this->GameWin($request->all(), $client_details);
             return response($response,200)
