@@ -67,6 +67,12 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Success'
             ]);     
         }
+        if($action_method == 'EndSession '){
+            return response()->json([
+                'statusCode' => 0,
+                'statusMessage' => 'Success'
+            ]); 
+        }
 
     }   
 }
