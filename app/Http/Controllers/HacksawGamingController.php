@@ -106,6 +106,8 @@ class HacksawGamingController extends Controller
             $client_details = ProviderHelper::getClientDetails('token', $player_token);  
         }
         if($client_details){
+            $roundId = $data['roundId'];
+            $provider_trans_id = $data['transactionId'];
             try{
                 ProviderHelper::idenpotencyTable("BET_".$data['transactionId']);
             }catch(\Exception $e){
@@ -120,12 +122,11 @@ class HacksawGamingController extends Controller
                 $balance = str_replace(".","", $client_details->balance);
                 return response()->json([
                     "accountBalance"=>$balance,
+                    "externalTransactionId"=> $roundId."_".$provider_trans_id,
                     "statusCode"=>11,
                     "statusMessage"=>"General error"
                 ]);
             }
-            $roundId = $data['roundId'];
-            $provider_trans_id = $data['transactionId'];
             $amount = $data['amount'] / 100;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
@@ -167,6 +168,7 @@ class HacksawGamingController extends Controller
                 $response = [
                     "accountBalance"=>(int) $format_balance,
                     "statusCode"=>0,
+                    "externalTransactionId"=> $roundId."_".$provider_trans_id,
                     "statusMessage"=>""
                 ];
                 $extensionData = [
@@ -191,6 +193,7 @@ class HacksawGamingController extends Controller
                     GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
                     $response = [
                         "accountBalance"=>(int) $format_balance,
+                        "externalTransactionId"=> $roundId."_".$provider_trans_id,
                         "statusCode"=>5,
                         "statusMessage"=>"Insufficient funds to place bet"
                     ];
@@ -228,6 +231,7 @@ class HacksawGamingController extends Controller
             $format_balance = str_replace(".","", $client_details->balance);
             $response = [
                 "accountBalance"=>(int) $format_balance,
+                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                 "statusCode"=>0,
                 "statusMessage"=>""
             ];
