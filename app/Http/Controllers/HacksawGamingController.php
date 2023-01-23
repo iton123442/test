@@ -24,6 +24,7 @@ class HacksawGamingController extends Controller
     }
     public function hacksawIndex(Request $request){
         $data = $request->all();
+        ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"HIT!");
         $action_method = $data['action'];
         $secret_key = $data['secret'];
         if(isset($data['token'])){
@@ -83,14 +84,14 @@ class HacksawGamingController extends Controller
             ]); 
         }
         if($action_method == 'Bet'){
-            ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"BET HIT!");
+            // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"BET HIT!");
             $response = $this->GameBet($request->all(), $client_details);
             return response($response,200)
                 ->header('Content-Type', 'application/json');
         }
         
         if($action_method == 'Win'){
-            ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
+            // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
             $response = $this->GameWin($request->all(), $client_details);
             return response($response,200)
                 ->header('Content-Type', 'application/json');
