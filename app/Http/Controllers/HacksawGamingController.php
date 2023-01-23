@@ -55,8 +55,8 @@ class HacksawGamingController extends Controller
         ]);
         }
         if($action_method == 'Balance'){
-            $token = $data['externalSessionId'];
-            $client_details = ProviderHelper::getClientDetails('token', $token); 
+            $playerid = $data['externalPlayerId'];
+            $client_details = ProviderHelper::getClientDetails('player_id', $playerid); 
             $balance = (float)$client_details->balance;
             return response()->json([
                 'accountBalance' => 173840.15,
