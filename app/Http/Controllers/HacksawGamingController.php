@@ -59,7 +59,7 @@ class HacksawGamingController extends Controller
             $client_details = ProviderHelper::getClientDetails('token', $token); 
             $balance = (float)$client_details->balance;
             return response()->json([
-                'accountBalance' => $balance,
+                'accountBalance' => 173840.15,
                 'accountCurrency' => $client_details->default_currency,
                 'statusCode' => 0,
                 'statusMessage' => 'Success'
