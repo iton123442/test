@@ -65,7 +65,7 @@ class HacksawGamingController extends Controller
         ProviderHelper::saveLogWithExeption('Hacksaw getbalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
         return response()->json([
             'accountBalance' => $client_details->balance,
-            'accountCurrency' => $client_details->default_currency,
+            'accountCurrency' => (int)$client_details->default_currency,
             'statusCode' => 0,
             'statusMessage' => 'Success'
         ]);  
