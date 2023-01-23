@@ -90,17 +90,15 @@ class HacksawGamingController extends Controller
         }
         if($action_method == 'Win'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
-            $balance = str_replace(".","", $client_details->balance);
-            $format_balance = (int)$balance;
-            return response()->json([
-                "accountBalance"=>$format_balance,
-                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                "statusCode"=>0,
-                "statusMessage"=>""
-            ]);
-            // $response = $this->GameWin($request->all());
-            // return response($response,200)
-            //     ->header('Content-Type', 'application/json');
+            // $balance = str_replace(".","", $client_details->balance);
+            // $format_balance = (int)$balance;
+            // return response()->json([
+            //     "accountBalance"=>$format_balance,
+            //     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+            //     "statusCode"=>0,
+            //     "statusMessage"=>""
+            // ]);
+            return $response = $this->GameWin($request->all(),$client_details);
         }
         if($action_method == 'Rollback'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
