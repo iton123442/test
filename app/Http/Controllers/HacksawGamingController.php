@@ -48,21 +48,23 @@ class HacksawGamingController extends Controller
         return response()->json([
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
+            'externalSessionId' =>$client_details->token,
             'accountBalance' => $balance,
             'statusCode' => 0,
             'statusMessage' => 'Success'
         ]);
         }
         if($action_method == 'Balance'){
-            $response = $this->getBalance($request->all(), $client_details);
+            $response = $this->getBalance($request->all());
             return response($response,200)
                 ->header('Content-Type', 'application/json');   
         }
 
     }
-    public function getBalance($request, $client_details){
-        $data = $request; 
-        ProviderHelper::saveLogWithExeption('Hacksaw getbalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
+    public function getBalance($request){
+        $data = $request;
+        $token = $data['externalSessionId'];
+        $client_details = ProviderHelper::getClientDetails('token', $token); 
         return response()->json([
             'accountBalance' => (int)$client_details->balance,
             'accountCurrency' => $client_details->default_currency,
