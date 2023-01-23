@@ -24,6 +24,7 @@ class HacksawGamingController extends Controller
     }
     public function hacksawIndex(Request $request){
         $data = $request->all();
+        ProviderHelper::saveLog("Hacksaw Request",75,json_encode($data),"HIT!");
         $action_method = $data['action'];
         $secret_key = $data['secret'];
         if(isset($data['token'])){
