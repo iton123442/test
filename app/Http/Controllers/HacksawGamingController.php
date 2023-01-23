@@ -59,7 +59,7 @@ class HacksawGamingController extends Controller
             $client_details = ProviderHelper::getClientDetails('player_id', $playerid); 
             $balance = (int)$client_details->balance;
             return response()->json([
-                'accountBalance' => 17384015,
+                'accountBalance' => $balance,
                 'accountCurrency' => $client_details->default_currency,
                 'statusCode' => 0,
                 'statusMessage' => 'Success'
