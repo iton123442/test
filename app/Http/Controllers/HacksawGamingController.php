@@ -86,10 +86,9 @@ class HacksawGamingController extends Controller
         if($action_method == 'Bet'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"BET HIT!");
             $response = $this->GameBet($request->all());
-            return response($response,200)
-                ->header('Content-Type', 'application/json');
+            return $response;
         }
-        if($action_method == 'Rollback'){
+        if($action_method == 'Win'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
@@ -102,6 +101,17 @@ class HacksawGamingController extends Controller
             // $response = $this->GameWin($request->all());
             // return response($response,200)
             //     ->header('Content-Type', 'application/json');
+        }
+        if($action_method == 'Rollback'){
+            // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
+            $balance = str_replace(".","", $client_details->balance);
+            $format_balance = (int)$balance;
+            return response()->json([
+                "accountBalance"=>$format_balance,
+                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                "statusCode"=>0,
+                "statusMessage"=>""
+            ]);
         }
     }
     public function GameBet($request){ 
