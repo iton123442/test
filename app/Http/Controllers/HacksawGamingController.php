@@ -85,14 +85,13 @@ class HacksawGamingController extends Controller
         }
         if($action_method == 'Bet'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"BET HIT!");
-            $response = $this->GameBet($request->all(), $client_details);
+            $response = $this->GameBet($request->all());
             return response($response,200)
                 ->header('Content-Type', 'application/json');
         }
-        
         if($action_method == 'Rollback'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
-            $response = $this->GameWin($request->all(), $client_details);
+            $response = $this->GameWin($request->all());
             return response($response,200)
                 ->header('Content-Type', 'application/json');
         }
