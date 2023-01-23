@@ -65,8 +65,9 @@ class HacksawGamingController extends Controller
         $data = $request;
         $token = $data['externalSessionId'];
         $client_details = ProviderHelper::getClientDetails('token', $token); 
+        $balance = (int)$client_details->balance;
         return response()->json([
-            'accountBalance' => (int)$client_details->balance,
+            'accountBalance' => $balance,
             'accountCurrency' => $client_details->default_currency,
             'statusCode' => 0,
             'statusMessage' => 'Success'
