@@ -30,17 +30,26 @@ class HacksawGamingController extends Controller
             $token = $data['token'];
             $client_details = ProviderHelper::getClientDetails('token', $token);
         }else{
-            $player_id = $data['externalPlayerId'];
-            $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+            try{
+                $player_id = $data['externalPlayerId'];
+                $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+            }catch(\Exception $e){
+                $player_token = $data['externalSessionId'];
+                $client_details = ProviderHelper::getClientDetails('token', $player_token);  
+            }          
         }
         if($client_details == null){
             return response()->json([
+                'accountBalance' => $client_details->balance,
+                'accountCurrency' => $client_details->default_currency,
                 'statusCode' => 2,
                 'statusMessage' => 'Invalid user / token expired'
             ]);
         }
         if($secret_key != $this->secret_key){
             return response()->json([
+                'accountBalance' => $client_details->balance,
+                'accountCurrency' => $client_details->default_currency,
                 'statusCode' => 4,
                 'statusMessage' => 'Invalid partner code'
             ]);
@@ -73,7 +82,15 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Success'
             ]); 
         }
-
-    }   
+        if($action_method == 'Bet'){
+            $response = $this->GameBet($request->all(), $client_details);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');
+        }
+    }
+    public function GameBet($request){ 
+        $data = $request;
+       
+    }  
 }
 
