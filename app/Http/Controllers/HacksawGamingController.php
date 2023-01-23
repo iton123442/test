@@ -56,16 +56,16 @@ class HacksawGamingController extends Controller
             ]);
         }
         if($action_method == 'Authenticate'){
-        $balance = str_replace(".","", $client_details->balance);
-        $format_balance = (int)$balance;
-        return response()->json([
-            'externalPlayerId' => $client_details->player_id,
-            'accountCurrency' => $client_details->default_currency,
-            'externalSessionId' =>$client_details->player_token,
-            'accountBalance' => $format_balance,
-            'statusCode' => 0,
-            'statusMessage' => 'Success'
-        ]);
+            $balance = str_replace(".","", $client_details->balance);
+            $format_balance = (int)$balance;
+            return response()->json([
+                'externalPlayerId' => $client_details->player_id,
+                'accountCurrency' => $client_details->default_currency,
+                'externalSessionId' =>$client_details->player_token,
+                'accountBalance' => $format_balance,
+                'statusCode' => 0,
+                'statusMessage' => 'Success'
+            ]);
         }
         if($action_method == 'Balance'){
             $balance = str_replace(".","", $client_details->balance);
@@ -91,6 +91,8 @@ class HacksawGamingController extends Controller
         }
         if($action_method == 'Rollback'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
+            $balance = str_replace(".","", $client_details->balance);
+            $format_balance = (int)$balance;
             return response()->json([
                 "accountBalance"=>$format_balance,
                 "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
