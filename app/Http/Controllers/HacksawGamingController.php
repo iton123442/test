@@ -45,7 +45,7 @@ class HacksawGamingController extends Controller
                 ]);
             }
         $balance = str_replace(".","", $client_details->balance);
-        $format_balance = (int)$client_details->balance;
+        $format_balance = (int)$balance;
         return response()->json([
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
@@ -59,7 +59,7 @@ class HacksawGamingController extends Controller
             $playerid = $data['externalPlayerId'];
             $client_details = ProviderHelper::getClientDetails('player_id', $playerid); 
             $balance = str_replace(".","", $client_details->balance);
-            $format_balance = (int)$client_details->balance;
+            $format_balance = (int)$balance;
             return response()->json([
                 'accountBalance' => $format_balance,
                 'accountCurrency' => $client_details->default_currency,
