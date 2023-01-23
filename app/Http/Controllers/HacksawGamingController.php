@@ -236,6 +236,7 @@ class HacksawGamingController extends Controller
         if($client_details){
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
+            Helper::saveLog('Hacksaw Rollback', $this->provider_db_id, json_encode($data), 'Success HIT!');
             return response()->json([
                 "accountBalance"=>$format_balance,
                 "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
