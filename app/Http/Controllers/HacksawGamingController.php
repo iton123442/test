@@ -39,13 +39,13 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Invalid user / token expired'
             ]);
         }
+        if($secret_key != $this->secret_key){
+            return response()->json([
+                'statusCode' => 4,
+                'statusMessage' => 'Invalid partner code'
+            ]);
+        }
         if($action_method == 'Authenticate'){
-            if($secret_key != $this->secret_key){
-                return response()->json([
-                    'statusCode' => 4,
-                    'statusMessage' => 'Invalid partner code'
-                ]);
-            }
         $balance = str_replace(".","", $client_details->balance);
         $format_balance = (int)$balance;
         return response()->json([
@@ -68,11 +68,6 @@ class HacksawGamingController extends Controller
             ]);     
         }
 
-    }
-    public function getBalance($request){
-       
-    }
-
-    
+    }   
 }
 
