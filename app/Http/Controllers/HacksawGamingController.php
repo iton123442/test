@@ -354,7 +354,7 @@ class HacksawGamingController extends Controller
             }else{
                 $amount = $data['amount'] / 100;
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameCode']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
