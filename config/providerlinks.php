@@ -852,7 +852,7 @@ return [
     'hacksawgaming' => [
         'partnerid' => 'tigergames_stg',
         'secret' => 'k8Cr6phob5&*m?PIb',
-        'api_url' => 'https://static-stg.hacksawgaming.com/1225/1.41.0/index.html?',
+        'api_url' => 'https://static-stg.hacksawgaming.com/launcher/static-launcher.html?',
         'provider_db_id' => 142,
     ],
 ];

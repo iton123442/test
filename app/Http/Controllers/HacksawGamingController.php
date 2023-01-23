@@ -40,7 +40,6 @@ class HacksawGamingController extends Controller
                 '2' => "Invalid user / token expired"
             ]);
         }
-        dd($client_details);
         return response()->json([
             'externalPlayerId' => '',
             'name' => 'Christopher',

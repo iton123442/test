@@ -2289,7 +2289,7 @@ class GameLobby{
             $url = config("providerlinks.hacksawgaming.api_url").'language='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&mode=live&token='.$data['token'].'&lobbyurl='.$data['exitUrl'].'&currency='.$client_details->default_currency;
             return $url;
             } catch (\Exception $e) {
-                Helper::saveLog('Nolimit Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+                Helper::saveLog('Hacksaw Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
                 return $e->getMessage();
             }
     }
