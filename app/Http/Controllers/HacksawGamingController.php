@@ -55,23 +55,20 @@ class HacksawGamingController extends Controller
         ]);
         }
         if($action_method == 'Balance'){
-            $response = $this->getBalance($request->all());
-            return response($response,200)
-                ->header('Content-Type', 'application/json');   
+            $token = $data['externalSessionId'];
+            $client_details = ProviderHelper::getClientDetails('token', $token); 
+            $balance = (int)$client_details->balance;
+            return response()->json([
+                'accountBalance' => $balance,
+                'accountCurrency' => $client_details->default_currency,
+                'statusCode' => 0,
+                'statusMessage' => 'Success'
+            ]);     
         }
 
     }
     public function getBalance($request){
-        $data = $request;
-        $token = $data['externalSessionId'];
-        $client_details = ProviderHelper::getClientDetails('token', $token); 
-        $balance = (int)$client_details->balance;
-        return response()->json([
-            'accountBalance' => $balance,
-            'accountCurrency' => $client_details->default_currency,
-            'statusCode' => 0,
-            'statusMessage' => 'Success'
-        ]);  
+       
     }
 
     
