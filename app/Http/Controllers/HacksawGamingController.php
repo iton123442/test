@@ -49,7 +49,7 @@ class HacksawGamingController extends Controller
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
             'externalSessionId' =>$client_details->player_token,
-            'accountBalance' => $balance,
+            'accountBalance' => $balance/100,
             'statusCode' => 0,
             'statusMessage' => 'Success'
         ]);
@@ -59,7 +59,7 @@ class HacksawGamingController extends Controller
             $client_details = ProviderHelper::getClientDetails('player_id', $playerid); 
             $balance = (int)$client_details->balance;
             return response()->json([
-                'accountBalance' => $balance,
+                'accountBalance' => $balance/100,
                 'accountCurrency' => $client_details->default_currency,
                 'statusCode' => 0,
                 'statusMessage' => 'Success'
