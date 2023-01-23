@@ -48,7 +48,7 @@ class HacksawGamingController extends Controller
         return response()->json([
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
-            'externalSessionId' =>$client_details->token,
+            'externalSessionId' =>$client_details->player_token,
             'accountBalance' => $balance,
             'statusCode' => 0,
             'statusMessage' => 'Success'
