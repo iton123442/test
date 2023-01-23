@@ -44,7 +44,7 @@ class HacksawGamingController extends Controller
                     '4' => "Invalid partner code"
                 ]);
             }
-        $balance = (int)$client_details->balance;
+        $balance = (float)$client_details->balance;
         return response()->json([
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
@@ -57,7 +57,7 @@ class HacksawGamingController extends Controller
         if($action_method == 'Balance'){
             $token = $data['externalSessionId'];
             $client_details = ProviderHelper::getClientDetails('token', $token); 
-            $balance = (int)$client_details->balance;
+            $balance = (float)$client_details->balance;
             return response()->json([
                 'accountBalance' => $balance,
                 'accountCurrency' => $client_details->default_currency,
