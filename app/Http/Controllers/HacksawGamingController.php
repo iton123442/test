@@ -22,7 +22,6 @@ class HacksawGamingController extends Controller
         $this->provider_db_id = config('providerlinks.hacksawgaming.provider_db_id');
         $this->secret_key = config('providerlinks.hacksawgaming.secret');
     }
-
     public function hacksawIndex(Request $request){
         $data = $request->all();
         $action_method = $data['action'];
@@ -44,16 +43,16 @@ class HacksawGamingController extends Controller
                 return response()->json([
                     '4' => "Invalid partner code"
                 ]);
-            } 
+            }
+        $balance = (int)$client_details->balance;
         return response()->json([
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
-            'accountBalance' => $client_details->balance,
+            'accountBalance' => $balance,
             'statusCode' => 0,
             'statusMessage' => 'Success'
         ]);
         }
-
         if($action_method == 'Balance'){
             $response = $this->getBalance($request->all(), $client_details);
             return response($response,200)
@@ -62,7 +61,6 @@ class HacksawGamingController extends Controller
 
     }
     public function getBalance($request, $client_details){
-
         $data = $request; 
         ProviderHelper::saveLogWithExeption('Hacksaw getbalance', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');
         return response()->json([
