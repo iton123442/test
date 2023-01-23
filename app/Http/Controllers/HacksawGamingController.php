@@ -49,7 +49,7 @@ class HacksawGamingController extends Controller
             'externalPlayerId' => $client_details->player_id,
             'accountCurrency' => $client_details->default_currency,
             'externalSessionId' =>$client_details->player_token,
-            'accountBalance' => $balance,
+            'accountBalance' => $balance/100,
             'statusCode' => 0,
             'statusMessage' => 'Success'
         ]);
