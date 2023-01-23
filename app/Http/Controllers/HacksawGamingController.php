@@ -24,7 +24,6 @@ class HacksawGamingController extends Controller
     }
     public function hacksawIndex(Request $request){
         $data = $request->all();
-        ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"HIT!");
         $action_method = $data['action'];
         $secret_key = $data['secret'];
         if(isset($data['token'])){
@@ -39,6 +38,7 @@ class HacksawGamingController extends Controller
                 $client_details = ProviderHelper::getClientDetails('token', $player_token);  
             }          
         }
+        ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"HIT!");
         if($client_details == null){
             return response()->json([
                 'accountBalance' => $client_details->balance,
