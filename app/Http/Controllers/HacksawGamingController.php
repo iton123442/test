@@ -163,11 +163,12 @@ class HacksawGamingController extends Controller
             && $client_response->fundtransferresponse->status->code == "200"){
                 Helper::saveLog('Hacksaw Bet', $this->provider_db_id, json_encode($data), 'FUNDTRANSFER HIT!');
                 $balance = round($client_response->fundtransferresponse->balance, 2);
-                $format_balance = str_replace(".","", $client_details->balance);
+                $bal = str_replace(".","", $balance);
+                $format_balance = (int)$bal;
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
                 $response = [
-                    "accountBalance"=>(int) $format_balance,
+                    "accountBalance"=> $format_balance,
                     "statusCode"=>0,
                     "externalTransactionId"=> $roundId."_".$provider_trans_id,
                     "statusMessage"=>""
@@ -229,9 +230,10 @@ class HacksawGamingController extends Controller
             $client_details = ProviderHelper::getClientDetails('token', $player_token);  
         }
         if($client_details){
-            $format_balance = str_replace(".","", $client_details->balance);
+            $balance = str_replace(".","", $client_details->balance);
+            $format_balance = (int)$balance;
             $response = [
-                "accountBalance"=>(int) $format_balance,
+                "accountBalance"=>$format_balance,
                 "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                 "statusCode"=>0,
                 "statusMessage"=>""
