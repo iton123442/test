@@ -84,9 +84,7 @@ class HacksawGamingController extends Controller
             ]); 
         }
         if($action_method == 'Bet'){
-            // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"BET HIT!");
-            $response = $this->GameBet($request->all(),$client_details);
-            return $response;
+            return $response = $this->GameBet($request->all(),$client_details);
         }
         if($action_method == 'Win'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
@@ -530,6 +528,113 @@ class HacksawGamingController extends Controller
                         "statusMessage"=>""
                     ]);
                 }
+            }
+        }else{
+            return response()->json([
+                'statusCode' => 2,
+                'statusMessage' => 'Invalid user / token expired'
+            ]);
+        }
+    }
+    public function GameCancel($request,$client_details){
+        $data = $request;
+        if($client_details){
+            try{
+                ProviderHelper::IdenpotencyTable($data['transactionId']);
+            }catch(\Exception $e){
+                $balance = str_replace(".","", $client_details->balance);
+                $format_balance = (int)$balance;
+                return response()->json([
+                    "accountBalance"=>$format_balance,
+                    "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                    "statusCode"=>1,
+                    "statusMessage"=>"General Error"
+                ]);
+            }
+            $provider_trans_id = $data['transactionId'];
+            $roundId = $data['roundId'];
+            if($data['amount'] == 0){
+                $amount = 0;
+            }else{
+                $amount = $data['amount'] / 100;
+            }
+            $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
+            $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
+            if($game == null){
+                $game = GametransactionMDB::getGameTransactionDataByProviderTransactionId($data['rolledBackTransactionId'],$client_details);
+            }
+            $balance = str_replace(".","", $client_details->balance);
+            $format_balance = (int)$balance;
+            $win = 4;
+            $updateTransData = [
+                "win" => $win,
+                "pay_amount" => round($amount + $game->pay_amount,2),
+                "income" => round($game->bet_amount-$game->pay_amount - $amount,2),
+                "entry_id" => $amount == 0 ? 1 : 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateTransData,$game->game_trans_id,$client_details);
+            $response =[
+                "accountBalance"=>$format_balance,
+                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                "statusCode"=>0,
+                "statusMessage"=>""
+            ];
+            $gameExtensionData = [
+                "game_trans_id" => $game->game_trans_id,
+                "provider_trans_id" => $provider_trans_id,
+                "round_id" => $roundId,
+                "amount" => $amount,
+                "game_transaction_type" => 3,
+                "provider_request" => json_encode($data),
+            ];
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+            $action_payload = [
+                "type" => "custom", #genreral,custom :D # REQUIRED!
+                "custom" => [
+                    "provider" => 'NagaGames',
+                    "game_transaction_ext_id" => $game_trans_ext_id,
+                    "client_connection_name" => $client_details->connection_name,
+                    "win_or_lost" => $win,
+                ],
+                "provider" => [
+                    "provider_request" => $data,
+                    "provider_trans_id"=>$provider_trans_id,
+                    "provider_round_id"=>$roundId,
+                    'provider_name' => $gamedetails->provider_name
+                ],
+                "mwapi" => [
+                    "roundId"=> $game->game_trans_id,
+                    "type" => 3,
+                    "game_id" => $gamedetails->game_id,
+                    "player_id" => $client_details->player_id,
+                    "mw_response" => $response,
+                ]
+            ];
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
+            if(isset($client_response->fundtransferresponse->status->code) &&
+            $client_response->fundtransferresponse->status->code == "200"){
+                $balance = round($client_details->balance+$amount, 2);
+                $bal = str_replace(".","", $client_details->balance);
+                $format_balance = (int)$bal;
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                //SUCCESS FUNDTRANSFER
+                $response = [
+                    "accountBalance"=>$format_balance,
+                    "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                    "statusCode"=>0,
+                    "statusMessage"=>""
+                ];
+                $msg = [
+                    "mw_response" => json_encode($response)
+                ];
+                GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
+                Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                return response()->json([
+                    "accountBalance"=>$format_balance,
+                    "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                    "statusCode"=>0,
+                    "statusMessage"=>""
+                ]);
             }
         }else{
             return response()->json([
