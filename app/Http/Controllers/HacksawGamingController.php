@@ -35,13 +35,15 @@ class HacksawGamingController extends Controller
         }
         if($client_details == null){
             return response()->json([
-                '2' => "Invalid user / token expired"
+                'statusCode' => 2,
+                'statusMessage' => 'Invalid user / token expired'
             ]);
         }
         if($action_method == 'Authenticate'){
             if($secret_key != $this->secret_key){
                 return response()->json([
-                    '4' => "Invalid partner code"
+                    'statusCode' => 4,
+                    'statusMessage' => 'Invalid partner code'
                 ]);
             }
         $balance = str_replace(".","", $client_details->balance);
@@ -56,8 +58,6 @@ class HacksawGamingController extends Controller
         ]);
         }
         if($action_method == 'Balance'){
-            $playerid = $data['externalPlayerId'];
-            $client_details = ProviderHelper::getClientDetails('player_id', $playerid); 
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
             return response()->json([
