@@ -126,7 +126,7 @@ class HacksawGamingController extends Controller
             }
             $roundId = $data['roundId'];
             $provider_trans_id = $data['transactionId'];
-            $amount = $data['amount'];
+            $amount = $data['amount'] / 100;
             $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             if($bet_transaction != null){
@@ -161,10 +161,11 @@ class HacksawGamingController extends Controller
             && $client_response->fundtransferresponse->status->code == "200"){
                 Helper::saveLog('Hacksaw Bet', $this->provider_db_id, json_encode($data), 'FUNDTRANSFER HIT!');
                 $balance = round($client_response->fundtransferresponse->balance, 2);
+                $format_balance = str_replace(".","", $client_details->balance);
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
                 $response = [
-                    "accountBalance"=>$balance,
+                    "accountBalance"=>(int) $format_balance,
                     "statusCode"=>0,
                     "statusMessage"=>""
                 ];
@@ -181,6 +182,7 @@ class HacksawGamingController extends Controller
             }elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
+                $format_balance = str_replace(".","", $client_details->balance);
                 try{    
                     $updateTrans = [
                         "win" => 2,
@@ -188,7 +190,7 @@ class HacksawGamingController extends Controller
                     ];
                     GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
                     $response = [
-                        "accountBalance"=>$balance,
+                        "accountBalance"=>(int) $format_balance,
                         "statusCode"=>5,
                         "statusMessage"=>"Insufficient funds to place bet"
                     ];
@@ -223,8 +225,9 @@ class HacksawGamingController extends Controller
             $client_details = ProviderHelper::getClientDetails('token', $player_token);  
         }
         if($client_details){
+            $format_balance = str_replace(".","", $client_details->balance);
             $response = [
-                "accountBalance"=>$balance,
+                "accountBalance"=>(int) $format_balance,
                 "statusCode"=>0,
                 "statusMessage"=>""
             ];
