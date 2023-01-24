@@ -14,7 +14,7 @@ use Carbon\Carbon;
 use DB;
 use DateTime;
 
-class SpearHeadController extends Controller
+class SpearHeadControllerOld extends Controller
 {
 
     public function __construct(){
