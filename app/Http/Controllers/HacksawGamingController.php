@@ -347,7 +347,7 @@ class HacksawGamingController extends Controller
                     "accountBalance"=>$format_balance,
                     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                     "statusCode"=>1,
-                    "statusMessage"=>"General Error"
+                    "statusMessage"=>"General/Server error"
                 ]);
             }
             $provider_trans_id = $data['transactionId'];
@@ -553,7 +553,7 @@ class HacksawGamingController extends Controller
                     "accountBalance"=>$format_balance,
                     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                     "statusCode"=>1,
-                    "statusMessage"=>"General Error"
+                    "statusMessage"=>"General/Server error"
                 ]);
             }
             $provider_trans_id = $data['transactionId'];
