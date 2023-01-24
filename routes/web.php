@@ -863,9 +863,9 @@ $app->post('/public/api/quickspin/rollback', 'QuickspinDirectController@rollback
 $app->post('/public/api/quickspin/fs_win', 'QuickspinDirectController@freeRound');
 
 // SpearHead
-$app->post('/public/api/spearhead/GetAccount', 'SpearHeadController@getAccount');
-$app->post('/public/api/spearhead/GetBalance', 'SpearHeadController@getBalance');
-$app->post('/public/api/spearhead','SpearHeadController@walletApiReq');
+$app->post('/public/api/spearhead/GetAccount', 'SpearHeadControllerOld@getAccount');
+$app->post('/public/api/spearhead/GetBalance', 'SpearHeadControllerOld@getBalance');
+$app->post('/public/api/spearhead','SpearHeadControllerOld@walletApiReq');
 
 //IDNPOKER
 $app->post('/public/api/idnpoker/makeDeposit', 'IDNPokerController@makeDeposit');
