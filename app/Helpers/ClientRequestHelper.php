@@ -187,15 +187,17 @@ class ClientRequestHelper{
                 }
                 $client_reponse->requestoclient = $requesttocient;
                 //ClientRequestHelper::currencyRateConverter($client_details->default_currency,$roundId);
-                try{
-                    $dataToUpdate = array(
-                        "client_response" => json_encode($client_reponse),
-                        "mw_request" => json_encode($requesttocient),
-                    );
-                    GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
-                }catch(\Exception $e){
-                    Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
-                }
+
+                // try{
+                //     $dataToUpdate = array(
+                //         "client_response" => json_encode($client_reponse),
+                //         "mw_request" => json_encode($requesttocient),
+                //     );
+                //     GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$transactionId,$client_details);
+                // }catch(\Exception $e){
+                //     Helper::saveLog($requesttocient['fundtransferrequest']['fundinfo']['roundId'], 504, json_encode($e->getMessage().' '.$e->getLine()),"");
+                // }
+                
                 // try {
 
                 //     $createGameTransactionLog = [
