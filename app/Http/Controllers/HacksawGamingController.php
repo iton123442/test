@@ -281,7 +281,7 @@ class HacksawGamingController extends Controller
                 //     "externalTransactionId"=> $roundId."_".$provider_trans_id,
                 //     "statusMessage"=>""
                 // ]);
-                return response(json_encode($response),200)->header('Content-Type', 'application/json');
+                return response($response,200)->header('Content-Type', 'application/json');
             }elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
