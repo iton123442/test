@@ -1039,7 +1039,17 @@ class GameTransactionMDB
            return 'false';
         }
     }
-
+    /**
+     * Create Response Logs
+     */
+    public static function createResponseLogs($data,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            return DB::connection($connection["connection_name"])->table($connection['db_list'][2].".game_response_log")->insertGetId($data);
+        }else{
+            return null;
+        }
+    }
     /**
      * Store the provider transaction identifier for selection later (Provider who dont send player details in the request body)
      * 
@@ -1097,7 +1107,7 @@ class GameTransactionMDB
         }
 
     }
-
+    
     /**
      * Update Logs
      */
