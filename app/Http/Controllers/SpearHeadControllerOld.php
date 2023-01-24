@@ -14,7 +14,7 @@ use Carbon\Carbon;
 use DB;
 use DateTime;
 
-class SpearHeadController extends Controller
+class SpearHeadControllerOld extends Controller
 {
 
     public function __construct(){
@@ -230,16 +230,23 @@ public function DebitProcess($req){
                             "Message" => 'Success',
                             "Details" => null,
                     ];
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($req),
-                        "mw_response" => json_encode($res),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'success',
-                        'general_details' => 'success',
-                    );
+                    // $updateTransactionEXt = array(
+                    //     "provider_request" =>json_encode($req),
+                    //     "mw_response" => json_encode($res),
+                    //     'mw_request' => json_encode($client_response->requestoclient),
+                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                    //     'transaction_detail' => 'success',
+                    //     'general_details' => 'success',
+                    // );
                    Helper::saveLog('SpearHead updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                   GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                   // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                   $data = [
+                      "mw_response" => json_encode($res),
+                      "game_trans_ext_id" => $game_trans_ext_id,
+                      "client_response" => json_encode($client_response->fundtransferresponse),
+                      "transaction_detail" => 'success'
+                    ];
+                    GameTransactionMDB::createResponseLogs($data,$client_details);
                 break;
                 case '402':
                     $http_status = 402;
@@ -254,16 +261,23 @@ public function DebitProcess($req){
                       "Message" => "Insufficient funds"
                     ];
 
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($req),
-                        "mw_response" => json_encode($res),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'failed',
-                        'general_details' => 'failed',
-                    );
-                    Helper::saveLog('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    // $updateTransactionEXt = array(
+                    //     "provider_request" =>json_encode($req),
+                    //     "mw_response" => json_encode($res),
+                    //     'mw_request' => json_encode($client_response->requestoclient),
+                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                    //     'transaction_detail' => 'failed',
+                    //     'general_details' => 'failed',
+                    // );
+                    // Helper::saveLog('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
+                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    $data = [
+                      "mw_response" => json_encode($res),
+                      "game_trans_ext_id" => $game_trans_ext_id,
+                      "client_response" => json_encode($client_response->fundtransferresponse),
+                      "transaction_detail" => 'failed'
+                    ];
+                    GameTransactionMDB::createResponseLogs($data,$client_details);
                 break;
                 default:
                     $updateGameTransaction = [
@@ -276,16 +290,23 @@ public function DebitProcess($req){
                       "ReturnCode" => 104,
                       "Message" => "Insufficient funds"
                     ];
-                    $updateTransactionEXt = array(
-                        "provider_request" =>json_encode($req),
-                        "mw_response" => json_encode($res),
-                        'mw_request' => json_encode($client_response->requestoclient),
-                        'client_response' => json_encode($client_response->fundtransferresponse),
-                        'transaction_detail' => 'failed',
-                        'general_details' => 'failed',
-                    );
+                    // $updateTransactionEXt = array(
+                    //     "provider_request" =>json_encode($req),
+                    //     "mw_response" => json_encode($res),
+                    //     'mw_request' => json_encode($client_response->requestoclient),
+                    //     'client_response' => json_encode($client_response->fundtransferresponse),
+                    //     'transaction_detail' => 'failed',
+                    //     'general_details' => 'failed',
+                    // );
                     Helper::saveLog('after 402 updateTransactionEXt', $this->provider_db_id, json_encode($data), 'ENDPOINT HIT');   
-                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                    $data = [
+                      "mw_response" => json_encode($res),
+                      "game_trans_ext_id" => $game_trans_ext_id,
+                      "client_response" => json_encode($client_response->fundtransferresponse),
+                      "transaction_detail" => 'failed'
+                    ];
+                    GameTransactionMDB::createResponseLogs($data,$client_details);
           }// End Switch
       }
           
@@ -442,15 +463,22 @@ public function CreditProcess($req){
     $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
     if(isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "200"){
-        $updateTransactionEXt = array(
-              "provider_request" =>json_encode($req),
-              "mw_response" => json_encode($res),
-              'mw_request' => json_encode($client_response->requestoclient),
-              'client_response' => json_encode($client_response->fundtransferresponse),
-              'transaction_detail' => 'success',
-              'general_details' => 'success',
-        );
-        GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+        // $updateTransactionEXt = array(
+        //       "provider_request" =>json_encode($req),
+        //       "mw_response" => json_encode($res),
+        //       'mw_request' => json_encode($client_response->requestoclient),
+        //       'client_response' => json_encode($client_response->fundtransferresponse),
+        //       'transaction_detail' => 'success',
+        //       'general_details' => 'success',
+        // );
+        // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+        $data = [
+          "mw_response" => json_encode($res),
+          "game_trans_ext_id" => $game_trans_ext_id,
+          "client_response" => json_encode($client_response->fundtransferresponse),
+          "transaction_detail" => 'success'
+        ];
+        GameTransactionMDB::createResponseLogs($data,$client_details);
         return $res;
     }elseif (isset($client_response->fundtransferresponse->status->code) 
     && $client_response->fundtransferresponse->status->code == "402") {
@@ -460,15 +488,22 @@ public function CreditProcess($req){
         "ReturnCode" => 104,
         "Message" => "Casino session limit exceeded"
       ];
-      $updateTransactionEXt = array(
-            "provider_request" =>json_encode($req),
-            "mw_response" => json_encode($res),
-            'mw_request' => json_encode($client_response->requestoclient),
-            'client_response' => json_encode($client_response->fundtransferresponse),
-            'transaction_detail' => 'FAILED',
-            'general_details' => 'FAILED',
-      );
-      GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+      // $updateTransactionEXt = array(
+      //       "provider_request" =>json_encode($req),
+      //       "mw_response" => json_encode($res),
+      //       'mw_request' => json_encode($client_response->requestoclient),
+      //       'client_response' => json_encode($client_response->fundtransferresponse),
+      //       'transaction_detail' => 'FAILED',
+      //       'general_details' => 'FAILED',
+      // );
+      // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+      $data = [
+        "mw_response" => json_encode($res),
+        "game_trans_ext_id" => $game_trans_ext_id,
+        "client_response" => json_encode($client_response->fundtransferresponse),
+        "transaction_detail" => 'success'
+      ];
+      GameTransactionMDB::createResponseLogs($data,$client_details);
       return $res;
 
     }
@@ -570,15 +605,22 @@ public function RollbackProcess($req){
                 return $res;
             }
 
-            $updateTransactionEXt = array(
-                "provider_request" =>json_encode($req),
-                "mw_response" => json_encode($res),
-                'mw_request' => json_encode($client_response->requestoclient),
-                'client_response' => json_encode($client_response->fundtransferresponse),
-                'transaction_detail' => 'success',
-                'general_details' => 'success',
-            );
-            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            // $updateTransactionEXt = array(
+            //     "provider_request" =>json_encode($req),
+            //     "mw_response" => json_encode($res),
+            //     'mw_request' => json_encode($client_response->requestoclient),
+            //     'client_response' => json_encode($client_response->fundtransferresponse),
+            //     'transaction_detail' => 'success',
+            //     'general_details' => 'success',
+            // );
+            // GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            $data = [
+              "mw_response" => json_encode($res),
+              "game_trans_ext_id" => $game_trans_ext_id,
+              "client_response" => json_encode($client_response->fundtransferresponse),
+              "transaction_detail" => 'success'
+            ];
+            GameTransactionMDB::createResponseLogs($data,$client_details);
 
         }
     }//end check player details
