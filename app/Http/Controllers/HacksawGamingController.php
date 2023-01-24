@@ -84,7 +84,8 @@ class HacksawGamingController extends Controller
             ]); 
         }
         if($action_method == 'Bet'){
-            return $response = $this->GameBet($request->all(),$client_details);
+            ProviderHelper::saveLog("Hacksaw Bet",142,json_encode($data),"Bet HIT!");
+            // return $response = $this->GameBet($request->all(),$client_details);
         }
         if($action_method == 'Win'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
@@ -263,7 +264,7 @@ class HacksawGamingController extends Controller
                 $response = [
                     "accountBalance"=> $format_balance,
                     "statusCode"=>0,
-                    // "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                    "externalTransactionId"=> $roundId."_".$provider_trans_id,
                     "statusMessage"=>""
                 ];
                 $extensionData = [
