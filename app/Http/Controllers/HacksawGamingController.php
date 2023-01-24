@@ -285,14 +285,14 @@ class HacksawGamingController extends Controller
                 ];
                 GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                 Helper::saveLog('Hacksaw Bet', $this->provider_db_id, json_encode($response), 'Success HIT!');
-                // return response()->json([
-                //     "accountBalance"=> $format_balance,
-                //     "statusCode"=>0,
-                //     "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                //     "statusMessage"=>""
-                // ]);
-                sleep(30);
-                return response($response,200)->header('Content-Type', 'application/json');
+                return response()->json([
+                    "accountBalance"=> $format_balance,
+                    "statusCode"=>0,
+                    "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                    "statusMessage"=>""
+                ]);
+                // sleep(30);
+                // return response($response,200)->header('Content-Type', 'application/json');
             }elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
