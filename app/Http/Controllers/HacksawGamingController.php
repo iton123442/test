@@ -100,17 +100,17 @@ class HacksawGamingController extends Controller
             return $response = $this->GameWin($request->all(),$client_details);
         }
         if($action_method == 'Rollback'){
-            ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
-            $balance = str_replace(".","", $client_details->balance);
-            $format_balance = (int)$balance;
-            return response()->json([
-                "accountBalance"=>$format_balance,
-                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                "statusCode"=>0,
-                "statusMessage"=>""
-            ]);
-            // ProviderHelper::saveLog("Hacksaw Rollback",142,json_encode($data),"Rollback HIT!");
-            // return $response = $this->GameCancel($request->all(),$client_details);
+            // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
+            // $balance = str_replace(".","", $client_details->balance);
+            // $format_balance = (int)$balance;
+            // return response()->json([
+            //     "accountBalance"=>$format_balance,
+            //     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+            //     "statusCode"=>0,
+            //     "statusMessage"=>""
+            // ]);
+            ProviderHelper::saveLog("Hacksaw Rollback",142,json_encode($data),"Rollback HIT!");
+            return $response = $this->GameCancel($request->all(),$client_details);
         }
     }
     public function GameBet($request,$client_details){ 
@@ -291,6 +291,7 @@ class HacksawGamingController extends Controller
                 //     "externalTransactionId"=> $roundId."_".$provider_trans_id,
                 //     "statusMessage"=>""
                 // ]);
+                sleep(30);
                 return response($response,200)->header('Content-Type', 'application/json');
             }elseif(isset($client_response->fundtransferresponse->status->code)
             && $client_response->fundtransferresponse->status->code == "402"){
