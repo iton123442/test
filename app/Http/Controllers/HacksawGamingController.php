@@ -263,7 +263,7 @@ class HacksawGamingController extends Controller
                 $response = [
                     "accountBalance"=> $format_balance,
                     "statusCode"=>0,
-                    "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                    // "externalTransactionId"=> $roundId."_".$provider_trans_id,
                     "statusMessage"=>""
                 ];
                 $extensionData = [
