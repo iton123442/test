@@ -146,6 +146,18 @@ class HacksawGamingController extends Controller
             $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             if($bet_transaction != null){
+                //Side Bet
+                $client_details->connection_name = $bet_transaction->connection_name;
+                $amount = $bet_transaction->bet_amount + $amount;
+                $game_transaction_id = $bet_transaction->game_trans_id;
+                $updateGameTransaction = [
+                    'win' => 5,
+                    'bet_amount' => $amount,
+                    'entry_id' => 1,
+                    'trans_status' => 1
+                ];
+                Helper::saveLog(' Hacksaw Sidebet success', $this->provider_db_id, json_encode($request), 'SideBet HIT');
+                GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                 //Freespin
                 if(isset($data['freeRoundData'])){
                     //this is double bet
@@ -178,7 +190,7 @@ class HacksawGamingController extends Controller
                             "accountBalance"=> $format_balance,
                             "statusCode"=>0,
                             "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                            "statusMessage"=>""
+                            "statusMessage"=>"Success"
                         ];
                         $extensionData = [
                             "mw_request" => json_encode($client_response->requestoclient),
@@ -193,7 +205,7 @@ class HacksawGamingController extends Controller
                             "accountBalance"=> $format_balance,
                             "statusCode"=>0,
                             "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                            "statusMessage"=>""
+                            "statusMessage"=>"Success"
                         ]);
                     }elseif(isset($client_response->fundtransferresponse->status->code)
                     && $client_response->fundtransferresponse->status->code == "402"){
@@ -274,7 +286,7 @@ class HacksawGamingController extends Controller
                     "accountBalance"=> $format_balance,
                     "statusCode"=>0,
                     "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                    "statusMessage"=>""
+                    "statusMessage"=>"Success"
                 ];
                 $extensionData = [
                     "mw_request" => json_encode($client_response->requestoclient),
@@ -289,7 +301,7 @@ class HacksawGamingController extends Controller
                     "accountBalance"=> $format_balance,
                     "statusCode"=>0,
                     "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                    "statusMessage"=>""
+                    "statusMessage"=>"Success"
                 ]);
                 // sleep(30);
                 // return response($response,200)->header('Content-Type', 'application/json');
