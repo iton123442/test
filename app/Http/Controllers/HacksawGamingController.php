@@ -30,12 +30,6 @@ class HacksawGamingController extends Controller
         if(isset($data['token'])){
             $token = $data['token'];
             $client_details = ProviderHelper::getClientDetails('token', $token);
-            if($action_method ="A disturbance in the force."){
-                return response()->json([
-                    'statusCode' => 0,
-                    'statusMessage' => 'Success'
-                ]);
-            }
         }else{
             try{
                 $player_id = $data['externalPlayerId'];
@@ -53,7 +47,12 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Invalid user / token expired'
             ]);
         }
-        
+        if($action_method =="A disturbance in the force."){
+            return response()->json([
+                'statusCode' => 0,
+                'statusMessage' => 'Success'
+            ]);
+        }
         if($secret_key != $this->secret_key){
             return response()->json([
                 'accountBalance' => $client_details->balance,
