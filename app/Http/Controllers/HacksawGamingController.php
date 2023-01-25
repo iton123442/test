@@ -386,7 +386,7 @@ class HacksawGamingController extends Controller
             }
             $gamedetails = ProviderHelper::findGameDetails('game_code',75, $data['gameId']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
-            $balance = str_replace(".","", $client_details->balance);
+            $balance = str_replace(".","", $client_details->balance+$amount);
             $format_balance = (int)$balance;
             if ($game == null){
                 Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
@@ -528,6 +528,13 @@ class HacksawGamingController extends Controller
                             Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($client_response),"FAILED HIT!");
                         }
                     }
+                }else{
+                    return response()->json([
+                        "accountBalance"=>$format_balance,
+                        "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                        "statusCode"=>0,
+                        "statusMessage"=>""
+                    ]);
                 }
             }
             $win = $amount + $game->pay_amount == 0 ? 0 : 1;
