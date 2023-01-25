@@ -149,8 +149,8 @@ class HacksawGamingController extends Controller
                     return response()->json([
                         "accountBalance"=>$balance,
                         "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                        "statusCode"=>1,
-                        "statusMessage"=>"General/Server error"
+                        "statusCode"=>5,
+                        "statusMessage"=>"Insufficient funds to place bet"
                     ]);
                 } 
                 // sleep(4);
