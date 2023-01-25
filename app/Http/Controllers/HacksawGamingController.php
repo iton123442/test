@@ -38,7 +38,7 @@ class HacksawGamingController extends Controller
                 $client_details = ProviderHelper::getClientDetails('token', $player_token);  
             }          
         }
-        ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"HIT!");
+        ProviderHelper::saveLog("Hacksaw Request",$this->provider_db_id,json_encode($data),"HIT!");
         if($client_details == null){
             return response()->json([
                 'accountBalance' => $client_details->balance,
@@ -84,7 +84,7 @@ class HacksawGamingController extends Controller
             ]); 
         }
         if($action_method == 'Bet'){
-            ProviderHelper::saveLog("Hacksaw Bet",142,json_encode($data),"Bet HIT!");
+            ProviderHelper::saveLog("Hacksaw Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
             return $response = $this->GameBet($request->all(),$client_details);
         }
         if($action_method == 'Win'){
@@ -109,7 +109,7 @@ class HacksawGamingController extends Controller
             //     "statusCode"=>0,
             //     "statusMessage"=>""
             // ]);
-            ProviderHelper::saveLog("Hacksaw Rollback",142,json_encode($data),"Rollback HIT!");
+            ProviderHelper::saveLog("Hacksaw Rollback",$this->provider_db_id,json_encode($data),"Rollback HIT!");
             return $response = $this->GameCancel($request->all(),$client_details);
         }
     }
@@ -143,7 +143,7 @@ class HacksawGamingController extends Controller
             }else{
                 $amount = $data['amount'] / 100;
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $data['gameId']);
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             if($bet_transaction != null){
                 //Side Bet
@@ -336,7 +336,7 @@ class HacksawGamingController extends Controller
                         "statusMessage"=>"Insufficient funds to place bet"
                     ]);
                 }catch(\Exception $e){
-                Helper::saveLog("FAILED BET", 142,json_encode($client_response),"FAILED HIT!");
+                Helper::saveLog("FAILED BET", $this->provider_db_id,json_encode($client_response),"FAILED HIT!");
                 }
             }
         }else{
@@ -369,7 +369,7 @@ class HacksawGamingController extends Controller
             }else{
                 $amount = $data['amount'] / 100;
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $data['gameId']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
@@ -461,7 +461,7 @@ class HacksawGamingController extends Controller
                             "statusMessage"=>"General Error"
                         ]);
                     }catch(\Exception $e){
-                        Helper::saveLog("FAILED WIN", 141,json_encode($client_response),"FAILED HIT!");
+                        Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($client_response),"FAILED HIT!");
                     }
                 }
             }
@@ -575,7 +575,7 @@ class HacksawGamingController extends Controller
             }else{
                 $amount = $data['amount'] / 100;
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code', 75, $data['gameId']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $data['gameId']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if($game == null){
                 $game = GametransactionMDB::getGameTransactionDataByProviderTransactionId($data['rolledBackTransactionId'],$client_details);
