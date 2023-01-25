@@ -67,7 +67,7 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Success'
             ]);
         }
-        if($action_method == 'Balance'){
+        elseif($action_method == 'Balance'){
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
             return response()->json([
@@ -77,17 +77,17 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Success'
             ]);     
         }
-        if($action_method == 'EndSession'){
+        elseif($action_method == 'EndSession'){
             return response()->json([
                 'statusCode' => 0,
                 'statusMessage' => 'Success'
             ]); 
         }
-        if($action_method == 'Bet'){
+        elseif($action_method == 'Bet'){
             ProviderHelper::saveLog("Hacksaw Bet",142,json_encode($data),"Bet HIT!");
             return $response = $this->GameBet($request->all(),$client_details);
         }
-        if($action_method == 'Win'){
+        elseif($action_method == 'Win'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
             // $balance = str_replace(".","", $client_details->balance);
             // $format_balance = (int)$balance;
@@ -99,7 +99,7 @@ class HacksawGamingController extends Controller
             // ]);
             return $response = $this->GameWin($request->all(),$client_details);
         }
-        if($action_method == 'Rollback'){
+        elseif($action_method == 'Rollback'){
             // ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"WIN HIT!");
             // $balance = str_replace(".","", $client_details->balance);
             // $format_balance = (int)$balance;
@@ -111,6 +111,11 @@ class HacksawGamingController extends Controller
             // ]);
             ProviderHelper::saveLog("Hacksaw Rollback",142,json_encode($data),"Rollback HIT!");
             return $response = $this->GameCancel($request->all(),$client_details);
+        }else{
+            return response()->json([
+                'statusCode' => 12,
+                'statusMessage' => 'Invalid action.'
+            ]); 
         }
     }
     public function GameBet($request,$client_details){ 
