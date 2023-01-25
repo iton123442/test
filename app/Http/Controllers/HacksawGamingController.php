@@ -388,7 +388,7 @@ class HacksawGamingController extends Controller
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
             if(isset($data['betTransactionId'])){
-                $game = GametransactionMDB::getGameTransactionDataByProviderTransactionIdAndEntryType($data['betTransactionId'],1,$client_details);
+                $game = GametransactionMDB::hacksawGetGameTransactionByTransId($data['betTransactionId'],$client_details);
             }else{
                 $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             }
