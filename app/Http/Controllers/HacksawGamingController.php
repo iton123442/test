@@ -145,7 +145,7 @@ class HacksawGamingController extends Controller
             }else{
                 $amount = $data['amount'] / 100;
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $data['gameId']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',75, $data['gameId']);
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             if($bet_transaction != null){
                 //Side Bet
@@ -373,7 +373,7 @@ class HacksawGamingController extends Controller
             }else{
                 $amount = $data['amount'] / 100;
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $data['gameId']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',75, $data['gameId']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
