@@ -27,15 +27,15 @@ class HacksawGamingController extends Controller
         $data = $request->all();
         $action_method = $data['action'];
         $secret_key = $data['secret'];
-        if($action_method ="A disturbance in the force."){
-            return response()->json([
-                'statusCode' => 0,
-                'statusMessage' => 'Success'
-            ]);
-        }
         if(isset($data['token'])){
             $token = $data['token'];
             $client_details = ProviderHelper::getClientDetails('token', $token);
+            if($action_method ="A disturbance in the force."){
+                return response()->json([
+                    'statusCode' => 0,
+                    'statusMessage' => 'Success'
+                ]);
+            }
         }else{
             try{
                 $player_id = $data['externalPlayerId'];
