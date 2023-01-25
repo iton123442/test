@@ -29,6 +29,8 @@ class HacksawGamingController extends Controller
         $secret_key = $data['secret'];
         if($action_method =="A disturbance in the force."){
             return response()->json([
+                'accountBalance' => 0,
+                'accountCurrency' => "USD",
                 'statusCode' => 0,
                 'statusMessage' => 'Success'
             ]);
@@ -48,7 +50,7 @@ class HacksawGamingController extends Controller
         if($client_details == null){
             return response()->json([
                 'accountBalance' => $client_details->balance,
-                'accountCurrency' => $client_details->default_currency,
+                
                 'statusCode' => 2,
                 'statusMessage' => 'Invalid user / token expired'
             ]);
