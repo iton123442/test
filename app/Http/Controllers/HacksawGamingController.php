@@ -34,9 +34,10 @@ class HacksawGamingController extends Controller
                 $player_id = $data['externalPlayerId'];
                 $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
             }catch(\Exception $e){
-                $player_token = $data['externalSessionId'];
-                $client_details = ProviderHelper::getClientDetails('token', $player_token);
-                if($client_details == null){
+                try{
+                    $player_token = $data['externalSessionId'];
+                    $client_details = ProviderHelper::getClientDetails('token', $player_token);
+                }catch(\Exception $e){
                     return response()->json([
                         'statusCode' => 12,
                         'statusMessage' => 'Invalid action.'
