@@ -149,8 +149,8 @@ class HacksawGamingController extends Controller
                     return response()->json([
                         "accountBalance"=>$balance,
                         "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                        "statusCode"=>11,
-                        "statusMessage"=>"General error"
+                        "statusCode"=>1,
+                        "statusMessage"=>"General/Server error"
                     ]);
                 } 
                 // sleep(4);
