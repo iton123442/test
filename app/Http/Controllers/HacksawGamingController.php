@@ -530,7 +530,7 @@ class HacksawGamingController extends Controller
                     }
                 }else{
                     return response()->json([
-                        "accountBalance"=>$format_balance,
+                        "accountBalance"=>(int)$format_balance+$amount,
                         "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                         "statusCode"=>0,
                         "statusMessage"=>""
