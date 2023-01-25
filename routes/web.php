@@ -552,7 +552,7 @@ $app->post('/public/gamelobby/launchurl','GameLobby\GameLobbyController@gameLobb
 // $app->post('/public/game/suggestions','GameLobby\GameInfoController@getGameSuggestions'); // DEPRECATED 
 // $app->get('game/topcharts','GameLobby\GameInfoController@getTopGames'); # Commented 4-8-21 -Al 
 $app->get('/public/game/topcharts/numberone','GameLobby\GameInfoController@getTopProvider'); # Commented 4-8-21 -Al 
-// $app->post('/public/game/playerdetailsrequest','GameLobby\GameInfoController@getClientPlayerDetails'); # Commented 4-8-21 -Al
+$app->post('/public/game/playerdetailsrequest','GameLobby\GameInfoController@getClientPlayerDetails'); # Commented 4-8-21 -Al
 // $app->post('/public/game/betlist','GameLobby\GameInfoController@getBetList'); # Commented 4-8-21 -Al
 $app->post('/public/game/query','GameLobby\QueryController@queryData');
 // IWallet
