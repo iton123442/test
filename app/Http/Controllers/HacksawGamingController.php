@@ -29,21 +29,17 @@ class HacksawGamingController extends Controller
         if(isset($data['token'])){
             $token = $data['token'];
             $client_details = ProviderHelper::getClientDetails('token', $token);
+        }elseif(isset($data['externalPlayerId'])){
+            $player_id = $data['externalPlayerId'];
+            $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+        }elseif(isset($data['externalSessionId'])){
+            $player_token = $data['externalSessionId'];
+            $client_details = ProviderHelper::getClientDetails('token', $player_token);
         }else{
-            try{
-                $player_id = $data['externalPlayerId'];
-                $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
-            }catch(\Exception $e){
-                try{
-                    $player_token = $data['externalSessionId'];
-                    $client_details = ProviderHelper::getClientDetails('token', $player_token);
-                }catch(\Exception $e){
-                    return response()->json([
-                        'statusCode' => 12,
-                        'statusMessage' => 'Invalid action.'
-                    ]); 
-                }
-            }          
+            return response()->json([
+                'statusCode' => 12,
+                'statusMessage' => 'Invalid action.'
+            ]); 
         }
         ProviderHelper::saveLog("Hacksaw Request",$this->provider_db_id,json_encode($data),"HIT!");
         if($client_details == null){
