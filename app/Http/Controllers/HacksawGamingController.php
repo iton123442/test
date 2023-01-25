@@ -145,7 +145,7 @@ class HacksawGamingController extends Controller
                 if ($bet_transaction != 'false') {
                     //this will be trigger if error occur 10s
                     Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($data),  $bet_transaction->mw_response);
-                    $balance = str_replace(".","", $client_details->balance);
+                    $balance = str_replace(".","", $client_details->balance-$amount);
                     return response()->json([
                         "accountBalance"=>$balance,
                         "externalTransactionId"=> $roundId."_".$provider_trans_id,
