@@ -47,6 +47,14 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Invalid user / token expired'
             ]);
         }
+        if($action_method ="A disturbance in the force."){
+            return response()->json([
+                'accountBalance' => $client_details->balance,
+                'accountCurrency' => $client_details->default_currency,
+                'statusCode' => 1,
+                'statusMessage' => 'General/Server error'
+            ]);
+        }
         if($secret_key != $this->secret_key){
             return response()->json([
                 'accountBalance' => $client_details->balance,
@@ -435,7 +443,7 @@ class HacksawGamingController extends Controller
                         "accountBalance"=>$format_balance,
                         "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                         "statusCode"=>0,
-                        "statusMessage"=>""
+                        "statusMessage"=>"Success"
                     ]);
                 }elseif(isset($client_response->fundtransferresponse->status->code)
                 && $client_response->fundtransferresponse->status->code == "402"){
