@@ -31,8 +31,8 @@ class HacksawGamingController extends Controller
             return response()->json([
                 'accountBalance' => 0,
                 'accountCurrency' => "USD",
-                'statusCode' => 0,
-                'statusMessage' => 'Success'
+                'statusCode' => 1,
+                'statusMessage' => 'General/Server error'
             ]);
         }
         if(isset($data['token'])){
