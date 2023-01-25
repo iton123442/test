@@ -49,8 +49,10 @@ class HacksawGamingController extends Controller
         }
         if($action_method ="A disturbance in the force."){
             return response()->json([
+                'accountBalance' => int($client_details->balance),
+                'accountCurrency' => $client_details->default_currency,
                 'statusCode' => 0,
-                'statusMessage' => 'success'
+                'statusMessage' => 'Success'
             ]);
         }
         if($secret_key != $this->secret_key){
