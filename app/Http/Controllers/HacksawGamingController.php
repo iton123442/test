@@ -119,34 +119,8 @@ class HacksawGamingController extends Controller
         if($client_details){
             $roundId = $data['roundId'];
             $provider_trans_id = $data['transactionId'];
-            try{
-                ProviderHelper::saveLog("Hacksaw Idempotent Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
-                ProviderHelper::idenpotencyTable("BET_".$data['transactionId']);
-            }catch(\Exception $e){
-                $bet_transaction = GameTransactionMDB::findGameExt($data['transactionId'], 1,'transaction_id', $client_details);
-                if ($bet_transaction != 'false') {
-                    //this will be trigger if error occur 10s
-                    Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($request->all()),  $bet_transaction->mw_response);
-                    return response()->json([
-                        json_encode($bet_transaction->mw_response)
-                    ]);
-                } 
-                // sleep(4);
-                $balance = str_replace(".","", $client_details->balance);
-                return response()->json([
-                    "accountBalance"=>$balance,
-                    "externalTransactionId"=> $roundId."_".$provider_trans_id,
-                    "statusCode"=>11,
-                    "statusMessage"=>"General error"
-                ]);
-            }
-            if($data['amount'] == 0){
-                $amount = 0;
-            }else{
-                $amount = $data['amount'] / 100;
-            }
             $gamedetails = ProviderHelper::findGameDetails('game_code',75, $data['gameId']);
-            $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
+            $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);           
             if($bet_transaction != null){
                 //Side Bet
                 ProviderHelper::saveLog("Hacksaw Side Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
@@ -252,6 +226,33 @@ class HacksawGamingController extends Controller
                     "statusMessage"=>"General Error"
                 ]);
             }
+            try{
+                ProviderHelper::saveLog("Hacksaw Idempotent Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
+                ProviderHelper::idenpotencyTable("BET_".$data['transactionId']);
+            }catch(\Exception $e){
+                $bet_transaction = GameTransactionMDB::findGameExt($data['transactionId'], 1,'transaction_id', $client_details);
+                if ($bet_transaction != 'false') {
+                    //this will be trigger if error occur 10s
+                    Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($request->all()),  $bet_transaction->mw_response);
+                    return response()->json([
+                        json_encode($bet_transaction->mw_response)
+                    ]);
+                } 
+                // sleep(4);
+                $balance = str_replace(".","", $client_details->balance);
+                return response()->json([
+                    "accountBalance"=>$balance,
+                    "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                    "statusCode"=>11,
+                    "statusMessage"=>"General error"
+                ]);
+            }
+            if($data['amount'] == 0){
+                $amount = 0;
+            }else{
+                $amount = $data['amount'] / 100;
+            }
+   
             $gameTransactionDatas = [
                 "provider_trans_id" => $provider_trans_id,
                 "token_id" => $client_details->token_id,
