@@ -23,6 +23,7 @@ class HacksawGamingController extends Controller
         $this->secret_key = config('providerlinks.hacksawgaming.secret');
     }
     public function hacksawIndex(Request $request){
+        ProviderHelper::saveLog("Hacksaw Index Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
         $data = $request->all();
         $action_method = $data['action'];
         $secret_key = $data['secret'];
@@ -37,8 +38,7 @@ class HacksawGamingController extends Controller
                 $player_token = $data['externalSessionId'];
                 $client_details = ProviderHelper::getClientDetails('token', $player_token);  
             }          
-        }
-        ProviderHelper::saveLog("Hacksaw Request",$this->provider_db_id,json_encode($data),"HIT!");
+        }   
         if($client_details == null){
             return response()->json([
                 'accountBalance' => $client_details->balance,
