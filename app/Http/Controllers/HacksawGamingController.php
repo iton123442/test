@@ -136,7 +136,7 @@ class HacksawGamingController extends Controller
             if($bet_transaction != null){
                 //Side Bet
                 ProviderHelper::saveLog("Hacksaw Side Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
-                $client_details->connection_name = $bet_transaction->connection_name;
+                // $client_details->connection_name = $bet_transaction->connection_name;
                 $amount = $bet_transaction->bet_amount + $amount;
                 $game_transaction_id = $bet_transaction->game_trans_id;
                 $updateGameTransaction = [
