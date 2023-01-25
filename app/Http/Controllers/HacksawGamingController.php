@@ -386,7 +386,7 @@ class HacksawGamingController extends Controller
             }
             $gamedetails = ProviderHelper::findGameDetails('game_code',75, $data['gameId']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
-            $balance = str_replace(".","", $client_details->balance+$amount);
+            $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
             if ($game == null){
                 Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
