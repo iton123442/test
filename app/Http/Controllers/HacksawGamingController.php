@@ -110,7 +110,7 @@ class HacksawGamingController extends Controller
             //     "statusMessage"=>""
             // ]);
             ProviderHelper::saveLog("Hacksaw Rollback",$this->provider_db_id,json_encode($data),"Rollback HIT!");
-            return $response = $this->GameCancel($request->all(),$client_details);
+            return $response = $this->Rollback($request->all(),$client_details);
         }
     }
     public function GameBet($request,$client_details){ 
@@ -356,7 +356,7 @@ class HacksawGamingController extends Controller
         $data = $request;
         if($client_details){
             try{
-                ProviderHelper::IdenpotencyTable($data['transactionId']);
+                ProviderHelper::IdenpotencyTable("WIN_".$data['transactionId']);
             }catch(\Exception $e){
                 $balance = str_replace(".","", $client_details->balance);
                 $format_balance = (int)$balance;
@@ -562,6 +562,7 @@ class HacksawGamingController extends Controller
         $data = $request;
         if($client_details){
             try{
+                Helper::saveLog('Hacksaw Rollback Idempotent', $this->provider_db_id, json_encode($data), 'Success HIT!');
                 ProviderHelper::IdenpotencyTable($data['transactionId']);
             }catch(\Exception $e){
                 $balance = str_replace(".","", $client_details->balance);
@@ -599,7 +600,7 @@ class HacksawGamingController extends Controller
                 "accountBalance"=>$format_balance,
                 "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                 "statusCode"=>0,
-                "statusMessage"=>""
+                "statusMessage"=>"Success"
             ];
             $gameExtensionData = [
                 "game_trans_id" => $game->game_trans_id,
@@ -664,6 +665,130 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Invalid user / token expired'
             ]);
         }
+    }
+
+ public function Rollback($request,$client_details){
+    $data = $request;
+    $reference_transaction_uuid = $data["rolledBackTransactionId"];
+    $amount = $data["amount"]/100;
+    $bal = str_replace(".","", $client_details->balance);
+    $format_balance = (int)$bal;
+    if($client_details != null){
+		$bet_transaction = GameTransactionMDB::findGameExt($reference_transaction_uuid, 3,'transaction_id', $client_details);
+		if ($bet_transaction != 'false') {
+           
+            Helper::saveLog('Hacksaw Roll duplicate_transaction success', $this->provider_db_id, json_encode($data),  $bet_transaction->mw_response);
+			return response()->json([
+                "accountBalance"=>$format_balance,
+                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                "statusCode"=>1,
+                "statusMessage"=>"General/Server error"
+            ]);
+		} 
+		try{
+	 		ProviderHelper::idenpotencyTable("Rollback_".$data["transactionId"]);
+		}catch(\Exception $e){
+		 	// sleep(7);
+		 	$bet_transaction = GameTransactionMDB::findGameExt($reference_transaction_uuid, 3,'transaction_id', $client_details);
+		 	if ($bet_transaction != 'false') {
+		 		//this will be trigger if error occur 10s
+                 Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($data),  $bet_transaction->mw_response);
+                 return response()->json([
+                    "accountBalance"=>$format_balance,
+                    "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                    "statusCode"=>1,
+                    "statusMessage"=>"General/Server error"
+                ]);
+				
+				
+		 	} 
+		}
+        $gamedetails = ProviderHelper::findGameDetails('game_code',75, $data['gameId']);
+		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
+		if($existing_bet == 'false'){
+            return response()->json([
+                "accountBalance"=>$format_balance,
+                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                "statusCode"=>1,
+                "statusMessage"=>"General/Server error"
+            ]);
+		}
+		$client_details->connection_name = $existing_bet->connection_name;
+		$already_process = GameTransactionMDB::findGameExt($reference_transaction_uuid, 2,'transaction_id', $client_details);
+		if($already_process != 'false'){
+			return response($already_process->mw_response,200)
+		 		->header('Content-Type', 'application/json');
+		}
+		try{
+			$num = $client_details->balance + $existing_bet->bet_amount;
+			ProviderHelper::_insertOrUpdate($client_details->token_id, $num); 
+			$response = [
+				"accountBalance" => $format_balance ,
+				"externalTransactionId" => $data['roundId']."_".$data['transactionId'],
+				"statusCode" => 0,
+				"statusMessage" =>"Success"
+			];
+			$create_gametransactionext = array(
+				"game_trans_id" => $existing_bet->game_trans_id,
+				"provider_trans_id" => $reference_transaction_uuid,
+				"round_id" => $transaction_uuid,
+				"amount" => $existing_bet->bet_amount,
+				"game_transaction_type"=> 3,
+				"provider_request" => json_encode($data),
+				"mw_response" => json_encode($response)
+			);
+			$game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($create_gametransactionext,$client_details);
+			$win_or_lost = 4;
+            $entry_id = $existing_bet->bet_amount > 0 ?  2 : 1;
+           	$income = 0;
+			$updateGameTransaction = [
+	            'win' => 5,
+	            'pay_amount' => $existing_bet->bet_amount,
+	            'income' => $income,
+	            'entry_id' => $entry_id,
+	            'trans_status' => 3
+	        ];
+        	GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
+			$body_details = [
+	            "type" => "credit",
+	            "win" => $win_or_lost,
+	            "token" => $client_details->player_token,
+	            "rollback" => "true",
+	            "game_details" => [
+	                "game_id" => $game_details->game_id
+	            ],
+	            "game_transaction" => [
+	                "amount" => $existing_bet->bet_amount
+	            ],
+	            "connection_name" => $existing_bet->connection_name,
+	            "game_trans_ext_id" => $game_trans_ext_id,
+	            "game_transaction_id" => $existing_bet->game_trans_id
+
+	        ];
+			try {
+				$client = new Client();
+		 		$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
+		 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
+		 		);
+		 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
+	            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+	            return $response;
+			} catch (\Exception $e) {
+	            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+	            return $response;
+			}
+		}catch(\Exception $e){
+            Helper::saveLog('Hacksaw Rollback error ='.$e->getMessage(), $this->provider_db_id, json_encode($data), "Rollback Error");
+            return response()->json([
+                "accountBalance"=>$format_balance,
+                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                "statusCode"=>1,
+                "statusMessage"=>"General/Server error"
+            ]);
+			
+			
+		}
+    }
     }
 }
 
