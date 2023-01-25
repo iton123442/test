@@ -48,8 +48,10 @@ class HacksawGamingController extends Controller
             ]);
         }
         if($action_method ="A disturbance in the force."){
+            $balance = str_replace(".","", $client_details->balance);
+            $format_balance = (int)$balance;
             return response()->json([
-                'accountBalance' => int($client_details->balance),
+                'accountBalance' => $format_balance,
                 'accountCurrency' => $client_details->default_currency,
                 'statusCode' => 0,
                 'statusMessage' => 'Success'
