@@ -580,7 +580,7 @@ class HacksawGamingController extends Controller
             }else{
                 $amount = $data['amount'] / 100;
             }
-            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $data['gameId']);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',75, $data['gameId']);
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if($game == null){
                 $game = GametransactionMDB::getGameTransactionDataByProviderTransactionId($data['rolledBackTransactionId'],$client_details);
@@ -650,7 +650,7 @@ class HacksawGamingController extends Controller
                     "mw_response" => json_encode($response)
                 ];
                 GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
-                Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                Helper::saveLog('Hacksaw Rollback', $this->provider_db_id, json_encode($data), 'Success HIT!');
                 return response()->json([
                     "accountBalance"=>$format_balance,
                     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
