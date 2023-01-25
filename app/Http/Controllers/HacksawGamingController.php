@@ -144,9 +144,13 @@ class HacksawGamingController extends Controller
                 $bet_transaction = GameTransactionMDB::findGameExt($data['transactionId'], 1,'transaction_id', $client_details);
                 if ($bet_transaction != 'false') {
                     //this will be trigger if error occur 10s
-                    Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($request->all()),  $bet_transaction->mw_response);
+                    Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($data),  $bet_transaction->mw_response);
+                    $balance = str_replace(".","", $client_details->balance);
                     return response()->json([
-                        json_encode($bet_transaction->mw_response)
+                        "accountBalance"=>$balance,
+                        "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                        "statusCode"=>11,
+                        "statusMessage"=>"General error"
                     ]);
                 } 
                 // sleep(4);
@@ -171,7 +175,6 @@ class HacksawGamingController extends Controller
                     'entry_id' => 1,
                     'trans_status' => 1
                 ];
-                Helper::saveLog(' Hacksaw Sidebet success', $this->provider_db_id, json_encode($request), 'SideBet HIT');
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
                 //Freespin
                 if(isset($data['freeRoundData'])){
