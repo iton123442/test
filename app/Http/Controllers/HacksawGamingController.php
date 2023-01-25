@@ -533,7 +533,7 @@ class HacksawGamingController extends Controller
                     $amount = $data['amount'];
                     $balance = str_replace(".","", $client_details->balance);
                     return response()->json([
-                        "accountBalance"=>(int)$balance,
+                        "accountBalance"=>(int)$balance+$amount,
                         "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                         "statusCode"=>0,
                         "statusMessage"=>""
