@@ -394,93 +394,97 @@ class HacksawGamingController extends Controller
             $format_balance = (int)$balance;
             if ($game == null){
                 Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
-                $gameTransactionDatas = [
-                    "provider_trans_id" => $provider_trans_id,
-                    "token_id" => $client_details->token_id,
-                    "game_id" => $gamedetails->game_id,
-                    "round_id" => $roundId,
-                    "bet_amount" => $amount,
-                    "pay_amount" => 0,
-                    "win" => 5,
-                    "income" => 0,
-                    "entry_id" => 1
-                ];
-                $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
-                $gameExtensionData = [
-                    "game_trans_id" => $game_trans_id,
-                    "provider_trans_id" => $provider_trans_id,
-                    "round_id" => $roundId,
-                    "amount" => $amount,
-                    "game_transaction_type" => 1,
-                    "provider_request" => json_encode($data),
-                ];
-                $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
-                $fund_extra_data = [
-                    'provider_name' => $gamedetails->provider_name
-                ];
-                $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
-                if(isset($client_response->fundtransferresponse->status->code)
-                && $client_response->fundtransferresponse->status->code == "200"){
-                    $balance = round($client_response->fundtransferresponse->balance, 2);
-                    $bal = str_replace(".","", $client_details->balance);
-                    $format_balance = (int)$bal;
-                    ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
-                    //SUCCESS FUNDTRANSFER
-                    $updateTransData = [
+                
+                if(isset($data['freeRoundData'])){
+                    $amount = 0;
+                    $gameTransactionDatas = [
+                        "provider_trans_id" => $provider_trans_id,
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $gamedetails->game_id,
+                        "round_id" => $roundId,
+                        "bet_amount" => $amount,
+                        "pay_amount" => 0,
                         "win" => 5,
+                        "income" => 0,
+                        "entry_id" => 1
                     ];
-                    GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
-                    $response = [
-                        "accountBalance"=>$format_balance,
-                        "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                        "statusCode"=>0,
-                        "statusMessage"=>""
+                    $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
+                    $gameExtensionData = [
+                        "game_trans_id" => $game_trans_id,
+                        "provider_trans_id" => $provider_trans_id,
+                        "round_id" => $roundId,
+                        "amount" => $amount,
+                        "game_transaction_type" => 1,
+                        "provider_request" => json_encode($data),
                     ];
-                    $extensionData = [
-                        "mw_response" =>json_encode($response),
-                        "mw_request" => json_encode($client_response->requestoclient),
-                        "client_response" => json_encode($client_response),
-                        "transaction_detail" => "Success",
-                        "general_details" => "Success",
+                    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+                    $fund_extra_data = [
+                        'provider_name' => $gamedetails->provider_name
                     ];
-                    GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
-                    Helper::saveLog('Hacksaw No BET', $this->provider_db_id, json_encode($data), 'Success HIT!');
-                    return response()->json([
-                        "accountBalance"=>$format_balance,
-                        "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                        "statusCode"=>0,
-                        "statusMessage"=>""
-                    ]);
-                }elseif(isset($client_response->fundtransferresponse->status->code)
-                && $client_response->fundtransferresponse->status->code == "402"){
-                    try{    
-                        $updateTrans = [
-                            "win" => 2,
-                            "trans_status" => 5
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
+                    if(isset($client_response->fundtransferresponse->status->code)
+                    && $client_response->fundtransferresponse->status->code == "200"){
+                        $balance = round($client_response->fundtransferresponse->balance, 2);
+                        $bal = str_replace(".","", $client_details->balance);
+                        $format_balance = (int)$bal;
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                        //SUCCESS FUNDTRANSFER
+                        $updateTransData = [
+                            "win" => 5,
                         ];
-                        GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
+                        GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
                         $response = [
                             "accountBalance"=>$format_balance,
                             "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                            "statusCode"=>11,
-                            "statusMessage"=>"General Error"
+                            "statusCode"=>0,
+                            "statusMessage"=>""
                         ];
-                        $updateExt = [
+                        $extensionData = [
                             "mw_response" =>json_encode($response),
-                            "mw_request" => json_encode('FAILED'),
+                            "mw_request" => json_encode($client_response->requestoclient),
                             "client_response" => json_encode($client_response),
-                            "transaction_detail" => "FAILED",
-                            "general_details" => "FAILED",
+                            "transaction_detail" => "Success",
+                            "general_details" => "Success",
                         ];
-                        GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
+                        GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
+                        Helper::saveLog('Hacksaw No BET', $this->provider_db_id, json_encode($data), 'Success HIT!');
                         return response()->json([
                             "accountBalance"=>$format_balance,
                             "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                            "statusCode"=>11,
-                            "statusMessage"=>"General Error"
+                            "statusCode"=>0,
+                            "statusMessage"=>""
                         ]);
-                    }catch(\Exception $e){
-                        Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($client_response),"FAILED HIT!");
+                    }elseif(isset($client_response->fundtransferresponse->status->code)
+                    && $client_response->fundtransferresponse->status->code == "402"){
+                        try{    
+                            $updateTrans = [
+                                "win" => 2,
+                                "trans_status" => 5
+                            ];
+                            GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
+                            $response = [
+                                "accountBalance"=>$format_balance,
+                                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                                "statusCode"=>11,
+                                "statusMessage"=>"General Error"
+                            ];
+                            $updateExt = [
+                                "mw_response" =>json_encode($response),
+                                "mw_request" => json_encode('FAILED'),
+                                "client_response" => json_encode($client_response),
+                                "transaction_detail" => "FAILED",
+                                "general_details" => "FAILED",
+                            ];
+                            GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
+                            return response()->json([
+                                "accountBalance"=>$format_balance,
+                                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                                "statusCode"=>11,
+                                "statusMessage"=>"General Error"
+                            ]);
+                        }catch(\Exception $e){
+                            Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($client_response),"FAILED HIT!");
+                        }
                     }
                 }
             }
@@ -598,6 +602,97 @@ class HacksawGamingController extends Controller
             $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             if($game == null){
                 $game = GametransactionMDB::getGameTransactionDataByProviderTransactionId($data['rolledBackTransactionId'],$client_details);
+                if($game ==null){
+                    $gameTransactionDatas = [
+                        "provider_trans_id" => $provider_trans_id,
+                        "token_id" => $client_details->token_id,
+                        "game_id" => $gamedetails->game_id,
+                        "round_id" => $roundId,
+                        "bet_amount" => $amount,
+                        "pay_amount" => 0,
+                        "win" => 5,
+                        "income" => 0,
+                        "entry_id" => 1
+                    ];
+                    $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
+                    ProviderHelper::saveLog("Hacksaw Create Trans Bet",$this->provider_db_id,json_encode($gameTransactionDatas),"Bet HIT!");
+                    $gameExtensionData = [
+                        "game_trans_id" => $game_trans_id,
+                        "provider_trans_id" => $provider_trans_id,
+                        "round_id" => $roundId,
+                        "amount" => $amount,
+                        "game_transaction_type" => 1,
+                        "provider_request" => json_encode($data),
+                    ];
+                    $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+                    $fund_extra_data = [
+                        'provider_name' => $gamedetails->provider_name
+                    ];
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
+                    if(isset($client_response->fundtransferresponse->status->code)
+                    && $client_response->fundtransferresponse->status->code == "200"){
+                        $balance = round($client_response->fundtransferresponse->balance, 2);
+                        $bal = str_replace(".","", $balance);
+                        $format_balance = (int)$bal;
+                        ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                        //SUCCESS FUNDTRANSFER
+                        $response = [
+                            "accountBalance"=> $format_balance,
+                            "statusCode"=>0,
+                            "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                            "statusMessage"=>"Success"
+                        ];
+                        $extensionData = [
+                            "mw_request" => json_encode($client_response->requestoclient),
+                            "mw_response" =>json_encode($response),
+                            "client_response" => json_encode($client_response),
+                            "transaction_detail" => "Success",
+                            "general_details" => "Success",
+                        ];
+                        GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
+                        return response()->json([
+                            "accountBalance"=> $format_balance,
+                            "statusCode"=>0,
+                            "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                            "statusMessage"=>"Success"
+                        ]);
+                        // sleep(30);
+                        // return response($response,200)->header('Content-Type', 'application/json');
+                    }elseif(isset($client_response->fundtransferresponse->status->code)
+                    && $client_response->fundtransferresponse->status->code == "402"){
+                        $balance = round($client_response->fundtransferresponse->balance, 2);
+                        $format_balance = str_replace(".","", $client_details->balance);
+                        try{    
+                            $updateTrans = [
+                                "win" => 2,
+                                "trans_status" => 5
+                            ];
+                            GameTransactionMDB::updateGametransaction($updateTrans,$game_trans_id,$client_details);
+                            $response = [
+                                "accountBalance"=>(int) $format_balance,
+                                "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                                "statusCode"=>5,
+                                "statusMessage"=>"Insufficient funds to place bet"
+                            ];
+                            $updateExt = [
+                                "mw_request" => json_encode('FAILED'),
+                                "mw_response" =>json_encode($response),
+                                "client_response" => json_encode($client_response),
+                                "transaction_detail" => "FAILED",
+                                "general_details" => "FAILED",
+                            ];
+                            GameTransactionMDB::updateGametransactionEXT($updateExt,$game_trans_ext_id,$client_details);
+                            return response()->json([
+                                "accountBalance"=>(int) $format_balance,
+                                "externalTransactionId"=> $roundId."_".$provider_trans_id,
+                                "statusCode"=>5,
+                                "statusMessage"=>"Insufficient funds to place bet"
+                            ]);
+                        }catch(\Exception $e){
+                        Helper::saveLog("FAILED BET", $this->provider_db_id,json_encode($client_response),"FAILED HIT!");
+                        }
+                    }
+                };
             }
             $balance = str_replace(".","", $client_details->balance);
             $format_balance = (int)$balance;
