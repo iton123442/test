@@ -115,10 +115,12 @@ class HacksawGamingController extends Controller
     }
     public function GameBet($request,$client_details){ 
         $data = $request;
+        ProviderHelper::saveLog("Hacksaw Function Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
         if($client_details){
             $roundId = $data['roundId'];
             $provider_trans_id = $data['transactionId'];
             try{
+                ProviderHelper::saveLog("Hacksaw Idempotent Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
                 ProviderHelper::idenpotencyTable("BET_".$data['transactionId']);
             }catch(\Exception $e){
                 $bet_transaction = GameTransactionMDB::findGameExt($data['transactionId'], 1,'transaction_id', $client_details);
@@ -147,6 +149,7 @@ class HacksawGamingController extends Controller
             $bet_transaction = GameTransactionMDB::getGameTransactionByRoundId($roundId,$client_details);
             if($bet_transaction != null){
                 //Side Bet
+                ProviderHelper::saveLog("Hacksaw Side Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
                 $client_details->connection_name = $bet_transaction->connection_name;
                 $amount = $bet_transaction->bet_amount + $amount;
                 $game_transaction_id = $bet_transaction->game_trans_id;
@@ -261,6 +264,7 @@ class HacksawGamingController extends Controller
                 "entry_id" => 1
             ];
             $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
+            ProviderHelper::saveLog("Hacksaw Create Trans Bet",$this->provider_db_id,json_encode($gameTransactionDatas),"Bet HIT!");
             $gameExtensionData = [
                 "game_trans_id" => $game_trans_id,
                 "provider_trans_id" => $provider_trans_id,
