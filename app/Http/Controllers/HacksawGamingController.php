@@ -530,8 +530,10 @@ class HacksawGamingController extends Controller
                     }
                 }else{
                     Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($data),$format_balance+$amount);
+                    $amount = $data['amount'];
+                    $balance = str_replace(".","", $client_details->balance);
                     return response()->json([
-                        "accountBalance"=>(int)$format_balance+$amount,
+                        "accountBalance"=>(int)$balance,
                         "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                         "statusCode"=>0,
                         "statusMessage"=>""
