@@ -429,31 +429,78 @@ class HacksawGamingController extends Controller
                         $format_balance = (int)$bal;
                         ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                         //SUCCESS FUNDTRANSFER
+                        $win = $amount == 0 ? 0 : 1;
                         $updateTransData = [
-                            "win" => 5,
+                            "win" => $win,
+                            "pay_amount" => round($amount,2),
+                            "income" => round($amount,2),
+                            "entry_id" => $amount == 0 ? 1 : 2,
                         ];
                         GameTransactionMDB::updateGametransaction($updateTransData,$game_trans_id,$client_details);
-                        $response = [
+                        $response =[
                             "accountBalance"=>$format_balance,
                             "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                             "statusCode"=>0,
                             "statusMessage"=>""
                         ];
-                        $extensionData = [
-                            "mw_response" =>json_encode($response),
-                            "mw_request" => json_encode($client_response->requestoclient),
-                            "client_response" => json_encode($client_response),
-                            "transaction_detail" => "Success",
-                            "general_details" => "Success",
+                        $gameExtensionData = [
+                            "game_trans_id" => $game_trans_id,
+                            "provider_trans_id" => $provider_trans_id,
+                            "round_id" => $roundId,
+                            "amount" => $amount,
+                            "game_transaction_type" => 2,
+                            "provider_request" => json_encode($data),
                         ];
-                        GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
-                        Helper::saveLog('Hacksaw No BET', $this->provider_db_id, json_encode($data), 'Success HIT!');
-                        return response()->json([
-                            "accountBalance"=>$format_balance,
-                            "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                            "statusCode"=>0,
-                            "statusMessage"=>""
-                        ]);
+                        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+                        $action_payload = [
+                            "type" => "custom", #genreral,custom :D # REQUIRED!
+                            "custom" => [
+                                "provider" => 'NagaGames',
+                                "game_transaction_ext_id" => $game_trans_ext_id,
+                                "client_connection_name" => $client_details->connection_name,
+                                "win_or_lost" => $win,
+                            ],
+                            "provider" => [
+                                "provider_request" => $data,
+                                "provider_trans_id"=>$provider_trans_id,
+                                "provider_round_id"=>$roundId,
+                                'provider_name' => $gamedetails->provider_name
+                            ],
+                            "mwapi" => [
+                                "roundId"=> $game_trans_id,
+                                "type" => 2,
+                                "game_id" => $gamedetails->game_id,
+                                "player_id" => $client_details->player_id,
+                                "mw_response" => $response,
+                            ]
+                        ];
+                        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_id,'credit',false,$action_payload);
+                        if(isset($client_response->fundtransferresponse->status->code) &&
+                        $client_response->fundtransferresponse->status->code == "200"){
+                            $balance = round($client_response->fundtransferresponse->balance, 2);
+                            $bal = str_replace(".","", $balance);
+                            $format_balance = (int)$bal;
+                            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                            //SUCCESS FUNDTRANSFER
+                            $response = [
+                                "accountBalance"=>$format_balance,
+                                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                                "statusCode"=>0,
+                                "statusMessage"=>""
+                            ];
+                            $msg = [
+                                "mw_response" => json_encode($response)
+                            ];
+                            GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
+                            Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                            return response()->json([
+                                "accountBalance"=>$format_balance,
+                                "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
+                                "statusCode"=>0,
+                                "statusMessage"=>""
+                            ]);
+                        
+                        }
                     }elseif(isset($client_response->fundtransferresponse->status->code)
                     && $client_response->fundtransferresponse->status->code == "402"){
                         try{    
@@ -479,8 +526,8 @@ class HacksawGamingController extends Controller
                             return response()->json([
                                 "accountBalance"=>$format_balance,
                                 "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
-                                "statusCode"=>11,
-                                "statusMessage"=>"General Error"
+                                "statusCode"=>5,
+                                "statusMessage"=>"Insufficient funds to place bet"
                             ]);
                         }catch(\Exception $e){
                             Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($client_response),"FAILED HIT!");
