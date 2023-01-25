@@ -674,9 +674,9 @@ class HacksawGamingController extends Controller
     $bal = str_replace(".","", $client_details->balance);
     $format_balance = (int)$bal;
     if($client_details != null){
+        ProviderHelper::saveLog("Hacksaw Rollback",$this->provider_db_id,json_encode($data),"Rollback HIT!");
 		$bet_transaction = GameTransactionMDB::findGameExt($reference_transaction_uuid, 3,'transaction_id', $client_details);
-		if ($bet_transaction != 'false') {
-           
+		if ($bet_transaction != 'false') {  
             Helper::saveLog('Hacksaw Roll duplicate_transaction success', $this->provider_db_id, json_encode($data),  $bet_transaction->mw_response);
 			return response()->json([
                 "accountBalance"=>$format_balance,
@@ -771,10 +771,10 @@ class HacksawGamingController extends Controller
 		 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
 		 		);
 		 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-	            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+                 ProviderHelper::saveLog("Hacksaw Rollback",$this->provider_db_id,json_encode($data),$response);
 	            return $response;
 			} catch (\Exception $e) {
-	            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request->all()), $response);
+	            HProviderHelper::saveLog("Hacksaw Rollback",$this->provider_db_id,json_encode($data),$response);
 	            return $response;
 			}
 		}catch(\Exception $e){
