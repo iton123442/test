@@ -539,8 +539,8 @@ class HacksawGamingController extends Controller
                 $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game->game_trans_id,'credit',false,$action_payload);
                 if(isset($client_response->fundtransferresponse->status->code) &&
                 $client_response->fundtransferresponse->status->code == "200"){
-                    $balance = round($client_details->balance+$amount, 2);
-                    $bal = str_replace(".","", $client_details->balance);
+                    $balance = round($client_response->fundtransferresponse->balance, 2);
+                    $bal = str_replace(".","", $balance);
                     $format_balance = (int)$bal;
                     ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                     //SUCCESS FUNDTRANSFER
@@ -648,7 +648,7 @@ class HacksawGamingController extends Controller
             if(isset($client_response->fundtransferresponse->status->code) &&
             $client_response->fundtransferresponse->status->code == "200"){
                 $balance = round($client_response->fundtransferresponse->balance, 2);
-                $bal = str_replace(".","", $client_details->balance);
+                $bal = str_replace(".","", $balance);
                 $format_balance = (int)$bal;
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
