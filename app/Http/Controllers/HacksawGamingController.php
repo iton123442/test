@@ -121,7 +121,7 @@ class HacksawGamingController extends Controller
             $provider_trans_id = $data['transactionId'];
             try{
                 ProviderHelper::saveLog("Hacksaw Idempotent Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
-                ProviderHelper::idenpotencyTable("BET_".$data['transactionId']);
+                //ProviderHelper::idenpotencyTable("BET_".$data['transactionId']);
             }catch(\Exception $e){
                 $bet_transaction = GameTransactionMDB::findGameExt($data['transactionId'], 1,'transaction_id', $client_details);
                 if ($bet_transaction != 'false') {
