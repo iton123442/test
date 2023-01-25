@@ -396,13 +396,12 @@ class HacksawGamingController extends Controller
                 Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
                 
                 if(isset($data['freeRoundData'])){
-                    $amount = 0;
                     $gameTransactionDatas = [
                         "provider_trans_id" => $provider_trans_id,
                         "token_id" => $client_details->token_id,
                         "game_id" => $gamedetails->game_id,
                         "round_id" => $roundId,
-                        "bet_amount" => $amount,
+                        "bet_amount" => 0,
                         "pay_amount" => 0,
                         "win" => 5,
                         "income" => 0,
@@ -413,7 +412,7 @@ class HacksawGamingController extends Controller
                         "game_trans_id" => $game_trans_id,
                         "provider_trans_id" => $provider_trans_id,
                         "round_id" => $roundId,
-                        "amount" => $amount,
+                        "amount" => 0,
                         "game_transaction_type" => 1,
                         "provider_request" => json_encode($data),
                     ];
@@ -421,7 +420,7 @@ class HacksawGamingController extends Controller
                     $fund_extra_data = [
                         'provider_name' => $gamedetails->provider_name
                     ];
-                    $client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
+                    $client_response = ClientRequestHelper::fundTransfer($client_details,0,$gamedetails->game_code,$gamedetails->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
                     if(isset($client_response->fundtransferresponse->status->code)
                     && $client_response->fundtransferresponse->status->code == "200"){
                         $balance = round($client_response->fundtransferresponse->balance, 2);
@@ -455,7 +454,7 @@ class HacksawGamingController extends Controller
                         $action_payload = [
                             "type" => "custom", #genreral,custom :D # REQUIRED!
                             "custom" => [
-                                "provider" => 'NagaGames',
+                                "provider" => 'Hacksaw Gaming',
                                 "game_transaction_ext_id" => $game_trans_ext_id,
                                 "client_connection_name" => $client_details->connection_name,
                                 "win_or_lost" => $win,
@@ -561,7 +560,7 @@ class HacksawGamingController extends Controller
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
-                    "provider" => 'NagaGames',
+                    "provider" => 'Hacksaw Gaming',
                     "game_transaction_ext_id" => $game_trans_ext_id,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => $win,
@@ -769,7 +768,7 @@ class HacksawGamingController extends Controller
             $action_payload = [
                 "type" => "custom", #genreral,custom :D # REQUIRED!
                 "custom" => [
-                    "provider" => 'NagaGames',
+                    "provider" => 'Hacksaw Gaming',
                     "game_transaction_ext_id" => $game_trans_ext_id,
                     "client_connection_name" => $client_details->connection_name,
                     "win_or_lost" => $win,
