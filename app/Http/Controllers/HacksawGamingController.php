@@ -644,7 +644,7 @@ class HacksawGamingController extends Controller
                     "accountBalance"=>$format_balance,
                     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                     "statusCode"=>0,
-                    "statusMessage"=>""
+                    "statusMessage"=>"Success"
                 ];
                 $msg = [
                     "mw_response" => json_encode($response)
@@ -655,7 +655,7 @@ class HacksawGamingController extends Controller
                     "accountBalance"=>$format_balance,
                     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
                     "statusCode"=>0,
-                    "statusMessage"=>""
+                    "statusMessage"=>"Success"
                 ]);
             }
         }else{
