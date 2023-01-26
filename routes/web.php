@@ -978,3 +978,8 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
 $app->get('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
+
+//Micro Gaming Seamless Wallet
+$app->post('/public/api/mg/getbalance', 'MicroGamingSeamlessController@GetBalance');
+$app->post('/public/api/mg/updatebalance', 'MicroGamingSeamlessController@Transactions');
+$app->post('/public/api/mg/rollback', 'MicroGamingSeamlessController@Rollback');
