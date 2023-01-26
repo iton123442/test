@@ -855,6 +855,12 @@ return [
         'api_url' => 'https://static-stg.hacksawgaming.com/launcher/static-launcher.html?',
         'provider_db_id' => 142,
     ],
+    'qtech' => [
+        'partnerid' => 'tigergames_stg',
+        'secret' => 'k8Cr6phob5&*m?PIb',
+        'api_url' => '',
+        'provider_db_id' => 144,
+    ],
 ];
 
 ?>

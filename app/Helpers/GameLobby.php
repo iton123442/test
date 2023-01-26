@@ -2296,12 +2296,35 @@ class GameLobby{
     public static function qtechLaunchUrl($data,$device){
         try {
             $client_details =ProviderHelper::getClientDetails('token',$data['token']);
-            $url = config("providerlinks.hacksawgaming.api_url").'language='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&mode=live&token='.$data['token'].'&lobbyurl='.$data['exitUrl'].'&currency='.$client_details->default_currency.'&partner='.config('providerlinks.hacksawgaming.partnerid');
-            return $url;
-            } catch (\Exception $e) {
-                Helper::saveLog('Hacksaw Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
-                return $e->getMessage();
-            }
+            $request_url = "https://{url-to-qtplatform}/v1/auth/token?grant_type=password&response_type=token&username={username}&password={password}";
+            $accessToken = ProviderHelper::qtGetAccessToken($request_url);
+            $api_url = "https://{url-to-qtplatform}/v1/games/".$data['game_code']."/launch-url";
+            $requesttosend = [
+                'playerId' => $client_details->player_id,
+                'currency' => $client_details->default_currency,
+                'country' => "CN",
+                'gender' => "M",
+                'birthDate' => "1986-01-01",
+                'lang' => "en-US",
+                'mode' => "real",
+                'device' => $device,
+                'returnUrl' => "https://daddy.betrnk.games",
+                'walletSessionId' => $data['token']
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.$accessToken
+                ]
+            ]);
+            $response = $client->post($api_url,[
+                'json' => $requesttosend,
+            ]);
+            return $response;
+        } catch (\Exception $e) {
+            Helper::saveLog('Qtech Gameluanch Error', 144, json_encode('unable to launch'), $e->getMessage() );
+            return $e->getMessage();
+        }
     }
 }
 
