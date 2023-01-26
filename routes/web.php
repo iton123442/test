@@ -975,3 +975,7 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 // $app->post('/public/nagagames/api/placeBet', 'NagaGamesNewController@placeBet');
 // $app->post('/public/nagagames/api/cancelBet', 'NagaGamesNewController@cancelBet');
 // $app->post('/public/nagagames/api/betStatus', 'NagaGamesNewController@betStatus');
+// Qtech 
+$app->get('/public/api/qtech/accounts/{id}/session', 'QtechController@verifySession');
+$app->post('/public/api/qtech/bonus/status', 'QtechController@promoStatus');
+$app->post('/public/api/qtech/bonus/rewards', 'QtechController@promoStatus');
