@@ -2282,6 +2282,27 @@ class GameLobby{
         Helper::saveLog('Naga gamelaunchfinal', 141, json_encode($gameLaunchURL), 'Gamelaunch Success');
         return $gameLaunchURL;  
     }
+
+    public static function hacksawgaming($data,$device){
+        try {
+            $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+            $url = config("providerlinks.hacksawgaming.api_url").'language='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&mode=live&token='.$data['token'].'&lobbyurl='.$data['exitUrl'].'&currency='.$client_details->default_currency.'&partner='.config('providerlinks.hacksawgaming.partnerid');
+            return $url;
+            } catch (\Exception $e) {
+                Helper::saveLog('Hacksaw Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+                return $e->getMessage();
+            }
+    }
+    public static function qtechLaunchUrl($data,$device){
+        try {
+            $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+            $url = config("providerlinks.hacksawgaming.api_url").'language='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&mode=live&token='.$data['token'].'&lobbyurl='.$data['exitUrl'].'&currency='.$client_details->default_currency.'&partner='.config('providerlinks.hacksawgaming.partnerid');
+            return $url;
+            } catch (\Exception $e) {
+                Helper::saveLog('Hacksaw Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+                return $e->getMessage();
+            }
+    }
 }
 
 ?>

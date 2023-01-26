@@ -551,8 +551,8 @@ $app->post('/public/gamelobby/launchurl','GameLobby\GameLobbyController@gameLobb
 // $app->post('/public/game/demogame','GameLobby\GameInfoController@getDemoGame'); # Commented 4-8-21 -Al
 // $app->post('/public/game/suggestions','GameLobby\GameInfoController@getGameSuggestions'); // DEPRECATED 
 // $app->get('game/topcharts','GameLobby\GameInfoController@getTopGames'); # Commented 4-8-21 -Al 
-// $app->get('game/topcharts/numberone','GameLobby\GameInfoController@getTopProvider'); # Commented 4-8-21 -Al 
-// $app->post('/public/game/playerdetailsrequest','GameLobby\GameInfoController@getClientPlayerDetails'); # Commented 4-8-21 -Al
+$app->get('/public/game/topcharts/numberone','GameLobby\GameInfoController@getTopProvider'); # Commented 4-8-21 -Al 
+$app->post('/public/game/playerdetailsrequest','GameLobby\GameInfoController@getClientPlayerDetails'); # Commented 4-8-21 -Al
 // $app->post('/public/game/betlist','GameLobby\GameInfoController@getBetList'); # Commented 4-8-21 -Al
 $app->post('/public/game/query','GameLobby\QueryController@queryData');
 // IWallet
@@ -979,3 +979,12 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 $app->get('/public/api/qtech/accounts/{id}/session', 'QtechController@verifySession');
 $app->post('/public/api/qtech/bonus/status', 'QtechController@promoStatus');
 $app->post('/public/api/qtech/bonus/rewards', 'QtechController@promoStatus');
+
+$app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
+$app->get('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
+
+//Micro Gaming Seamless Wallet
+$app->post('/public/api/mg/login', 'MicroGamingSeamlessController@Login');
+$app->post('/public/api/mg/getbalance', 'MicroGamingSeamlessController@GetBalance');
+$app->post('/public/api/mg/updatebalance', 'MicroGamingSeamlessController@Transactions');
+$app->post('/public/api/mg/rollback', 'MicroGamingSeamlessController@Rollback');
