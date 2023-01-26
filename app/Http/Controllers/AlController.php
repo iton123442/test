@@ -747,8 +747,53 @@ class AlController extends Controller
 
     public function tapulan(Request $request){
 
-      throw new \ErrorException('NO DATA WAS RECEIVED!');
-      dd(1);
+
+
+        // Add Bulk Games!
+        $failed = [];
+        $request_data = json_decode(json_encode($request->all()));
+
+        foreach ($request_data as $data){
+          
+          $data = json_decode($data->data);
+
+          try {
+            $gameDetails = ProviderHelper::findGameDetails('game_code', $data->provider_id, $data->game_code);
+
+            $game_icon = isset($data->game_icon) > $data->game_icon : null;
+            $game_demo = isset($data->game_demo) > $data->game_demo : null;
+
+            if($gameDetails == null){
+              $data = [
+                "game_type_id" => $data->game_type_id,
+                "provider_id" => $data->provider_id,
+                "sub_provider_id" => $data->sub_provider_id,
+                "game_name" => $data->game_name,
+                "game_demo" => $game_demo,
+                "icon" => $game_icon,
+                "game_code" => $data->game_code,
+              ];
+              DB::table('games')->insert($data);
+              continue;
+            }else{
+               continue;
+             }
+          } catch (\Exception $e) {
+              array_push($failed, $data);
+          }
+
+          dd(["failed" => $failed]);
+
+        }
+
+
+        dd("NOt ALLOWED Bro!");
+
+
+      // BELOW ALL DEPRECATED!
+
+      // throw new \ErrorException('NO DATA WAS RECEIVED!');
+      // dd(1);
       
 
 
@@ -1332,6 +1377,49 @@ class AlController extends Controller
         return $client_response;
     }
 
+
+    /**
+     * @param
+     */
+    public function bulkAddGames(Request $request){
+   
+            $failed = [];
+            $request_data = json_decode(json_encode($request->all()));
+
+            foreach ($request_data as $data){
+              
+              $data = json_decode($data->data);
+
+              try {
+                $gameDetails = ProviderHelper::findGameDetails('game_code', $data->provider_id, $data->game_code);
+
+                $game_icon = isset($data->game_icon) > $data->game_icon : null;
+                $game_demo = isset($data->game_demo) > $data->game_demo : null;
+
+                if($gameDetails == null){
+                  $data = [
+                    "game_type_id" => $data->game_type_id,
+                    "provider_id" => $data->provider_id,
+                    "sub_provider_id" => $data->sub_provider_id,
+                    "game_name" => $data->game_name,
+                    "game_demo" => $game_demo,
+                    "icon" => $game_icon,
+                    "game_code" => $data->game_code,
+                  ];
+                  DB::table('games')->insert($data);
+                  continue;
+                }else{
+                   continue;
+                 }
+              } catch (\Exception $e) {
+                  array_push($failed, $data);
+              }
+
+              dd(["failed" => $failed]);
+
+            }
+
+    }
 
 
 }
