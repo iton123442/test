@@ -977,3 +977,4 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 // $app->post('/public/nagagames/api/betStatus', 'NagaGamesNewController@betStatus');
 
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
+$app->post('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
