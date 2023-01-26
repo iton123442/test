@@ -779,12 +779,9 @@ class AlController extends Controller
               array_push($failed, $data);
           }
 
-          dd(["failed" => $failed]);
-
         }
 
-
-        dd("NOt ALLOWED Bro!");
+        dd(["failed" => $failed]);
 
 
       // BELOW ALL DEPRECATED!
