@@ -985,17 +985,19 @@ class HacksawGamingController extends Controller
     }
 
     public function Gamelist(Request $request){
-        $partner_id = "tigergames_stg";
-        $endpoint = "https://api.hacksawgaming.com/api/v1/meta/".$partner_id."/gameList";
-        $client = new GuzzleHttp\Client();
-        $response = $client->request('GET', $endpoint, [
-            'query' => [
-                'partner' => $partner_id,
-                'currency' => 'USD'
-            ]
-        ]);
+        $client = new Client();
+            $partner_id = 'tigergames_stg';
+            $currency = 'USD';
+            $gameId = 1001;
 
-        $data = json_decode($response->getBody(), true);
-        return $data;
+            $response = $client->request('GET', 'https://api.hacksawgaming.com/api/v1/meta/' . $partner_id . '/gameList', [
+                'query' => [
+                    'currency' => $currency
+                ]
+            ]);
+
+            $data = json_decode($response->getBody());
+
+            return $data;
    }
 }
