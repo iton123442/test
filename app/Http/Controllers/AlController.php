@@ -748,14 +748,13 @@ class AlController extends Controller
     public function tapulan(Request $request){
 
 
-
         // Add Bulk Games!
         $failed = [];
         $request_data = json_decode(json_encode($request->all()));
 
-        foreach ($request_data as $data){
+        foreach ($request_data as $req){
           
-          $data = json_decode($data->data);
+          $data = json_decode($req);
 
           try {
             $gameDetails = ProviderHelper::findGameDetails('game_code', $data->provider_id, $data->game_code);
