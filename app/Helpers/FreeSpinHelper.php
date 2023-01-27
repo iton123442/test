@@ -867,6 +867,7 @@ class FreeSpinHelper{
                 //     )]
                 // );//end client post
             }
+            Helper::saveLog('BNG freespin request', 44, json_encode($data), json_encode($requesttosend));
         try {
             $response = $client->post($baseUrl,['body' => json_encode($requesttosend)]);
             $dataresponse = json_decode($response->getBody()->getContents());
