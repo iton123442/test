@@ -917,8 +917,9 @@ class BNGController extends Controller
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
+                            "msg" => 1,
                             "value" =>number_format(Helper::getBalance($client_details),2,'.', ''),
-                            "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
+                            "version" => round(microtime(true) * 1000)//$this->_getExtParameter(),
                         ),
                     );
                     //$this->_setExtParameter($this->_getExtParameter()+1);
@@ -943,6 +944,7 @@ class BNGController extends Controller
                     $response =array(
                         "uid"=>$data["uid"],
                         "balance" => array(
+                            "msg" => 2,
                             "value" =>number_format(Helper::getBalance($client_details),2,'.', ''),
                             "version" => round(microtime(true) * 1000)//$this->_getExtParameter()
                         ),
