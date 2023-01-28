@@ -424,8 +424,8 @@ class AlController extends Controller
         // dd($client_details);
 
 
-        $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
-        dd($client_details);
+        // $client_details = Providerhelper::getClientDetails($request->type,  $request->identifier);
+        // dd($client_details);
 
 
 
