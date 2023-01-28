@@ -2,24 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PlayerDetail;
-use App\Models\PlayerSessionToken;
-use App\Helpers\Helper;
-use App\Helpers\GameTransaction;
-use App\Helpers\GameSubscription;
-use App\Helpers\GameRound;
-use App\Helpers\Game;
-use App\Helpers\CallParameters;
-use App\Helpers\PlayerHelper;
-use App\Helpers\TokenHelper;
-
-use App\Support\RouteParam;
-
 use Illuminate\Http\Request;
-
-use GuzzleHttp\Exception\GuzzleException;
+use App\Helpers\Helper;
+use App\Helpers\ProviderHelper;
 use GuzzleHttp\Client;
-
+use App\Helpers\ClientRequestHelper;
+use App\Models\GameTransaction;
+use App\Models\GameTransactionMDB;
+use App\Helpers\FreeSpinHelper;
+use App\Helpers\Game;
+use Carbon\Carbon;
 use DB;
 
 class QTechController extends Controller
