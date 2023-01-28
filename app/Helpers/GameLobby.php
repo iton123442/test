@@ -2298,10 +2298,43 @@ class GameLobby{
             $client_details =ProviderHelper::getClientDetails('token',$data['token']);
             $url = config("providerlinks.gamingcorps.gamelaunch_url").'game_code='.$data['game_code'].'&language='.$data['lang'].'&currency='.$client_details->default_currency.'&casino_token='.config("providerlinks.gamingcorps.casino_token").'&player_id='.$client_details->player_id.'&platform=desktop&auto_spin=false&max_bet=false';
             return $url;
-            } catch (\Exception $e) {
-                Helper::saveLog('Gaming Corps Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
-                return $e->getMessage();
-            }
+        } catch (\Exception $e) {
+            Helper::saveLog('Gaming Corps Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+            return $e->getMessage();
+        }
+    }
+    public static function qtechLaunchUrl($data,$device){
+        try {
+            $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+            $request_url = "https://{url-to-qtplatform}/v1/auth/token?grant_type=password&response_type=token&username={username}&password={password}";
+            $accessToken = ProviderHelper::qtGetAccessToken($request_url);
+            $api_url = "https://{url-to-qtplatform}/v1/games/".$data['game_code']."/launch-url";
+            $requesttosend = [
+                'playerId' => $client_details->player_id,
+                'currency' => $client_details->default_currency,
+                'country' => "CN",
+                'gender' => "M",
+                'birthDate' => "1986-01-01",
+                'lang' => "en-US",
+                'mode' => "real",
+                'device' => $device,
+                'returnUrl' => "https://daddy.betrnk.games",
+                'walletSessionId' => $data['token']
+            ];
+            $client = new Client([
+                'headers' => [ 
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer '.$accessToken
+                ]
+            ]);
+            $response = $client->post($api_url,[
+                'json' => $requesttosend,
+            ]);
+            return $response;
+        } catch (\Exception $e) {
+            Helper::saveLog('Qtech Gameluanch Error', 144, json_encode('unable to launch'), $e->getMessage() );
+            return $e->getMessage();
+        }
     }
 }
 

@@ -978,4 +978,20 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 //Hacksaw
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
 //GamingCorps
-$app->post('/public/api/gamingcorps', 'GamingCorpGamingController@hacksawIndex');
+$app->post('/public/api/gamingcorps/authentication', 'GamingCorpGamingController@Verify');
+// Qtech 
+$app->get('/public/qtech/api/accounts/{id}/session', 'QtechController@verifySession');
+$app->get('/public/qtech/api/accounts/{id}/balance', 'QtechController@getBalance');
+$app->post('/public/qtech/api/transactions', 'QtechController@transactions');
+$app->post('/public/qtech/api/transactions/rollback', 'QtechController@rollback');
+$app->post('/public/qtech/api/bonus/status', 'QtechController@promoStatus');
+$app->post('/public/qtech/api/bonus/rewards', 'QtechController@promoStatus');
+
+$app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
+$app->get('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
+
+//Micro Gaming Seamless Wallet
+$app->post('/public/api/mg/login', 'MicroGamingSeamlessController@Login');
+$app->post('/public/api/mg/getbalance', 'MicroGamingSeamlessController@GetBalance');
+$app->post('/public/api/mg/updatebalance', 'MicroGamingSeamlessController@Transactions');
+$app->post('/public/api/mg/rollback', 'MicroGamingSeamlessController@Rollback');

@@ -861,6 +861,12 @@ return [
         'gamelaunch_url' => 'https://staging-lobby.gamingcorpscasino.com/?',
         'provider_db_id' => 146,
     ],
+    'qtech' => [
+        'partnerid' => 'tigergames_stg',
+        'secret' => 'k8Cr6phob5&*m?PIb',
+        'api_url' => '',
+        'provider_db_id' => 144,
+    ]
 ];
 
 ?>
