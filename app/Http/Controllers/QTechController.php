@@ -14,7 +14,7 @@ use App\Helpers\Game;
 use Carbon\Carbon;
 use DB;
 
-class QtechController extends Controller
+class QTechController extends Controller
 {
    public function verifySession(Request $request){
         dd($request->all());
