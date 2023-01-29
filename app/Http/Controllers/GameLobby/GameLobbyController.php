@@ -1249,7 +1249,7 @@ class GameLobbyController extends Controller
                 elseif($provider_code == 146){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
-                        "url" => GameLobby::qtechLaunchUrl($request->all(), $device), 
+                        "url" => GameLobby::gamingCorpsLaunchUrl($request->all(), $device), 
                         "game_launch" => true
                     );
                     return response($msg,200)
