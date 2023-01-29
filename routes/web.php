@@ -975,6 +975,8 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 // $app->post('/public/nagagames/api/placeBet', 'NagaGamesNewController@placeBet');
 // $app->post('/public/nagagames/api/cancelBet', 'NagaGamesNewController@cancelBet');
 // $app->post('/public/nagagames/api/betStatus', 'NagaGamesNewController@betStatus');
+//GamingCorps
+$app->post('/public/api/gamingcorps/gamingcorpscasino/authenticate', 'GamingCorpsController@Verify');
 // Qtech 
 $app->get('/public/qtech/api/accounts/{id}/session', 'QTechController@verifySession');
 $app->get('/public/qtech/api/accounts/{id}/balance', 'QTechController@getBalance');
@@ -983,6 +985,13 @@ $app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback'
 $app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
 $app->post('/public/qtech/api/bonus/rewards', 'QTechController@promoStatus');
 
+$app->get('/public/qtech/api/accounts/{id}/session', 'QtechController@verifySession');
+$app->get('/public/qtech/api/accounts/{id}/balance', 'QtechController@getBalance');
+$app->post('/public/qtech/api/transactions', 'QtechController@transactions');
+$app->post('/public/qtech/api/transactions/rollback', 'QtechController@rollback');
+$app->post('/public/qtech/api/bonus/status', 'QtechController@promoStatus');
+$app->post('/public/qtech/api/bonus/rewards', 'QtechController@promoStatus');
+//Hacksaw
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
 $app->get('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
 

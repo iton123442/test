@@ -42,7 +42,7 @@ class HacksawGamingController extends Controller
                 'statusMessage' => 'Invalid action.'
             ]); 
         }
-        ProviderHelper::saveLog("Hacksaw Request",$this->provider_db_id,json_encode($data),"HIT!");
+        ProviderHelper::saveLog("Hacksaw Request",142,json_encode($data),"HIT!");
         if($client_details == null){
             return response()->json([
                 'accountBalance' => $client_details->balance,
@@ -88,14 +88,14 @@ class HacksawGamingController extends Controller
             ]); 
         }
         elseif($action_method == 'Bet'){
-            ProviderHelper::saveLog("Hacksaw Bet",142,json_encode($data),"Bet HIT!");
+            // ProviderHelper::saveLog("Hacksaw Bet",142,json_encode($data),"Bet HIT!");
             return $response = $this->GameBet($request->all(),$client_details);
         }
         elseif($action_method == 'Win'){
             return $response = $this->GameWin($request->all(),$client_details);
         }
         elseif($action_method == 'Rollback'){
-            ProviderHelper::saveLog("Hacksaw Rollback",$this->provider_db_id,json_encode($data),"Rollback HIT!");
+            // ProviderHelper::saveLog("Hacksaw Rollback",$this->provider_db_id,json_encode($data),"Rollback HIT!");
             return $response = $this->GameCancel($request->all(),$client_details);
         }else{
             return response()->json([
@@ -106,7 +106,7 @@ class HacksawGamingController extends Controller
     }
     public function GameBet($request,$client_details){ 
         $data = $request;
-        ProviderHelper::saveLog("Hacksaw Function Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
+        // ProviderHelper::saveLog("Hacksaw Function Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
         if($client_details){
             if($data['amount'] == 0){
                 $amount = 0;
@@ -123,7 +123,7 @@ class HacksawGamingController extends Controller
                 $bet_transaction = GameTransactionMDB::findGameExt($data['transactionId'], 1,'transaction_id', $client_details);
                 if ($bet_transaction != 'false') {
                     //this will be trigger if error occur 10s
-                    Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($data),  $bet_transaction->mw_response);
+                    // Helper::saveLog('Hacksaw BET duplicate_transaction success', $this->provider_db_id, json_encode($data),  $bet_transaction->mw_response);
                     $balance = str_replace(".","", $client_details->balance-$amount);
                     return response()->json([
                         "accountBalance"=>$balance,
@@ -196,7 +196,7 @@ class HacksawGamingController extends Controller
                             "general_details" => "Success",
                         ];
                         GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
-                        Helper::saveLog('Hacksaw Bet', $this->provider_db_id, json_encode($response), 'Success HIT!');
+                        // Helper::saveLog('Hacksaw Bet', $this->provider_db_id, json_encode($response), 'Success HIT!');
                         return response()->json([
                             "accountBalance"=> $format_balance,
                             "statusCode"=>0,
@@ -372,7 +372,7 @@ class HacksawGamingController extends Controller
                 $game = GametransactionMDB::getGameTransactionByRoundId($roundId, $client_details);
             }
             if ($game == null){
-                Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
+                // Helper::saveLog("NO BET FOUND", 141,json_encode($data),"HIT!");
                 
                 if(isset($data['freeRoundData'])){
                     $gameTransactionDatas = [
@@ -470,7 +470,7 @@ class HacksawGamingController extends Controller
                                 "mw_response" => json_encode($response)
                             ];
                             GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
-                            Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                            // Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
                             return response()->json([
                                 "accountBalance"=>$format_balance,
                                 "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
@@ -512,7 +512,7 @@ class HacksawGamingController extends Controller
                         }
                     }
                 }else{
-                    Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($data),$format_balance+$amount);
+                    // Helper::saveLog("FAILED WIN",$this->provider_db_id,json_encode($data),$format_balance+$amount);
                     $amount = $data['amount'];
                     $balance = str_replace(".","", $client_details->balance+$amount);
                     return response()->json([
@@ -595,7 +595,7 @@ class HacksawGamingController extends Controller
                         "mw_response" => json_encode($response)
                     ];
                     GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
-                    Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                    // Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
                     return response()->json([
                         "accountBalance"=>$format_balance,
                         "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
@@ -651,7 +651,7 @@ class HacksawGamingController extends Controller
                         "entry_id" => 1
                     ];
                     $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
-                    ProviderHelper::saveLog("Hacksaw Create Trans Bet",$this->provider_db_id,json_encode($gameTransactionDatas),"Bet HIT!");
+                    // ProviderHelper::saveLog("Hacksaw Create Trans Bet",$this->provider_db_id,json_encode($gameTransactionDatas),"Bet HIT!");
                     $gameExtensionData = [
                         "game_trans_id" => $game_trans_id,
                         "provider_trans_id" => $provider_trans_id,
@@ -734,7 +734,7 @@ class HacksawGamingController extends Controller
                                 "mw_response" => json_encode($response)
                             ];
                             GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
-                            Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                            // Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
                             return response()->json([
                                 "accountBalance"=>$format_balance,
                                 "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],
@@ -844,7 +844,7 @@ class HacksawGamingController extends Controller
                     "mw_response" => json_encode($response)
                 ];
                 GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
-                Helper::saveLog('Hacksaw Rollback', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                // Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
                 return response()->json([
                     "accountBalance"=>$format_balance,
                     "externalTransactionId"=> $data['roundId']."_".$data['transactionId'],

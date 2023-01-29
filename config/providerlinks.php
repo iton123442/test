@@ -855,12 +855,18 @@ return [
         'api_url' => 'https://static-stg.hacksawgaming.com/launcher/static-launcher.html?',
         'provider_db_id' => 142,
     ],
+    'gamingcorps' => [
+        'casino_token' => 'tiger_games',
+        'secret' => 'LYYNtPxJ2mHMZ9u',
+        'gamelaunch_url' => 'https://staging-lobby.gamingcorpscasino.com/?',
+        'provider_db_id' => 146,
+    ],
     'qtech' => [
         'partnerid' => 'tigergames_stg',
         'secret' => 'k8Cr6phob5&*m?PIb',
         'api_url' => '',
         'provider_db_id' => 144,
-    ],
+    ]
 ];
 
 ?>
