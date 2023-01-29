@@ -17,6 +17,7 @@ use DB;
 class QTechController extends Controller
 {
    public function verifySession(Request $request){
-        dd($request->route("id"));
+        $id = $request->route("id");
+        dd($id);
     }
 }
