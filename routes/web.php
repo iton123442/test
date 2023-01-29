@@ -978,7 +978,7 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 //Hacksaw
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
 //GamingCorps
-$app->post('/public/api/gamingcorps/authenticate', 'GamingCorpsController@Verify');
+$app->post('/public/api/gamingcorps/gamingcorpscasino/authenticate', 'GamingCorpsController@Verify');
 // Qtech 
 $app->get('/public/qtech/api/accounts/{id}/session', 'QtechController@verifySession');
 $app->get('/public/qtech/api/accounts/{id}/balance', 'QtechController@getBalance');
