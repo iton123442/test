@@ -1003,14 +1003,14 @@ $app->post('/public/api/mg/rollback', 'MicroGamingSeamlessController@Rollback');
 
 
 //Pragmatic Play Version 2
-$app->post('/public/api/v2/pp/authenticate','PragmaticPLayController@authenticate');
-$app->post('/public/api/v2/pp/balance','PragmaticPLayController@balance');
-$app->post('/public/api/v2/pp/bet','PragmaticPLayController@bet');
-$app->post('/public/api/v2/pp/result','PragmaticPLayController@result');
-$app->post('/public/api/v2/pp/refund','PragmaticPLayController@refund');
-$app->post('/public/api/v2/pp/bonusWin','PragmaticPLayController@bonusWin');
-$app->post('/public/api/v2/pp/jackpotWin','PragmaticPLayController@jackpotWin');
-$app->post('/public/api/v2/pp/promoWin','PragmaticPLayController@promoWin');
-$app->post('/public/api/v2/pp/endRound','PragmaticPLayController@endRound');
-$app->post('/public/api/v2/pp/getBalancePerGame','PragmaticPLayController@getBalancePerGame');
-$app->post('/public/api/v2/pp/session/expired','PragmaticPLayController@sessionExpired');
+$app->post('/public/api/v2/pp/authenticate','PragmaticPlayV2Controller@authenticate');
+$app->post('/public/api/v2/pp/balance','PragmaticPlayV2Controller@balance');
+$app->post('/public/api/v2/pp/bet','PragmaticPlayV2Controller@bet');
+$app->post('/public/api/v2/pp/result','PragmaticPlayV2Controller@result');
+$app->post('/public/api/v2/pp/refund','PragmaticPlayV2Controller@refund');
+$app->post('/public/api/v2/pp/bonusWin','PragmaticPlayV2Controller@bonusWin');
+$app->post('/public/api/v2/pp/jackpotWin','PragmaticPlayV2Controller@jackpotWin');
+$app->post('/public/api/v2/pp/promoWin','PragmaticPlayV2Controller@promoWin');
+$app->post('/public/api/v2/pp/endRound','PragmaticPlayV2Controller@endRound');
+$app->post('/public/api/v2/pp/getBalancePerGame','PragmaticPlayV2Controller@getBalancePerGame');
+$app->post('/public/api/v2/pp/session/expired','PragmaticPlayV2Controller@sessionExpired');
