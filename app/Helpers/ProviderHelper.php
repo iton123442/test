@@ -1359,7 +1359,7 @@ class ProviderHelper{
 		$client = new Client();
 		$response = $client->get($url);
         $data = json_decode($response->getBody(), true);
-        return $data->access_token;
+        return $data['access_token'];
 	}
 	public static function simplePlayAPICall ($queryString, $hashedString) {     
         $result = ['error' => 1, 'message'=> 'An error occurred.', 'data' => []];
