@@ -2306,9 +2306,9 @@ class GameLobby{
     public static function qtechLaunchUrl($data,$device){
         try {
             $client_details =ProviderHelper::getClientDetails('token',$data['token']);
-            $request_url = "https://{url-to-qtplatform}/v1/auth/token?grant_type=password&response_type=token&username={username}&password={password}";
+            $request_url = config("providerlinks.qtech.api_url")."/v1/auth/token?grant_type=password&response_type=token&username=".config("providerlinks.qtech.username")."&password=".config("providerlinks.qtech.password");
             $accessToken = ProviderHelper::qtGetAccessToken($request_url);
-            $api_url = "https://{url-to-qtplatform}/v1/games/".$data['game_code']."/launch-url";
+            $api_url = config("providerlinks.qtech.api_url")."/v1/games/".$data['game_code']."/launch-url";
             $requesttosend = [
                 'playerId' => $client_details->player_id,
                 'currency' => $client_details->default_currency,

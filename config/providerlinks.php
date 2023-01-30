@@ -862,10 +862,11 @@ return [
         'provider_db_id' => 146,
     ],
     'qtech' => [
-        'partnerid' => 'tigergames_stg',
-        'secret' => 'k8Cr6phob5&*m?PIb',
-        'api_url' => '',
+        'username' => 'api_tgstagingv1',
+        'password' => 'fudbpk10',
+        'api_url' => 'https://api-int.qtplatform.com',
         'provider_db_id' => 144,
+        'pass_key' => 'PiHBFfQVHh',
     ]
 ];
 
