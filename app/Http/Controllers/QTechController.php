@@ -34,4 +34,23 @@ class QTechController extends Controller
         ];
         return $response;
     }
+    
+    public function getBalance(Request $request, $id){
+        Helper::saveLog('QtechSession', 144, json_encode($request->all()),  "HIT_id:". $id );
+        $walletSessionId = $request->header('Wallet-Session');
+        $passKey = $request->header('Pass-Key');
+        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        if(!$client_details){
+            $response = [
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
+            ];
+            return $response;
+        }
+        $response = [
+            "balance" => $client_details->balance,
+            "currency" => $client_details->default_currency
+        ];
+        return $response;
+    }
 }
