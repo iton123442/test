@@ -17,7 +17,7 @@ use DB;
 class QTechController extends Controller
 {
    public function verifySession(Request $request, $id){
-        Helper::saveLog('QtechSession', 66, json_encode($request->all()),  "HIT_id:". $id );
+        Helper::saveLog('QtechSession', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
         $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
