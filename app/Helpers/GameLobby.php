@@ -2342,8 +2342,8 @@ class GameLobby{
 
     public static function pragmaticplayV2launcher($game_code = null, $token = null, $data, $device)
     {
-        Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($data), "HIT");
         $stylename = config('providerlinks.ppv2.secureLogin');
+        Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($data), json_encode($stylename));
         $key = config('providerlinks.ppv2.secret_key');
         $host = config('providerlinks.ppv2.host');
 
