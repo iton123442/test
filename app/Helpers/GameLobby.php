@@ -2329,7 +2329,7 @@ class GameLobby{
                 ]
             ]);
             $response = $client->post($api_url,[
-                'json' => $requesttosend,
+                'body' => json_encode($requesttosend),
             ]);
             return $response;
         } catch (\Exception $e) {
