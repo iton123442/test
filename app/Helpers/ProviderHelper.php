@@ -1359,7 +1359,6 @@ class ProviderHelper{
 		$client = new Client();
 		$response = $client->get($url);
         $data = json_decode($response->getBody(), true);
-        Helper::saveLog('accesstokenQT', 144, $data, "HIT");
         return $data['access_token'];
 	}
 	public static function simplePlayAPICall ($queryString, $hashedString) {     

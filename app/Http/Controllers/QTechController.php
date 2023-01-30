@@ -17,6 +17,16 @@ use DB;
 class QTechController extends Controller
 {
    public function verifySession(Request $request, $id){
-        dd($id);
+        Helper::saveLog('QtechSession', 66, json_encode($request->all()),  "HIT_id:". $id );
+        $walletSessionId = $request->header('Wallet-Session');
+        $passKey = $request->header('Pass-Key');
+        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        if(!$client_details){
+            $response = [
+                "code" => "INVALID_TOKEN",
+                "message" => "The given wallet session token has expired"
+            ];
+            return $response;
+        }
     }
 }
