@@ -1264,7 +1264,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code==143){
+                elseif($provider_code == 143){
                     $url = GameLobby::pragmaticplayV2launcher($request->game_code, $request->token, $request->all(), $device);
                     if($url){
                         $msg = array(

@@ -2383,7 +2383,7 @@ class GameLobby{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
-            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), json_encode($client_response));
+            Helper::saveLog('Pragmatic Play Gameluanch ERR', 143, json_encode($msg), json_encode($msg));
             return $msg;
         }
     }
