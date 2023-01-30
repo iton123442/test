@@ -985,7 +985,7 @@ $app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback'
 $app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
 $app->post('/public/qtech/api/bonus/rewards', 'QTechController@promoStatus');
 
-$app->get('/accounts/{id}/session', 'QTechController@verifySession');
+$app->get('/public/qtech/api/accounts/{id}/session', 'QTechController@verifySession');
 $app->get('/public/qtech/api/accounts/{id}/balance', 'QTechController@getBalance');
 $app->post('/public/qtech/api/transactions', 'QTechController@transactions');
 $app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback');
