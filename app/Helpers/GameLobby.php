@@ -2315,7 +2315,7 @@ class GameLobby{
                 'country' => "CN",
                 'gender' => "M",
                 'birthDate' => "1986-01-01",
-                'lang' => "en-US",
+                'lang' => "en_US",
                 'mode' => "real",
                 'device' => $device,
                 'returnUrl' => "https://daddy.betrnk.games",
