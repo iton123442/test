@@ -34,8 +34,9 @@ class PragmaticPlayV2Controller extends Controller
 
         // $hash = md5('providerId='.$data->providerId.'&token='.$data->token.$this->key);
         $dataSort = json_decode($json_encode, true);
+        Helper::saveLog("PP hash sort", $this->provider_id, json_encode($dataSort), "sort request");
         $hash = $this->hashParam($dataSort);
-
+        Helper::saveLog("PP hash ", $this->provider_id, json_encode($hash), "hash Result");
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
