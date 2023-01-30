@@ -2321,6 +2321,7 @@ class GameLobby{
                 'returnUrl' => "https://daddy.betrnk.games",
                 'walletSessionId' => $data['token']
             ];
+            Helper::saveLog('Qtech Gameluanch Error', 144, json_encode($requesttosend), "access_token:".$accessToken );
             $client = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json',
