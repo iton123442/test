@@ -867,7 +867,12 @@ return [
         'api_url' => 'https://api-int.qtplatform.com',
         'provider_db_id' => 144,
         'pass_key' => 'PiHBFfQVHh',
-    ]
+    ],
+    'tpp' => [
+        'secureLogin' => 'mgscomm_mgscommsw302', //or stylename
+        'secret_key' => 'D8B944D07d314fF2',
+        'host' => 'https://api-sg13.ppgames.net/IntegrationService/v3/http/CasinoGameAPI/game/url/',
+    ],
 ];
 
 ?>

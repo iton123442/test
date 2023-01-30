@@ -2336,6 +2336,57 @@ class GameLobby{
             return $e->getMessage();
         }
     }
+
+    public static function pragmaticplayV2launcher($game_code = null, $token = null, $data, $device)
+    {
+        Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($data), "HIT");
+        $stylename = config('providerlinks.ppv2.secureLogin');
+        $key = config('providerlinks.ppv2.secret_key');
+        $host = config('providerlinks.ppv2.host');
+
+        $client_details = Providerhelper::getClientDetails('token', $token);
+        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+        $game_details = DB::table('games')->where('provider_id','=',26)->where('game_code','=',$game_code)->orderBy('created_at','desc')->first();
+        if($device == 'desktop'){ 
+            $device = 'WEB';
+        }else{ 
+            $device = 'MOBILE'; 
+        }
+        $userid = "TGaming_".$client_details->player_id;
+        $currency = $client_details->default_currency;
+        $hash = md5("currency=".$currency."&language=".$data['lang']."&lobbyUrl=".$data['exitUrl']."&platform=".$device."&secureLogin=".$stylename."&stylename=".$stylename."&symbol=".$game_code."&technology=H5&token=".$token."".$key);
+        try{
+            $form_body = [
+                "currency" => $currency,
+                "language" => $data['lang'],
+                "lobbyUrl" => $data['exitUrl'],
+                "platform" => $device,
+                "secureLogin" => $stylename,
+                "stylename" => $stylename,
+                "symbol" => $game_code,
+                "technology" => "H5",
+                "token" => $token,
+                "hash" => $hash
+            ];
+            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), "HIT");
+            $client = new Client();
+            $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), json_encode($client_response));
+            $url = $client_response->gameURL;
+            return $url;
+
+        
+        }catch(\Exception $e){
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            Helper::saveLog('Pragmatic Play Gameluanch ERR', 143, json_encode($msg), json_encode($msg));
+            return $msg;
+        }
+    }
 }
 
 ?>

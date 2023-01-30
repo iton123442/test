@@ -1264,6 +1264,23 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
+                elseif($provider_code == 143){
+                    $url = GameLobby::pragmaticplayV2launcher($request->game_code, $request->token, $request->all(), $device);
+                    if($url){
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "url" => $url,
+                            "game_launch" => true
+                        );
+                    }else{
+                        $msg = array(
+                            "game_code" => $request->input("game_code"),
+                            "url" => $this->createFallbackLink($request->all()),
+                            "game_launch" => false
+                        );
+                    }
+                    return $msg;
+                } 
 
             }
         }
