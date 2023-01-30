@@ -28,5 +28,10 @@ class QTechController extends Controller
             ];
             return $response;
         }
+        $response = [
+            "balance" => $client_details->balance,
+            "currency" => $client_details->default_currency
+        ];
+        return $response;
     }
 }
