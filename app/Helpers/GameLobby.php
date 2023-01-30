@@ -2331,7 +2331,9 @@ class GameLobby{
             $response = $client->post($api_url,[
                 'body' => json_encode($requesttosend),
             ]);
-            return $response;
+            $res = json_decode($response->getBody(),TRUE);
+            Helper::saveLog('Qtech Gameluanch', 144, json_encode($requesttosend), json_encode($res) );
+            return $res;
         } catch (\Exception $e) {
             Helper::saveLog('Qtech Gameluanch Error', 144, json_encode('unable to launch'), $e->getMessage() );
             return $e->getMessage();
