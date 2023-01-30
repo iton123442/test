@@ -1359,6 +1359,7 @@ class ProviderHelper{
 		$client = new Client();
 		$response = $client->get($url);
         $data = json_decode($response->getBody(), true);
+        dd($data);
         return $data['access_token'];
 	}
 	public static function simplePlayAPICall ($queryString, $hashedString) {     
