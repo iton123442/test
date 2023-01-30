@@ -1078,6 +1078,7 @@ class PragmaticPlayV2Controller extends Controller
         }
         $str = str_replace("\n","",$param.$this->key);
         $clean = str_replace("\r","",$str);
+        Helper::saveLog('PP ERROR', $this->provider_id, json_encode($clean), md5($clean));
         return $hash = md5($clean);
     }
 
