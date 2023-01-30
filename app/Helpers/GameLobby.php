@@ -2367,10 +2367,11 @@ class GameLobby{
                 "token" => $token,
                 "hash" => $hash
             ];
+            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), "HIT");
             $client = new Client();
             $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
             $client_response = json_decode($guzzle_response->getBody()->getContents());
-            Helper::saveLog('Game Launch Pragmatic Play', 26, json_encode($form_body), json_encode($client_response));
+            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), json_encode($client_response));
             $url = $client_response->gameURL;
             return $url;
 
@@ -2381,7 +2382,7 @@ class GameLobby{
                 'err_line' => $e->getLine(),
                 'err_file' => $e->getFile()
             );
-            ProviderHelper::saveLog('pragmatic gamelaunch err', 26, json_encode($msg), $e->getMessage());
+            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), json_encode($client_response));
             return $msg;
         }
     }
