@@ -1014,3 +1014,11 @@ $app->post('/public/api/v2/pp/promoWin','PragmaticPlayV2Controller@promoWin');
 $app->post('/public/api/v2/pp/endRound','PragmaticPlayV2Controller@endRound');
 $app->post('/public/api/v2/pp/getBalancePerGame','PragmaticPlayV2Controller@getBalancePerGame');
 $app->post('/public/api/v2/pp/session/expired','PragmaticPlayV2Controller@sessionExpired');
+
+
+//Relax Gaming
+$app->post('/public/api/v1/relax/verifyToken','RelaxGamingController@verifyToken');
+$app->post('/public/api/v1/relax/getBalance','RelaxGamingController@getBalance');
+$app->post('/public/api/v1/relax/withdraw','RelaxGamingController@Bet');
+$app->post('/public/api/v1/relax/deposit','RelaxGamingController@Win');
+$app->post('/public/api/v1/relax/rollback','RelaxGamingController@rollback');
