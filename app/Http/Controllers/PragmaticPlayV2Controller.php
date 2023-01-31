@@ -16,11 +16,11 @@ use App\Models\GameTransactionMDB;
 class PragmaticPlayV2Controller extends Controller
 {
     public $key;
-    public $provider_id = 26; //26 
+    public $provider_id = 143; //26 
 
 
     public function __construct(){
-    	$this->key = config('providerlinks.tpp.secret_key');
+    	$this->key = config('providerlinks.ppv2.secret_key');
     }
 
     public function authenticate(Request $request)
@@ -35,7 +35,6 @@ class PragmaticPlayV2Controller extends Controller
         // $hash = md5('providerId='.$data->providerId.'&token='.$data->token.$this->key);
         $dataSort = json_decode($json_encode, true);
         $hash = $this->hashParam($dataSort);
-
         if($hash != $data->hash){
             $response = [
                 "error" => 5,
@@ -49,7 +48,7 @@ class PragmaticPlayV2Controller extends Controller
         $hash = $data->hash;
         $token = $data->token;
         $client_details = ProviderHelper::getClientDetails('token',$token);
-       
+        Helper::saveLog("PP hash clientDetails", $this->provider_id, json_encode($data), json_encode($client_details));
         if($client_details != null)
         {
             $currency = $client_details->default_currency;

@@ -1000,3 +1000,25 @@ $app->post('/public/api/mg/login', 'MicroGamingSeamlessController@Login');
 $app->post('/public/api/mg/getbalance', 'MicroGamingSeamlessController@GetBalance');
 $app->post('/public/api/mg/updatebalance', 'MicroGamingSeamlessController@Transactions');
 $app->post('/public/api/mg/rollback', 'MicroGamingSeamlessController@Rollback');
+
+
+//Pragmatic Play Version 2
+$app->post('/public/api/v2/pp/authenticate','PragmaticPlayV2Controller@authenticate');
+$app->post('/public/api/v2/pp/balance','PragmaticPlayV2Controller@balance');
+$app->post('/public/api/v2/pp/bet','PragmaticPlayV2Controller@bet');
+$app->post('/public/api/v2/pp/result','PragmaticPlayV2Controller@result');
+$app->post('/public/api/v2/pp/refund','PragmaticPlayV2Controller@refund');
+$app->post('/public/api/v2/pp/bonusWin','PragmaticPlayV2Controller@bonusWin');
+$app->post('/public/api/v2/pp/jackpotWin','PragmaticPlayV2Controller@jackpotWin');
+$app->post('/public/api/v2/pp/promoWin','PragmaticPlayV2Controller@promoWin');
+$app->post('/public/api/v2/pp/endRound','PragmaticPlayV2Controller@endRound');
+$app->post('/public/api/v2/pp/getBalancePerGame','PragmaticPlayV2Controller@getBalancePerGame');
+$app->post('/public/api/v2/pp/session/expired','PragmaticPlayV2Controller@sessionExpired');
+
+
+//Relax Gaming
+$app->post('/public/api/v1/relax/verifyToken','RelaxGamingController@verifyToken');
+$app->post('/public/api/v1/relax/getBalance','RelaxGamingController@getBalance');
+$app->post('/public/api/v1/relax/withdraw','RelaxGamingController@Bet');
+$app->post('/public/api/v1/relax/deposit','RelaxGamingController@Win');
+$app->post('/public/api/v1/relax/rollback','RelaxGamingController@rollback');

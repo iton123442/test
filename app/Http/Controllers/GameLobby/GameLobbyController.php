@@ -1265,6 +1265,7 @@ class GameLobbyController extends Controller
                     ->header('Content-Type', 'application/json');
                 }
                 elseif($provider_code == 143){
+                    Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode("GAME LOBBY CONTROLLER"), "HIT");
                     $url = GameLobby::pragmaticplayV2launcher($request->game_code, $request->token, $request->all(), $device);
                     if($url){
                         $msg = array(
