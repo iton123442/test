@@ -77,11 +77,11 @@ class QTechController extends Controller
             return $response;
         }
         if($request->txnType == "DEBIT"){
-            return $this->debitProcess($request->all());
+            return $this->debitProcess($request->all(),$client_details);
         }
         
     }
-    public function debitProcess($request){
+    public function debitProcess($request,$client_details){
         $transaction_id = $request['txnId'];
         $round_id = $request['roundId'];
         $bet_amount = $request['amount'];
