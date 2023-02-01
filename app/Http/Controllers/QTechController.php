@@ -78,6 +78,8 @@ class QTechController extends Controller
         }
         if($request->txnType == "DEBIT"){
             return $this->debitProcess($request->all(),$client_details);
+        }elseif($request->txnType == "CREDIT"){
+            return $this->creditProcess($request->all(),$client_details);
         }
         
     }
