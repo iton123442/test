@@ -23,15 +23,40 @@ class GamingCorpsController extends Controller{
         $this->provider_db_id = config('providerlinks.gamingcorps.provider_db_id'); //sub provider ID
         $this->secret = config('providerlinks.gamingcorps.secret');
         $this->casino_token = config('providerlinks.gamingcorps.casino_token');
-        $this->providerID = 74; //Real provider ID
+        $this->providerID = 78; //Real provider ID
         $this->dateToday = date("Y/m/d");
     }
 
     public function Verify(Request $request){
         Helper::saveLog("Auth request", $this->provider_id, json_encode($request->all()), "HIT");
+        $response =array(
+            "authenticate"=> array(
+                "authentication_token"=> $this->secret,
+                "status" => 0,
+                "message" => "",
+                "external_id" => "554029",
+                "balance" => 200,
+                "nickname" => "spadeGtest",
+                "currency" => "USD",
+            )
+        );
+        return response($response,200)->header('Content-Type','application/json');
     }
-
-    
+    public function getBalance(Request $request){
+        $data = json_decode($request->getContent(),TRUE);
+        $client_details = ProviderHelper::getClientDetails('player_id', $data['external_id']);
+        Helper::saveLog('GamingCorps GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
+        if($client_details){
+            $response = array(
+                    "status" => 0,
+                    "message" => "",
+                    "balance" => 200,
+                    "currency" => "USD"
+            );
+            Helper::saveLog('GamingCorps GetBALANCE', $this->provider_db_id, json_encode($response), 'Success HIT!');
+            return response($response,200)->header('Content-Type', 'application/json');
+        }
+    }
     // public function hashParam($sortData,$toCompare){
     //     $hasher = hash('sha256',json_encode($sortData, JSON_FORCE_OBJECT));
     //     if ($hasher != $toCompare){
@@ -47,24 +72,6 @@ class GamingCorpsController extends Controller{
     //     }
     //     Helper::saveLog('Naga Games Hasher2', $this->provider_db_id, json_encode($hasher), 'HASH!');
     //     return $hasher;
-    // }
-    // public function getBalance(Request $request){
-    //     $data = json_decode($request->getContent(),TRUE);
-    //     $client_details = ProviderHelper::getClientDetails('token', $data['data']['playerToken']);
-    //     Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
-    //     $hash = $this-> hashParam($data['data'],$data['dataHash']);
-    //     if($client_details){
-    //         $response = array(
-    //             "data"=> [
-    //             "nativeId"=>"TG_" . $client_details->player_id,
-    //             "currency"=>$client_details ->default_currency,
-    //             "balance"=> (int) round($client_details->balance,2)
-    //             ],
-    //             "error" => null
-    //         );
-    //         Helper::saveLog('NAGAGAMES GetBALANCE', $this->provider_db_id, json_encode($response), 'Success HIT!');
-    //         return response($response,200)->header('Content-Type', 'application/json');
-    //     }
     // }
     // public function placeBet (Request $request){
     //     $data = json_decode($request->getContent(),TRUE);
