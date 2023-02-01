@@ -70,11 +70,20 @@ class QTechController extends Controller
             ProviderHelper::idenpotencyTable("QTech-".$request->txnId);
         } catch (\Exception $e) {
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->txnId, 'transaction_id',1, $client_details);
-            $response = [
-                "balance" => (float)$client_details->balance,
-                "referenceId" => $bet_transaction->game_trans_id
-            ];
-            return $response;
+            if($bet_transaction != 'false'){
+                $response = [
+                    "balance" => (float)$client_details->balance,
+                    "referenceId" => $bet_transaction->game_trans_id
+                ];
+                return $response;
+            }else{
+                $response = [
+                  "code" => "INSUFFICIENT_FUNDS",
+                  "message" =>"Not enough funds for the debit operation"
+                ];
+                return $response;
+            }
+            
         }
         if($request->txnType == "DEBIT"){
             return $this->debitProcess($request->all(),$client_details);
@@ -94,10 +103,7 @@ class QTechController extends Controller
             $client_details->connection_name = $bet_transaction->connection_name;
             $amount = $bet_transaction->bet_amount + $bet_amount;
             $updateGameTransaction = [
-                'win' => 5,
                 'bet_amount' => $amount,
-                'entry_id' => 1,
-                'trans_status' => 1
             ];
             GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
             $game_transaction_id = $bet_transaction->game_trans_id;
@@ -128,8 +134,29 @@ class QTechController extends Controller
               "game_transaction_type"=> 1,
               "provider_request" =>json_encode($request),
         );
-        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
-        $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit');
+        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);+
+        $fund_extra_data = [
+            'provider_name' => $game_details->provider_name
+        ];
+        try {
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount, $game_code, $game_details->game_name, $game_trans_ext_id, $game_transaction_id, 'debit',false,$fund_extra_data);
+        } catch (\Exception $e) {
+            $updateGameTransaction = [
+                  'win' => 2,
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
+            $updateTransactionEXt = array(
+                "provider_request" =>json_encode($request),
+                'transaction_detail' => 'failed',
+                'general_details' => 'failed',
+            );
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            $response = [
+              "code" => "INSUFFICIENT_FUNDS",
+              "message" =>"Not enough funds for the debit operation"
+            ];
+            return $response;
+        }
         if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
           switch ($client_response->fundtransferresponse->status->code) {
@@ -154,7 +181,7 @@ class QTechController extends Controller
                     $updateGameTransaction = [
                           'win' => 2,
                     ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
                     $response = [
                       "code" => "INSUFFICIENT_FUNDS",
                       "message" =>"Not enough funds for the debit operation"
@@ -172,9 +199,9 @@ class QTechController extends Controller
                 break;
                 default:
                     $updateGameTransaction = [
-                                'win' => 2,
-                            ];
-                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+                        'win' => 2,
+                    ];
+                    GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
                     $response = [
                       "code" => "INSUFFICIENT_FUNDS",
                       "message" =>"Not enough funds for the debit operation"
@@ -192,6 +219,7 @@ class QTechController extends Controller
       }// End Fundtransfer
       return $response;
     }
+
     public function creditProcess($request,$client_details){
         $transaction_id = $request['txnId'];
         $round_id = $request['roundId'];
@@ -232,9 +260,7 @@ class QTechController extends Controller
         ];
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
         ProviderHelper::_insertOrUpdate($client_details->token_id, $winBalance);
-        $fund_extra_data = [
-            'provider_name' => $game_details->provider_name
-        ];
+        
         $action_payload = [
               "type" => "custom", #genreral,custom :D # REQUIRED!
               "custom" => [
@@ -264,7 +290,16 @@ class QTechController extends Controller
                   ]
               ]
         ];
-        $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
+        try {
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_id,'credit',false,$action_payload);
+        } catch (\Exception $e) {
+            $updateTransactionEXt = array(
+                  "provider_request" =>json_encode($request),
+                  'transaction_detail' => 'failed',
+                  'general_details' => 'failed',
+            );
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+        }
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             $updateTransactionEXt = array(
