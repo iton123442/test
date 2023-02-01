@@ -87,6 +87,7 @@ class QTechController extends Controller
         $bet_amount = $request['amount'];
         $game_code = $request['gameId'];
         $game_details = Game::find($game_code, config('providerlinks.qtech.provider_db_id'));
+        dd($game_details);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',1, $client_details);
         if($bet_transaction != 'false'){
             $client_details->connection_name = $bet_transaction->connection_name;
