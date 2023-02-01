@@ -862,11 +862,17 @@ return [
         'provider_db_id' => 146,
     ],
     'qtech' => [
-        'partnerid' => 'tigergames_stg',
-        'secret' => 'k8Cr6phob5&*m?PIb',
-        'api_url' => '',
+        'username' => 'api_tgstagingv1',
+        'password' => 'fudbpk10',
+        'api_url' => 'https://api-int.qtplatform.com',
         'provider_db_id' => 144,
-    ]
+        'pass_key' => 'PiHBFfQVHh',
+    ],
+    'ppv2' => [
+        'secureLogin' => 'mgscomm_mgscommsw302', //or stylename
+        'secret_key' => 'D8B944D07d314fF2',
+        'host' => 'https://api-sg13.ppgames.net/IntegrationService/v3/http/CasinoGameAPI/game/url/',
+    ],
 ];
 
 ?>

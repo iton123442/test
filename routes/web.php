@@ -978,12 +978,19 @@ $app->post('/public/nagagames/api/betStatus', 'NagaGamesController@betStatus');
 //GamingCorps
 $app->post('/public/api/gamingcorps/gamingcorpscasino/authenticate', 'GamingCorpsController@Verify');
 // Qtech 
-$app->get('/public/qtech/api/accounts/{id}/session', 'QtechController@verifySession');
-$app->get('/public/qtech/api/accounts/{id}/balance', 'QtechController@getBalance');
-$app->post('/public/qtech/api/transactions', 'QtechController@transactions');
-$app->post('/public/qtech/api/transactions/rollback', 'QtechController@rollback');
-$app->post('/public/qtech/api/bonus/status', 'QtechController@promoStatus');
-$app->post('/public/qtech/api/bonus/rewards', 'QtechController@promoStatus');
+$app->get('/public/qtech/api/accounts/{id}/session', 'QTechController@verifySession');
+$app->get('/public/qtech/api/accounts/{id}/balance', 'QTechController@getBalance');
+$app->post('/public/qtech/api/transactions', 'QTechController@transactions');
+$app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback');
+$app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
+$app->post('/public/qtech/api/bonus/rewards', 'QTechController@promoStatus');
+
+$app->get('/public/qtech/api/accounts/{id}/session', 'QTechController@verifySession');
+$app->get('/public/qtech/api/accounts/{id}/balance', 'QTechController@getBalance');
+$app->post('/public/qtech/api/transactions', 'QTechController@transactions');
+$app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback');
+$app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
+$app->post('/public/qtech/api/bonus/rewards', 'QTechController@promoStatus');
 //Hacksaw
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
 $app->get('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
@@ -993,3 +1000,25 @@ $app->post('/public/api/mg/login', 'MicroGamingSeamlessController@Login');
 $app->post('/public/api/mg/getbalance', 'MicroGamingSeamlessController@GetBalance');
 $app->post('/public/api/mg/updatebalance', 'MicroGamingSeamlessController@Transactions');
 $app->post('/public/api/mg/rollback', 'MicroGamingSeamlessController@Rollback');
+
+
+//Pragmatic Play Version 2
+$app->post('/public/api/v2/pp/authenticate','PragmaticPlayV2Controller@authenticate');
+$app->post('/public/api/v2/pp/balance','PragmaticPlayV2Controller@balance');
+$app->post('/public/api/v2/pp/bet','PragmaticPlayV2Controller@bet');
+$app->post('/public/api/v2/pp/result','PragmaticPlayV2Controller@result');
+$app->post('/public/api/v2/pp/refund','PragmaticPlayV2Controller@refund');
+$app->post('/public/api/v2/pp/bonusWin','PragmaticPlayV2Controller@bonusWin');
+$app->post('/public/api/v2/pp/jackpotWin','PragmaticPlayV2Controller@jackpotWin');
+$app->post('/public/api/v2/pp/promoWin','PragmaticPlayV2Controller@promoWin');
+$app->post('/public/api/v2/pp/endRound','PragmaticPlayV2Controller@endRound');
+$app->post('/public/api/v2/pp/getBalancePerGame','PragmaticPlayV2Controller@getBalancePerGame');
+$app->post('/public/api/v2/pp/session/expired','PragmaticPlayV2Controller@sessionExpired');
+
+
+//Relax Gaming
+$app->post('/public/api/v1/relax/verifyToken','RelaxGamingController@verifyToken');
+$app->post('/public/api/v1/relax/getBalance','RelaxGamingController@getBalance');
+$app->post('/public/api/v1/relax/withdraw','RelaxGamingController@Bet');
+$app->post('/public/api/v1/relax/deposit','RelaxGamingController@Win');
+$app->post('/public/api/v1/relax/rollback','RelaxGamingController@rollback');

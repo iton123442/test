@@ -2306,21 +2306,22 @@ class GameLobby{
     public static function qtechLaunchUrl($data,$device){
         try {
             $client_details =ProviderHelper::getClientDetails('token',$data['token']);
-            $request_url = "https://{url-to-qtplatform}/v1/auth/token?grant_type=password&response_type=token&username={username}&password={password}";
+            $request_url = config("providerlinks.qtech.api_url")."/v1/auth/token?grant_type=password&response_type=token&username=".config("providerlinks.qtech.username")."&password=".config("providerlinks.qtech.password");
             $accessToken = ProviderHelper::qtGetAccessToken($request_url);
-            $api_url = "https://{url-to-qtplatform}/v1/games/".$data['game_code']."/launch-url";
+            $api_url = config("providerlinks.qtech.api_url")."/v1/games/".$data['game_code']."/launch-url";
             $requesttosend = [
                 'playerId' => $client_details->player_id,
                 'currency' => $client_details->default_currency,
                 'country' => "CN",
                 'gender' => "M",
                 'birthDate' => "1986-01-01",
-                'lang' => "en-US",
+                'lang' => "en_US",
                 'mode' => "real",
                 'device' => $device,
                 'returnUrl' => "https://daddy.betrnk.games",
                 'walletSessionId' => $data['token']
             ];
+            Helper::saveLog('Qtech Gameluanch', 144, json_encode($requesttosend), "access_token:".$accessToken." token:".$data['token'] );
             $client = new Client([
                 'headers' => [ 
                     'Content-Type' => 'application/json',
@@ -2328,12 +2329,65 @@ class GameLobby{
                 ]
             ]);
             $response = $client->post($api_url,[
-                'json' => $requesttosend,
+                'body' => json_encode($requesttosend),
             ]);
-            return $response;
+            $res = json_decode($response->getBody(),TRUE);
+            Helper::saveLog('Qtech Gameluanch', 144, json_encode($requesttosend), json_encode($res) );
+            return $res['url'];
         } catch (\Exception $e) {
             Helper::saveLog('Qtech Gameluanch Error', 144, json_encode('unable to launch'), $e->getMessage() );
             return $e->getMessage();
+        }
+    }
+
+    public static function pragmaticplayV2launcher($game_code = null, $token = null, $data, $device)
+    {
+        $stylename = config('providerlinks.ppv2.secureLogin');
+        Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($data), json_encode($stylename));
+        $key = config('providerlinks.ppv2.secret_key');
+        $host = config('providerlinks.ppv2.host');
+
+        $client_details = Providerhelper::getClientDetails('token', $token);
+        $player_details = Providerhelper::playerDetailsCall($client_details->player_token);
+        $game_details = DB::table('games')->where('provider_id','=',26)->where('game_code','=',$game_code)->orderBy('created_at','desc')->first();
+        if($device == 'desktop'){ 
+            $device = 'WEB';
+        }else{ 
+            $device = 'MOBILE'; 
+        }
+        $userid = "TGaming_".$client_details->player_id;
+        $currency = $client_details->default_currency;
+        $hash = md5("currency=".$currency."&language=".$data['lang']."&lobbyUrl=".$data['exitUrl']."&platform=".$device."&secureLogin=".$stylename."&stylename=".$stylename."&symbol=".$game_code."&technology=H5&token=".$token."".$key);
+        try{
+            $form_body = [
+                "currency" => $currency,
+                "language" => $data['lang'],
+                "lobbyUrl" => $data['exitUrl'],
+                "platform" => $device,
+                "secureLogin" => $stylename,
+                "stylename" => $stylename,
+                "symbol" => $game_code,
+                "technology" => "H5",
+                "token" => $token,
+                "hash" => $hash
+            ];
+            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), "HIT");
+            $client = new Client();
+            $guzzle_response = $client->post($host,  ['form_params' => $form_body]);
+            $client_response = json_decode($guzzle_response->getBody()->getContents());
+            Helper::saveLog('Pragmatic Play Gameluanch', 143, json_encode($form_body), json_encode($client_response));
+            $url = $client_response->gameURL;
+            return $url;
+
+        
+        }catch(\Exception $e){
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            Helper::saveLog('Pragmatic Play Gameluanch ERR', 143, json_encode($msg), json_encode($msg));
+            return $msg;
         }
     }
 }
