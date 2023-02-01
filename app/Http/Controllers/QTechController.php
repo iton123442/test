@@ -29,7 +29,7 @@ class QTechController extends Controller
             return $response;
         }
         $response = [
-            "balance" => $client_details->balance,
+            "balance" => number_format($client_details->balance, 2),
             "currency" => $client_details->default_currency
         ];
         return $response;
@@ -48,7 +48,7 @@ class QTechController extends Controller
             return $response;
         }
         $response = [
-            "balance" => $client_details->balance,
+            "balance" => number_format($client_details->balance, 2),
             "currency" => $client_details->default_currency
         ];
         return $response;
@@ -69,17 +69,24 @@ class QTechController extends Controller
         try {
             ProviderHelper::idenpotencyTable("QTech-".$request->txnId);
         } catch (\Exception $e) {
-            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($request->txnId, 'transaction_id',1, $client_details);
+            $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
             if($bet_transaction != 'false'){
+                if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
+                    $response = [
+                      "code" => "INSUFFICIENT_FUNDS",
+                      "message" =>"Not enough funds for the debit operation"
+                    ];
+                    return $response;
+                }
                 $response = [
-                    "balance" => (float)$client_details->balance,
-                    "referenceId" => $bet_transaction->game_trans_id
+                    "balance" => (float)number_format($client_details->balance, 2),
+                    "referenceId" => $bet_transaction->game_trans_id,
                 ];
                 return $response;
             }else{
                 $response = [
-                  "code" => "INSUFFICIENT_FUNDS",
-                  "message" =>"Not enough funds for the debit operation"
+                    "balance" => (float)number_format($client_details->balance, 2),
+                    "referenceId" => $bet_transaction->game_trans_id,
                 ];
                 return $response;
             }
@@ -163,7 +170,7 @@ class QTechController extends Controller
                 case '200':
                     $http_status = 200;
                     $response = [
-                            "balance" => (float)$client_response->fundtransferresponse->balance,
+                            "balance" => (float)number_format($client_response->fundtransferresponse->balance, 2),
                             "referenceId" => $game_transaction_id
                     ];
                     $updateTransactionEXt = array(
@@ -239,7 +246,7 @@ class QTechController extends Controller
         }
 
         $response = [
-            "balance" => (float)$winBalance,
+            "balance" => (float)number_format($winBalance, 2),
             "referenceId" => $game_trans_id,
         ];
 
@@ -254,7 +261,7 @@ class QTechController extends Controller
             "game_trans_id" => $game_trans_id,
             "provider_trans_id" => $transaction_id,
             "round_id" => $round_id,
-            "amount" => 0,
+            "amount" => $pay_amount,
             "game_transaction_type" => 2,
             "provider_request" => json_encode($request),
         ];
@@ -345,4 +352,95 @@ class QTechController extends Controller
               return $response;
         }
     }  
+    public function rollback(Request $request){
+        Helper::saveLog('QtechTransactions', 144, json_encode($request->all()), json_encode($request->txnType));
+        $walletSessionId = $request->header('Wallet-Session');
+        $passKey = $request->header('Pass-Key');        
+        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        if(!$client_details){
+            $response = [
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
+            ];
+            return $response;
+        }
+        try {
+            ProviderHelper::idenpotencyTable("QTech-".$request->txnId);
+        } catch (\Exception $e) {
+            $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,3,'transaction_id',$client_details);
+            if($bet_transaction != 'false'){
+                if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
+                    $response = [
+                      "code" => "REQUEST_DECLINED",
+                      "message" =>"General error. Duplicate Transaction."
+                    ];
+                    return $response;
+                }
+                $response = [
+                    "balance" => (float)number_format($client_details->balance, 2),
+                    "referenceId" => $bet_transaction->game_trans_id,
+                ];
+                return $response;
+            }else{
+                $response = [
+                    "balance" => (float)number_format($client_details->balance, 2),
+                    "referenceId" => $bet_transaction->game_trans_id,
+                ];
+                return $response;
+            }
+            
+        }
+        $transaction_id = $request->txnId;
+        $round_id = $request->roundId;
+        $pay_amount = $request->amount;
+        $game_code = $request->gameId;
+        $game_details = ProviderHelper::findGameDetails('game_code',config('providerlinks.qtech.provider_db_id'), $game_code);
+        $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',1, $client_details);
+        $game_trans_id = $bet_transaction->game_trans_id;
+        $winBalance = $client_details->balance + $pay_amount;
+        $win_or_lost = $pay_amount > 0 ?  1 : 0;
+        $entry_id = $pay_amount > 0 ?  2 : 1;
+        $income = $bet_transaction->bet_amount - $pay_amount;
+
+        $updateGameTransaction = [
+          'win' => 4,
+          'pay_amount' => $pay_amount,
+          'income' => $income,
+          'entry_id' => 3,
+        ];
+        GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+        $gameExtensionData = [
+            "game_trans_id" => $game_trans_id,
+            "provider_trans_id" => $transaction_id,
+            "round_id" => $round_id,
+            "amount" => $pay_amount,
+            "game_transaction_type" => 2,
+            "provider_request" => json_encode($request),
+        ];
+        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+
+        $fund_extra_data = [
+            'provider_name' => $game_details->provider_name
+        ];
+        $client_response = ClientRequestHelper::fundTransfer($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"credit",true,$fund_extra_data);
+        if(isset($client_response->fundtransferresponse->status->code) 
+        && $client_response->fundtransferresponse->status->code == "200"){
+            ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+            $response = [
+                "balance" => (float)number_format($client_response->fundtransferresponse->balance, 2),
+                "referenceId" => $game_trans_id,
+            ];
+            // Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
+            $dataToUpdate = array(
+                "mw_response" => json_encode($response),
+                "client_response" => json_encode($client_response),
+                "mw_request" => json_encode($client_response->requestoclient),
+                "transaction_detail" => 'SUCCESS',
+            );
+            GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
+            return response($response,200)
+                ->header('Content-Type', 'application/json');
+        }
+
+    }
 }
