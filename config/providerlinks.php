@@ -865,7 +865,7 @@ return [
         'username' => 'api_tgstagingv1',
         'password' => 'fudbpk10',
         'api_url' => 'https://api-int.qtplatform.com',
-        'provider_db_id' => 144,
+        'provider_db_id' => 76,
         'pass_key' => 'PiHBFfQVHh',
     ],
     'ppv2' => [
