@@ -2296,7 +2296,7 @@ class GameLobby{
     public static function gamingCorpsLaunchUrl($data,$device){
         try {
             $client_details =ProviderHelper::getClientDetails('token',$data['token']);
-            $url = config("providerlinks.gamingcorps.gamelaunch_url").'game_code='.$data['game_code'].'&language='.$data['lang'].'&currency='.$client_details->default_currency.'&casino_token='.config("providerlinks.gamingcorps.casino_token").'&player_id='.$client_details->player_id.'&platform=desktop&auto_spin=false&max_bet=false';
+            $url = config("providerlinks.gamingcorps.gamelaunch_url").'game_code='.$data['game_code'].'&language='.$data['lang'].'&currency='.$client_details->default_currency.'&casino_token='.config("providerlinks.gamingcorps.casino_token").'&player_id='.$client_details->player_id.'&platform='.$device.'&auto_spin=false&max_bet=false';
             return $url;
         } catch (\Exception $e) {
             Helper::saveLog('Gaming Corps Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
@@ -2389,6 +2389,16 @@ class GameLobby{
             Helper::saveLog('Pragmatic Play Gameluanch ERR', 143, json_encode($msg), json_encode($msg));
             return $msg;
         }
+    }
+    public static function relaxgaming($data,$device){
+        try {
+            $client_details =ProviderHelper::getClientDetails('token',$data['token']);
+            $url = config("providerlinks.relaxgaming.url").'language='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&mode=real&token='.$data['token'].'&lobbyurl='.$data['exitUrl'].'&currency='.$client_details->default_currency.'&partner='.config('providerlinks.relax.partner');
+            return $url;
+            } catch (\Exception $e) {
+                Helper::saveLog('Hacksaw Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+                return $e->getMessage();
+            }
     }
 }
 

@@ -873,6 +873,11 @@ return [
         'secret_key' => 'D8B944D07d314fF2',
         'host' => 'https://api-sg13.ppgames.net/IntegrationService/v3/http/CasinoGameAPI/game/url/',
     ],
+    'relaxgaming' => [
+        'partnerid' => '', 
+        'partner' => 'Tiger Games',
+        'url' => 'https://d2drhksbtcqozo.cloudfront.net/casino/launcher.html',
+    ],
 ];
 
 ?>
