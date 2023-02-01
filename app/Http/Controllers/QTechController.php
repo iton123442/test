@@ -28,8 +28,9 @@ class QTechController extends Controller
             ];
             return $response;
         }
+        $balance = str_replace(',', '', number_format($client_details->balance, 2));
         $response = [
-            "balance" => number_format($client_details->balance, 2),
+            "balance" => (float) $balance,
             "currency" => $client_details->default_currency
         ];
         return $response;
@@ -47,8 +48,9 @@ class QTechController extends Controller
             ];
             return $response;
         }
+        $balance = str_replace(',', '', number_format($client_details->balance, 2));
         $response = [
-            "balance" => number_format($client_details->balance, 2),
+            "balance" => (float) $balance,
             "currency" => $client_details->default_currency
         ];
         return $response;
@@ -78,14 +80,16 @@ class QTechController extends Controller
                     ];
                     return $response;
                 }
+                $balance = str_replace(',', '', number_format($client_details->balance, 2));
                 $response = [
-                    "balance" => (float)number_format($client_details->balance, 2),
+                    "balance" => (float) $balance,
                     "referenceId" => $bet_transaction->game_trans_id,
                 ];
                 return $response;
             }else{
+                $balance = str_replace(',', '', number_format($client_details->balance, 2));
                 $response = [
-                    "balance" => (float)number_format($client_details->balance, 2),
+                    "balance" => (float) $balance,
                     "referenceId" => $bet_transaction->game_trans_id,
                 ];
                 return $response;
@@ -169,8 +173,9 @@ class QTechController extends Controller
           switch ($client_response->fundtransferresponse->status->code) {
                 case '200':
                     $http_status = 200;
+                    $balance = str_replace(',', '', number_format($client_response->fundtransferresponse->balance, 2));
                     $response = [
-                            "balance" => (float)number_format($client_response->fundtransferresponse->balance, 2),
+                            "balance" => (float) $balance,
                             "referenceId" => $game_transaction_id
                     ];
                     $updateTransactionEXt = array(
@@ -244,9 +249,9 @@ class QTechController extends Controller
         }else{
             $transaction_detail = "SUCCESS";
         }
-
+        $balance = str_replace(',', '', number_format($winBalance, 2));
         $response = [
-            "balance" => (float)number_format($winBalance, 2),
+            "balance" => (float) $balance,
             "referenceId" => $game_trans_id,
         ];
 
@@ -377,13 +382,13 @@ class QTechController extends Controller
                     return $response;
                 }
                 $response = [
-                    "balance" => (float)number_format($client_details->balance, 2),
+                    "balance" => (float) number_format($client_details->balance, 2),
                     "referenceId" => $bet_transaction->game_trans_id,
                 ];
                 return $response;
             }else{
                 $response = [
-                    "balance" => (float)number_format($client_details->balance, 2),
+                    "balance" => (float) number_format($client_details->balance, 2),
                     "referenceId" => $bet_transaction->game_trans_id,
                 ];
                 return $response;
@@ -426,8 +431,9 @@ class QTechController extends Controller
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+            $balance = str_replace(',', '', number_format($client_response->fundtransferresponse->balance, 2));
             $response = [
-                "balance" => (float)number_format($client_response->fundtransferresponse->balance, 2),
+                "balance" => (float) $balance,
                 "referenceId" => $game_trans_id,
             ];
             // Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
