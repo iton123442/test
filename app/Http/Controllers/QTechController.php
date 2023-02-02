@@ -358,7 +358,6 @@ class QTechController extends Controller
         }
     }  
     public function rollback(Request $request){
-        Helper::saveLog('QtechTransactions', 144, json_encode($request->all()), json_encode($request->txnType));
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');        
         $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
