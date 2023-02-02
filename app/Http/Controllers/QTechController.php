@@ -69,7 +69,7 @@ class QTechController extends Controller
                     "balance" => (float) $client_details->balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id
                 ];
-                return $response
+                return $response;
             }
             $response = [
                 "code" => "LOGIN_FAILED",
@@ -378,7 +378,7 @@ class QTechController extends Controller
                     "balance" => (float) $client_details->balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id
                 ];
-                return $response
+                return $response;
             }
             $response = [
                 "code" => "LOGIN_FAILED",
