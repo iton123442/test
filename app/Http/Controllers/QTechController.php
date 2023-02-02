@@ -448,7 +448,7 @@ class QTechController extends Controller
         }
 
     }
-    
+
     public function bonusRewards(Request $request){
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         try {
@@ -534,7 +534,7 @@ class QTechController extends Controller
                   "mw_response" => json_encode($response),
                   'mw_request' => json_encode($client_response->requestoclient),
                   'client_response' => json_encode($client_response->fundtransferresponse),
-                  'transaction_detail' => $transaction_detail,
+                  'transaction_detail' => 'success',
                   'general_details' => 'success',
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
