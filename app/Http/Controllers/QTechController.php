@@ -20,7 +20,7 @@ class QTechController extends Controller
         Helper::saveLog('QtechSession', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
-        $client_details = ProviderHelper::getClientDetails('player_id',$id);
+        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
         if(!$client_details){
             $response = [
                 "code" => "INVALID_TOKEN",
@@ -40,7 +40,7 @@ class QTechController extends Controller
         Helper::saveLog('QtechBalance', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
-        $client_details = ProviderHelper::getClientDetails('player_id',$id);
+        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
         if(!$client_details){
             $response = [
                 "code" => "LOGIN_FAILED",
@@ -65,11 +65,7 @@ class QTechController extends Controller
             $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
             if($client_details){
                 $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
-                $balance = str_replace(',', '', number_format($client_details->balance, 2));
-                $response = [
-                    "balance" => (float) $balance,
-                    "referenceId" => (string) $bet_transaction->game_trans_id
-                ];
+                $response = $bet_transaction->mw_response;
                 return $response;
             }
             $response = [
@@ -376,10 +372,7 @@ class QTechController extends Controller
             if($client_details){
                 $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
                 $balance = str_replace(',', '', number_format($client_details->balance, 2));
-                $response = [
-                    "balance" => (float) $balance,
-                    "referenceId" => (string) $bet_transaction->game_trans_id
-                ];
+                $response = $bet_transaction->mw_response;
                 return $response;
             }
             $response = [
