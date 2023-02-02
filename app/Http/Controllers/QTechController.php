@@ -485,7 +485,7 @@ class QTechController extends Controller
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
         $response = [
             "balance" => (float)$balance,
-            "referenceId" => $game_transaction_id
+            "referenceId" => (string) $game_transaction_id
         ];
         $action_payload = [
               "type" => "custom", #genreral,custom :D # REQUIRED!
