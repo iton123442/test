@@ -25,7 +25,7 @@ class RelaxGamingController extends Controller
 
    public function verifyToken(Request $request){
     $data = $request->all();
-    Helper::saveLog('Relax Gaming Auth Request ', $this->provider_db_id, json_encode($data), "SUCCESS");
+    ProviderHelper::saveLog("Relax Auth Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
     $token = $data['token'];
     $client_details = ProviderHelper::getClientDetails('token', $token);
     if($client_details){
@@ -46,7 +46,7 @@ class RelaxGamingController extends Controller
     }   
     public function getBalance(Request $request){
       $data =$request->all();
-      Helper::saveLog('Relax Gaming Balance Request ', $this->provider_db_id, json_encode($data), "SUCCESS");
+      ProviderHelper::saveLog("Relax Balance Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
       $player_id = $data['customerid'];
       $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
       if($client_details){
