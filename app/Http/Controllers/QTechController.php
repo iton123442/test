@@ -20,7 +20,7 @@ class QTechController extends Controller
         Helper::saveLog('QtechSession', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
-        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
             $response = [
                 "code" => "INVALID_TOKEN",
@@ -40,7 +40,7 @@ class QTechController extends Controller
         Helper::saveLog('QtechBalance', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
-        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
             $response = [
                 "code" => "LOGIN_FAILED",
