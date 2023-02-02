@@ -65,7 +65,7 @@ class QTechController extends Controller
             $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
             if($client_details){
                 $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
-                $bet_response = json_decode(json_encode($bet_transaction->mw_response));
+                $bet_response = json_decode($bet_transaction->mw_response);
                 dd($bet_response->balance);
                 // $response = [
                 //     "balance" => $bet_response['balance'] + $request->amount,
