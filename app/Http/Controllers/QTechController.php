@@ -448,6 +448,7 @@ class QTechController extends Controller
         }
 
     }
+    
     public function bonusRewards(Request $request){
         dd($request->all());
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
@@ -571,6 +572,5 @@ class QTechController extends Controller
               GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
               return $response;
         }
-
     }
 }
