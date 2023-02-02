@@ -984,13 +984,6 @@ $app->post('/public/qtech/api/transactions', 'QTechController@transactions');
 $app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback');
 $app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
 $app->post('/public/qtech/api/bonus/rewards', 'QTechController@bonusRewards');
-
-$app->get('/public/qtech/api/accounts/{id}/session', 'QTechController@verifySession');
-$app->get('/public/qtech/api/accounts/{id}/balance', 'QTechController@getBalance');
-$app->post('/public/qtech/api/transactions', 'QTechController@transactions');
-$app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback');
-$app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
-$app->post('/public/qtech/api/bonus/rewards', 'QTechController@promoStatus');
 //Hacksaw
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
 $app->get('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
