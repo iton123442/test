@@ -20,7 +20,7 @@ class QTechController extends Controller
         Helper::saveLog('QtechSession', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
-        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
             $response = [
                 "code" => "INVALID_TOKEN",
@@ -40,7 +40,7 @@ class QTechController extends Controller
         Helper::saveLog('QtechBalance', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
-        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
             $response = [
                 "code" => "LOGIN_FAILED",
@@ -60,19 +60,8 @@ class QTechController extends Controller
         Helper::saveLog('QtechTransactions', 144, json_encode($request->all()), json_encode($request->txnType));
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');        
-        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         if(!$client_details){
-            $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
-            if($client_details){
-                $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
-                $bet_response = json_decode($bet_transaction->mw_response);
-                $response = [
-                    "balance" => $bet_response->balance,
-                    "referenceId" => $bet_response->referenceId
-                ];
-                return response($response,200)
-                        ->header('Content-Type', 'application/json');
-            }
             $response = [
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
@@ -371,19 +360,8 @@ class QTechController extends Controller
     public function rollback(Request $request){
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');        
-        $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
+        $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         if(!$client_details){
-            $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
-            if($client_details){
-                $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
-                $bet_response = json_decode($bet_transaction->mw_response);
-                $response = [
-                    "balance" => $bet_response->balance,
-                    "referenceId" => $bet_response->referenceId
-                ];
-                return response($response,200)
-                        ->header('Content-Type', 'application/json');
-            }
             $response = [
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
