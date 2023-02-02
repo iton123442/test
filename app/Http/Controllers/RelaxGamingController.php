@@ -34,7 +34,7 @@ class RelaxGamingController extends Controller
             'countrycode' => $client_details->country_code,
             'cashiertoken' =>$client_details->player_token,
             'customercurrency' => $client_details->default_currency,
-            'balance' =>0,
+            'balance' => $client_details->balance,
             'jurisdiction' => 'Success',
         ]);
     }else{
@@ -51,7 +51,7 @@ class RelaxGamingController extends Controller
       $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
       if($client_details){
         return response()->json([
-            'balance' =>0,
+            'balance' => $client_details->balance,
             'customercurrency' => $client_details->country_code
         ]);
       }else{

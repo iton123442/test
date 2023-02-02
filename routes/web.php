@@ -1010,8 +1010,8 @@ $app->post('/public/api/v2/pp/session/expired','PragmaticPlayV2Controller@sessio
 
 
 //Relax Gaming
-$app->post('/public/api/v1/relax/verifyToken','RelaxGamingController@verifyToken');
-$app->post('/public/api/v1/relax/getBalance','RelaxGamingController@getBalance');
-$app->post('/public/api/v1/relax/withdraw','RelaxGamingController@Bet');
-$app->post('/public/api/v1/relax/deposit','RelaxGamingController@Win');
-$app->post('/public/api/v1/relax/rollback','RelaxGamingController@rollback');
+$app->post('/public/api/relax/verifyToken','RelaxGamingController@verifyToken');
+$app->post('/public/api/relax/getBalance','RelaxGamingController@getBalance');
+$app->post('/public/api/relax/withdraw','RelaxGamingController@Bet');
+$app->post('/public/api/relax/deposit','RelaxGamingController@Win');
+$app->post('/public/api/relax/rollback','RelaxGamingController@rollback');
