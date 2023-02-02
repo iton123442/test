@@ -16,8 +16,16 @@ use DB;
 
 class RelaxGamingController extends Controller
 {
+
+    public function __construct(){
+    	$this->provider_db_id = config('providerlinks.relaxgaming.provider_id');
+        $this->key = config('providerlinks.relaxgaming.password');
+        $this->api_url = config('providerlinks.relaxgaming.api');
+    }
+
    public function verifyToken(Request $request){
     $data = $request->all();
+    Helper::saveLog('Relax Gaming Auth Request ', $this->provider_db_id, json_encode($data), "SUCCESS");
     $token = $data['token'];
     $client_details = ProviderHelper::getClientDetails('token', $token);
     if($client_details){
@@ -38,6 +46,7 @@ class RelaxGamingController extends Controller
     }   
     public function getBalance(Request $request){
       $data =$request->all();
+      Helper::saveLog('Relax Gaming Balance Request ', $this->provider_db_id, json_encode($data), "SUCCESS");
       $player_id = $data['customerid'];
       $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
       if($client_details){

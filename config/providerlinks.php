@@ -874,9 +874,12 @@ return [
         'host' => 'https://api-sg13.ppgames.net/IntegrationService/v3/http/CasinoGameAPI/game/url/',
     ],
     'relaxgaming' => [
-        'partnerid' => '', 
-        'partner' => 'Tiger Games',
+        'partnerid' => '1813', 
+        'partner' => 'betrnk',
         'url' => 'https://d2drhksbtcqozo.cloudfront.net/casino/launcher.html',
+        'api' => 'https://stag-casino-partner.api.relaxg.net:7000/papi/1.0',
+        'provider_id' =>77,
+        'password'=>'L6Xgpqbp9jSrgQJE'
     ],
 ];
 

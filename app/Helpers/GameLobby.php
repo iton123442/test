@@ -2393,10 +2393,10 @@ class GameLobby{
     public static function relaxgaming($data,$device){
         try {
             $client_details =ProviderHelper::getClientDetails('token',$data['token']);
-            $url = config("providerlinks.relaxgaming.url").'language='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&mode=real&token='.$data['token'].'&lobbyurl='.$data['exitUrl'].'&currency='.$client_details->default_currency.'&partner='.config('providerlinks.relax.partner');
+            $url = config("providerlinks.relaxgaming.url").'lang='.$data['lang'].'&channel='.$device.'&gameid='.$data['game_code'].'&moneymode=real&ticket='.$data['token'].'&homeurl='.$data['exitUrl'].'&currency='.$client_details->default_currency.'&partnerid='.config('providerlinks.relaxgaming.partnerid').'&partner='.config('providerlinks.relaxgaming.partner');
             return $url;
             } catch (\Exception $e) {
-                Helper::saveLog('Hacksaw Gameluanch error', 23, json_encode('unable to launch'), $e->getMessage() );
+                Helper::saveLog('relaxgaming Gameluanch error', 77, json_encode('unable to launch'), $e->getMessage() );
                 return $e->getMessage();
             }
     }
