@@ -66,11 +66,10 @@ class QTechController extends Controller
             if($client_details){
                 $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
                 $bet_response = json_decode($bet_transaction->mw_response);
-                dd($bet_response->balance);
-                // $response = [
-                //     "balance" => $bet_response['balance'] + $request->amount,
-                //     "referenceId" => $bet_response['referenceId']
-                // ];
+                $response = [
+                    "balance" => $bet_response->balance + $request->amount,
+                    "referenceId" => $bet_response->referenceId
+                ];
                 return response($bet_response,200)
                         ->header('Content-Type', 'application/json');
             }
@@ -377,10 +376,10 @@ class QTechController extends Controller
             $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
             if($client_details){
                 $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
-                $bet_response = json_decode(json_encode($bet_transaction->mw_response));
+                $bet_response = json_decode($bet_transaction->mw_response);
                 $response = [
-                    "balance" => $bet_response['balance'] + $request->amount,
-                    "referenceId" => $bet_response['referenceId']
+                    "balance" => $bet_response->balance + $request->amount,
+                    "referenceId" => $bet_response->referenceId
                 ];
                 return response($response,200)
                         ->header('Content-Type', 'application/json');
