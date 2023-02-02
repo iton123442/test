@@ -64,7 +64,7 @@ class QTechController extends Controller
         if(!$client_details){
             $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
             if($client_details){
-                $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
+                $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
                 $response = [
                     "balance" => (float) $client_details->balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id
@@ -373,7 +373,7 @@ class QTechController extends Controller
         if(!$client_details){
             $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
             if($client_details){
-                $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
+                $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
                 $response = [
                     "balance" => (float) $client_details->balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id
