@@ -449,6 +449,7 @@ class QTechController extends Controller
 
     }
     public function bonusRewards(Request $request){
+        dd($request->all());
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         try {
             ProviderHelper::idenpotencyTable("QTech-Rewards".$request->txnId);
