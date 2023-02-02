@@ -70,7 +70,7 @@ class QTechController extends Controller
                     "balance" => $bet_response->balance + $request->amount,
                     "referenceId" => $bet_response->referenceId
                 ];
-                return response($bet_response,200)
+                return response($response,200)
                         ->header('Content-Type', 'application/json');
             }
             $response = [
