@@ -62,6 +62,15 @@ class QTechController extends Controller
         $passKey = $request->header('Pass-Key');        
         $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
         if(!$client_details){
+            $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
+            if($client_details){
+                $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
+                $response = [
+                    "balance" => (float) $client_details->balance,
+                    "referenceId" => (string) $bet_transaction->game_trans_id
+                ];
+                return $response
+            }
             $response = [
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
@@ -362,6 +371,15 @@ class QTechController extends Controller
         $passKey = $request->header('Pass-Key');        
         $client_details = ProviderHelper::getClientDetails('token',$walletSessionId);
         if(!$client_details){
+            $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
+            if($client_details){
+                $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
+                $response = [
+                    "balance" => (float) $client_details->balance,
+                    "referenceId" => (string) $bet_transaction->game_trans_id
+                ];
+                return $response
+            }
             $response = [
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
