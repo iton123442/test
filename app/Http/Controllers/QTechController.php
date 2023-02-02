@@ -67,7 +67,7 @@ class QTechController extends Controller
                 $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
                 $bet_response = json_decode($bet_transaction->mw_response);
                 $response = [
-                    "balance" => $bet_response->balance + $request->amount,
+                    "balance" => $bet_response->balance
                     "referenceId" => $bet_response->referenceId
                 ];
                 return response($response,200)
@@ -378,7 +378,7 @@ class QTechController extends Controller
                 $bet_transaction = GameTransactionMDB::findGameExt($request->roundId,1,'round_id',$client_details);
                 $bet_response = json_decode($bet_transaction->mw_response);
                 $response = [
-                    "balance" => $bet_response->balance + $request->amount,
+                    "balance" => $bet_response->balance
                     "referenceId" => $bet_response->referenceId
                 ];
                 return response($response,200)
