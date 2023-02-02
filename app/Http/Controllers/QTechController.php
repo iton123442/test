@@ -83,14 +83,14 @@ class QTechController extends Controller
                 $balance = str_replace(',', '', number_format($client_details->balance, 2));
                 $response = [
                     "balance" => (float) $balance,
-                    "referenceId" => $bet_transaction->game_trans_id,
+                    "referenceId" => (string)$bet_transaction->game_trans_id,
                 ];
                 return $response;
             }else{
                 $balance = str_replace(',', '', number_format($client_details->balance, 2));
                 $response = [
                     "balance" => (float) $balance,
-                    "referenceId" => $bet_transaction->game_trans_id,
+                    "referenceId" => (string)$bet_transaction->game_trans_id,
                 ];
                 return $response;
             }
@@ -176,7 +176,7 @@ class QTechController extends Controller
                     $balance = str_replace(',', '', number_format($client_response->fundtransferresponse->balance, 2));
                     $response = [
                             "balance" => (float) $balance,
-                            "referenceId" => $game_transaction_id
+                            "referenceId" => (string)$game_transaction_id
                     ];
                     $updateTransactionEXt = array(
                         "provider_request" =>json_encode($request),
@@ -252,7 +252,7 @@ class QTechController extends Controller
         $balance = str_replace(',', '', number_format($winBalance, 2));
         $response = [
             "balance" => (float) $balance,
-            "referenceId" => $game_trans_id,
+            "referenceId" => (string) $game_trans_id,
         ];
 
         $updateGameTransaction = [
@@ -383,13 +383,13 @@ class QTechController extends Controller
                 }
                 $response = [
                     "balance" => (float) number_format($client_details->balance, 2),
-                    "referenceId" => $bet_transaction->game_trans_id,
+                    "referenceId" => (string) $bet_transaction->game_trans_id,
                 ];
                 return $response;
             }else{
                 $response = [
                     "balance" => (float) number_format($client_details->balance, 2),
-                    "referenceId" => $bet_transaction->game_trans_id,
+                    "referenceId" => (string) $bet_transaction->game_trans_id,
                 ];
                 return $response;
             }
@@ -434,7 +434,7 @@ class QTechController extends Controller
             $balance = str_replace(',', '', number_format($client_response->fundtransferresponse->balance, 2));
             $response = [
                 "balance" => (float) $balance,
-                "referenceId" => $game_trans_id,
+                "referenceId" => (string) $game_trans_id,
             ];
             // Helper::updateBNGGameTransactionExt($transactionId,$client_response->requestoclient,$response,$client_response);
             $dataToUpdate = array(
