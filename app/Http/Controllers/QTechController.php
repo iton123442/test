@@ -386,6 +386,7 @@ class QTechController extends Controller
                 ];
                 return $response;
             }else{
+                $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
                 $response = [
                     "balance" => (float) number_format($client_details->balance, 2),
                     "referenceId" => (string) $bet_transaction->game_trans_id,
