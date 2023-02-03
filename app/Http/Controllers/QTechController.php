@@ -20,6 +20,14 @@ class QTechController extends Controller
         Helper::saveLog('QtechSession', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
+        if($passKey != config('providerlinks.qtech.pass_key')){
+            $response = [
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
+            ];
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
+        }
         $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
             $response = [
@@ -71,7 +79,15 @@ class QTechController extends Controller
     public function transactions(Request $request){
         Helper::saveLog('QtechTransactions', 144, json_encode($request->all()), json_encode($request->txnType));
         $walletSessionId = $request->header('Wallet-Session');
-        $passKey = $request->header('Pass-Key');        
+        $passKey = $request->header('Pass-Key');   
+        if($passKey != config('providerlinks.qtech.pass_key')){
+            $response = [
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
+            ];
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
+        }     
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         if(!$client_details){
             $response = [
@@ -390,7 +406,15 @@ class QTechController extends Controller
     }  
     public function rollback(Request $request){
         $walletSessionId = $request->header('Wallet-Session');
-        $passKey = $request->header('Pass-Key');        
+        $passKey = $request->header('Pass-Key');   
+        if($passKey != config('providerlinks.qtech.pass_key')){
+            $response = [
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
+            ];
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
+        }     
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         if(!$client_details){
             $response = [
@@ -486,6 +510,16 @@ class QTechController extends Controller
     }
 
     public function bonusRewards(Request $request){
+        $walletSessionId = $request->header('Wallet-Session');
+        $passKey = $request->header('Pass-Key'); 
+        if($passKey != config('providerlinks.qtech.pass_key')){
+            $response = [
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
+            ];
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
+        }
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         try {
             ProviderHelper::idenpotencyTable("QTech-Rewards".$request->txnId);
