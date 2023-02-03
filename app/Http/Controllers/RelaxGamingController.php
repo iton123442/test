@@ -28,13 +28,15 @@ class RelaxGamingController extends Controller
     ProviderHelper::saveLog("Relax Auth Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
     $token = $data['token'];
     $client_details = ProviderHelper::getClientDetails('token', $token);
+    $balance = str_replace(".","", $client_details->balance);
+    $format_balance = (int)$balance;
     if($client_details){
         return response()->json([
             'customerid' => $client_details->player_id,
             'countrycode' => $client_details->country_code,
             'cashiertoken' =>$token,
             'customercurrency' => $client_details->default_currency,
-            'balance' => $client_details->balance,
+            'balance' => $format_balance,
             'jurisdiction' => 'CW',
         ]);
     }else{
@@ -49,10 +51,12 @@ class RelaxGamingController extends Controller
       ProviderHelper::saveLog("Relax Balance Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
       $player_id = $data['customerid'];
       $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+      $balance = str_replace(".","", $client_details->balance);
+      $format_balance = (int)$balance;
       if($client_details){
         return response()->json([
             'balance' => $client_details->balance,
-            'customercurrency' => $client_details->country_code
+            'customercurrency' => $format_balance
         ]);
       }else{
 
