@@ -146,6 +146,7 @@ class RelaxGamingController extends Controller
                 $format_balance = (int)$bal;
                 ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
                 //SUCCESS FUNDTRANSFER
+                
                 $response = [
                     "balance"=> $format_balance,
                     "txid"=>$provider_transaction,
@@ -288,8 +289,11 @@ class RelaxGamingController extends Controller
         $client_response->fundtransferresponse->status->code == "200"){
             ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
             //SUCCESS FUNDTRANSFER
+            $balance = round($client_response->fundtransferresponse->balance, 2);
+            $bal = str_replace(".","", $balance);
+            $format_balance = (int)$bal;
             $response =[
-                "balance"=>$client_response->fundtransferresponse->balance,
+                "balance"=>$format_balance,
                 "txid"=> $provider_transaction,
                 "remotetxid"=>"tgwin_".$game->game_trans_id
             ];
