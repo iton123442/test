@@ -26,14 +26,16 @@ class QTechController extends Controller
                 "code" => "INVALID_TOKEN",
                 "message" => "The given wallet session token has expired"
             ];
-            return $response;
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
         }
         $balance = str_replace(',', '', number_format($client_details->balance, 2));
         $response = [
             "balance" => (float) $balance,
             "currency" => $client_details->default_currency
         ];
-        return $response;
+        return response($response,200)
+                        ->header('Content-Type', 'application/json');
     }
 
     public function getBalance(Request $request, $id){
@@ -45,7 +47,8 @@ class QTechController extends Controller
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
             ];
-            return $response;
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
         }
         $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
@@ -53,14 +56,16 @@ class QTechController extends Controller
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
             ];
-            return $response;
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
         }
         $balance = str_replace(',', '', number_format($client_details->balance, 2));
         $response = [
             "balance" => (float) $balance,
             "currency" => $client_details->default_currency
         ];
-        return $response;
+        return response($response,200)
+                        ->header('Content-Type', 'application/json');
     }
 
     public function transactions(Request $request){
@@ -73,7 +78,8 @@ class QTechController extends Controller
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
             ];
-            return $response;
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
         }
         try {
             ProviderHelper::idenpotencyTable("QTech-Transactions".$request->txnId);
@@ -86,20 +92,23 @@ class QTechController extends Controller
                         "balance" => (float) $balance,
                         "referenceId" => (string)$bet_transaction->game_trans_id,
                     ];
-                    return $response;
+                    return response($response,200)
+                        ->header('Content-Type', 'application/json');
                 }else{
                     if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
                         $response = [
                           "code" => "INSUFFICIENT_FUNDS",
                           "message" =>"Not enough funds for the debit operation"
                         ];
-                        return $response;
+                        return response($response,400)
+                        ->header('Content-Type', 'application/json');
                     }
                     $response = [
                         "balance" => (float) $balance,
                         "referenceId" => (string)$bet_transaction->game_trans_id,
                     ];
-                    return $response;
+                    return response($response,200)
+                        ->header('Content-Type', 'application/json');
                 }
                 
             }else{
@@ -107,7 +116,8 @@ class QTechController extends Controller
                     "balance" => (float) $balance,
                     "referenceId" => (string)$bet_transaction->game_trans_id,
                 ];
-                return $response;
+                return response($response,200)
+                        ->header('Content-Type', 'application/json');
             }
             
         }
@@ -181,7 +191,8 @@ class QTechController extends Controller
               "code" => "INSUFFICIENT_FUNDS",
               "message" =>"Not enough funds for the debit operation"
             ];
-            return $response;
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
         }
         if (isset($client_response->fundtransferresponse->status->code)) {
           ProviderHelper::_insertOrUpdateCache($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -204,7 +215,7 @@ class QTechController extends Controller
                    GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                 break;
                 case '402':
-                    $http_status = 402;
+                    $http_status = 400;
                     $updateGameTransaction = [
                           'win' => 2,
                     ];
@@ -225,6 +236,7 @@ class QTechController extends Controller
                     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                 break;
                 default:
+                    $http_status = 400;
                     $updateGameTransaction = [
                         'win' => 2,
                     ];
@@ -244,7 +256,8 @@ class QTechController extends Controller
                     GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
           }// End Switch
       }// End Fundtransfer
-      return $response;
+      return response($response,$http_status)
+                        ->header('Content-Type', 'application/json');
     }
 
     public function creditProcess($request,$client_details){
@@ -338,12 +351,13 @@ class QTechController extends Controller
                   'general_details' => 'success',
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-            return $response;
+            response($response,200)
+                        ->header('Content-Type', 'application/json');
         }elseif (isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "402") {
           $response = [
-            "code"=>"REQUEST_DECLINED",
-            "message" => "General error. If request could not be processed."
+                "code"=>"REQUEST_DECLINED",
+                "message" => "General error. If request could not be processed."
           ];
           $updateTransactionEXt = array(
                 "provider_request" =>json_encode($request),
@@ -354,7 +368,8 @@ class QTechController extends Controller
                 'general_details' => 'FAILED',
           );
           GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-          return $response;
+          return response($response,400)
+                        ->header('Content-Type', 'application/json');
         }else{
               $response = [
                 "code"=>"REQUEST_DECLINED",
@@ -369,7 +384,8 @@ class QTechController extends Controller
                     'general_details' => 'FAILED',
               );
               GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-              return $response;
+              return response($response,400)
+                        ->header('Content-Type', 'application/json');
         }
     }  
     public function rollback(Request $request){
@@ -381,7 +397,8 @@ class QTechController extends Controller
                 "code" => "LOGIN_FAILED",
                 "message" => "The given pass-key is incorrect."
             ];
-            return $response;
+            return response($response,401)
+                        ->header('Content-Type', 'application/json');
         }
         try {
             ProviderHelper::idenpotencyTable("QTech-Rollback".$request->txnId);
@@ -394,20 +411,23 @@ class QTechController extends Controller
                       "code" => "REQUEST_DECLINED",
                       "message" =>"General error. Duplicate Transaction."
                     ];
-                    return $response;
+                    return response($response,400)
+                        ->header('Content-Type', 'application/json');
                 }
                 $response = [
                     "balance" => (float) $balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id,
                 ];
-                return $response;
+                return response($response,200)
+                        ->header('Content-Type', 'application/json');
             }else{
                 $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
                 $response = [
                     "balance" => (float) $balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id,
                 ];
-                return $response;
+                return response($response,200)
+                        ->header('Content-Type', 'application/json');
             }
             
         }
@@ -476,7 +496,8 @@ class QTechController extends Controller
                 "balance" => (float) $balance,
                 "referenceId" => (string) $bet_transaction->game_trans_id,
             ];
-            return $response;
+           return response($response,200)
+                        ->header('Content-Type', 'application/json');
         }
         $balance = $client_details->balance + $request->amount;
         $gameTransactionData = array(
@@ -555,7 +576,8 @@ class QTechController extends Controller
                   'general_details' => 'success',
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-            return $response;
+            return response($response,200)
+                        ->header('Content-Type', 'application/json');
         }elseif (isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "402") {
           $response = [
@@ -571,7 +593,8 @@ class QTechController extends Controller
                 'general_details' => 'FAILED',
           );
           GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-          return $response;
+          return response($response,400)
+                        ->header('Content-Type', 'application/json');
         }else{
               $response = [
                 "code"=>"REQUEST_DECLINED",
@@ -586,7 +609,8 @@ class QTechController extends Controller
                     'general_details' => 'FAILED',
               );
               GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-              return $response;
+              return response($response,400)
+                        ->header('Content-Type', 'application/json');
         }
     }
 }
