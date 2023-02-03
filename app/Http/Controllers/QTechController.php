@@ -372,6 +372,7 @@ class QTechController extends Controller
             ProviderHelper::idenpotencyTable("QTech-Rollback".$request->txnId);
         } catch (\Exception $e) {
             $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,3,'transaction_id',$client_details);
+            $balance = str_replace(',', '', number_format($client_details->balance, 2));
             if($bet_transaction != 'false'){
                 if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
                     $response = [
@@ -381,14 +382,14 @@ class QTechController extends Controller
                     return $response;
                 }
                 $response = [
-                    "balance" => (float) number_format($client_details->balance, 2),
+                    "balance" => (float) $balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id,
                 ];
                 return $response;
             }else{
                 $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
                 $response = [
-                    "balance" => (float) number_format($client_details->balance, 2),
+                    "balance" => (float) $balance,
                     "referenceId" => (string) $bet_transaction->game_trans_id,
                 ];
                 return $response;
@@ -455,8 +456,9 @@ class QTechController extends Controller
             ProviderHelper::idenpotencyTable("QTech-Rewards".$request->txnId);
         } catch (\Exception $e) {
             $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
+            $balance = str_replace(',', '', number_format($client_details->balance, 2));
             $response = [
-                "balance" => (float) number_format($client_details->balance, 2),
+                "balance" => (float) $balance,
                 "referenceId" => (string) $bet_transaction->game_trans_id,
             ];
             return $response;
