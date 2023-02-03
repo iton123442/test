@@ -556,6 +556,14 @@ class QTechController extends Controller
             return response($response,401)
                         ->header('Content-Type', 'application/json');
         }
+        if(!isset($request->rewardType)){
+            $response = [
+                "code"=>"REQUEST_DECLINED",
+                "message" => "General error. If request could not be processed."
+            ];
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         try {
             ProviderHelper::idenpotencyTable("QTech-Rewards".$request->txnId);
