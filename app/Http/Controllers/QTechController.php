@@ -367,7 +367,7 @@ class QTechController extends Controller
                   'general_details' => 'success',
             );
             GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
-            response($response,200)
+            return response($response,200)
                         ->header('Content-Type', 'application/json');
         }elseif (isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "402") {
