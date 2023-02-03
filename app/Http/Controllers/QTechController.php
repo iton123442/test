@@ -23,10 +23,10 @@ class QTechController extends Controller
         $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
             $response = [
-                "code" => "INVALID_TOKEN",
-                "message" => "The given wallet session token has expired"
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
             ];
-            return response($response,400)
+            return response($response,401)
                         ->header('Content-Type', 'application/json');
         }
         $balance = str_replace(',', '', number_format($client_details->balance, 2));
