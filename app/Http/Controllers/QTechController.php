@@ -96,14 +96,7 @@ class QTechController extends Controller
             return response($response,401)
                         ->header('Content-Type', 'application/json');
         }  
-        if(!ProviderHelper::getClientDetails('token',$walletSessionId)){
-            $response = [
-                "code" => "INVALID_TOKEN",
-                "message" => "Missing, invalid or expired player (wallet) session token."
-            ];
-            return response($response,400)
-                        ->header('Content-Type', 'application/json');
-        }   
+
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         if(!$client_details){
             $response = [
@@ -154,6 +147,22 @@ class QTechController extends Controller
             
         }
         if($request->txnType == "DEBIT"){
+            if(!ProviderHelper::getClientDetails('token',$walletSessionId)){
+                $response = [
+                    "code" => "INVALID_TOKEN",
+                    "message" => "Missing, invalid or expired player (wallet) session token."
+                ];
+                return response($response,400)
+                            ->header('Content-Type', 'application/json');
+            } 
+            if($bet_amount > $client_details->balance){
+                $response = [
+                  "code" => "INSUFFICIENT_FUNDS",
+                  "message" =>"Not enough funds for the debit operation"
+                ];
+                return response($response,400)
+                            ->header('Content-Type', 'application/json');
+            }
             return $this->debitProcess($request->all(),$client_details);
         }elseif($request->txnType == "CREDIT"){
             return $this->creditProcess($request->all(),$client_details);
@@ -167,6 +176,7 @@ class QTechController extends Controller
         $game_code = $request['gameId'];
         $game_details = ProviderHelper::findGameDetails('game_code',config('providerlinks.qtech.provider_db_id'), $game_code);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',1, $client_details);
+
         if($bet_transaction != 'false'){
             $client_details->connection_name = $bet_transaction->connection_name;
             $amount = $bet_transaction->bet_amount + $bet_amount;
