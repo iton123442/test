@@ -115,7 +115,7 @@ class RelaxGamingController extends Controller
             }
             
             $gameTransactionDatas = [
-                "provider_trans_id" => $provider_trans_id,
+                "provider_trans_id" => $provider_transaction,
                 "token_id" => $client_details->token_id,
                 "game_id" => $gamedetails->game_id,
                 "round_id" => $round_id,
@@ -128,7 +128,7 @@ class RelaxGamingController extends Controller
             $game_trans_id = GameTransactionMDB::createGametransaction($gameTransactionDatas,$client_details);
             $gameExtensionData = [
                 "game_trans_id" => $game_trans_id,
-                "provider_trans_id" => $provider_trans_id,
+                "provider_trans_id" => $provider_transaction,
                 "round_id" => $round_id,
                 "amount" => $bet_amount,
                 "game_transaction_type" => 1,
