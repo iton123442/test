@@ -1264,7 +1264,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code == 144 || $provider_code == 147 || $provider_code == 148 || $provider_code == 149){
+                elseif($provider_code == 144 || $provider_code == 147 || $provider_code == 148 || $provider_code == 149 || $provider_code == 150 || $provider_code == 151 || $provider_code == 152 || $provider_code == 153 || $provider_code == 154 || $provider_code == 155 || $provider_code == 156 || $provider_code == 157 || $provider_code == 158 || $provider_code == 159 || $provider_code == 160 || $provider_code == 161 || $provider_code == 162 || $provider_code == 163 || $provider_code == 164 || $provider_code == 165 || $provider_code == 166 || $provider_code == 167 || $provider_code == 168 || $provider_code == 169 || $provider_code == 170 || $provider_code == 171 || $provider_code == 172 || $provider_code == 173 || $provider_code == 174 || $provider_code == 175 || $provider_code == 176 || $provider_code == 177  || $provider_code == 178 || $provider_code == 179 || $provider_code == 180 || $provider_code == 181 || $provider_code == 182 || $provider_code == 183 || $provider_code == 184 || $provider_code == 185 || $provider_code == 186 || $provider_code == 187 || $provider_code == 188 || $provider_code == 189 || $provider_code == 190 || $provider_code == 191 || $provider_code == 192 || $provider_code == 193 || $provider_code == 194){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::qtechLaunchUrl($request->all(), $device), 
