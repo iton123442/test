@@ -29,6 +29,14 @@ class QTechController extends Controller
                         ->header('Content-Type', 'application/json');
         }
         $client_details = ProviderHelper::getClientDetails('player_id',$id);
+        if($client_details->player_token != $walletSessionId){
+            $response = [
+                "code" => "INVALID_TOKEN",
+                "message" => "Missing, invalid or expired player (wallet) session token."
+            ];
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }
         if(!$client_details){
             $response = [
                 "code" => "LOGIN_FAILED",
@@ -59,6 +67,14 @@ class QTechController extends Controller
                         ->header('Content-Type', 'application/json');
         }
         $client_details = ProviderHelper::getClientDetails('player_id',$id);
+        if($client_details->player_token != $walletSessionId){
+            $response = [
+                "code" => "INVALID_TOKEN",
+                "message" => "Missing, invalid or expired player (wallet) session token."
+            ];
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }
         if(!$client_details){
             $response = [
                 "code" => "LOGIN_FAILED",
@@ -416,6 +432,14 @@ class QTechController extends Controller
                         ->header('Content-Type', 'application/json');
         }     
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
+        if($client_details->player_token != $walletSessionId){
+            $response = [
+                "code" => "INVALID_TOKEN",
+                "message" => "Missing, invalid or expired player (wallet) session token."
+            ];
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }
         if(!$client_details){
             $response = [
                 "code" => "LOGIN_FAILED",
@@ -521,6 +545,14 @@ class QTechController extends Controller
                         ->header('Content-Type', 'application/json');
         }
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
+        if($client_details->player_token != $walletSessionId){
+            $response = [
+                "code" => "INVALID_TOKEN",
+                "message" => "Missing, invalid or expired player (wallet) session token."
+            ];
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }
         try {
             ProviderHelper::idenpotencyTable("QTech-Rewards".$request->txnId);
         } catch (\Exception $e) {
