@@ -71,23 +71,31 @@ class QTechController extends Controller
         try {
             ProviderHelper::idenpotencyTable("QTech-Transactions".$request->txnId);
         } catch (\Exception $e) {
-            $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
+            $bet_transaction = GameTransactionMDB::findGameExtOrderByTransType($request->txnId,false,'transaction_id',$client_details);
+            $balance = str_replace(',', '', number_format($client_details->balance, 2));
             if($bet_transaction != 'false'){
-                if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
+                if($bet_transaction->game_transaction_type == 2 || $bet_transaction->game_transaction_type == '2'){
                     $response = [
-                      "code" => "INSUFFICIENT_FUNDS",
-                      "message" =>"Not enough funds for the debit operation"
+                        "balance" => (float) $balance,
+                        "referenceId" => (string)$bet_transaction->game_trans_id,
+                    ];
+                    return $response;
+                }else{
+                    if($bet_transaction->transaction_detail == '"FAILED"' || $bet_transaction->transaction_detail == "FAILED" ){
+                        $response = [
+                          "code" => "INSUFFICIENT_FUNDS",
+                          "message" =>"Not enough funds for the debit operation"
+                        ];
+                        return $response;
+                    }
+                    $response = [
+                        "balance" => (float) $balance,
+                        "referenceId" => (string)$bet_transaction->game_trans_id,
                     ];
                     return $response;
                 }
-                $balance = str_replace(',', '', number_format($client_details->balance, 2));
-                $response = [
-                    "balance" => (float) $balance,
-                    "referenceId" => (string)$bet_transaction->game_trans_id,
-                ];
-                return $response;
+                
             }else{
-                $balance = str_replace(',', '', number_format($client_details->balance, 2));
                 $response = [
                     "balance" => (float) $balance,
                     "referenceId" => (string)$bet_transaction->game_trans_id,
