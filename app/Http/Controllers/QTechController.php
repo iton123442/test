@@ -40,6 +40,13 @@ class QTechController extends Controller
         Helper::saveLog('QtechBalance', 144, json_encode($request->all()),  "HIT_id:". $id );
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key');
+        if($passKey != config('providerlinks.qtech.pass_key')){
+            $response = [
+                "code" => "LOGIN_FAILED",
+                "message" => "The given pass-key is incorrect."
+            ];
+            return $response;
+        }
         $client_details = ProviderHelper::getClientDetails('player_id',$id);
         if(!$client_details){
             $response = [
