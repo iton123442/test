@@ -155,7 +155,7 @@ class QTechController extends Controller
                 return response($response,400)
                             ->header('Content-Type', 'application/json');
             } 
-            if($bet_amount > $client_details->balance){
+            if($request->amount > $client_details->balance){
                 $response = [
                   "code" => "INSUFFICIENT_FUNDS",
                   "message" =>"Not enough funds for the debit operation"
