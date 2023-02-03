@@ -303,6 +303,7 @@ class RelaxGamingController extends Controller
             ];
             GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
             // Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+            ProviderHelper::saveLog("Relax Win Fundtransfer Success",$this->provider_db_id,json_encode($request->all()),json_encode($response));
             return json_encode($response);
         }
         }else{
