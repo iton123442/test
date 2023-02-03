@@ -212,7 +212,7 @@ class RelaxGamingController extends Controller
     $data = $request->all();
     ProviderHelper::saveLog("Relax Win Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
     $game_code = $data['gameref'];
-    $win_amount = $data['amount']/100;
+    $win_amount = $data['amount'];
     $round_id = $data['gamesessionid'];
     $provider_transaction = $data['txid'];
     $player_id = $data['customerid'];
