@@ -446,7 +446,6 @@ class QTechController extends Controller
             return response($response,200)
                 ->header('Content-Type', 'application/json');
         }
-
     }
 
     public function bonusRewards(Request $request){
@@ -460,7 +459,6 @@ class QTechController extends Controller
                 "referenceId" => (string) $bet_transaction->game_trans_id,
             ];
             return $response;
-            
         }
         $balance = $client_details->balance + $request->amount;
         $gameTransactionData = array(
@@ -488,6 +486,7 @@ class QTechController extends Controller
             "balance" => (float)$balance,
             "referenceId" => (string) $game_transaction_id
         ];
+        ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
         $action_payload = [
               "type" => "custom", #genreral,custom :D # REQUIRED!
               "custom" => [
