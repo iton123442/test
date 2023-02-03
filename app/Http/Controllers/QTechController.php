@@ -463,7 +463,7 @@ class QTechController extends Controller
         try {
             ProviderHelper::idenpotencyTable("QTech-Rewards".$request->txnId);
         } catch (\Exception $e) {
-            $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,1,'transaction_id',$client_details);
+            $bet_transaction = GameTransactionMDB::findGameExt($request->txnId,false,'transaction_id',$client_details);
             $balance = str_replace(',', '', number_format($client_details->balance, 2));
             $response = [
                 "balance" => (float) $balance,
