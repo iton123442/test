@@ -545,6 +545,7 @@ class QTechController extends Controller
     }
 
     public function bonusRewards(Request $request){
+        Helper::saveLog('QtechTransactions rollback', 144, json_encode($request->all()), "HIT");
         $walletSessionId = $request->header('Wallet-Session');
         $passKey = $request->header('Pass-Key'); 
         if($passKey != config('providerlinks.qtech.pass_key')){
