@@ -488,6 +488,14 @@ class QTechController extends Controller
         $game_code = $request->gameId;
         $game_details = ProviderHelper::findGameDetails('game_code',config('providerlinks.qtech.provider_db_id'), $game_code);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',1, $client_details);
+        if(!$bet_transaction){
+            $response = [
+              "code" => "REQUEST_DECLINED",
+              "message" =>"General error. Duplicate Transaction."
+            ];
+            return response($response,400)
+                ->header('Content-Type', 'application/json');
+        }
         $game_trans_id = $bet_transaction->game_trans_id;
         $winBalance = $client_details->balance + $pay_amount;
         $win_or_lost = $pay_amount > 0 ?  1 : 0;
