@@ -419,7 +419,7 @@ class QTechController extends Controller
             "provider_trans_id" => $transaction_id,
             "round_id" => $round_id,
             "amount" => $pay_amount,
-            "game_transaction_type" => 2,
+            "game_transaction_type" => 3,
             "provider_request" => json_encode($request),
         ];
         $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
