@@ -32,7 +32,7 @@ class RelaxGamingController extends Controller
         return response()->json([
             'customerid' => $client_details->player_id,
             'countrycode' => $client_details->country_code,
-            'cashiertoken' =>$client_details->player_token,
+            'cashiertoken' =>$token,
             'customercurrency' => $client_details->default_currency,
             'balance' => $client_details->balance,
             'jurisdiction' => 'CW',
