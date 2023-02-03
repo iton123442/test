@@ -95,7 +95,15 @@ class QTechController extends Controller
             ];
             return response($response,401)
                         ->header('Content-Type', 'application/json');
-        }     
+        }  
+        if(!ProviderHelper::getClientDetails('token',$walletSessionId)){
+            $response = [
+                "code" => "INVALID_TOKEN",
+                "message" => "Missing, invalid or expired player (wallet) session token."
+            ];
+            return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }   
         $client_details = ProviderHelper::getClientDetails('player_id',$request->playerId);
         if(!$client_details){
             $response = [
