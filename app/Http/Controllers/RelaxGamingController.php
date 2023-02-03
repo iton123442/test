@@ -72,9 +72,9 @@ class RelaxGamingController extends Controller
         $data =$request->all();
         ProviderHelper::saveLog("Relax Bet Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
         $player_id = $data['customerid'];
-        $game_code = $data['gameid'];
+        $game_code = $data['gameref'];
         $round_id = $data['gamesessionid'];
-        $bet_amount = $data['amount'];
+        $bet_amount = $data['amount']/100;
         $provider_transaction = $data['txid'];
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         if($client_details){
@@ -159,6 +159,7 @@ class RelaxGamingController extends Controller
                     "transaction_detail" => "Success",
                     "general_details" => "Success",
                 ];
+                ProviderHelper::saveLog("Relax Bet Fundtransfer Success",$this->provider_db_id,json_encode($request->all()),json_encode($extensionData));
                 GameTransactionMDB::updateGametransactionEXT($extensionData,$game_trans_ext_id,$client_details);
                 return response()->json([
                     "balance"=> $format_balance,
@@ -210,8 +211,8 @@ class RelaxGamingController extends Controller
     public function Win(Request $request){
     $data = $request->all();
     ProviderHelper::saveLog("Relax Win Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
-    $game_code = $data['gameid'];
-    $win_amount = $data['amount'];
+    $game_code = $data['gameref'];
+    $win_amount = $data['amount']/100;
     $round_id = $data['gamesessionid'];
     $provider_transaction = $data['txid'];
     $player_id = $data['customerid'];
