@@ -489,12 +489,12 @@ class QTechController extends Controller
         $game_details = ProviderHelper::findGameDetails('game_code',config('providerlinks.qtech.provider_db_id'), $game_code);
         $bet_transaction = GameTransactionMDB::findGameTransactionDetails($round_id, 'round_id',1, $client_details);
         if($bet_transaction == 'false'){
+            $balance = str_replace(',', '', number_format($client_details->balance, 2));
             $response = [
-              "code" => "REQUEST_DECLINED",
-              "message" =>"General error. If request could not be processed."
+                "balance" => (float) $balance,
             ];
-            return response($response,400)
-                ->header('Content-Type', 'application/json');
+            return response($response,200)
+                    ->header('Content-Type', 'application/json');
         }
         $game_trans_id = $bet_transaction->game_trans_id;
         $winBalance = $client_details->balance + $pay_amount;
