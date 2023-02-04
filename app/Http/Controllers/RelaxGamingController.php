@@ -37,7 +37,7 @@ class RelaxGamingController extends Controller
             'cashiertoken' =>$token,
             'customercurrency' => $client_details->default_currency,
             'balance' => $format_balance,
-            'jurisdiction' => 'CW',
+            'jurisdiction' => '',
         ]);
     }else{
         return response()->json([

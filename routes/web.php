@@ -1015,3 +1015,7 @@ $app->post('/public/api/relax/getBalance','RelaxGamingController@getBalance');
 $app->post('/public/api/relax/withdraw','RelaxGamingController@Bet');
 $app->post('/public/api/relax/deposit','RelaxGamingController@Win');
 $app->post('/public/api/relax/rollback','RelaxGamingController@rollback');
+$app->post('/public/api/relax/freespins/add','RelaxGamingController@FreeRounds');
+$app->post('/public/api/relax/freespins/querypossiblecounts','RelaxGamingController@FreeRoundsCounts');
+$app->post('/public/api/relax/featuretriggers/add','RelaxGamingController@FeatureTrigger');
+$app->post('/public/api/relax/notifyFreespinsCancel','RelaxGamingController@FreeSpinCancel'); 
