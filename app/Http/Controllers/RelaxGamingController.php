@@ -381,7 +381,7 @@ class RelaxGamingController extends Controller
             $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
     
             $fund_extra_data = [
-                'provider_name' => $game_details->provider_name
+                'provider_name' => "Relax Gaming"
             ];
             $client_response = ClientRequestHelper::fundTransfer($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"credit",true,$fund_extra_data);
             if(isset($client_response->fundtransferresponse->status->code) 
