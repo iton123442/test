@@ -337,19 +337,15 @@ class RelaxGamingController extends Controller
                 ProviderHelper::IdenpotencyTable($provider_txid);
             }catch(\Exception $e){
                 return response()->json([
-                    'errorcode' => "UNHANDLED",
-                    'errormessage' =>"Final fallback error code."      
+                    'errorcode' => "TRANSACTION_DECLINED",
+                    'errormessage' =>"Duplicate Relax Transaction ID"      
                 ]);
             }
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',1, $client_details);
             if($bet_transaction == null){
-                $balance = round($client_details->balance, 2);
-                $bal = str_replace(".","", $balance);
-                $format_balance = (int)$bal;
                 return response()->json([
-                    'balance' => $format_balance,
-                    'txid' =>$provider_txid,
-                    'remotetxid'  => $rollback_trans_id
+                    'errorcode' => "TRANSACTION_DECLINED",
+                    'errormessage' =>"Transaction Not Found"      
                 ]);
             }
             $game_id = $bet_transaction->game_id;
