@@ -342,7 +342,7 @@ class RelaxGamingController extends Controller
                 ]);
             }
             $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',1, $client_details);
-            if($bet_history == null){
+            if($bet_transaction == null){
                 $balance = round($client_details->balance, 2);
                 $bal = str_replace(".","", $balance);
                 $format_balance = (int)$bal;
