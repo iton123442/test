@@ -324,8 +324,8 @@ class RelaxGamingController extends Controller
     }
 
     public function rollback(Request $request){
-        Helper::saveLog('RelaxGaming rollback', 144, json_encode($request), json_encode($request->all()));
         $data = $request->all();
+        Helper::saveLog('RelaxGaming rollback', $this->provider_db_id, json_encode($data), 'Rollback HIT!');
         $player_id = $data['customerid'];
         $provider_txid = $data['txid'];
         $rollback_trans_id = $data['originaltxid'];
