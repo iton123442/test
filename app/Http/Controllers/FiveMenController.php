@@ -669,7 +669,7 @@ class FiveMenController extends Controller
 		$game_details = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
-		Helper::saveLog('5men Rollback ', $this->provider_db_id, json_encode($string_to_obj), 'Success HIT!');
+		Helper::saveLog('5men Rollback Data Request ', $this->provider_db_id, json_encode($data), 'Success HIT!');
 		try{
 			ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['callback_id']);
 		}catch(\Exception $e){
