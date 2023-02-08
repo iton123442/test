@@ -163,9 +163,11 @@ class PlayTechController extends Controller
 
                             $game_code = "";
                             if(isset($value["additionalData"]["launchAlias"])){
+                                dd(123);
                                 $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $value["additionalData"]["launchAlias"]);
                                 $game_code = $value["additionalData"]["launchAlias"];
                             }else{
+                                dd(456);
                                 $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $request->gameCode);
                                 $game_code = $request->gameCode;
                             }
