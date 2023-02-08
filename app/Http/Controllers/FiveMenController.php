@@ -670,41 +670,20 @@ class FiveMenController extends Controller
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 		Helper::saveLog('5men Rollback Data Request ', $this->provider_db_id, json_encode($data), 'Success HIT!');
-		try{
-			ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['callback_id']);
-		}catch(\Exception $e){
-
-			$bet_transaction = GameTransactionMDB::findGameExt($data["refund_round_id"], 3,'round_id', $client_details);
-            if ($bet_transaction != 'false') {
-                if ($bet_transaction->mw_response == 'null') {
-                   	$response = array(
-						"status" => 'error',
-						"error" => [
-							'scope' => 'user',
-							'no_refund'=> 0,
-							"message" => "Internal error. Please reopen the game",
-						]
-					);
-                }else {
-                    $response = $bet_transaction->mw_response;
-                }
-				
-
-            } else {
-                $response = array(
-					"status" => 'error',
-					"error" => [
-						'scope' => 'user',
-						'no_refund'=> 0,
-						"message" => "Internal error. Please reopen the game",
-					]
-				);
-            } 
-
-
-            Helper::saveLog('5MEN bet found 1 ', $this->provider_db_id, json_encode($data), $response);
-            return $response;
-		}
+		// try{
+		// 	ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['callback_id']);
+		// }catch(\Exception $e){
+        //         $response = array(
+		// 			"status" => 'error',
+		// 			"error" => [
+		// 				'scope' => 'user',
+		// 				'no_refund'=> 0,
+		// 				"message" => "Internal error. Please reopen the game",
+		// 			]
+		// 		);
+        //     Helper::saveLog('5MEN bet found 1 ', $this->provider_db_id, json_encode($data), $response);
+        //     return $response;
+		// }
 		$rollback_trans_id = $data['data']['refund_round_id'];
 		//$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',1, $client_details);
