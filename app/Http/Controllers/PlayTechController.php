@@ -140,8 +140,7 @@ class PlayTechController extends Controller
     public function transaction(Request $request){
         Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($request->all()),  "HIT" );
         $hashedata = $this->checkMD5($request->all());
-        // if($hashedata == "true"){
-        if(true){
+        if($hashedata == "true"){
             if($request->brandId == config('providerlinks.playtech.brand_id')){
                 $client_details = ProviderHelper::getClientDetails('token', $request->playerSessionId);
                 if($client_details != null){
@@ -156,7 +155,6 @@ class PlayTechController extends Controller
                         return response($response,200)
                         ->header('Content-Type', 'application/json');
                     }
-                    // if ($game_details != null) { // Put inside the loop
 
                        $success_transaction = [];
                        foreach($request->trans  as $key =>  $value){
@@ -170,6 +168,7 @@ class PlayTechController extends Controller
                                 $game_code = $request->gameCode;
                             }
 
+                            // Error
                             if ($game_details == null) {
                                 $response = [
                                     "requestId" => $request->requestId,
@@ -182,8 +181,6 @@ class PlayTechController extends Controller
                             try{
                                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$value["transId"].'-'.$value["roundId"]);
                             }catch(\Exception $e){
-
-                               
 
                                 $bet_transaction = GameTransactionMDB::findGameExt($value["transId"], false,'transaction_id', $client_details);
                                 if ($bet_transaction != 'false') {
@@ -224,6 +221,7 @@ class PlayTechController extends Controller
                                 return response($response,200)
                                     ->header('Content-Type', 'application/json');
                             }
+                            
                             if ($value["transType"] == "bet" || $value["transType"] == "transIn" ){
                                 $response = $this->betProcess($value, $client_details,$game_details,$request->requestId, $request->all() );
                             } elseif ($value["transType"] == "win" || $value["transType"] == "transOut"){
@@ -231,16 +229,9 @@ class PlayTechController extends Controller
                             } elseif ($value["transType"] == "cancel"){
                                 $response = $this->cancelProcess($value, $client_details,$game_details,$request->requestId, $request->all() );
                             }
-                            return response($response,200)
-                                ->header('Content-Type', 'application/json');
+                            // return response($response,200)
+                            //     ->header('Content-Type', 'application/json');
                        }
-                    // }
-                    // $response = [
-                    //     "requestId" => $request->requestId,
-                    //     "error" => "G_01",
-                    //     "message" => "Game not found"
-                    // ];
-                    // Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
                     return response($response,200)
                     ->header('Content-Type', 'application/json');
                 }
