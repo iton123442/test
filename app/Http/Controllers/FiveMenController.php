@@ -407,7 +407,7 @@ class FiveMenController extends Controller
 		$entry_id = ($existing_bet->pay_amount + $amount) > 0 ?  2 : 1;
 		$income = $existing_bet->bet_amount - ($existing_bet->pay_amount + $amount) ;
 		$updateGameTransaction = [
-			'win' => 5,
+			'win' => $win_or_lost,
 			"pay_amount" => $existing_bet->pay_amount + $amount,
 			'income' => $income,
 			'entry_id' => $entry_id,
@@ -416,24 +416,30 @@ class FiveMenController extends Controller
 		GameTransactionMDB::updateGametransaction($updateGameTransaction, $existing_bet->game_trans_id, $client_details);
 
 		$body_details = [
-			"type" => "credit",
-			"win" => $win_or_lost,
-			"token" => $client_details->player_token,
-			"rollback" => false,
-			"game_details" => [
-				"game_id" => $game_details->game_id
-			],
-			"game_transaction" => [
-				"amount" => $amount
-			],
-			"connection_name" => $existing_bet->connection_name,
-			"game_trans_ext_id" => $game_trans_ext_id,
-			"game_transaction_id" => $existing_bet->game_trans_id
-
+			"type" => "custom", #genreral,custom :D # REQUIRED!
+            "custom" => [
+                "provider" => '5Men Gaming',
+                "game_transaction_ext_id" => $game_trans_ext_id,
+                "client_connection_name" => $client_details->connection_name,
+                "win_or_lost" => $win_or_lost,
+            ],
+            "provider" => [
+                "provider_request" => $string_to_obj,
+                "provider_trans_id"=>$reference_transaction_uuid,
+                "provider_round_id"=>$$request["callback_id"],
+                'provider_name' => $game_details->provider_name
+            ],
+            "mwapi" => [
+                "roundId"=> $existing_bet->game_trans_id,
+                "type" => 2,
+                "game_id" => $game_details->game_id,
+                "player_id" => $client_details->player_id,
+                "mw_response" => $response,
+            ]
 		];
 
 		try {
-			$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_details->game_code,$game_details->game_name,$existing_bet->game_trans_id,'credit',false,$action_payload);
+			$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_details->game_code,$game_details->game_name,$existing_bet->game_trans_id,'credit',false,$body_details);
 			if(isset($client_response->fundtransferresponse->status->code) &&
 			$client_response->fundtransferresponse->status->code == "200"){
 				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
@@ -700,7 +706,7 @@ class FiveMenController extends Controller
             return $response;
 		}
 		$reference_transaction_uuid = $data['data']['refund_round_id'];
-		// $existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
+		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		$existing_refund = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 3,'round_id', $client_details);
 		if ($existing_refund != 'false') {
 			if ($existing_refund->mw_response == 'null') {
@@ -787,7 +793,7 @@ class FiveMenController extends Controller
 
 	        try {
 				$fund_extra_data = [
-					'provider_name' => "Relax Gaming"
+					'provider_name' => "5Men Gaming"
 				];
 				$client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$existing_bet->game_trans_id,"credit",true,$fund_extra_data);
 				if(isset($client_response->fundtransferresponse->status->code) 
