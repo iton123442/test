@@ -30,6 +30,65 @@ class GameLobbyController extends Controller
         /*$this->middleware('authorize:' . __CLASS__, ['except' => ['index', 'store']]);*/
     }
 
+
+    /**
+     * Filter Games
+     */
+    public function getProviderList(Request $request){
+
+        $request_data = json_decode(json_encode($request->all()));
+        $numdays = isset($request_data->numdays) ? $request_data->numdays : 7; // default 7 days
+       
+
+        $client_id = $request_data->client_id;
+        if (!is_numeric($client_id)){
+            return ['status' => 'failed', 'msg' => 'Client ID Not Found!'];
+        }
+
+
+        $days = strtotime ( "-".$numdays." days"); 
+        $start_date = date( "Y-m-d" , $days).' '.date('h:i:s');
+        $end_date = date('Y-m-d h:i:s');
+
+
+        $providerLists = array();
+
+        if(isset($request_data->allgames)){
+
+            if($request_data->allgames == true){
+                // true get all games regardless of released or new
+                // $condition = " WHERE client_id = '".$request->client."' AND operator_id = '".$request->operator."' ";
+            }else{
+                // false only the new released or added games
+            }
+        }
+
+        if(isset($request_data->provider)){
+
+            if($request_data->provider == true){
+                // true get all games regardless of released or new
+                // $condition = " WHERE client_id = '".$request->client."' AND operator_id = '".$request->operator."' ";
+            }else{
+                // false only the new released or added games
+            }
+        }
+
+
+
+        $games= DB::select("select g.sub_provider_id,(select sub_provider_name from sub_providers where sub_provider_id = g.sub_provider_id) proivder,game_id,game_name,game_code, min_bet,max_bet,info,rtp,status,release_date, (select game_type_name from game_types where game_type_id = g.game_type_id) type
+        from games g where sub_provider_id NOT IN (select sub_provider_id from excluded_sub_provider where cgs_id in (select cgs_id from client_game_subscribe where client_id IN (select client_id from clients where client_id = ".$client_id.") )) and status = 'upcoming'");
+        
+        foreach($games as $item){
+          $providerLists[] = array( 'client_id' => $client_id, 'game_provider' => $item->proivder, 'game_code' => $item->game_id, 'provider_game_code' => $item->game_code, 'game_name' => $item->game_name, 'game_type' => $item->type, 'min_bet' => $item->min_bet, 'max_bet' => $item->max_bet, 'info' => $item->info, 'rtp' => $item->rtp, 'status' => $item->status, 'release_date' => $item->release_date );
+        }
+
+
+        return $providerLists;
+        dd($providerLists);
+
+    }
+
+
     /**
      * Get all upcoming games
      */
@@ -50,13 +109,13 @@ class GameLobbyController extends Controller
 
         */
      
-        $clientID = $request->get('client_id');
-        if (!is_numeric($clientID)){
-            return ['status' => 'failed', 'msg' => 'Client ID Not Found'];
+        $client_id = $request->get('client_id');
+        if (!is_numeric($client_id)){
+            return ['status' => 'failed', 'msg' => 'Client ID Not Found!'];
         }
 
         $upcomingGamesArray = array();
-        $clients = DB::select("select client_id as id, operator_id as opID from clients where operator_id in (select operator_id from clients where client_id = $clientID )");
+        $clients = DB::select("select client_id as id, operator_id as opID from clients where operator_id in (select operator_id from clients where client_id = $client_id )");
         foreach($clients as $client){
 
             $spID= DB::select("select g.sub_provider_id,(select sub_provider_name from sub_providers where sub_provider_id = g.sub_provider_id) proivder,game_id,game_name,game_code, min_bet,max_bet,info,rtp,status,release_date, (select game_type_name from game_types where game_type_id = g.game_type_id) type

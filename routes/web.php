@@ -537,6 +537,8 @@ $app->post('/public/currency/convert','Payments\PaymentLobbyController@currencyC
 $app->post('/public/game/demo','GameLobby\DemoGameController@GameDemo');
 $app->get('/public/game/launchurl/playforfun', 'GameLobby\GameDemoClientController@gameLaunchDemo');
 
+# Tiger Games API
+$app->post('/public/game/providers','GameLobby\GameLobbyController@getProviderList');
 $app->get('/public/game/upcoming','GameLobby\GameLobbyController@getUpcomingGames');
 $app->get('/public/game/list','GameLobby\GameLobbyController@getGameList');
 $app->get('/public/game/provider/{provider_name}','GameLobby\GameLobbyController@getProviderDetails');
@@ -825,9 +827,9 @@ $app->post('/public/api/dragongaming/refund', 'DragonGamingController@rollbackTr
 
 
 // PlayTech
-$app->post('/public/api/playtech/auth', 'PlaytechControllerNew@auth');
-$app->post('/public/api/playtech/balance', 'PlaytechControllerNew@getBalance');
-$app->post('/public/api/playtech/transaction', 'PlaytechControllerNew@transaction');
+$app->post('/public/api/playtech/auth', 'PlaytechController@auth');
+$app->post('/public/api/playtech/balance', 'PlaytechController@getBalance');
+$app->post('/public/api/playtech/transaction', 'PlaytechController@transaction');
 // FunkyGames
 $app->post('/public/FunkyGames/GetGameList', 'FunkyGamesController@gameList');
 $app->post('/public/Funky/User/GetBalance','FunkyGamesController@GetBalance');
