@@ -537,6 +537,8 @@ $app->post('/public/currency/convert','Payments\PaymentLobbyController@currencyC
 $app->post('/public/game/demo','GameLobby\DemoGameController@GameDemo');
 $app->get('/public/game/launchurl/playforfun', 'GameLobby\GameDemoClientController@gameLaunchDemo');
 
+# Tiger Games API
+$app->post('/public/game/providers','GameLobby\GameLobbyController@getProviderList');
 $app->get('/public/game/upcoming','GameLobby\GameLobbyController@getUpcomingGames');
 $app->get('/public/game/list','GameLobby\GameLobbyController@getGameList');
 $app->get('/public/game/provider/{provider_name}','GameLobby\GameLobbyController@getProviderDetails');
@@ -825,9 +827,9 @@ $app->post('/public/api/dragongaming/refund', 'DragonGamingController@rollbackTr
 
 
 // PlayTech
-$app->post('/public/api/playtech/auth', 'PlaytechControllerNew@auth');
-$app->post('/public/api/playtech/balance', 'PlaytechControllerNew@getBalance');
-$app->post('/public/api/playtech/transaction', 'PlaytechControllerNew@transaction');
+$app->post('/public/api/playtech/auth', 'PlayTechController@auth');
+$app->post('/public/api/playtech/balance', 'PlayTechController@getBalance');
+$app->post('/public/api/playtech/transaction', 'PlayTechController@transaction');
 // FunkyGames
 $app->post('/public/FunkyGames/GetGameList', 'FunkyGamesController@gameList');
 $app->post('/public/Funky/User/GetBalance','FunkyGamesController@GetBalance');
@@ -984,6 +986,13 @@ $app->post('/public/qtech/api/transactions', 'QTechController@transactions');
 $app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback');
 $app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
 $app->post('/public/qtech/api/bonus/rewards', 'QTechController@bonusRewards');
+
+$app->get('/public/qtech/api/accounts/{id}/session', 'QTechController@verifySession');
+$app->get('/public/qtech/api/accounts/{id}/balance', 'QTechController@getBalance');
+$app->post('/public/qtech/api/transactions', 'QTechController@transactions');
+$app->post('/public/qtech/api/transactions/rollback', 'QTechController@rollback');
+$app->post('/public/qtech/api/bonus/status', 'QTechController@promoStatus');
+$app->post('/public/qtech/api/bonus/rewards', 'QTechController@promoStatus');
 //Hacksaw
 $app->post('/public/api/hacksaw', 'HacksawGamingController@hacksawIndex');
 $app->get('/public/api/hacksaw/gamelist', 'HacksawGamingController@Gamelist');
@@ -1019,3 +1028,4 @@ $app->post('/public/api/relax/freespins/add','RelaxGamingController@FreeRounds')
 $app->post('/public/api/relax/freespins/querypossiblecounts','RelaxGamingController@FreeRoundsCounts');
 $app->post('/public/api/relax/featuretriggers/add','RelaxGamingController@FeatureTrigger');
 $app->post('/public/api/relax/notifyFreespinsCancel','RelaxGamingController@FreeSpinCancel'); 
+
