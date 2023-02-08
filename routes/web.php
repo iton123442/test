@@ -827,9 +827,9 @@ $app->post('/public/api/dragongaming/refund', 'DragonGamingController@rollbackTr
 
 
 // PlayTech
-$app->post('/public/api/playtech/auth', 'PlaytechController@auth');
-$app->post('/public/api/playtech/balance', 'PlaytechController@getBalance');
-$app->post('/public/api/playtech/transaction', 'PlaytechController@transaction');
+$app->post('/public/api/playtech/auth', 'PlayTechController@auth');
+$app->post('/public/api/playtech/balance', 'PlayTechController@getBalance');
+$app->post('/public/api/playtech/transaction', 'PlayTechController@transaction');
 // FunkyGames
 $app->post('/public/FunkyGames/GetGameList', 'FunkyGamesController@gameList');
 $app->post('/public/Funky/User/GetBalance','FunkyGamesController@GetBalance');
