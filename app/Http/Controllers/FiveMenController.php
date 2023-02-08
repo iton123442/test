@@ -426,7 +426,7 @@ class FiveMenController extends Controller
             "provider" => [
                 "provider_request" => $string_to_obj,
                 "provider_trans_id"=>$reference_transaction_uuid,
-                "provider_round_id"=>$$request["callback_id"],
+                "provider_round_id"=>$request["callback_id"],
                 'provider_name' => $game_details->provider_name
             ],
             "mwapi" => [
