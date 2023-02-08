@@ -99,8 +99,7 @@ class FiveMenController extends Controller
 	    // GAME DETAILS
 		$string_to_obj = json_decode($request['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-
-		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
+		$game_details = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
 
@@ -136,7 +135,7 @@ class FiveMenController extends Controller
             } 
 
 
-            Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
+            Helper::saveLog('5Men bet found 1 ', $this->provider_db_id, json_encode($request), $response);
             return $response;
 		}
 		
@@ -185,7 +184,10 @@ class FiveMenController extends Controller
 	        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameTransactionEXTData,$client_details);
 	        
 			try {
-				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"debit",false);
+				$fund_extra_data = [
+					'provider_name' => $gamedetails->provider_name
+				];
+				$client_response = ClientRequestHelper::fundTransfer($client_details,$bet_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,'debit',false,$fund_extra_data);
 	        } catch (\Exception $e) {
 			    $response = array(
 					"status" => 'error',
@@ -209,7 +211,7 @@ class FiveMenController extends Controller
 	                'trans_status' => 5,
 	            ];
 	            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-				Helper::saveLog('TGG BET FATAL ERROR', $this->provider_db_id, json_encode($request), $response);
+				Helper::saveLog('5MEN BET FATAL ERROR', $this->provider_db_id, json_encode($request), $response);
 			    return $response;
 	        }
 
@@ -233,7 +235,7 @@ class FiveMenController extends Controller
 							"general_details" => "success",
 						);
 				        GameTransactionMDB::updateGametransactionEXT($update_gametransactionext,$game_trans_ext_id,$client_details);
-				        Helper::saveLog('TGG success BET PROCESS ', $this->provider_db_id, json_encode($request), $response);
+				        Helper::saveLog('5MEN success BET PROCESS ', $this->provider_db_id, json_encode($request), $response);
 						break;
 					case "402":
 
@@ -260,7 +262,7 @@ class FiveMenController extends Controller
 			                'trans_status' => 5
 			            ];
 			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-	          			Helper::saveLog('TGG success BET Not enough money ', $this->provider_db_id, json_encode($request), $response);
+	          			Helper::saveLog('5MEN success BET Not enough money ', $this->provider_db_id, json_encode($request), $response);
 						// ProviderHelper::createRestrictGame($game_details->game_id,$client_details->player_id,$game_trans_ext_id,json_encode(json_encode($response)));
 						break;
 					default:
@@ -285,7 +287,7 @@ class FiveMenController extends Controller
 			                'trans_status' => 5
 			            ];
 			            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
-	          			Helper::saveLog('TGG success BET FAILED ', $this->provider_db_id, json_encode($request), $response);
+	          			Helper::saveLog('5MEN success BET FAILED ', $this->provider_db_id, json_encode($request), $response);
 				}
 
 				return $response;
@@ -300,7 +302,7 @@ class FiveMenController extends Controller
 					"message" => "System error",
 				]
 			);
-			Helper::saveLog('TGG ERROR BET catch', $this->provider_db_id, json_encode($request), $msg);
+			Helper::saveLog('5MEN ERROR BET catch', $this->provider_db_id, json_encode($request), $msg);
 			return $msg;
 		}
 
@@ -353,7 +355,7 @@ class FiveMenController extends Controller
             } 
 
 
-            Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($request), $response);
+            Helper::saveLog('5MEN bet found 1 ', $this->provider_db_id, json_encode($request), $response);
             return $response;
 		}
 		
@@ -365,13 +367,13 @@ class FiveMenController extends Controller
 					'currency' => $client_details->default_currency,
 				],
 			);
-			Helper::saveLog('TGG collect', $this->provider_db_id, json_encode($request), $response);
+			Helper::saveLog('5MEN collect', $this->provider_db_id, json_encode($request), $response);
 			return $response;
 		}
 
 		$reference_transaction_uuid = $request['data']['action_id'];// action id its first action id is round id
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
-		Helper::saveLog("TGG freespin", $this->provider_db_id, json_encode($request), "HIT");
+		Helper::saveLog("5MEN freespin", $this->provider_db_id, json_encode($request), "HIT");
 		if ($existing_bet == 'false') {
 			$reference_transaction_uuid = $request['data']['round_id'];
 			$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
@@ -431,13 +433,27 @@ class FiveMenController extends Controller
 		];
 
 		try {
-			$client = new Client();
-			$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
-				[ 'body' => json_encode($body_details), 'timeout' => '2.00']
-			);
-			//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-			Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
-			return $response;
+			$client_response = ClientRequestHelper::fundTransfer_TG($client_details,$amount,$game_details->game_code,$game_details->game_name,$existing_bet->game_trans_id,'credit',false,$action_payload);
+			if(isset($client_response->fundtransferresponse->status->code) &&
+			$client_response->fundtransferresponse->status->code == "200"){
+				ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+				//SUCCESS FUNDTRANSFER
+				$balance = round($client_response->fundtransferresponse->balance, 2);
+				$response = array(
+					'status' => 'ok',
+					'data' => [
+						'balance' => (string)$balance,
+						'currency' => $client_details->default_currency,
+					],
+				);
+				$msg = [
+					"mw_response" => json_encode($response)
+				];
+				GameTransactionMDB::updateGametransactionEXT($msg,$game_trans_ext_id,$client_details);
+				// Helper::saveLog('Hacksaw Win', $this->provider_db_id, json_encode($data), 'Success HIT!');
+				ProviderHelper::saveLog("5MEN Win Fundtransfer Success",$this->provider_db_id,json_encode($request->all()),json_encode($response));
+				return json_encode($response);
+			}
 		} catch (\Exception $e) {
 			Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($request), $response);
 			return $response;
@@ -522,12 +538,12 @@ class FiveMenController extends Controller
 		// 					'message' => "Transaction not found",
 		// 				]
 		// 		  	);
-		// 		  	Helper::saveLog("TGG not found transaction Spin", $this->provider_db_id, json_encode($request), $response);
+		// 		  	Helper::saveLog("5MEN not found transaction Spin", $this->provider_db_id, json_encode($request), $response);
 		// 	        return $response;
 		// 		}
 		// 	} elseif ($string_to_obj->game->action == 'freespin') {
 		// 		$reference_transaction_uuid = $request['data']['round_id'];
-		// 		Helper::saveLog("TGG freespin", $this->provider_db_id, json_encode($request), "HIT");
+		// 		Helper::saveLog("5MEN freespin", $this->provider_db_id, json_encode($request), "HIT");
 		// 		if ($existing_bet == 'false') {
 		// 			$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'round_id',false, $client_details);
 		// 		}
@@ -608,7 +624,7 @@ class FiveMenController extends Controller
 		// 				'currency' => $client_details->default_currency,
 		// 			],
 		// 		);
-		// 		Helper::saveLog('TGG collect', $this->provider_db_id, json_encode($request), $response);
+		// 		Helper::saveLog('5MEN collect', $this->provider_db_id, json_encode($request), $response);
 		// 		return $response;
 		// 	} else {
 
@@ -619,7 +635,7 @@ class FiveMenController extends Controller
 		// 				'currency' => $client_details->default_currency,
 		// 			],
 		// 		);
-		// 		Helper::saveLog('TGG win deefault', $this->provider_db_id, json_encode($request), $response);
+		// 		Helper::saveLog('5MEN win deefault', $this->provider_db_id, json_encode($request), $response);
 		// 		return $response;
 
 		// 	}
@@ -634,7 +650,7 @@ class FiveMenController extends Controller
 		// 			'currency' => $client_details->default_currency,
 		// 		],
 		// 	);
-		// 	Helper::saveLog('TGG win else deefault', $this->provider_db_id, json_encode($request), $response);
+		// 	Helper::saveLog('5MEN win else deefault', $this->provider_db_id, json_encode($request), $response);
 		// 	return $response;
 		// }
 		
@@ -644,11 +660,10 @@ class FiveMenController extends Controller
 
 		$string_to_obj = json_decode($data['data']['details']);
 	    $game_id = $string_to_obj->game->game_id;
-
-		$game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $game_id);
+		$game_details = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_id);
 
 		//GET EXISTING BET IF TRUE MEANS ALREADY PROCESS 
-
+		Helper::saveLog('5men Rollback ', $this->provider_db_id, json_encode($string_to_obj), 'Success HIT!');
 		try{
 			ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['callback_id']);
 		}catch(\Exception $e){
@@ -681,13 +696,11 @@ class FiveMenController extends Controller
             } 
 
 
-            Helper::saveLog('TGG bet found 1 ', $this->provider_db_id, json_encode($data), $response);
+            Helper::saveLog('5MEN bet found 1 ', $this->provider_db_id, json_encode($data), $response);
             return $response;
 		}
-
 		$reference_transaction_uuid = $data['data']['refund_round_id'];
 		// $existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
-
 		$existing_refund = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 3,'round_id', $client_details);
 		if ($existing_refund != 'false') {
 			if ($existing_refund->mw_response == 'null') {
@@ -702,7 +715,7 @@ class FiveMenController extends Controller
 			}else {
 				$response = $existing_refund->mw_response;
 			}
-			Helper::saveLog('TGG bet refund 1 ', $this->provider_db_id, json_encode($data), $response);
+			Helper::saveLog('5MEN bet refund 1 ', $this->provider_db_id, json_encode($data), $response);
             return $response;
 		}
 		$existing_bet = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 1,'round_id', $client_details);
@@ -773,13 +786,30 @@ class FiveMenController extends Controller
 	        ];
 
 	        try {
-				$client = new Client();
-		 		$guzzle_response = $client->post(config('providerlinks.oauth_mw_api.mwurl') . '/tigergames/bg-bgFundTransferV2MultiDB',
-		 			[ 'body' => json_encode($body_details), 'timeout' => '2.00']
-		 		);
-		 		//THIS RESPONSE IF THE TIMEOUT NOT FAILED
-	            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($data), $response);
-	            return $response;
+				$fund_extra_data = [
+					'provider_name' => "Relax Gaming"
+				];
+				$client_response = ClientRequestHelper::fundTransfer($client_details,$amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$existing_bet->game_trans_id,"credit",true,$fund_extra_data);
+				if(isset($client_response->fundtransferresponse->status->code) 
+				&& $client_response->fundtransferresponse->status->code == "200"){
+					ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+					$response = array(
+						'status' => 'ok',
+						'data' => [
+							'balance' => (string)$client_response->fundtransferresponse->balance,
+							'currency' => $client_details->default_currency,
+						],
+					  );
+					$dataToUpdate = array(
+						"mw_response" => json_encode($response),
+						"client_response" => json_encode($client_response),
+						"mw_request" => json_encode($client_response->requestoclient),
+						"transaction_detail" => 'SUCCESS',
+					);
+					GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
+					return response($response,200)
+						->header('Content-Type', 'application/json');
+				}
 			} catch (\Exception $e) {
 	            Helper::saveLog($game_trans_ext_id, $this->provider_db_id, json_encode($data), $response);
 	            return $response;
@@ -793,7 +823,7 @@ class FiveMenController extends Controller
 					'message' => "Transaction not found",
 				]
 		  	);
-		  	Helper::saveLog("TGG not found transaction Spin", $this->provider_db_id, json_encode($data), $response);
+		  	Helper::saveLog("5MEN not found transaction Spin", $this->provider_db_id, json_encode($data), $response);
 	        return $response;
 		}
 
@@ -871,7 +901,7 @@ class FiveMenController extends Controller
 		$token = 'n58ec5e159f769ae0b7b3a0774fdbf80';
 		$client_player_details = $this->getClientDetails('token', $token);
         $requesttosend = [
-          "project" => config('providerlinks.tgg.project_id'),
+          "project" => config('providerlinks.5MEN.project_id'),
           "version" => 1,
           "token" => $token,
           "game" => 498, //game_code, game_id
@@ -913,7 +943,7 @@ class FiveMenController extends Controller
 				'display_name' => $client_details->display_name
 			]
 		];
-		TGGHelper::saveLog('TGG Balance Response ', $this->provider_db_id, json_encode($request), $response);
+		TGGHelper::saveLog('5MEN Balance Response ', $this->provider_db_id, json_encode($request), $response);
 		return $response;
 	}
 

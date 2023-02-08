@@ -100,7 +100,7 @@ class RelaxGamingController extends Controller
         $provider_transaction = $data['txid'];
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         if($client_details){
-            $gamedetails = ProviderHelper::findGameDetails('game_code',77, $game_code);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_code);
             try{
                 // ProviderHelper::saveLog("Hacksaw Idempotent Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
                 ProviderHelper::idenpotencyTable("BET_".$provider_transaction);
@@ -112,7 +112,7 @@ class RelaxGamingController extends Controller
                     return response()->json([
                         "balance"=>$balance,
                         "txid"=> $bet_transaction->provider_transaction,
-                        "remotetxid"=>0
+                        "remotetxid"=>$bet_transaction->game_transid
                     ]);
                 } 
                 // sleep(4);
@@ -248,7 +248,7 @@ class RelaxGamingController extends Controller
                 "errormessage"=> "Duplicate Win"
             ]);
         }
-        $gamedetails = ProviderHelper::findGameDetails('game_code',77, $game_code);
+        $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_code);
         if($gamedetails){
             if($win_amount == 0){
                 $amount = 0;
