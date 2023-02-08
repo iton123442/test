@@ -70,17 +70,34 @@ class RelaxGamingController extends Controller
 
     public function Bet(Request $request){
         $data =$request->all();
+        $method = $data['txtype'];
         ProviderHelper::saveLog("Relax Bet Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
+        if($method == "freespinspayout"){
+            $player_id = $data['remoteusername'];
+            $provider_transaction = $data['txid'];
+            $game_code = $data['gameref'];
+            $bet_amount = $data['amount']/100;
+            Helper::saveLog('Relax Gaming freespinspayout',$this->provider_db_id,json_encode($request->all()),"Free Rounds HIT!");                
+            $client_details = ProviderHelper::getClientDetails('player_id',$player_id);
+            try {
+                ProviderHelper::idenpotencyTable("Relax-Rewards".$provider_transaction);
+            } catch (\Exception $e) {
+                $bet_transaction = GameTransactionMDB::findGameExt($provider_transaction,false,'transaction_id',$client_details);
+                $balance = str_replace(',', '', number_format($client_details->balance, 2));
+                $response = [
+                    "balance" => (float) $balance,
+                    "referenceId" => (string) $bet_transaction->game_trans_id,
+                ];
+               return response($response,200)
+                            ->header('Content-Type', 'application/json');
+            }
+
+        }else{
         $player_id = $data['customerid'];
         $game_code = $data['gameref'];
         $round_id = $data['gamesessionid'];
         $bet_amount = $data['amount']/100;
         $provider_transaction = $data['txid'];
-        $method = $data['txtype'];
-        if($method == "freespinspayout"){
-            Helper::saveLog('Relax Gaming freespinspayout',$this->provider_db_id,json_encode($request->all()),"Free Rounds HIT!");
-
-        }else{
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         if($client_details){
             $gamedetails = ProviderHelper::findGameDetails('game_code',77, $game_code);
@@ -419,6 +436,7 @@ class RelaxGamingController extends Controller
 
     public function FreeRounds(Request $request){
         $data = $request->all();
+        Helper::saveLog('Relax FreeRounds', $this->provider_db_id, json_encode($data), "FREE ROUNDS HIT");
         dd($data);
 
     }
