@@ -1893,7 +1893,7 @@ class GameLobby{
         $client_details = ProviderHelper::getClientDetails('token',$data['token']);
         $getGameDetails = Helper::findGameDetails( "game_code",config('providerlinks.playtech.provider_db_id'), $data['game_code']);
         if($getGameDetails->game_type_id == "15"){
-            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$getGameDetails->info."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'].'&tableAlias='.$data['game_code'];
+            $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$getGameDetails->secondary_game_code."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'].'&tableAlias='.$data['game_code'];
             Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
             return $gameUrl;
         } else {
@@ -1902,6 +1902,18 @@ class GameLobby{
             Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
             return $gameUrl;
         }
+
+        // OLD
+        // if($getGameDetails->game_type_id == "15"){
+        //     $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$getGameDetails->info."&token=".$data['token']."&platform=web&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'].'&tableAlias='.$data['game_code'];
+        //     Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
+        //     return $gameUrl;
+        // } else {
+        //     $is_support  = $getGameDetails->info ==  ''  ? 'web' : $getGameDetails->info;
+        //     $gameUrl = config('providerlinks.playtech.api_url')."/launcher?gameCode=".$data['game_code']."&token=".$data['token']."&platform=".$is_support."&language=en&playerId=".$client_details->player_id."&brandId=".config('providerlinks.playtech.brand_id')."&mode=1&backUrl=".$data['exitUrl'];
+        //     Helper::saveLog('PlayTech GAMELUANCH', 68, json_encode($gameUrl),  "HIT" );
+        //     return $gameUrl;
+        // }
 
         return "false";
        
