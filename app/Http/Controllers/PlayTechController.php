@@ -140,11 +140,12 @@ class PlayTechController extends Controller
     public function transaction(Request $request){
         Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($request->all()),  "HIT" );
         $hashedata = $this->checkMD5($request->all());
-        if($hashedata == "true"){
+        // if($hashedata == "true"){
+        if(true){
             if($request->brandId == config('providerlinks.playtech.brand_id')){
                 $client_details = ProviderHelper::getClientDetails('token', $request->playerSessionId);
                 if($client_details != null){
-                    $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $request->gameCode);
+                    // $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $request->gameCode);
                     if($client_details->player_id != $request->playerId){
                         $response = [
                             "requestId" => $request->requestId,
@@ -155,11 +156,32 @@ class PlayTechController extends Controller
                         return response($response,200)
                         ->header('Content-Type', 'application/json');
                     }
-                    if ($game_details != null) {
+                    // if ($game_details != null) { // Put inside the loop
                        foreach($request->trans  as $key =>  $value){
                             try{
                                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$value["transId"].'-'.$value["roundId"]);
                             }catch(\Exception $e){
+
+
+                                $game_code = "";
+                                if(isset($value["additionalData"]["launchAlias"])){
+                                    $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $value["additionalData"]["launchAlias"]);
+                                    $game_code = $value["additionalData"]["launchAlias"];
+                                }else{
+                                    $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $request->gameCode);
+                                    $game_code = $request->gameCode;
+                                }
+
+                                // if ($game_details != null) {
+                                //     $response = [
+                                //         "requestId" => $request->requestId,
+                                //         "error" => "G_01",
+                                //         "message" => "Game not found"
+                                //     ];
+                                //     return $response;
+                                // }
+
+
                                 $bet_transaction = GameTransactionMDB::findGameExt($value["transId"], false,'transaction_id', $client_details);
                                 if ($bet_transaction != 'false') {
                                     if ($bet_transaction->mw_response == 'null') {
@@ -209,12 +231,12 @@ class PlayTechController extends Controller
                             return response($response,200)
                                 ->header('Content-Type', 'application/json');
                        }
-                    }
-                    $response = [
-                        "requestId" => $request->requestId,
-                        "error" => "G_01",
-                        "message" => "Game not found"
-                    ];
+                    // }
+                    // $response = [
+                    //     "requestId" => $request->requestId,
+                    //     "error" => "G_01",
+                    //     "message" => "Game not found"
+                    // ];
                     // Helper::saveLog('PlayTech transaction', $this->provider_db_id, json_encode($response),  "response" );
                     return response($response,200)
                     ->header('Content-Type', 'application/json');
