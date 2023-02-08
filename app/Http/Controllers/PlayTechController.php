@@ -158,19 +158,19 @@ class PlayTechController extends Controller
                     }
                     // if ($game_details != null) { // Put inside the loop
                        foreach($request->trans  as $key =>  $value){
+
+                            $game_code = "";
+                            if(isset($value["additionalData"]["launchAlias"])){
+                                $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $value["additionalData"]["launchAlias"]);
+                                $game_code = $value["additionalData"]["launchAlias"];
+                            }else{
+                                $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $request->gameCode);
+                                $game_code = $request->gameCode;
+                            }
+                            
                             try{
                                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$value["transId"].'-'.$value["roundId"]);
                             }catch(\Exception $e){
-
-
-                                $game_code = "";
-                                if(isset($value["additionalData"]["launchAlias"])){
-                                    $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $value["additionalData"]["launchAlias"]);
-                                    $game_code = $value["additionalData"]["launchAlias"];
-                                }else{
-                                    $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $request->gameCode);
-                                    $game_code = $request->gameCode;
-                                }
 
                                 // if ($game_details != null) {
                                 //     $response = [
@@ -180,7 +180,6 @@ class PlayTechController extends Controller
                                 //     ];
                                 //     return $response;
                                 // }
-
 
                                 $bet_transaction = GameTransactionMDB::findGameExt($value["transId"], false,'transaction_id', $client_details);
                                 if ($bet_transaction != 'false') {
