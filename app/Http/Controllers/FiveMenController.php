@@ -674,7 +674,7 @@ class FiveMenController extends Controller
 			ProviderHelper::idenpotencyTable($this->prefix.'_'.$data['callback_id']);
 		}catch(\Exception $e){
 
-			$bet_transaction = GameTransactionMDB::findGameExt($data["callback_id"], 3,'round_id', $client_details);
+			$bet_transaction = GameTransactionMDB::findGameExt($data["refund_round_id"], 3,'round_id', $client_details);
             if ($bet_transaction != 'false') {
                 if ($bet_transaction->mw_response == 'null') {
                    	$response = array(
@@ -705,26 +705,9 @@ class FiveMenController extends Controller
             Helper::saveLog('5MEN bet found 1 ', $this->provider_db_id, json_encode($data), $response);
             return $response;
 		}
-		$reference_transaction_uuid = $data['data']['refund_round_id'];
-		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
-		$existing_refund = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 3,'round_id', $client_details);
-		if ($existing_refund != 'false') {
-			if ($existing_refund->mw_response == 'null') {
-					$response = array(
-						"status" => 'error',
-						"error" => [
-							'scope' => 'user',
-							'no_refund'=> 0,
-							"message" => "Internal error. Please reopen the game",
-						]
-					);
-			}else {
-				$response = $existing_refund->mw_response;
-			}
-			Helper::saveLog('5MEN bet refund 1 ', $this->provider_db_id, json_encode($data), $response);
-            return $response;
-		}
-		$existing_bet = GameTransactionMDB::findGameExt($data["data"]["refund_callback_id"], 1,'round_id', $client_details);
+		$rollback_trans_id = $data['data']['refund_round_id'];
+		//$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
+		$existing_bet = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',1, $client_details);
 		if ($existing_bet != 'false') {
 			if($existing_bet->transaction_detail != 'SUCCESS'){
 				$response = array(
