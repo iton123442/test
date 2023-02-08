@@ -157,6 +157,8 @@ class PlayTechController extends Controller
                         ->header('Content-Type', 'application/json');
                     }
                     // if ($game_details != null) { // Put inside the loop
+
+                       $success_transaction = [];
                        foreach($request->trans  as $key =>  $value){
 
                             $game_code = "";
@@ -167,19 +169,21 @@ class PlayTechController extends Controller
                                 $game_details = Helper::findGameDetails('game_code', $this->provider_db_id, $request->gameCode);
                                 $game_code = $request->gameCode;
                             }
-                            
+
+                            if ($game_details != null) {
+                                $response = [
+                                    "requestId" => $request->requestId,
+                                    "error" => "G_01",
+                                    "message" => "Game not found"
+                                ];
+                                return $response;
+                            }
+
                             try{
                                 ProviderHelper::idenpotencyTable($this->prefix.'_'.$value["transId"].'-'.$value["roundId"]);
                             }catch(\Exception $e){
 
-                                // if ($game_details != null) {
-                                //     $response = [
-                                //         "requestId" => $request->requestId,
-                                //         "error" => "G_01",
-                                //         "message" => "Game not found"
-                                //     ];
-                                //     return $response;
-                                // }
+                               
 
                                 $bet_transaction = GameTransactionMDB::findGameExt($value["transId"], false,'transaction_id', $client_details);
                                 if ($bet_transaction != 'false') {
