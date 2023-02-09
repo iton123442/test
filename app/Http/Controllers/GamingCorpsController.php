@@ -28,14 +28,16 @@ class GamingCorpsController extends Controller{
     }
 
     public function Verify(Request $request){
-        Helper::saveLog("Auth request", $this->provider_id, json_encode($request->all()), "HIT");
+        Helper::saveLog("Auth request", $this->providerID, json_encode($request->all()), "HIT");
+        
+        $client_details = ProviderHelper::getClientDetails('player_id', $request['player_id']);
         $response =array(
             "authenticate"=> array(
                 "authentication_token"=> $this->secret,
                 "status" => 0,
                 "message" => "",
-                "external_id" => "554029",
-                "balance" => 200,
+                "external_id" => $client_details->player_id,
+                "balance" => $client_details->balance,
                 "nickname" => "spadeGtest",
                 "currency" => "USD",
             )
@@ -45,7 +47,7 @@ class GamingCorpsController extends Controller{
     public function getBalance(Request $request){
         $data = json_decode($request->getContent(),TRUE);
         $client_details = ProviderHelper::getClientDetails('player_id', $data['external_id']);
-        Helper::saveLog('GamingCorps GetBALANCE', $this->provider_db_id, json_encode($data), 'Balance HIT!');
+        Helper::saveLog('GamingCorps GetBALANCE', $this->providerID, json_encode($data), 'Balance HIT!');
         if($client_details){
             $response = array(
                     "status" => 0,
@@ -53,7 +55,7 @@ class GamingCorpsController extends Controller{
                     "balance" => 200,
                     "currency" => "USD"
             );
-            Helper::saveLog('GamingCorps GetBALANCE', $this->provider_db_id, json_encode($response), 'Success HIT!');
+            Helper::saveLog('GamingCorps GetBALANCE', $this->providerID, json_encode($response), 'Success HIT!');
             return response($response,200)->header('Content-Type', 'application/json');
         }
     }
