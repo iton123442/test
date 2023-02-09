@@ -29,8 +29,22 @@ class GamingCorpsController extends Controller{
 
     public function Verify(Request $request){
         Helper::saveLog("Auth request", $this->providerID, json_encode($request->all()), "HIT");
-        
-        $client_details = ProviderHelper::getClientDetails('player_id', $request['player_id']);
+        $data = $request["authenticate"];
+        $client_details = ProviderHelper::getClientDetails('player_id', $data['player_id']);
+        if ($client_details != null){
+            $response =array(
+                "authenticate"=> array(
+                    "authentication_token"=> $this->secret,
+                    "status" => 0,
+                    "message" => "",
+                    "external_id" => $data['player_id'],
+                    "balance" => 0,
+                    "nickname" => "",
+                    "currency" => "",
+                )
+            );
+            response($response, 200)->header('Content-Type', 'application/json');
+        }
         $response =array(
             "authenticate"=> array(
                 "authentication_token"=> $this->secret,
