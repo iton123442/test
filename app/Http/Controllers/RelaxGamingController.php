@@ -75,10 +75,12 @@ class RelaxGamingController extends Controller
         if($method == "freespinspayout"){
             $player_id = $data['remoteusername'];
             $provider_transaction = $data['txid'];
-            $game_code = $data['gameref'];
+            $game_code = $data['gameid'];
             $bet_amount = $data['amount']/100;
             Helper::saveLog('Relax Gaming freespinspayout',$this->provider_db_id,json_encode($request->all()),"Free Rounds HIT!");                
             $client_details = ProviderHelper::getClientDetails('player_id',$player_id);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_code);
+            if($gamedetails){
             try {
                 ProviderHelper::idenpotencyTable("Relax-Rewards".$provider_transaction);
             } catch (\Exception $e) {
@@ -91,6 +93,132 @@ class RelaxGamingController extends Controller
                return response($response,200)
                             ->header('Content-Type', 'application/json');
             }
+            $balance = $client_details->balance + $bet_amount;
+            $gameTransactionData = array(
+                "provider_trans_id" => $provider_transaction,
+                "token_id" => $client_details->token_id,
+                "game_id" => 0,
+                "round_id" => 0,
+                "bet_amount" => 0,
+                "win" => 2,
+                "pay_amount" => $bet_amount,
+                "income" => 0,
+                "entry_id" => 1,
+          );
+          $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
+          $gameExtensionData = [
+            "game_trans_id" => $game_transaction_id,
+            "provider_trans_id" => $provider_transaction,
+            "round_id" => 0,
+            "amount" => $bet_amount,
+            "game_transaction_type" => 2,
+            "provider_request" => json_encode($data),
+        ];
+        $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+        $response = [
+            "status" => "ok",
+            "txid" => (string) $game_transaction_id,
+            "freespinids" =>[
+                int($player_id),
+                $game_transaction_id
+
+            ]
+        ];
+
+        ProviderHelper::_insertOrUpdate($client_details->token_id, $balance);
+        $action_payload = [
+            "type" => "custom", #genreral,custom :D # REQUIRED!
+            "custom" => [
+                "provider" => 'Relax Gaming',
+                "client_connection_name" => $client_details->connection_name,
+                "win_or_lost" => 2,
+                "entry_id" => 2,
+                "pay_amount" => $bet_amount,
+                "income" => 0,
+                "game_trans_ext_id" => $game_trans_ext_id
+            ],
+            "provider" => [
+                "provider_request" => json_encode($data), #R
+                "provider_trans_id"=> $provider_transaction, #R
+                "provider_round_id"=> 0, #R
+            ],
+            "mwapi" => [
+                "roundId"=>$game_transaction_id, #R
+                "type"=>2, #R
+                "game_id" => 0, #R
+                "player_id" => $client_details->player_id, #R
+                "mw_response" => $response, #R
+            ],
+            'fundtransferrequest' => [
+                'fundinfo' => [
+                    'freespin' => false,
+                ]
+            ]
+        ];
+        try {
+            $client_response = ClientRequestHelper::fundTransfer_TG($client_details,$bet_amount,$gamedetails->game_code,$gamedetails->game_name,$game_transaction_id,'credit',false,$action_payload);
+        } catch (\Exception $e) {
+            $updateTransactionEXt = array(
+                  "provider_request" =>json_encode($data),
+                  'transaction_detail' => 'failed',
+                  'general_details' => 'failed',
+            );
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+        }
+        if(isset($client_response->fundtransferresponse->status->code) 
+        && $client_response->fundtransferresponse->status->code == "200"){
+            $updateTransactionEXt = array(
+                  "provider_request" =>json_encode($data),
+                  "mw_response" => json_encode($response),
+                  'mw_request' => json_encode($client_response->requestoclient),
+                  'client_response' => json_encode($client_response->fundtransferresponse),
+                  'transaction_detail' => 'success',
+                  'general_details' => 'success',
+            );
+            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+            return response($response,200)
+                        ->header('Content-Type', 'application/json');
+        }elseif (isset($client_response->fundtransferresponse->status->code) 
+        && $client_response->fundtransferresponse->status->code == "402") {
+          $response = [
+            "status"=>"error",
+            "errorcode" => "INVALID_PARAMETERS"
+          ];
+          $updateTransactionEXt = array(
+                "provider_request" =>json_encode($data),
+                "mw_response" => json_encode($response),
+                'mw_request' => json_encode($client_response->requestoclient),
+                'client_response' => json_encode($client_response->fundtransferresponse),
+                'transaction_detail' => 'FAILED',
+                'general_details' => 'FAILED',
+          );
+          GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+          return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }else{
+              $response = [
+                "status"=>"error",
+               "errorcode" => "INVALID_PARAMETERS"
+              ];
+              $updateTransactionEXt = array(
+                    "provider_request" =>json_encode($data),
+                    "mw_response" => json_encode($response),
+                    'mw_request' => json_encode($client_response->requestoclient),
+                    'client_response' => json_encode($client_response->fundtransferresponse),
+                    'transaction_detail' => 'FAILED',
+                    'general_details' => 'FAILED',
+              );
+              GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+              return response($response,400)
+                        ->header('Content-Type', 'application/json');
+        }
+    }else{
+        return response()->json([
+            "status"=>"error",
+            "errorcode"=> "INVALID_PARAMETERS"
+        ]);
+
+    }
 
         }else{
         $player_id = $data['customerid'];
