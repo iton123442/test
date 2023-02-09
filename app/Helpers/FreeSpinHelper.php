@@ -2121,6 +2121,7 @@ class FreeSpinHelper{
         if($game_details == false){
             return 400;
         }
+        $currentDateTime = Carbon::now()->format('Y-m-d\TH:i');
         try{
             $insertFreespin = [
                 "player_id" => $player_details->player_id,
@@ -2128,7 +2129,7 @@ class FreeSpinHelper{
                 "total_spin" => $data["details"]["rounds"],
                 "spin_remaining" => $data["details"]["rounds"],
                 "denominations" => $data["details"]["denomination"],
-                "date_start" => $data["details"]["start_time"],
+                "date_start" => $currentDateTime,
                 "date_expire" => $data["details"]["expiration_date"],
                 "provider_trans_id" => $freeround_id,
             ];
@@ -2139,8 +2140,6 @@ class FreeSpinHelper{
         $request_url = config("providerlinks.qtech.api_url")."/v1/auth/token?grant_type=password&response_type=token&username=".config("providerlinks.qtech.username")."&password=".config("providerlinks.qtech.password");
         $accessToken = ProviderHelper::qtGetAccessToken($request_url);
         // AppFreespinRules/2641900152036USDQNGIXXAI
-        $currentDateTime = Carbon::now()->format('Y-m-d\TH:i');
-        // $startDate = Carbon::createFromFormat('Y-m-d\TH:i', $data["details"]["start_time"]);
         $endDate = Carbon::createFromFormat('Y-m-d\TH:i', $data["details"]["expiration_date"]);
         $diffInDays = $endDate->diffInDays($currentDateTime);
         $requesttosend = [
