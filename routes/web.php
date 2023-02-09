@@ -1027,3 +1027,5 @@ $app->post('/public/api/relax/freespins/querypossiblecounts','RelaxGamingControl
 $app->post('/public/api/relax/featuretriggers/add','RelaxGamingController@FeatureTrigger');
 $app->post('/public/api/relax/notifyFreespinsCancel','RelaxGamingController@FreeSpinCancel'); 
 
+
+

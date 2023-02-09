@@ -1314,7 +1314,7 @@ class GameLobbyController extends Controller
                     return response($msg,200)
                     ->header('Content-Type', 'application/json');
                 }
-                elseif($provider_code == 145){
+                elseif($provider_code == 145 || $provider_code == 215 || $provider_code == 214 || $provider_code == 213||$provider_code == 212 || $provider_code == 211 || $provider_code == 210 || $provider_code == 209 || $provider_code == 208 || $provider_code == 207 || $provider_code == 206 || $provider_code == 205){
                     $msg = array(
                         "game_code" => $request->input("game_code"),
                         "url" => GameLobby::relaxgaming($request->all(), $device), 
