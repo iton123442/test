@@ -636,7 +636,6 @@ $app->post('/public/api/microgaming/makeWithdraw','MicroGamingController@makeWit
 $app->post('/public/api/microgaming/getPlayerBalance','MicroGamingController@getPlayerBalance');
 
 //Evolution Gaming Endpoints
-
 $app->post('/public/api/evogaming2/check','EvolutionController@authentication');
 $app->post('/public/api/evogaming2/balance','EvolutionController@balance');
 $app->post('/public/api/evogaming2/debit','EvolutionController@debit');
@@ -646,8 +645,7 @@ $app->post('/public/api/evogaming2/sid','EvolutionController@sid');
 $app->post('/public/api/evogaming2/launch','EvolutionController@gameLaunch');
 $app->post('/public/api/evogaming2/internalrefund','EvolutionController@internalrefund');
 
-//Evolution Gaming Endpoints
-
+//Evolution Gaming Endpoints (IN-USED)
 $app->post('/public/api/evogaming/check','EvolutionMDBController@authentication');
 $app->post('/public/api/evogaming/balance','EvolutionMDBController@balance');
 $app->post('/public/api/evogaming/debit','EvolutionMDBController@debit');
