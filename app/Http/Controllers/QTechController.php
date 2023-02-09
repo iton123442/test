@@ -384,6 +384,29 @@ class QTechController extends Controller
         }
         if(isset($client_response->fundtransferresponse->status->code) 
         && $client_response->fundtransferresponse->status->code == "200"){
+            $getFreespin = FreeSpinHelper::getFreeSpinDetails($request['bonusPromoCode'], "provider_trans_id" );
+            if($getFreespin){
+                //update transaction
+                $spin_remaining = $getFreespin->spin_remaining - 1;
+                $status = ($spin_remaining) == 0 ? 2 : 1;
+                $updateFreespinData = [
+                    "status" => 2,
+                    "spin_remaining" => $spin_remaining
+                ];
+                FreeSpinHelper::updateFreeSpinDetails($updateFreespinData, $getFreespin->freespin_id);
+                    //create transction 
+                if($status == 2) {
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = true;
+                }  else {
+                    $action_payload["fundtransferrequest"]["fundinfo"]["freeroundend"] = false; //explod the provider trans use the original
+                }
+                
+                    $createFreeRoundTransaction = array(
+                        "game_trans_id" => $bet_transaction->game_trans_id,
+                        'freespin_id' => $getFreespin->freespin_id
+                );
+                FreeSpinHelper::createFreeRoundTransaction($createFreeRoundTransaction);
+            }
             $updateTransactionEXt = array(
                   "provider_request" =>json_encode($request),
                   "mw_response" => json_encode($response),
