@@ -83,9 +83,8 @@ class FiveMenController extends Controller
 
 		if($request->name == 'refund'){
 
-			$response = $this->gameRefund($request->all(), $client_details);
-			return response($response,200)
-                ->header('Content-Type', 'application/json');
+			return $response = $this->gameRefund($request->all(), $client_details);
+			// return response($response,200)->header('Content-Type', 'application/json');
 
 		}
 
@@ -707,6 +706,7 @@ class FiveMenController extends Controller
 					// 		"message" => "Internal error. Please reopen the game",
 					// 	]
 					// );
+					Helper::saveLog('5Men Refund Exist Response ', $this->provider_db_id, json_encode($data), $response);
 					return $response;
 				}
 			}
