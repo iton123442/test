@@ -37,7 +37,7 @@ class RelaxGamingController extends Controller
             'cashiertoken' =>$token,
             'customercurrency' => $client_details->default_currency,
             'balance' => $format_balance,
-            'jurisdiction' => 'CW',
+            'jurisdiction' => '',
         ]);
     }else{
         return response()->json([
@@ -70,7 +70,29 @@ class RelaxGamingController extends Controller
 
     public function Bet(Request $request){
         $data =$request->all();
+        $method = $data['txtype'];
         ProviderHelper::saveLog("Relax Bet Request",$this->provider_db_id,json_encode($request->all()),"HIT!");
+        if($method == "freespinspayout"){
+            $player_id = $data['remoteusername'];
+            $provider_transaction = $data['txid'];
+            $game_code = $data['gameref'];
+            $bet_amount = $data['amount']/100;
+            Helper::saveLog('Relax Gaming freespinspayout',$this->provider_db_id,json_encode($request->all()),"Free Rounds HIT!");                
+            $client_details = ProviderHelper::getClientDetails('player_id',$player_id);
+            try {
+                ProviderHelper::idenpotencyTable("Relax-Rewards".$provider_transaction);
+            } catch (\Exception $e) {
+                $bet_transaction = GameTransactionMDB::findGameExt($provider_transaction,false,'transaction_id',$client_details);
+                $balance = str_replace(',', '', number_format($client_details->balance, 2));
+                $response = [
+                    "balance" => (float) $balance,
+                    "referenceId" => (string) $bet_transaction->game_trans_id,
+                ];
+               return response($response,200)
+                            ->header('Content-Type', 'application/json');
+            }
+
+        }else{
         $player_id = $data['customerid'];
         $game_code = $data['gameref'];
         $round_id = $data['gamesessionid'];
@@ -78,7 +100,7 @@ class RelaxGamingController extends Controller
         $provider_transaction = $data['txid'];
         $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
         if($client_details){
-            $gamedetails = ProviderHelper::findGameDetails('game_code',77, $game_code);
+            $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_code);
             try{
                 // ProviderHelper::saveLog("Hacksaw Idempotent Bet",$this->provider_db_id,json_encode($data),"Bet HIT!");
                 ProviderHelper::idenpotencyTable("BET_".$provider_transaction);
@@ -90,7 +112,7 @@ class RelaxGamingController extends Controller
                     return response()->json([
                         "balance"=>$balance,
                         "txid"=> $bet_transaction->provider_transaction,
-                        "remotetxid"=>0
+                        "remotetxid"=>$bet_transaction->game_transid
                     ]);
                 } 
                 // sleep(4);
@@ -113,7 +135,6 @@ class RelaxGamingController extends Controller
                 ];
                 GameTransactionMDB::updateGametransaction($updateGameTransaction, $bet_transaction->game_trans_id, $client_details);
             }
-            
             $gameTransactionDatas = [
                 "provider_trans_id" => $provider_transaction,
                 "token_id" => $client_details->token_id,
@@ -207,6 +228,7 @@ class RelaxGamingController extends Controller
           ]);
         }
     }
+    }
 
     public function Win(Request $request){
     $data = $request->all();
@@ -226,7 +248,7 @@ class RelaxGamingController extends Controller
                 "errormessage"=> "Duplicate Win"
             ]);
         }
-        $gamedetails = ProviderHelper::findGameDetails('game_code',77, $game_code);
+        $gamedetails = ProviderHelper::findGameDetails('game_code',$this->provider_db_id, $game_code);
         if($gamedetails){
             if($win_amount == 0){
                 $amount = 0;
@@ -266,7 +288,7 @@ class RelaxGamingController extends Controller
         $action_payload = [
             "type" => "custom", #genreral,custom :D # REQUIRED!
             "custom" => [
-                "provider" => 'Hacksaw Gaming',
+                "provider" => 'Relax Gaming',
                 "game_transaction_ext_id" => $game_trans_ext_id,
                 "client_connection_name" => $client_details->connection_name,
                 "win_or_lost" => $win,
@@ -322,4 +344,101 @@ class RelaxGamingController extends Controller
         ]);
     }
     }
+
+    public function rollback(Request $request){
+        $data = $request->all();
+        Helper::saveLog('RelaxGaming rollback', $this->provider_db_id, json_encode($data), 'Rollback HIT!');
+        $player_id = $data['customerid'];
+        $provider_txid = $data['txid'];
+        $rollback_trans_id = $data['originaltxid'];
+        $round_id = $data['gamesessionid'];
+        $client_details = ProviderHelper::getClientDetails('player_id', $player_id);
+        if($client_details){
+            try{
+                Helper::saveLog('RelaxGaming Rollback Idempotent', $this->provider_db_id, json_encode($data), 'Success HIT!');
+                ProviderHelper::IdenpotencyTable($provider_txid);
+            }catch(\Exception $e){
+                return response()->json([
+                    'errorcode' => "TRANSACTION_DECLINED",
+                    'errormessage' =>"Duplicate Relax Transaction ID"      
+                ]);
+            }
+            $bet_transaction = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',1, $client_details);
+            if($bet_transaction == null){
+                return response()->json([
+                    'errorcode' => "TRANSACTION_DECLINED",
+                    'errormessage' =>"Transaction Not Found"      
+                ]);
+            }
+            $game_id = $bet_transaction->game_id;
+            $game_details = ProviderHelper::findGameID($game_id);
+            $balance = str_replace(".","", $client_details->balance);
+            $format_balance = (int)$balance;
+            $game_trans_id = $bet_transaction->game_trans_id;
+            $pay_amount = $bet_transaction->bet_amount;
+            $winBalance = $client_details->balance + $pay_amount;
+            $win_or_lost = $pay_amount > 0 ?  1 : 0;
+            $entry_id = $pay_amount > 0 ?  2 : 1;
+            $income = $bet_transaction->bet_amount - $pay_amount;
+    
+            $updateGameTransaction = [
+              'win' => 4,
+              'pay_amount' => $pay_amount,
+              'income' => $income,
+              'entry_id' => 3,
+            ];
+            GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_trans_id, $client_details);
+            $gameExtensionData = [
+                "game_trans_id" => $game_trans_id,
+                "provider_trans_id" => $provider_txid,
+                "round_id" => $round_id,
+                "amount" => $pay_amount,
+                "game_transaction_type" => 3,
+                "provider_request" => json_encode($request),
+            ];
+            $game_trans_ext_id = GameTransactionMDB::createGameTransactionExt($gameExtensionData,$client_details);
+    
+            $fund_extra_data = [
+                'provider_name' => "Relax Gaming"
+            ];
+            $client_response = ClientRequestHelper::fundTransfer($client_details,$pay_amount,$game_details->game_code,$game_details->game_name,$game_trans_ext_id,$game_trans_id,"credit",true,$fund_extra_data);
+            if(isset($client_response->fundtransferresponse->status->code) 
+            && $client_response->fundtransferresponse->status->code == "200"){
+                ProviderHelper::_insertOrUpdate($client_details->token_id, $client_response->fundtransferresponse->balance);
+                $balance = str_replace(',', '', number_format($client_response->fundtransferresponse->balance, 2));
+                $bal = str_replace(".","", $balance);
+                $format_balance = (int)$bal;
+                $response = [
+                    "balance" => $format_balance,
+                    "txid" => $provider_txid,
+                    'remotetxid' => "rollback_".$game_trans_id
+                ];
+                $dataToUpdate = array(
+                    "mw_response" => json_encode($response),
+                    "client_response" => json_encode($client_response),
+                    "mw_request" => json_encode($client_response->requestoclient),
+                    "transaction_detail" => 'SUCCESS',
+                );
+                GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$game_trans_ext_id,$client_details);
+                return response($response,200)
+                    ->header('Content-Type', 'application/json');
+            }
+
+
+        }else{
+            return response()->json([
+                'errorcode' => "INVALID_TOKEN",
+                'errormessage' =>"The token could not be verified."      
+            ]);
+
+        }
+    }
+
+    public function FreeRounds(Request $request){
+        $data = $request->all();
+        Helper::saveLog('Relax FreeRounds', $this->provider_db_id, json_encode($data), "FREE ROUNDS HIT");
+        dd($data);
+
+    }
+
 }
