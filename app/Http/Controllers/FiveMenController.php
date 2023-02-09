@@ -683,12 +683,12 @@ class FiveMenController extends Controller
         //     Helper::saveLog('5MEN bet found 1 ', $this->provider_db_id, json_encode($data), $response);
         //     return $response;
 		// }
-		$rollback_trans_id = $data['data']['refund_round_id'];
-		$reference_transaction_uuid = $data['data']['refund_action_id'];
+		$transaction_uuid = $data['data']['callback_id'];
+		$reference_transaction_uuid = $data['data']['refund_round_id'];
 		//$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
-		$existing_bet = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',false, $client_details);
+		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		if ($existing_bet != 'false') {
-			$refund_exist = GameTransactionMDB::findGameExt($rollback_trans_id, 3, 'round_id',  $client_details);
+			$refund_exist = GameTransactionMDB::findGameExt($transaction_uuid, 3, 'round_id',  $client_details);
 			if ($refund_exist != 'false') {
 				if($refund_exist->transaction_detail == 'SUCCESS'){
 					$response = array(
@@ -713,7 +713,7 @@ class FiveMenController extends Controller
 
 			$client_details->connection_name = $existing_bet->connection_name;
 			$amount = $data['data']['amount'];
-			$transaction_uuid = $data['callback_id'];
+			
 
            	$balance = $client_details->balance + $amount;
         	ProviderHelper::_insertOrUpdate($client_details->token_id, $balance); 
