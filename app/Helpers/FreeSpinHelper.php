@@ -2146,7 +2146,7 @@ class FreeSpinHelper{
             "txnId" => $freeround_id,
             "playerId" => (string) $player_details->player_id,
             "gameId" => $data["game_code"],
-            "totalBetValue" => $data["details"]["denomination"],
+            "totalBetValue" => (int) $data["details"]["denomination"],
             "roundOptions" => [
                (int) $data["details"]["rounds"]
             ],
