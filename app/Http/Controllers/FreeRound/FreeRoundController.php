@@ -202,6 +202,8 @@ class FreeRoundController extends Controller
             return FreeSpinHelper::createFreeRoundPragmaticPlay($player_details, $data, $sub_provder_id,$freeround_id);
         }   elseif ($sub_provder_id == 47) {
             return FreeSpinHelper::createFreeRoundHabanero($player_details, $data, $sub_provder_id,$freeround_id);
+        }   elseif ($sub_provder_id == 157) {
+            return FreeSpinHelper::createFreeroundQTech($player_details, $data, $sub_provder_id,$freeround_id);
         }
         else {
             return 400;
