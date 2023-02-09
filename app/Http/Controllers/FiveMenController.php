@@ -683,7 +683,7 @@ class FiveMenController extends Controller
         //     Helper::saveLog('5MEN bet found 1 ', $this->provider_db_id, json_encode($data), $response);
         //     return $response;
 		// }
-		$transaction_uuid = $data['data']['callback_id'];
+		$transaction_uuid = $data['callback_id'];
 		$reference_transaction_uuid = $data['data']['refund_round_id'];
 		//$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
