@@ -699,14 +699,14 @@ class FiveMenController extends Controller
 							'currency' => $client_details->default_currency,
 						],
 					);
-					$response = array(
-						"status" => 'error',
-						"error" => [
-							'scope' => 'user',
-							'no_refund'=> 1,
-							"message" => "Internal error. Please reopen the game",
-						]
-					);
+					// $response = array(
+					// 	"status" => 'error',
+					// 	"error" => [
+					// 		'scope' => 'user',
+					// 		'no_refund'=> 1,
+					// 		"message" => "Internal error. Please reopen the game",
+					// 	]
+					// );
 					return $response;
 				}
 			}
