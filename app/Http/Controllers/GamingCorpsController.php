@@ -35,8 +35,8 @@ class GamingCorpsController extends Controller{
             $response =array(
                 "authenticate"=> array(
                     "authentication_token"=> $this->secret,
-                    "status" => 0,
-                    "message" => "",
+                    "status" => 401,
+                    "message" => "You need to authenticate first",
                     "external_id" => $data['player_id'],
                     "balance" => 0,
                     "nickname" => "",
