@@ -2128,6 +2128,7 @@ class FreeSpinHelper{
                 "total_spin" => $data["details"]["rounds"],
                 "spin_remaining" => $data["details"]["rounds"],
                 "denominations" => $data["details"]["denomination"],
+                "date_start" => $data["details"]["start_time"],
                 "date_expire" => $data["details"]["expiration_date"],
                 "provider_trans_id" => $freeround_id,
             ];
@@ -2151,7 +2152,7 @@ class FreeSpinHelper{
                (int) $data["details"]["rounds"]
             ],
             "currency" => $player_details->default_currency,
-            "promoCode" => "TG",
+            "promoCode" => $id,
             "validityDays" => (int) $diffInDays,
             "rejectable" => true
         ];
