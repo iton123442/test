@@ -84,7 +84,6 @@ class FiveMenController extends Controller
 		if($request->name == 'refund'){
 
 			$response = $this->gameRefund($request->all(), $client_details);
-			Helper::saveLog('5Men Refund Response', $this->provider_db_id, json_encode($request->all()), json_encode($response));
 			return response($response,200)
                 ->header('Content-Type', 'application/json');
 
@@ -690,16 +689,26 @@ class FiveMenController extends Controller
 		//$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',1, $client_details);
 		if ($existing_bet != 'false') {
-			if($existing_bet->transaction_detail != 'SUCCESS'){
-				$response = array(
-					"status" => 'error',
-					"error" => [
-						'scope' => 'user',
-						'no_refund'=> 1,
-						"message" => "Internal error. Please reopen the game",
-					]
-				);
-				return $response;
+			$refund_exist = GameTransactionMDB::findGameExt($rollback_trans_id, 3, 'round_id',  $client_details);
+			if ($refund_exist != 'false') {
+				if($refund_exist->transaction_detail == 'SUCCESS'){
+					$response = array(
+						'status' => 'ok',
+						'data' => [
+							'balance' => (string)$client_details->balance,
+							'currency' => $client_details->default_currency,
+						],
+					);
+					$response = array(
+						"status" => 'error',
+						"error" => [
+							'scope' => 'user',
+							'no_refund'=> 1,
+							"message" => "Internal error. Please reopen the game",
+						]
+					);
+					return $response;
+				}
 			}
 
 			$client_details->connection_name = $existing_bet->connection_name;
