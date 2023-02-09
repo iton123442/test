@@ -865,13 +865,21 @@ return [
         'username' => 'api_tgstagingv1',
         'password' => 'fudbpk10',
         'api_url' => 'https://api-int.qtplatform.com',
-        'provider_db_id' => 144,
+        'provider_db_id' => 76,
         'pass_key' => 'PiHBFfQVHh',
     ],
     'ppv2' => [
         'secureLogin' => 'mgscomm_mgscommsw302', //or stylename
         'secret_key' => 'D8B944D07d314fF2',
         'host' => 'https://api-sg13.ppgames.net/IntegrationService/v3/http/CasinoGameAPI/game/url/',
+    ],
+    'relaxgaming' => [
+        'partnerid' => '1813', 
+        'partner' => 'betrnk',
+        'url' => 'https://d2drhksbtcqozo.cloudfront.net/casino/launcher.html?',
+        'api' => 'https://stag-casino-partner.api.relaxg.net:7000/papi/1.0',
+        'provider_id' =>77,
+        'password'=>'L6Xgpqbp9jSrgQJE'
     ],
 ];
 

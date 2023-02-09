@@ -191,6 +191,29 @@ class GameTransactionMDB
             return null;
         }
     }
+    public static function GeneralGameTransactionByTransId($transId,$client_details){
+        $connection = self::getAvailableConnection($client_details->connection_name);
+        if($connection != null){
+            // $game = DB::connection($connection["connection_name"])->select("SELECT
+            //                 entry_id,bet_amount,game_trans_id,pay_amount,income
+            //                 FROM {$connection['db_list'][1]}.game_transactions g
+            //                 WHERE  round_id = '".$game_round."'");
+            // $cnt = count($game);
+            // return $cnt > 0? $game[0]: null;
+            $select = "SELECT game_id,entry_id,bet_amount,game_trans_id,pay_amount,win,income FROM ";
+            $db = "{$connection['db_list'][1]}.game_transactions g ";
+            $where = "WHERE  provider_trans_id = '{$transId}'";
+            $game = DB::connection($connection["connection_name"])->select($select.$db.$where);
+            $cnt = count($game);
+            if ($cnt > 0){
+                return $game[0];
+            }else{
+                return self::checkAndGetFromOtherServer($select,$where,$connection["connection_name"],'gt');
+            }
+        }else{
+            return null;
+        }
+    }
     public static function getGameTransactionByGeneralDetailsEXT($general_details,$client_details){
         $connection = self::getAvailableConnection($client_details->connection_name);
         if($connection != null){
@@ -588,6 +611,70 @@ class GameTransactionMDB
                 if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
                     $connection_default = config("serverlist.server_list.default");
                     $data = DB::connection($connection_default["connection_name"])->select('select  * from  `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                    if ( count($data) > 0  ) {
+                        $connection_name = "default";
+                        $details = $data;
+                        
+                    }
+                } 
+                // $connection_list = config("serverlist.server_list");
+                // foreach($connection_list as $key => $connection){
+                //     $status = self::checkDBConnection($connection["connection_name"]);
+                //     if($status && $connection_name != $connection["connection_name"]){
+                //         $data = DB::connection( $connection["connection_name"] )->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . ' LIMIT 1');
+                //         if ( count($data) > 0  ) {
+                //             $connection_name = $key;// key is the client connection_name
+                //             $details = $data;
+                //             break;
+                //         }
+                //     }
+                // }
+            }
+
+            $count = count($details);
+            if ($count > 0) {
+                //apend on the details the connection which mean to rewrite the client_details
+                $details[0]->connection_name = $connection_name;
+            }
+            return $count > 0 ? $details[0] : 'false';
+        } catch (\Exception $e) {
+            return 'false';
+        }
+
+    }
+
+    public  static function findGameExtOrderByTransType($provider_identifier, $game_transaction_type=false, $type,$client_details)
+    {
+        $game_trans_type = '';
+        if($game_transaction_type != false){
+            $game_trans_type = "and gte.game_transaction_type = ". $game_transaction_type;
+        }
+        if ($type == 'transaction_id') {
+            $where = 'where gte.provider_trans_id = "'.$provider_identifier.'" '.$game_trans_type;
+        }
+        if ($type == 'round_id') {
+            $where = 'where gte.round_id = "' . $provider_identifier.'" '.$game_trans_type;
+        }
+        if ($type == 'game_transaction_ext_id') {
+            $where = 'where gte.game_trans_ext_id = "' . $provider_identifier . '" ';
+        }
+        if ($type == 'game_trans_id') {
+            $where = 'where gte.game_trans_id = "' . $provider_identifier . '" ';
+        }
+        try {
+            $connection_name = $client_details->connection_name;
+            $details = [];
+            $connection = config("serverlist.server_list.".$client_details->connection_name.".connection_name");
+            $status = self::checkDBConnection($connection);
+            if ( ($connection != null) && $status) {
+                $connection = config("serverlist.server_list.".$client_details->connection_name);
+                $details = DB::connection($connection["connection_name"])->select('select  * from  `'.$connection['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . 'ORDER BY game_transaction_type desc LIMIT 1');
+            }
+            if ( !(count($details) > 0) )  {
+
+                if(self::checkDBConnection(config("serverlist.server_list.default.connection_name"))){
+                    $connection_default = config("serverlist.server_list.default");
+                    $data = DB::connection($connection_default["connection_name"])->select('select  * from  `'.$connection_default['db_list'][0].'`.`game_transaction_ext` as gte ' . $where . 'ORDER BY game_transaction_type desc LIMIT 1');
                     if ( count($data) > 0  ) {
                         $connection_name = "default";
                         $details = $data;

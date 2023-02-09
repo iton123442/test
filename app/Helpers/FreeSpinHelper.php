@@ -11,6 +11,7 @@ use SimpleXMLElement;
 use Webpatser\Uuid\Uuid;
 use App\Helpers\ClientRequestHelper;
 use DB;
+use Carbon\Carbon;
 class FreeSpinHelper{
 
     public static function getFreeSpinBalance($player_id,$game_id){
@@ -2113,6 +2114,96 @@ class FreeSpinHelper{
 
          }
 
+    }
+    public static function createFreeroundQTech($player_details,$data, $sub_provder_id,$freeround_id){
+        Helper::saveLog('Qtech Freespin', $sub_provder_id,json_encode($freeround_id), 'Freespin HIT');
+        $game_details = ProviderHelper::getSubGameDetails($sub_provder_id,$data["game_code"]);
+        if($game_details == false){
+            return 400;
+        }
+        try{
+            $insertFreespin = [
+                "player_id" => $player_details->player_id,
+                "game_id" => $game_details->game_id,
+                "total_spin" => $data["details"]["rounds"],
+                "spin_remaining" => $data["details"]["rounds"],
+                "denominations" => $data["details"]["denomination"],
+                "date_expire" => $data["details"]["expiration_date"],
+                "provider_trans_id" => $freeround_id,
+            ];
+        }catch(\Exception $e){
+            return 400;
+        }
+        $id = FreeSpinHelper::createFreeRound($insertFreespin);
+        $request_url = config("providerlinks.qtech.api_url")."/v1/auth/token?grant_type=password&response_type=token&username=".config("providerlinks.qtech.username")."&password=".config("providerlinks.qtech.password");
+        $accessToken = ProviderHelper::qtGetAccessToken($request_url);
+        // AppFreespinRules/2641900152036USDQNGIXXAI
+        $currentDateTime = Carbon::now()->format('Y-m-d\TH:i');
+        // $startDate = Carbon::createFromFormat('Y-m-d\TH:i', $data["details"]["start_time"]);
+        $endDate = Carbon::createFromFormat('Y-m-d\TH:i', $data["details"]["expiration_date"]);
+        $diffInDays = $endDate->diffInDays($currentDateTime);
+        $requesttosend = [
+            "txnId" => $freeround_id,
+            "playerId" => (string) $player_details->player_id,
+            "gameId" => $data["game_code"],
+            "totalBetValue" => $data["details"]["denomination"],
+            "roundOptions" => [
+               (int) $data["details"]["rounds"]
+            ],
+            "currency" => $player_details->default_currency,
+            "promoCode" => "TG",
+            "validityDays" => (int) $diffInDays,
+            "rejectable" => true
+        ];
+        $client = new Client([
+            'headers' => [ 
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer '.$accessToken
+            ]
+        ]);
+        $sendtoUrl = config('providerlinks.qtech.api_url')."/v1/bonus/free-rounds";
+        try {
+            $guzzle_response = $client->post($sendtoUrl,['body' => json_encode($requesttosend)]);
+            $dataresponse = json_decode($guzzle_response->getBody()->getContents());
+            Helper::saveLog('QTech Freespin datas', $sub_provder_id,json_encode($requesttosend), json_encode($dataresponse));
+        } catch (\Exception $e) {
+            $msg = array(
+                'err_message' => $e->getMessage(),
+                'err_line' => $e->getLine(),
+                'err_file' => $e->getFile()
+            );
+            $data = [
+                "status" => 3,
+                "details" => json_encode($msg)
+            ];
+            FreeSpinHelper::updateFreeRound($data, $id);
+            return 400;
+        }
+        if(isset($dataresponse->StatusCode) && $dataresponse->StatusCode != 0){
+            $createFreeround = [
+                "status" => 3,
+            ];
+            FreeSpinHelper::updateFreeRound($createFreeround, $id);
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "400"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 400;
+        }else{
+            $freespinExtenstion = [
+                "freespin_id" => $id,
+                "mw_request" => json_encode($requesttosend),
+                "provider_response" => json_encode($dataresponse),
+                "client_request" => json_encode($data),
+                "mw_response" => "200"
+            ];
+            FreeSpinHelper::createFreeRoundExtenstion($freespinExtenstion);
+            return 200;
+        }
     }
 }
 ?>
