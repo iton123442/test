@@ -2151,7 +2151,7 @@ class FreeSpinHelper{
                (int) $data["details"]["rounds"]
             ],
             "currency" => $player_details->default_currency,
-            "promoCode" => $id,
+            "promoCode" => $freeround_id,
             "validityDays" => (int) $diffInDays,
             "rejectable" => true
         ];
