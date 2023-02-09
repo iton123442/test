@@ -178,6 +178,8 @@ class EvolutionMDBController extends Controller
                         $dataToUpdate = array(
                             "mw_response" => json_encode($msg),
                             "transaction_detail" =>"success",
+                            "mw_request"=>json_encode($client_response->requestoclient),
+                            "client_response" =>json_encode($client_response),
                             "general_details" => "success",
                         );
                         GameTransactionMDB::updateGametransactionEXT($dataToUpdate,$betGametransactionExtId,$client_details);
@@ -197,6 +199,8 @@ class EvolutionMDBController extends Controller
                         );
                         $dataToUpdate = array(
                             "mw_response" => json_encode($msg),
+                            "mw_request"=>json_encode($client_response->requestoclient),
+                            "client_response" =>json_encode($client_response),
                             "transaction_detail" =>"FAILED",
                             "general_details" => "FAILED",
                         );
@@ -395,6 +399,8 @@ class EvolutionMDBController extends Controller
                         );
                         $dataToUpdate = array(
                             "mw_response" => json_encode($msg),
+                            "mw_request"=>json_encode($client_response->requestoclient),
+                            "client_response" =>json_encode($client_response),
                             "transaction_detail" =>"success",
                             "general_details" => "success",
                         );
@@ -416,7 +422,7 @@ class EvolutionMDBController extends Controller
                     $dataToUpdate = array(
                         "mw_response" =>json_encode($msg),
                         "mw_request"=>json_encode($client_response->requestoclient),
-                        "client_response" =>json_encode($client_response->fundtransferresponse),
+                        "client_response" =>json_encode($client_response),
                         "transaction_detail" => "PENDING",
                         "general_details" => "PENDING",
                     );

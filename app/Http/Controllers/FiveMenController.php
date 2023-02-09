@@ -84,6 +84,7 @@ class FiveMenController extends Controller
 		if($request->name == 'refund'){
 
 			$response = $this->gameRefund($request->all(), $client_details);
+			Helper::saveLog('5Men Refund Response', $this->provider_db_id, json_encode($request->all()), json_encode($response));
 			return response($response,200)
                 ->header('Content-Type', 'application/json');
 

@@ -272,7 +272,7 @@ class FundtransferProcessorController extends Controller
                                     "win" => $payload->action->custom->win_or_lost,
                                 ];
                                 ClientRequestHelper::updateGameTransactionCCMD($updateGameTransaction, $payload->action->mwapi->roundId, $payload->action->custom->client_connection_name);
-                                // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
+                                $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
                                 // $createGameTransactionLog = [
                                 //     "connection_name" => $payload->action->custom->client_connection_name,
                                 //     "column" =>[
@@ -284,7 +284,7 @@ class FundtransferProcessorController extends Controller
                                 //     ]
                                 // ];
                                 // dispatch(new CreateGameTransactionLog($createGameTransactionLog));
-                                ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
+                                // ProviderHelper::queLogs($payload->action->custom->client_connection_name, $payload->action->custom->game_transaction_ext_id, $requesttocient, $client_response, "client_details", "success");
                             }
                             elseif($payload->action->custom->provider == 'bng'){
                                 // $gteid = ClientRequestHelper::updateGTEIDMDB($gteid,$requesttocient,$client_response,'success','success',$payload->action->custom->client_connection_name);
