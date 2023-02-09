@@ -1189,29 +1189,29 @@ class FundtransferProcessorController extends Controller
 
                     switch ($client_response->fundtransferresponse->status->code) {
                         case '200':
-                            //  $updateTransactionEXt = array(
-                            //     'mw_request' => json_encode($client_response->requestoclient),
-                            //     'client_response' => json_encode($client_response->fundtransferresponse),
-                            //     'transaction_detail' => 'success',
-                            //     'general_details' => 'success',
-                            // );
-                            //GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
+                             $updateTransactionEXt = array(
+                                'mw_request' => json_encode($client_response->requestoclient),
+                                'client_response' => json_encode($client_response->fundtransferresponse),
+                                'transaction_detail' => 'success',
+                                'general_details' => 'success',
+                            );
+                            GameTransactionMDB::updateGametransactionEXT($updateTransactionEXt,$game_trans_ext_id,$client_details);
                             $updateGameTransaction = [
                                 'win' => $details["win"],
                             ];
-                            $createGameTransactionLog = [
-                                "connection_name" => $client_details->connection_name,
-                                "column" =>[
-                                    "game_trans_ext_id" => $game_trans_ext_id,
-                                    // 'mw_request' => json_encode($client_response->requestoclient),
-                                    'request' => json_encode($client_response->requestoclient),
-                                    'response' => json_encode($client_response->fundtransferresponse),
-                                    // 'client_response' => json_encode($client_response->fundtransferresponse),
-                                    "log_type" => "client_details",
-                                    "transaction_detail" => "success",
-                                 ]
-                            ];
-                            ProviderHelper::queTransactionLogs($createGameTransactionLog);
+                            // $createGameTransactionLog = [
+                            //     "connection_name" => $client_details->connection_name,
+                            //     "column" =>[
+                            //         "game_trans_ext_id" => $game_trans_ext_id,
+                            //         // 'mw_request' => json_encode($client_response->requestoclient),
+                            //         'request' => json_encode($client_response->requestoclient),
+                            //         'response' => json_encode($client_response->fundtransferresponse),
+                            //         // 'client_response' => json_encode($client_response->fundtransferresponse),
+                            //         "log_type" => "client_details",
+                            //         "transaction_detail" => "success",
+                            //      ]
+                            // ];
+                            // ProviderHelper::queTransactionLogs($createGameTransactionLog);
                             GameTransactionMDB::updateGametransaction($updateGameTransaction, $game_transaction_id, $client_details);
                 
                             Helper::saveLog("success", $game_trans_ext_id, json_encode($client_response->requestoclient), $client_response->fundtransferresponse);
