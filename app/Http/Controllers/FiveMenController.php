@@ -685,6 +685,7 @@ class FiveMenController extends Controller
         //     return $response;
 		// }
 		$rollback_trans_id = $data['data']['refund_round_id'];
+		$reference_transaction_uuid = $data['data']['refund_action_id'];
 		//$existing_bet = GameTransactionMDB::findGameTransactionDetails($reference_transaction_uuid, 'transaction_id',false, $client_details);
 		$existing_bet = GameTransactionMDB::findGameTransactionDetails($rollback_trans_id, 'transaction_id',1, $client_details);
 		if ($existing_bet != 'false') {
