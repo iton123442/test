@@ -199,7 +199,7 @@ class QTechController extends Controller
             );
             $game_transaction_id = GameTransactionMDB::createGametransaction($gameTransactionData, $client_details);
         }//end bet transaction swf_oncondition(transition)
-        if(isset($request['FREE_ROUND'])){
+        if(isset($request['bonusType']) && $request['bonusType'] == "FREE_ROUND"){
             $transaction_detail = "FREE_ROUND";
         }else{
             $transaction_detail = "SUCCESS";
@@ -314,7 +314,7 @@ class QTechController extends Controller
         $win_or_lost = $pay_amount > 0 ?  1 : 0;
         $entry_id = $pay_amount > 0 ?  2 : 1;
         $income = $bet_transaction->bet_amount - $pay_amount;
-        if(isset($request['FREE_ROUND'])){
+        if(isset($request['bonusType']) && $request['bonusType'] == "FREE_ROUND"){
             $transaction_detail = "FREE_ROUND";
         }else{
             $transaction_detail = "SUCCESS";
